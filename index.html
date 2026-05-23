@@ -254,6 +254,17 @@
       margin-top: 3px;
     }
 
+    /* ── Downloads source label ── */
+    .dl-source {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      color: var(--stale);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 1px;
+    }
+
     /* ── Category badge ── */
     .cat-badge {
       display: inline-block;
@@ -360,7 +371,7 @@
       <span class="logo">HV<span>Tracker</span></span>
       <span class="tagline">Health scores for open-source AI agents</span>
       <div class="meta">
-        65 agents &nbsp;·&nbsp; updated 2026-05-23 12:37 UTC<br>
+        65 agents &nbsp;·&nbsp; updated 2026-05-23 13:54 UTC<br>
         scores refresh weekly
       </div>
     </header>
@@ -410,6 +421,7 @@
             <th data-col="last_push">Last Push<span class="sort-arrow"></span></th>
             <th class="r" data-col="weekly_commits">4-wk commits<span class="sort-arrow"></span></th>
             <th class="r" data-col="forks">Forks<span class="sort-arrow"></span></th>
+            <th class="r" data-col="downloads">Downloads (7d)<span class="sort-arrow"></span></th>
             <th class="r sorted" data-col="score">Score<span class="sort-arrow">↓</span></th>
           </tr>
         </thead>
@@ -419,10 +431,11 @@
             data-rank="1"
             data-rank_delta="0"
             data-name="Dify"
-            data-stars="142331"
+            data-stars="142334"
             data-last_push="2026-05-23"
             data-weekly_commits="545"
-            data-forks="22390"
+            data-forks="22391"
+            data-downloads="0"
             data-score="100.0"
             data-category="Workflow Platforms"
             data-category_rank="1"
@@ -448,6 +461,11 @@
             <td class="r num">545</td>
             <td class="r num">22.4k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-high">100.0</span>
             </td>
           </tr>
@@ -456,10 +474,11 @@
             data-rank="2"
             data-rank_delta="0"
             data-name="LiteLLM"
-            data-stars="48005"
+            data-stars="48007"
             data-last_push="2026-05-23"
             data-weekly_commits="1692"
             data-forks="8282"
+            data-downloads="0"
             data-score="96.3"
             data-category="LLM Gateways &amp; Infra"
             data-category_rank="1"
@@ -485,6 +504,11 @@
             <td class="r num">1692</td>
             <td class="r num">8.3k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-high">96.3</span>
             </td>
           </tr>
@@ -493,10 +517,11 @@
             data-rank="3"
             data-rank_delta="0"
             data-name="Aider"
-            data-stars="45198"
+            data-stars="45200"
             data-last_push="2026-05-22"
             data-weekly_commits="5"
             data-forks="4463"
+            data-downloads="0"
             data-score="79.6"
             data-category="Coding Agents"
             data-category_rank="1"
@@ -522,6 +547,11 @@
             <td class="r num">5</td>
             <td class="r num">4.5k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-high">79.6</span>
             </td>
           </tr>
@@ -530,10 +560,11 @@
             data-rank="4"
             data-rank_delta="0"
             data-name="AutoGPT"
-            data-stars="184468"
+            data-stars="184472"
             data-last_push="2026-05-23"
             data-weekly_commits="0"
-            data-forks="46228"
+            data-forks="46229"
+            data-downloads="0"
             data-score="75.0"
             data-category="Agent Frameworks"
             data-category_rank="1"
@@ -559,6 +590,11 @@
             <td class="r num">0</td>
             <td class="r num">46.2k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-high">75.0</span>
             </td>
           </tr>
@@ -567,10 +603,11 @@
             data-rank="5"
             data-rank_delta="0"
             data-name="Browser Use"
-            data-stars="95192"
+            data-stars="95200"
             data-last_push="2026-05-23"
             data-weekly_commits="0"
             data-forks="10717"
+            data-downloads="6274507"
             data-score="73.6"
             data-category="Browser &amp; Computer Use"
             data-category_rank="1"
@@ -596,6 +633,12 @@
             <td class="r num">0</td>
             <td class="r num">10.7k</td>
             <td class="r">
+              
+              <span class="num">6,274,507</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-high">73.6</span>
             </td>
           </tr>
@@ -604,10 +647,11 @@
             data-rank="6"
             data-rank_delta="0"
             data-name="OpenHands"
-            data-stars="74599"
+            data-stars="74609"
             data-last_push="2026-05-23"
             data-weekly_commits="0"
-            data-forks="9450"
+            data-forks="9452"
+            data-downloads="333594"
             data-score="72.7"
             data-category="Coding Agents"
             data-category_rank="2"
@@ -631,7 +675,13 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">9.4k</td>
+            <td class="r num">9.5k</td>
+            <td class="r">
+              
+              <span class="num">333,594</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
             <td class="r">
               <span class="score-pill score-high">72.7</span>
             </td>
@@ -641,10 +691,11 @@
             data-rank="7"
             data-rank_delta="0"
             data-name="LLaMA-Factory"
-            data-stars="71526"
+            data-stars="71527"
             data-last_push="2026-05-21"
             data-weekly_commits="0"
             data-forks="8722"
+            data-downloads="0"
             data-score="72.2"
             data-category="Research &amp; Data"
             data-category_rank="1"
@@ -670,6 +721,11 @@
             <td class="r num">0</td>
             <td class="r num">8.7k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-high">72.2</span>
             </td>
           </tr>
@@ -678,10 +734,11 @@
             data-rank="8"
             data-rank_delta="0"
             data-name="Cline"
-            data-stars="62205"
+            data-stars="62208"
             data-last_push="2026-05-23"
             data-weekly_commits="0"
-            data-forks="6504"
+            data-forks="6505"
+            data-downloads="63144"
             data-score="71.5"
             data-category="Coding Agents"
             data-category_rank="3"
@@ -707,6 +764,12 @@
             <td class="r num">0</td>
             <td class="r num">6.5k</td>
             <td class="r">
+              
+              <span class="num">63,144</span>
+              <span class="dl-source">npm</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-high">71.5</span>
             </td>
           </tr>
@@ -715,10 +778,11 @@
             data-rank="9"
             data-rank_delta="0"
             data-name="AnythingLLM"
-            data-stars="60501"
+            data-stars="60504"
             data-last_push="2026-05-23"
             data-weekly_commits="0"
-            data-forks="6550"
+            data-forks="6551"
+            data-downloads="0"
             data-score="71.4"
             data-category="Memory &amp; Knowledge"
             data-category_rank="1"
@@ -742,7 +806,12 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">6.5k</td>
+            <td class="r num">6.6k</td>
+            <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
             <td class="r">
               <span class="score-pill score-high">71.4</span>
             </td>
@@ -752,10 +821,11 @@
             data-rank="10"
             data-rank_delta="0"
             data-name="CrewAI"
-            data-stars="52004"
+            data-stars="52007"
             data-last_push="2026-05-23"
             data-weekly_commits="0"
-            data-forks="7209"
+            data-forks="7208"
+            data-downloads="4211814"
             data-score="71.2"
             data-category="Agent Frameworks"
             data-category_rank="2"
@@ -781,6 +851,12 @@
             <td class="r num">0</td>
             <td class="r num">7.2k</td>
             <td class="r">
+              
+              <span class="num">4,211,814</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-high">71.2</span>
             </td>
           </tr>
@@ -789,10 +865,11 @@
             data-rank="11"
             data-rank_delta="0"
             data-name="Mem0"
-            data-stars="56486"
+            data-stars="56491"
             data-last_push="2026-05-23"
             data-weekly_commits="0"
             data-forks="6439"
+            data-downloads="0"
             data-score="71.2"
             data-category="Memory &amp; Knowledge"
             data-category_rank="2"
@@ -818,6 +895,11 @@
             <td class="r num">0</td>
             <td class="r num">6.4k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-high">71.2</span>
             </td>
           </tr>
@@ -830,6 +912,7 @@
             data-last_push="2026-05-17"
             data-weekly_commits="0"
             data-forks="5549"
+            data-downloads="48059"
             data-score="70.4"
             data-category="Coding Agents"
             data-category_rank="4"
@@ -855,6 +938,12 @@
             <td class="r num">0</td>
             <td class="r num">5.5k</td>
             <td class="r">
+              
+              <span class="num">48,059</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-high">70.4</span>
             </td>
           </tr>
@@ -863,10 +952,11 @@
             data-rank="13"
             data-rank_delta="0"
             data-name="Agno"
-            data-stars="40306"
+            data-stars="40307"
             data-last_push="2026-05-23"
             data-weekly_commits="0"
             data-forks="5413"
+            data-downloads="1112132"
             data-score="70.0"
             data-category="Agent Frameworks"
             data-category_rank="3"
@@ -892,6 +982,12 @@
             <td class="r num">0</td>
             <td class="r num">5.4k</td>
             <td class="r">
+              
+              <span class="num">1,112,132</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-high">70.0</span>
             </td>
           </tr>
@@ -900,10 +996,11 @@
             data-rank="14"
             data-rank_delta="0"
             data-name="LangGraph"
-            data-stars="32748"
+            data-stars="32754"
             data-last_push="2026-05-22"
             data-weekly_commits="0"
             data-forks="5539"
+            data-downloads="2449503"
             data-score="69.5"
             data-category="Agent Frameworks"
             data-category_rank="4"
@@ -919,7 +1016,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">32.7k</td>
+            <td class="r num">32.8k</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -929,6 +1026,12 @@
             <td class="r num">0</td>
             <td class="r num">5.5k</td>
             <td class="r">
+              
+              <span class="num">2,449,503</span>
+              <span class="dl-source">npm</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">69.5</span>
             </td>
           </tr>
@@ -937,10 +1040,11 @@
             data-rank="15"
             data-rank_delta="0"
             data-name="Continue"
-            data-stars="33334"
+            data-stars="33335"
             data-last_push="2026-05-22"
             data-weekly_commits="0"
             data-forks="4552"
+            data-downloads="88"
             data-score="69.1"
             data-category="Coding Agents"
             data-category_rank="5"
@@ -966,6 +1070,12 @@
             <td class="r num">0</td>
             <td class="r num">4.6k</td>
             <td class="r">
+              
+              <span class="num">88</span>
+              <span class="dl-source">npm</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">69.1</span>
             </td>
           </tr>
@@ -974,10 +1084,11 @@
             data-rank="16"
             data-rank_delta="0"
             data-name="CopilotKit"
-            data-stars="31690"
+            data-stars="31691"
             data-last_push="2026-05-23"
             data-weekly_commits="0"
-            data-forks="4090"
+            data-forks="4091"
+            data-downloads="262268"
             data-score="68.8"
             data-category="Agent Frameworks"
             data-category_rank="5"
@@ -1003,6 +1114,12 @@
             <td class="r num">0</td>
             <td class="r num">4.1k</td>
             <td class="r">
+              
+              <span class="num">262,268</span>
+              <span class="dl-source">npm</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">68.8</span>
             </td>
           </tr>
@@ -1015,6 +1132,7 @@
             data-last_push="2026-05-21"
             data-weekly_commits="0"
             data-forks="4583"
+            data-downloads="101053"
             data-score="68.5"
             data-category="Agent Frameworks"
             data-category_rank="6"
@@ -1040,6 +1158,12 @@
             <td class="r num">0</td>
             <td class="r num">4.6k</td>
             <td class="r">
+              
+              <span class="num">101,053</span>
+              <span class="dl-source">npm+pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">68.5</span>
             </td>
           </tr>
@@ -1048,10 +1172,11 @@
             data-rank="18"
             data-rank_delta="0"
             data-name="Semantic Kernel"
-            data-stars="27961"
+            data-stars="27962"
             data-last_push="2026-05-19"
             data-weekly_commits="0"
             data-forks="4605"
+            data-downloads="656343"
             data-score="68.3"
             data-category="Agent Frameworks"
             data-category_rank="7"
@@ -1077,6 +1202,12 @@
             <td class="r num">0</td>
             <td class="r num">4.6k</td>
             <td class="r">
+              
+              <span class="num">656,343</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">68.3</span>
             </td>
           </tr>
@@ -1085,10 +1216,11 @@
             data-rank="19"
             data-rank_delta="0"
             data-name="Vercel AI SDK"
-            data-stars="24416"
+            data-stars="24417"
             data-last_push="2026-05-22"
             data-weekly_commits="0"
             data-forks="4463"
+            data-downloads="13769108"
             data-score="68.3"
             data-category="Agent Frameworks"
             data-category_rank="8"
@@ -1114,6 +1246,12 @@
             <td class="r num">0</td>
             <td class="r num">4.5k</td>
             <td class="r">
+              
+              <span class="num">13,769,108</span>
+              <span class="dl-source">npm</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">68.3</span>
             </td>
           </tr>
@@ -1121,54 +1259,18 @@
           <tr
             data-rank="20"
             data-rank_delta="0"
-            data-name="ChatDev"
-            data-stars="33167"
-            data-last_push="2026-05-12"
-            data-weekly_commits="0"
-            data-forks="4111"
-            data-score="67.5"
-            data-category="Multi-Agent Systems"
-            data-category_rank="1"
-          >
-            <td class="rank r">
-              <span class="rank-num">20</span>
-            </td>
-            <td class="delta delta-same">—</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="https://github.com/OpenBMB/ChatDev" target="_blank" rel="noopener noreferrer">ChatDev</a>
-              <span class="agent-repo">OpenBMB/ChatDev</span>
-              <span class="agent-desc" title="ChatDev 2.0: Dev All through LLM-powered Multi-Agent Collaboration">ChatDev 2.0: Dev All through LLM-powered Multi-Agent Collaboration</span>
-              <span class="lang">Python</span>
-              <span class="cat-badge">Multi-Agent Systems</span>
-            </td>
-            <td class="r num">33.2k</td>
-            <td>
-              <div class="push-date recent">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-05-12</span>
-              </div>
-            </td>
-            <td class="r num">0</td>
-            <td class="r num">4.1k</td>
-            <td class="r">
-              <span class="score-pill score-mid">67.5</span>
-            </td>
-          </tr>
-          
-          <tr
-            data-rank="21"
-            data-rank_delta="0"
             data-name="Haystack"
-            data-stars="25350"
+            data-stars="25351"
             data-last_push="2026-05-22"
             data-weekly_commits="0"
             data-forks="2804"
+            data-downloads="229199"
             data-score="67.5"
             data-category="Workflow Platforms"
             data-category_rank="2"
           >
             <td class="rank r">
-              <span class="rank-num">21</span>
+              <span class="rank-num">20</span>
             </td>
             <td class="delta delta-same">—</td>
             <td class="agent-cell">
@@ -1188,7 +1290,57 @@
             <td class="r num">0</td>
             <td class="r num">2.8k</td>
             <td class="r">
+              
+              <span class="num">229,199</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">67.5</span>
+            </td>
+          </tr>
+          
+          <tr
+            data-rank="21"
+            data-rank_delta="0"
+            data-name="ChatDev"
+            data-stars="33167"
+            data-last_push="2026-05-12"
+            data-weekly_commits="0"
+            data-forks="4111"
+            data-downloads="40"
+            data-score="67.4"
+            data-category="Multi-Agent Systems"
+            data-category_rank="1"
+          >
+            <td class="rank r">
+              <span class="rank-num">21</span>
+            </td>
+            <td class="delta delta-same">—</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="https://github.com/OpenBMB/ChatDev" target="_blank" rel="noopener noreferrer">ChatDev</a>
+              <span class="agent-repo">OpenBMB/ChatDev</span>
+              <span class="agent-desc" title="ChatDev 2.0: Dev All through LLM-powered Multi-Agent Collaboration">ChatDev 2.0: Dev All through LLM-powered Multi-Agent Collaboration</span>
+              <span class="lang">Python</span>
+              <span class="cat-badge">Multi-Agent Systems</span>
+            </td>
+            <td class="r num">33.2k</td>
+            <td>
+              <div class="push-date recent">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-05-12</span>
+              </div>
+            </td>
+            <td class="r num">0</td>
+            <td class="r num">4.1k</td>
+            <td class="r">
+              
+              <span class="num">40</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
+              <span class="score-pill score-mid">67.4</span>
             </td>
           </tr>
           
@@ -1200,6 +1352,7 @@
             data-last_push="2026-05-12"
             data-weekly_commits="0"
             data-forks="4839"
+            data-downloads="0"
             data-score="67.2"
             data-category="Research &amp; Data"
             data-category_rank="2"
@@ -1225,6 +1378,11 @@
             <td class="r num">0</td>
             <td class="r num">4.8k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">67.2</span>
             </td>
           </tr>
@@ -1232,54 +1390,18 @@
           <tr
             data-rank="23"
             data-rank_delta="0"
-            data-name="AutoGen"
-            data-stars="58311"
-            data-last_push="2026-04-15"
-            data-weekly_commits="0"
-            data-forks="8806"
-            data-score="66.7"
-            data-category="Agent Frameworks"
-            data-category_rank="9"
-          >
-            <td class="rank r">
-              <span class="rank-num">23</span>
-            </td>
-            <td class="delta delta-same">—</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="https://github.com/microsoft/autogen" target="_blank" rel="noopener noreferrer">AutoGen</a>
-              <span class="agent-repo">microsoft/autogen</span>
-              <span class="agent-desc" title="A programming framework for agentic AI">A programming framework for agentic AI</span>
-              <span class="lang">Python</span>
-              <span class="cat-badge">Agent Frameworks</span>
-            </td>
-            <td class="r num">58.3k</td>
-            <td>
-              <div class="push-date aging">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-04-15</span>
-              </div>
-            </td>
-            <td class="r num">0</td>
-            <td class="r num">8.8k</td>
-            <td class="r">
-              <span class="score-pill score-mid">66.7</span>
-            </td>
-          </tr>
-          
-          <tr
-            data-rank="24"
-            data-rank_delta="0"
             data-name="Roo Code"
-            data-stars="24138"
+            data-stars="24137"
             data-last_push="2026-05-15"
             data-weekly_commits="0"
             data-forks="3265"
+            data-downloads="0"
             data-score="66.7"
             data-category="Coding Agents"
             data-category_rank="6"
           >
             <td class="rank r">
-              <span class="rank-num">24</span>
+              <span class="rank-num">23</span>
             </td>
             <td class="delta delta-same">—</td>
             <td class="agent-cell">
@@ -1299,6 +1421,55 @@
             <td class="r num">0</td>
             <td class="r num">3.3k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
+              <span class="score-pill score-mid">66.7</span>
+            </td>
+          </tr>
+          
+          <tr
+            data-rank="24"
+            data-rank_delta="0"
+            data-name="AutoGen"
+            data-stars="58312"
+            data-last_push="2026-04-15"
+            data-weekly_commits="0"
+            data-forks="8807"
+            data-downloads="344466"
+            data-score="66.7"
+            data-category="Agent Frameworks"
+            data-category_rank="9"
+          >
+            <td class="rank r">
+              <span class="rank-num">24</span>
+            </td>
+            <td class="delta delta-same">—</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="https://github.com/microsoft/autogen" target="_blank" rel="noopener noreferrer">AutoGen</a>
+              <span class="agent-repo">microsoft/autogen</span>
+              <span class="agent-desc" title="A programming framework for agentic AI">A programming framework for agentic AI</span>
+              <span class="lang">Python</span>
+              <span class="cat-badge">Agent Frameworks</span>
+            </td>
+            <td class="r num">58.3k</td>
+            <td>
+              <div class="push-date aging">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-04-15</span>
+              </div>
+            </td>
+            <td class="r num">0</td>
+            <td class="r num">8.8k</td>
+            <td class="r">
+              
+              <span class="num">344,466</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">66.7</span>
             </td>
           </tr>
@@ -1310,7 +1481,8 @@
             data-stars="17228"
             data-last_push="2026-05-23"
             data-weekly_commits="0"
-            data-forks="2120"
+            data-forks="2121"
+            data-downloads="8665106"
             data-score="65.9"
             data-category="Agent Frameworks"
             data-category_rank="10"
@@ -1336,6 +1508,12 @@
             <td class="r num">0</td>
             <td class="r num">2.1k</td>
             <td class="r">
+              
+              <span class="num">8,665,106</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">65.9</span>
             </td>
           </tr>
@@ -1344,10 +1522,11 @@
             data-rank="26"
             data-rank_delta="0"
             data-name="Letta"
-            data-stars="22909"
+            data-stars="22911"
             data-last_push="2026-05-14"
             data-weekly_commits="0"
-            data-forks="2438"
+            data-forks="2437"
+            data-downloads="0"
             data-score="65.8"
             data-category="Memory &amp; Knowledge"
             data-category_rank="3"
@@ -1373,6 +1552,11 @@
             <td class="r num">0</td>
             <td class="r num">2.4k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">65.8</span>
             </td>
           </tr>
@@ -1381,10 +1565,11 @@
             data-rank="27"
             data-rank_delta="0"
             data-name="SWE-agent"
-            data-stars="19278"
+            data-stars="19279"
             data-last_push="2026-05-18"
             data-weekly_commits="0"
             data-forks="2092"
+            data-downloads="0"
             data-score="65.6"
             data-category="Coding Agents"
             data-category_rank="7"
@@ -1410,6 +1595,11 @@
             <td class="r num">0</td>
             <td class="r num">2.1k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">65.6</span>
             </td>
           </tr>
@@ -1418,10 +1608,11 @@
             data-rank="28"
             data-rank_delta="0"
             data-name="CAMEL"
-            data-stars="17024"
+            data-stars="17025"
             data-last_push="2026-05-19"
             data-weekly_commits="0"
             data-forks="1911"
+            data-downloads="0"
             data-score="65.1"
             data-category="Multi-Agent Systems"
             data-category_rank="2"
@@ -1447,6 +1638,11 @@
             <td class="r num">0</td>
             <td class="r num">1.9k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">65.1</span>
             </td>
           </tr>
@@ -1455,10 +1651,11 @@
             data-rank="29"
             data-rank_delta="0"
             data-name="Guidance"
-            data-stars="21472"
+            data-stars="21473"
             data-last_push="2026-05-21"
             data-weekly_commits="0"
-            data-forks="1163"
+            data-forks="1164"
+            data-downloads="0"
             data-score="65.1"
             data-category="Agent Frameworks"
             data-category_rank="11"
@@ -1484,6 +1681,11 @@
             <td class="r num">0</td>
             <td class="r num">1.2k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">65.1</span>
             </td>
           </tr>
@@ -1492,10 +1694,11 @@
             data-rank="30"
             data-rank_delta="0"
             data-name="Maxun"
-            data-stars="15605"
+            data-stars="15607"
             data-last_push="2026-05-21"
             data-weekly_commits="0"
             data-forks="1283"
+            data-downloads="0"
             data-score="64.5"
             data-category="Research &amp; Data"
             data-category_rank="3"
@@ -1521,6 +1724,11 @@
             <td class="r num">0</td>
             <td class="r num">1.3k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">64.5</span>
             </td>
           </tr>
@@ -1533,6 +1741,7 @@
             data-last_push="2026-04-17"
             data-weekly_commits="0"
             data-forks="3494"
+            data-downloads="52"
             data-score="63.6"
             data-category="Coding Agents"
             data-category_rank="8"
@@ -1558,6 +1767,12 @@
             <td class="r num">0</td>
             <td class="r num">3.5k</td>
             <td class="r">
+              
+              <span class="num">52</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">63.6</span>
             </td>
           </tr>
@@ -1566,10 +1781,11 @@
             data-rank="32"
             data-rank_delta="0"
             data-name="E2B"
-            data-stars="12333"
+            data-stars="12334"
             data-last_push="2026-05-23"
             data-weekly_commits="0"
             data-forks="911"
+            data-downloads="1044470"
             data-score="63.3"
             data-category="LLM Gateways &amp; Infra"
             data-category_rank="2"
@@ -1595,6 +1811,12 @@
             <td class="r num">0</td>
             <td class="r num">911</td>
             <td class="r">
+              
+              <span class="num">1,044,470</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">63.3</span>
             </td>
           </tr>
@@ -1603,10 +1825,11 @@
             data-rank="33"
             data-rank_delta="0"
             data-name="GPT Researcher"
-            data-stars="27243"
+            data-stars="27244"
             data-last_push="2026-04-16"
             data-weekly_commits="0"
             data-forks="3662"
+            data-downloads="28595"
             data-score="63.2"
             data-category="Research &amp; Data"
             data-category_rank="4"
@@ -1632,6 +1855,12 @@
             <td class="r num">0</td>
             <td class="r num">3.7k</td>
             <td class="r">
+              
+              <span class="num">28,595</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">63.2</span>
             </td>
           </tr>
@@ -1643,7 +1872,8 @@
             data-stars="11915"
             data-last_push="2026-05-17"
             data-weekly_commits="0"
-            data-forks="855"
+            data-forks="856"
+            data-downloads="65213"
             data-score="62.3"
             data-category="LLM Gateways &amp; Infra"
             data-category_rank="3"
@@ -1667,7 +1897,13 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">855</td>
+            <td class="r num">856</td>
+            <td class="r">
+              
+              <span class="num">65,213</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
             <td class="r">
               <span class="score-pill score-mid">62.3</span>
             </td>
@@ -1681,6 +1917,7 @@
             data-last_push="2026-05-14"
             data-weekly_commits="0"
             data-forks="1105"
+            data-downloads="0"
             data-score="62.2"
             data-category="Workflow Platforms"
             data-category_rank="3"
@@ -1706,6 +1943,11 @@
             <td class="r num">0</td>
             <td class="r num">1.1k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">62.2</span>
             </td>
           </tr>
@@ -1714,10 +1956,11 @@
             data-rank="36"
             data-rank_delta="0"
             data-name="UFO"
-            data-stars="8731"
+            data-stars="8732"
             data-last_push="2026-05-15"
             data-weekly_commits="0"
             data-forks="1022"
+            data-downloads="0"
             data-score="61.5"
             data-category="Browser &amp; Computer Use"
             data-category_rank="2"
@@ -1743,6 +1986,11 @@
             <td class="r num">0</td>
             <td class="r num">1.0k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">61.5</span>
             </td>
           </tr>
@@ -1755,6 +2003,7 @@
             data-last_push="2026-04-13"
             data-weekly_commits="0"
             data-forks="2173"
+            data-downloads="0"
             data-score="61.5"
             data-category="Browser &amp; Computer Use"
             data-category_rank="3"
@@ -1780,6 +2029,11 @@
             <td class="r num">0</td>
             <td class="r num">2.2k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">61.5</span>
             </td>
           </tr>
@@ -1792,7 +2046,8 @@
             data-last_push="2026-05-08"
             data-weekly_commits="0"
             data-forks="1644"
-            data-score="61.1"
+            data-downloads="0"
+            data-score="60.9"
             data-category="Coding Agents"
             data-category_rank="9"
           >
@@ -1817,7 +2072,12 @@
             <td class="r num">0</td>
             <td class="r num">1.6k</td>
             <td class="r">
-              <span class="score-pill score-mid">61.1</span>
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
+              <span class="score-pill score-mid">60.9</span>
             </td>
           </tr>
           
@@ -1828,7 +2088,8 @@
             data-stars="34669"
             data-last_push="2026-03-26"
             data-weekly_commits="0"
-            data-forks="2204"
+            data-forks="2202"
+            data-downloads="0"
             data-score="59.7"
             data-category="Memory &amp; Knowledge"
             data-category_rank="4"
@@ -1854,6 +2115,11 @@
             <td class="r num">0</td>
             <td class="r num">2.2k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">59.7</span>
             </td>
           </tr>
@@ -1866,6 +2132,7 @@
             data-last_push="2026-05-23"
             data-weekly_commits="0"
             data-forks="389"
+            data-downloads="7012"
             data-score="58.9"
             data-category="Coding Agents"
             data-category_rank="10"
@@ -1891,6 +2158,12 @@
             <td class="r num">0</td>
             <td class="r num">389</td>
             <td class="r">
+              
+              <span class="num">7,012</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">58.9</span>
             </td>
           </tr>
@@ -1903,6 +2176,7 @@
             data-last_push="2026-03-02"
             data-weekly_commits="0"
             data-forks="1747"
+            data-downloads="0"
             data-score="56.0"
             data-category="Coding Agents"
             data-category_rank="11"
@@ -1928,6 +2202,11 @@
             <td class="r num">0</td>
             <td class="r num">1.7k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">56.0</span>
             </td>
           </tr>
@@ -1936,10 +2215,11 @@
             data-rank="42"
             data-rank_delta="0"
             data-name="MetaGPT"
-            data-stars="68230"
+            data-stars="68231"
             data-last_push="2026-01-21"
             data-weekly_commits="0"
-            data-forks="8693"
+            data-forks="8694"
+            data-downloads="7820"
             data-score="55.4"
             data-category="Multi-Agent Systems"
             data-category_rank="3"
@@ -1965,6 +2245,12 @@
             <td class="r num">0</td>
             <td class="r num">8.7k</td>
             <td class="r">
+              
+              <span class="num">7,820</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">55.4</span>
             </td>
           </tr>
@@ -1977,6 +2263,7 @@
             data-last_push="2026-04-28"
             data-weekly_commits="0"
             data-forks="373"
+            data-downloads="0"
             data-score="55.2"
             data-category="Agent Frameworks"
             data-category_rank="12"
@@ -2002,6 +2289,11 @@
             <td class="r num">0</td>
             <td class="r num">373</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">55.2</span>
             </td>
           </tr>
@@ -2010,10 +2302,11 @@
             data-rank="44"
             data-rank_delta="0"
             data-name="Qwen Agent"
-            data-stars="16382"
+            data-stars="16384"
             data-last_push="2026-03-04"
             data-weekly_commits="0"
-            data-forks="1611"
+            data-forks="1610"
+            data-downloads="96785"
             data-score="54.1"
             data-category="Agent Frameworks"
             data-category_rank="13"
@@ -2039,6 +2332,12 @@
             <td class="r num">0</td>
             <td class="r num">1.6k</td>
             <td class="r">
+              
+              <span class="num">96,785</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">54.1</span>
             </td>
           </tr>
@@ -2051,6 +2350,7 @@
             data-last_push="2026-03-23"
             data-weekly_commits="0"
             data-forks="776"
+            data-downloads="0"
             data-score="52.7"
             data-category="Agent Frameworks"
             data-category_rank="14"
@@ -2076,6 +2376,11 @@
             <td class="r num">0</td>
             <td class="r num">776</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">52.7</span>
             </td>
           </tr>
@@ -2088,6 +2393,7 @@
             data-last_push="2026-01-31"
             data-weekly_commits="0"
             data-forks="2854"
+            data-downloads="0"
             data-score="51.6"
             data-category="Agent Frameworks"
             data-category_rank="15"
@@ -2113,6 +2419,11 @@
             <td class="r num">0</td>
             <td class="r num">2.9k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">51.6</span>
             </td>
           </tr>
@@ -2125,6 +2436,7 @@
             data-last_push="2026-03-19"
             data-weekly_commits="0"
             data-forks="585"
+            data-downloads="0"
             data-score="51.5"
             data-category="LLM Gateways &amp; Infra"
             data-category_rank="4"
@@ -2150,6 +2462,11 @@
             <td class="r num">0</td>
             <td class="r num">585</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">51.5</span>
             </td>
           </tr>
@@ -2158,10 +2475,11 @@
             data-rank="48"
             data-rank_delta="0"
             data-name="UI-TARS"
-            data-stars="10700"
+            data-stars="10701"
             data-last_push="2026-01-27"
             data-weekly_commits="0"
             data-forks="801"
+            data-downloads="0"
             data-score="46.6"
             data-category="Browser &amp; Computer Use"
             data-category_rank="4"
@@ -2187,6 +2505,11 @@
             <td class="r num">0</td>
             <td class="r num">801</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">46.6</span>
             </td>
           </tr>
@@ -2199,6 +2522,7 @@
             data-last_push="2025-05-14"
             data-weekly_commits="0"
             data-forks="7345"
+            data-downloads="0"
             data-score="46.4"
             data-category="Coding Agents"
             data-category_rank="12"
@@ -2224,6 +2548,11 @@
             <td class="r num">0</td>
             <td class="r num">7.3k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-mid">46.4</span>
             </td>
           </tr>
@@ -2232,10 +2561,11 @@
             data-rank="50"
             data-rank_delta="0"
             data-name="Vision Agent"
-            data-stars="5283"
+            data-stars="5284"
             data-last_push="2026-01-29"
             data-weekly_commits="0"
             data-forks="598"
+            data-downloads="1398"
             data-score="44.4"
             data-category="Browser &amp; Computer Use"
             data-category_rank="5"
@@ -2261,6 +2591,12 @@
             <td class="r num">0</td>
             <td class="r num">598</td>
             <td class="r">
+              
+              <span class="num">1,398</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">44.4</span>
             </td>
           </tr>
@@ -2269,10 +2605,11 @@
             data-rank="51"
             data-rank_delta="0"
             data-name="AgentBench"
-            data-stars="3445"
+            data-stars="3446"
             data-last_push="2026-02-08"
             data-weekly_commits="0"
             data-forks="255"
+            data-downloads="0"
             data-score="43.1"
             data-category="Agent Frameworks"
             data-category_rank="16"
@@ -2298,6 +2635,11 @@
             <td class="r num">0</td>
             <td class="r num">255</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">43.1</span>
             </td>
           </tr>
@@ -2310,6 +2652,7 @@
             data-last_push="2025-07-07"
             data-weekly_commits="0"
             data-forks="2376"
+            data-downloads="0"
             data-score="41.8"
             data-category="Research &amp; Data"
             data-category_rank="5"
@@ -2335,6 +2678,11 @@
             <td class="r num">0</td>
             <td class="r num">2.4k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">41.8</span>
             </td>
           </tr>
@@ -2347,6 +2695,7 @@
             data-last_push="2025-09-25"
             data-weekly_commits="0"
             data-forks="2590"
+            data-downloads="0"
             data-score="41.6"
             data-category="Coding Agents"
             data-category_rank="13"
@@ -2372,6 +2721,11 @@
             <td class="r num">0</td>
             <td class="r num">2.6k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">41.6</span>
             </td>
           </tr>
@@ -2384,6 +2738,7 @@
             data-last_push="2025-01-22"
             data-weekly_commits="0"
             data-forks="2215"
+            data-downloads="0"
             data-score="41.0"
             data-category="Agent Frameworks"
             data-category_rank="17"
@@ -2409,6 +2764,11 @@
             <td class="r num">0</td>
             <td class="r num">2.2k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">41.0</span>
             </td>
           </tr>
@@ -2421,6 +2781,7 @@
             data-last_push="2026-01-30"
             data-weekly_commits="0"
             data-forks="210"
+            data-downloads="277"
             data-score="40.3"
             data-category="Coding Agents"
             data-category_rank="14"
@@ -2446,6 +2807,12 @@
             <td class="r num">0</td>
             <td class="r num">210</td>
             <td class="r">
+              
+              <span class="num">277</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">40.3</span>
             </td>
           </tr>
@@ -2458,6 +2825,7 @@
             data-last_push="2024-04-07"
             data-weekly_commits="0"
             data-forks="1080"
+            data-downloads="0"
             data-score="38.6"
             data-category="Coding Agents"
             data-category_rank="15"
@@ -2483,6 +2851,11 @@
             <td class="r num">0</td>
             <td class="r num">1.1k</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">38.6</span>
             </td>
           </tr>
@@ -2495,6 +2868,7 @@
             data-last_push="2025-06-26"
             data-weekly_commits="0"
             data-forks="913"
+            data-downloads="0"
             data-score="36.7"
             data-category="Memory &amp; Knowledge"
             data-category_rank="5"
@@ -2520,6 +2894,11 @@
             <td class="r num">0</td>
             <td class="r num">913</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">36.7</span>
             </td>
           </tr>
@@ -2532,6 +2911,7 @@
             data-last_push="2024-08-14"
             data-weekly_commits="0"
             data-forks="725"
+            data-downloads="0"
             data-score="36.0"
             data-category="Workflow Platforms"
             data-category_rank="4"
@@ -2557,6 +2937,11 @@
             <td class="r num">0</td>
             <td class="r num">725</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">36.0</span>
             </td>
           </tr>
@@ -2565,10 +2950,11 @@
             data-rank="59"
             data-rank_delta="0"
             data-name="LaVague"
-            data-stars="6353"
+            data-stars="6354"
             data-last_push="2025-01-21"
             data-weekly_commits="0"
             data-forks="574"
+            data-downloads="207"
             data-score="35.7"
             data-category="Browser &amp; Computer Use"
             data-category_rank="6"
@@ -2594,6 +2980,12 @@
             <td class="r num">0</td>
             <td class="r num">574</td>
             <td class="r">
+              
+              <span class="num">207</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">35.7</span>
             </td>
           </tr>
@@ -2606,6 +2998,7 @@
             data-last_push="2025-09-18"
             data-weekly_commits="0"
             data-forks="461"
+            data-downloads="0"
             data-score="35.7"
             data-category="Coding Agents"
             data-category_rank="16"
@@ -2631,6 +3024,11 @@
             <td class="r num">0</td>
             <td class="r num">461</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">35.7</span>
             </td>
           </tr>
@@ -2643,6 +3041,7 @@
             data-last_push="2024-03-08"
             data-weekly_commits="0"
             data-forks="621"
+            data-downloads="0"
             data-score="35.2"
             data-category="Coding Agents"
             data-category_rank="17"
@@ -2668,6 +3067,11 @@
             <td class="r num">0</td>
             <td class="r num">621</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">35.2</span>
             </td>
           </tr>
@@ -2680,6 +3084,7 @@
             data-last_push="2024-09-09"
             data-weekly_commits="0"
             data-forks="512"
+            data-downloads="0"
             data-score="34.8"
             data-category="Multi-Agent Systems"
             data-category_rank="4"
@@ -2705,6 +3110,11 @@
             <td class="r num">0</td>
             <td class="r num">512</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">34.8</span>
             </td>
           </tr>
@@ -2717,6 +3127,7 @@
             data-last_push="2025-05-26"
             data-weekly_commits="0"
             data-forks="283"
+            data-downloads="0"
             data-score="32.6"
             data-category="Coding Agents"
             data-category_rank="18"
@@ -2742,6 +3153,11 @@
             <td class="r num">0</td>
             <td class="r num">283</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">32.6</span>
             </td>
           </tr>
@@ -2754,6 +3170,7 @@
             data-last_push="2023-09-05"
             data-weekly_commits="0"
             data-forks="111"
+            data-downloads="0"
             data-score="26.5"
             data-category="Coding Agents"
             data-category_rank="19"
@@ -2779,6 +3196,11 @@
             <td class="r num">0</td>
             <td class="r num">111</td>
             <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
+            <td class="r">
               <span class="score-pill score-low">26.5</span>
             </td>
           </tr>
@@ -2791,6 +3213,7 @@
             data-last_push="2024-03-15"
             data-weekly_commits="0"
             data-forks="33"
+            data-downloads="0"
             data-score="24.6"
             data-category="Coding Agents"
             data-category_rank="20"
@@ -2815,6 +3238,11 @@
             </td>
             <td class="r num">0</td>
             <td class="r num">33</td>
+            <td class="r">
+              
+              <span class="num" style="color: var(--stale);">—</span>
+              
+            </td>
             <td class="r">
               <span class="score-pill score-low">24.6</span>
             </td>

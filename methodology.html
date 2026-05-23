@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="How HVTracker measures open-source AI agent health — data sources, scoring formula, and versioning.">
+  <title>Methodology — HVTracker</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f6f6f1;
+      --surface:   #ffffff;
+      --border:    #ddddd6;
+      --text:      #1a1a1a;
+      --muted:     #6b7280;
+      --accent:    #2d7a3e;
+      --accent-lt: #e8f5ec;
+      --font-mono: "JetBrains Mono", "Fira Mono", "Cascadia Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
+      --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .page { max-width: 1100px; margin: 0 auto; padding: 0 20px 48px; }
+
+    header {
+      padding: 36px 0 24px;
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+    .logo span { color: var(--accent); }
+
+    .tagline { font-size: 13px; color: var(--muted); }
+
+    .site-nav {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      display: flex;
+      gap: 16px;
+      align-items: baseline;
+    }
+    .site-nav a { color: var(--muted); }
+    .site-nav a:hover { color: var(--accent); }
+    .site-nav .active { color: var(--accent); font-weight: 600; }
+
+    .content {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 40px 0 0;
+    }
+
+    .doc-title {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .doc-meta {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    section { margin-bottom: 40px; }
+
+    h2 {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    p { margin-bottom: 14px; }
+    p:last-child { margin-bottom: 0; }
+
+    .sources { list-style: none; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); }
+    .sources li {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sources li:last-child { border-bottom: none; }
+    .sources dt {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .sources dd { margin: 0; color: var(--text); font-size: 14px; }
+    .sources .limitation {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .formula-block {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 18px 20px;
+      margin: 16px 0;
+      line-height: 1.7;
+    }
+
+    .weights { list-style: none; margin: 16px 0; }
+    .weights li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .weights li:last-child { border-bottom: none; }
+    .weights strong {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--accent);
+      display: inline-block;
+      min-width: 88px;
+    }
+
+    ul.bullets {
+      padding-left: 1.25em;
+      margin: 0;
+    }
+    ul.bullets li { margin-bottom: 10px; }
+    ul.bullets li:last-child { margin-bottom: 0; }
+
+    .changelog { list-style: none; }
+    .changelog li {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .changelog li:last-child { border-bottom: none; }
+    .changelog .ver {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .note {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 16px;
+      padding: 12px 14px;
+      background: var(--accent-lt);
+      border-radius: 4px;
+      border-left: 3px solid var(--accent);
+    }
+
+    footer {
+      max-width: 700px;
+      margin: 48px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    footer p { margin-bottom: 12px; }
+    footer .footer-links {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      margin-bottom: 20px;
+    }
+    footer .disclaimer {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 640px) {
+      header { flex-direction: column; gap: 8px; }
+      .site-nav { margin-left: 0; }
+      .doc-title { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <header>
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <span class="tagline">Health scores for open-source AI agents</span>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <span class="active">Methodology</span>
+      </nav>
+    </header>
+
+    <article class="content">
+      <h1 class="doc-title">Methodology</h1>
+      <p class="doc-meta">v1.1 · Last updated 2026-05-23</p>
+
+      <section id="philosophy">
+        <h2>Philosophy</h2>
+        <p>HVTracker measures what is independently observable. We do not accept submissions, self-reported claims, or maintainer surveys. Every signal comes from public APIs that anyone can query and verify.</p>
+        <p>The composite health score rewards sustained activity and real-world adoption over vanity metrics. Stars alone are easy to acquire; the combination of stars, active development, package downloads, and community discussion is much harder to fake. The methodology will evolve as new measurable signals become available; each major change increments the version number and is logged in the changelog at the bottom of this page.</p>
+      </section>
+
+      <section id="data-sources">
+        <h2>Data Sources</h2>
+        <dl class="sources">
+          <div>
+            <dt>GitHub REST API</dt>
+            <dd>Stars, forks, commit count over the last four weeks, days since last push, repository description, primary language, and open issue count. Refreshed weekly.</dd>
+            <dd class="limitation">Star counts can be inflated by short-term campaigns. We mitigate by log-scaling and weighting against freshness, activity, and forks.</dd>
+          </div>
+          <div>
+            <dt>npm Registry</dt>
+            <dd>Weekly download counts for JavaScript/TypeScript agents that publish packages listed in <code>agents.json</code>. Refreshed weekly.</dd>
+            <dd class="limitation">Download figures reflect package installs, not distinct users, and may include CI mirrors.</dd>
+          </div>
+          <div>
+            <dt>PyPI (via pypistats)</dt>
+            <dd>Weekly download counts for Python agents that publish packages. Refreshed weekly.</dd>
+            <dd class="limitation">PyPI statistics aggregate all install types; they overstate interactive use relative to automated pulls.</dd>
+          </div>
+          <div>
+            <dt>Docker Hub</dt>
+            <dd>Total image pull counts for agents distributed as containers (where a <code>docker_image</code> is configured). Refreshed weekly.</dd>
+            <dd class="limitation">Docker pull counts are cumulative and never decrease — they favor older images.</dd>
+          </div>
+          <div>
+            <dt>Hacker News (Algolia API)</dt>
+            <dd>Count of story mentions matching a curated search term over the last 30 days. Refreshed weekly.</dd>
+            <dd class="limitation">Search terms are hand-tuned to reduce false positives; agents with generic names may be omitted.</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section id="scoring">
+        <h2>Scoring Formula</h2>
+        <p>The health score is a composite from 0 to 100, summed from four components with fixed maximums:</p>
+        <div class="formula-block">
+          Score = stars(30) + freshness(25) + activity(25) + community(20)
+        </div>
+        <ul class="weights">
+          <li><strong>Stars · 30%</strong> — <code>min(30, ln(1 + stars) / ln(1 + 100,000) × 30)</code>. Log-scaled against a fixed anchor of 100,000 stars. Rewards adoption without letting megarepos dominate linearly.</li>
+          <li><strong>Freshness · 25%</strong> — <code>max(0, 25 × (1 − days_since_last_push / 180))</code>. Linear decay to zero over six months of inactivity. A recent push is a necessary signal of maintenance.</li>
+          <li><strong>Activity · 25%</strong> — <code>min(25, ln(1 + commits₄wk) / ln(1 + 100) × 25)</code>. Commits summed over the last four weeks (GitHub commit-activity API). Log-scaled; 100 commits in that window earns the full 25 points.</li>
+          <li><strong>Community · 20%</strong> — <code>min(20, ln(1 + forks) / ln(1 + 20,000) × 20)</code>. Fork count as a proxy for downstream reuse; log-scaled against 20,000 forks.</li>
+        </ul>
+        <p class="note">Package download counts (npm/PyPI), Docker pull totals, and Hacker News mentions are collected and shown on the leaderboard but are <strong>not</strong> yet incorporated into the score. They will be folded into v1.2 once enough historical data accumulates to set sensible weights.</p>
+      </section>
+
+      <section id="not-measured">
+        <h2>What We Don't Measure (Yet)</h2>
+        <ul class="bullets">
+          <li><strong>Runtime correctness on real coding tasks</strong> — planned for v2.0 via independent benchmarking.</li>
+          <li><strong>Real-world usage outcomes</strong> — planned for v3.0 via opt-in signed telemetry.</li>
+          <li><strong>Security posture</strong> — CVE counts and security advisory tracking under consideration for v1.3.</li>
+          <li><strong>Documentation quality</strong> — no automated rubric yet.</li>
+          <li><strong>API stability and breaking-change frequency</strong> — not tracked.</li>
+          <li><strong>LLM provider compatibility</strong> — not tracked.</li>
+        </ul>
+      </section>
+
+      <section id="versioning">
+        <h2>Versioning</h2>
+        <p>Methodology changes are versioned explicitly. Every revision is recorded in the changelog below. Raw data snapshots are preserved on each build so past leaderboard states remain auditable — see the <a href="https://github.com/YugantM/hvtracker/tree/main/output/history">historical snapshots</a> in the repository.</p>
+      </section>
+
+      <section id="changelog">
+        <h2>Changelog</h2>
+        <ul class="changelog">
+          <li><span class="ver">v1.1</span> (current) — Added npm, PyPI, Docker Hub, and Hacker News data sources. Daily historical snapshots now archived.</li>
+          <li><span class="ver">v1.0</span> (May 2026) — Initial methodology. GitHub-only signals: stars, freshness, activity, community (forks).</li>
+        </ul>
+      </section>
+    </article>
+
+    <footer>
+      <div class="footer-links">
+        <a href="/">← Leaderboard</a>
+        <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">Source code</a>
+        <a href="https://github.com/YugantM/hvtracker/issues" target="_blank" rel="noopener">Open an issue</a>
+      </div>
+      <p>Questions or critiques? <a href="https://github.com/YugantM/hvtracker/issues" target="_blank" rel="noopener">Open an issue</a> on GitHub.</p>
+      <p class="disclaimer">HVTracker is not affiliated with any of the projects listed. Data is collected from public APIs.</p>
+    </footer>
+
+  </div>
+</body>
+</html>
