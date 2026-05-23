@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Open-source AI coding agent health scores, ranked by activity and community momentum.">
-  <title>HVTracker — AI Coding Agent Leaderboard</title>
+  <meta name="description" content="Health scores for open-source AI agents, ranked by activity and community momentum.">
+  <title>HVTracker — AI Agent Leaderboard</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -76,6 +76,40 @@
       white-space: nowrap;
     }
 
+    /* ── Category filter bar ── */
+    .cat-bar {
+      display: flex;
+      gap: 8px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .cat-pill {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 5px 12px;
+      border-radius: 16px;
+      cursor: pointer;
+      user-select: none;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .cat-pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .cat-pill.active {
+      background: var(--accent-lt);
+      color: var(--accent);
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
     /* ── Score legend ── */
     .legend {
       display: flex;
@@ -138,6 +172,7 @@
     }
     tbody tr:nth-child(even) { background: var(--row-alt); }
     tbody tr:hover { background: var(--accent-lt); }
+    tbody tr.hidden { display: none; }
 
     td { padding: 10px 12px; vertical-align: middle; }
 
@@ -148,6 +183,12 @@
       color: var(--muted);
       width: 36px;
       text-align: right;
+    }
+    .rank-global-muted {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--stale);
+      font-weight: 400;
     }
 
     /* ── Rank delta ── */
@@ -211,6 +252,19 @@
       background: var(--border);
       color: var(--muted);
       margin-top: 3px;
+    }
+
+    /* ── Category badge ── */
+    .cat-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: #f3f4f6;
+      color: var(--muted);
+      margin-top: 3px;
+      margin-left: 4px;
     }
 
     /* ── Numbers ── */
@@ -294,6 +348,8 @@
       header { flex-direction: column; gap: 6px; }
       .meta { margin-left: 0; text-align: left; }
       .agent-desc { display: none; }
+      .cat-bar { gap: 5px; }
+      .cat-pill { font-size: 10px; padding: 4px 10px; }
     }
   </style>
 </head>
@@ -302,12 +358,21 @@
 
     <header>
       <span class="logo">HV<span>Tracker</span></span>
-      <span class="tagline">Open-source AI coding agent leaderboard</span>
+      <span class="tagline">Health scores for open-source AI agents</span>
       <div class="meta">
         {{ total }} agents &nbsp;·&nbsp; updated {{ updated }}<br>
         scores refresh weekly
       </div>
     </header>
+
+    {% if categories %}
+    <div class="cat-bar" id="catBar">
+      <span class="cat-pill active" data-category="">All ({{ total }})</span>
+      {% for cat in categories %}
+      <span class="cat-pill" data-category="{{ cat.name }}">{{ cat.name }} ({{ cat.count }})</span>
+      {% endfor %}
+    </div>
+    {% endif %}
 
     <div class="legend">
       <span style="color: var(--text); font-weight:600; font-size:12px;">Last push:</span>
@@ -345,14 +410,19 @@
             data-weekly_commits="{{ row.weekly_commits }}"
             data-forks="{{ row.forks }}"
             data-score="{{ row.score }}"
+            data-category="{{ row.category }}"
+            data-category_rank="{{ row.category_rank }}"
           >
-            <td class="rank r">{{ row.rank }}</td>
+            <td class="rank r">
+              <span class="rank-num">{{ row.rank }}</span>
+            </td>
             <td class="delta {{ row.rank_delta_class }}">{{ row.rank_delta_display }}</td>
             <td class="agent-cell">
               <a class="agent-name" href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.name }}</a>
               <span class="agent-repo">{{ row.repo }}</span>
               {% if row.description %}<span class="agent-desc" title="{{ row.description }}">{{ row.description }}</span>{% endif %}
               {% if row.language %}<span class="lang">{{ row.language }}</span>{% endif %}
+              {% if row.category %}<span class="cat-badge">{{ row.category }}</span>{% endif %}
             </td>
             <td class="r num">{{ row.stars_fmt }}</td>
             <td>
@@ -373,7 +443,7 @@
     </div>
 
     <footer>
-      <span>{{ total }} agents tracked</span>
+      <span>{{ total }} agents tracked across 8 categories</span>
       <span class="footer-sep">·</span>
       <span>scores update every Monday</span>
       <span class="footer-sep">·</span>
@@ -385,19 +455,35 @@
   </div>
 
   <script>
-    // Client-side column sorting
+    // ── Category filtering & sorting ──
     (function () {
       const table = document.getElementById("leaderboard");
       const tbody = table.querySelector("tbody");
       const headers = table.querySelectorAll("thead th[data-col]");
+      const pills = document.querySelectorAll("#catBar .cat-pill");
+      const rankHeader = document.querySelector("thead th[data-col='rank']");
+      let activeCategory = "";
       let sortCol = "score";
       let sortAsc = false;
 
+      function getVisibleRows() {
+        return Array.from(tbody.querySelectorAll("tr:not(.hidden)"));
+      }
+
       function sortRows() {
-        const rows = Array.from(tbody.querySelectorAll("tr"));
+        const rows = getVisibleRows();
         rows.sort((a, b) => {
-          let av = a.dataset[sortCol];
-          let bv = b.dataset[sortCol];
+          let col = sortCol;
+          // When category filter is active and sorting by rank, use category_rank
+          if (col === "rank" && activeCategory) {
+            let av = parseFloat(a.dataset.category_rank) || 0;
+            let bv = parseFloat(b.dataset.category_rank) || 0;
+            if (av < bv) return sortAsc ? -1 : 1;
+            if (av > bv) return sortAsc ? 1 : -1;
+            return 0;
+          }
+          let av = a.dataset[col];
+          let bv = b.dataset[col];
           const num = !isNaN(parseFloat(av));
           if (num) {
             av = parseFloat(av); bv = parseFloat(bv);
@@ -406,9 +492,67 @@
           if (av > bv) return sortAsc ? 1 : -1;
           return 0;
         });
+        const allRows = Array.from(tbody.querySelectorAll("tr"));
+        allRows.forEach(r => r.remove());
         rows.forEach(r => tbody.appendChild(r));
+        allRows.forEach(r => {
+          if (r.classList.contains("hidden")) tbody.appendChild(r);
+        });
       }
 
+      function applyFilter(category) {
+        activeCategory = category;
+        const rows = tbody.querySelectorAll("tr");
+        rows.forEach(row => {
+          if (!category || row.dataset.category === category) {
+            row.classList.remove("hidden");
+          } else {
+            row.classList.add("hidden");
+          }
+        });
+        updateRankDisplay();
+        sortRows();
+      }
+
+      function updateRankDisplay() {
+        const visibleRows = getVisibleRows();
+        if (activeCategory) {
+          rankHeader.innerHTML = '#<span class="sort-arrow"></span>';
+          if (sortCol === "rank") {
+            const arrow = rankHeader.querySelector(".sort-arrow");
+            if (arrow) arrow.textContent = sortAsc ? "↑" : "↓";
+          }
+          visibleRows.forEach(row => {
+            const rankCell = row.querySelector(".rank");
+            const catRank = row.dataset.category_rank || "";
+            const globalRank = row.dataset.rank || "";
+            rankCell.innerHTML = '<span class="rank-num">' + catRank + '</span>'
+              + ' <span class="rank-global-muted">#' + globalRank + '</span>';
+          });
+        } else {
+          rankHeader.innerHTML = '#<span class="sort-arrow"></span>';
+          if (sortCol === "rank") {
+            const arrow = rankHeader.querySelector(".sort-arrow");
+            if (arrow) arrow.textContent = sortAsc ? "↑" : "↓";
+          }
+          visibleRows.forEach(row => {
+            const rankCell = row.querySelector(".rank");
+            const globalRank = row.dataset.rank || "";
+            rankCell.innerHTML = '<span class="rank-num">' + globalRank + '</span>';
+          });
+        }
+      }
+
+      // Category pill clicks
+      pills.forEach(pill => {
+        pill.addEventListener("click", () => {
+          pills.forEach(p => p.classList.remove("active"));
+          pill.classList.add("active");
+          applyFilter(pill.dataset.category);
+        });
+      });
+
+      // Column header clicks
       headers.forEach(th => {
         th.addEventListener("click", () => {
           const col = th.dataset.col;
@@ -427,6 +571,8 @@
           const arrow = th.querySelector(".sort-arrow");
           if (arrow) arrow.textContent = sortAsc ? "↑" : "↓";
           sortRows();
+          // Update rank display in case rank column arrows changed
+          if (col === "rank") updateRankDisplay();
         });
       });
     })();

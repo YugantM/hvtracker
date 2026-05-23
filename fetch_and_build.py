@@ -163,6 +163,7 @@ def main() -> None:
     def fetch_one(agent: dict) -> dict | None:
         repo_id = agent["repo"]
         name = agent.get("name", repo_id.split("/")[1])
+        category = agent.get("category", "")
         try:
             repo = get_repo(repo_id)
         except requests.HTTPError as e:
@@ -179,6 +180,7 @@ def main() -> None:
         print(f"OK  {repo_id:<45} score={score:5.1f}")
         return {
             "name": name,
+            "category": category,
             "repo": repo_id,
             "url": repo["html_url"],
             "stars": repo["stargazers_count"],
@@ -208,6 +210,17 @@ def main() -> None:
     for i, row in enumerate(rows, 1):
         row["rank"] = i
 
+    # Compute category ranks (within each category, sorted by score)
+    cat_groups: dict[str, list[dict]] = {}
+    for row in rows:
+        cat = row.get("category", "")
+        if cat:
+            cat_groups.setdefault(cat, []).append(row)
+    for cat_agents in cat_groups.values():
+        cat_agents.sort(key=lambda x: x["score"], reverse=True)
+        for j, row in enumerate(cat_agents, 1):
+            row["category_rank"] = j
+
     # Compute rank deltas
     now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     for row in rows:
@@ -226,6 +239,22 @@ def main() -> None:
             row["rank_delta_display"] = rank_delta_display(delta, False)
             row["rank_delta_class"] = rank_delta_class(delta, False)
             row["rank_delta_sort"] = delta
+
+    # Collect category metadata for the template
+    category_order = [
+        "Coding Agents",
+        "Agent Frameworks",
+        "Workflow Platforms",
+        "Browser & Computer Use",
+        "LLM Gateways & Infra",
+        "Memory & Knowledge",
+        "Research & Data",
+        "Multi-Agent Systems",
+    ]
+    categories = []
+    for cat in category_order:
+        if cat in cat_groups:
+            categories.append({"name": cat, "count": len(cat_groups[cat])})
 
     # Write data.json (machine-readable leaderboard)
     data_output = {
@@ -248,6 +277,8 @@ def main() -> None:
                 "description": r["description"],
                 "language": r["language"],
                 "open_issues": r["open_issues"],
+                "category": r.get("category", ""),
+                "category_rank": r.get("category_rank"),
             }
             for r in rows
         ],
@@ -262,6 +293,7 @@ def main() -> None:
         rows=rows,
         updated=now_str,
         total=len(rows),
+        categories=categories,
     )
 
     out_path = os.path.join(script_dir, "index.html")
