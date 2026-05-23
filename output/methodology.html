@@ -9,13 +9,14 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #f6f6f1;
-      --surface:   #ffffff;
-      --border:    #ddddd6;
-      --text:      #1a1a1a;
-      --muted:     #6b7280;
-      --accent:    #2d7a3e;
-      --accent-lt: #e8f5ec;
+      --bg:        #0c0c15;
+      --surface:   #13131f;
+      --surface-2: #1a1a2a;
+      --border:    #252538;
+      --text:      #eeeef5;
+      --muted:     #8a87a8;
+      --accent:    #7c6af6;
+      --accent-lt: rgba(124,106,246,0.10);
       --font-mono: "JetBrains Mono", "Fira Mono", "Cascadia Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
       --font-sans: "Inter", system-ui, -apple-system, sans-serif;
     }
@@ -36,16 +37,26 @@
 
     header {
       padding: 36px 0 24px;
-      border-bottom: 2px solid var(--accent);
+      border-bottom: 1px solid var(--border);
+      position: relative;
       display: flex;
       align-items: baseline;
       gap: 20px;
       flex-wrap: wrap;
     }
+    header::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 220px;
+      height: 1px;
+      background: linear-gradient(to right, var(--accent), transparent);
+    }
 
     .logo {
       font-family: var(--font-mono);
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
       letter-spacing: -0.5px;
       color: var(--text);
@@ -105,7 +116,7 @@
     p { margin-bottom: 14px; }
     p:last-child { margin-bottom: 0; }
 
-    .sources { list-style: none; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); }
+    .sources { list-style: none; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-2); }
     .sources li {
       padding: 16px 18px;
       border-bottom: 1px solid var(--border);
@@ -127,7 +138,7 @@
     .formula-block {
       font-family: var(--font-mono);
       font-size: 13px;
-      background: var(--surface);
+      background: var(--surface-2);
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 18px 20px;

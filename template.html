@@ -9,21 +9,38 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #f6f6f1;
-      --surface:   #ffffff;
-      --border:    #ddddd6;
-      --text:      #1a1a1a;
-      --muted:     #6b7280;
-      --accent:    #2d7a3e;
-      --accent-lt: #e8f5ec;
-      --fresh:     #2d7a3e;
-      --recent:    #5a8f3c;
-      --aging:     #a0845c;
-      --stale:     #9ca3af;
-      --score-hi:  #2d7a3e;
-      --score-mid: #7a6b2d;
-      --score-lo:  #9ca3af;
-      --row-alt:   #f9f9f6;
+      /* Base */
+      --bg:          #0c0c15;
+      --surface:     #13131f;
+      --surface-2:   #1a1a2a;
+      --border:      #252538;
+      /* Text */
+      --text:        #eeeef5;
+      --muted:       #8a87a8;
+      /* Accent — Indigo/Violet */
+      --accent:      #7c6af6;
+      --accent-lt:   rgba(124,106,246,0.10);
+      --accent-dim:  #4a3fa0;
+      /* Mocha Mousse (Pantone 2025) — warm secondary */
+      --mocha:       #c4a882;
+      --mocha-lt:    rgba(157,124,90,0.15);
+      /* Freshness */
+      --fresh:       #34d399;
+      --recent:      #a3e635;
+      --aging:       #f59e0b;
+      --stale:       #6b7280;
+      /* Score */
+      --score-hi-bg: rgba(124,106,246,0.15);
+      --score-hi-fg: #a5a0ff;
+      --score-mid-bg: rgba(157,124,90,0.15);
+      --score-mid-fg: #c4a882;
+      --score-lo-bg: rgba(100,100,120,0.12);
+      --score-lo-fg: #6b7280;
+      /* Delta */
+      --delta-up:    #34d399;
+      --delta-down:  #c9818e;
+      /* Row */
+      --row-alt:     rgba(255,255,255,0.018);
       --font-mono: "JetBrains Mono", "Fira Mono", "Cascadia Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
       --font-sans: "Inter", system-ui, -apple-system, sans-serif;
     }
@@ -46,16 +63,26 @@
     /* ── Header ── */
     header {
       padding: 36px 0 24px;
-      border-bottom: 2px solid var(--accent);
+      border-bottom: 1px solid var(--border);
+      position: relative;
       display: flex;
       align-items: baseline;
       gap: 20px;
       flex-wrap: wrap;
     }
+    header::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 220px;
+      height: 1px;
+      background: linear-gradient(to right, var(--accent), transparent);
+    }
 
     .logo {
       font-family: var(--font-mono);
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
       letter-spacing: -0.5px;
       color: var(--text);
@@ -94,13 +121,13 @@
       cursor: pointer;
       user-select: none;
       border: 1px solid var(--border);
-      background: var(--surface);
+      background: var(--surface-2);
       color: var(--muted);
       transition: all 0.15s;
       white-space: nowrap;
     }
     .cat-pill:hover {
-      border-color: var(--accent);
+      border-color: var(--accent-dim);
       color: var(--accent);
     }
     .cat-pill.active {
@@ -132,19 +159,34 @@
 
     /* ── Table wrapper ── */
     .table-wrap {
-      overflow-x: auto;
+      position: relative;
+      overflow-x: visible;
       margin-top: 0;
     }
 
     /* ── Table ── */
     table {
       width: 100%;
+      table-layout: fixed;
       border-collapse: collapse;
       font-size: 13px;
     }
 
+    col.col-rank     { width: 40px; }
+    col.col-delta    { width: 50px; }
+    col.col-agent    { width: auto; min-width: 200px; }
+    col.col-stars    { width: 70px; }
+    col.col-push     { width: 110px; }
+    col.col-commits  { width: 80px; }
+    col.col-dl       { width: 110px; }
+    col.col-hn       { width: 70px; }
+    col.col-score    { width: 70px; }
+
+    /* Prevent table squeezing below usable width; horizontal scroll takes over */
+    table { min-width: 820px; }
+
     thead th {
-      padding: 10px 12px;
+      padding: 10px 11px;
       text-align: left;
       font-family: var(--font-mono);
       font-size: 11px;
@@ -173,8 +215,9 @@
     tbody tr:nth-child(even) { background: var(--row-alt); }
     tbody tr:hover { background: var(--accent-lt); }
     tbody tr.hidden { display: none; }
+    tbody tr.top-row td:first-child { border-left: 2px solid var(--accent); }
 
-    td { padding: 10px 12px; vertical-align: middle; }
+    td { padding: 10px 11px; vertical-align: middle; }
 
     /* ── Rank ── */
     .rank {
@@ -200,8 +243,8 @@
       width: 48px;
       white-space: nowrap;
     }
-    .delta-up   { color: #2d7a3e; }
-    .delta-down { color: #c0392b; }
+    .delta-up   { color: var(--delta-up); }
+    .delta-down { color: var(--delta-down); }
     .delta-same { color: var(--stale); }
     .delta-new  {
       display: inline-block;
@@ -217,7 +260,7 @@
     }
 
     /* ── Agent name cell ── */
-    .agent-cell { min-width: 220px; }
+    .agent-cell { min-width: 0; overflow: hidden; }
     .agent-name {
       font-weight: 600;
       font-size: 13.5px;
@@ -236,21 +279,21 @@
       font-size: 11.5px;
       color: var(--muted);
       margin-top: 3px;
-      max-width: 340px;
+      max-width: 380px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    /* ── Language badge ── */
+    /* ── Language badge — Mocha Mousse warmth ── */
     .lang {
       display: inline-block;
       font-family: var(--font-mono);
       font-size: 10px;
       padding: 1px 6px;
       border-radius: 3px;
-      background: var(--border);
-      color: var(--muted);
+      background: var(--mocha-lt);
+      color: var(--mocha);
       margin-top: 3px;
     }
 
@@ -272,7 +315,7 @@
       font-size: 10px;
       padding: 1px 6px;
       border-radius: 3px;
-      background: #f3f4f6;
+      background: var(--surface-2);
       color: var(--muted);
       margin-top: 3px;
       margin-left: 4px;
@@ -318,9 +361,9 @@
       min-width: 52px;
       text-align: center;
     }
-    .score-high { background: var(--accent-lt); color: var(--accent); }
-    .score-mid  { background: #fef9e7; color: #7a6b2d; }
-    .score-low  { background: #f3f4f6; color: var(--stale); }
+    .score-high { background: var(--score-hi-bg); color: var(--score-hi-fg); }
+    .score-mid  { background: var(--score-mid-bg); color: var(--score-mid-fg); }
+    .score-low  { background: var(--score-lo-bg); color: var(--score-lo-fg); }
 
     /* ── Score formula tooltip ── */
     .formula-row {
@@ -355,10 +398,27 @@
     .formula strong { color: var(--text); }
 
     /* ── Mobile ── */
+    @media (max-width: 860px) {
+      .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .table-wrap::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 28px;
+        height: 100%;
+        background: linear-gradient(to right, rgba(12, 12, 21, 0), var(--bg) 70%);
+        pointer-events: none;
+      }
+      .agent-desc { max-width: 220px; }
+    }
+
     @media (max-width: 640px) {
       header { flex-direction: column; gap: 6px; }
       .meta { margin-left: 0; text-align: left; }
-      .agent-desc { display: none; }
       .cat-bar { gap: 5px; }
       .cat-pill { font-size: 10px; padding: 4px 10px; }
     }
@@ -398,6 +458,17 @@
 
     <div class="table-wrap">
       <table id="leaderboard">
+        <colgroup>
+          <col class="col-rank">
+          <col class="col-delta">
+          <col class="col-agent">
+          <col class="col-stars">
+          <col class="col-push">
+          <col class="col-commits">
+          <col class="col-dl">
+          <col class="col-hn">
+          <col class="col-score">
+        </colgroup>
         <thead>
           <tr>
             <th class="r" data-col="rank">#<span class="sort-arrow">↑</span></th>
@@ -406,7 +477,6 @@
             <th class="r" data-col="stars">Stars<span class="sort-arrow"></span></th>
             <th data-col="last_push">Last Push<span class="sort-arrow"></span></th>
             <th class="r" data-col="weekly_commits">4-wk commits<span class="sort-arrow"></span></th>
-            <th class="r" data-col="forks">Forks<span class="sort-arrow"></span></th>
             <th class="r" data-col="downloads">Downloads (7d)<span class="sort-arrow"></span></th>
             <th class="r" data-col="hn_mentions_30d">HN (30d)<span class="sort-arrow"></span></th>
             <th class="r sorted" data-col="score">Score<span class="sort-arrow">↓</span></th>
@@ -414,14 +484,13 @@
         </thead>
         <tbody>
           {% for row in rows %}
-          <tr
+          <tr{% if row.rank <= 3 %} class="top-row"{% endif %}
             data-rank="{{ row.rank }}"
             data-rank_delta="{{ row.rank_delta_sort }}"
             data-name="{{ row.name }}"
             data-stars="{{ row.stars }}"
             data-last_push="{{ row.last_push }}"
             data-weekly_commits="{{ row.weekly_commits }}"
-            data-forks="{{ row.forks }}"
             data-downloads="{{ row.weekly_downloads or 0 }}"
             data-hn_mentions_30d="{{ row.hn_mentions_30d if row.hn_mentions_30d is not none else -1 }}"
             data-score="{{ row.score }}"
@@ -447,7 +516,6 @@
               </div>
             </td>
             <td class="r num">{{ row.weekly_commits }}</td>
-            <td class="r num">{{ row.forks_fmt }}</td>
             <td class="r">
               {% if row.weekly_downloads is not none %}
               <span class="num">{{ row.downloads_fmt }}</span>

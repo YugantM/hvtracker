@@ -4,14 +4,18 @@
 import json
 import math
 import os
+import re
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from urllib.parse import quote, urlencode
 
 import requests
+from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader
+
+load_dotenv()
 
 GITHUB_API = "https://api.github.com"
 TOKEN = os.environ.get("GITHUB_TOKEN", "")
@@ -46,6 +50,56 @@ def get_commit_activity(owner_repo: str) -> list:
         # Any other failure: skip gracefully
         return []
     return []
+
+
+def _parse_link_last_page(link_header: str) -> tuple[int | None, str | None]:
+    """Parse rel=\"last\" page number and URL from a GitHub Link header."""
+    for part in link_header.split(","):
+        if 'rel="last"' not in part:
+            continue
+        url_match = re.search(r"<([^>]+)>", part)
+        page_match = re.search(r"[?&]page=(\d+)", part)
+        page = int(page_match.group(1)) if page_match else None
+        url = url_match.group(1) if url_match else None
+        return page, url
+    return None, None
+
+
+def fetch_recent_commits(owner_repo: str, days: int = 30) -> int | None:
+    """Count commits on the default branch in the last `days` days."""
+    since = datetime.now(timezone.utc) - timedelta(days=days)
+    since_iso = since.strftime("%Y-%m-%dT%H:%M:%SZ")
+    url = f"{GITHUB_API}/repos/{owner_repo}/commits"
+    params = {"since": since_iso, "per_page": 100}
+
+    try:
+        r = requests.get(url, headers=HEADERS, params=params, timeout=30)
+        r.raise_for_status()
+        commits = r.json()
+        if not isinstance(commits, list):
+            return None
+
+        link = r.headers.get("Link", "")
+        if not link:
+            count = len(commits)
+        else:
+            last_page, last_url = _parse_link_last_page(link)
+            if last_page is None or last_page <= 1:
+                count = len(commits)
+            elif last_url:
+                r_last = requests.get(last_url, headers=HEADERS, timeout=30)
+                r_last.raise_for_status()
+                last_commits = r_last.json()
+                if not isinstance(last_commits, list):
+                    return None
+                count = (last_page - 1) * 100 + len(last_commits)
+            else:
+                count = last_page * 100
+
+        print(f"Recent commits for {owner_repo}: {count}", file=sys.stderr)
+        return count
+    except Exception:
+        return None
 
 
 def fetch_npm_downloads(package_name: str) -> int | None:
@@ -83,17 +137,20 @@ def fetch_hn_mentions(search_term: str, days: int = 30) -> int:
 def fetch_pypi_downloads(package_name: str) -> int | None:
     """Fetch last-week download count from PyPI via pypistats. Returns None on any error."""
     url = f"https://pypistats.org/api/packages/{package_name}/recent"
-    try:
-        r = requests.get(url, timeout=10)
-        if r.status_code == 200:
-            data = r.json().get("data", {})
-            return data.get("last_week")
-        return None
-    except Exception:
-        return None
-    finally:
-        # pypistats rate limit is ~1 req/s; sleep generously between calls
-        time.sleep(1.0)
+    for attempt in range(2):
+        try:
+            r = requests.get(url, timeout=10)
+            if r.status_code == 200:
+                data = r.json().get("data", {})
+                time.sleep(2.0)  # conservative: ~1 req/2s to stay within rate limit
+                return data.get("last_week")
+            if r.status_code == 429:
+                time.sleep(15.0)  # back off and retry once
+                continue
+            return None
+        except Exception:
+            return None
+    return None
 
 
 def compute_score(repo: dict, weeks: list) -> float:
@@ -168,6 +225,26 @@ def load_previous_ranks(data_path: str) -> dict[str, int]:
         return {}
 
 
+def load_previous_downloads(data_path: str) -> dict[str, tuple[int, str]]:
+    """Load previous download counts from data.json.
+    Returns {pypi_or_npm_package: (count, dl_source)} for use as fallback on 429."""
+    if not os.path.exists(data_path):
+        return {}
+    try:
+        with open(data_path, encoding="utf-8") as f:
+            prev = json.load(f)
+        result = {}
+        for a in prev.get("agents", []):
+            dl = a.get("weekly_downloads")
+            src = a.get("dl_source", "")
+            if dl is not None:
+                # key by repo so we can look up regardless of package name changes
+                result[a["repo"].lower()] = (dl, src)
+        return result
+    except (json.JSONDecodeError, KeyError):
+        return {}
+
+
 def rank_delta_display(delta: int | None, is_new: bool) -> str:
     """Return display string for rank delta."""
     if is_new:
@@ -208,8 +285,9 @@ def main() -> None:
             deduped.append(a)
     agents = deduped
 
-    # Load previous rankings for delta computation
+    # Load previous rankings and downloads for delta computation and 429 fallback
     prev_ranks = load_previous_ranks(data_path)
+    prev_downloads = load_previous_downloads(data_path)
 
     def fetch_one(agent: dict) -> dict | None:
         repo_id = agent["repo"]
@@ -226,30 +304,19 @@ def main() -> None:
             return None
 
         weeks = get_commit_activity(repo_id)
-        recent_commits = sum(w["total"] for w in weeks[-4:]) if weeks else 0
         score = compute_score(repo, weeks)
+        # Use Stats API 4-week sum (same source as score) for the display column.
+        # Falls back to Commits API only if Stats API returned nothing.
+        commits_4wk = sum(w["total"] for w in weeks[-4:]) if weeks else None
+        if commits_4wk is None or (commits_4wk == 0 and not weeks):
+            commits_4wk = fetch_recent_commits(repo_id)
+        recent_commits = commits_4wk
         d = days_ago(repo["pushed_at"])
 
-        # Fetch npm / PyPI downloads if configured; combine if both present
-        weekly_downloads = None
-        dl_source = ""
-        dl_parts = []
-        if npm_pkg:
-            npm_dl = fetch_npm_downloads(npm_pkg)
-            if npm_dl is not None:
-                dl_parts.append(("npm", npm_dl))
+        # Fetch npm downloads in parallel (npm API has no strict rate limit)
         pypi_pkg = agent.get("pypi_package", "")
-        if pypi_pkg:
-            pypi_dl = fetch_pypi_downloads(pypi_pkg)
-            if pypi_dl is not None:
-                dl_parts.append(("pypi", pypi_dl))
-        if dl_parts:
-            weekly_downloads = sum(dl for _, dl in dl_parts)
-            dl_source = "+".join(src for src, _ in dl_parts)
-            dl_note = f"  dl={weekly_downloads:,} ({dl_source})"
-        else:
-            dl_note = ""
-        print(f"OK  {repo_id:<45} score={score:5.1f}{dl_note}")
+        npm_dl = fetch_npm_downloads(npm_pkg) if npm_pkg else None
+        print(f"OK  {repo_id:<45} score={score:5.1f}")
 
         return {
             "name": name,
@@ -271,8 +338,9 @@ def main() -> None:
             "open_issues": repo.get("open_issues_count", 0),
             "npm_package": npm_pkg if npm_pkg else "",
             "pypi_package": pypi_pkg if pypi_pkg else "",
-            "weekly_downloads": weekly_downloads,
-            "dl_source": dl_source,
+            "npm_dl": npm_dl,
+            "weekly_downloads": None,  # filled in serial pass below
+            "dl_source": "",
         }
 
     rows = []
@@ -295,6 +363,34 @@ def main() -> None:
             time.sleep(0.3)
         else:
             row["hn_mentions_30d"] = None
+
+    # Fetch PyPI downloads serially to respect pypistats ~1 req/s rate limit.
+    # (npm was already fetched in parallel above; combine here.)
+    # On 429, fall back to the previous run's cached value so the table never goes blank.
+    print("\nFetching PyPI downloads (serial, with cached fallback on 429)...")
+    for row in rows:
+        pypi_pkg = row.get("pypi_package", "")
+        repo_key = row["repo"].lower()
+        dl_parts = []
+        if row.get("npm_dl") is not None:
+            dl_parts.append(("npm", row["npm_dl"]))
+        if pypi_pkg:
+            pypi_dl = fetch_pypi_downloads(pypi_pkg)
+            if pypi_dl is not None:
+                dl_parts.append(("pypi", pypi_dl))
+            else:
+                # 429 or error — use last known good value from previous run
+                cached = prev_downloads.get(repo_key)
+                if cached:
+                    cached_count, cached_src = cached
+                    row["weekly_downloads"] = cached_count
+                    row["dl_source"] = cached_src
+                    print(f"  dl {row['repo']:<45} {cached_count:,} ({cached_src}) [cached fallback]")
+                    continue
+        if dl_parts:
+            row["weekly_downloads"] = sum(dl for _, dl in dl_parts)
+            row["dl_source"] = "+".join(src for src, _ in dl_parts)
+            print(f"  dl {row['repo']:<45} {row['weekly_downloads']:,} ({row['dl_source']})")
 
     rows.sort(key=lambda x: x["score"], reverse=True)
     for i, row in enumerate(rows, 1):
@@ -377,6 +473,7 @@ def main() -> None:
                 "npm_package": r.get("npm_package", ""),
                 "pypi_package": r.get("pypi_package", ""),
                 "weekly_downloads": r.get("weekly_downloads"),
+                "dl_source": r.get("dl_source", ""),
                 "hn_mentions_30d": r.get("hn_mentions_30d"),
             }
             for r in rows
