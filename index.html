@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Open-source AI coding agent health scores, ranked by activity and community momentum.">
+  <title>HVTracker — AI Coding Agent Leaderboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f6f6f1;
+      --surface:   #ffffff;
+      --border:    #ddddd6;
+      --text:      #1a1a1a;
+      --muted:     #6b7280;
+      --accent:    #2d7a3e;
+      --accent-lt: #e8f5ec;
+      --fresh:     #2d7a3e;
+      --recent:    #5a8f3c;
+      --aging:     #a0845c;
+      --stale:     #9ca3af;
+      --score-hi:  #2d7a3e;
+      --score-mid: #7a6b2d;
+      --score-lo:  #9ca3af;
+      --row-alt:   #f9f9f6;
+      --font-mono: "JetBrains Mono", "Fira Mono", "Cascadia Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
+      --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Layout ── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── Header ── */
+    header {
+      padding: 36px 0 24px;
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+    .logo span { color: var(--accent); }
+
+    .tagline {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .meta {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    /* ── Score legend ── */
+    .legend {
+      display: flex;
+      gap: 20px;
+      padding: 12px 0;
+      font-size: 12px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-fresh  { background: var(--fresh); }
+    .dot-recent { background: var(--recent); }
+    .dot-aging  { background: var(--aging); }
+    .dot-stale  { background: var(--stale); }
+
+    /* ── Table wrapper ── */
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 0;
+    }
+
+    /* ── Table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      padding: 10px 12px;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+    thead th:hover { color: var(--text); }
+    thead th.sorted { color: var(--accent); }
+    thead th .sort-arrow { margin-left: 3px; opacity: 0.5; font-size: 10px; }
+    thead th.sorted .sort-arrow { opacity: 1; }
+
+    thead th.r, td.r { text-align: right; }
+    thead th.c, td.c { text-align: center; }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+    tbody tr:nth-child(even) { background: var(--row-alt); }
+    tbody tr:hover { background: var(--accent-lt); }
+
+    td { padding: 10px 12px; vertical-align: middle; }
+
+    /* ── Rank ── */
+    .rank {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+      width: 36px;
+      text-align: right;
+    }
+
+    /* ── Agent name cell ── */
+    .agent-cell { min-width: 220px; }
+    .agent-name {
+      font-weight: 600;
+      font-size: 13.5px;
+      color: var(--text);
+    }
+    .agent-name:hover { color: var(--accent); }
+    .agent-repo {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+    .agent-desc {
+      display: block;
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 3px;
+      max-width: 340px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ── Language badge ── */
+    .lang {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: var(--border);
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* ── Numbers ── */
+    .num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    /* ── Last push freshness ── */
+    .push-date {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .push-dot {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+    .fresh  .push-dot { background: var(--fresh); }
+    .recent .push-dot { background: var(--recent); }
+    .aging  .push-dot { background: var(--aging); }
+    .stale  .push-dot { background: var(--stale); }
+
+    .fresh  .push-text { color: var(--fresh); }
+    .recent .push-text { color: var(--recent); }
+    .aging  .push-text { color: var(--aging); }
+    .stale  .push-text { color: var(--stale); }
+
+    /* ── Score pill ── */
+    .score-pill {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 4px;
+      min-width: 52px;
+      text-align: center;
+    }
+    .score-high { background: var(--accent-lt); color: var(--accent); }
+    .score-mid  { background: #fef9e7; color: #7a6b2d; }
+    .score-low  { background: #f3f4f6; color: var(--stale); }
+
+    /* ── Score formula tooltip ── */
+    .formula-row {
+      padding: 10px 12px 6px;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    /* ── Footer ── */
+    footer {
+      padding: 28px 0 40px;
+      border-top: 1px solid var(--border);
+      margin-top: 12px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    footer a { color: var(--accent); }
+    footer a:hover { text-decoration: underline; }
+    .footer-sep { color: var(--border); }
+
+    /* ── Score formula note ── */
+    .formula {
+      font-size: 11.5px;
+      color: var(--muted);
+      padding: 8px 0 14px;
+      font-family: var(--font-mono);
+    }
+    .formula strong { color: var(--text); }
+
+    /* ── Mobile ── */
+    @media (max-width: 640px) {
+      header { flex-direction: column; gap: 6px; }
+      .meta { margin-left: 0; text-align: left; }
+      .agent-desc { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <header>
+      <span class="logo">HV<span>Tracker</span></span>
+      <span class="tagline">Open-source AI coding agent leaderboard</span>
+      <div class="meta">
+        54 agents &nbsp;·&nbsp; updated 2026-05-23 06:00 UTC<br>
+        scores refresh weekly
+      </div>
+    </header>
+
+    <div class="legend">
+      <span style="color: var(--text); font-weight:600; font-size:12px;">Last push:</span>
+      <span class="legend-item"><span class="dot dot-fresh"></span> &lt; 7 days</span>
+      <span class="legend-item"><span class="dot dot-recent"></span> 7–30 days</span>
+      <span class="legend-item"><span class="dot dot-aging"></span> 30–90 days</span>
+      <span class="legend-item"><span class="dot dot-stale"></span> &gt; 90 days</span>
+      <span style="margin-left: auto; font-family: var(--font-mono); font-size:11px;">
+        Score = stars(30) + freshness(25) + activity(25) + community(20)
+      </span>
+    </div>
+
+    <div class="table-wrap">
+      <table id="leaderboard">
+        <thead>
+          <tr>
+            <th class="r" data-col="rank">#<span class="sort-arrow">↑</span></th>
+            <th data-col="name">Agent</th>
+            <th class="r" data-col="stars">Stars<span class="sort-arrow"></span></th>
+            <th data-col="last_push">Last Push<span class="sort-arrow"></span></th>
+            <th class="r" data-col="weekly_commits">4-wk commits<span class="sort-arrow"></span></th>
+            <th class="r" data-col="forks">Forks<span class="sort-arrow"></span></th>
+            <th class="r sorted" data-col="score">Score<span class="sort-arrow">↓</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr
+            data-rank="1"
+            data-name="OpenHands"
+            data-stars="38200"
+            data-last_push="2026-05-22"
+            data-weekly_commits="47"
+            data-forks="4300"
+            data-score="88.4"
+          >
+            <td class="rank r">1</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="#" target="_blank" rel="noopener noreferrer">OpenHands</a>
+              <span class="agent-repo">All-Hands-AI/OpenHands</span>
+              <span class="agent-desc" title="Open Code and AI Software Engineer.">Open Code and AI Software Engineer.</span>
+              <span class="lang">Python</span>
+            </td>
+            <td class="r num">38.2k</td>
+            <td>
+              <div class="push-date fresh">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-05-22</span>
+              </div>
+            </td>
+            <td class="r num">47</td>
+            <td class="r num">4.3k</td>
+            <td class="r">
+              <span class="score-pill score-high">88.4</span>
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+
+    <footer>
+      <span>54 agents tracked</span>
+      <span class="footer-sep">·</span>
+      <span>scores update every Monday</span>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">source on GitHub</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/YugantM/hvtracker/blob/main/agents.json" target="_blank" rel="noopener">add an agent</a>
+    </footer>
+
+  </div>
+
+  <script>
+    // Client-side column sorting
+    (function () {
+      const table = document.getElementById("leaderboard");
+      const tbody = table.querySelector("tbody");
+      const headers = table.querySelectorAll("thead th[data-col]");
+      let sortCol = "score";
+      let sortAsc = false;
+
+      function sortRows() {
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+        rows.sort((a, b) => {
+          let av = a.dataset[sortCol];
+          let bv = b.dataset[sortCol];
+          const num = !isNaN(parseFloat(av));
+          if (num) {
+            av = parseFloat(av); bv = parseFloat(bv);
+          }
+          if (av < bv) return sortAsc ? -1 : 1;
+          if (av > bv) return sortAsc ? 1 : -1;
+          return 0;
+        });
+        rows.forEach(r => tbody.appendChild(r));
+      }
+
+      headers.forEach(th => {
+        th.addEventListener("click", () => {
+          const col = th.dataset.col;
+          if (col === sortCol) {
+            sortAsc = !sortAsc;
+          } else {
+            sortCol = col;
+            sortAsc = col === "name" || col === "last_push";
+          }
+          headers.forEach(h => {
+            h.classList.remove("sorted");
+            const arrow = h.querySelector(".sort-arrow");
+            if (arrow) arrow.textContent = "";
+          });
+          th.classList.add("sorted");
+          const arrow = th.querySelector(".sort-arrow");
+          if (arrow) arrow.textContent = sortAsc ? "↑" : "↓";
+          sortRows();
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
