@@ -254,6 +254,17 @@
       margin-top: 3px;
     }
 
+    /* ── Downloads source label ── */
+    .dl-source {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      color: var(--stale);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 1px;
+    }
+
     /* ── Category badge ── */
     .cat-badge {
       display: inline-block;
@@ -381,7 +392,7 @@
       <span class="legend-item"><span class="dot dot-aging"></span> 30–90 days</span>
       <span class="legend-item"><span class="dot dot-stale"></span> &gt; 90 days</span>
       <span style="margin-left: auto; font-family: var(--font-mono); font-size:11px;">
-        Score = stars(30) + freshness(25) + activity(25) + community(20)
+        <a href="/methodology" style="color: inherit;">Score = stars(30) + freshness(25) + activity(25) + community(20)</a>
       </span>
     </div>
 
@@ -396,6 +407,8 @@
             <th data-col="last_push">Last Push<span class="sort-arrow"></span></th>
             <th class="r" data-col="weekly_commits">4-wk commits<span class="sort-arrow"></span></th>
             <th class="r" data-col="forks">Forks<span class="sort-arrow"></span></th>
+            <th class="r" data-col="downloads">Downloads (7d)<span class="sort-arrow"></span></th>
+            <th class="r" data-col="hn_mentions_30d">HN (30d)<span class="sort-arrow"></span></th>
             <th class="r sorted" data-col="score">Score<span class="sort-arrow">↓</span></th>
           </tr>
         </thead>
@@ -409,6 +422,8 @@
             data-last_push="{{ row.last_push }}"
             data-weekly_commits="{{ row.weekly_commits }}"
             data-forks="{{ row.forks }}"
+            data-downloads="{{ row.weekly_downloads or 0 }}"
+            data-hn_mentions_30d="{{ row.hn_mentions_30d if row.hn_mentions_30d is not none else -1 }}"
             data-score="{{ row.score }}"
             data-category="{{ row.category }}"
             data-category_rank="{{ row.category_rank }}"
@@ -434,6 +449,17 @@
             <td class="r num">{{ row.weekly_commits }}</td>
             <td class="r num">{{ row.forks_fmt }}</td>
             <td class="r">
+              {% if row.weekly_downloads is not none %}
+              <span class="num">{{ row.downloads_fmt }}</span>
+              <span class="dl-source">{{ row.dl_source }}</span>
+              {% else %}
+              <span class="num" style="color: var(--stale);">—</span>
+              {% endif %}
+            </td>
+            <td class="r num">
+              {% if row.hn_mentions_30d is not none %}{{ row.hn_mentions_30d }}{% else %}<span style="color: var(--stale);">—</span>{% endif %}
+            </td>
+            <td class="r">
               <span class="score-pill {{ row.score_class }}">{{ row.score }}</span>
             </td>
           </tr>
@@ -446,6 +472,8 @@
       <span>{{ total }} agents tracked across 8 categories</span>
       <span class="footer-sep">·</span>
       <span>scores update every Monday</span>
+      <span class="footer-sep">·</span>
+      <a href="/methodology">Methodology</a>
       <span class="footer-sep">·</span>
       <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">source on GitHub</a>
       <span class="footer-sep">·</span>

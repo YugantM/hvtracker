@@ -10,6 +10,7 @@ on:
       - agents.json
       - fetch_and_build.py
       - template.html
+      - templates/methodology.html.j2
 
 permissions:
   contents: write
@@ -70,7 +71,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html data.json
+          git add index.html data.json methodology.html output/history/ output/methodology.html
           if git diff --cached --quiet; then
             echo "No changes — skipping commit."
           else

@@ -8,6 +8,7 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
+from urllib.parse import quote, urlencode
 
 import requests
 from jinja2 import Environment, FileSystemLoader
@@ -20,6 +21,8 @@ HEADERS = {
 }
 if TOKEN:
     HEADERS["Authorization"] = f"Bearer {TOKEN}"
+
+METHODOLOGY_VERSION = "v1.1"
 
 
 def get_repo(owner_repo: str) -> dict:
@@ -43,6 +46,54 @@ def get_commit_activity(owner_repo: str) -> list:
         # Any other failure: skip gracefully
         return []
     return []
+
+
+def fetch_npm_downloads(package_name: str) -> int | None:
+    """Fetch last-week download count from npm. Returns None on any error."""
+    encoded = quote(package_name, safe='')
+    url = f"https://api.npmjs.org/downloads/point/last-week/{encoded}"
+    try:
+        r = requests.get(url, timeout=10)
+        if r.status_code == 200:
+            return r.json().get("downloads")
+        return None
+    except Exception:
+        return None
+
+
+def fetch_hn_mentions(search_term: str, days: int = 30) -> int:
+    """Count HN stories matching search_term in the last `days` days."""
+    # Algolia HN Search API allows 10,000 requests/hour (~65 calls per build).
+    since = int(time.time()) - days * 86400
+    params = {
+        "query": search_term,
+        "tags": "story",
+        "numericFilters": f"created_at_i>{since}",
+    }
+    url = f"https://hn.algolia.com/api/v1/search?{urlencode(params)}"
+    try:
+        r = requests.get(url, timeout=15)
+        if r.status_code == 200:
+            return int(r.json().get("nbHits", 0))
+        return 0
+    except Exception:
+        return 0
+
+
+def fetch_pypi_downloads(package_name: str) -> int | None:
+    """Fetch last-week download count from PyPI via pypistats. Returns None on any error."""
+    url = f"https://pypistats.org/api/packages/{package_name}/recent"
+    try:
+        r = requests.get(url, timeout=10)
+        if r.status_code == 200:
+            data = r.json().get("data", {})
+            return data.get("last_week")
+        return None
+    except Exception:
+        return None
+    finally:
+        # pypistats rate limit is ~1 req/s; sleep generously between calls
+        time.sleep(1.0)
 
 
 def compute_score(repo: dict, weeks: list) -> float:
@@ -164,6 +215,7 @@ def main() -> None:
         repo_id = agent["repo"]
         name = agent.get("name", repo_id.split("/")[1])
         category = agent.get("category", "")
+        npm_pkg = agent.get("npm_package", "")
         try:
             repo = get_repo(repo_id)
         except requests.HTTPError as e:
@@ -177,7 +229,28 @@ def main() -> None:
         recent_commits = sum(w["total"] for w in weeks[-4:]) if weeks else 0
         score = compute_score(repo, weeks)
         d = days_ago(repo["pushed_at"])
-        print(f"OK  {repo_id:<45} score={score:5.1f}")
+
+        # Fetch npm / PyPI downloads if configured; combine if both present
+        weekly_downloads = None
+        dl_source = ""
+        dl_parts = []
+        if npm_pkg:
+            npm_dl = fetch_npm_downloads(npm_pkg)
+            if npm_dl is not None:
+                dl_parts.append(("npm", npm_dl))
+        pypi_pkg = agent.get("pypi_package", "")
+        if pypi_pkg:
+            pypi_dl = fetch_pypi_downloads(pypi_pkg)
+            if pypi_dl is not None:
+                dl_parts.append(("pypi", pypi_dl))
+        if dl_parts:
+            weekly_downloads = sum(dl for _, dl in dl_parts)
+            dl_source = "+".join(src for src, _ in dl_parts)
+            dl_note = f"  dl={weekly_downloads:,} ({dl_source})"
+        else:
+            dl_note = ""
+        print(f"OK  {repo_id:<45} score={score:5.1f}{dl_note}")
+
         return {
             "name": name,
             "category": category,
@@ -196,6 +269,10 @@ def main() -> None:
             "description": (repo.get("description") or "")[:120],
             "language": repo.get("language") or "",
             "open_issues": repo.get("open_issues_count", 0),
+            "npm_package": npm_pkg if npm_pkg else "",
+            "pypi_package": pypi_pkg if pypi_pkg else "",
+            "weekly_downloads": weekly_downloads,
+            "dl_source": dl_source,
         }
 
     rows = []
@@ -206,9 +283,27 @@ def main() -> None:
             if result:
                 rows.append(result)
 
+    hn_terms = {
+        a["repo"].lower(): a["hn_search_term"]
+        for a in agents
+        if a.get("hn_search_term")
+    }
+    for row in rows:
+        term = hn_terms.get(row["repo"].lower())
+        if term:
+            row["hn_mentions_30d"] = fetch_hn_mentions(term)
+            time.sleep(0.3)
+        else:
+            row["hn_mentions_30d"] = None
+
     rows.sort(key=lambda x: x["score"], reverse=True)
     for i, row in enumerate(rows, 1):
         row["rank"] = i
+
+    # Add formatted download counts for template rendering
+    for row in rows:
+        dl = row.get("weekly_downloads")
+        row["downloads_fmt"] = f"{dl:,}" if dl is not None else "—"
 
     # Compute category ranks (within each category, sorted by score)
     cat_groups: dict[str, list[dict]] = {}
@@ -279,6 +374,10 @@ def main() -> None:
                 "open_issues": r["open_issues"],
                 "category": r.get("category", ""),
                 "category_rank": r.get("category_rank"),
+                "npm_package": r.get("npm_package", ""),
+                "pypi_package": r.get("pypi_package", ""),
+                "weekly_downloads": r.get("weekly_downloads"),
+                "hn_mentions_30d": r.get("hn_mentions_30d"),
             }
             for r in rows
         ],
@@ -287,7 +386,21 @@ def main() -> None:
         json.dump(data_output, f, indent=2, ensure_ascii=False)
     print(f"\nWrote data.json with {len(rows)} agents.")
 
-    env = Environment(loader=FileSystemLoader(script_dir), autoescape=True)
+    # Historical snapshots enable trend analysis and are core IP — never delete these files.
+    history_dir = os.path.join(script_dir, "output", "history")
+    os.makedirs(history_dir, exist_ok=True)
+    today_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    history_path = os.path.join(history_dir, f"{today_utc}.json")
+    with open(history_path, "w", encoding="utf-8") as f:
+        json.dump(data_output, f, indent=2, ensure_ascii=False)
+    print(f"Wrote history snapshot {history_path}.")
+
+    templates_dir = os.path.join(script_dir, "templates")
+    env = Environment(
+        loader=FileSystemLoader([templates_dir, script_dir]),
+        autoescape=True,
+    )
+
     tmpl = env.get_template("template.html")
     html = tmpl.render(
         rows=rows,
@@ -295,11 +408,26 @@ def main() -> None:
         total=len(rows),
         categories=categories,
     )
-
     out_path = os.path.join(script_dir, "index.html")
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"Built index.html with {len(rows)} agents.")
+
+    methodology_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    methodology_html = env.get_template("methodology.html.j2").render(
+        methodology_version=METHODOLOGY_VERSION,
+        updated=methodology_date,
+    )
+    output_dir = os.path.join(script_dir, "output")
+    os.makedirs(output_dir, exist_ok=True)
+    methodology_paths = [
+        os.path.join(output_dir, "methodology.html"),
+        os.path.join(script_dir, "methodology.html"),
+    ]
+    for path in methodology_paths:
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(methodology_html)
+    print(f"Built methodology.html ({METHODOLOGY_VERSION}, updated {methodology_date}).")
 
 
 if __name__ == "__main__":

@@ -32,6 +32,7 @@ For every agent repo in [`agents.json`](./agents.json), HVTracker fetches:
 | **Forks** | `forks_count` |
 | **Last push** | `pushed_at` (shown with freshness dot: green ≤7d, olive ≤30d, brown ≤90d, gray >90d) |
 | **4-week commits** | Sum of weekly commits from `/stats/commit_activity` |
+| **Downloads (7d)** | Weekly downloads from npm and/or PyPI (summed if both), shown with source label ("npm", "pypi", or "npm+pypi") |
 | **Language** | Primary language from GitHub |
 | **Description** | Repo description (truncated to 120 chars) |
 | **Open issues** | `open_issues_count` |
@@ -84,7 +85,7 @@ data.json (opt) ─┘
 ```
 
 1. **`fetch_and_build.py`** reads the agent list from `agents.json`.
-2. For each repo, it calls the GitHub API (parallel, 10 threads) to fetch stars, forks, commit activity, last push date, language, and description.
+2. For each repo, it calls the GitHub API (parallel, 10 threads) to fetch stars, forks, commit activity, last push date, language, and description. If the agent has `npm_package` and/or `pypi_package` fields, it also fetches weekly download counts from the npm registry and PyPI (pypistats) APIs, summing them if both are present.
 3. A **health score** (0–100) is computed from four sub-scores (see below).
 4. Agents are sorted by score descending and assigned ranks.
 5. The previous `data.json` is loaded to compute **rank deltas** (▲▼/—/NEW).
@@ -184,6 +185,8 @@ Edit [`agents.json`](./agents.json) and add a new entry:
 
 - **`repo`** — the GitHub owner/repo path (exactly as it appears in the URL)
 - **`name`** — the display name shown in the leaderboard
+- **`npm_package`** (optional) — the npm package name for fetching weekly download counts
+- **`pypi_package`** (optional) — the PyPI package name for fetching weekly download counts
 
 After adding, rebuild (`python fetch_and_build.py`) and open a pull request. Alternatively, the workflow will auto-rebuild and deploy when the PR is merged.
 
@@ -234,7 +237,10 @@ The `data.json` file serves double duty:
       "score": 100.0,
       "description": "Production-ready platform for agentic workflow development.",
       "language": "TypeScript",
-      "open_issues": 820
+      "open_issues": 820,
+      "npm_package": "",
+      "pypi_package": "",
+      "weekly_downloads": null
     }
     // ... more agents
   ]
