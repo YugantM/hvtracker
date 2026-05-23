@@ -150,6 +150,31 @@
       text-align: right;
     }
 
+    /* ── Rank delta ── */
+    .delta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+      width: 48px;
+      white-space: nowrap;
+    }
+    .delta-up   { color: #2d7a3e; }
+    .delta-down { color: #c0392b; }
+    .delta-same { color: var(--stale); }
+    .delta-new  {
+      display: inline-block;
+      background: var(--accent-lt);
+      color: var(--accent);
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 1.5;
+    }
+
     /* ── Agent name cell ── */
     .agent-cell { min-width: 220px; }
     .agent-name {
@@ -300,6 +325,7 @@
         <thead>
           <tr>
             <th class="r" data-col="rank">#<span class="sort-arrow">↑</span></th>
+            <th class="c" data-col="rank_delta">Δ<span class="sort-arrow"></span></th>
             <th data-col="name">Agent</th>
             <th class="r" data-col="stars">Stars<span class="sort-arrow"></span></th>
             <th data-col="last_push">Last Push<span class="sort-arrow"></span></th>
@@ -312,6 +338,7 @@
           {% for row in rows %}
           <tr
             data-rank="{{ row.rank }}"
+            data-rank_delta="{{ row.rank_delta_sort }}"
             data-name="{{ row.name }}"
             data-stars="{{ row.stars }}"
             data-last_push="{{ row.last_push }}"
@@ -320,6 +347,7 @@
             data-score="{{ row.score }}"
           >
             <td class="rank r">{{ row.rank }}</td>
+            <td class="delta {{ row.rank_delta_class }}">{{ row.rank_delta_display }}</td>
             <td class="agent-cell">
               <a class="agent-name" href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.name }}</a>
               <span class="agent-repo">{{ row.repo }}</span>

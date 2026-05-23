@@ -5,6 +5,11 @@ on:
     # Every Monday at 06:00 UTC
     - cron: "0 6 * * 1"
   workflow_dispatch:  # allow manual trigger from Actions tab
+  push:
+    paths:
+      - agents.json
+      - fetch_and_build.py
+      - template.html
 
 permissions:
   contents: write
@@ -35,9 +40,9 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html
+          git add index.html data.json
           if git diff --cached --quiet; then
-            echo "No changes to index.html — skipping commit."
+            echo "No changes — skipping commit."
           else
             git commit -m "chore: regenerate leaderboard $(date -u '+%Y-%m-%d')"
             git push

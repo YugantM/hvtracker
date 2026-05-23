@@ -105,9 +105,44 @@ def score_class(s: float) -> str:
     return "score-low"
 
 
+def load_previous_ranks(data_path: str) -> dict[str, int]:
+    """Load previous rankings from data.json. Returns {repo: rank} mapping."""
+    if not os.path.exists(data_path):
+        return {}
+    try:
+        with open(data_path, encoding="utf-8") as f:
+            prev = json.load(f)
+        return {a["repo"].lower(): a["rank"] for a in prev.get("agents", [])}
+    except (json.JSONDecodeError, KeyError):
+        return {}
+
+
+def rank_delta_display(delta: int | None, is_new: bool) -> str:
+    """Return display string for rank delta."""
+    if is_new:
+        return "NEW"
+    if delta is None or delta == 0:
+        return "—"
+    if delta > 0:
+        return f"▲{delta}"
+    return f"▼{abs(delta)}"
+
+
+def rank_delta_class(delta: int | None, is_new: bool) -> str:
+    """Return CSS class for rank delta."""
+    if is_new:
+        return "delta-new"
+    if delta is None or delta == 0:
+        return "delta-same"
+    if delta > 0:
+        return "delta-up"
+    return "delta-down"
+
+
 def main() -> None:
     script_dir = os.path.dirname(os.path.abspath(__file__))
     agents_path = os.path.join(script_dir, "agents.json")
+    data_path = os.path.join(script_dir, "data.json")
 
     with open(agents_path) as f:
         agents = json.load(f)
@@ -121,6 +156,9 @@ def main() -> None:
             seen.add(key)
             deduped.append(a)
     agents = deduped
+
+    # Load previous rankings for delta computation
+    prev_ranks = load_previous_ranks(data_path)
 
     def fetch_one(agent: dict) -> dict | None:
         repo_id = agent["repo"]
@@ -170,18 +208,66 @@ def main() -> None:
     for i, row in enumerate(rows, 1):
         row["rank"] = i
 
+    # Compute rank deltas
+    now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    for row in rows:
+        repo_key = row["repo"].lower()
+        old_rank = prev_ranks.get(repo_key)
+        if old_rank is None:
+            row["previous_rank"] = None
+            row["rank_delta"] = None
+            row["rank_delta_display"] = rank_delta_display(None, True)
+            row["rank_delta_class"] = rank_delta_class(None, True)
+            row["rank_delta_sort"] = 9999  # sentinel for client-side sort (NEW agents)
+        else:
+            delta = old_rank - row["rank"]  # positive = improved (moved up)
+            row["previous_rank"] = old_rank
+            row["rank_delta"] = delta
+            row["rank_delta_display"] = rank_delta_display(delta, False)
+            row["rank_delta_class"] = rank_delta_class(delta, False)
+            row["rank_delta_sort"] = delta
+
+    # Write data.json (machine-readable leaderboard)
+    data_output = {
+        "updated": now_str,
+        "total": len(rows),
+        "agents": [
+            {
+                "name": r["name"],
+                "repo": r["repo"],
+                "url": r["url"],
+                "rank": r["rank"],
+                "previous_rank": r["previous_rank"],
+                "rank_delta": r["rank_delta"],
+                "stars": r["stars"],
+                "forks": r["forks"],
+                "last_push": r["last_push"],
+                "days_ago": r["days_ago"],
+                "weekly_commits": r["weekly_commits"],
+                "score": r["score"],
+                "description": r["description"],
+                "language": r["language"],
+                "open_issues": r["open_issues"],
+            }
+            for r in rows
+        ],
+    }
+    with open(data_path, "w", encoding="utf-8") as f:
+        json.dump(data_output, f, indent=2, ensure_ascii=False)
+    print(f"\nWrote data.json with {len(rows)} agents.")
+
     env = Environment(loader=FileSystemLoader(script_dir), autoescape=True)
     tmpl = env.get_template("template.html")
     html = tmpl.render(
         rows=rows,
-        updated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+        updated=now_str,
         total=len(rows),
     )
 
     out_path = os.path.join(script_dir, "index.html")
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"\nBuilt index.html with {len(rows)} agents.")
+    print(f"Built index.html with {len(rows)} agents.")
 
 
 if __name__ == "__main__":
