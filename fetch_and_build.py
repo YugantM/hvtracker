@@ -484,6 +484,7 @@ def main() -> None:
     # Write data.json (machine-readable leaderboard)
     data_output = {
         "updated": now_str,
+        "methodology_version": METHODOLOGY_VERSION,
         "total": len(rows),
         "agents": [
             {
