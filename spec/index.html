@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specifications — HVTracker</title>
+  <meta name="description" content="Formal specifications published by HVTracker for measuring AI agent health and supply chain trust.">
+  <link rel="canonical" href="https://hvtracker.net/spec/">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#0c0c15; --surface:#13131f; --surface-2:#1a1a2a; --border:#252538;
+      --text:#eeeef5; --muted:#8a87a8;
+      --accent:#7c6af6; --accent-lt:rgba(124,106,246,0.10); --accent-dim:#4a3fa0;
+      --mocha:#c4a882;
+      --fresh:#34d399; --aging:#f59e0b; --stale:#6b7280;
+      --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Inter",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:15px; line-height:1.65; min-height:100vh; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:1100px; margin:0 auto; padding:0 20px 60px; }
+
+    header {
+      padding:28px 0 20px; border-bottom:1px solid var(--border);
+      display:flex; align-items:baseline; gap:20px; flex-wrap:wrap; position:relative;
+    }
+    header::after {
+      content:""; position:absolute; bottom:-1px; left:0;
+      width:220px; height:1px;
+      background:linear-gradient(to right, var(--accent), transparent);
+    }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; letter-spacing:-0.5px; color:var(--text); }
+    .logo span { color:var(--accent); }
+    .site-nav { margin-left:auto; font-family:var(--font-mono); font-size:12px; display:flex; gap:16px; align-items:baseline; }
+    .site-nav a { color:var(--muted); }
+    .site-nav a:hover { color:var(--accent); text-decoration:none; }
+    .site-nav .active { color:var(--accent); font-weight:600; }
+
+    .content { max-width:760px; margin:0 auto; padding:40px 0 0; }
+
+    .page-title { font-family:var(--font-mono); font-size:26px; font-weight:700; letter-spacing:-0.5px; margin-bottom:10px; }
+    .page-subtitle { font-size:14px; color:var(--muted); margin-bottom:36px; }
+
+    .spec-list { list-style:none; display:flex; flex-direction:column; gap:14px; }
+    .spec-card {
+      display:block; padding:20px 22px;
+      border:1px solid var(--border); border-radius:6px;
+      background:var(--surface); transition:border-color 0.15s, background 0.15s;
+      text-decoration:none;
+    }
+    .spec-card:hover { border-color:var(--accent-dim); background:var(--surface-2); text-decoration:none; }
+    .spec-card-header { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
+    .spec-card-title { font-family:var(--font-mono); font-size:15px; font-weight:700; color:var(--text); }
+    .spec-card-ver { font-family:var(--font-mono); font-size:11px; color:var(--muted); }
+    .spec-card-desc { font-size:13.5px; color:var(--muted); margin-bottom:10px; }
+    .spec-card-footer { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+
+    .status-badge {
+      display:inline-block; font-family:var(--font-mono); font-size:10px; font-weight:700;
+      padding:2px 8px; border-radius:3px; text-transform:uppercase; letter-spacing:0.06em;
+    }
+    .status-published  { background:rgba(52,211,153,0.15); color:var(--fresh); }
+    .status-draft      { background:rgba(245,158,11,0.15);  color:var(--aging); }
+    .status-review     { background:var(--accent-lt);        color:var(--accent); }
+    .status-superseded { background:rgba(107,114,128,0.15); color:var(--stale); }
+
+    .spec-date { font-family:var(--font-mono); font-size:11px; color:var(--stale); }
+
+    footer {
+      max-width:760px; margin:48px auto 0; padding-top:24px;
+      border-top:1px solid var(--border);
+      font-size:12px; color:var(--muted);
+      display:flex; gap:14px; flex-wrap:wrap; align-items:center;
+    }
+    footer a { color:var(--accent); }
+    .footer-sep { color:var(--border); }
+  </style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+</head>
+<body>
+  <div class="page">
+
+    <header>
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/methodology">Methodology</a>
+        <span class="active">Specifications</span>
+      </nav>
+    </header>
+
+    <div class="content">
+      <h1 class="page-title">Specifications</h1>
+      <p class="page-subtitle">Formal technical documents defining how HVTracker measures AI agent health and supply chain trust. Each specification is versioned, permanently linked, and written in normative RFC style.</p>
+
+      <ul class="spec-list">
+        
+        <li>
+          <a class="spec-card" href="/spec/methodology/v2.0">
+            <div class="spec-card-header">
+              <span class="spec-card-title">HVTracker Methodology Specification</span>
+              <span class="spec-card-ver">v2.0</span>
+            </div>
+            <div class="spec-card-desc">This document defines the measurement methodology used by HVTracker to compute health scores and supply chain trust signals for open-source AI agent projects. It specifies the data…</div>
+            <div class="spec-card-footer">
+              <span class="status-badge status-published">Published</span>
+              <span class="spec-date">2026-05-24</span>
+            </div>
+          </a>
+        </li>
+        
+      </ul>
+    </div>
+
+    <footer>
+      <a href="/">← Leaderboard</a>
+      <span class="footer-sep">·</span>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+
+  </div>
+</body>
+</html>
