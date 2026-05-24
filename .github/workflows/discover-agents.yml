@@ -46,14 +46,18 @@ jobs:
           # Build markdown table body
           TABLE=$(python3 - <<'PYEOF'
           import json
+          MAX_ROWS = 50
           with open('candidates.json') as f:
               candidates = json.load(f)
+          shown = candidates[:MAX_ROWS]
           lines = ['| Repo | Stars | Language | License | Last Push | Description |',
                    '|------|-------|----------|---------|-----------|-------------|']
-          for c in candidates:
+          for c in shown:
               repo_link = f"[{c['repo']}]({c['url']})"
               desc = c['description'][:80].replace('|', '\\|') if c['description'] else '—'
               lines.append(f"| {repo_link} | {c['stars']:,} | {c['language'] or '—'} | {c['license']} | {c['last_push']} | {desc} |")
+          if len(candidates) > MAX_ROWS:
+              lines.append(f'| … | | | | | _and {len(candidates) - MAX_ROWS} more — see candidates.json_ |')
           print('\n'.join(lines))
           PYEOF
           )
