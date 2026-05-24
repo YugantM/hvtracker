@@ -396,6 +396,44 @@
     footer a:hover { text-decoration: underline; }
     .footer-sep { color: var(--border); }
 
+    /* ── Biggest movers strip ── */
+    .movers {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .movers-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .movers-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .mover {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--surface);
+      text-decoration: none;
+      transition: border-color 0.15s;
+    }
+    .mover:hover { border-color: var(--accent-dim); text-decoration: none; }
+    .mover-arrow { font-weight: 700; }
+    .mover-up .mover-arrow { color: var(--delta-up); }
+    .mover-down .mover-arrow { color: var(--delta-down); }
+    .mover-name { color: var(--text); }
+    .mover-rank { color: var(--muted); font-size: 10px; }
+
     /* ── Score formula note ── */
     .formula {
       font-size: 11.5px;
@@ -472,6 +510,28 @@
         <a href="/methodology" style="color: inherit;">Score = stars(30) + freshness(25) + activity(25) + community(20)</a>
       </span>
     </div>
+
+    {% if movers and (movers.up or movers.down) %}
+    <div class="movers">
+      <span class="movers-title">Biggest movers ({{ history_days }}-day window)</span>
+      <div class="movers-row">
+        {% for m in movers.up %}
+        <a href="/agents/{{ m.slug }}" class="mover mover-up">
+          <span class="mover-arrow">▲{{ m.delta }}</span>
+          <span class="mover-name">{{ m.name }}</span>
+          <span class="mover-rank">#{{ m.rank }}</span>
+        </a>
+        {% endfor %}
+        {% for m in movers.down %}
+        <a href="/agents/{{ m.slug }}" class="mover mover-down">
+          <span class="mover-arrow">▼{{ m.delta|abs }}</span>
+          <span class="mover-name">{{ m.name }}</span>
+          <span class="mover-rank">#{{ m.rank }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
 
     <div class="table-wrap">
       <table id="leaderboard">

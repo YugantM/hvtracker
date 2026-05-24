@@ -130,6 +130,14 @@
     .breakdown-fill { height:100%; background:var(--accent); border-radius:3px; }
     .breakdown-value { text-align:right; color:var(--text); }
 
+    .trend { padding:24px 0; border-bottom:1px solid var(--border); }
+    .sparkline-wrap { margin-top:10px; }
+    .sparkline-labels {
+      display:flex; justify-content:space-between;
+      font-family:var(--font-mono); font-size:10px; color:var(--muted);
+      margin-top:4px;
+    }
+
     .links {
       padding:20px 0 28px; display:flex; gap:14px; flex-wrap:wrap;
       font-family:var(--font-mono); font-size:12px;
@@ -209,6 +217,21 @@
       </div>
       {% endif %}
     </section>
+
+    {% if row.sparkline_svg %}
+    <section class="trend">
+      <h2 class="section-title">Rank Trend</h2>
+      <div class="sparkline-wrap">
+        {{ row.sparkline_svg | safe }}
+        <div class="sparkline-labels">
+          {% if row.rank_history %}
+          <span>{{ row.rank_history[0].date }}</span>
+          <span>{{ row.rank_history[-1].date }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
 
     <section class="stats">
       <h2 class="section-title">Activity & Reach</h2>

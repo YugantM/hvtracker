@@ -264,6 +264,84 @@ def load_previous_downloads(history_dir: str) -> dict[str, tuple[int, str]]:
         return {}
 
 
+def load_history(history_dir: str) -> list[dict]:
+    """Load all history snapshots sorted chronologically. Returns list of dicts."""
+    snapshots = []
+    try:
+        for f in sorted(os.listdir(history_dir)):
+            if re.match(r"\d{4}-\d{2}-\d{2}\.json$", f):
+                with open(os.path.join(history_dir, f), encoding="utf-8") as fh:
+                    snap = json.load(fh)
+                    snap["_date"] = f[:-5]
+                    snapshots.append(snap)
+    except Exception:
+        pass
+    return snapshots
+
+
+def compute_movers(history: list[dict], window: int = 7) -> dict:
+    """Compare latest snapshot vs `window` days ago. Returns {up: [...], down: [...]}."""
+    if len(history) < 2:
+        return {"up": [], "down": []}
+    latest = history[-1]
+    # Find snapshot closest to `window` days back
+    baseline = history[0] if len(history) <= window else history[-min(window, len(history))]
+    old_ranks = {a["repo"].lower(): a["rank"] for a in baseline.get("agents", [])}
+    movers = []
+    for a in latest.get("agents", []):
+        repo = a["repo"].lower()
+        old = old_ranks.get(repo)
+        if old is None:
+            continue
+        delta = old - a["rank"]  # positive = improved
+        if delta != 0:
+            movers.append({"name": a["name"], "slug": re.sub(r"[^a-z0-9]+", "-", a["name"].lower()).strip("-"),
+                           "rank": a["rank"], "delta": delta, "score": a["score"]})
+    movers.sort(key=lambda m: m["delta"], reverse=True)
+    up = [m for m in movers if m["delta"] > 0][:3]
+    down = [m for m in movers if m["delta"] < 0][-3:]
+    down.sort(key=lambda m: m["delta"])  # most negative first
+    return {"up": up, "down": down}
+
+
+def compute_sparklines(history: list[dict]) -> dict[str, list[dict]]:
+    """Build per-agent rank history for sparkline rendering.
+    Returns {repo_lower: [{date, rank, score}, ...]}."""
+    sparklines: dict[str, list[dict]] = {}
+    for snap in history:
+        date = snap.get("_date", "")
+        for a in snap.get("agents", []):
+            key = a["repo"].lower()
+            sparklines.setdefault(key, []).append({
+                "date": date,
+                "rank": a["rank"],
+                "score": a["score"],
+            })
+    return sparklines
+
+
+def render_sparkline_svg(points: list[dict], width: int = 200, height: int = 40) -> str:
+    """Render a mini SVG sparkline for rank over time. Lower rank = higher on chart."""
+    if len(points) < 2:
+        return ""
+    ranks = [p["rank"] for p in points]
+    min_r, max_r = min(ranks), max(ranks)
+    span = max(max_r - min_r, 1)
+    n = len(ranks)
+    coords = []
+    for i, r in enumerate(ranks):
+        x = round(i / (n - 1) * width, 1)
+        y = round((r - min_r) / span * (height - 8) + 4, 1)  # 4px padding top/bottom
+        coords.append(f"{x},{y}")
+    path = "M" + "L".join(coords)
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}" style="display:block">'
+        f'<path d="{path}" fill="none" stroke="#7c6af6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+        f'</svg>'
+    )
+
+
 def rank_delta_display(delta: int | None, is_new: bool) -> str:
     """Return display string for rank delta."""
     if is_new:
@@ -311,6 +389,8 @@ def main() -> None:
     os.makedirs(history_dir, exist_ok=True)
     prev_ranks = load_previous_ranks(history_dir)
     prev_downloads = load_previous_downloads(history_dir)
+    history = load_history(history_dir)
+    sparkline_data = compute_sparklines(history)
 
     def fetch_one(agent: dict) -> dict | None:
         repo_id = agent["repo"]
@@ -534,12 +614,16 @@ def main() -> None:
         autoescape=True,
     )
 
+    movers = compute_movers(history)
+
     tmpl = env.get_template("template.html")
     html = tmpl.render(
         rows=rows,
         updated=now_str,
         total=len(rows),
         categories=categories,
+        movers=movers,
+        history_days=len(history),
     )
     out_path = os.path.join(script_dir, "index.html")
     with open(out_path, "w", encoding="utf-8") as f:
@@ -567,6 +651,10 @@ def main() -> None:
     agents_dir = os.path.join(script_dir, "agents")
     os.makedirs(agents_dir, exist_ok=True)
     for row in rows:
+        repo_key = row["repo"].lower()
+        points = sparkline_data.get(repo_key, [])
+        row["sparkline_svg"] = render_sparkline_svg(points)
+        row["rank_history"] = points
         slug_dir = os.path.join(agents_dir, row["slug"])
         os.makedirs(slug_dir, exist_ok=True)
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
