@@ -9,21 +9,38 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #f6f6f1;
-      --surface:   #ffffff;
-      --border:    #ddddd6;
-      --text:      #1a1a1a;
-      --muted:     #6b7280;
-      --accent:    #2d7a3e;
-      --accent-lt: #e8f5ec;
-      --fresh:     #2d7a3e;
-      --recent:    #5a8f3c;
-      --aging:     #a0845c;
-      --stale:     #9ca3af;
-      --score-hi:  #2d7a3e;
-      --score-mid: #7a6b2d;
-      --score-lo:  #9ca3af;
-      --row-alt:   #f9f9f6;
+      /* Base */
+      --bg:          #0c0c15;
+      --surface:     #13131f;
+      --surface-2:   #1a1a2a;
+      --border:      #252538;
+      /* Text */
+      --text:        #eeeef5;
+      --muted:       #8a87a8;
+      /* Accent — Indigo/Violet */
+      --accent:      #7c6af6;
+      --accent-lt:   rgba(124,106,246,0.10);
+      --accent-dim:  #4a3fa0;
+      /* Mocha Mousse (Pantone 2025) — warm secondary */
+      --mocha:       #c4a882;
+      --mocha-lt:    rgba(157,124,90,0.15);
+      /* Freshness */
+      --fresh:       #34d399;
+      --recent:      #a3e635;
+      --aging:       #f59e0b;
+      --stale:       #6b7280;
+      /* Score */
+      --score-hi-bg: rgba(124,106,246,0.15);
+      --score-hi-fg: #a5a0ff;
+      --score-mid-bg: rgba(157,124,90,0.15);
+      --score-mid-fg: #c4a882;
+      --score-lo-bg: rgba(100,100,120,0.12);
+      --score-lo-fg: #6b7280;
+      /* Delta */
+      --delta-up:    #34d399;
+      --delta-down:  #c9818e;
+      /* Row */
+      --row-alt:     rgba(255,255,255,0.018);
       --font-mono: "JetBrains Mono", "Fira Mono", "Cascadia Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
       --font-sans: "Inter", system-ui, -apple-system, sans-serif;
     }
@@ -46,16 +63,26 @@
     /* ── Header ── */
     header {
       padding: 36px 0 24px;
-      border-bottom: 2px solid var(--accent);
+      border-bottom: 1px solid var(--border);
+      position: relative;
       display: flex;
       align-items: baseline;
       gap: 20px;
       flex-wrap: wrap;
     }
+    header::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 220px;
+      height: 1px;
+      background: linear-gradient(to right, var(--accent), transparent);
+    }
 
     .logo {
       font-family: var(--font-mono);
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
       letter-spacing: -0.5px;
       color: var(--text);
@@ -94,13 +121,13 @@
       cursor: pointer;
       user-select: none;
       border: 1px solid var(--border);
-      background: var(--surface);
+      background: var(--surface-2);
       color: var(--muted);
       transition: all 0.15s;
       white-space: nowrap;
     }
     .cat-pill:hover {
-      border-color: var(--accent);
+      border-color: var(--accent-dim);
       color: var(--accent);
     }
     .cat-pill.active {
@@ -132,19 +159,34 @@
 
     /* ── Table wrapper ── */
     .table-wrap {
-      overflow-x: auto;
+      position: relative;
+      overflow-x: visible;
       margin-top: 0;
     }
 
     /* ── Table ── */
     table {
       width: 100%;
+      table-layout: fixed;
       border-collapse: collapse;
       font-size: 13px;
     }
 
+    col.col-rank     { width: 40px; }
+    col.col-delta    { width: 50px; }
+    col.col-agent    { width: auto; min-width: 200px; }
+    col.col-stars    { width: 70px; }
+    col.col-push     { width: 110px; }
+    col.col-commits  { width: 80px; }
+    col.col-dl       { width: 110px; }
+    col.col-hn       { width: 70px; }
+    col.col-score    { width: 70px; }
+
+    /* Prevent table squeezing below usable width; horizontal scroll takes over */
+    table { min-width: 820px; }
+
     thead th {
-      padding: 10px 12px;
+      padding: 10px 11px;
       text-align: left;
       font-family: var(--font-mono);
       font-size: 11px;
@@ -173,8 +215,9 @@
     tbody tr:nth-child(even) { background: var(--row-alt); }
     tbody tr:hover { background: var(--accent-lt); }
     tbody tr.hidden { display: none; }
+    tbody tr.top-row td:first-child { border-left: 2px solid var(--accent); }
 
-    td { padding: 10px 12px; vertical-align: middle; }
+    td { padding: 10px 11px; vertical-align: middle; }
 
     /* ── Rank ── */
     .rank {
@@ -200,8 +243,8 @@
       width: 48px;
       white-space: nowrap;
     }
-    .delta-up   { color: #2d7a3e; }
-    .delta-down { color: #c0392b; }
+    .delta-up   { color: var(--delta-up); }
+    .delta-down { color: var(--delta-down); }
     .delta-same { color: var(--stale); }
     .delta-new  {
       display: inline-block;
@@ -217,7 +260,7 @@
     }
 
     /* ── Agent name cell ── */
-    .agent-cell { min-width: 220px; }
+    .agent-cell { min-width: 0; overflow: hidden; }
     .agent-name {
       font-weight: 600;
       font-size: 13.5px;
@@ -236,21 +279,21 @@
       font-size: 11.5px;
       color: var(--muted);
       margin-top: 3px;
-      max-width: 340px;
+      max-width: 380px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    /* ── Language badge ── */
+    /* ── Language badge — Mocha Mousse warmth ── */
     .lang {
       display: inline-block;
       font-family: var(--font-mono);
       font-size: 10px;
       padding: 1px 6px;
       border-radius: 3px;
-      background: var(--border);
-      color: var(--muted);
+      background: var(--mocha-lt);
+      color: var(--mocha);
       margin-top: 3px;
     }
 
@@ -272,7 +315,7 @@
       font-size: 10px;
       padding: 1px 6px;
       border-radius: 3px;
-      background: #f3f4f6;
+      background: var(--surface-2);
       color: var(--muted);
       margin-top: 3px;
       margin-left: 4px;
@@ -318,9 +361,9 @@
       min-width: 52px;
       text-align: center;
     }
-    .score-high { background: var(--accent-lt); color: var(--accent); }
-    .score-mid  { background: #fef9e7; color: #7a6b2d; }
-    .score-low  { background: #f3f4f6; color: var(--stale); }
+    .score-high { background: var(--score-hi-bg); color: var(--score-hi-fg); }
+    .score-mid  { background: var(--score-mid-bg); color: var(--score-mid-fg); }
+    .score-low  { background: var(--score-lo-bg); color: var(--score-lo-fg); }
 
     /* ── Score formula tooltip ── */
     .formula-row {
@@ -355,10 +398,27 @@
     .formula strong { color: var(--text); }
 
     /* ── Mobile ── */
+    @media (max-width: 860px) {
+      .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .table-wrap::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 28px;
+        height: 100%;
+        background: linear-gradient(to right, rgba(12, 12, 21, 0), var(--bg) 70%);
+        pointer-events: none;
+      }
+      .agent-desc { max-width: 220px; }
+    }
+
     @media (max-width: 640px) {
       header { flex-direction: column; gap: 6px; }
       .meta { margin-left: 0; text-align: left; }
-      .agent-desc { display: none; }
       .cat-bar { gap: 5px; }
       .cat-pill { font-size: 10px; padding: 4px 10px; }
     }
@@ -371,7 +431,7 @@
       <span class="logo">HV<span>Tracker</span></span>
       <span class="tagline">Health scores for open-source AI agents</span>
       <div class="meta">
-        65 agents &nbsp;·&nbsp; updated 2026-05-23 14:18 UTC<br>
+        65 agents &nbsp;·&nbsp; updated 2026-05-24 00:21 UTC<br>
         scores refresh weekly
       </div>
     </header>
@@ -412,6 +472,17 @@
 
     <div class="table-wrap">
       <table id="leaderboard">
+        <colgroup>
+          <col class="col-rank">
+          <col class="col-delta">
+          <col class="col-agent">
+          <col class="col-stars">
+          <col class="col-push">
+          <col class="col-commits">
+          <col class="col-dl">
+          <col class="col-hn">
+          <col class="col-score">
+        </colgroup>
         <thead>
           <tr>
             <th class="r" data-col="rank">#<span class="sort-arrow">↑</span></th>
@@ -420,7 +491,6 @@
             <th class="r" data-col="stars">Stars<span class="sort-arrow"></span></th>
             <th data-col="last_push">Last Push<span class="sort-arrow"></span></th>
             <th class="r" data-col="weekly_commits">4-wk commits<span class="sort-arrow"></span></th>
-            <th class="r" data-col="forks">Forks<span class="sort-arrow"></span></th>
             <th class="r" data-col="downloads">Downloads (7d)<span class="sort-arrow"></span></th>
             <th class="r" data-col="hn_mentions_30d">HN (30d)<span class="sort-arrow"></span></th>
             <th class="r sorted" data-col="score">Score<span class="sort-arrow">↓</span></th>
@@ -428,16 +498,15 @@
         </thead>
         <tbody>
           
-          <tr
+          <tr class="top-row"
             data-rank="1"
             data-rank_delta="0"
             data-name="Dify"
-            data-stars="142338"
+            data-stars="142371"
             data-last_push="2026-05-23"
-            data-weekly_commits="545"
-            data-forks="22392"
-            data-downloads="0"
-            data-hn_mentions_30d="453"
+            data-weekly_commits="441"
+            data-downloads="425"
+            data-hn_mentions_30d="445"
             data-score="100.0"
             data-category="Workflow Platforms"
             data-category_rank="1"
@@ -453,36 +522,35 @@
               <span class="lang">TypeScript</span>
               <span class="cat-badge">Workflow Platforms</span>
             </td>
-            <td class="r num">142.3k</td>
+            <td class="r num">142.4k</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">545</td>
-            <td class="r num">22.4k</td>
+            <td class="r num">441</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">425</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
-              453
+              445
             </td>
             <td class="r">
               <span class="score-pill score-high">100.0</span>
             </td>
           </tr>
           
-          <tr
+          <tr class="top-row"
             data-rank="2"
             data-rank_delta="0"
             data-name="LiteLLM"
-            data-stars="48006"
-            data-last_push="2026-05-23"
-            data-weekly_commits="1692"
-            data-forks="8282"
+            data-stars="48029"
+            data-last_push="2026-05-24"
+            data-weekly_commits="954"
             data-downloads="124397742"
             data-hn_mentions_30d="5"
             data-score="96.3"
@@ -504,11 +572,10 @@
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
-                <span class="push-text">2026-05-23</span>
+                <span class="push-text">2026-05-24</span>
               </div>
             </td>
-            <td class="r num">1692</td>
-            <td class="r num">8.3k</td>
+            <td class="r num">954</td>
             <td class="r">
               
               <span class="num">124,397,742</span>
@@ -523,16 +590,15 @@
             </td>
           </tr>
           
-          <tr
+          <tr class="top-row"
             data-rank="3"
             data-rank_delta="0"
             data-name="Aider"
-            data-stars="45200"
+            data-stars="45213"
             data-last_push="2026-05-22"
             data-weekly_commits="5"
-            data-forks="4463"
             data-downloads="241743"
-            data-hn_mentions_30d="156"
+            data-hn_mentions_30d="158"
             data-score="79.5"
             data-category="Coding Agents"
             data-category_rank="1"
@@ -556,7 +622,6 @@
               </div>
             </td>
             <td class="r num">5</td>
-            <td class="r num">4.5k</td>
             <td class="r">
               
               <span class="num">241,743</span>
@@ -564,7 +629,7 @@
               
             </td>
             <td class="r num">
-              156
+              158
             </td>
             <td class="r">
               <span class="score-pill score-high">79.5</span>
@@ -575,12 +640,11 @@
             data-rank="4"
             data-rank_delta="0"
             data-name="AutoGPT"
-            data-stars="184473"
+            data-stars="184481"
             data-last_push="2026-05-23"
-            data-weekly_commits="0"
-            data-forks="46230"
-            data-downloads="0"
-            data-hn_mentions_30d="251"
+            data-weekly_commits="173"
+            data-downloads="89"
+            data-hn_mentions_30d="370"
             data-score="75.0"
             data-category="Agent Frameworks"
             data-category_rank="1"
@@ -603,15 +667,15 @@
                 <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">46.2k</td>
+            <td class="r num">173</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">89</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
-              251
+              370
             </td>
             <td class="r">
               <span class="score-pill score-high">75.0</span>
@@ -622,11 +686,10 @@
             data-rank="5"
             data-rank_delta="0"
             data-name="Browser Use"
-            data-stars="95201"
+            data-stars="95235"
             data-last_push="2026-05-23"
-            data-weekly_commits="0"
-            data-forks="10717"
-            data-downloads="0"
+            data-weekly_commits="94"
+            data-downloads="6274507"
             data-hn_mentions_30d="10"
             data-score="73.6"
             data-category="Browser &amp; Computer Use"
@@ -650,11 +713,11 @@
                 <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">10.7k</td>
+            <td class="r num">94</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">6,274,507</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
@@ -669,11 +732,10 @@
             data-rank="6"
             data-rank_delta="0"
             data-name="OpenHands"
-            data-stars="74615"
+            data-stars="74655"
             data-last_push="2026-05-23"
-            data-weekly_commits="0"
-            data-forks="9452"
-            data-downloads="0"
+            data-weekly_commits="199"
+            data-downloads="333594"
             data-hn_mentions_30d="1"
             data-score="72.7"
             data-category="Coding Agents"
@@ -690,18 +752,18 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">74.6k</td>
+            <td class="r num">74.7k</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">9.5k</td>
+            <td class="r num">199</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">333,594</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
@@ -716,11 +778,10 @@
             data-rank="7"
             data-rank_delta="0"
             data-name="LLaMA-Factory"
-            data-stars="71527"
+            data-stars="71530"
             data-last_push="2026-05-21"
-            data-weekly_commits="0"
-            data-forks="8722"
-            data-downloads="0"
+            data-weekly_commits="26"
+            data-downloads="33276"
             data-hn_mentions_30d="0"
             data-score="72.2"
             data-category="Research &amp; Data"
@@ -744,11 +805,11 @@
                 <span class="push-text">2026-05-21</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">8.7k</td>
+            <td class="r num">26</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">33,276</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
@@ -763,12 +824,11 @@
             data-rank="8"
             data-rank_delta="0"
             data-name="Cline"
-            data-stars="62209"
+            data-stars="62224"
             data-last_push="2026-05-23"
-            data-weekly_commits="0"
-            data-forks="6507"
+            data-weekly_commits="382"
             data-downloads="63144"
-            data-hn_mentions_30d="3"
+            data-hn_mentions_30d="6"
             data-score="71.5"
             data-category="Coding Agents"
             data-category_rank="3"
@@ -791,8 +851,7 @@
                 <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">6.5k</td>
+            <td class="r num">382</td>
             <td class="r">
               
               <span class="num">63,144</span>
@@ -800,7 +859,7 @@
               
             </td>
             <td class="r num">
-              3
+              6
             </td>
             <td class="r">
               <span class="score-pill score-high">71.5</span>
@@ -811,12 +870,11 @@
             data-rank="9"
             data-rank_delta="0"
             data-name="AnythingLLM"
-            data-stars="60504"
+            data-stars="60524"
             data-last_push="2026-05-23"
-            data-weekly_commits="0"
-            data-forks="6551"
+            data-weekly_commits="53"
             data-downloads="0"
-            data-hn_mentions_30d="1"
+            data-hn_mentions_30d="0"
             data-score="71.4"
             data-category="Memory &amp; Knowledge"
             data-category_rank="1"
@@ -839,15 +897,14 @@
                 <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">6.6k</td>
+            <td class="r num">53</td>
             <td class="r">
               
               <span class="num" style="color: var(--stale);">—</span>
               
             </td>
             <td class="r num">
-              1
+              0
             </td>
             <td class="r">
               <span class="score-pill score-high">71.4</span>
@@ -858,10 +915,9 @@
             data-rank="10"
             data-rank_delta="0"
             data-name="CrewAI"
-            data-stars="52008"
+            data-stars="52032"
             data-last_push="2026-05-23"
-            data-weekly_commits="0"
-            data-forks="7208"
+            data-weekly_commits="108"
             data-downloads="4211814"
             data-hn_mentions_30d="2"
             data-score="71.2"
@@ -886,8 +942,7 @@
                 <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">7.2k</td>
+            <td class="r num">108</td>
             <td class="r">
               
               <span class="num">4,211,814</span>
@@ -906,11 +961,10 @@
             data-rank="11"
             data-rank_delta="0"
             data-name="Mem0"
-            data-stars="56494"
+            data-stars="56536"
             data-last_push="2026-05-23"
-            data-weekly_commits="0"
-            data-forks="6439"
-            data-downloads="0"
+            data-weekly_commits="48"
+            data-downloads="742446"
             data-hn_mentions_30d="464"
             data-score="71.2"
             data-category="Memory &amp; Knowledge"
@@ -934,11 +988,11 @@
                 <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">6.4k</td>
+            <td class="r num">48</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">742,446</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
@@ -953,11 +1007,10 @@
             data-rank="12"
             data-rank_delta="0"
             data-name="Open Interpreter"
-            data-stars="63634"
+            data-stars="63642"
             data-last_push="2026-05-17"
-            data-weekly_commits="0"
-            data-forks="5549"
-            data-downloads="0"
+            data-weekly_commits="7"
+            data-downloads="48059"
             data-hn_mentions_30d="0"
             data-score="70.4"
             data-category="Coding Agents"
@@ -981,11 +1034,11 @@
                 <span class="push-text">2026-05-17</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">5.5k</td>
+            <td class="r num">7</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">48,059</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
@@ -1000,12 +1053,11 @@
             data-rank="13"
             data-rank_delta="0"
             data-name="Agno"
-            data-stars="40307"
+            data-stars="40315"
             data-last_push="2026-05-23"
-            data-weekly_commits="0"
-            data-forks="5413"
+            data-weekly_commits="169"
             data-downloads="1112132"
-            data-hn_mentions_30d="217"
+            data-hn_mentions_30d="226"
             data-score="70.0"
             data-category="Agent Frameworks"
             data-category_rank="3"
@@ -1028,8 +1080,7 @@
                 <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">5.4k</td>
+            <td class="r num">169</td>
             <td class="r">
               
               <span class="num">1,112,132</span>
@@ -1037,7 +1088,7 @@
               
             </td>
             <td class="r num">
-              217
+              226
             </td>
             <td class="r">
               <span class="score-pill score-high">70.0</span>
@@ -1048,13 +1099,12 @@
             data-rank="14"
             data-rank_delta="0"
             data-name="LangGraph"
-            data-stars="32754"
+            data-stars="32777"
             data-last_push="2026-05-22"
-            data-weekly_commits="0"
-            data-forks="5540"
+            data-weekly_commits="118"
             data-downloads="16116082"
             data-hn_mentions_30d="10"
-            data-score="69.5"
+            data-score="69.4"
             data-category="Agent Frameworks"
             data-category_rank="4"
           >
@@ -1076,8 +1126,7 @@
                 <span class="push-text">2026-05-22</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">5.5k</td>
+            <td class="r num">118</td>
             <td class="r">
               
               <span class="num">16,116,082</span>
@@ -1088,7 +1137,7 @@
               10
             </td>
             <td class="r">
-              <span class="score-pill score-mid">69.5</span>
+              <span class="score-pill score-mid">69.4</span>
             </td>
           </tr>
           
@@ -1096,13 +1145,12 @@
             data-rank="15"
             data-rank_delta="0"
             data-name="Continue"
-            data-stars="33335"
+            data-stars="33345"
             data-last_push="2026-05-22"
             data-weekly_commits="0"
-            data-forks="4552"
             data-downloads="88"
             data-hn_mentions_30d="-1"
-            data-score="69.1"
+            data-score="69.0"
             data-category="Coding Agents"
             data-category_rank="5"
           >
@@ -1125,7 +1173,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">4.6k</td>
             <td class="r">
               
               <span class="num">88</span>
@@ -1136,7 +1183,7 @@
               <span style="color: var(--stale);">—</span>
             </td>
             <td class="r">
-              <span class="score-pill score-mid">69.1</span>
+              <span class="score-pill score-mid">69.0</span>
             </td>
           </tr>
           
@@ -1144,10 +1191,9 @@
             data-rank="16"
             data-rank_delta="0"
             data-name="CopilotKit"
-            data-stars="31691"
+            data-stars="31700"
             data-last_push="2026-05-23"
-            data-weekly_commits="0"
-            data-forks="4091"
+            data-weekly_commits="2763"
             data-downloads="262268"
             data-hn_mentions_30d="1"
             data-score="68.8"
@@ -1172,8 +1218,7 @@
                 <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">4.1k</td>
+            <td class="r num">2763</td>
             <td class="r">
               
               <span class="num">262,268</span>
@@ -1192,12 +1237,11 @@
             data-rank="17"
             data-rank_delta="0"
             data-name="Composio"
-            data-stars="28405"
+            data-stars="28418"
             data-last_push="2026-05-21"
-            data-weekly_commits="0"
-            data-forks="4583"
+            data-weekly_commits="342"
             data-downloads="101053"
-            data-hn_mentions_30d="41"
+            data-hn_mentions_30d="117"
             data-score="68.5"
             data-category="Agent Frameworks"
             data-category_rank="6"
@@ -1220,8 +1264,7 @@
                 <span class="push-text">2026-05-21</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">4.6k</td>
+            <td class="r num">342</td>
             <td class="r">
               
               <span class="num">101,053</span>
@@ -1229,7 +1272,7 @@
               
             </td>
             <td class="r num">
-              41
+              117
             </td>
             <td class="r">
               <span class="score-pill score-mid">68.5</span>
@@ -1239,19 +1282,64 @@
           <tr
             data-rank="18"
             data-rank_delta="0"
-            data-name="Semantic Kernel"
-            data-stars="27962"
-            data-last_push="2026-05-19"
-            data-weekly_commits="0"
-            data-forks="4605"
-            data-downloads="656343"
-            data-hn_mentions_30d="0"
+            data-name="Vercel AI SDK"
+            data-stars="24423"
+            data-last_push="2026-05-23"
+            data-weekly_commits="323"
+            data-downloads="13769108"
+            data-hn_mentions_30d="7"
             data-score="68.3"
             data-category="Agent Frameworks"
             data-category_rank="7"
           >
             <td class="rank r">
               <span class="rank-num">18</span>
+            </td>
+            <td class="delta delta-same">—</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="https://github.com/vercel/ai" target="_blank" rel="noopener noreferrer">Vercel AI SDK</a>
+              <span class="agent-repo">vercel/ai</span>
+              <span class="agent-desc" title="The AI Toolkit for TypeScript. From the creators of Next.js, the AI SDK is a free open-source library for building AI-po">The AI Toolkit for TypeScript. From the creators of Next.js, the AI SDK is a free open-source library for building AI-po</span>
+              <span class="lang">TypeScript</span>
+              <span class="cat-badge">Agent Frameworks</span>
+            </td>
+            <td class="r num">24.4k</td>
+            <td>
+              <div class="push-date fresh">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-05-23</span>
+              </div>
+            </td>
+            <td class="r num">323</td>
+            <td class="r">
+              
+              <span class="num">13,769,108</span>
+              <span class="dl-source">npm</span>
+              
+            </td>
+            <td class="r num">
+              7
+            </td>
+            <td class="r">
+              <span class="score-pill score-mid">68.3</span>
+            </td>
+          </tr>
+          
+          <tr
+            data-rank="19"
+            data-rank_delta="0"
+            data-name="Semantic Kernel"
+            data-stars="27963"
+            data-last_push="2026-05-19"
+            data-weekly_commits="35"
+            data-downloads="656343"
+            data-hn_mentions_30d="0"
+            data-score="68.2"
+            data-category="Agent Frameworks"
+            data-category_rank="8"
+          >
+            <td class="rank r">
+              <span class="rank-num">19</span>
             </td>
             <td class="delta delta-same">—</td>
             <td class="agent-cell">
@@ -1268,8 +1356,7 @@
                 <span class="push-text">2026-05-19</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">4.6k</td>
+            <td class="r num">35</td>
             <td class="r">
               
               <span class="num">656,343</span>
@@ -1280,122 +1367,25 @@
               0
             </td>
             <td class="r">
-              <span class="score-pill score-mid">68.3</span>
-            </td>
-          </tr>
-          
-          <tr
-            data-rank="19"
-            data-rank_delta="0"
-            data-name="Vercel AI SDK"
-            data-stars="24419"
-            data-last_push="2026-05-22"
-            data-weekly_commits="0"
-            data-forks="4463"
-            data-downloads="13769108"
-            data-hn_mentions_30d="8"
-            data-score="68.3"
-            data-category="Agent Frameworks"
-            data-category_rank="8"
-          >
-            <td class="rank r">
-              <span class="rank-num">19</span>
-            </td>
-            <td class="delta delta-same">—</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="https://github.com/vercel/ai" target="_blank" rel="noopener noreferrer">Vercel AI SDK</a>
-              <span class="agent-repo">vercel/ai</span>
-              <span class="agent-desc" title="The AI Toolkit for TypeScript. From the creators of Next.js, the AI SDK is a free open-source library for building AI-po">The AI Toolkit for TypeScript. From the creators of Next.js, the AI SDK is a free open-source library for building AI-po</span>
-              <span class="lang">TypeScript</span>
-              <span class="cat-badge">Agent Frameworks</span>
-            </td>
-            <td class="r num">24.4k</td>
-            <td>
-              <div class="push-date fresh">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-05-22</span>
-              </div>
-            </td>
-            <td class="r num">0</td>
-            <td class="r num">4.5k</td>
-            <td class="r">
-              
-              <span class="num">13,769,108</span>
-              <span class="dl-source">npm</span>
-              
-            </td>
-            <td class="r num">
-              8
-            </td>
-            <td class="r">
-              <span class="score-pill score-mid">68.3</span>
+              <span class="score-pill score-mid">68.2</span>
             </td>
           </tr>
           
           <tr
             data-rank="20"
             data-rank_delta="0"
-            data-name="Haystack"
-            data-stars="25351"
-            data-last_push="2026-05-22"
-            data-weekly_commits="0"
-            data-forks="2804"
-            data-downloads="229199"
-            data-hn_mentions_30d="-1"
-            data-score="67.5"
-            data-category="Workflow Platforms"
-            data-category_rank="2"
-          >
-            <td class="rank r">
-              <span class="rank-num">20</span>
-            </td>
-            <td class="delta delta-same">—</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="https://github.com/deepset-ai/haystack" target="_blank" rel="noopener noreferrer">Haystack</a>
-              <span class="agent-repo">deepset-ai/haystack</span>
-              <span class="agent-desc" title="Open-source AI orchestration framework for building context-engineered, production-ready LLM applications. Design modula">Open-source AI orchestration framework for building context-engineered, production-ready LLM applications. Design modula</span>
-              <span class="lang">MDX</span>
-              <span class="cat-badge">Workflow Platforms</span>
-            </td>
-            <td class="r num">25.4k</td>
-            <td>
-              <div class="push-date fresh">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-05-22</span>
-              </div>
-            </td>
-            <td class="r num">0</td>
-            <td class="r num">2.8k</td>
-            <td class="r">
-              
-              <span class="num">229,199</span>
-              <span class="dl-source">pypi</span>
-              
-            </td>
-            <td class="r num">
-              <span style="color: var(--stale);">—</span>
-            </td>
-            <td class="r">
-              <span class="score-pill score-mid">67.5</span>
-            </td>
-          </tr>
-          
-          <tr
-            data-rank="21"
-            data-rank_delta="0"
             data-name="ChatDev"
-            data-stars="33167"
+            data-stars="33168"
             data-last_push="2026-05-12"
-            data-weekly_commits="0"
-            data-forks="4111"
+            data-weekly_commits="5"
             data-downloads="40"
-            data-hn_mentions_30d="6"
+            data-hn_mentions_30d="4"
             data-score="67.4"
             data-category="Multi-Agent Systems"
             data-category_rank="1"
           >
             <td class="rank r">
-              <span class="rank-num">21</span>
+              <span class="rank-num">20</span>
             </td>
             <td class="delta delta-same">—</td>
             <td class="agent-cell">
@@ -1412,8 +1402,7 @@
                 <span class="push-text">2026-05-12</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">4.1k</td>
+            <td class="r num">5</td>
             <td class="r">
               
               <span class="num">40</span>
@@ -1421,7 +1410,7 @@
               
             </td>
             <td class="r num">
-              6
+              4
             </td>
             <td class="r">
               <span class="score-pill score-mid">67.4</span>
@@ -1429,14 +1418,59 @@
           </tr>
           
           <tr
+            data-rank="21"
+            data-rank_delta="0"
+            data-name="Haystack"
+            data-stars="25355"
+            data-last_push="2026-05-22"
+            data-weekly_commits="120"
+            data-downloads="229199"
+            data-hn_mentions_30d="-1"
+            data-score="67.3"
+            data-category="Workflow Platforms"
+            data-category_rank="2"
+          >
+            <td class="rank r">
+              <span class="rank-num">21</span>
+            </td>
+            <td class="delta delta-same">—</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="https://github.com/deepset-ai/haystack" target="_blank" rel="noopener noreferrer">Haystack</a>
+              <span class="agent-repo">deepset-ai/haystack</span>
+              <span class="agent-desc" title="Open-source AI orchestration framework for building context-engineered, production-ready LLM applications. Design modula">Open-source AI orchestration framework for building context-engineered, production-ready LLM applications. Design modula</span>
+              <span class="lang">MDX</span>
+              <span class="cat-badge">Workflow Platforms</span>
+            </td>
+            <td class="r num">25.4k</td>
+            <td>
+              <div class="push-date fresh">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-05-22</span>
+              </div>
+            </td>
+            <td class="r num">120</td>
+            <td class="r">
+              
+              <span class="num">229,199</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r num">
+              <span style="color: var(--stale);">—</span>
+            </td>
+            <td class="r">
+              <span class="score-pill score-mid">67.3</span>
+            </td>
+          </tr>
+          
+          <tr
             data-rank="22"
             data-rank_delta="0"
             data-name="Resume Matcher"
-            data-stars="27136"
+            data-stars="27139"
             data-last_push="2026-05-12"
-            data-weekly_commits="0"
-            data-forks="4839"
-            data-downloads="0"
+            data-weekly_commits="39"
+            data-downloads="47"
             data-hn_mentions_30d="-1"
             data-score="67.2"
             data-category="Research &amp; Data"
@@ -1460,11 +1494,11 @@
                 <span class="push-text">2026-05-12</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">4.8k</td>
+            <td class="r num">39</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">47</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
@@ -1478,58 +1512,10 @@
           <tr
             data-rank="23"
             data-rank_delta="0"
-            data-name="Roo Code"
-            data-stars="24137"
-            data-last_push="2026-05-15"
-            data-weekly_commits="0"
-            data-forks="3265"
-            data-downloads="0"
-            data-hn_mentions_30d="-1"
-            data-score="66.7"
-            data-category="Coding Agents"
-            data-category_rank="6"
-          >
-            <td class="rank r">
-              <span class="rank-num">23</span>
-            </td>
-            <td class="delta delta-same">—</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="https://github.com/RooCodeInc/Roo-Code" target="_blank" rel="noopener noreferrer">Roo Code</a>
-              <span class="agent-repo">RooVetGit/Roo-Code</span>
-              <span class="agent-desc" title="Roo Code gives you a whole dev team of AI agents in your code editor.">Roo Code gives you a whole dev team of AI agents in your code editor.</span>
-              <span class="lang">TypeScript</span>
-              <span class="cat-badge">Coding Agents</span>
-            </td>
-            <td class="r num">24.1k</td>
-            <td>
-              <div class="push-date fresh">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-05-15</span>
-              </div>
-            </td>
-            <td class="r num">0</td>
-            <td class="r num">3.3k</td>
-            <td class="r">
-              
-              <span class="num" style="color: var(--stale);">—</span>
-              
-            </td>
-            <td class="r num">
-              <span style="color: var(--stale);">—</span>
-            </td>
-            <td class="r">
-              <span class="score-pill score-mid">66.7</span>
-            </td>
-          </tr>
-          
-          <tr
-            data-rank="24"
-            data-rank_delta="0"
             data-name="AutoGen"
-            data-stars="58311"
+            data-stars="58323"
             data-last_push="2026-04-15"
             data-weekly_commits="0"
-            data-forks="8808"
             data-downloads="344466"
             data-hn_mentions_30d="6"
             data-score="66.7"
@@ -1537,7 +1523,7 @@
             data-category_rank="9"
           >
             <td class="rank r">
-              <span class="rank-num">24</span>
+              <span class="rank-num">23</span>
             </td>
             <td class="delta delta-same">—</td>
             <td class="agent-cell">
@@ -1555,7 +1541,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">8.8k</td>
             <td class="r">
               
               <span class="num">344,466</span>
@@ -1571,13 +1556,58 @@
           </tr>
           
           <tr
+            data-rank="24"
+            data-rank_delta="0"
+            data-name="Roo Code"
+            data-stars="24138"
+            data-last_push="2026-05-15"
+            data-weekly_commits="18"
+            data-downloads="4"
+            data-hn_mentions_30d="-1"
+            data-score="66.5"
+            data-category="Coding Agents"
+            data-category_rank="6"
+          >
+            <td class="rank r">
+              <span class="rank-num">24</span>
+            </td>
+            <td class="delta delta-same">—</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="https://github.com/RooCodeInc/Roo-Code" target="_blank" rel="noopener noreferrer">Roo Code</a>
+              <span class="agent-repo">RooVetGit/Roo-Code</span>
+              <span class="agent-desc" title="Roo Code gives you a whole dev team of AI agents in your code editor.">Roo Code gives you a whole dev team of AI agents in your code editor.</span>
+              <span class="lang">TypeScript</span>
+              <span class="cat-badge">Coding Agents</span>
+            </td>
+            <td class="r num">24.1k</td>
+            <td>
+              <div class="push-date recent">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-05-15</span>
+              </div>
+            </td>
+            <td class="r num">18</td>
+            <td class="r">
+              
+              <span class="num">4</span>
+              <span class="dl-source">npm</span>
+              
+            </td>
+            <td class="r num">
+              <span style="color: var(--stale);">—</span>
+            </td>
+            <td class="r">
+              <span class="score-pill score-mid">66.5</span>
+            </td>
+          </tr>
+          
+          <tr
             data-rank="25"
             data-rank_delta="0"
             data-name="PydanticAI"
-            data-stars="17228"
+            data-stars="17242"
             data-last_push="2026-05-23"
-            data-weekly_commits="0"
-            data-forks="2121"
+            data-weekly_commits="139"
             data-downloads="8665106"
             data-hn_mentions_30d="1"
             data-score="65.9"
@@ -1602,8 +1632,7 @@
                 <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">2.1k</td>
+            <td class="r num">139</td>
             <td class="r">
               
               <span class="num">8,665,106</span>
@@ -1622,13 +1651,12 @@
             data-rank="26"
             data-rank_delta="0"
             data-name="Letta"
-            data-stars="22911"
+            data-stars="22916"
             data-last_push="2026-05-14"
-            data-weekly_commits="0"
-            data-forks="2437"
+            data-weekly_commits="1"
             data-downloads="8700"
             data-hn_mentions_30d="0"
-            data-score="65.8"
+            data-score="65.7"
             data-category="Memory &amp; Knowledge"
             data-category_rank="3"
           >
@@ -1650,8 +1678,7 @@
                 <span class="push-text">2026-05-14</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">2.4k</td>
+            <td class="r num">1</td>
             <td class="r">
               
               <span class="num">8,700</span>
@@ -1662,7 +1689,7 @@
               0
             </td>
             <td class="r">
-              <span class="score-pill score-mid">65.8</span>
+              <span class="score-pill score-mid">65.7</span>
             </td>
           </tr>
           
@@ -1670,13 +1697,12 @@
             data-rank="27"
             data-rank_delta="0"
             data-name="SWE-agent"
-            data-stars="19279"
+            data-stars="19280"
             data-last_push="2026-05-18"
             data-weekly_commits="0"
-            data-forks="2093"
             data-downloads="77"
             data-hn_mentions_30d="1"
-            data-score="65.6"
+            data-score="65.5"
             data-category="Coding Agents"
             data-category_rank="7"
           >
@@ -1699,18 +1725,17 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">2.1k</td>
             <td class="r">
               
               <span class="num">77</span>
-              <span class="dl-source">pypi</span>
+              <span class="dl-source"></span>
               
             </td>
             <td class="r num">
               1
             </td>
             <td class="r">
-              <span class="score-pill score-mid">65.6</span>
+              <span class="score-pill score-mid">65.5</span>
             </td>
           </tr>
           
@@ -1720,9 +1745,8 @@
             data-name="CAMEL"
             data-stars="17025"
             data-last_push="2026-05-19"
-            data-weekly_commits="0"
-            data-forks="1911"
-            data-downloads="0"
+            data-weekly_commits="38"
+            data-downloads="37362"
             data-hn_mentions_30d="0"
             data-score="65.1"
             data-category="Multi-Agent Systems"
@@ -1746,11 +1770,11 @@
                 <span class="push-text">2026-05-19</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">1.9k</td>
+            <td class="r num">38</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">37,362</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
@@ -1765,13 +1789,12 @@
             data-rank="29"
             data-rank_delta="0"
             data-name="Guidance"
-            data-stars="21473"
+            data-stars="21474"
             data-last_push="2026-05-21"
-            data-weekly_commits="0"
-            data-forks="1164"
-            data-downloads="0"
+            data-weekly_commits="4"
+            data-downloads="6466"
             data-hn_mentions_30d="-1"
-            data-score="65.1"
+            data-score="65.0"
             data-category="Agent Frameworks"
             data-category_rank="11"
           >
@@ -1793,18 +1816,18 @@
                 <span class="push-text">2026-05-21</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">1.2k</td>
+            <td class="r num">4</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">6,466</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               <span style="color: var(--stale);">—</span>
             </td>
             <td class="r">
-              <span class="score-pill score-mid">65.1</span>
+              <span class="score-pill score-mid">65.0</span>
             </td>
           </tr>
           
@@ -1812,13 +1835,12 @@
             data-rank="30"
             data-rank_delta="0"
             data-name="Maxun"
-            data-stars="15607"
-            data-last_push="2026-05-21"
-            data-weekly_commits="0"
-            data-forks="1283"
-            data-downloads="0"
+            data-stars="15608"
+            data-last_push="2026-05-23"
+            data-weekly_commits="68"
+            data-downloads="26"
             data-hn_mentions_30d="13"
-            data-score="64.5"
+            data-score="64.6"
             data-category="Research &amp; Data"
             data-category_rank="3"
           >
@@ -1837,21 +1859,21 @@
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
-                <span class="push-text">2026-05-21</span>
+                <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">1.3k</td>
+            <td class="r num">68</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">26</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               13
             </td>
             <td class="r">
-              <span class="score-pill score-mid">64.5</span>
+              <span class="score-pill score-mid">64.6</span>
             </td>
           </tr>
           
@@ -1859,10 +1881,9 @@
             data-rank="31"
             data-rank_delta="0"
             data-name="GPT Pilot"
-            data-stars="33774"
+            data-stars="33771"
             data-last_push="2026-04-17"
             data-weekly_commits="0"
-            data-forks="3494"
             data-downloads="52"
             data-hn_mentions_30d="0"
             data-score="63.6"
@@ -1888,7 +1909,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">3.5k</td>
             <td class="r">
               
               <span class="num">52</span>
@@ -1907,11 +1927,10 @@
             data-rank="32"
             data-rank_delta="0"
             data-name="E2B"
-            data-stars="12334"
+            data-stars="12335"
             data-last_push="2026-05-23"
-            data-weekly_commits="0"
-            data-forks="911"
-            data-downloads="1044470"
+            data-weekly_commits="34"
+            data-downloads="1050240"
             data-hn_mentions_30d="1"
             data-score="63.3"
             data-category="LLM Gateways &amp; Infra"
@@ -1935,12 +1954,11 @@
                 <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">911</td>
+            <td class="r num">34</td>
             <td class="r">
               
-              <span class="num">1,044,470</span>
-              <span class="dl-source">pypi</span>
+              <span class="num">1,050,240</span>
+              <span class="dl-source">npm+pypi</span>
               
             </td>
             <td class="r num">
@@ -1955,13 +1973,12 @@
             data-rank="33"
             data-rank_delta="0"
             data-name="GPT Researcher"
-            data-stars="27244"
+            data-stars="27248"
             data-last_push="2026-04-16"
             data-weekly_commits="0"
-            data-forks="3662"
-            data-downloads="0"
+            data-downloads="28595"
             data-hn_mentions_30d="0"
-            data-score="63.2"
+            data-score="63.0"
             data-category="Research &amp; Data"
             data-category_rank="4"
           >
@@ -1984,17 +2001,17 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">3.7k</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">28,595</span>
+              <span class="dl-source"></span>
               
             </td>
             <td class="r num">
               0
             </td>
             <td class="r">
-              <span class="score-pill score-mid">63.2</span>
+              <span class="score-pill score-mid">63.0</span>
             </td>
           </tr>
           
@@ -2002,11 +2019,10 @@
             data-rank="34"
             data-rank_delta="0"
             data-name="LLM"
-            data-stars="11915"
+            data-stars="11916"
             data-last_push="2026-05-17"
-            data-weekly_commits="0"
-            data-forks="856"
-            data-downloads="0"
+            data-weekly_commits="49"
+            data-downloads="65213"
             data-hn_mentions_30d="-1"
             data-score="62.3"
             data-category="LLM Gateways &amp; Infra"
@@ -2030,11 +2046,11 @@
                 <span class="push-text">2026-05-17</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">856</td>
+            <td class="r num">49</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">65,213</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
@@ -2051,8 +2067,7 @@
             data-name="PromptFlow"
             data-stars="11131"
             data-last_push="2026-05-14"
-            data-weekly_commits="0"
-            data-forks="1105"
+            data-weekly_commits="6"
             data-downloads="94859"
             data-hn_mentions_30d="0"
             data-score="62.2"
@@ -2077,8 +2092,7 @@
                 <span class="push-text">2026-05-14</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">1.1k</td>
+            <td class="r num">6</td>
             <td class="r">
               
               <span class="num">94,859</span>
@@ -2097,10 +2111,9 @@
             data-rank="36"
             data-rank_delta="0"
             data-name="UFO"
-            data-stars="8732"
+            data-stars="8735"
             data-last_push="2026-05-15"
-            data-weekly_commits="0"
-            data-forks="1022"
+            data-weekly_commits="19"
             data-downloads="0"
             data-hn_mentions_30d="-1"
             data-score="61.5"
@@ -2125,8 +2138,7 @@
                 <span class="push-text">2026-05-15</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">1.0k</td>
+            <td class="r num">19</td>
             <td class="r">
               
               <span class="num" style="color: var(--stale);">—</span>
@@ -2147,10 +2159,9 @@
             data-stars="24797"
             data-last_push="2026-04-13"
             data-weekly_commits="0"
-            data-forks="2173"
             data-downloads="0"
             data-hn_mentions_30d="1"
-            data-score="61.5"
+            data-score="61.3"
             data-category="Browser &amp; Computer Use"
             data-category_rank="3"
           >
@@ -2173,7 +2184,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">2.2k</td>
             <td class="r">
               
               <span class="num" style="color: var(--stale);">—</span>
@@ -2183,7 +2193,7 @@
               1
             </td>
             <td class="r">
-              <span class="score-pill score-mid">61.5</span>
+              <span class="score-pill score-mid">61.3</span>
             </td>
           </tr>
           
@@ -2191,10 +2201,9 @@
             data-rank="38"
             data-rank_delta="0"
             data-name="LlamaCoder"
-            data-stars="6939"
+            data-stars="6940"
             data-last_push="2026-05-08"
-            data-weekly_commits="0"
-            data-forks="1644"
+            data-weekly_commits="3"
             data-downloads="0"
             data-hn_mentions_30d="0"
             data-score="60.9"
@@ -2219,8 +2228,7 @@
                 <span class="push-text">2026-05-08</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">1.6k</td>
+            <td class="r num">3</td>
             <td class="r">
               
               <span class="num" style="color: var(--stale);">—</span>
@@ -2238,12 +2246,11 @@
             data-rank="39"
             data-rank_delta="0"
             data-name="Khoj"
-            data-stars="34669"
+            data-stars="34673"
             data-last_push="2026-03-26"
             data-weekly_commits="0"
-            data-forks="2202"
             data-downloads="4710"
-            data-hn_mentions_30d="8"
+            data-hn_mentions_30d="9"
             data-score="59.7"
             data-category="Memory &amp; Knowledge"
             data-category_rank="4"
@@ -2267,7 +2274,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">2.2k</td>
             <td class="r">
               
               <span class="num">4,710</span>
@@ -2275,7 +2281,7 @@
               
             </td>
             <td class="r num">
-              8
+              9
             </td>
             <td class="r">
               <span class="score-pill score-mid">59.7</span>
@@ -2288,8 +2294,7 @@
             data-name="GPTMe"
             data-stars="4307"
             data-last_push="2026-05-23"
-            data-weekly_commits="0"
-            data-forks="389"
+            data-weekly_commits="202"
             data-downloads="7012"
             data-hn_mentions_30d="3"
             data-score="58.9"
@@ -2314,8 +2319,7 @@
                 <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">0</td>
-            <td class="r num">389</td>
+            <td class="r num">202</td>
             <td class="r">
               
               <span class="num">7,012</span>
@@ -2337,10 +2341,9 @@
             data-stars="33541"
             data-last_push="2026-03-02"
             data-weekly_commits="0"
-            data-forks="1747"
-            data-downloads="0"
-            data-hn_mentions_30d="2"
-            data-score="56.0"
+            data-downloads="1"
+            data-hn_mentions_30d="0"
+            data-score="55.8"
             data-category="Coding Agents"
             data-category_rank="11"
           >
@@ -2363,17 +2366,17 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">1.7k</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">1</span>
+              <span class="dl-source">npm</span>
               
             </td>
             <td class="r num">
-              2
+              0
             </td>
             <td class="r">
-              <span class="score-pill score-mid">56.0</span>
+              <span class="score-pill score-mid">55.8</span>
             </td>
           </tr>
           
@@ -2381,12 +2384,11 @@
             data-rank="42"
             data-rank_delta="0"
             data-name="MetaGPT"
-            data-stars="68231"
+            data-stars="68239"
             data-last_push="2026-01-21"
             data-weekly_commits="0"
-            data-forks="8694"
             data-downloads="7820"
-            data-hn_mentions_30d="2"
+            data-hn_mentions_30d="40"
             data-score="55.4"
             data-category="Multi-Agent Systems"
             data-category_rank="3"
@@ -2410,7 +2412,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">8.7k</td>
             <td class="r">
               
               <span class="num">7,820</span>
@@ -2418,7 +2419,7 @@
               
             </td>
             <td class="r num">
-              2
+              40
             </td>
             <td class="r">
               <span class="score-pill score-mid">55.4</span>
@@ -2432,8 +2433,7 @@
             data-stars="4147"
             data-last_push="2026-04-28"
             data-weekly_commits="0"
-            data-forks="373"
-            data-downloads="0"
+            data-downloads="2665"
             data-hn_mentions_30d="0"
             data-score="55.2"
             data-category="Agent Frameworks"
@@ -2458,10 +2458,10 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">373</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">2,665</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
@@ -2476,10 +2476,9 @@
             data-rank="44"
             data-rank_delta="0"
             data-name="Qwen Agent"
-            data-stars="16384"
+            data-stars="16385"
             data-last_push="2026-03-04"
             data-weekly_commits="0"
-            data-forks="1610"
             data-downloads="96785"
             data-hn_mentions_30d="0"
             data-score="54.1"
@@ -2505,7 +2504,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">1.6k</td>
             <td class="r">
               
               <span class="num">96,785</span>
@@ -2524,10 +2522,9 @@
             data-rank="45"
             data-rank_delta="0"
             data-name="TaskWeaver"
-            data-stars="6160"
+            data-stars="6161"
             data-last_push="2026-03-23"
             data-weekly_commits="0"
-            data-forks="776"
             data-downloads="0"
             data-hn_mentions_30d="0"
             data-score="52.7"
@@ -2553,7 +2550,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">776</td>
             <td class="r">
               
               <span class="num" style="color: var(--stale);">—</span>
@@ -2571,12 +2567,11 @@
             data-rank="46"
             data-rank_delta="0"
             data-name="BabyAGI"
-            data-stars="22274"
+            data-stars="22276"
             data-last_push="2026-01-31"
             data-weekly_commits="0"
-            data-forks="2854"
-            data-downloads="0"
-            data-hn_mentions_30d="2"
+            data-downloads="63"
+            data-hn_mentions_30d="8"
             data-score="51.6"
             data-category="Agent Frameworks"
             data-category_rank="15"
@@ -2600,14 +2595,14 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">2.9k</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">63</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
-              2
+              8
             </td>
             <td class="r">
               <span class="score-pill score-mid">51.6</span>
@@ -2618,13 +2613,12 @@
             data-rank="47"
             data-rank_delta="0"
             data-name="AgentOps"
-            data-stars="5572"
+            data-stars="5573"
             data-last_push="2026-03-19"
             data-weekly_commits="0"
-            data-forks="585"
             data-downloads="142131"
-            data-hn_mentions_30d="397"
-            data-score="51.5"
+            data-hn_mentions_30d="1090"
+            data-score="51.3"
             data-category="LLM Gateways &amp; Infra"
             data-category_rank="4"
           >
@@ -2647,7 +2641,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">585</td>
             <td class="r">
               
               <span class="num">142,131</span>
@@ -2655,10 +2648,10 @@
               
             </td>
             <td class="r num">
-              397
+              1090
             </td>
             <td class="r">
-              <span class="score-pill score-mid">51.5</span>
+              <span class="score-pill score-mid">51.3</span>
             </td>
           </tr>
           
@@ -2666,11 +2659,10 @@
             data-rank="48"
             data-rank_delta="0"
             data-name="UI-TARS"
-            data-stars="10702"
+            data-stars="10706"
             data-last_push="2026-01-27"
             data-weekly_commits="0"
-            data-forks="801"
-            data-downloads="0"
+            data-downloads="2852"
             data-hn_mentions_30d="1"
             data-score="46.6"
             data-category="Browser &amp; Computer Use"
@@ -2695,10 +2687,10 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">801</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">2,852</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
@@ -2716,8 +2708,7 @@
             data-stars="55217"
             data-last_push="2025-05-14"
             data-weekly_commits="0"
-            data-forks="7345"
-            data-downloads="0"
+            data-downloads="375"
             data-hn_mentions_30d="1"
             data-score="46.4"
             data-category="Coding Agents"
@@ -2742,10 +2733,10 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">7.3k</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">375</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
@@ -2763,7 +2754,6 @@
             data-stars="5284"
             data-last_push="2026-01-29"
             data-weekly_commits="0"
-            data-forks="598"
             data-downloads="1398"
             data-hn_mentions_30d="0"
             data-score="44.4"
@@ -2789,7 +2779,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">598</td>
             <td class="r">
               
               <span class="num">1,398</span>
@@ -2811,10 +2800,9 @@
             data-stars="3446"
             data-last_push="2026-02-08"
             data-weekly_commits="0"
-            data-forks="255"
             data-downloads="0"
             data-hn_mentions_30d="0"
-            data-score="43.1"
+            data-score="43.0"
             data-category="Agent Frameworks"
             data-category_rank="16"
           >
@@ -2837,7 +2825,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">255</td>
             <td class="r">
               
               <span class="num" style="color: var(--stale);">—</span>
@@ -2847,7 +2834,7 @@
               0
             </td>
             <td class="r">
-              <span class="score-pill score-low">43.1</span>
+              <span class="score-pill score-low">43.0</span>
             </td>
           </tr>
           
@@ -2855,11 +2842,10 @@
             data-rank="52"
             data-rank_delta="0"
             data-name="GPT Crawler"
-            data-stars="22246"
+            data-stars="22245"
             data-last_push="2025-07-07"
             data-weekly_commits="0"
-            data-forks="2376"
-            data-downloads="0"
+            data-downloads="111"
             data-hn_mentions_30d="0"
             data-score="41.8"
             data-category="Research &amp; Data"
@@ -2884,10 +2870,10 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">2.4k</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">111</span>
+              <span class="dl-source">npm</span>
               
             </td>
             <td class="r num">
@@ -2902,10 +2888,9 @@
             data-rank="53"
             data-rank_delta="0"
             data-name="Devika"
-            data-stars="19510"
+            data-stars="19508"
             data-last_push="2025-09-25"
             data-weekly_commits="0"
-            data-forks="2590"
             data-downloads="0"
             data-hn_mentions_30d="3"
             data-score="41.6"
@@ -2931,7 +2916,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">2.6k</td>
             <td class="r">
               
               <span class="num" style="color: var(--stale);">—</span>
@@ -2949,12 +2933,11 @@
             data-rank="54"
             data-rank_delta="0"
             data-name="SuperAGI"
-            data-stars="17533"
+            data-stars="17532"
             data-last_push="2025-01-22"
             data-weekly_commits="0"
-            data-forks="2215"
-            data-downloads="0"
-            data-hn_mentions_30d="2"
+            data-downloads="42"
+            data-hn_mentions_30d="56"
             data-score="41.0"
             data-category="Agent Frameworks"
             data-category_rank="17"
@@ -2978,14 +2961,14 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">2.2k</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">42</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
-              2
+              56
             </td>
             <td class="r">
               <span class="score-pill score-low">41.0</span>
@@ -2999,10 +2982,9 @@
             data-stars="2224"
             data-last_push="2026-01-30"
             data-weekly_commits="0"
-            data-forks="210"
-            data-downloads="0"
+            data-downloads="277"
             data-hn_mentions_30d="1"
-            data-score="40.3"
+            data-score="40.2"
             data-category="Coding Agents"
             data-category_rank="14"
           >
@@ -3025,17 +3007,17 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">210</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">277</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               1
             </td>
             <td class="r">
-              <span class="score-pill score-low">40.3</span>
+              <span class="score-pill score-low">40.2</span>
             </td>
           </tr>
           
@@ -3043,11 +3025,10 @@
             data-rank="56"
             data-rank_delta="0"
             data-name="smol developer"
-            data-stars="12185"
+            data-stars="12186"
             data-last_push="2024-04-07"
             data-weekly_commits="0"
-            data-forks="1080"
-            data-downloads="0"
+            data-downloads="32"
             data-hn_mentions_30d="0"
             data-score="38.6"
             data-category="Coding Agents"
@@ -3072,10 +3053,10 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">1.1k</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">32</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
@@ -3090,10 +3071,9 @@
             data-rank="57"
             data-rank_delta="0"
             data-name="OpenGPTs"
-            data-stars="6747"
+            data-stars="6745"
             data-last_push="2025-06-26"
             data-weekly_commits="0"
-            data-forks="913"
             data-downloads="0"
             data-hn_mentions_30d="1"
             data-score="36.7"
@@ -3119,7 +3099,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">913</td>
             <td class="r">
               
               <span class="num" style="color: var(--stale);">—</span>
@@ -3140,7 +3119,6 @@
             data-stars="5959"
             data-last_push="2024-08-14"
             data-weekly_commits="0"
-            data-forks="725"
             data-downloads="0"
             data-hn_mentions_30d="0"
             data-score="36.0"
@@ -3166,7 +3144,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">725</td>
             <td class="r">
               
               <span class="num" style="color: var(--stale);">—</span>
@@ -3183,66 +3160,18 @@
           <tr
             data-rank="59"
             data-rank_delta="0"
-            data-name="LaVague"
-            data-stars="6354"
-            data-last_push="2025-01-21"
-            data-weekly_commits="0"
-            data-forks="574"
-            data-downloads="0"
-            data-hn_mentions_30d="2"
-            data-score="35.7"
-            data-category="Browser &amp; Computer Use"
-            data-category_rank="6"
-          >
-            <td class="rank r">
-              <span class="rank-num">59</span>
-            </td>
-            <td class="delta delta-same">—</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="https://github.com/lavague-ai/LaVague" target="_blank" rel="noopener noreferrer">LaVague</a>
-              <span class="agent-repo">lavague-ai/LaVague</span>
-              <span class="agent-desc" title="Large Action Model framework to develop AI Web Agents">Large Action Model framework to develop AI Web Agents</span>
-              <span class="lang">Python</span>
-              <span class="cat-badge">Browser &amp; Computer Use</span>
-            </td>
-            <td class="r num">6.4k</td>
-            <td>
-              <div class="push-date stale">
-                <span class="push-dot"></span>
-                <span class="push-text">2025-01-21</span>
-              </div>
-            </td>
-            <td class="r num">0</td>
-            <td class="r num">574</td>
-            <td class="r">
-              
-              <span class="num" style="color: var(--stale);">—</span>
-              
-            </td>
-            <td class="r num">
-              2
-            </td>
-            <td class="r">
-              <span class="score-pill score-low">35.7</span>
-            </td>
-          </tr>
-          
-          <tr
-            data-rank="60"
-            data-rank_delta="0"
             data-name="Sweep"
             data-stars="7713"
             data-last_push="2025-09-18"
             data-weekly_commits="0"
-            data-forks="461"
-            data-downloads="0"
+            data-downloads="184"
             data-hn_mentions_30d="-1"
             data-score="35.7"
             data-category="Coding Agents"
             data-category_rank="16"
           >
             <td class="rank r">
-              <span class="rank-num">60</span>
+              <span class="rank-num">59</span>
             </td>
             <td class="delta delta-same">—</td>
             <td class="agent-cell">
@@ -3260,10 +3189,10 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">461</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">184</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
@@ -3275,13 +3204,58 @@
           </tr>
           
           <tr
+            data-rank="60"
+            data-rank_delta="0"
+            data-name="LaVague"
+            data-stars="6355"
+            data-last_push="2025-01-21"
+            data-weekly_commits="0"
+            data-downloads="207"
+            data-hn_mentions_30d="12"
+            data-score="35.6"
+            data-category="Browser &amp; Computer Use"
+            data-category_rank="6"
+          >
+            <td class="rank r">
+              <span class="rank-num">60</span>
+            </td>
+            <td class="delta delta-same">—</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="https://github.com/lavague-ai/LaVague" target="_blank" rel="noopener noreferrer">LaVague</a>
+              <span class="agent-repo">lavague-ai/LaVague</span>
+              <span class="agent-desc" title="Large Action Model framework to develop AI Web Agents">Large Action Model framework to develop AI Web Agents</span>
+              <span class="lang">Python</span>
+              <span class="cat-badge">Browser &amp; Computer Use</span>
+            </td>
+            <td class="r num">6.4k</td>
+            <td>
+              <div class="push-date stale">
+                <span class="push-dot"></span>
+                <span class="push-text">2025-01-21</span>
+              </div>
+            </td>
+            <td class="r num">0</td>
+            <td class="r">
+              
+              <span class="num">207</span>
+              <span class="dl-source">pypi</span>
+              
+            </td>
+            <td class="r num">
+              12
+            </td>
+            <td class="r">
+              <span class="score-pill score-low">35.6</span>
+            </td>
+          </tr>
+          
+          <tr
             data-rank="61"
             data-rank_delta="0"
             data-name="Wolverine"
             data-stars="5088"
             data-last_push="2024-03-08"
             data-weekly_commits="0"
-            data-forks="621"
             data-downloads="0"
             data-hn_mentions_30d="-1"
             data-score="35.2"
@@ -3307,7 +3281,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">621</td>
             <td class="r">
               
               <span class="num" style="color: var(--stale);">—</span>
@@ -3328,9 +3301,8 @@
             data-stars="5041"
             data-last_push="2024-09-09"
             data-weekly_commits="0"
-            data-forks="512"
-            data-downloads="0"
-            data-hn_mentions_30d="1"
+            data-downloads="16"
+            data-hn_mentions_30d="0"
             data-score="34.8"
             data-category="Multi-Agent Systems"
             data-category_rank="4"
@@ -3354,14 +3326,14 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">512</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">16</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
-              1
+              0
             </td>
             <td class="r">
               <span class="score-pill score-low">34.8</span>
@@ -3375,9 +3347,8 @@
             data-stars="3448"
             data-last_push="2025-05-26"
             data-weekly_commits="0"
-            data-forks="283"
-            data-downloads="0"
-            data-hn_mentions_30d="3"
+            data-downloads="9"
+            data-hn_mentions_30d="2"
             data-score="32.6"
             data-category="Coding Agents"
             data-category_rank="18"
@@ -3401,14 +3372,14 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">283</td>
             <td class="r">
               
-              <span class="num" style="color: var(--stale);">—</span>
+              <span class="num">9</span>
+              <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
-              3
+              2
             </td>
             <td class="r">
               <span class="score-pill score-low">32.6</span>
@@ -3422,7 +3393,6 @@
             data-stars="679"
             data-last_push="2023-09-05"
             data-weekly_commits="0"
-            data-forks="111"
             data-downloads="0"
             data-hn_mentions_30d="-1"
             data-score="26.5"
@@ -3448,7 +3418,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">111</td>
             <td class="r">
               
               <span class="num" style="color: var(--stale);">—</span>
@@ -3469,7 +3438,6 @@
             data-stars="812"
             data-last_push="2024-03-15"
             data-weekly_commits="0"
-            data-forks="33"
             data-downloads="0"
             data-hn_mentions_30d="-1"
             data-score="24.6"
@@ -3495,7 +3463,6 @@
               </div>
             </td>
             <td class="r num">0</td>
-            <td class="r num">33</td>
             <td class="r">
               
               <span class="num" style="color: var(--stale);">—</span>
