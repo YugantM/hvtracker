@@ -229,5 +229,219 @@ freshness_score = max(0.0, 25 × (1 − days_since / 180))</pre>
 """,
 }
 
+ELIGIBILITY_V1 = {
+    "title": "HVTracker Eligibility Specification",
+    "slug": "eligibility",
+    "version": "v1.0",
+    "status": "Published",
+    "date": "2026-05-24",
+    "authors": ["HVTracker"],
+    "abstract": (
+        "This document defines the criteria by which a software project qualifies "
+        "for inclusion in the HVTracker leaderboard. It specifies necessary and "
+        "sufficient conditions using normative language (MUST, SHOULD, MAY) such "
+        "that two independent reviewers applying this specification to any candidate "
+        "project will reach the same inclusion or exclusion decision. This "
+        "specification supersedes all prior informal or implicit eligibility rules."
+    ),
+    "sections": [
+        {"id": "s1", "num": "1.", "title": "Abstract"},
+        {"id": "s2", "num": "2.", "title": "Motivation"},
+        {"id": "s3", "num": "3.", "title": "Terminology"},
+        {"id": "s4", "num": "4.", "title": "Eligibility Criteria",
+         "subsections": [
+             {"id": "s4-1", "num": "4.1", "title": "Required Criteria (MUST)"},
+             {"id": "s4-2", "num": "4.2", "title": "Recommended Criteria (SHOULD)"},
+             {"id": "s4-3", "num": "4.3", "title": "Optional Criteria (MAY)"},
+         ]},
+        {"id": "s5", "num": "5.", "title": "Disqualification Criteria"},
+        {"id": "s6", "num": "6.", "title": "Review Process",
+         "subsections": [
+             {"id": "s6-1", "num": "6.1", "title": "Adding a New Project"},
+             {"id": "s6-2", "num": "6.2", "title": "Reviewing Existing Projects"},
+             {"id": "s6-3", "num": "6.3", "title": "Removal Process"},
+         ]},
+        {"id": "s7", "num": "7.", "title": "Automated Enforcement"},
+        {"id": "s8", "num": "8.", "title": "Versioning and Changelog"},
+    ],
+    "appendices": [
+        {"id": "app-a", "num": "A.", "title": "Boundary Cases"},
+        {"id": "app-b", "num": "B.", "title": "Criteria Quick Reference"},
+    ],
+    "body": """
+<h2 id="s1"><span class="sec-num">1.</span> Abstract</h2>
+<p>This document defines the criteria by which a software project qualifies for inclusion in the HVTracker leaderboard. It specifies necessary and sufficient conditions using normative language such that two independent reviewers applying this specification to any candidate project will reach the same inclusion or exclusion decision.</p>
+<p>The key words <span class="must">MUST</span>, <span class="must">MUST NOT</span>, <span class="should">SHOULD</span>, <span class="should">SHOULD NOT</span>, and <span class="may">MAY</span> in this document are to be interpreted as described in <a href="https://www.rfc-editor.org/rfc/rfc2119" target="_blank" rel="noopener">RFC 2119</a>.</p>
+
+<h2 id="s2"><span class="sec-num">2.</span> Motivation</h2>
+<p>HVTracker tracks open-source AI agent projects and generates daily health scores. As the index has grown, the question of what belongs in it has become harder to answer by intuition alone. Several failure modes have emerged:</p>
+<ul>
+  <li>Projects that were once active agents are now archived or unmaintained.</li>
+  <li>Some entries are hosted services that expose no inspectable source code.</li>
+  <li>Some entries are thin API wrappers with no agent logic of their own.</li>
+  <li>Some entries are forks with no independent development activity.</li>
+</ul>
+<p>Without a formal eligibility specification, the index is subject to arbitrary inclusion driven by novelty rather than fit. A formal specification makes the boundary visible, consistent, and disputable. It also enables automated checking during the build process so violations surface as warnings rather than silent drift.</p>
+
+<h2 id="s3"><span class="sec-num">3.</span> Terminology</h2>
+<dl>
+  <dt>AI agent</dt>
+  <dd>A software system that autonomously performs multi-step tasks by combining a language model with external capabilities such as tool use, memory, code execution, browser control, or file system access. An AI agent takes an underspecified goal as input and determines the sequence of actions required to accomplish it without requiring a human to specify each step.</dd>
+  <dt>Autonomous task execution</dt>
+  <dd>The capacity of a system to complete a task end-to-end without human confirmation at each step. A system that requires a human to approve every action before proceeding is a tool, not an agent.</dd>
+  <dt>Tool use</dt>
+  <dd>The capacity of a software system to invoke external functions, APIs, code interpreters, or system interfaces as part of completing a task. Tool use is a necessary but not sufficient condition for agent classification.</dd>
+  <dt>Hosted service</dt>
+  <dd>A software system delivered exclusively via a networked API or web interface for which no source code is publicly available for inspection, modification, or self-hosting. Hosted services are not eligible regardless of their capabilities.</dd>
+  <dt>Thin client</dt>
+  <dd>A software package whose primary function is to make API calls to a remote service, containing no agent logic of its own. Not independently eligible.</dd>
+  <dt>Framework</dt>
+  <dd>A software library or toolkit that enables developers to construct AI agents, providing abstractions for tool use, memory, planning, or multi-agent coordination.</dd>
+  <dt>Open-source license</dt>
+  <dd>A license that meets the Open Source Definition as maintained by the Open Source Initiative (OSI), or a license widely accepted in the open-source community providing equivalent rights. Includes all OSI-approved licenses and the RAIL family when source is publicly available.</dd>
+  <dt>Version control repository</dt>
+  <dd>A hosted repository using a distributed version control system (e.g., Git) that is publicly accessible without authentication.</dd>
+  <dt>Meaningful activity</dt>
+  <dd>At least one of the following within a trailing 12-month window: a merged pull request, a commit to the primary branch, a published release, or a closed issue with a maintainer response. Activity by automated bots (dependency bumps, CI runs) does not count unless accompanied by human commits.</dd>
+  <dt>Archived project</dt>
+  <dd>A project whose version control repository has been placed in a read-only archived state by its maintainers, or for which maintainers have publicly stated it is no longer maintained.</dd>
+  <dt>Abandoned fork</dt>
+  <dd>A repository that is a fork of another project and has received zero independent commits since the fork was created, or since the upstream project itself became inactive.</dd>
+</dl>
+
+<h2 id="s4"><span class="sec-num">4.</span> Eligibility Criteria</h2>
+
+<h3 id="s4-1"><span class="sec-num">4.1</span> Required Criteria (MUST)</h3>
+<p>A candidate project <span class="must">MUST</span> satisfy all of the following to be eligible for inclusion.</p>
+
+<p><strong>4.1.1 Open-source license.</strong> The project <span class="must">MUST</span> be distributed under an open-source license as defined in Section 3. The license <span class="must">MUST</span> be declared in the primary repository (e.g., LICENSE file, SPDX identifier in package manifest). A project with no declared license is not eligible.</p>
+
+<p><strong>4.1.2 Public version control repository.</strong> The project <span class="must">MUST</span> have a publicly accessible version control repository as defined in Section 3. The repository <span class="must">MUST</span> be the primary location for source code and development activity — a mirror is not sufficient if the primary repository is private.</p>
+
+<p><strong>4.1.3 Software deliverable.</strong> The project <span class="must">MUST</span> be primarily delivered as software that can be inspected, cloned, and run by a third party. Projects delivered exclusively as hosted services are not eligible. A project that offers both a hosted service and a self-hostable open-source component is eligible on the basis of the open-source component only.</p>
+
+<p><strong>4.1.4 Agent characteristics.</strong> The project <span class="must">MUST</span> demonstrate at least two of the following three agent characteristics:</p>
+<ul>
+  <li><strong>(a) Autonomous task execution:</strong> The system can complete a multi-step task given only an initial natural-language goal, without requiring human confirmation at each step.</li>
+  <li><strong>(b) Tool use:</strong> The system can invoke external functions, APIs, code interpreters, file systems, or browser interfaces as part of task completion.</li>
+  <li><strong>(c) Goal-directed planning:</strong> The system decomposes a goal into sub-tasks, selects actions based on intermediate results, and adapts its plan when an action fails.</li>
+</ul>
+<p>A system that satisfies only (b) — tool use — without (a) or (c) is a tool-augmented chatbot, not an agent, and is not eligible.</p>
+
+<p><strong>4.1.5 Non-trivial implementation.</strong> The project <span class="must">MUST</span> contain non-trivial agent logic in its own codebase. A package whose sole function is to forward requests to a remote agent API is not eligible on its own. The project <span class="must">MUST</span> contain at least one of: a planning or reasoning loop, a memory system, a tool dispatch mechanism, or a multi-step execution engine implemented in the package itself.</p>
+
+<h3 id="s4-2"><span class="sec-num">4.2</span> Recommended Criteria (SHOULD)</h3>
+<p>A candidate project <span class="should">SHOULD</span> satisfy the following. Projects that do not satisfy these criteria are not disqualified but are flagged for manual review.</p>
+
+<p><strong>4.2.1 Meaningful recent activity.</strong> The project <span class="should">SHOULD</span> demonstrate meaningful activity as defined in Section 3 within the trailing 12 months. Projects with no meaningful activity in 12 months are flagged as inactive. They remain on the leaderboard but receive an inactive annotation visible to users.</p>
+
+<p><strong>4.2.2 Installable package.</strong> The project <span class="should">SHOULD</span> be installable via a mainstream package manager (npm, PyPI, Homebrew, Cargo, etc.). Projects distributed only as source tarballs or ZIP archives are technically eligible but harder to track.</p>
+
+<p><strong>4.2.3 Documentation of agent capabilities.</strong> The project <span class="should">SHOULD</span> document its agent characteristics in its README or official documentation. A project that makes no claims about agent behavior in its own documentation cannot be verified against criterion 4.1.4.</p>
+
+<h3 id="s4-3"><span class="sec-num">4.3</span> Optional Criteria (MAY)</h3>
+<p><strong>4.3.1 Framework eligibility.</strong> A project <span class="may">MAY</span> be a framework or library that enables agent construction rather than an agent itself, provided it meets all MUST criteria and additionally:</p>
+<ul>
+  <li>Its primary design goal is enabling agent construction, not general-purpose programming.</li>
+  <li>It provides abstractions specific to agent behavior: tool registration, memory interfaces, agent lifecycle management, or multi-agent coordination.</li>
+  <li>At least one publicly available project built on the framework qualifies as an agent under 4.1.4.</li>
+</ul>
+<p>General-purpose utility libraries (HTTP clients, JSON parsers, LLM SDK wrappers with no agent abstractions) are not eligible under this clause.</p>
+
+<h2 id="s5"><span class="sec-num">5.</span> Disqualification Criteria</h2>
+<p>A project is disqualified and <span class="must">MUST</span> be removed from the leaderboard if any of the following conditions are met. Disqualification criteria take precedence over eligibility criteria.</p>
+<table class="spec-table">
+  <thead><tr><th>ID</th><th>Criterion</th><th>Data source</th></tr></thead>
+  <tbody>
+    <tr><td>5.1</td><td>The project's primary repository has been archived (read-only) by its maintainers.</td><td>GitHub API: <code>archived</code> field</td></tr>
+    <tr><td>5.2</td><td>The project has changed its license to one that no longer meets the open-source definition in Section 3. Evaluated as of the most recent release.</td><td>GitHub API: <code>license.spdx_id</code></td></tr>
+    <tr><td>5.3</td><td>The project is a fork of another tracked project and has made zero independent commits in the trailing 24 months.</td><td>GitHub API: <code>fork</code> flag + commit comparison</td></tr>
+    <tr><td>5.4</td><td>The project's repository has been made private or deleted.</td><td>GitHub API: HTTP 404 on repo endpoint</td></tr>
+    <tr><td>5.5</td><td>The project's maintainers have formally requested removal from the index.</td><td>Manual</td></tr>
+  </tbody>
+</table>
+
+<h2 id="s6"><span class="sec-num">6.</span> Review Process</h2>
+
+<h3 id="s6-1"><span class="sec-num">6.1</span> Adding a New Project</h3>
+<p>To add a candidate project, a reviewer applies the criteria in Section 4 in order:</p>
+<ol>
+  <li>Verify 4.1.1 (license): Check the LICENSE file and SPDX identifier.</li>
+  <li>Verify 4.1.2 (repository): Confirm the repository is public and not a mirror.</li>
+  <li>Verify 4.1.3 (software deliverable): Confirm the project can be cloned and run.</li>
+  <li>Verify 4.1.4 (agent characteristics): Verify at least two of (a), (b), (c).</li>
+  <li>Verify 4.1.5 (non-trivial implementation): Confirm agent logic exists in the codebase.</li>
+  <li>Check 4.2.1 (recent activity): Note if inactive; flag for annotation, not exclusion.</li>
+  <li>Check Section 5 (disqualification): If any apply, the project is excluded regardless of 4.1.</li>
+</ol>
+<p>The reviewer records their findings in a structured note attached to the pull request that adds the agent to <code>agents.json</code>. The note <span class="must">MUST</span> reference each criterion explicitly.</p>
+
+<h3 id="s6-2"><span class="sec-num">6.2</span> Reviewing Existing Projects</h3>
+<p>The automated build process checks criteria 5.1 (archived), 5.4 (private/deleted), and 4.2.1 (recent activity) on every run. Violations are emitted as warnings in the build log and do not block the build. The owner reviews warnings and decides on action.</p>
+<p>Criteria that require human judgment (4.1.4, 4.1.5, 5.3) are reviewed manually on a quarterly basis or when flagged.</p>
+
+<h3 id="s6-3"><span class="sec-num">6.3</span> Removal Process</h3>
+<p>Before removing a project, the owner reviews the disqualification reason and, where practical, notifies the project maintainers. Removal is recorded in the git commit message with the criterion cited. No project is removed without owner approval.</p>
+
+<h2 id="s7"><span class="sec-num">7.</span> Automated Enforcement</h2>
+<p>The build system implements automated checks for the following criteria during each daily cron run. All checks are non-blocking (warnings only). No agent is removed automatically.</p>
+<table class="spec-table">
+  <thead><tr><th>Check</th><th>Criterion</th><th>Data source</th></tr></thead>
+  <tbody>
+    <tr><td>Repository archived</td><td>5.1</td><td>GitHub API: <code>archived</code> field</td></tr>
+    <tr><td>Repository not found (HTTP 404)</td><td>5.4</td><td>GitHub API: exception handling in fetch</td></tr>
+    <tr><td>No activity in 12 months</td><td>4.2.1</td><td>GitHub API: <code>pushed_at</code> field</td></tr>
+    <tr><td>No declared license</td><td>4.1.1</td><td>GitHub API: <code>license</code> field</td></tr>
+  </tbody>
+</table>
+<p>Criteria 4.1.4 and 4.1.5 require human review and are not automatically enforced.</p>
+
+<h2 id="s8"><span class="sec-num">8.</span> Versioning and Changelog</h2>
+<p>This specification is versioned independently of the HVTracker Methodology Specification. Changes to eligibility criteria increment the minor version (v1.0 → v1.1) for clarifications and the major version (v1.0 → v2.0) for changes that would cause a currently included project to be excluded or a currently excluded project to become eligible.</p>
+<table class="spec-table">
+  <thead><tr><th>Version</th><th>Date</th><th>Summary</th></tr></thead>
+  <tbody>
+    <tr><td><strong>v1.0</strong></td><td>2026-05-24</td><td>Initial publication. Defines five MUST criteria, three SHOULD criteria, one MAY clause, five disqualification triggers, and automated enforcement checks for §4.1.1, §4.2.1, §5.1, and §5.4.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="app-a"><span class="sec-num">A.</span> Boundary Cases</h2>
+<p>The following cases illustrate how the criteria apply in ambiguous situations. These are non-normative.</p>
+<dl>
+  <dt>A.1 Hosted service with open-source server code</dt>
+  <dd>A product that offers a hosted SaaS interface and also publishes the server code under an open-source license. Eligible on the basis of the open-source component if it meets 4.1.4 and 4.1.5. The hosted interface is irrelevant to eligibility.</dd>
+  <dt>A.2 Research prototype</dt>
+  <dd>A repository associated with a published academic paper, containing code that runs an agent experiment but has no releases, no package, and no commits after the paper's publication date. Eligible under 4.1 if agent characteristics are present, but flagged under 4.2.1 as inactive. Not disqualified.</dd>
+  <dt>A.3 Model provider SDK</dt>
+  <dd>An SDK published by an LLM provider that includes convenience wrappers for function calling and tool use. Eligible under 4.3.1 (framework) only if it includes agent-specific abstractions (e.g., an agent loop, tool registry, multi-step execution engine). A bare function-calling wrapper is not eligible.</dd>
+  <dt>A.4 Fork with substantial divergence</dt>
+  <dd>A fork of a tracked project that has added its own planning engine, tool integrations, and an independent release history. Not subject to 5.3. Evaluated independently against all criteria in Section 4.</dd>
+  <dt>A.5 Partial relicense</dt>
+  <dd>A project that relicenses its core under a commercial license but retains an open-source community edition. Eligible only if the community edition meets all criteria in Section 4 independently, without depending on proprietary components for core agent functionality.</dd>
+</dl>
+
+<h2 id="app-b"><span class="sec-num">B.</span> Criteria Quick Reference</h2>
+<table class="spec-table">
+  <thead><tr><th>ID</th><th>Level</th><th>Criterion</th></tr></thead>
+  <tbody>
+    <tr><td>4.1.1</td><td><span class="must">MUST</span></td><td>Open-source license declared</td></tr>
+    <tr><td>4.1.2</td><td><span class="must">MUST</span></td><td>Public version control repository</td></tr>
+    <tr><td>4.1.3</td><td><span class="must">MUST</span></td><td>Software deliverable, not hosted-only</td></tr>
+    <tr><td>4.1.4</td><td><span class="must">MUST</span></td><td>≥2 of: autonomous execution, tool use, goal-directed planning</td></tr>
+    <tr><td>4.1.5</td><td><span class="must">MUST</span></td><td>Non-trivial agent logic in own codebase</td></tr>
+    <tr><td>4.2.1</td><td><span class="should">SHOULD</span></td><td>Meaningful activity in trailing 12 months</td></tr>
+    <tr><td>4.2.2</td><td><span class="should">SHOULD</span></td><td>Installable via mainstream package manager</td></tr>
+    <tr><td>4.2.3</td><td><span class="should">SHOULD</span></td><td>Agent capabilities documented in README</td></tr>
+    <tr><td>4.3.1</td><td><span class="may">MAY</span></td><td>Framework eligible if agent-specific abstractions present</td></tr>
+    <tr><td>5.1</td><td>DISQUALIFY</td><td>Repository archived</td></tr>
+    <tr><td>5.2</td><td>DISQUALIFY</td><td>License no longer open-source</td></tr>
+    <tr><td>5.3</td><td>DISQUALIFY</td><td>Abandoned fork, zero independent commits in 24 months</td></tr>
+    <tr><td>5.4</td><td>DISQUALIFY</td><td>Repository private or deleted</td></tr>
+    <tr><td>5.5</td><td>DISQUALIFY</td><td>Maintainer withdrawal request</td></tr>
+  </tbody>
+</table>
+""",
+}
+
 # All published specs, in display order (newest first)
-ALL_SPECS = [METHODOLOGY_V2]
+ALL_SPECS = [ELIGIBILITY_V1, METHODOLOGY_V2]

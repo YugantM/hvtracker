@@ -184,23 +184,33 @@ def fetch_pypi_provenance(package_name: str) -> bool | None:
 
 
 def fetch_scorecard(owner_repo: str) -> dict | None:
-    """Fetch OSSF Scorecard via deps.dev project API. Returns {score, checks} or None."""
-    encoded = quote(f"github.com/{owner_repo}", safe='')
-    url = f"https://api.deps.dev/v3/projects/{encoded}"
+    """Fetch OSSF Scorecard — tries deps.dev first, falls back to securityscorecards.dev."""
+    # Primary: deps.dev
     try:
-        r = requests.get(url, timeout=15)
-        if r.status_code != 200:
-            return None
-        sc = r.json().get("scorecard")
-        if not sc:
-            return None
-        overall = sc.get("overallScore", sc.get("score"))
-        checks = {}
-        for c in sc.get("checks", []):
-            checks[c["name"]] = c.get("score", -1)
-        return {"score": overall, "checks": checks}
+        encoded = quote(f"github.com/{owner_repo}", safe='')
+        r = requests.get(f"https://api.deps.dev/v3/projects/{encoded}", timeout=15)
+        if r.status_code == 200:
+            sc = r.json().get("scorecard")
+            if sc:
+                overall = sc.get("overallScore", sc.get("score"))
+                checks = {c["name"]: c.get("score", -1) for c in sc.get("checks", [])}
+                return {"score": overall, "checks": checks}
     except Exception:
-        return None
+        pass
+    # Fallback: securityscorecards.dev
+    try:
+        r = requests.get(
+            f"https://api.securityscorecards.dev/projects/github.com/{owner_repo}",
+            timeout=15,
+        )
+        if r.status_code == 200:
+            data = r.json()
+            overall = data.get("score")
+            checks = {c["name"]: c.get("score", -1) for c in data.get("checks", [])}
+            return {"score": overall, "checks": checks}
+    except Exception:
+        pass
+    return None
 
 
 def fetch_signed_commit_ratio(owner_repo: str, sample: int = 100) -> float | None:
@@ -434,6 +444,40 @@ def rank_delta_class(delta: int | None, is_new: bool) -> str:
     return "delta-down"
 
 
+def run_eligibility_checks(rows: list[dict]) -> list[dict]:
+    """Check automated eligibility criteria from the Eligibility Spec v1.0.
+
+    Checks performed (all non-blocking warnings):
+      §4.1.1 — no declared license
+      §4.2.1 — no meaningful activity in trailing 12 months (days_ago >= 365)
+      §5.1   — repository is archived
+    §5.4 (repo 404/private) is already handled in fetch_one (returns None).
+
+    Returns a list of violation dicts for the build report.
+    """
+    violations = []
+    for r in rows:
+        repo = r["repo"]
+        if r.get("archived"):
+            violations.append({"repo": repo, "criterion": "5.1", "detail": "repository is archived"})
+        if r.get("license_spdx") is None:
+            violations.append({"repo": repo, "criterion": "4.1.1", "detail": "no declared license (GitHub license field is null)"})
+        if r.get("days_ago", 0) >= 365:
+            violations.append({"repo": repo, "criterion": "4.2.1",
+                                "detail": f"no meaningful activity in 12 months (last push {r.get('last_push', 'unknown')})"})
+
+    if violations:
+        print("\n── Eligibility Warnings (Eligibility Spec v1.0) ──────────────────────")
+        for v in violations:
+            print(f"  WARN [{v['criterion']}] {v['repo']}: {v['detail']}")
+        print(f"  {len(violations)} warning(s). No agents removed automatically — owner review required.")
+        print("────────────────────────────────────────────────────────────────────────\n")
+    else:
+        print("Eligibility check: all agents pass automated criteria.")
+
+    return violations
+
+
 def main() -> None:
     script_dir = os.path.dirname(os.path.abspath(__file__))
     agents_path = os.path.join(script_dir, "agents.json")
@@ -515,6 +559,8 @@ def main() -> None:
             "description": (repo.get("description") or "")[:120],
             "language": repo.get("language") or "",
             "open_issues": repo.get("open_issues_count", 0),
+            "archived": repo.get("archived", False),
+            "license_spdx": (repo.get("license") or {}).get("spdx_id") or None,
             "npm_package": npm_pkg if npm_pkg else "",
             "pypi_package": pypi_pkg if pypi_pkg else "",
             "npm_dl": npm_dl,
@@ -599,6 +645,8 @@ def main() -> None:
     rows.sort(key=lambda x: x["score"], reverse=True)
     for i, row in enumerate(rows, 1):
         row["rank"] = i
+
+    run_eligibility_checks(rows)
 
     # Add formatted download counts and slug/breakdown for template rendering
     for row in rows:
@@ -700,6 +748,7 @@ def main() -> None:
                 "weekly_downloads": r.get("weekly_downloads"),
                 "dl_source": r.get("dl_source", ""),
                 "hn_mentions_30d": r.get("hn_mentions_30d"),
+                "has_provenance": r.get("has_provenance"),
                 "npm_provenance": r.get("npm_provenance"),
                 "pypi_provenance": r.get("pypi_provenance"),
                 "signed_commits_ratio": r.get("signed_commits_ratio"),
