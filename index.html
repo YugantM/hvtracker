@@ -191,14 +191,32 @@
     .table-wrap {
       position: relative;
       overflow-x: visible;
-      overflow-y: auto;
-      max-height: 75vh;
-      min-height: 400px;
       margin-top: 0;
-      /* Subtle border so the scroll region is visually bounded */
-      border: 1px solid var(--border);
-      border-radius: 6px;
     }
+
+    /* ── Pagination bar ── */
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 4px 4px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .pg-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 5px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .pg-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .pg-btn:disabled { opacity: 0.3; cursor: default; }
 
     /* ── Table ── */
     table {
@@ -255,6 +273,7 @@
     tbody tr:nth-child(even) { background: var(--row-alt); }
     tbody tr:hover { background: var(--accent-lt); }
     tbody tr.hidden { display: none; }
+    tbody tr.pg-hidden { display: none; }
     tbody tr.top-row td:first-child { border-left: 2px solid var(--accent); }
 
     td { padding: 10px 11px; vertical-align: middle; }
@@ -4221,6 +4240,11 @@
           
         </tbody>
       </table>
+      <div class="pagination-bar" id="paginationBar">
+        <button class="pg-btn" id="prevBtn">← Prev</button>
+        <span id="pgInfo"></span>
+        <button class="pg-btn" id="nextBtn">Next →</button>
+      </div>
     </div>
 
     <footer>
@@ -4238,26 +4262,50 @@
   </div>
 
   <script>
-    // ── Category filtering & sorting ──
+    // ── Category filtering, sorting & pagination ──
     (function () {
+      const PAGE_SIZE = 15;
+      let currentPage = 0;
+
       const table = document.getElementById("leaderboard");
       const tbody = table.querySelector("tbody");
       const headers = table.querySelectorAll("thead th[data-col]");
       const pills = document.querySelectorAll("#catBar .cat-pill");
       const rankHeader = document.querySelector("thead th[data-col='rank']");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const pgInfo = document.getElementById("pgInfo");
       let activeCategory = "";
       let sortCol = "score";
       let sortAsc = false;
 
-      function getVisibleRows() {
+      // Rows not filtered out by category
+      function getFilteredRows() {
         return Array.from(tbody.querySelectorAll("tr:not(.hidden)"));
       }
 
+      function renderPage() {
+        const rows = getFilteredRows();
+        const total = rows.length;
+        const start = currentPage * PAGE_SIZE;
+        const end = Math.min(start + PAGE_SIZE, total);
+        rows.forEach((r, i) => {
+          if (i >= start && i < end) {
+            r.classList.remove("pg-hidden");
+          } else {
+            r.classList.add("pg-hidden");
+          }
+        });
+        prevBtn.disabled = currentPage === 0;
+        nextBtn.disabled = end >= total;
+        pgInfo.textContent = total === 0 ? "No results" :
+          (start + 1) + "–" + end + " of " + total;
+      }
+
       function sortRows() {
-        const rows = getVisibleRows();
+        const rows = getFilteredRows();
         rows.sort((a, b) => {
           let col = sortCol;
-          // When category filter is active and sorting by rank, use category_rank
           if (col === "rank" && activeCategory) {
             let av = parseFloat(a.dataset.category_rank) || 0;
             let bv = parseFloat(b.dataset.category_rank) || 0;
@@ -4268,9 +4316,7 @@
           let av = a.dataset[col];
           let bv = b.dataset[col];
           const num = !isNaN(parseFloat(av));
-          if (num) {
-            av = parseFloat(av); bv = parseFloat(bv);
-          }
+          if (num) { av = parseFloat(av); bv = parseFloat(bv); }
           if (av < bv) return sortAsc ? -1 : 1;
           if (av > bv) return sortAsc ? 1 : -1;
           return 0;
@@ -4281,12 +4327,13 @@
         allRows.forEach(r => {
           if (r.classList.contains("hidden")) tbody.appendChild(r);
         });
+        renderPage();
       }
 
       function applyFilter(category) {
         activeCategory = category;
-        const rows = tbody.querySelectorAll("tr");
-        rows.forEach(row => {
+        currentPage = 0;
+        tbody.querySelectorAll("tr").forEach(row => {
           if (!category || row.dataset.category === category) {
             row.classList.remove("hidden");
           } else {
@@ -4298,35 +4345,30 @@
       }
 
       function updateRankDisplay() {
-        const visibleRows = getVisibleRows();
-        if (activeCategory) {
-          rankHeader.innerHTML = '#<span class="sort-arrow"></span>';
-          if (sortCol === "rank") {
-            const arrow = rankHeader.querySelector(".sort-arrow");
-            if (arrow) arrow.textContent = sortAsc ? "↑" : "↓";
-          }
-          visibleRows.forEach(row => {
-            const rankCell = row.querySelector(".rank");
-            const catRank = row.dataset.category_rank || "";
-            const globalRank = row.dataset.rank || "";
-            rankCell.innerHTML = '<span class="rank-num">' + catRank + '</span>'
-              + ' <span class="rank-global-muted">#' + globalRank + '</span>';
-          });
-        } else {
-          rankHeader.innerHTML = '#<span class="sort-arrow"></span>';
-          if (sortCol === "rank") {
-            const arrow = rankHeader.querySelector(".sort-arrow");
-            if (arrow) arrow.textContent = sortAsc ? "↑" : "↓";
-          }
-          visibleRows.forEach(row => {
-            const rankCell = row.querySelector(".rank");
-            const globalRank = row.dataset.rank || "";
-            rankCell.innerHTML = '<span class="rank-num">' + globalRank + '</span>';
-          });
+        const rows = getFilteredRows();
+        rankHeader.innerHTML = '#<span class="sort-arrow"></span>';
+        if (sortCol === "rank") {
+          const arrow = rankHeader.querySelector(".sort-arrow");
+          if (arrow) arrow.textContent = sortAsc ? "↑" : "↓";
         }
+        rows.forEach(row => {
+          const rankCell = row.querySelector(".rank");
+          const catRank = row.dataset.category_rank || "";
+          const globalRank = row.dataset.rank || "";
+          rankCell.innerHTML = activeCategory
+            ? '<span class="rank-num">' + catRank + '</span> <span class="rank-global-muted">#' + globalRank + '</span>'
+            : '<span class="rank-num">' + globalRank + '</span>';
+        });
       }
 
-      // Category pill clicks
+      prevBtn.addEventListener("click", () => {
+        if (currentPage > 0) { currentPage--; renderPage(); window.scrollTo(0, table.offsetTop - 20); }
+      });
+      nextBtn.addEventListener("click", () => {
+        const total = getFilteredRows().length;
+        if ((currentPage + 1) * PAGE_SIZE < total) { currentPage++; renderPage(); window.scrollTo(0, table.offsetTop - 20); }
+      });
+
       pills.forEach(pill => {
         pill.addEventListener("click", () => {
           pills.forEach(p => p.classList.remove("active"));
@@ -4335,29 +4377,22 @@
         });
       });
 
-      // Column header clicks
       headers.forEach(th => {
         th.addEventListener("click", () => {
           const col = th.dataset.col;
-          if (col === sortCol) {
-            sortAsc = !sortAsc;
-          } else {
-            sortCol = col;
-            sortAsc = col === "name" || col === "last_push";
-          }
-          headers.forEach(h => {
-            h.classList.remove("sorted");
-            const arrow = h.querySelector(".sort-arrow");
-            if (arrow) arrow.textContent = "";
-          });
+          if (col === sortCol) { sortAsc = !sortAsc; } else { sortCol = col; sortAsc = col === "name" || col === "last_push"; }
+          headers.forEach(h => { h.classList.remove("sorted"); const a = h.querySelector(".sort-arrow"); if (a) a.textContent = ""; });
           th.classList.add("sorted");
           const arrow = th.querySelector(".sort-arrow");
           if (arrow) arrow.textContent = sortAsc ? "↑" : "↓";
+          currentPage = 0;
           sortRows();
-          // Update rank display in case rank column arrows changed
           if (col === "rank") updateRankDisplay();
         });
       });
+
+      // Initial render
+      renderPage();
     })();
   </script>
 </body>
