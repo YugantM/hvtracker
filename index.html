@@ -191,7 +191,13 @@
     .table-wrap {
       position: relative;
       overflow-x: visible;
+      overflow-y: auto;
+      max-height: 75vh;
+      min-height: 400px;
       margin-top: 0;
+      /* Subtle border so the scroll region is visually bounded */
+      border: 1px solid var(--border);
+      border-radius: 6px;
     }
 
     /* ── Table ── */
@@ -230,6 +236,9 @@
       white-space: nowrap;
       cursor: pointer;
       user-select: none;
+      position: sticky;
+      top: 0;
+      z-index: 2;
     }
     thead th:hover { color: var(--text); }
     thead th.sorted { color: var(--accent); }
