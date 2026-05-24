@@ -478,10 +478,29 @@ def run_eligibility_checks(rows: list[dict]) -> list[dict]:
     return violations
 
 
+def load_scorecard_cache(script_dir: str) -> dict:
+    """Load scorecard-cache.json if present. Returns dict keyed by owner/repo."""
+    path = os.path.join(script_dir, "scorecard-cache.json")
+    if not os.path.isfile(path):
+        print("scorecard-cache.json not found — scorecard data will be empty this run.")
+        return {}
+    try:
+        with open(path) as f:
+            data = json.load(f)
+        agents = data.get("agents", {})
+        print(f"Loaded scorecard cache: {len(agents)} repos (scanned {data.get('scanned_at', 'unknown')})")
+        return agents
+    except Exception as e:
+        print(f"WARN: failed to load scorecard cache: {e}")
+        return {}
+
+
 def main() -> None:
     script_dir = os.path.dirname(os.path.abspath(__file__))
     agents_path = os.path.join(script_dir, "agents.json")
     data_path = os.path.join(script_dir, "data.json")
+
+    scorecard_cache = load_scorecard_cache(script_dir)
 
     with open(agents_path) as f:
         agents = json.load(f)
@@ -629,18 +648,30 @@ def main() -> None:
         else:
             row["pypi_provenance"] = None
 
-    # Fetch OSSF Scorecard via deps.dev (serial, free API, no auth needed)
-    print("\nFetching OSSF Scorecard via deps.dev (serial)...")
+    # Load OSSF Scorecard from weekly CLI cache (scorecard-cache.json).
+    # Falls back to API if cache misses, then to None.
+    print("\nLoading OSSF Scorecard from cache...")
+    cache_hits = 0
+    api_hits = 0
     for row in rows:
-        sc = fetch_scorecard(row["repo"])
-        if sc:
-            row["scorecard_score"] = sc["score"]
-            row["scorecard_checks"] = sc["checks"]
-            print(f"  scorecard {row['repo']:<45} {sc['score']}")
+        repo_key = row["repo"]
+        cached = scorecard_cache.get(repo_key)
+        if cached:
+            row["scorecard_score"] = cached["score"]
+            row["scorecard_checks"] = cached["checks"]
+            cache_hits += 1
         else:
-            row["scorecard_score"] = None
-            row["scorecard_checks"] = {}
-        time.sleep(0.3)
+            # Cache miss — try live API as fallback
+            sc = fetch_scorecard(repo_key)
+            if sc:
+                row["scorecard_score"] = sc["score"]
+                row["scorecard_checks"] = sc["checks"]
+                api_hits += 1
+            else:
+                row["scorecard_score"] = None
+                row["scorecard_checks"] = {}
+    print(f"  Scorecard: {cache_hits} from cache, {api_hits} from API, "
+          f"{len(rows)-cache_hits-api_hits} unavailable.")
 
     rows.sort(key=lambda x: x["score"], reverse=True)
     for i, row in enumerate(rows, 1):

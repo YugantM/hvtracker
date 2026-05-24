@@ -1,0 +1,51 @@
+name: Scorecard scan
+
+on:
+  schedule:
+    # Every Wednesday at 04:00 UTC (different day from daily cron at Mon-Sun 06:00)
+    - cron: "0 4 * * 3"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  SCORECARD_VERSION: "v5.5.0"
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Download scorecard CLI
+        run: |
+          curl -sL "https://github.com/ossf/scorecard/releases/download/${SCORECARD_VERSION}/scorecard_${SCORECARD_VERSION#v}_linux_amd64.tar.gz" \
+            | tar xz scorecard
+          chmod +x scorecard
+          ./scorecard version
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Run scorecard scan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        run: python scan_scorecards.py
+
+      - name: Commit and push scorecard cache
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add scorecard-cache.json
+          if git diff --cached --quiet; then
+            echo "No changes to scorecard cache."
+          else
+            git commit -m "chore: update scorecard cache $(date -u '+%Y-%m-%d')"
+            git push
+          fi

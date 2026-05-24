@@ -126,11 +126,16 @@ hvtracker/
 ├── agents.json             # Flat list of {repo, name} objects to track
 ├── index.html              # Generated output — the live leaderboard (committed to repo)
 ├── data.json               # Machine-readable snapshot — used as delta baseline (committed to repo)
+├── scan_scorecards.py      # Run OSSF Scorecard CLI against all agents; writes scorecard-cache.json
+├── scorecard-cache.json    # Weekly CLI scan results (cache for daily builds)
+├── discover_agents.py      # Search GitHub for new agent candidates; writes candidates.json
 ├── requirements.txt        # Python dependencies (requests + jinja2 only)
 ├── CNAME                   # hvtracker.net → GitHub Pages
 ├── .github/workflows/
-│   └── update.yml          # GitHub Actions — daily cron at 06:00 UTC + manual trigger
-└── CLAUDE.md               # Karpathy behavioral guidelines (simplicity, surgical changes, goal-driven)
+│   ├── update.yml          # GitHub Actions — daily cron at 06:00 UTC + manual trigger
+│   ├── scorecard-scan.yml  # GitHub Actions — weekly OSSF Scorecard CLI scan (Wednesdays 04:00 UTC)
+│   └── discover-agents.yml # GitHub Actions — weekly agent discovery (Sundays 12:00 UTC)
+└── CLAUDE.md               # Behavioral guidelines (simplicity, surgical changes, goal-driven)
 ```
 
 ---
@@ -175,6 +180,16 @@ On the first run (no `data.json` exists), all agents show **NEW** in the delta c
 
 ---
 
+## Automated agent discovery
+
+New agents are discovered weekly via automated GitHub search. Every Sunday at 12:00 UTC, a GitHub Actions workflow searches for repositories matching AI agent topics and keywords, filters them against automated eligibility pre-checks (500+ stars, active in the last 365 days, open-source license, not archived, not a fork), and opens a GitHub Issue labeled `agent-candidate` listing the candidates found that week.
+
+**Candidates are proposals only.** Each candidate must be evaluated against the [Eligibility Specification](https://hvtracker.net/spec/eligibility/v1.0) before being added to `agents.json`. Category assignment is manual. The workflow never auto-adds agents.
+
+To review candidates: look for open issues labeled [`agent-candidate`](https://github.com/YugantM/hvtracker/labels/agent-candidate).
+
+---
+
 ## Adding an agent
 
 Edit [`agents.json`](./agents.json) and add a new entry:
@@ -194,14 +209,13 @@ After adding, rebuild (`python fetch_and_build.py`) and open a pull request. Alt
 
 ## CI/CD (GitHub Actions)
 
-**Workflow file:** [`.github/workflows/update.yml`](.github/workflows/update.yml)
+| Workflow | Schedule | Description |
+|---|---|---|
+| [`update.yml`](.github/workflows/update.yml) | Daily 06:00 UTC | Fetches latest data, regenerates `index.html` + `data.json`, commits + pushes |
+| [`scorecard-scan.yml`](.github/workflows/scorecard-scan.yml) | Weekly Wed 04:00 UTC | Downloads OSSF Scorecard CLI, scans all agents, commits `scorecard-cache.json` |
+| [`discover-agents.yml`](.github/workflows/discover-agents.yml) | Weekly Sun 12:00 UTC | Searches GitHub for new agent candidates, opens an issue if any are found |
 
-| Trigger | Behavior |
-|---|---|
-| **Schedule** — every day at 06:00 UTC | Fetches latest data, regenerates `index.html` + `data.json`, commits + pushes |
-| **Manual** (`workflow_dispatch`) | Trigger from the Actions tab anytime |
-
-The workflow prefers `secrets.GH_PAT` (a personal access token, 5,000 req/hr) and falls back to `secrets.GITHUB_TOKEN` (1,000 req/hr) for API authentication. Commit messages follow the format: `chore: regenerate leaderboard YYYY-MM-DD`.
+All workflows support `workflow_dispatch` for manual runs. They prefer `secrets.GH_PAT` (5,000 req/hr) and fall back to `secrets.GITHUB_TOKEN` (1,000 req/hr). Daily build commit messages follow the format: `chore: regenerate leaderboard YYYY-MM-DD`.
 
 ---
 

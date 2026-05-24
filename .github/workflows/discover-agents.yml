@@ -1,0 +1,73 @@
+name: Discover agent candidates
+
+on:
+  schedule:
+    # Every Sunday at 12:00 UTC
+    - cron: "0 12 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install requests python-dotenv
+
+      - name: Run discovery
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        run: python discover_agents.py
+
+      - name: Open issue if candidates found
+        if: hashFiles('candidates.json') != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          WEEK=$(date -u '+%Y-%m-%d')
+          COUNT=$(python3 -c "import json; print(len(json.load(open('candidates.json'))))")
+
+          # Build markdown table body
+          TABLE=$(python3 - <<'PYEOF'
+          import json
+          with open('candidates.json') as f:
+              candidates = json.load(f)
+          lines = ['| Repo | Stars | Language | License | Last Push | Description |',
+                   '|------|-------|----------|---------|-----------|-------------|']
+          for c in candidates:
+              repo_link = f"[{c['repo']}]({c['url']})"
+              desc = c['description'][:80].replace('|', '\\|') if c['description'] else '—'
+              lines.append(f"| {repo_link} | {c['stars']:,} | {c['language'] or '—'} | {c['license']} | {c['last_push']} | {desc} |")
+          print('\n'.join(lines))
+          PYEOF
+          )
+
+          gh issue create \
+            --title "🔍 New agent candidates — week of ${WEEK} (${COUNT} found)" \
+            --label "agent-candidate" \
+            --body "## New agent candidates — ${WEEK}
+
+          Automated weekly discovery found **${COUNT}** candidate(s) not yet in \`agents.json\` that pass automated eligibility pre-checks (500+ stars, active in last 365 days, open-source license, not archived, not a fork).
+
+          **These are proposals only.** Review each against the [Eligibility Specification](https://hvtracker.net/spec/eligibility/v1.0) before adding to \`agents.json\`. Category assignment is manual.
+
+          ${TABLE}
+
+          ---
+          _Criteria 4.1.4 (agent characteristics) and 4.1.5 (non-trivial implementation) require human review and are not checked here._"
