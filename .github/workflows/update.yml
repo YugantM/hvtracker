@@ -5,12 +5,6 @@ on:
     # Every day at 06:00 UTC
     - cron: "0 6 * * *"
   workflow_dispatch:  # allow manual trigger from Actions tab
-  push:
-    paths:
-      - agents.json
-      - fetch_and_build.py
-      - template.html
-      - templates/methodology.html.j2
 
 permissions:
   contents: write
