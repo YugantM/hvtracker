@@ -26,7 +26,7 @@ HEADERS = {
 if TOKEN:
     HEADERS["Authorization"] = f"Bearer {TOKEN}"
 
-METHODOLOGY_VERSION = "v1.1"
+METHODOLOGY_VERSION = "v2.0"
 
 
 def get_repo(owner_repo: str) -> dict:
@@ -151,6 +151,76 @@ def fetch_pypi_downloads(package_name: str) -> int | None:
         except Exception:
             return None
     return None
+
+
+def fetch_npm_provenance(package_name: str) -> bool | None:
+    """Check if the latest version of an npm package has provenance attestations."""
+    encoded = quote(package_name, safe='@/')
+    url = f"https://registry.npmjs.org/{encoded}/latest"
+    try:
+        r = requests.get(url, timeout=10)
+        if r.status_code == 200:
+            return r.json().get("dist", {}).get("attestations") is not None
+        return None
+    except Exception:
+        return None
+
+
+def fetch_pypi_provenance(package_name: str) -> bool | None:
+    """Check if a PyPI package's latest release has PEP 740 provenance attestations."""
+    url = f"https://pypi.org/simple/{package_name}/"
+    headers = {"Accept": "application/vnd.pypi.simple.v1+json"}
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
+        if r.status_code != 200:
+            return None
+        files = r.json().get("files", [])
+        if not files:
+            return None
+        last_file = files[-1]
+        return last_file.get("provenance") is not None
+    except Exception:
+        return None
+
+
+def fetch_scorecard(owner_repo: str) -> dict | None:
+    """Fetch OSSF Scorecard via deps.dev project API. Returns {score, checks} or None."""
+    encoded = quote(f"github.com/{owner_repo}", safe='')
+    url = f"https://api.deps.dev/v3/projects/{encoded}"
+    try:
+        r = requests.get(url, timeout=15)
+        if r.status_code != 200:
+            return None
+        sc = r.json().get("scorecard")
+        if not sc:
+            return None
+        overall = sc.get("overallScore", sc.get("score"))
+        checks = {}
+        for c in sc.get("checks", []):
+            checks[c["name"]] = c.get("score", -1)
+        return {"score": overall, "checks": checks}
+    except Exception:
+        return None
+
+
+def fetch_signed_commit_ratio(owner_repo: str, sample: int = 100) -> float | None:
+    """Sample recent commits and return fraction with verified signatures (0.0–1.0)."""
+    url = f"{GITHUB_API}/repos/{owner_repo}/commits"
+    params = {"per_page": min(sample, 100)}
+    try:
+        r = requests.get(url, headers=HEADERS, params=params, timeout=30)
+        if r.status_code != 200:
+            return None
+        commits = r.json()
+        if not isinstance(commits, list) or not commits:
+            return None
+        verified = sum(
+            1 for c in commits
+            if c.get("commit", {}).get("verification", {}).get("verified")
+        )
+        return round(verified / len(commits), 3)
+    except Exception:
+        return None
 
 
 def score_components(stars: int, days_since: int, recent_commits: int, forks: int) -> dict:
@@ -419,9 +489,11 @@ def main() -> None:
         # Flag cells where Stats API may still be stale (recent push, very low count).
         commits_low_confidence = bool(d <= 7 and (recent_commits or 0) < 10)
 
-        # Fetch npm downloads in parallel (npm API has no strict rate limit)
+        # Fetch npm downloads + provenance in parallel (npm API has no strict rate limit)
         pypi_pkg = agent.get("pypi_package", "")
         npm_dl = fetch_npm_downloads(npm_pkg) if npm_pkg else None
+        npm_prov = fetch_npm_provenance(npm_pkg) if npm_pkg else None
+        signed_ratio = fetch_signed_commit_ratio(repo_id)
         print(f"OK  {repo_id:<45} score={score:5.1f}")
 
         return {
@@ -446,6 +518,8 @@ def main() -> None:
             "npm_package": npm_pkg if npm_pkg else "",
             "pypi_package": pypi_pkg if pypi_pkg else "",
             "npm_dl": npm_dl,
+            "npm_provenance": npm_prov,
+            "signed_commits_ratio": signed_ratio,
             "weekly_downloads": None,  # filled in serial pass below
             "dl_source": "",
         }
@@ -499,6 +573,29 @@ def main() -> None:
             row["dl_source"] = "+".join(src for src, _ in dl_parts)
             print(f"  dl {row['repo']:<45} {row['weekly_downloads']:,} ({row['dl_source']})")
 
+    # Fetch PyPI provenance serially (pypi.org Simple API, ~1 req/s to be safe)
+    print("\nFetching PyPI provenance (serial)...")
+    for row in rows:
+        pypi_pkg = row.get("pypi_package", "")
+        if pypi_pkg:
+            row["pypi_provenance"] = fetch_pypi_provenance(pypi_pkg)
+            time.sleep(0.5)
+        else:
+            row["pypi_provenance"] = None
+
+    # Fetch OSSF Scorecard via deps.dev (serial, free API, no auth needed)
+    print("\nFetching OSSF Scorecard via deps.dev (serial)...")
+    for row in rows:
+        sc = fetch_scorecard(row["repo"])
+        if sc:
+            row["scorecard_score"] = sc["score"]
+            row["scorecard_checks"] = sc["checks"]
+            print(f"  scorecard {row['repo']:<45} {sc['score']}")
+        else:
+            row["scorecard_score"] = None
+            row["scorecard_checks"] = {}
+        time.sleep(0.3)
+
     rows.sort(key=lambda x: x["score"], reverse=True)
     for i, row in enumerate(rows, 1):
         row["rank"] = i
@@ -514,6 +611,18 @@ def main() -> None:
             row.get("weekly_commits") or 0,
             row["forks"],
         )
+        # Provenance summary for template rendering
+        prov_signals = []
+        if row.get("npm_provenance"):
+            prov_signals.append("npm")
+        if row.get("pypi_provenance"):
+            prov_signals.append("pypi")
+        row["provenance_sources"] = prov_signals
+        row["has_provenance"] = len(prov_signals) > 0
+        sc = row.get("scorecard_score")
+        row["scorecard_fmt"] = f"{sc:.1f}" if sc is not None else None
+        sr = row.get("signed_commits_ratio")
+        row["signed_commits_pct"] = round(sr * 100) if sr is not None else None
 
     # Compute category ranks (within each category, sorted by score)
     cat_groups: dict[str, list[dict]] = {}
@@ -591,6 +700,11 @@ def main() -> None:
                 "weekly_downloads": r.get("weekly_downloads"),
                 "dl_source": r.get("dl_source", ""),
                 "hn_mentions_30d": r.get("hn_mentions_30d"),
+                "npm_provenance": r.get("npm_provenance"),
+                "pypi_provenance": r.get("pypi_provenance"),
+                "signed_commits_ratio": r.get("signed_commits_ratio"),
+                "scorecard_score": r.get("scorecard_score"),
+                "scorecard_checks": r.get("scorecard_checks", {}),
             }
             for r in rows
         ],
@@ -701,6 +815,9 @@ def main() -> None:
                     f"Score {r['score']}/100 · {r['stars']:,} stars · "
                     f"last push {r['last_push']} · "
                     f"{r.get('weekly_commits') or 0} commits in last 4 weeks"
+                    f"{' · pkg provenance: ' + ','.join(r.get('provenance_sources',[])) if r.get('has_provenance') else ''}"
+                    f"{' · OSSF ' + r['scorecard_fmt'] + '/10' if r.get('scorecard_fmt') else ''}"
+                    f"{' · ' + str(r.get('signed_commits_pct','')) + '% signed commits' if r.get('signed_commits_pct') is not None else ''}"
                 ).strip(),
                 "date_modified": now_iso,
                 "tags": [r["category"]] if r.get("category") else [],

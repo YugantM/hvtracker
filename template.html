@@ -188,10 +188,11 @@
     col.col-commits  { width: 115px; }
     col.col-dl       { width: 130px; }
     col.col-hn       { width: 70px; }
+    col.col-trust    { width: 90px; }
     col.col-score    { width: 70px; }
 
     /* Prevent table squeezing below usable width; horizontal scroll takes over */
-    table { min-width: 875px; }
+    table { min-width: 965px; }
 
     thead th {
       padding: 10px 11px;
@@ -443,8 +444,43 @@
     }
     .formula strong { color: var(--text); }
 
+    /* ── Trust signals ── */
+    .trust-cell {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      align-items: center;
+    }
+    .trust-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      line-height: 1.5;
+    }
+    .trust-prov {
+      background: rgba(52,211,153,0.12);
+      color: var(--fresh);
+    }
+    .trust-sc {
+      background: var(--accent-lt);
+      color: var(--accent);
+    }
+    .trust-sig {
+      background: var(--mocha-lt);
+      color: var(--mocha);
+    }
+    .trust-none {
+      color: var(--stale);
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
     /* ── Mobile ── */
-    @media (max-width: 895px) {
+    @media (max-width: 985px) {
       .table-wrap {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -544,6 +580,7 @@
           <col class="col-commits">
           <col class="col-dl">
           <col class="col-hn">
+          <col class="col-trust">
           <col class="col-score">
         </colgroup>
         <thead>
@@ -556,6 +593,7 @@
             <th class="r" data-col="weekly_commits">4-wk commits<span class="sort-arrow"></span></th>
             <th class="r" data-col="downloads">Downloads (7d)<span class="sort-arrow"></span></th>
             <th class="r" data-col="hn_mentions_30d">HN (30d)<span class="sort-arrow"></span></th>
+            <th class="c" data-col="scorecard">Trust<span class="sort-arrow"></span></th>
             <th class="r sorted" data-col="score">Score<span class="sort-arrow">↓</span></th>
           </tr>
         </thead>
@@ -570,6 +608,7 @@
             data-weekly_commits="{{ row.weekly_commits }}"
             data-downloads="{{ row.weekly_downloads or 0 }}"
             data-hn_mentions_30d="{{ row.hn_mentions_30d if row.hn_mentions_30d is not none else -1 }}"
+            data-scorecard="{{ row.scorecard_score if row.scorecard_score is not none else -1 }}"
             data-score="{{ row.score }}"
             data-category="{{ row.category }}"
             data-category_rank="{{ row.category_rank }}"
@@ -603,6 +642,14 @@
             </td>
             <td class="r num">
               {% if row.hn_mentions_30d is not none %}{{ row.hn_mentions_30d }}{% else %}<span style="color: var(--stale);">—</span>{% endif %}
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title="{% if row.has_provenance %}Pkg provenance: {{ row.provenance_sources|join(', ') }}{% endif %}{% if row.scorecard_fmt %} · OSSF {{ row.scorecard_fmt }}/10{% endif %}{% if row.signed_commits_pct is not none %} · {{ row.signed_commits_pct }}% signed commits{% endif %}">
+                {% if row.has_provenance %}<span class="trust-badge trust-prov">prov</span>{% endif %}
+                {% if row.scorecard_fmt %}<span class="trust-badge trust-sc">{{ row.scorecard_fmt }}</span>{% endif %}
+                {% if row.signed_commits_pct is not none and row.signed_commits_pct >= 50 %}<span class="trust-badge trust-sig">sig</span>{% endif %}
+                {% if not row.has_provenance and not row.scorecard_fmt and (row.signed_commits_pct is none or row.signed_commits_pct < 50) %}<span class="trust-none">—</span>{% endif %}
+              </div>
             </td>
             <td class="r">
               <span class="score-pill {{ row.score_class }}">{{ row.score }}</span>

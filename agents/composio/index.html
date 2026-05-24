@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Composio — health score, stars, activity | HVTracker</title>
-  <meta name="description" content="Composio ranks #17 of 65 open-source AI agents on HVTracker. Score 68.4/100, 28.4k stars, last push 2026-05-21.">
+  <meta name="description" content="Composio ranks #17 of 65 open-source AI agents on HVTracker. Score 68.3/100, 28.4k stars, last push 2026-05-21.">
   <link rel="canonical" href="https://hvtracker.net/agents/composio">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="Composio — #17 on HVTracker">
-  <meta property="og:description" content="Score 68.4/100 · 28.4k stars · last push 2026-05-21">
+  <meta property="og:description" content="Score 68.3/100 · 28.4k stars · last push 2026-05-21">
   <meta property="og:url" content="https://hvtracker.net/agents/composio">
   <meta name="twitter:card" content="summary">
 
@@ -24,9 +24,9 @@
     "description": "Composio powers 1000+ toolkits, tool search, context management, authentication, and a sandboxed workbench to help you b",
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "68.4",
+      "ratingValue": "68.3",
       "bestRating": "100",
-      "ratingCount": "28420"
+      "ratingCount": "28418"
     }
   }
   </script>
@@ -138,6 +138,28 @@
       margin-top:4px;
     }
 
+    .provenance { padding:24px 0; border-bottom:1px solid var(--border); }
+    .prov-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+      gap:14px 24px;
+    }
+    .prov-signal { padding:10px 12px; border:1px solid var(--border); border-radius:6px; background:var(--surface); }
+    .prov-label {
+      font-family:var(--font-mono); font-size:10.5px; color:var(--muted);
+      text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;
+    }
+    .prov-value { font-family:var(--font-mono); font-size:16px; font-weight:600; }
+    .prov-yes { color:var(--fresh); }
+    .prov-no { color:var(--stale); }
+    .prov-sub { font-size:11px; color:var(--muted); margin-top:3px; }
+    .sc-checks {
+      margin-top:10px; display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+      gap:6px 16px; font-family:var(--font-mono); font-size:11px;
+    }
+    .sc-check { display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid var(--border); }
+    .sc-check-name { color:var(--muted); }
+    .sc-check-val { font-weight:600; }
+
     .links {
       padding:20px 0 28px; display:flex; gap:14px; flex-wrap:wrap;
       font-family:var(--font-mono); font-size:12px;
@@ -203,7 +225,7 @@
 
     <section class="rank-block">
       <div>
-        <div class="score-pill score-mid">68.4</div>
+        <div class="score-pill score-mid">68.3</div>
         <div class="rank-label">Health Score · out of 100</div>
       </div>
       <div>
@@ -247,11 +269,11 @@
         <div class="fresh">
           <div class="stat-label">Last Push</div>
           <div class="stat-value"><span class="fresh-dot"></span>2026-05-21</div>
-          <div class="stat-sub">2 days ago</div>
+          <div class="stat-sub">3 days ago</div>
         </div>
         <div>
           <div class="stat-label">Commits (4 wk)</div>
-          <div class="stat-value">334</div>
+          <div class="stat-value">326</div>
         </div>
         <div>
           <div class="stat-label">Downloads (7d)</div>
@@ -283,8 +305,8 @@
       </div>
       <div class="breakdown-row">
         <span class="breakdown-label">Freshness (max 25)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:98.9%"></div></div>
-        <span class="breakdown-value">24.7</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:98.3%"></div></div>
+        <span class="breakdown-value">24.6</span>
       </div>
       <div class="breakdown-row">
         <span class="breakdown-label">Activity (max 25)</span>
@@ -296,6 +318,34 @@
         <div class="breakdown-bar"><div class="breakdown-fill" style="width:85.1%"></div></div>
         <span class="breakdown-value">17.0</span>
       </div>
+    </section>
+
+    <section class="provenance">
+      <h2 class="section-title">Supply Chain Trust</h2>
+      <div class="prov-grid">
+        <div class="prov-signal">
+          <div class="prov-label">Package Provenance</div>
+          
+          <div class="prov-value prov-no">None</div>
+          <div class="prov-sub">No package attestations found</div>
+          
+        </div>
+        <div class="prov-signal">
+          <div class="prov-label">OSSF Scorecard</div>
+          
+          <div class="prov-value prov-no">—</div>
+          <div class="prov-sub">Not available</div>
+          
+        </div>
+        <div class="prov-signal">
+          <div class="prov-label">Signed Commits</div>
+          
+          <div class="prov-value " style="color:var(--aging);">45%</div>
+          <div class="prov-sub">of last 100 commits verified</div>
+          
+        </div>
+      </div>
+      
     </section>
 
     <section class="links">
@@ -354,7 +404,7 @@
     
 
     <footer>
-      <span>Updated 2026-05-24 08:43 UTC</span>
+      <span>Updated 2026-05-24 12:14 UTC</span>
       <span class="footer-sep">·</span>
       <a href="/methodology">methodology</a>
       <span class="footer-sep">·</span>

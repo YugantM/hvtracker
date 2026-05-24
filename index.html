@@ -188,10 +188,11 @@
     col.col-commits  { width: 115px; }
     col.col-dl       { width: 130px; }
     col.col-hn       { width: 70px; }
+    col.col-trust    { width: 90px; }
     col.col-score    { width: 70px; }
 
     /* Prevent table squeezing below usable width; horizontal scroll takes over */
-    table { min-width: 875px; }
+    table { min-width: 965px; }
 
     thead th {
       padding: 10px 11px;
@@ -443,8 +444,43 @@
     }
     .formula strong { color: var(--text); }
 
+    /* ── Trust signals ── */
+    .trust-cell {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      align-items: center;
+    }
+    .trust-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      line-height: 1.5;
+    }
+    .trust-prov {
+      background: rgba(52,211,153,0.12);
+      color: var(--fresh);
+    }
+    .trust-sc {
+      background: var(--accent-lt);
+      color: var(--accent);
+    }
+    .trust-sig {
+      background: var(--mocha-lt);
+      color: var(--mocha);
+    }
+    .trust-none {
+      color: var(--stale);
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
     /* ── Mobile ── */
-    @media (max-width: 895px) {
+    @media (max-width: 985px) {
       .table-wrap {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -485,7 +521,7 @@
       <span class="logo">HV<span>Tracker</span></span>
       <span class="tagline">Health scores for open-source AI agents</span>
       <div class="meta">
-        65 agents &nbsp;·&nbsp; updated 2026-05-24 08:43 UTC<br>
+        65 agents &nbsp;·&nbsp; updated 2026-05-24 12:14 UTC<br>
         scores refresh daily
       </div>
     </header>
@@ -570,6 +606,7 @@
           <col class="col-commits">
           <col class="col-dl">
           <col class="col-hn">
+          <col class="col-trust">
           <col class="col-score">
         </colgroup>
         <thead>
@@ -582,6 +619,7 @@
             <th class="r" data-col="weekly_commits">4-wk commits<span class="sort-arrow"></span></th>
             <th class="r" data-col="downloads">Downloads (7d)<span class="sort-arrow"></span></th>
             <th class="r" data-col="hn_mentions_30d">HN (30d)<span class="sort-arrow"></span></th>
+            <th class="c" data-col="scorecard">Trust<span class="sort-arrow"></span></th>
             <th class="r sorted" data-col="score">Score<span class="sort-arrow">↓</span></th>
           </tr>
         </thead>
@@ -591,11 +629,12 @@
             data-rank="1"
             data-rank_delta="0"
             data-name="Dify"
-            data-stars="142414"
+            data-stars="142429"
             data-last_push="2026-05-24"
             data-weekly_commits="449"
             data-downloads="437"
-            data-hn_mentions_30d="444"
+            data-hn_mentions_30d="442"
+            data-scorecard="-1"
             data-score="100.0"
             data-category="Workflow Platforms"
             data-category_rank="1"
@@ -626,7 +665,15 @@
               
             </td>
             <td class="r num">
-              444
+              442
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 100% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-high">100.0</span>
@@ -637,11 +684,12 @@
             data-rank="2"
             data-rank_delta="0"
             data-name="LiteLLM"
-            data-stars="48057"
+            data-stars="48066"
             data-last_push="2026-05-24"
             data-weekly_commits="954"
             data-downloads="124433599"
             data-hn_mentions_30d="3"
+            data-scorecard="-1"
             data-score="96.3"
             data-category="LLM Gateways &amp; Infra"
             data-category_rank="1"
@@ -674,6 +722,14 @@
             <td class="r num">
               3
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 93% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-high">96.3</span>
             </td>
@@ -683,11 +739,12 @@
             data-rank="3"
             data-rank_delta="0"
             data-name="Aider"
-            data-stars="45225"
+            data-stars="45231"
             data-last_push="2026-05-22"
             data-weekly_commits="5"
             data-downloads="247859"
-            data-hn_mentions_30d="102"
+            data-hn_mentions_30d="156"
+            data-scorecard="-1"
             data-score="79.5"
             data-category="Coding Agents"
             data-category_rank="1"
@@ -718,7 +775,15 @@
               
             </td>
             <td class="r num">
-              102
+              156
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 16% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-high">79.5</span>
@@ -729,11 +794,12 @@
             data-rank="4"
             data-rank_delta="0"
             data-name="AutoGPT"
-            data-stars="184491"
+            data-stars="184498"
             data-last_push="2026-05-24"
-            data-weekly_commits="167"
+            data-weekly_commits="165"
             data-downloads="71"
-            data-hn_mentions_30d="370"
+            data-hn_mentions_30d="371"
+            data-scorecard="-1"
             data-score="75.0"
             data-category="Agent Frameworks"
             data-category_rank="1"
@@ -756,7 +822,7 @@
                 <span class="push-text">2026-05-24</span>
               </div>
             </td>
-            <td class="r num">167</td>
+            <td class="r num">165</td>
             <td class="r">
               
               <span class="num">71</span>
@@ -764,7 +830,15 @@
               
             </td>
             <td class="r num">
-              370
+              371
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 92% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-high">75.0</span>
@@ -775,11 +849,12 @@
             data-rank="5"
             data-rank_delta="0"
             data-name="Browser Use"
-            data-stars="95273"
+            data-stars="95289"
             data-last_push="2026-05-23"
             data-weekly_commits="94"
-            data-downloads="7078005"
+            data-downloads="6274507"
             data-hn_mentions_30d="10"
+            data-scorecard="-1"
             data-score="73.6"
             data-category="Browser &amp; Computer Use"
             data-category_rank="1"
@@ -805,12 +880,20 @@
             <td class="r num">94</td>
             <td class="r">
               
-              <span class="num">7,078,005</span>
+              <span class="num">6,274,507</span>
               <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               10
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 54% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-high">73.6</span>
@@ -821,11 +904,12 @@
             data-rank="6"
             data-rank_delta="0"
             data-name="OpenHands"
-            data-stars="74692"
+            data-stars="74707"
             data-last_push="2026-05-24"
             data-weekly_commits="199"
             data-downloads="312266"
             data-hn_mentions_30d="1"
+            data-scorecard="-1"
             data-score="72.7"
             data-category="Coding Agents"
             data-category_rank="2"
@@ -858,6 +942,14 @@
             <td class="r num">
               1
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 100% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-high">72.7</span>
             </td>
@@ -867,12 +959,13 @@
             data-rank="7"
             data-rank_delta="0"
             data-name="LLaMA-Factory"
-            data-stars="71539"
+            data-stars="71545"
             data-last_push="2026-05-21"
             data-weekly_commits="26"
             data-downloads="32994"
             data-hn_mentions_30d="0"
-            data-score="72.1"
+            data-scorecard="-1"
+            data-score="72.0"
             data-category="Research &amp; Data"
             data-category_rank="1"
           >
@@ -904,8 +997,16 @@
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title="Pkg provenance: pypi · 100% signed commits">
+                <span class="trust-badge trust-prov">prov</span>
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
-              <span class="score-pill score-high">72.1</span>
+              <span class="score-pill score-high">72.0</span>
             </td>
           </tr>
           
@@ -913,11 +1014,12 @@
             data-rank="8"
             data-rank_delta="0"
             data-name="Cline"
-            data-stars="62235"
+            data-stars="62243"
             data-last_push="2026-05-24"
-            data-weekly_commits="378"
+            data-weekly_commits="377"
             data-downloads="56905"
-            data-hn_mentions_30d="7"
+            data-hn_mentions_30d="9"
+            data-scorecard="-1"
             data-score="71.5"
             data-category="Coding Agents"
             data-category_rank="3"
@@ -940,7 +1042,7 @@
                 <span class="push-text">2026-05-24</span>
               </div>
             </td>
-            <td class="r num">378</td>
+            <td class="r num">377</td>
             <td class="r">
               
               <span class="num">56,905</span>
@@ -948,7 +1050,15 @@
               
             </td>
             <td class="r num">
-              7
+              9
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title="Pkg provenance: npm · 88% signed commits">
+                <span class="trust-badge trust-prov">prov</span>
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-high">71.5</span>
@@ -959,11 +1069,12 @@
             data-rank="9"
             data-rank_delta="0"
             data-name="AnythingLLM"
-            data-stars="60535"
+            data-stars="60539"
             data-last_push="2026-05-24"
             data-weekly_commits="53"
             data-downloads="0"
-            data-hn_mentions_30d="0"
+            data-hn_mentions_30d="1"
+            data-scorecard="-1"
             data-score="71.4"
             data-category="Memory &amp; Knowledge"
             data-category_rank="1"
@@ -993,7 +1104,15 @@
               
             </td>
             <td class="r num">
-              0
+              1
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 60% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-high">71.4</span>
@@ -1004,11 +1123,12 @@
             data-rank="10"
             data-rank_delta="0"
             data-name="CrewAI"
-            data-stars="52061"
+            data-stars="52073"
             data-last_push="2026-05-23"
             data-weekly_commits="108"
-            data-downloads="4080920"
+            data-downloads="4211814"
             data-hn_mentions_30d="2"
+            data-scorecard="-1"
             data-score="71.2"
             data-category="Agent Frameworks"
             data-category_rank="2"
@@ -1034,12 +1154,20 @@
             <td class="r num">108</td>
             <td class="r">
               
-              <span class="num">4,080,920</span>
+              <span class="num">4,211,814</span>
               <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               2
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 100% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-high">71.2</span>
@@ -1050,11 +1178,12 @@
             data-rank="11"
             data-rank_delta="0"
             data-name="Mem0"
-            data-stars="56557"
-            data-last_push="2026-05-23"
+            data-stars="56565"
+            data-last_push="2026-05-24"
             data-weekly_commits="48"
             data-downloads="737782"
-            data-hn_mentions_30d="462"
+            data-hn_mentions_30d="461"
+            data-scorecard="-1"
             data-score="71.2"
             data-category="Memory &amp; Knowledge"
             data-category_rank="2"
@@ -1074,7 +1203,7 @@
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
-                <span class="push-text">2026-05-23</span>
+                <span class="push-text">2026-05-24</span>
               </div>
             </td>
             <td class="r num">48</td>
@@ -1085,7 +1214,15 @@
               
             </td>
             <td class="r num">
-              462
+              461
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title="Pkg provenance: pypi · 100% signed commits">
+                <span class="trust-badge trust-prov">prov</span>
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-high">71.2</span>
@@ -1096,12 +1233,13 @@
             data-rank="12"
             data-rank_delta="0"
             data-name="Open Interpreter"
-            data-stars="63646"
+            data-stars="63648"
             data-last_push="2026-05-17"
             data-weekly_commits="7"
-            data-downloads="48832"
+            data-downloads="48059"
             data-hn_mentions_30d="0"
-            data-score="70.4"
+            data-scorecard="-1"
+            data-score="70.2"
             data-category="Coding Agents"
             data-category_rank="4"
           >
@@ -1126,15 +1264,23 @@
             <td class="r num">7<span title="Stats API may be stale for this repo" style="color:var(--aging);font-size:10px;margin-left:2px;">?</span></td>
             <td class="r">
               
-              <span class="num">48,832</span>
+              <span class="num">48,059</span>
               <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 41% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
+            </td>
             <td class="r">
-              <span class="score-pill score-high">70.4</span>
+              <span class="score-pill score-high">70.2</span>
             </td>
           </tr>
           
@@ -1142,11 +1288,12 @@
             data-rank="13"
             data-rank_delta="0"
             data-name="Agno"
-            data-stars="40319"
+            data-stars="40320"
             data-last_push="2026-05-24"
             data-weekly_commits="168"
             data-downloads="1145021"
-            data-hn_mentions_30d="232"
+            data-hn_mentions_30d="237"
+            data-scorecard="-1"
             data-score="70.0"
             data-category="Agent Frameworks"
             data-category_rank="3"
@@ -1177,7 +1324,15 @@
               
             </td>
             <td class="r num">
-              232
+              237
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 72% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-high">70.0</span>
@@ -1188,11 +1343,12 @@
             data-rank="14"
             data-rank_delta="0"
             data-name="LangGraph"
-            data-stars="32797"
+            data-stars="32804"
             data-last_push="2026-05-24"
             data-weekly_commits="118"
             data-downloads="16218178"
             data-hn_mentions_30d="10"
+            data-scorecard="-1"
             data-score="69.5"
             data-category="Agent Frameworks"
             data-category_rank="4"
@@ -1225,6 +1381,14 @@
             <td class="r num">
               10
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title="Pkg provenance: npm · 100% signed commits">
+                <span class="trust-badge trust-prov">prov</span>
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">69.5</span>
             </td>
@@ -1234,11 +1398,12 @@
             data-rank="15"
             data-rank_delta="0"
             data-name="Continue"
-            data-stars="33347"
+            data-stars="33350"
             data-last_push="2026-05-22"
             data-weekly_commits="0"
             data-downloads="78"
             data-hn_mentions_30d="-1"
+            data-scorecard="-1"
             data-score="69.0"
             data-category="Coding Agents"
             data-category_rank="5"
@@ -1254,7 +1419,7 @@
               <span class="lang">TypeScript</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">33.3k</td>
+            <td class="r num">33.4k</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1271,6 +1436,14 @@
             <td class="r num">
               <span style="color: var(--stale);">—</span>
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 89% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">69.0</span>
             </td>
@@ -1280,11 +1453,12 @@
             data-rank="16"
             data-rank_delta="0"
             data-name="CopilotKit"
-            data-stars="31706"
+            data-stars="31708"
             data-last_push="2026-05-23"
-            data-weekly_commits="2721"
+            data-weekly_commits="2688"
             data-downloads="264012"
             data-hn_mentions_30d="1"
+            data-scorecard="-1"
             data-score="68.8"
             data-category="Agent Frameworks"
             data-category_rank="5"
@@ -1307,7 +1481,7 @@
                 <span class="push-text">2026-05-23</span>
               </div>
             </td>
-            <td class="r num">2721</td>
+            <td class="r num">2688</td>
             <td class="r">
               
               <span class="num">264,012</span>
@@ -1316,6 +1490,14 @@
             </td>
             <td class="r num">
               1
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title="Pkg provenance: npm · 23% signed commits">
+                <span class="trust-badge trust-prov">prov</span>
+                
+                
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-mid">68.8</span>
@@ -1326,12 +1508,13 @@
             data-rank="17"
             data-rank_delta="0"
             data-name="Composio"
-            data-stars="28420"
+            data-stars="28418"
             data-last_push="2026-05-21"
-            data-weekly_commits="334"
+            data-weekly_commits="326"
             data-downloads="111050"
             data-hn_mentions_30d="117"
-            data-score="68.4"
+            data-scorecard="-1"
+            data-score="68.3"
             data-category="Agent Frameworks"
             data-category_rank="6"
           >
@@ -1353,7 +1536,7 @@
                 <span class="push-text">2026-05-21</span>
               </div>
             </td>
-            <td class="r num">334</td>
+            <td class="r num">326</td>
             <td class="r">
               
               <span class="num">111,050</span>
@@ -1363,8 +1546,16 @@
             <td class="r num">
               117
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 45% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
+            </td>
             <td class="r">
-              <span class="score-pill score-mid">68.4</span>
+              <span class="score-pill score-mid">68.3</span>
             </td>
           </tr>
           
@@ -1372,11 +1563,12 @@
             data-rank="18"
             data-rank_delta="0"
             data-name="Vercel AI SDK"
-            data-stars="24428"
+            data-stars="24431"
             data-last_push="2026-05-23"
             data-weekly_commits="323"
             data-downloads="13732578"
             data-hn_mentions_30d="7"
+            data-scorecard="-1"
             data-score="68.3"
             data-category="Agent Frameworks"
             data-category_rank="7"
@@ -1409,6 +1601,14 @@
             <td class="r num">
               7
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title="Pkg provenance: npm · 100% signed commits">
+                <span class="trust-badge trust-prov">prov</span>
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">68.3</span>
             </td>
@@ -1423,6 +1623,7 @@
             data-weekly_commits="35"
             data-downloads="660418"
             data-hn_mentions_30d="0"
+            data-scorecard="-1"
             data-score="68.1"
             data-category="Agent Frameworks"
             data-category_rank="8"
@@ -1455,6 +1656,14 @@
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 100% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">68.1</span>
             </td>
@@ -1468,7 +1677,8 @@
             data-last_push="2026-05-12"
             data-weekly_commits="4"
             data-downloads="32"
-            data-hn_mentions_30d="1"
+            data-hn_mentions_30d="8"
+            data-scorecard="-1"
             data-score="67.4"
             data-category="Multi-Agent Systems"
             data-category_rank="1"
@@ -1499,7 +1709,15 @@
               
             </td>
             <td class="r num">
-              1
+              8
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 44% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-mid">67.4</span>
@@ -1510,11 +1728,12 @@
             data-rank="21"
             data-rank_delta="0"
             data-name="Haystack"
-            data-stars="25358"
+            data-stars="25357"
             data-last_push="2026-05-22"
-            data-weekly_commits="119"
+            data-weekly_commits="118"
             data-downloads="226646"
             data-hn_mentions_30d="-1"
+            data-scorecard="5.3"
             data-score="67.3"
             data-category="Workflow Platforms"
             data-category_rank="2"
@@ -1537,7 +1756,7 @@
                 <span class="push-text">2026-05-22</span>
               </div>
             </td>
-            <td class="r num">119</td>
+            <td class="r num">118</td>
             <td class="r">
               
               <span class="num">226,646</span>
@@ -1546,6 +1765,14 @@
             </td>
             <td class="r num">
               <span style="color: var(--stale);">—</span>
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title="Pkg provenance: pypi · OSSF 5.3/10 · 100% signed commits">
+                <span class="trust-badge trust-prov">prov</span>
+                <span class="trust-badge trust-sc">5.3</span>
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-mid">67.3</span>
@@ -1556,12 +1783,13 @@
             data-rank="22"
             data-rank_delta="0"
             data-name="Resume Matcher"
-            data-stars="27140"
+            data-stars="27143"
             data-last_push="2026-05-12"
             data-weekly_commits="39"
-            data-downloads="46"
+            data-downloads="47"
             data-hn_mentions_30d="-1"
-            data-score="67.2"
+            data-scorecard="-1"
+            data-score="67.0"
             data-category="Research &amp; Data"
             data-category_rank="2"
           >
@@ -1586,15 +1814,23 @@
             <td class="r num">39</td>
             <td class="r">
               
-              <span class="num">46</span>
+              <span class="num">47</span>
               <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               <span style="color: var(--stale);">—</span>
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 38% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
+            </td>
             <td class="r">
-              <span class="score-pill score-mid">67.2</span>
+              <span class="score-pill score-mid">67.0</span>
             </td>
           </tr>
           
@@ -1602,12 +1838,13 @@
             data-rank="23"
             data-rank_delta="0"
             data-name="AutoGen"
-            data-stars="58334"
+            data-stars="58339"
             data-last_push="2026-04-15"
             data-weekly_commits="0"
             data-downloads="336580"
-            data-hn_mentions_30d="0"
-            data-score="66.6"
+            data-hn_mentions_30d="6"
+            data-scorecard="5.8"
+            data-score="66.5"
             data-category="Agent Frameworks"
             data-category_rank="9"
           >
@@ -1637,10 +1874,18 @@
               
             </td>
             <td class="r num">
-              0
+              6
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title="Pkg provenance: pypi · OSSF 5.8/10 · 100% signed commits">
+                <span class="trust-badge trust-prov">prov</span>
+                <span class="trust-badge trust-sc">5.8</span>
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
-              <span class="score-pill score-mid">66.6</span>
+              <span class="score-pill score-mid">66.5</span>
             </td>
           </tr>
           
@@ -1648,11 +1893,12 @@
             data-rank="24"
             data-rank_delta="0"
             data-name="Roo Code"
-            data-stars="24138"
+            data-stars="24141"
             data-last_push="2026-05-15"
             data-weekly_commits="18"
             data-downloads="6"
             data-hn_mentions_30d="-1"
+            data-scorecard="-1"
             data-score="66.5"
             data-category="Coding Agents"
             data-category_rank="6"
@@ -1685,6 +1931,14 @@
             <td class="r num">
               <span style="color: var(--stale);">—</span>
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 100% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">66.5</span>
             </td>
@@ -1699,6 +1953,7 @@
             data-weekly_commits="138"
             data-downloads="8898673"
             data-hn_mentions_30d="1"
+            data-scorecard="-1"
             data-score="65.9"
             data-category="Agent Frameworks"
             data-category_rank="10"
@@ -1731,6 +1986,14 @@
             <td class="r num">
               1
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title="Pkg provenance: pypi · 100% signed commits">
+                <span class="trust-badge trust-prov">prov</span>
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">65.9</span>
             </td>
@@ -1745,6 +2008,7 @@
             data-weekly_commits="1"
             data-downloads="8700"
             data-hn_mentions_30d="0"
+            data-scorecard="-1"
             data-score="65.8"
             data-category="Memory &amp; Knowledge"
             data-category_rank="3"
@@ -1777,6 +2041,14 @@
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 3% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">65.8</span>
             </td>
@@ -1786,11 +2058,12 @@
             data-rank="27"
             data-rank_delta="0"
             data-name="SWE-agent"
-            data-stars="19281"
+            data-stars="19282"
             data-last_push="2026-05-18"
             data-weekly_commits="0"
             data-downloads="71"
             data-hn_mentions_30d="1"
+            data-scorecard="-1"
             data-score="65.4"
             data-category="Coding Agents"
             data-category_rank="7"
@@ -1823,6 +2096,14 @@
             <td class="r num">
               1
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 87% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">65.4</span>
             </td>
@@ -1832,12 +2113,13 @@
             data-rank="28"
             data-rank_delta="0"
             data-name="CAMEL"
-            data-stars="17026"
+            data-stars="17027"
             data-last_push="2026-05-19"
             data-weekly_commits="31"
             data-downloads="37973"
             data-hn_mentions_30d="0"
-            data-score="65.1"
+            data-scorecard="-1"
+            data-score="65.0"
             data-category="Multi-Agent Systems"
             data-category_rank="2"
           >
@@ -1869,8 +2151,16 @@
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 56% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
-              <span class="score-pill score-mid">65.1</span>
+              <span class="score-pill score-mid">65.0</span>
             </td>
           </tr>
           
@@ -1883,6 +2173,7 @@
             data-weekly_commits="4"
             data-downloads="6848"
             data-hn_mentions_30d="-1"
+            data-scorecard="-1"
             data-score="65.0"
             data-category="Agent Frameworks"
             data-category_rank="11"
@@ -1915,6 +2206,14 @@
             <td class="r num">
               <span style="color: var(--stale);">—</span>
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 100% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">65.0</span>
             </td>
@@ -1924,11 +2223,12 @@
             data-rank="30"
             data-rank_delta="0"
             data-name="Maxun"
-            data-stars="15607"
+            data-stars="15609"
             data-last_push="2026-05-23"
             data-weekly_commits="68"
-            data-downloads="27"
+            data-downloads="26"
             data-hn_mentions_30d="13"
+            data-scorecard="-1"
             data-score="64.7"
             data-category="Research &amp; Data"
             data-category_rank="3"
@@ -1954,12 +2254,20 @@
             <td class="r num">68</td>
             <td class="r">
               
-              <span class="num">27</span>
+              <span class="num">26</span>
               <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               13
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 40% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-mid">64.7</span>
@@ -1973,8 +2281,9 @@
             data-stars="33772"
             data-last_push="2026-04-17"
             data-weekly_commits="0"
-            data-downloads="43"
+            data-downloads="0"
             data-hn_mentions_30d="0"
+            data-scorecard="-1"
             data-score="63.6"
             data-category="Coding Agents"
             data-category_rank="8"
@@ -2000,12 +2309,19 @@
             <td class="r num">0</td>
             <td class="r">
               
-              <span class="num">43</span>
-              <span class="dl-source">pypi</span>
+              <span class="num" style="color: var(--stale);">—</span>
               
             </td>
             <td class="r num">
               0
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 1% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-mid">63.6</span>
@@ -2021,6 +2337,7 @@
             data-weekly_commits="34"
             data-downloads="998262"
             data-hn_mentions_30d="1"
+            data-scorecard="-1"
             data-score="63.2"
             data-category="LLM Gateways &amp; Infra"
             data-category_rank="2"
@@ -2053,6 +2370,14 @@
             <td class="r num">
               1
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 74% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">63.2</span>
             </td>
@@ -2062,11 +2387,12 @@
             data-rank="33"
             data-rank_delta="0"
             data-name="GPT Researcher"
-            data-stars="27256"
+            data-stars="27258"
             data-last_push="2026-04-16"
             data-weekly_commits="0"
             data-downloads="28566"
             data-hn_mentions_30d="0"
+            data-scorecard="-1"
             data-score="63.1"
             data-category="Research &amp; Data"
             data-category_rank="4"
@@ -2099,6 +2425,14 @@
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 60% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">63.1</span>
             </td>
@@ -2113,6 +2447,7 @@
             data-weekly_commits="6"
             data-downloads="93937"
             data-hn_mentions_30d="0"
+            data-scorecard="-1"
             data-score="62.1"
             data-category="Workflow Platforms"
             data-category_rank="3"
@@ -2145,6 +2480,14 @@
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 99% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">62.1</span>
             </td>
@@ -2154,11 +2497,12 @@
             data-rank="35"
             data-rank_delta="-1"
             data-name="LLM"
-            data-stars="11918"
+            data-stars="11919"
             data-last_push="2026-05-17"
             data-weekly_commits="49"
-            data-downloads="65213"
+            data-downloads="66410"
             data-hn_mentions_30d="-1"
+            data-scorecard="-1"
             data-score="62.1"
             data-category="LLM Gateways &amp; Infra"
             data-category_rank="3"
@@ -2184,12 +2528,20 @@
             <td class="r num">49</td>
             <td class="r">
               
-              <span class="num">65,213</span>
+              <span class="num">66,410</span>
               <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               <span style="color: var(--stale);">—</span>
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title="Pkg provenance: pypi · 13% signed commits">
+                <span class="trust-badge trust-prov">prov</span>
+                
+                
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-mid">62.1</span>
@@ -2205,6 +2557,7 @@
             data-weekly_commits="19"
             data-downloads="0"
             data-hn_mentions_30d="-1"
+            data-scorecard="-1"
             data-score="61.4"
             data-category="Browser &amp; Computer Use"
             data-category_rank="2"
@@ -2236,6 +2589,14 @@
             <td class="r num">
               <span style="color: var(--stale);">—</span>
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 34% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">61.4</span>
             </td>
@@ -2245,11 +2606,12 @@
             data-rank="37"
             data-rank_delta="0"
             data-name="OmniParser"
-            data-stars="24800"
+            data-stars="24801"
             data-last_push="2026-04-13"
             data-weekly_commits="0"
             data-downloads="0"
             data-hn_mentions_30d="1"
+            data-scorecard="-1"
             data-score="61.3"
             data-category="Browser &amp; Computer Use"
             data-category_rank="3"
@@ -2281,6 +2643,14 @@
             <td class="r num">
               1
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 12% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">61.3</span>
             </td>
@@ -2295,6 +2665,7 @@
             data-weekly_commits="3"
             data-downloads="0"
             data-hn_mentions_30d="0"
+            data-scorecard="-1"
             data-score="60.9"
             data-category="Coding Agents"
             data-category_rank="9"
@@ -2326,6 +2697,14 @@
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 8% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">60.9</span>
             </td>
@@ -2335,11 +2714,12 @@
             data-rank="39"
             data-rank_delta="0"
             data-name="Khoj"
-            data-stars="34689"
+            data-stars="34692"
             data-last_push="2026-03-26"
             data-weekly_commits="0"
             data-downloads="4818"
             data-hn_mentions_30d="9"
+            data-scorecard="-1"
             data-score="59.5"
             data-category="Memory &amp; Knowledge"
             data-category_rank="4"
@@ -2372,6 +2752,14 @@
             <td class="r num">
               9
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title="Pkg provenance: pypi · 16% signed commits">
+                <span class="trust-badge trust-prov">prov</span>
+                
+                
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">59.5</span>
             </td>
@@ -2383,9 +2771,10 @@
             data-name="GPTMe"
             data-stars="4308"
             data-last_push="2026-05-24"
-            data-weekly_commits="201"
+            data-weekly_commits="203"
             data-downloads="6678"
             data-hn_mentions_30d="3"
+            data-scorecard="-1"
             data-score="58.8"
             data-category="Coding Agents"
             data-category_rank="10"
@@ -2408,7 +2797,7 @@
                 <span class="push-text">2026-05-24</span>
               </div>
             </td>
-            <td class="r num">201</td>
+            <td class="r num">203</td>
             <td class="r">
               
               <span class="num">6,678</span>
@@ -2417,6 +2806,14 @@
             </td>
             <td class="r num">
               3
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 97% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-mid">58.8</span>
@@ -2427,11 +2824,12 @@
             data-rank="41"
             data-rank_delta="0"
             data-name="Tabby"
-            data-stars="33541"
+            data-stars="33542"
             data-last_push="2026-03-02"
             data-weekly_commits="0"
             data-downloads="2"
             data-hn_mentions_30d="0"
+            data-scorecard="-1"
             data-score="55.9"
             data-category="Coding Agents"
             data-category_rank="11"
@@ -2464,6 +2862,14 @@
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 99% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">55.9</span>
             </td>
@@ -2473,12 +2879,13 @@
             data-rank="42"
             data-rank_delta="0"
             data-name="MetaGPT"
-            data-stars="68246"
+            data-stars="68252"
             data-last_push="2026-01-21"
             data-weekly_commits="0"
-            data-downloads="7820"
-            data-hn_mentions_30d="41"
-            data-score="55.4"
+            data-downloads="8020"
+            data-hn_mentions_30d="5"
+            data-scorecard="-1"
+            data-score="55.2"
             data-category="Multi-Agent Systems"
             data-category_rank="3"
           >
@@ -2493,7 +2900,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Multi-Agent Systems</span>
             </td>
-            <td class="r num">68.2k</td>
+            <td class="r num">68.3k</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -2503,15 +2910,23 @@
             <td class="r num">0</td>
             <td class="r">
               
-              <span class="num">7,820</span>
+              <span class="num">8,020</span>
               <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
-              41
+              5
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 33% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
             </td>
             <td class="r">
-              <span class="score-pill score-mid">55.4</span>
+              <span class="score-pill score-mid">55.2</span>
             </td>
           </tr>
           
@@ -2522,8 +2937,9 @@
             data-stars="4147"
             data-last_push="2026-04-28"
             data-weekly_commits="0"
-            data-downloads="2703"
+            data-downloads="0"
             data-hn_mentions_30d="0"
+            data-scorecard="-1"
             data-score="55.1"
             data-category="Agent Frameworks"
             data-category_rank="12"
@@ -2549,12 +2965,19 @@
             <td class="r num">0</td>
             <td class="r">
               
-              <span class="num">2,703</span>
-              <span class="dl-source">pypi</span>
+              <span class="num" style="color: var(--stale);">—</span>
               
             </td>
             <td class="r num">
               0
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 28% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-mid">55.1</span>
@@ -2565,11 +2988,12 @@
             data-rank="44"
             data-rank_delta="0"
             data-name="Qwen Agent"
-            data-stars="16388"
+            data-stars="16387"
             data-last_push="2026-03-04"
             data-weekly_commits="0"
             data-downloads="96701"
             data-hn_mentions_30d="0"
+            data-scorecard="4.8"
             data-score="54.0"
             data-category="Agent Frameworks"
             data-category_rank="13"
@@ -2602,6 +3026,14 @@
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · OSSF 4.8/10 · 14% signed commits">
+                
+                <span class="trust-badge trust-sc">4.8</span>
+                
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">54.0</span>
             </td>
@@ -2616,6 +3048,7 @@
             data-weekly_commits="0"
             data-downloads="0"
             data-hn_mentions_30d="0"
+            data-scorecard="-1"
             data-score="52.5"
             data-category="Agent Frameworks"
             data-category_rank="14"
@@ -2647,6 +3080,14 @@
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 77% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">52.5</span>
             </td>
@@ -2659,8 +3100,9 @@
             data-stars="22277"
             data-last_push="2026-01-31"
             data-weekly_commits="0"
-            data-downloads="70"
+            data-downloads="63"
             data-hn_mentions_30d="8"
+            data-scorecard="-1"
             data-score="51.5"
             data-category="Agent Frameworks"
             data-category_rank="15"
@@ -2686,12 +3128,20 @@
             <td class="r num">0</td>
             <td class="r">
               
-              <span class="num">70</span>
+              <span class="num">63</span>
               <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               8
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 40% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-mid">51.5</span>
@@ -2706,7 +3156,8 @@
             data-last_push="2026-03-19"
             data-weekly_commits="0"
             data-downloads="135884"
-            data-hn_mentions_30d="1088"
+            data-hn_mentions_30d="1092"
+            data-scorecard="-1"
             data-score="51.4"
             data-category="LLM Gateways &amp; Infra"
             data-category_rank="4"
@@ -2737,7 +3188,15 @@
               
             </td>
             <td class="r num">
-              1088
+              1092
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 100% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-mid">51.4</span>
@@ -2753,6 +3212,7 @@
             data-weekly_commits="0"
             data-downloads="352"
             data-hn_mentions_30d="1"
+            data-scorecard="-1"
             data-score="46.5"
             data-category="Coding Agents"
             data-category_rank="12"
@@ -2785,6 +3245,14 @@
             <td class="r num">
               1
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 42% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-mid">46.5</span>
             </td>
@@ -2797,8 +3265,9 @@
             data-stars="10712"
             data-last_push="2026-01-27"
             data-weekly_commits="0"
-            data-downloads="2852"
+            data-downloads="2545"
             data-hn_mentions_30d="1"
+            data-scorecard="-1"
             data-score="46.5"
             data-category="Browser &amp; Computer Use"
             data-category_rank="4"
@@ -2824,12 +3293,20 @@
             <td class="r num">0</td>
             <td class="r">
               
-              <span class="num">2,852</span>
+              <span class="num">2,545</span>
               <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               1
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 19% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-mid">46.5</span>
@@ -2845,6 +3322,7 @@
             data-weekly_commits="0"
             data-downloads="1388"
             data-hn_mentions_30d="0"
+            data-scorecard="-1"
             data-score="44.2"
             data-category="Browser &amp; Computer Use"
             data-category_rank="5"
@@ -2877,6 +3355,14 @@
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 37% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-low">44.2</span>
             </td>
@@ -2886,11 +3372,12 @@
             data-rank="51"
             data-rank_delta="0"
             data-name="AgentBench"
-            data-stars="3446"
+            data-stars="3447"
             data-last_push="2026-02-08"
             data-weekly_commits="0"
             data-downloads="0"
             data-hn_mentions_30d="0"
+            data-scorecard="-1"
             data-score="43.0"
             data-category="Agent Frameworks"
             data-category_rank="16"
@@ -2922,6 +3409,14 @@
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 51% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-low">43.0</span>
             </td>
@@ -2931,11 +3426,12 @@
             data-rank="52"
             data-rank_delta="0"
             data-name="GPT Crawler"
-            data-stars="22245"
+            data-stars="22244"
             data-last_push="2025-07-07"
             data-weekly_commits="0"
             data-downloads="116"
             data-hn_mentions_30d="0"
+            data-scorecard="-1"
             data-score="41.8"
             data-category="Research &amp; Data"
             data-category_rank="5"
@@ -2968,6 +3464,14 @@
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 44% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-low">41.8</span>
             </td>
@@ -2982,6 +3486,7 @@
             data-weekly_commits="0"
             data-downloads="0"
             data-hn_mentions_30d="3"
+            data-scorecard="-1"
             data-score="41.6"
             data-category="Coding Agents"
             data-category_rank="13"
@@ -3013,6 +3518,14 @@
             <td class="r num">
               3
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 56% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-low">41.6</span>
             </td>
@@ -3025,8 +3538,9 @@
             data-stars="17534"
             data-last_push="2025-01-22"
             data-weekly_commits="0"
-            data-downloads="40"
-            data-hn_mentions_30d="56"
+            data-downloads="42"
+            data-hn_mentions_30d="57"
+            data-scorecard="-1"
             data-score="41.1"
             data-category="Agent Frameworks"
             data-category_rank="17"
@@ -3052,12 +3566,20 @@
             <td class="r num">0</td>
             <td class="r">
               
-              <span class="num">40</span>
+              <span class="num">42</span>
               <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
-              56
+              57
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 65% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-low">41.1</span>
@@ -3071,8 +3593,9 @@
             data-stars="2224"
             data-last_push="2026-01-30"
             data-weekly_commits="0"
-            data-downloads="280"
+            data-downloads="277"
             data-hn_mentions_30d="1"
+            data-scorecard="-1"
             data-score="40.2"
             data-category="Coding Agents"
             data-category_rank="14"
@@ -3098,12 +3621,20 @@
             <td class="r num">0</td>
             <td class="r">
               
-              <span class="num">280</span>
+              <span class="num">277</span>
               <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               1
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 17% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-low">40.2</span>
@@ -3114,11 +3645,12 @@
             data-rank="56"
             data-rank_delta="0"
             data-name="smol developer"
-            data-stars="12187"
+            data-stars="12188"
             data-last_push="2024-04-07"
             data-weekly_commits="0"
-            data-downloads="32"
+            data-downloads="33"
             data-hn_mentions_30d="0"
+            data-scorecard="-1"
             data-score="38.6"
             data-category="Coding Agents"
             data-category_rank="15"
@@ -3144,12 +3676,20 @@
             <td class="r num">0</td>
             <td class="r">
               
-              <span class="num">32</span>
+              <span class="num">33</span>
               <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               0
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 65% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-low">38.6</span>
@@ -3160,11 +3700,12 @@
             data-rank="57"
             data-rank_delta="0"
             data-name="OpenGPTs"
-            data-stars="6744"
+            data-stars="6742"
             data-last_push="2025-06-26"
             data-weekly_commits="0"
             data-downloads="0"
-            data-hn_mentions_30d="0"
+            data-hn_mentions_30d="1"
+            data-scorecard="-1"
             data-score="36.8"
             data-category="Memory &amp; Knowledge"
             data-category_rank="5"
@@ -3194,7 +3735,15 @@
               
             </td>
             <td class="r num">
-              0
+              1
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 58% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-low">36.8</span>
@@ -3210,6 +3759,7 @@
             data-weekly_commits="0"
             data-downloads="0"
             data-hn_mentions_30d="0"
+            data-scorecard="-1"
             data-score="36.0"
             data-category="Workflow Platforms"
             data-category_rank="4"
@@ -3241,6 +3791,14 @@
             <td class="r num">
               0
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 23% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-low">36.0</span>
             </td>
@@ -3250,11 +3808,12 @@
             data-rank="59"
             data-rank_delta="0"
             data-name="Sweep"
-            data-stars="7712"
+            data-stars="7711"
             data-last_push="2025-09-18"
             data-weekly_commits="0"
-            data-downloads="184"
+            data-downloads="188"
             data-hn_mentions_30d="-1"
+            data-scorecard="-1"
             data-score="35.7"
             data-category="Coding Agents"
             data-category_rank="16"
@@ -3280,12 +3839,20 @@
             <td class="r num">0</td>
             <td class="r">
               
-              <span class="num">184</span>
+              <span class="num">188</span>
               <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               <span style="color: var(--stale);">—</span>
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 24% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-low">35.7</span>
@@ -3299,8 +3866,9 @@
             data-stars="6356"
             data-last_push="2025-01-21"
             data-weekly_commits="0"
-            data-downloads="322"
-            data-hn_mentions_30d="4"
+            data-downloads="0"
+            data-hn_mentions_30d="5"
+            data-scorecard="-1"
             data-score="35.6"
             data-category="Browser &amp; Computer Use"
             data-category_rank="6"
@@ -3326,12 +3894,19 @@
             <td class="r num">0</td>
             <td class="r">
               
-              <span class="num">322</span>
-              <span class="dl-source">pypi</span>
+              <span class="num" style="color: var(--stale);">—</span>
               
             </td>
             <td class="r num">
-              4
+              5
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 70% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-low">35.6</span>
@@ -3347,6 +3922,7 @@
             data-weekly_commits="0"
             data-downloads="0"
             data-hn_mentions_30d="-1"
+            data-scorecard="-1"
             data-score="35.2"
             data-category="Coding Agents"
             data-category_rank="17"
@@ -3378,6 +3954,14 @@
             <td class="r num">
               <span style="color: var(--stale);">—</span>
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 36% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-low">35.2</span>
             </td>
@@ -3390,8 +3974,9 @@
             data-stars="5041"
             data-last_push="2024-09-09"
             data-weekly_commits="0"
-            data-downloads="16"
+            data-downloads="10"
             data-hn_mentions_30d="1"
+            data-scorecard="-1"
             data-score="34.8"
             data-category="Multi-Agent Systems"
             data-category_rank="4"
@@ -3417,12 +4002,20 @@
             <td class="r num">0</td>
             <td class="r">
               
-              <span class="num">16</span>
+              <span class="num">10</span>
               <span class="dl-source">pypi</span>
               
             </td>
             <td class="r num">
               1
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 45% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-low">34.8</span>
@@ -3438,6 +4031,7 @@
             data-weekly_commits="0"
             data-downloads="7"
             data-hn_mentions_30d="2"
+            data-scorecard="-1"
             data-score="32.6"
             data-category="Coding Agents"
             data-category_rank="18"
@@ -3470,6 +4064,14 @@
             <td class="r num">
               2
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 0% signed commits">
+                
+                
+                
+                <span class="trust-none">—</span>
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-low">32.6</span>
             </td>
@@ -3484,6 +4086,7 @@
             data-weekly_commits="0"
             data-downloads="0"
             data-hn_mentions_30d="-1"
+            data-scorecard="-1"
             data-score="26.5"
             data-category="Coding Agents"
             data-category_rank="19"
@@ -3515,6 +4118,14 @@
             <td class="r num">
               <span style="color: var(--stale);">—</span>
             </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 98% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
+            </td>
             <td class="r">
               <span class="score-pill score-low">26.5</span>
             </td>
@@ -3529,6 +4140,7 @@
             data-weekly_commits="0"
             data-downloads="0"
             data-hn_mentions_30d="-1"
+            data-scorecard="-1"
             data-score="24.6"
             data-category="Coding Agents"
             data-category_rank="20"
@@ -3559,6 +4171,14 @@
             </td>
             <td class="r num">
               <span style="color: var(--stale);">—</span>
+            </td>
+            <td class="c">
+              <div class="trust-cell" style="justify-content:center;" title=" · 89% signed commits">
+                
+                
+                <span class="trust-badge trust-sig">sig</span>
+                
+              </div>
             </td>
             <td class="r">
               <span class="score-pill score-low">24.6</span>
