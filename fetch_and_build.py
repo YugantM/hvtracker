@@ -777,10 +777,17 @@ def main() -> None:
 
     # sitemap.xml — /, /methodology, all /agents/<slug>
     today_iso = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    from specs import ALL_SPECS as _ALL_SPECS
     sitemap_urls = [
         ("https://hvtracker.net/", "1.0", "daily"),
         ("https://hvtracker.net/methodology", "0.5", "monthly"),
+        ("https://hvtracker.net/spec/", "0.4", "monthly"),
     ]
+    for spec in _ALL_SPECS:
+        sitemap_urls.append((
+            f"https://hvtracker.net/spec/{spec['slug']}/{spec['version']}",
+            "0.4", "monthly"
+        ))
     for row in rows:
         sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}", "0.8", "daily"))
     sitemap_lines = ['<?xml version="1.0" encoding="UTF-8"?>',
@@ -844,6 +851,28 @@ def main() -> None:
         with open(path, "w", encoding="utf-8") as f:
             f.write(methodology_html)
     print(f"Built methodology.html ({METHODOLOGY_VERSION}, updated {methodology_date}).")
+
+    # Build /spec/ pages
+    from specs import ALL_SPECS
+    spec_tmpl = env.get_template("spec.html.j2")
+    spec_index_tmpl = env.get_template("spec_index.html.j2")
+
+    spec_base = os.path.join(script_dir, "spec")
+    os.makedirs(spec_base, exist_ok=True)
+
+    for spec in ALL_SPECS:
+        spec_dir = os.path.join(spec_base, spec["slug"], spec["version"])
+        os.makedirs(spec_dir, exist_ok=True)
+        html = spec_tmpl.render(spec=spec)
+        with open(os.path.join(spec_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(html)
+        print(f"Built spec: /spec/{spec['slug']}/{spec['version']}")
+
+    # /spec/ index
+    index_html = spec_index_tmpl.render(specs=ALL_SPECS)
+    with open(os.path.join(spec_base, "index.html"), "w", encoding="utf-8") as f:
+        f.write(index_html)
+    print(f"Built spec index with {len(ALL_SPECS)} spec(s).")
 
 
 if __name__ == "__main__":

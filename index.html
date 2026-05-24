@@ -3,16 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Health scores for open-source AI agents, ranked by activity and community momentum.">
-  <title>HVTracker — AI Agent Leaderboard</title>
+  <meta name="description" content="Track the health, activity, trust, and momentum of open-source AI agents, coding agents, frameworks, memory tools, and agent infrastructure.">
+  <title>HVTracker — Open-Source AI Agent Leaderboard</title>
+  <link rel="canonical" href="https://hvtracker.net/">
   <link rel="alternate" type="application/feed+json" title="HVTracker — JSON Feed" href="/feed.json">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="HVTracker — AI Agent Leaderboard">
-  <meta property="og:description" content="Health scores for 65+ open-source AI agents, ranked by activity and community momentum. Updated daily.">
+  <meta property="og:title" content="HVTracker — Open-Source AI Agent Leaderboard">
+  <meta property="og:description" content="Track the health, activity, trust, and momentum of open-source AI agents, coding agents, frameworks, memory tools, and agent infrastructure.">
   <meta property="og:url" content="https://hvtracker.net/">
   <meta property="og:image" content="https://hvtracker.net/og.png">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="HVTracker — Open-Source AI Agent Leaderboard">
+  <meta name="twitter:description" content="Track the health, activity, trust, and momentum of open-source AI agents, coding agents, frameworks, memory tools, and agent infrastructure.">
   <meta name="twitter:image" content="https://hvtracker.net/og.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "HVTracker",
+    "url": "https://hvtracker.net/",
+    "description": "Track the health, activity, trust, and momentum of open-source AI agents, coding agents, frameworks, memory tools, and agent infrastructure.",
+    "inLanguage": "en"
+  }
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -110,6 +123,132 @@
       text-align: right;
       white-space: nowrap;
     }
+    .site-nav {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      display: flex;
+      gap: 14px;
+      align-items: baseline;
+    }
+    .site-nav a { color: var(--muted); }
+    .site-nav a:hover { color: var(--accent); }
+
+    /* ── Intro positioning ── */
+    .intro {
+      padding: 26px 0 20px;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.8fr);
+      gap: 28px;
+      align-items: start;
+    }
+    .intro-kicker {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .intro h1 {
+      font-size: 30px;
+      line-height: 1.18;
+      letter-spacing: 0;
+      margin-bottom: 10px;
+      max-width: 680px;
+    }
+    .intro-copy {
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 720px;
+    }
+    .intro-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .intro-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--surface);
+    }
+    .intro-action:hover {
+      border-color: var(--accent-dim);
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .intro-action.primary {
+      background: var(--accent-lt);
+      border-color: var(--accent-dim);
+      color: var(--accent);
+    }
+    .intro-panel {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      padding: 14px 16px;
+    }
+    .intro-panel h2 {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .intro-panel p {
+      color: var(--muted);
+      font-size: 12.5px;
+      margin-bottom: 10px;
+    }
+    .score-keys {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .score-keys span {
+      display: flex;
+      gap: 6px;
+      align-items: baseline;
+    }
+    .score-keys strong {
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .why {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr);
+      gap: 26px;
+      align-items: start;
+    }
+    .why h2 {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .why p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .why p:last-child { margin-bottom: 0; }
 
     /* ── Category filter bar ── */
     .cat-bar {
@@ -481,6 +620,11 @@
 
     /* ── Mobile ── */
     @media (max-width: 985px) {
+      .intro,
+      .why {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
       .table-wrap {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -501,6 +645,10 @@
     @media (max-width: 640px) {
       header { flex-direction: column; gap: 6px; }
       .meta { margin-left: 0; text-align: left; }
+      .site-nav { order: 3; }
+      .intro { padding-top: 22px; }
+      .intro h1 { font-size: 24px; }
+      .score-keys { grid-template-columns: 1fr; }
       .cat-bar { gap: 5px; }
       .cat-pill { font-size: 10px; padding: 4px 10px; }
     }
@@ -520,11 +668,49 @@
     <header>
       <span class="logo">HV<span>Tracker</span></span>
       <span class="tagline">Health scores for open-source AI agents</span>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/methodology">Methodology</a>
+      </nav>
       <div class="meta">
         65 agents &nbsp;·&nbsp; updated 2026-05-24 12:41 UTC<br>
         scores refresh daily
       </div>
     </header>
+
+    <section class="intro" aria-labelledby="intro-title">
+      <div>
+        <div class="intro-kicker">Open-source AI agent intelligence</div>
+        <h1 id="intro-title">Track the health and momentum of open-source AI agents.</h1>
+        <p class="intro-copy">HVTracker ranks open-source AI agents, coding agents, frameworks, memory tools, workflow platforms, and agent infrastructure using public signals like GitHub activity, freshness, stars, package downloads, community attention, and trust indicators.</p>
+        <div class="intro-actions">
+          <a class="intro-action primary" href="#leaderboard">Browse Leaderboard</a>
+          <a class="intro-action" href="/methodology">View Methodology</a>
+          <a class="intro-action" href="/data.json">View Data/API</a>
+          <a class="intro-action" href="https://github.com/YugantM/hvtracker/issues" target="_blank" rel="noopener">Suggest a Project</a>
+        </div>
+      </div>
+      <aside class="intro-panel" aria-labelledby="score-title">
+        <h2 id="score-title">What the score means</h2>
+        <p>The health score combines public signals for maintenance, adoption, and community interest. Trust signals are shown separately so readers can inspect them directly.</p>
+        <div class="score-keys">
+          <span><strong>Activity</strong> recent commits</span>
+          <span><strong>Freshness</strong> last push</span>
+          <span><strong>Community</strong> forks</span>
+          <span><strong>Adoption</strong> stars</span>
+          <span><strong>Trust</strong> provenance</span>
+          <span><strong>Attention</strong> HN + downloads</span>
+        </div>
+      </aside>
+    </section>
+
+    <section class="why" aria-labelledby="why-title">
+      <h2 id="why-title">Why this matters</h2>
+      <div>
+        <p>AI agent projects appear quickly, change direction quickly, and sometimes go quiet just as fast.</p>
+        <p>HVTracker helps builders, researchers, and teams identify which projects are active, trusted, growing, or becoming stale.</p>
+        <p>The goal is not just popularity. The leaderboard combines project health, adoption signals, update cadence, and observable trust indicators.</p>
+      </div>
+    </section>
 
     
     <div class="cat-bar" id="catBar">
