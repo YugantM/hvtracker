@@ -133,123 +133,6 @@
     .site-nav a { color: var(--muted); }
     .site-nav a:hover { color: var(--accent); }
 
-    /* ── Intro positioning ── */
-    .intro {
-      padding: 26px 0 20px;
-      border-bottom: 1px solid var(--border);
-      display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.8fr);
-      gap: 28px;
-      align-items: start;
-    }
-    .intro-kicker {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 8px;
-    }
-    .intro h1 {
-      font-size: 30px;
-      line-height: 1.18;
-      letter-spacing: 0;
-      margin-bottom: 10px;
-      max-width: 680px;
-    }
-    .intro-copy {
-      color: var(--muted);
-      font-size: 14px;
-      max-width: 720px;
-    }
-    .intro-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
-    .intro-action {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 32px;
-      padding: 6px 12px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--muted);
-      background: var(--surface);
-    }
-    .intro-action:hover {
-      border-color: var(--accent-dim);
-      color: var(--accent);
-      text-decoration: none;
-    }
-    .intro-action.primary {
-      background: var(--accent-lt);
-      border-color: var(--accent-dim);
-      color: var(--accent);
-    }
-    .intro-panel {
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: var(--surface);
-      padding: 14px 16px;
-    }
-    .intro-panel h2 {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--text);
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-    .intro-panel p {
-      color: var(--muted);
-      font-size: 12.5px;
-      margin-bottom: 10px;
-    }
-    .score-keys {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 6px 12px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .score-keys span {
-      display: flex;
-      gap: 6px;
-      align-items: baseline;
-    }
-    .score-keys strong {
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 600;
-    }
-    .why {
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border);
-      display: grid;
-      grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr);
-      gap: 26px;
-      align-items: start;
-    }
-    .why h2 {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--text);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-    .why p {
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 8px;
-    }
-    .why p:last-child { margin-bottom: 0; }
-
     /* ── Category filter bar ── */
     .cat-bar {
       display: flex;
@@ -620,11 +503,6 @@
 
     /* ── Mobile ── */
     @media (max-width: 985px) {
-      .intro,
-      .why {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
       .table-wrap {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -646,9 +524,6 @@
       header { flex-direction: column; gap: 6px; }
       .meta { margin-left: 0; text-align: left; }
       .site-nav { order: 3; }
-      .intro { padding-top: 22px; }
-      .intro h1 { font-size: 24px; }
-      .score-keys { grid-template-columns: 1fr; }
       .cat-bar { gap: 5px; }
       .cat-pill { font-size: 10px; padding: 4px 10px; }
     }
@@ -676,41 +551,6 @@
         scores refresh daily
       </div>
     </header>
-
-    <section class="intro" aria-labelledby="intro-title">
-      <div>
-        <div class="intro-kicker">Open-source AI agent intelligence</div>
-        <h1 id="intro-title">Track the health and momentum of open-source AI agents.</h1>
-        <p class="intro-copy">HVTracker ranks open-source AI agents, coding agents, frameworks, memory tools, workflow platforms, and agent infrastructure using public signals like GitHub activity, freshness, stars, package downloads, community attention, and trust indicators.</p>
-        <div class="intro-actions">
-          <a class="intro-action primary" href="#leaderboard">Browse Leaderboard</a>
-          <a class="intro-action" href="/methodology">View Methodology</a>
-          <a class="intro-action" href="/data.json">View Data/API</a>
-          <a class="intro-action" href="https://github.com/YugantM/hvtracker/issues" target="_blank" rel="noopener">Suggest a Project</a>
-        </div>
-      </div>
-      <aside class="intro-panel" aria-labelledby="score-title">
-        <h2 id="score-title">What the score means</h2>
-        <p>The health score combines public signals for maintenance, adoption, and community interest. Trust signals are shown separately so readers can inspect them directly.</p>
-        <div class="score-keys">
-          <span><strong>Activity</strong> recent commits</span>
-          <span><strong>Freshness</strong> last push</span>
-          <span><strong>Community</strong> forks</span>
-          <span><strong>Adoption</strong> stars</span>
-          <span><strong>Trust</strong> provenance</span>
-          <span><strong>Attention</strong> HN + downloads</span>
-        </div>
-      </aside>
-    </section>
-
-    <section class="why" aria-labelledby="why-title">
-      <h2 id="why-title">Why this matters</h2>
-      <div>
-        <p>AI agent projects appear quickly, change direction quickly, and sometimes go quiet just as fast.</p>
-        <p>HVTracker helps builders, researchers, and teams identify which projects are active, trusted, growing, or becoming stale.</p>
-        <p>The goal is not just popularity. The leaderboard combines project health, adoption signals, update cadence, and observable trust indicators.</p>
-      </div>
-    </section>
 
     
     <div class="cat-bar" id="catBar">
@@ -744,38 +584,6 @@
       <span class="legend-item" style="color:var(--aging);">? = commit count may be stale (GitHub Stats API cache)</span>
     </div>
 
-    
-    <div class="movers">
-      <span class="movers-title">Biggest movers (2-day window)</span>
-      <div class="movers-row">
-        
-        <a href="/agents/promptflow" class="mover mover-up">
-          <span class="mover-arrow">▲1</span>
-          <span class="mover-name">PromptFlow</span>
-          <span class="mover-rank">#34</span>
-        </a>
-        
-        <a href="/agents/gpt-engineer" class="mover mover-up">
-          <span class="mover-arrow">▲1</span>
-          <span class="mover-name">GPT Engineer</span>
-          <span class="mover-rank">#48</span>
-        </a>
-        
-        
-        <a href="/agents/llm" class="mover mover-down">
-          <span class="mover-arrow">▼1</span>
-          <span class="mover-name">LLM</span>
-          <span class="mover-rank">#35</span>
-        </a>
-        
-        <a href="/agents/ui-tars" class="mover mover-down">
-          <span class="mover-arrow">▼1</span>
-          <span class="mover-name">UI-TARS</span>
-          <span class="mover-rank">#49</span>
-        </a>
-        
-      </div>
-    </div>
     
 
     <div class="table-wrap">
@@ -833,7 +641,7 @@
               <span class="lang">TypeScript</span>
               <span class="cat-badge">Workflow Platforms</span>
             </td>
-            <td class="r num">142.4k</td>
+            <td class="r num">142,450</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -888,7 +696,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">LLM Gateways &amp; Infra</span>
             </td>
-            <td class="r num">48.1k</td>
+            <td class="r num">48,094</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -943,7 +751,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">45.2k</td>
+            <td class="r num">45,231</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -998,7 +806,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">184.5k</td>
+            <td class="r num">184,505</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1053,7 +861,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Browser &amp; Computer Use</span>
             </td>
-            <td class="r num">95.3k</td>
+            <td class="r num">95,305</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1108,7 +916,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">74.7k</td>
+            <td class="r num">74,722</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1163,7 +971,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Research &amp; Data</span>
             </td>
-            <td class="r num">71.5k</td>
+            <td class="r num">71,550</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1218,7 +1026,7 @@
               <span class="lang">TypeScript</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">62.3k</td>
+            <td class="r num">62,252</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1273,7 +1081,7 @@
               <span class="lang">JavaScript</span>
               <span class="cat-badge">Memory &amp; Knowledge</span>
             </td>
-            <td class="r num">60.5k</td>
+            <td class="r num">60,541</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1327,7 +1135,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">52.1k</td>
+            <td class="r num">52,084</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1382,7 +1190,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Memory &amp; Knowledge</span>
             </td>
-            <td class="r num">56.6k</td>
+            <td class="r num">56,586</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1437,7 +1245,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">63.6k</td>
+            <td class="r num">63,648</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1492,7 +1300,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">40.3k</td>
+            <td class="r num">40,323</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1547,7 +1355,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">32.8k</td>
+            <td class="r num">32,819</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1602,7 +1410,7 @@
               <span class="lang">TypeScript</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">33.4k</td>
+            <td class="r num">33,354</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1657,7 +1465,7 @@
               <span class="lang">TypeScript</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">31.7k</td>
+            <td class="r num">31,711</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1712,7 +1520,7 @@
               <span class="lang">TypeScript</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">28.4k</td>
+            <td class="r num">28,426</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1767,7 +1575,7 @@
               <span class="lang">TypeScript</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">24.4k</td>
+            <td class="r num">24,436</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1822,7 +1630,7 @@
               <span class="lang">C#</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">28.0k</td>
+            <td class="r num">27,965</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1877,7 +1685,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Multi-Agent Systems</span>
             </td>
-            <td class="r num">33.2k</td>
+            <td class="r num">33,173</td>
             <td>
               <div class="push-date recent">
                 <span class="push-dot"></span>
@@ -1932,7 +1740,7 @@
               <span class="lang">MDX</span>
               <span class="cat-badge">Workflow Platforms</span>
             </td>
-            <td class="r num">25.4k</td>
+            <td class="r num">25,359</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1987,7 +1795,7 @@
               <span class="lang">TypeScript</span>
               <span class="cat-badge">Research &amp; Data</span>
             </td>
-            <td class="r num">27.1k</td>
+            <td class="r num">27,145</td>
             <td>
               <div class="push-date recent">
                 <span class="push-dot"></span>
@@ -2042,7 +1850,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">58.4k</td>
+            <td class="r num">58,350</td>
             <td>
               <div class="push-date aging">
                 <span class="push-dot"></span>
@@ -2097,7 +1905,7 @@
               <span class="lang">TypeScript</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">24.1k</td>
+            <td class="r num">24,139</td>
             <td>
               <div class="push-date recent">
                 <span class="push-dot"></span>
@@ -2152,7 +1960,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">17.3k</td>
+            <td class="r num">17,252</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -2207,7 +2015,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Memory &amp; Knowledge</span>
             </td>
-            <td class="r num">22.9k</td>
+            <td class="r num">22,928</td>
             <td>
               <div class="push-date recent">
                 <span class="push-dot"></span>
@@ -2262,7 +2070,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">19.3k</td>
+            <td class="r num">19,285</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -2317,7 +2125,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Multi-Agent Systems</span>
             </td>
-            <td class="r num">17.0k</td>
+            <td class="r num">17,026</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -2372,7 +2180,7 @@
               <span class="lang">Jupyter Notebook</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">21.5k</td>
+            <td class="r num">21,474</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -2427,7 +2235,7 @@
               <span class="lang">TypeScript</span>
               <span class="cat-badge">Research &amp; Data</span>
             </td>
-            <td class="r num">15.6k</td>
+            <td class="r num">15,609</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -2482,7 +2290,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">33.8k</td>
+            <td class="r num">33,772</td>
             <td>
               <div class="push-date aging">
                 <span class="push-dot"></span>
@@ -2537,7 +2345,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">LLM Gateways &amp; Infra</span>
             </td>
-            <td class="r num">12.3k</td>
+            <td class="r num">12,338</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -2592,7 +2400,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Research &amp; Data</span>
             </td>
-            <td class="r num">27.3k</td>
+            <td class="r num">27,262</td>
             <td>
               <div class="push-date aging">
                 <span class="push-dot"></span>
@@ -2647,7 +2455,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Workflow Platforms</span>
             </td>
-            <td class="r num">11.1k</td>
+            <td class="r num">11,131</td>
             <td>
               <div class="push-date recent">
                 <span class="push-dot"></span>
@@ -2702,7 +2510,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">LLM Gateways &amp; Infra</span>
             </td>
-            <td class="r num">11.9k</td>
+            <td class="r num">11,920</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -2757,7 +2565,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Browser &amp; Computer Use</span>
             </td>
-            <td class="r num">8.7k</td>
+            <td class="r num">8,742</td>
             <td>
               <div class="push-date recent">
                 <span class="push-dot"></span>
@@ -2811,7 +2619,7 @@
               <span class="lang">Jupyter Notebook</span>
               <span class="cat-badge">Browser &amp; Computer Use</span>
             </td>
-            <td class="r num">24.8k</td>
+            <td class="r num">24,801</td>
             <td>
               <div class="push-date aging">
                 <span class="push-dot"></span>
@@ -2865,7 +2673,7 @@
               <span class="lang">TypeScript</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">6.9k</td>
+            <td class="r num">6,942</td>
             <td>
               <div class="push-date recent">
                 <span class="push-dot"></span>
@@ -2919,7 +2727,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Memory &amp; Knowledge</span>
             </td>
-            <td class="r num">34.7k</td>
+            <td class="r num">34,692</td>
             <td>
               <div class="push-date aging">
                 <span class="push-dot"></span>
@@ -2974,7 +2782,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">4.3k</td>
+            <td class="r num">4,309</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -3029,7 +2837,7 @@
               <span class="lang">Rust</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">33.5k</td>
+            <td class="r num">33,542</td>
             <td>
               <div class="push-date aging">
                 <span class="push-dot"></span>
@@ -3084,7 +2892,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Multi-Agent Systems</span>
             </td>
-            <td class="r num">68.3k</td>
+            <td class="r num">68,259</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -3139,7 +2947,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">4.1k</td>
+            <td class="r num">4,147</td>
             <td>
               <div class="push-date recent">
                 <span class="push-dot"></span>
@@ -3194,7 +3002,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">16.4k</td>
+            <td class="r num">16,387</td>
             <td>
               <div class="push-date aging">
                 <span class="push-dot"></span>
@@ -3249,7 +3057,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">6.2k</td>
+            <td class="r num">6,162</td>
             <td>
               <div class="push-date aging">
                 <span class="push-dot"></span>
@@ -3303,7 +3111,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">22.3k</td>
+            <td class="r num">22,276</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -3358,7 +3166,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">LLM Gateways &amp; Infra</span>
             </td>
-            <td class="r num">5.6k</td>
+            <td class="r num">5,576</td>
             <td>
               <div class="push-date aging">
                 <span class="push-dot"></span>
@@ -3413,7 +3221,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">55.2k</td>
+            <td class="r num">55,216</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -3468,7 +3276,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Browser &amp; Computer Use</span>
             </td>
-            <td class="r num">10.7k</td>
+            <td class="r num">10,714</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -3523,7 +3331,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Browser &amp; Computer Use</span>
             </td>
-            <td class="r num">5.3k</td>
+            <td class="r num">5,287</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -3578,7 +3386,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">3.4k</td>
+            <td class="r num">3,447</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -3632,7 +3440,7 @@
               <span class="lang">TypeScript</span>
               <span class="cat-badge">Research &amp; Data</span>
             </td>
-            <td class="r num">22.2k</td>
+            <td class="r num">22,244</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -3687,7 +3495,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">19.5k</td>
+            <td class="r num">19,508</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -3741,7 +3549,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Agent Frameworks</span>
             </td>
-            <td class="r num">17.5k</td>
+            <td class="r num">17,532</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -3796,7 +3604,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">2.2k</td>
+            <td class="r num">2,224</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -3851,7 +3659,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">12.2k</td>
+            <td class="r num">12,188</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -3906,7 +3714,7 @@
               <span class="lang">Rich Text Format</span>
               <span class="cat-badge">Memory &amp; Knowledge</span>
             </td>
-            <td class="r num">6.7k</td>
+            <td class="r num">6,742</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -3960,7 +3768,7 @@
               <span class="lang">HTML</span>
               <span class="cat-badge">Workflow Platforms</span>
             </td>
-            <td class="r num">6.0k</td>
+            <td class="r num">5,959</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -4014,7 +3822,7 @@
               <span class="lang">Jupyter Notebook</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">7.7k</td>
+            <td class="r num">7,711</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -4069,7 +3877,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Browser &amp; Computer Use</span>
             </td>
-            <td class="r num">6.4k</td>
+            <td class="r num">6,356</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -4124,7 +3932,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">5.1k</td>
+            <td class="r num">5,088</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -4178,7 +3986,7 @@
               <span class="lang">JavaScript</span>
               <span class="cat-badge">Multi-Agent Systems</span>
             </td>
-            <td class="r num">5.0k</td>
+            <td class="r num">5,041</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
@@ -4233,7 +4041,7 @@
               <span class="lang">Python</span>
               <span class="cat-badge">Coding Agents</span>
             </td>
-            <td class="r num">3.4k</td>
+            <td class="r num">3,448</td>
             <td>
               <div class="push-date stale">
                 <span class="push-dot"></span>
