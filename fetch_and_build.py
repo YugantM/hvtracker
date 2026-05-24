@@ -219,35 +219,48 @@ def score_class(s: float) -> str:
     return "score-low"
 
 
-def load_previous_ranks(data_path: str) -> dict[str, int]:
-    """Load previous rankings from data.json. Returns {repo: rank} mapping."""
-    if not os.path.exists(data_path):
+def _load_prior_snapshot(history_dir: str) -> dict | None:
+    """Return the most recent history snapshot older than today, or None."""
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    try:
+        candidates = sorted(
+            [f for f in os.listdir(history_dir)
+             if re.match(r"\d{4}-\d{2}-\d{2}\.json$", f) and f[:-5] < today],
+            reverse=True,
+        )
+        if not candidates:
+            return None
+        with open(os.path.join(history_dir, candidates[0]), encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
+def load_previous_ranks(history_dir: str) -> dict[str, int]:
+    """Load previous rankings from the most recent prior history snapshot."""
+    prev = _load_prior_snapshot(history_dir)
+    if not prev:
         return {}
     try:
-        with open(data_path, encoding="utf-8") as f:
-            prev = json.load(f)
         return {a["repo"].lower(): a["rank"] for a in prev.get("agents", [])}
-    except (json.JSONDecodeError, KeyError):
+    except (KeyError, TypeError):
         return {}
 
 
-def load_previous_downloads(data_path: str) -> dict[str, tuple[int, str]]:
-    """Load previous download counts from data.json.
-    Returns {pypi_or_npm_package: (count, dl_source)} for use as fallback on 429."""
-    if not os.path.exists(data_path):
+def load_previous_downloads(history_dir: str) -> dict[str, tuple[int, str]]:
+    """Load previous download counts for use as fallback on PyPI 429."""
+    prev = _load_prior_snapshot(history_dir)
+    if not prev:
         return {}
     try:
-        with open(data_path, encoding="utf-8") as f:
-            prev = json.load(f)
         result = {}
         for a in prev.get("agents", []):
             dl = a.get("weekly_downloads")
             src = a.get("dl_source", "")
             if dl is not None:
-                # key by repo so we can look up regardless of package name changes
                 result[a["repo"].lower()] = (dl, src)
         return result
-    except (json.JSONDecodeError, KeyError):
+    except (KeyError, TypeError):
         return {}
 
 
@@ -291,9 +304,13 @@ def main() -> None:
             deduped.append(a)
     agents = deduped
 
-    # Load previous rankings and downloads for delta computation and 429 fallback
-    prev_ranks = load_previous_ranks(data_path)
-    prev_downloads = load_previous_downloads(data_path)
+    # Load previous rankings and downloads from the most recent daily history snapshot.
+    # Using history/ (not data.json) means deltas always compare against the prior
+    # calendar day's run — unaffected by manual commits or code pushes during the day.
+    history_dir = os.path.join(script_dir, "output", "history")
+    os.makedirs(history_dir, exist_ok=True)
+    prev_ranks = load_previous_ranks(history_dir)
+    prev_downloads = load_previous_downloads(history_dir)
 
     def fetch_one(agent: dict) -> dict | None:
         repo_id = agent["repo"]

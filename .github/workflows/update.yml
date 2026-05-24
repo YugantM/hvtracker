@@ -26,36 +26,6 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Restore previous data.json for delta baseline
-        run: |
-          echo "=== Debug: data.json state BEFORE restore ==="
-          if [ -f data.json ]; then
-            echo "data.json exists (from checkout):"
-            echo "  size: $(wc -c < data.json) bytes"
-            python3 -c "import json; d=json.load(open('data.json')); print('  timestamp:', d.get('updated','N/A')); print('  agents:', d.get('total','N/A'))" 2>/dev/null || echo "  (parse failed)"
-            echo "  first 3 repos:"
-            jq -r '.agents[:3][] | "    \(.repo) rank=\(.rank)"' data.json 2>/dev/null || echo "  (jq parse failed)"
-          else
-            echo "data.json does NOT exist in checkout"
-          fi
-
-          # Restore data.json from the PREVIOUS commit so deltas are computed
-          # against a true prior baseline, not the current (potentially just-pushed) state.
-          # NOTE: if someone force-pushes, HEAD~1 may not point to the actual
-          # previous CI run — an acceptable limitation for now.
-          if git rev-parse HEAD~1 > /dev/null 2>&1; then
-            if git show HEAD~1:data.json > /tmp/prev_data.json 2>/dev/null; then
-              mv /tmp/prev_data.json data.json
-              echo ""
-              echo "=== Debug: data.json state AFTER restore (from HEAD~1) ==="
-              python3 -c "import json; d=json.load(open('data.json')); print('  timestamp:', d.get('updated','N/A')); print('  agents:', d.get('total','N/A'))" 2>/dev/null || echo "  (parse failed)"
-            else
-              echo "No data.json in previous commit — treating as first run"
-            fi
-          else
-            echo "No previous commit (first push) — treating as first run"
-          fi
-
       - name: Fetch data and build index.html
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
