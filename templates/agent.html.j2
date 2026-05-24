@@ -224,7 +224,7 @@
         <div class="{{ row.freshness_class }}">
           <div class="stat-label">Last Push</div>
           <div class="stat-value"><span class="fresh-dot"></span>{{ row.last_push }}</div>
-          <div class="stat-sub">{{ row.days_ago }} day{{ '' if row.days_ago == 1 else 's' }} ago</div>
+          <div class="stat-sub">{% if row.days_ago == 0 %}today{% elif row.days_ago == 1 %}yesterday{% else %}{{ row.days_ago }} days ago{% endif %}</div>
         </div>
         <div>
           <div class="stat-label">Commits (4 wk)</div>

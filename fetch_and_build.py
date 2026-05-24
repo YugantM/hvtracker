@@ -570,6 +570,37 @@ def main() -> None:
         f.write("\n".join(sitemap_lines) + "\n")
     print(f"Wrote sitemap.xml with {len(sitemap_urls)} URLs.")
 
+    # feed.json — JSON Feed 1.1 spec (jsonfeed.org). One item per agent.
+    now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    feed = {
+        "version": "https://jsonfeed.org/version/1.1",
+        "title": "HVTracker — Open-Source AI Agent Leaderboard",
+        "description": "Daily health scores and rankings for open-source AI agents.",
+        "home_page_url": "https://hvtracker.net/",
+        "feed_url": "https://hvtracker.net/feed.json",
+        "language": "en",
+        "items": [
+            {
+                "id": f"https://hvtracker.net/agents/{r['slug']}",
+                "url": f"https://hvtracker.net/agents/{r['slug']}",
+                "external_url": r["url"],
+                "title": f"#{r['rank']} {r['name']} — score {r['score']}",
+                "content_text": (
+                    f"{r.get('description','')}\n\n"
+                    f"Score {r['score']}/100 · {r['stars']:,} stars · "
+                    f"last push {r['last_push']} · "
+                    f"{r.get('weekly_commits') or 0} commits in last 4 weeks"
+                ).strip(),
+                "date_modified": now_iso,
+                "tags": [r["category"]] if r.get("category") else [],
+            }
+            for r in rows
+        ],
+    }
+    with open(os.path.join(script_dir, "feed.json"), "w", encoding="utf-8") as f:
+        json.dump(feed, f, indent=2, ensure_ascii=False)
+    print(f"Wrote feed.json with {len(rows)} items.")
+
     methodology_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     methodology_html = env.get_template("methodology.html.j2").render(
         methodology_version=METHODOLOGY_VERSION,

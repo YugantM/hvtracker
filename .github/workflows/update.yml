@@ -15,10 +15,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: "pip"
@@ -65,7 +65,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html data.json methodology.html output/history/ output/methodology.html
+          git add index.html data.json methodology.html output/history/ output/methodology.html agents/ sitemap.xml feed.json
           if git diff --cached --quiet; then
             echo "No changes — skipping commit."
           else
