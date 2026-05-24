@@ -2,8 +2,8 @@ name: Update leaderboard
 
 on:
   schedule:
-    # Every Monday at 06:00 UTC
-    - cron: "0 6 * * 1"
+    # Every day at 06:00 UTC
+    - cron: "0 6 * * *"
   workflow_dispatch:  # allow manual trigger from Actions tab
   push:
     paths:
