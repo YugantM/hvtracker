@@ -311,13 +311,16 @@ def main() -> None:
 
         weeks = get_commit_activity(repo_id)
         score = compute_score(repo, weeks)
-        # Use Stats API 4-week sum (same source as score) for the display column.
-        # Falls back to Commits API only if Stats API returned nothing.
+        d = days_ago(repo["pushed_at"])
+        # Use Stats API 4-week sum for the display column.
+        # Fall back to Commits API when Stats returned nothing, or when the repo
+        # pushed recently but the 4-week sum is zero (Stats API serves stale cache).
         commits_4wk = sum(w["total"] for w in weeks[-4:]) if weeks else None
-        if commits_4wk is None or (commits_4wk == 0 and not weeks):
+        if commits_4wk is None or (commits_4wk == 0 and (not weeks or d <= 7)):
             commits_4wk = fetch_recent_commits(repo_id)
         recent_commits = commits_4wk
-        d = days_ago(repo["pushed_at"])
+        # Flag cells where Stats API may still be stale (recent push, very low count).
+        commits_low_confidence = bool(d <= 7 and (recent_commits or 0) < 10)
 
         # Fetch npm downloads in parallel (npm API has no strict rate limit)
         pypi_pkg = agent.get("pypi_package", "")
@@ -337,6 +340,7 @@ def main() -> None:
             "days_ago": d,
             "freshness_class": freshness_class(d),
             "weekly_commits": recent_commits,
+            "commits_low_confidence": commits_low_confidence,
             "score": score,
             "score_class": score_class(score),
             "description": (repo.get("description") or "")[:120],
@@ -477,6 +481,7 @@ def main() -> None:
                 "last_push": r["last_push"],
                 "days_ago": r["days_ago"],
                 "weekly_commits": r["weekly_commits"],
+                "commits_low_confidence": r.get("commits_low_confidence", False),
                 "score": r["score"],
                 "description": r["description"],
                 "language": r["language"],
