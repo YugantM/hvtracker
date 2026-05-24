@@ -142,10 +142,10 @@ def fetch_pypi_downloads(package_name: str) -> int | None:
             r = requests.get(url, timeout=10)
             if r.status_code == 200:
                 data = r.json().get("data", {})
-                time.sleep(2.0)  # conservative: ~1 req/2s to stay within rate limit
+                time.sleep(1.2)  # ~1 req/1.2s — safe for pypistats rate limit
                 return data.get("last_week")
             if r.status_code == 429:
-                time.sleep(15.0)  # back off and retry once
+                time.sleep(10.0)  # back off and retry once
                 continue
             return None
         except Exception:

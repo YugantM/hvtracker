@@ -64,7 +64,7 @@ jobs:
 
       - name: Fetch data and build index.html
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         run: python fetch_and_build.py
 
       - name: Commit and push if changed
