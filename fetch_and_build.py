@@ -153,28 +153,34 @@ def fetch_pypi_downloads(package_name: str) -> int | None:
     return None
 
 
-def compute_score(repo: dict, weeks: list) -> float:
-    stars = repo["stargazers_count"]
-    forks = repo["forks_count"]
+def score_components(stars: int, days_since: int, recent_commits: int, forks: int) -> dict:
+    """Compute the four score components. Reused by the leaderboard and profile pages."""
+    stars_score = min(30, math.log1p(stars) / math.log1p(100_000) * 30)
+    freshness_score = max(0.0, 25 * (1 - days_since / 180))
+    activity_score = min(25, math.log1p(recent_commits) / math.log1p(100) * 25)
+    community_score = min(20, math.log1p(forks) / math.log1p(20_000) * 20)
+    return {
+        "stars": round(stars_score, 1),
+        "freshness": round(freshness_score, 1),
+        "activity": round(activity_score, 1),
+        "community": round(community_score, 1),
+        "stars_pct": round(stars_score / 30 * 100, 1),
+        "freshness_pct": round(freshness_score / 25 * 100, 1),
+        "activity_pct": round(activity_score / 25 * 100, 1),
+        "community_pct": round(community_score / 20 * 100, 1),
+    }
 
+
+def compute_score(repo: dict, weeks: list) -> float:
     pushed_at = datetime.fromisoformat(repo["pushed_at"].replace("Z", "+00:00"))
     days_since = (datetime.now(timezone.utc) - pushed_at).days
-
     recent_commits = sum(w["total"] for w in weeks[-4:]) if weeks else 0
+    c = score_components(repo["stargazers_count"], days_since, recent_commits, repo["forks_count"])
+    return round(c["stars"] + c["freshness"] + c["activity"] + c["community"], 1)
 
-    # Stars: log scale up to 30 pts (100k stars = 30 pts)
-    stars_score = min(30, math.log1p(stars) / math.log1p(100_000) * 30)
 
-    # Freshness: linear decay over 180 days, up to 25 pts
-    freshness_score = max(0.0, 25 * (1 - days_since / 180))
-
-    # Activity: log scale commits last 4 weeks, up to 25 pts (100 commits = 25 pts)
-    activity_score = min(25, math.log1p(recent_commits) / math.log1p(100) * 25)
-
-    # Community: log scale forks, up to 20 pts (20k forks = 20 pts)
-    community_score = min(20, math.log1p(forks) / math.log1p(20_000) * 20)
-
-    return round(stars_score + freshness_score + activity_score + community_score, 1)
+def slugify(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
 def fmt_num(n: int) -> str:
@@ -396,10 +402,17 @@ def main() -> None:
     for i, row in enumerate(rows, 1):
         row["rank"] = i
 
-    # Add formatted download counts for template rendering
+    # Add formatted download counts and slug/breakdown for template rendering
     for row in rows:
         dl = row.get("weekly_downloads")
         row["downloads_fmt"] = f"{dl:,}" if dl is not None else "—"
+        row["slug"] = slugify(row["name"])
+        row["score_breakdown"] = score_components(
+            row["stars"],
+            row["days_ago"],
+            row.get("weekly_commits") or 0,
+            row["forks"],
+        )
 
     # Compute category ranks (within each category, sorted by score)
     cat_groups: dict[str, list[dict]] = {}
@@ -509,6 +522,53 @@ def main() -> None:
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"Built index.html with {len(rows)} agents.")
+
+    # Compute sibling links per agent (top-5 in same category, excluding self)
+    by_cat: dict[str, list[dict]] = {}
+    for r in rows:
+        cat = r.get("category", "")
+        if cat:
+            by_cat.setdefault(cat, []).append(r)
+    for cat_rows in by_cat.values():
+        cat_rows.sort(key=lambda x: x["score"], reverse=True)
+    for row in rows:
+        cat = row.get("category", "")
+        siblings = [s for s in by_cat.get(cat, []) if s["slug"] != row["slug"]][:5]
+        row["siblings"] = [
+            {"name": s["name"], "slug": s["slug"], "score": s["score"], "rank": s["rank"]}
+            for s in siblings
+        ]
+
+    # Per-agent profile pages — /agents/<slug>/index.html
+    agent_tmpl = env.get_template("agent.html.j2")
+    agents_dir = os.path.join(script_dir, "agents")
+    os.makedirs(agents_dir, exist_ok=True)
+    for row in rows:
+        slug_dir = os.path.join(agents_dir, row["slug"])
+        os.makedirs(slug_dir, exist_ok=True)
+        with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str))
+    print(f"Built {len(rows)} agent profile pages under agents/.")
+
+    # sitemap.xml — /, /methodology, all /agents/<slug>
+    today_iso = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    sitemap_urls = [
+        ("https://hvtracker.net/", "1.0", "daily"),
+        ("https://hvtracker.net/methodology", "0.5", "monthly"),
+    ]
+    for row in rows:
+        sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}", "0.8", "daily"))
+    sitemap_lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+                     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for loc, prio, freq in sitemap_urls:
+        sitemap_lines.append(
+            f"  <url><loc>{loc}</loc><lastmod>{today_iso}</lastmod>"
+            f"<changefreq>{freq}</changefreq><priority>{prio}</priority></url>"
+        )
+    sitemap_lines.append("</urlset>")
+    with open(os.path.join(script_dir, "sitemap.xml"), "w", encoding="utf-8") as f:
+        f.write("\n".join(sitemap_lines) + "\n")
+    print(f"Wrote sitemap.xml with {len(sitemap_urls)} URLs.")
 
     methodology_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     methodology_html = env.get_template("methodology.html.j2").render(

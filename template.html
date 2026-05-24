@@ -177,13 +177,13 @@
     col.col-agent    { width: auto; min-width: 200px; }
     col.col-stars    { width: 70px; }
     col.col-push     { width: 110px; }
-    col.col-commits  { width: 80px; }
-    col.col-dl       { width: 110px; }
+    col.col-commits  { width: 115px; }
+    col.col-dl       { width: 130px; }
     col.col-hn       { width: 70px; }
     col.col-score    { width: 70px; }
 
     /* Prevent table squeezing below usable width; horizontal scroll takes over */
-    table { min-width: 820px; }
+    table { min-width: 875px; }
 
     thead th {
       padding: 10px 11px;
@@ -398,7 +398,7 @@
     .formula strong { color: var(--text); }
 
     /* ── Mobile ── */
-    @media (max-width: 860px) {
+    @media (max-width: 895px) {
       .table-wrap {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -440,7 +440,7 @@
       <span class="tagline">Health scores for open-source AI agents</span>
       <div class="meta">
         {{ total }} agents &nbsp;·&nbsp; updated {{ updated }}<br>
-        scores refresh weekly
+        scores refresh daily
       </div>
     </header>
 
@@ -510,8 +510,8 @@
             </td>
             <td class="delta {{ row.rank_delta_class }}">{{ row.rank_delta_display }}</td>
             <td class="agent-cell">
-              <a class="agent-name" href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.name }}</a>
-              <span class="agent-repo">{{ row.repo }}</span>
+              <a class="agent-name" href="/agents/{{ row.slug }}">{{ row.name }}</a>
+              <a class="agent-repo" href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>
               {% if row.description %}<span class="agent-desc" title="{{ row.description }}">{{ row.description }}</span>{% endif %}
               {% if row.language %}<span class="lang">{{ row.language }}</span>{% endif %}
               {% if row.category %}<span class="cat-badge">{{ row.category }}</span>{% endif %}
@@ -547,7 +547,7 @@
     <footer>
       <span>{{ total }} agents tracked across 8 categories</span>
       <span class="footer-sep">·</span>
-      <span>scores update every Monday</span>
+      <span>scores update daily at 06:00 UTC</span>
       <span class="footer-sep">·</span>
       <a href="/methodology">Methodology</a>
       <span class="footer-sep">·</span>

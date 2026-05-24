@@ -259,27 +259,27 @@
         <dl class="sources">
           <div>
             <dt>GitHub REST API</dt>
-            <dd>Stars, forks, commit count over the last four weeks, days since last push, repository description, primary language, and open issue count. Refreshed weekly.</dd>
+            <dd>Stars, forks, commit count over the last four weeks, days since last push, repository description, primary language, and open issue count. Refreshed daily.</dd>
             <dd class="limitation">Star counts can be inflated by short-term campaigns. We mitigate by log-scaling and weighting against freshness, activity, and forks.</dd>
           </div>
           <div>
             <dt>npm Registry</dt>
-            <dd>Weekly download counts for JavaScript/TypeScript agents that publish packages listed in <code>agents.json</code>. Refreshed weekly.</dd>
+            <dd>Weekly download counts for JavaScript/TypeScript agents that publish packages listed in <code>agents.json</code>. Refreshed daily.</dd>
             <dd class="limitation">Download figures reflect package installs, not distinct users, and may include CI mirrors.</dd>
           </div>
           <div>
             <dt>PyPI (via pypistats)</dt>
-            <dd>Weekly download counts for Python agents that publish packages. Refreshed weekly.</dd>
+            <dd>Weekly download counts for Python agents that publish packages. Refreshed daily.</dd>
             <dd class="limitation">PyPI statistics aggregate all install types; they overstate interactive use relative to automated pulls.</dd>
           </div>
           <div>
             <dt>Docker Hub</dt>
-            <dd>Total image pull counts for agents distributed as containers (where a <code>docker_image</code> is configured). Refreshed weekly.</dd>
+            <dd>Total image pull counts for agents distributed as containers (where a <code>docker_image</code> is configured). Refreshed daily.</dd>
             <dd class="limitation">Docker pull counts are cumulative and never decrease — they favor older images.</dd>
           </div>
           <div>
             <dt>Hacker News (Algolia API)</dt>
-            <dd>Count of story mentions matching a curated search term over the last 30 days. Refreshed weekly.</dd>
+            <dd>Count of story mentions matching a curated search term over the last 30 days. Refreshed daily.</dd>
             <dd class="limitation">Search terms are hand-tuned to reduce false positives; agents with generic names may be omitted.</dd>
           </div>
         </dl>

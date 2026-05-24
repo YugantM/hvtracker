@@ -3,7 +3,7 @@
 **Live:** [hvtracker.net](https://hvtracker.net)  
 **Repo:** [github.com/YugantM/hvtracker](https://github.com/YugantM/hvtracker)
 
-HVTracker is an open-source leaderboard that tracks the health and momentum of 65+ open-source AI agent repositories on GitHub. Scores update every Monday, with rank-change deltas (▲▼) computed between runs.
+HVTracker is an open-source leaderboard that tracks the health and momentum of 65+ open-source AI agent repositories on GitHub. Scores update daily at 06:00 UTC, with rank-change deltas (▲▼) computed between runs.
 
 ---
 
@@ -129,7 +129,7 @@ hvtracker/
 ├── requirements.txt        # Python dependencies (requests + jinja2 only)
 ├── CNAME                   # hvtracker.net → GitHub Pages
 ├── .github/workflows/
-│   └── update.yml          # GitHub Actions — runs weekly & on source pushes
+│   └── update.yml          # GitHub Actions — daily cron at 06:00 UTC + manual trigger
 └── CLAUDE.md               # Karpathy behavioral guidelines (simplicity, surgical changes, goal-driven)
 ```
 
@@ -198,11 +198,10 @@ After adding, rebuild (`python fetch_and_build.py`) and open a pull request. Alt
 
 | Trigger | Behavior |
 |---|---|
-| **Schedule** — every Monday at 06:00 UTC | Fetches latest data, regenerates `index.html` + `data.json`, commits + pushes |
-| **Push** to `agents.json`, `fetch_and_build.py`, or `template.html` | Same as above — auto-rebuilds on source changes |
+| **Schedule** — every day at 06:00 UTC | Fetches latest data, regenerates `index.html` + `data.json`, commits + pushes |
 | **Manual** (`workflow_dispatch`) | Trigger from the Actions tab anytime |
 
-The workflow uses `secrets.GITHUB_TOKEN` (auto-provided by GitHub Actions) for API authentication. Commit messages follow the format: `chore: regenerate leaderboard YYYY-MM-DD`.
+The workflow prefers `secrets.GH_PAT` (a personal access token, 5,000 req/hr) and falls back to `secrets.GITHUB_TOKEN` (1,000 req/hr) for API authentication. Commit messages follow the format: `chore: regenerate leaderboard YYYY-MM-DD`.
 
 ---
 
