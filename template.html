@@ -653,7 +653,7 @@
                 <span class="push-text">{{ row.last_push }}</span>
               </div>
             </td>
-            <td class="r num"><span{% if row.commits_low_confidence %} title="commit count may be stale (GitHub Stats API cache)"{% endif %}>{{ row.weekly_commits }}</span></td>
+            <td class="r num">{{ row.weekly_commits }}{% if row.commits_low_confidence %}<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span>{% endif %}</td>
             <td class="r">
               {% if row.weekly_downloads is not none %}
               <span class="num">{{ row.downloads_fmt }}</span>

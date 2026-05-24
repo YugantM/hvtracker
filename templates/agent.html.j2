@@ -273,7 +273,7 @@
         </div>
         <div>
           <div class="stat-label">Commits (4 wk)</div>
-          <div class="stat-value"><span{% if row.commits_low_confidence %} title="commit count may be stale (GitHub Stats API cache)"{% endif %}>{% if row.weekly_commits is not none %}{{ row.weekly_commits }}{% else %}—{% endif %}</span></div>
+          <div class="stat-value">{% if row.weekly_commits is not none %}{{ row.weekly_commits }}{% else %}—{% endif %}{% if row.commits_low_confidence %}<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:13px;margin-left:3px;cursor:help;">?</span>{% endif %}</div>
         </div>
         <div>
           <div class="stat-label">Downloads (7d)</div>
