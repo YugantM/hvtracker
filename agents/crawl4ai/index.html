@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crawl4AI — health score, stars, activity | HVTracker</title>
+  <meta name="description" content="Crawl4AI ranks #29 of 171 open-source AI agents on HVTracker. Score 71.7/100, 66.2k stars, last push 2026-05-25.">
+  <link rel="canonical" href="https://hvtracker.net/agents/crawl4ai">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Crawl4AI — #29 on HVTracker">
+  <meta property="og:description" content="Score 71.7/100 · 66.2k stars · last push 2026-05-25">
+  <meta property="og:url" content="https://hvtracker.net/agents/crawl4ai">
+  <meta name="twitter:card" content="summary">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Crawl4AI",
+    "applicationCategory": "Research &amp; Data",
+    "operatingSystem": "Cross-platform",
+    "url": "https://github.com/unclecode/crawl4ai",
+    "description": "🚀🤖 Crawl4AI: Open-source LLM Friendly Web Crawler &amp; Scraper. Don&#39;t be shy, join here: https://discord.gg/jP8KfhDhyN",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "71.7",
+      "bestRating": "100",
+      "ratingCount": "66238"
+    }
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#0c0c15; --surface:#13131f; --surface-2:#1a1a2a; --border:#252538;
+      --text:#eeeef5; --muted:#8a87a8;
+      --accent:#7c6af6; --accent-lt:rgba(124,106,246,0.10); --accent-dim:#4a3fa0;
+      --mocha:#c4a882; --mocha-lt:rgba(157,124,90,0.15);
+      --fresh:#34d399; --recent:#a3e635; --aging:#f59e0b; --stale:#6b7280;
+      --score-hi-bg:rgba(124,106,246,0.15); --score-hi-fg:#a5a0ff;
+      --score-mid-bg:rgba(157,124,90,0.15); --score-mid-fg:#c4a882;
+      --score-lo-bg:rgba(100,100,120,0.12); --score-lo-fg:#6b7280;
+      --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Inter",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:14px; line-height:1.55; min-height:100vh; }
+    a { color:inherit; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:760px; margin:0 auto; padding:0 20px; }
+
+    header {
+      padding:28px 0 20px; border-bottom:1px solid var(--border);
+      display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; position:relative;
+    }
+    header::after {
+      content:""; position:absolute; bottom:-1px; left:0;
+      width:180px; height:1px;
+      background:linear-gradient(to right, var(--accent), transparent);
+    }
+    .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; }
+    .logo span { color:var(--accent); }
+    .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; }
+    .back:hover { color:var(--accent); }
+
+    .hero { padding:32px 0 18px; border-bottom:1px solid var(--border); }
+    h1 { font-size:32px; font-weight:700; letter-spacing:-0.5px; margin-bottom:6px; }
+    .hero .repo {
+      font-family:var(--font-mono); font-size:12px; color:var(--muted);
+    }
+    .hero .repo a:hover { color:var(--accent); }
+    .hero .desc {
+      margin-top:14px; font-size:14.5px; color:var(--text); max-width:640px;
+    }
+    .hero .badges { margin-top:14px; display:flex; gap:6px; flex-wrap:wrap; }
+    .badge {
+      display:inline-block; font-family:var(--font-mono); font-size:10.5px;
+      padding:2px 8px; border-radius:3px; background:var(--surface-2); color:var(--muted);
+    }
+    .badge.lang { background:var(--mocha-lt); color:var(--mocha); }
+    .badge.cat { background:var(--accent-lt); color:var(--accent); }
+
+    .rank-block {
+      padding:24px 0; border-bottom:1px solid var(--border);
+      display:flex; gap:30px; align-items:flex-end; flex-wrap:wrap;
+    }
+    .rank-big {
+      font-family:var(--font-mono); font-size:54px; font-weight:700; line-height:1;
+      color:var(--accent); letter-spacing:-2px;
+    }
+    .rank-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-top:6px; }
+    .rank-sub { font-family:var(--font-mono); font-size:13px; color:var(--muted); }
+    .score-pill {
+      display:inline-block; font-family:var(--font-mono); font-size:22px; font-weight:700;
+      padding:6px 18px; border-radius:6px; margin-bottom:4px;
+    }
+    .score-high { background:var(--score-hi-bg); color:var(--score-hi-fg); }
+    .score-mid  { background:var(--score-mid-bg); color:var(--score-mid-fg); }
+    .score-low  { background:var(--score-lo-bg); color:var(--score-lo-fg); }
+
+    .stats { padding:24px 0; border-bottom:1px solid var(--border); }
+    .stats-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+      gap:18px 24px;
+    }
+    .stat-label {
+      font-family:var(--font-mono); font-size:10.5px; color:var(--muted);
+      text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;
+    }
+    .stat-value { font-family:var(--font-mono); font-size:18px; font-weight:600; }
+    .stat-sub { font-size:11px; color:var(--muted); margin-top:2px; }
+    .fresh-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; vertical-align:middle; }
+    .fresh  .fresh-dot { background:var(--fresh); }  .fresh  .stat-value { color:var(--fresh); }
+    .recent .fresh-dot { background:var(--recent); } .recent .stat-value { color:var(--recent); }
+    .aging  .fresh-dot { background:var(--aging); }  .aging  .stat-value { color:var(--aging); }
+    .stale  .fresh-dot { background:var(--stale); }  .stale  .stat-value { color:var(--stale); }
+
+    .breakdown { padding:24px 0; border-bottom:1px solid var(--border); }
+    .section-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:14px; }
+    .breakdown-row {
+      display:grid; grid-template-columns:140px 1fr 60px;
+      gap:14px; align-items:center; padding:8px 0;
+      font-family:var(--font-mono); font-size:12px;
+    }
+    .breakdown-label { color:var(--muted); }
+    .breakdown-bar {
+      height:6px; background:var(--surface-2); border-radius:3px; overflow:hidden;
+    }
+    .breakdown-fill { height:100%; background:var(--accent); border-radius:3px; }
+    .breakdown-value { text-align:right; color:var(--text); }
+
+    .trend { padding:24px 0; border-bottom:1px solid var(--border); }
+    .sparkline-wrap { margin-top:10px; }
+    .sparkline-labels {
+      display:flex; justify-content:space-between;
+      font-family:var(--font-mono); font-size:10px; color:var(--muted);
+      margin-top:4px;
+    }
+
+    .provenance { padding:24px 0; border-bottom:1px solid var(--border); }
+    .prov-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+      gap:14px 24px;
+    }
+    .prov-signal { padding:10px 12px; border:1px solid var(--border); border-radius:6px; background:var(--surface); }
+    .prov-label {
+      font-family:var(--font-mono); font-size:10.5px; color:var(--muted);
+      text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;
+    }
+    .prov-value { font-family:var(--font-mono); font-size:16px; font-weight:600; }
+    .prov-yes { color:var(--fresh); }
+    .prov-no { color:var(--stale); }
+    .prov-sub { font-size:11px; color:var(--muted); margin-top:3px; }
+    .sc-checks {
+      margin-top:10px; display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+      gap:6px 16px; font-family:var(--font-mono); font-size:11px;
+    }
+    .sc-check { display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid var(--border); }
+    .sc-check-name { color:var(--muted); }
+    .sc-check-val { font-weight:600; }
+
+    .links {
+      padding:20px 0 28px; display:flex; gap:14px; flex-wrap:wrap;
+      font-family:var(--font-mono); font-size:12px;
+    }
+    .links a {
+      padding:6px 12px; border:1px solid var(--border); border-radius:4px;
+      color:var(--muted);
+    }
+    .links a:hover { color:var(--accent); border-color:var(--accent-dim); text-decoration:none; }
+
+    .siblings { padding:24px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+    .siblings ul { list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px 18px; }
+    .siblings li a {
+      display:flex; align-items:baseline; gap:8px;
+      padding:8px 10px; border:1px solid var(--border); border-radius:4px;
+      background:var(--surface); transition:all 0.15s;
+    }
+    .siblings li a:hover { border-color:var(--accent-dim); background:var(--surface-2); text-decoration:none; }
+    .siblings .sib-rank {
+      font-family:var(--font-mono); font-size:10.5px; color:var(--muted);
+      min-width:28px; text-align:right;
+    }
+    .siblings .sib-name { flex:1; font-weight:500; font-size:13px; color:var(--text); }
+    .siblings .sib-score { font-family:var(--font-mono); font-size:11px; color:var(--accent); }
+
+    footer {
+      padding:24px 0 40px; border-top:1px solid var(--border);
+      font-size:12px; color:var(--muted);
+      display:flex; gap:14px; flex-wrap:wrap; align-items:center;
+    }
+    footer a { color:var(--accent); }
+    .footer-sep { color:var(--border); }
+  </style>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+</head>
+<body>
+  <div class="page">
+
+    <header>
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <a href="/" class="back">← back to leaderboard</a>
+    </header>
+
+    <section class="hero">
+      <h1>Crawl4AI</h1>
+      <div class="repo">
+        <a href="https://github.com/unclecode/crawl4ai" target="_blank" rel="noopener noreferrer">unclecode/crawl4ai</a>
+      </div>
+      <p class="desc">🚀🤖 Crawl4AI: Open-source LLM Friendly Web Crawler &amp; Scraper. Don&#39;t be shy, join here: https://discord.gg/jP8KfhDhyN</p>
+      <div class="badges">
+        <span class="badge cat">Research &amp; Data</span>
+        <span class="badge lang">Python</span>
+      </div>
+    </section>
+
+    <section class="rank-block">
+      <div>
+        <div class="score-pill score-high">71.7</div>
+        <div class="rank-label">Health Score · out of 100</div>
+      </div>
+      <div>
+        <div class="rank-big">#29</div>
+        <div class="rank-label">Global Rank · of 171</div>
+      </div>
+      
+      <div>
+        <div class="rank-big" style="color:var(--mocha)">#3</div>
+        <div class="rank-label">In Research &amp; Data</div>
+      </div>
+      
+    </section>
+
+    
+
+    <section class="stats">
+      <h2 class="section-title">Activity & Reach</h2>
+      <div class="stats-grid">
+        <div>
+          <div class="stat-label">Stars</div>
+          <div class="stat-value">66.2k</div>
+        </div>
+        <div>
+          <div class="stat-label">Forks</div>
+          <div class="stat-value">6.8k</div>
+        </div>
+        <div class="fresh">
+          <div class="stat-label">Last Push</div>
+          <div class="stat-value"><span class="fresh-dot"></span>2026-05-25</div>
+          <div class="stat-sub">today</div>
+        </div>
+        <div>
+          <div class="stat-label">Commits (4 wk)</div>
+          <div class="stat-value">0<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:13px;margin-left:3px;cursor:help;">?</span></div>
+        </div>
+        <div>
+          <div class="stat-label">Downloads (7d)</div>
+          <div class="stat-value">—</div>
+          
+        </div>
+        <div>
+          <div class="stat-label">HN mentions (30d)</div>
+          <div class="stat-value">10</div>
+        </div>
+        <div>
+          <div class="stat-label">Open Issues</div>
+          <div class="stat-value">91</div>
+        </div>
+        <div>
+          <div class="stat-label">Rank Change</div>
+          <div class="stat-value">NEW</div>
+          
+        </div>
+      </div>
+    </section>
+
+    <section class="breakdown">
+      <h2 class="section-title">Score Breakdown</h2>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Stars (max 30)</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:96.4%"></div></div>
+        <span class="breakdown-value">28.9</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Freshness (max 25)</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:100.0%"></div></div>
+        <span class="breakdown-value">25.0</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Activity (max 25)</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:0.0%"></div></div>
+        <span class="breakdown-value">0.0</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Community (max 20)</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:89.1%"></div></div>
+        <span class="breakdown-value">17.8</span>
+      </div>
+    </section>
+
+    <section class="provenance">
+      <h2 class="section-title">Supply Chain Trust</h2>
+      <div class="prov-grid">
+        <div class="prov-signal">
+          <div class="prov-label">Package Provenance</div>
+          
+          <div class="prov-value prov-no">None</div>
+          <div class="prov-sub">No package attestations found</div>
+          
+        </div>
+        <div class="prov-signal">
+          <div class="prov-label">OSSF Scorecard</div>
+          
+          <div class="prov-value prov-no">—</div>
+          <div class="prov-sub">Not available</div>
+          
+        </div>
+        <div class="prov-signal">
+          <div class="prov-label">Signed Commits</div>
+          
+          <div class="prov-value " style="color:var(--aging);">19%</div>
+          <div class="prov-sub">of last 100 commits verified</div>
+          
+        </div>
+      </div>
+      
+    </section>
+
+    
+
+    <section class="links">
+      <a href="https://github.com/unclecode/crawl4ai" target="_blank" rel="noopener noreferrer">GitHub →</a>
+      <a href="https://pypi.org/project/crawl4ai/" target="_blank" rel="noopener noreferrer">PyPI: crawl4ai</a>
+      
+    </section>
+
+    
+    <section class="siblings">
+      <h2 class="section-title">Other agents in Research &amp; Data</h2>
+      <ul>
+        
+        <li>
+          <a href="/agents/firecrawl">
+            <span class="sib-rank">#24</span>
+            <span class="sib-name">Firecrawl</span>
+            <span class="sib-score">73.0</span>
+          </a>
+        </li>
+        
+        <li>
+          <a href="/agents/deerflow">
+            <span class="sib-rank">#28</span>
+            <span class="sib-name">DeerFlow</span>
+            <span class="sib-score">72.6</span>
+          </a>
+        </li>
+        
+        <li>
+          <a href="/agents/wrenai">
+            <span class="sib-rank">#73</span>
+            <span class="sib-name">WrenAI</span>
+            <span class="sib-score">65.2</span>
+          </a>
+        </li>
+        
+        <li>
+          <a href="/agents/maxun">
+            <span class="sib-rank">#81</span>
+            <span class="sib-name">Maxun</span>
+            <span class="sib-score">64.4</span>
+          </a>
+        </li>
+        
+        <li>
+          <a href="/agents/gpt-researcher">
+            <span class="sib-rank">#89</span>
+            <span class="sib-name">GPT Researcher</span>
+            <span class="sib-score">62.8</span>
+          </a>
+        </li>
+        
+      </ul>
+    </section>
+    
+
+    <footer>
+      <span>Updated 2026-05-25 22:54 UTC</span>
+      <span class="footer-sep">·</span>
+      <a href="/methodology">methodology</a>
+      <span class="footer-sep">·</span>
+      <a href="/">all agents</a>
+    </footer>
+
+  </div>
+</body>
+</html>
