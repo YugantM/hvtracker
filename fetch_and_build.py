@@ -940,6 +940,25 @@ def main() -> None:
         sr = row.get("signed_commits_ratio")
         row["signed_commits_pct"] = round(sr * 100) if sr is not None else None
 
+        # Evidence grade: how many independent signal types does this agent have?
+        signal_types = 1  # GitHub repo data always present
+        if row.get("weekly_downloads") is not None:
+            signal_types += 1
+        if row.get("scorecard_score") is not None or row.get("has_provenance"):
+            signal_types += 1
+        if row.get("public_actions"):
+            signal_types += 1
+        if row.get("hn_mentions_30d") is not None:
+            signal_types += 1
+        if signal_types >= 5:
+            row["evidence_grade"] = "A"
+        elif signal_types >= 4:
+            row["evidence_grade"] = "B"
+        elif signal_types >= 3:
+            row["evidence_grade"] = "C"
+        else:
+            row["evidence_grade"] = "D"
+
     # Compute category ranks (within each category, sorted by score)
     cat_groups: dict[str, list[dict]] = {}
     for row in rows:
@@ -1035,6 +1054,7 @@ def main() -> None:
                 "scorecard_score": r.get("scorecard_score"),
                 "scorecard_checks": r.get("scorecard_checks", {}),
                 "public_actions": r.get("public_actions"),
+                "evidence_grade": r.get("evidence_grade", "D"),
             }
             for r in rows
         ],

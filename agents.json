@@ -9,7 +9,9 @@
       "type": "pr_body",
       "pattern": "Co-Authored-By: Claude",
       "search_endpoint": "pulls"
-    }
+    },
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "All-Hands-AI/OpenHands",
@@ -21,14 +23,18 @@
       "type": "pr_body",
       "pattern": "Authored by OpenHands",
       "search_endpoint": "pulls"
-    }
+    },
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "princeton-nlp/SWE-agent",
     "name": "SWE-agent",
     "category": "Coding Agents",
     "pypi_package": "sweagent",
-    "hn_search_term": "swe-agent"
+    "hn_search_term": "swe-agent",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "paul-gauthier/aider",
@@ -40,47 +46,61 @@
       "type": "commit_trailer",
       "pattern": "Co-authored-by: aider",
       "search_endpoint": "commits"
-    }
+    },
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "continuedev/continue",
     "name": "Continue",
     "category": "Coding Agents",
-    "npm_package": "continue"
+    "npm_package": "continue",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "cline/cline",
     "name": "Cline",
     "category": "Coding Agents",
     "npm_package": "cline",
-    "hn_search_term": "cline ai"
+    "hn_search_term": "cline ai",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "RooVetGit/Roo-Code",
     "name": "Roo Code",
     "category": "Coding Agents",
-    "npm_package": "roo-cline"
+    "npm_package": "roo-cline",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "geekan/MetaGPT",
     "name": "MetaGPT",
     "category": "Multi-Agent Systems",
     "pypi_package": "metagpt",
-    "hn_search_term": "metagpt"
+    "hn_search_term": "metagpt",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "microsoft/autogen",
     "name": "AutoGen",
     "category": "Agent Frameworks",
     "pypi_package": "autogen-agentchat",
-    "hn_search_term": "microsoft autogen"
+    "hn_search_term": "microsoft autogen",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "CrewAIInc/crewAI",
     "name": "CrewAI",
     "category": "Agent Frameworks",
     "pypi_package": "crewai",
-    "hn_search_term": "crewai"
+    "hn_search_term": "crewai",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "langchain-ai/langgraph",
@@ -88,42 +108,54 @@
     "category": "Agent Frameworks",
     "pypi_package": "langgraph",
     "npm_package": "@langchain/langgraph",
-    "hn_search_term": "langgraph"
+    "hn_search_term": "langgraph",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "Significant-Gravitas/AutoGPT",
     "name": "AutoGPT",
     "category": "Agent Frameworks",
     "pypi_package": "agpt",
-    "hn_search_term": "autogpt"
+    "hn_search_term": "autogpt",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "yoheinakajima/babyagi",
     "name": "BabyAGI",
     "category": "Agent Frameworks",
     "pypi_package": "babyagi",
-    "hn_search_term": "babyagi"
+    "hn_search_term": "babyagi",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "assafelovic/gpt-researcher",
     "name": "GPT Researcher",
     "category": "Research & Data",
     "pypi_package": "gpt-researcher",
-    "hn_search_term": "gpt-researcher"
+    "hn_search_term": "gpt-researcher",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "pydantic/pydantic-ai",
     "name": "PydanticAI",
     "category": "Agent Frameworks",
     "pypi_package": "pydantic-ai",
-    "hn_search_term": "pydantic-ai"
+    "hn_search_term": "pydantic-ai",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "OpenBMB/ChatDev",
     "name": "ChatDev",
     "category": "Multi-Agent Systems",
     "pypi_package": "chatdev",
-    "hn_search_term": "chatdev"
+    "hn_search_term": "chatdev",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "TransformerOptimus/SuperAGI",
@@ -131,7 +163,9 @@
     "category": "Agent Frameworks",
     "pypi_package": "superagi",
     "hn_search_term": "superagi",
-    "status": "legacy"
+    "status": "legacy",
+    "listing_status": "legacy",
+    "tracking_mode": "direct"
   },
   {
     "repo": "e2b-dev/e2b",
@@ -139,42 +173,54 @@
     "category": "LLM Gateways & Infra",
     "pypi_package": "e2b",
     "npm_package": "@e2b/sdk",
-    "hn_search_term": "e2b-dev"
+    "hn_search_term": "e2b-dev",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "OpenInterpreter/open-interpreter",
     "name": "Open Interpreter",
     "category": "Coding Agents",
     "pypi_package": "open-interpreter",
-    "hn_search_term": "open-interpreter"
+    "hn_search_term": "open-interpreter",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "letta-ai/letta",
     "name": "Letta",
     "category": "Memory & Knowledge",
     "pypi_package": "letta",
-    "hn_search_term": "letta ai"
+    "hn_search_term": "letta ai",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "camel-ai/camel",
     "name": "CAMEL",
     "category": "Multi-Agent Systems",
     "pypi_package": "camel-ai",
-    "hn_search_term": "camel-ai"
+    "hn_search_term": "camel-ai",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "microsoft/semantic-kernel",
     "name": "Semantic Kernel",
     "category": "Agent Frameworks",
     "pypi_package": "semantic-kernel",
-    "hn_search_term": "semantic kernel"
+    "hn_search_term": "semantic kernel",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "browser-use/browser-use",
     "name": "Browser Use",
     "category": "Browser & Computer Use",
     "pypi_package": "browser-use",
-    "hn_search_term": "browser-use agent"
+    "hn_search_term": "browser-use agent",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "composiohq/composio",
@@ -182,7 +228,9 @@
     "category": "Agent Frameworks",
     "pypi_package": "composio-core",
     "npm_package": "composio-core",
-    "hn_search_term": "composio"
+    "hn_search_term": "composio",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "smol-ai/developer",
@@ -190,32 +238,42 @@
     "category": "Coding Agents",
     "pypi_package": "smol-dev",
     "hn_search_term": "smol developer",
-    "status": "legacy"
+    "status": "legacy",
+    "listing_status": "legacy",
+    "tracking_mode": "direct"
   },
   {
     "repo": "kuafuai/DevOpsGPT",
     "name": "DevOpsGPT",
     "category": "Workflow Platforms",
     "hn_search_term": "devopsgpt",
-    "status": "legacy"
+    "status": "legacy",
+    "listing_status": "legacy",
+    "tracking_mode": "direct"
   },
   {
     "repo": "biobootloader/wolverine",
     "name": "Wolverine",
     "category": "Coding Agents",
-    "status": "legacy"
+    "status": "legacy",
+    "listing_status": "legacy",
+    "tracking_mode": "direct"
   },
   {
     "repo": "ai-christianson/RA.Aid",
     "name": "RA.Aid",
     "category": "Coding Agents",
     "pypi_package": "ra-aid",
-    "hn_search_term": "ra-aid"
+    "hn_search_term": "ra-aid",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "microsoft/UFO",
     "name": "UFO",
-    "category": "Browser & Computer Use"
+    "category": "Browser & Computer Use",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "lavague-ai/LaVague",
@@ -223,86 +281,112 @@
     "category": "Browser & Computer Use",
     "pypi_package": "lavague",
     "hn_search_term": "lavague",
-    "status": "legacy"
+    "status": "legacy",
+    "listing_status": "legacy",
+    "tracking_mode": "direct"
   },
   {
     "repo": "bytedance/UI-TARS",
     "name": "UI-TARS",
     "category": "Browser & Computer Use",
     "pypi_package": "ui-tars",
-    "hn_search_term": "ui-tars"
+    "hn_search_term": "ui-tars",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "mem0ai/mem0",
     "name": "Mem0",
     "category": "Memory & Knowledge",
     "pypi_package": "mem0ai",
-    "hn_search_term": "mem0"
+    "hn_search_term": "mem0",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "microsoft/promptflow",
     "name": "PromptFlow",
     "category": "Workflow Platforms",
     "pypi_package": "promptflow",
-    "hn_search_term": "promptflow"
+    "hn_search_term": "promptflow",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "deepset-ai/haystack",
     "name": "Haystack",
     "category": "Workflow Platforms",
-    "pypi_package": "haystack-ai"
+    "pypi_package": "haystack-ai",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "entropy-research/Devon",
     "name": "Devon",
     "category": "Coding Agents",
     "pypi_package": "devon-agent",
-    "hn_search_term": "devon ai agent"
+    "hn_search_term": "devon ai agent",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "microsoft/guidance",
     "name": "Guidance",
     "category": "Agent Frameworks",
-    "pypi_package": "guidance"
+    "pypi_package": "guidance",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "getmaxun/maxun",
     "name": "Maxun",
     "category": "Research & Data",
     "pypi_package": "maxun",
-    "hn_search_term": "maxun"
+    "hn_search_term": "maxun",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "agno-agi/agno",
     "name": "Agno",
     "category": "Agent Frameworks",
     "pypi_package": "agno",
-    "hn_search_term": "agno"
+    "hn_search_term": "agno",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "SylphAI-Inc/AdalFlow",
     "name": "AdalFlow",
     "category": "Agent Frameworks",
     "pypi_package": "adalflow",
-    "hn_search_term": "adalflow"
+    "hn_search_term": "adalflow",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "aymenfurter/microagents",
     "name": "Microagents",
     "category": "Coding Agents",
-    "status": "legacy"
+    "status": "legacy",
+    "listing_status": "legacy",
+    "tracking_mode": "direct"
   },
   {
     "repo": "microsoft/OmniParser",
     "name": "OmniParser",
     "category": "Browser & Computer Use",
-    "hn_search_term": "omniparser"
+    "hn_search_term": "omniparser",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "stitionai/devika",
     "name": "Devika",
     "category": "Coding Agents",
-    "hn_search_term": "devika"
+    "hn_search_term": "devika",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "OpenBMB/AgentVerse",
@@ -310,76 +394,98 @@
     "category": "Multi-Agent Systems",
     "pypi_package": "agentverse",
     "hn_search_term": "agentverse",
-    "status": "legacy"
+    "status": "legacy",
+    "listing_status": "legacy",
+    "tracking_mode": "direct"
   },
   {
     "repo": "Mintplex-Labs/anything-llm",
     "name": "AnythingLLM",
     "category": "Memory & Knowledge",
     "npm_package": "anything-llm",
-    "hn_search_term": "anythingllm"
+    "hn_search_term": "anythingllm",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "BerriAI/litellm",
     "name": "LiteLLM",
     "category": "LLM Gateways & Infra",
     "pypi_package": "litellm",
-    "hn_search_term": "litellm"
+    "hn_search_term": "litellm",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "CopilotKit/CopilotKit",
     "name": "CopilotKit",
     "category": "Agent Frameworks",
     "npm_package": "@copilotkit/react-core",
-    "hn_search_term": "copilotkit"
+    "hn_search_term": "copilotkit",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "langgenius/dify",
     "name": "Dify",
     "category": "Workflow Platforms",
     "pypi_package": "dify-client",
-    "hn_search_term": "dify"
+    "hn_search_term": "dify",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "Pythagora-io/gpt-pilot",
     "name": "GPT Pilot",
     "category": "Coding Agents",
     "pypi_package": "gpt-pilot",
-    "hn_search_term": "gpt-pilot"
+    "hn_search_term": "gpt-pilot",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "gptme/gptme",
     "name": "GPTMe",
     "category": "Coding Agents",
     "pypi_package": "gptme",
-    "hn_search_term": "gptme"
+    "hn_search_term": "gptme",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "khoj-ai/khoj",
     "name": "Khoj",
     "category": "Memory & Knowledge",
     "pypi_package": "khoj",
-    "hn_search_term": "khoj"
+    "hn_search_term": "khoj",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "QwenLM/Qwen-Agent",
     "name": "Qwen Agent",
     "category": "Agent Frameworks",
     "pypi_package": "qwen-agent",
-    "hn_search_term": "qwen-agent"
+    "hn_search_term": "qwen-agent",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "sweepai/sweep",
     "name": "Sweep",
     "category": "Coding Agents",
-    "pypi_package": "sweepai"
+    "pypi_package": "sweepai",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "vercel/ai",
     "name": "Vercel AI SDK",
     "category": "Agent Frameworks",
     "npm_package": "ai",
-    "hn_search_term": "vercel ai sdk"
+    "hn_search_term": "vercel ai sdk",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "google-gemini/gemini-cli",
@@ -389,12 +495,16 @@
       "type": "pr_body",
       "pattern": "Generated with Gemini CLI",
       "search_endpoint": "pulls"
-    }
+    },
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "openai/codex",
     "name": "Codex",
-    "category": "Coding Agents"
+    "category": "Coding Agents",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "QwenLM/qwen-code",
@@ -404,791 +514,1037 @@
       "type": "pr_body",
       "pattern": "Generated with Qwen Code",
       "search_endpoint": "pulls"
-    }
+    },
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "github/copilot-cli",
     "name": "GitHub Copilot CLI",
-    "category": "Coding Agents"
+    "category": "Coding Agents",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "plandex-ai/plandex",
     "name": "Plandex",
     "category": "Coding Agents",
-    "pypi_package": "plandex"
+    "pypi_package": "plandex",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "langchain-ai/open-swe",
     "name": "Open SWE",
-    "category": "Coding Agents"
+    "category": "Coding Agents",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "microsoft/agent-framework",
     "name": "Microsoft Agent Framework",
-    "category": "Agent Frameworks"
+    "category": "Agent Frameworks",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "google/adk-python",
     "name": "Google ADK (Python)",
     "category": "Agent Frameworks",
-    "pypi_package": "google-adk"
+    "pypi_package": "google-adk",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "google/adk-go",
     "name": "Google ADK (Go)",
-    "category": "Agent Frameworks"
+    "category": "Agent Frameworks",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "agentscope-ai/agentscope",
     "name": "AgentScope",
     "category": "Agent Frameworks",
-    "pypi_package": "agentscope"
+    "pypi_package": "agentscope",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "elizaOS/eliza",
     "name": "Eliza",
     "category": "Agent Frameworks",
-    "npm_package": "@elizaos/core"
+    "npm_package": "@elizaos/core",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "VoltAgent/voltagent",
     "name": "VoltAgent",
     "category": "Agent Frameworks",
-    "npm_package": "@voltagent/core"
+    "npm_package": "@voltagent/core",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "MervinPraison/PraisonAI",
     "name": "PraisonAI",
     "category": "Agent Frameworks",
-    "pypi_package": "praisonai"
+    "pypi_package": "praisonai",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "strands-agents/sdk-python",
     "name": "Strands Agents",
     "category": "Agent Frameworks",
-    "pypi_package": "strands-agents"
+    "pypi_package": "strands-agents",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "alibaba/spring-ai-alibaba",
     "name": "Spring AI Alibaba",
-    "category": "Agent Frameworks"
+    "category": "Agent Frameworks",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "FlowiseAI/Flowise",
     "name": "Flowise",
     "category": "Workflow Platforms",
-    "npm_package": "flowise"
+    "npm_package": "flowise",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "coze-dev/coze-studio",
     "name": "Coze Studio",
-    "category": "Workflow Platforms"
+    "category": "Workflow Platforms",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "activepieces/activepieces",
     "name": "Activepieces",
     "category": "Workflow Platforms",
-    "npm_package": "@activepieces/shared"
+    "npm_package": "@activepieces/shared",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "triggerdotdev/trigger.dev",
     "name": "Trigger.dev",
     "category": "Workflow Platforms",
-    "npm_package": "@trigger.dev/sdk"
+    "npm_package": "@trigger.dev/sdk",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "flyteorg/flyte",
     "name": "Flyte",
     "category": "Workflow Platforms",
-    "pypi_package": "flytekit"
+    "pypi_package": "flytekit",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "bytedance/UI-TARS-desktop",
     "name": "UI-TARS Desktop",
-    "category": "Browser & Computer Use"
+    "category": "Browser & Computer Use",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "trycua/cua",
     "name": "Cua",
     "category": "Browser & Computer Use",
-    "pypi_package": "cua"
+    "pypi_package": "cua",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "browser-use/web-ui",
     "name": "Browser Use Web UI",
-    "category": "Browser & Computer Use"
+    "category": "Browser & Computer Use",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "topoteretes/cognee",
     "name": "Cognee",
     "category": "Memory & Knowledge",
-    "pypi_package": "cognee"
+    "pypi_package": "cognee",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "getzep/graphiti",
     "name": "Graphiti",
     "category": "Memory & Knowledge",
-    "pypi_package": "graphiti-core"
+    "pypi_package": "graphiti-core",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "leon-ai/leon",
     "name": "Leon",
     "category": "Memory & Knowledge",
-    "npm_package": "@leon-ai/leon"
+    "npm_package": "@leon-ai/leon",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "firecrawl/firecrawl",
     "name": "Firecrawl",
     "category": "Research & Data",
     "pypi_package": "firecrawl-py",
-    "npm_package": "@mendable/firecrawl-js"
+    "npm_package": "@mendable/firecrawl-js",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "bytedance/deer-flow",
     "name": "DeerFlow",
-    "category": "Research & Data"
+    "category": "Research & Data",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "Canner/WrenAI",
     "name": "WrenAI",
-    "category": "Research & Data"
+    "category": "Research & Data",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "livekit/agents",
     "name": "LiveKit Agents",
     "category": "LLM Gateways & Infra",
-    "pypi_package": "livekit-agents"
+    "pypi_package": "livekit-agents",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "TEN-framework/ten-framework",
     "name": "TEN Framework",
-    "category": "LLM Gateways & Infra"
+    "category": "LLM Gateways & Infra",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "langchain-ai/langchain",
     "name": "LangChain",
     "category": "Agent Frameworks",
     "hn_search_term": "langchain",
-    "pypi_package": "langchain"
+    "pypi_package": "langchain",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "run-llama/llama_index",
     "name": "LlamaIndex",
     "category": "Agent Frameworks",
     "hn_search_term": "llamaindex",
-    "pypi_package": "llama-index"
+    "pypi_package": "llama-index",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "openai/openai-agents-python",
     "name": "OpenAI Agents SDK",
     "category": "Agent Frameworks",
     "hn_search_term": "openai agents",
-    "pypi_package": "openai-agents"
+    "pypi_package": "openai-agents",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "firebase/genkit",
     "name": "Google Genkit",
     "category": "Agent Frameworks",
     "hn_search_term": "genkit",
-    "npm_package": "genkit"
+    "npm_package": "genkit",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "huggingface/smolagents",
     "name": "smolagents",
     "category": "Agent Frameworks",
     "hn_search_term": "smolagents",
-    "pypi_package": "smolagents"
+    "pypi_package": "smolagents",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "microsoft/TaskWeaver",
     "name": "TaskWeaver",
     "category": "Agent Frameworks",
     "hn_search_term": "taskweaver",
-    "pypi_package": "taskweaver"
+    "pypi_package": "taskweaver",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "i-am-bee/bee-agent-framework",
     "name": "Bee Agent Framework",
     "category": "Agent Frameworks",
     "hn_search_term": "bee agent",
-    "npm_package": "bee-agent-framework"
+    "npm_package": "bee-agent-framework",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "mastra-ai/mastra",
     "name": "Mastra",
     "category": "Agent Frameworks",
     "hn_search_term": "mastra",
-    "npm_package": "@mastra-ai/mastra"
+    "npm_package": "@mastra-ai/mastra",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "BrainBlend-AI/atomic-agents",
     "name": "Atomic Agents",
     "category": "Agent Frameworks",
     "hn_search_term": "atomic-agents",
-    "pypi_package": "atomic-agents"
+    "pypi_package": "atomic-agents",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "griptape-ai/griptape",
     "name": "Griptape",
     "category": "Agent Frameworks",
     "hn_search_term": "griptape",
-    "pypi_package": "griptape"
+    "pypi_package": "griptape",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "PrefectHQ/marvin",
     "name": "Marvin",
     "category": "Agent Frameworks",
     "hn_search_term": "prefect marvin",
-    "pypi_package": "marvin"
+    "pypi_package": "marvin",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "dagworks-inc/burr",
     "name": "Burr",
     "category": "Agent Frameworks",
     "hn_search_term": "dagworks burr",
-    "pypi_package": "burr"
+    "pypi_package": "burr",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "PrefectHQ/ControlFlow",
     "name": "ControlFlow",
     "category": "Agent Frameworks",
     "hn_search_term": "controlflow prefect",
-    "pypi_package": "controlflow"
+    "pypi_package": "controlflow",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "langroid/langroid",
     "name": "Langroid",
     "category": "Agent Frameworks",
     "hn_search_term": "langroid",
-    "pypi_package": "langroid"
+    "pypi_package": "langroid",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "VRSEN/agency-swarm",
     "name": "Agency Swarm",
     "category": "Agent Frameworks",
     "hn_search_term": "agency swarm",
-    "pypi_package": "agency-swarm"
+    "pypi_package": "agency-swarm",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "FoundationAgents/OpenManus",
     "name": "OpenManus",
     "category": "Agent Frameworks",
-    "hn_search_term": "openmanus"
+    "hn_search_term": "openmanus",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "aitomatic/openssa",
     "name": "OpenSSA",
     "category": "Agent Frameworks",
     "hn_search_term": "openssa",
-    "pypi_package": "openssa"
+    "pypi_package": "openssa",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "ag2ai/fastagency",
     "name": "FastAgency",
     "category": "Agent Frameworks",
     "hn_search_term": "fastagency ag2",
-    "pypi_package": "fastagency"
+    "pypi_package": "fastagency",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "swarmzero/swarmzero",
     "name": "SwarmZero",
     "category": "Agent Frameworks",
     "hn_search_term": "swarmzero",
-    "pypi_package": "swarmzero"
+    "pypi_package": "swarmzero",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "openai/swarm",
     "name": "Swarm by OpenAI",
     "category": "Agent Frameworks",
     "hn_search_term": "openai swarm",
-    "pypi_package": "openai-swarm"
+    "pypi_package": "openai-swarm",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "TabbyML/tabby",
     "name": "Tabby",
     "category": "Coding Agents",
-    "hn_search_term": "tabby coding"
+    "hn_search_term": "tabby coding",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "sst/opencode",
     "name": "opencode",
     "category": "Coding Agents",
     "hn_search_term": "opencode",
-    "npm_package": "opencode"
+    "npm_package": "opencode",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "block/goose",
     "name": "Goose",
     "category": "Coding Agents",
-    "hn_search_term": "block goose"
+    "hn_search_term": "block goose",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "AbanteAI/archive-old-cli-mentat",
     "name": "Mentat",
     "category": "Coding Agents",
-    "hn_search_term": "mentat coding"
+    "hn_search_term": "mentat coding",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "trypear/pearai-master",
     "name": "PearAI",
     "category": "Coding Agents",
-    "hn_search_term": "pearai"
+    "hn_search_term": "pearai",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "langchain-ai/langgraph-codeact",
     "name": "CodeAct",
     "category": "Coding Agents",
-    "hn_search_term": "codeact langgraph"
+    "hn_search_term": "codeact langgraph",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "Skyvern-AI/skyvern",
     "name": "Skyvern",
     "category": "Browser & Computer Use",
     "hn_search_term": "skyvern",
-    "pypi_package": "skyvern"
+    "pypi_package": "skyvern",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "browserbase/stagehand",
     "name": "Stagehand",
     "category": "Browser & Computer Use",
     "hn_search_term": "stagehand browserbase",
-    "npm_package": "@browserbasehq/stagehand"
+    "npm_package": "@browserbasehq/stagehand",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "browserbase/open-operator",
     "name": "Open Operator",
     "category": "Browser & Computer Use",
-    "hn_search_term": "open operator browserbase"
+    "hn_search_term": "open operator browserbase",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "openclaw/openclaw",
     "name": "OpenClaw",
     "category": "Browser & Computer Use",
-    "hn_search_term": "openclaw"
+    "hn_search_term": "openclaw",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "xlang-ai/OpenCUA",
     "name": "OpenCUA",
     "category": "Browser & Computer Use",
-    "hn_search_term": "opencua"
+    "hn_search_term": "opencua",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "EmergenceAI/agent-e",
     "name": "Agent-E",
     "category": "Browser & Computer Use",
-    "hn_search_term": "agent-e emergence"
+    "hn_search_term": "agent-e emergence",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "MinorJerry/WebVoyager",
     "name": "WebVoyager",
     "category": "Browser & Computer Use",
-    "hn_search_term": "webvoyager"
+    "hn_search_term": "webvoyager",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "ServiceNow/BrowserGym",
     "name": "BrowserGym agents",
     "category": "Browser & Computer Use",
     "hn_search_term": "browsergym",
-    "pypi_package": "browsergym"
+    "pypi_package": "browsergym",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "langflow-ai/langflow",
     "name": "Langflow",
     "category": "Workflow Platforms",
     "hn_search_term": "langflow",
-    "pypi_package": "langflow"
+    "pypi_package": "langflow",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "n8n-io/n8n",
     "name": "n8n",
     "category": "Workflow Platforms",
     "hn_search_term": "n8n",
-    "npm_package": "n8n"
+    "npm_package": "n8n",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "botpress/botpress",
     "name": "Botpress",
     "category": "Workflow Platforms",
     "hn_search_term": "botpress",
-    "npm_package": "@botpress/client"
+    "npm_package": "@botpress/client",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "RasaHQ/rasa",
     "name": "Rasa",
     "category": "Workflow Platforms",
     "hn_search_term": "rasa",
-    "pypi_package": "rasa"
+    "pypi_package": "rasa",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "homanp/superagent",
     "name": "Superagent",
     "category": "Workflow Platforms",
     "hn_search_term": "superagent homanp",
-    "pypi_package": "superagent-py"
+    "pypi_package": "superagent-py",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "stanford-oval/storm",
     "name": "STORM",
     "category": "Research & Data",
     "hn_search_term": "storm wiki",
-    "pypi_package": "knowledge-storm"
+    "pypi_package": "knowledge-storm",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "nickscamara/open-deep-research",
     "name": "Open Deep Research",
     "category": "Research & Data",
-    "hn_search_term": "open deep research"
+    "hn_search_term": "open deep research",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "unclecode/crawl4ai",
     "name": "Crawl4AI",
     "category": "Research & Data",
     "hn_search_term": "crawl4ai",
-    "pypi_package": "crawl4ai"
+    "pypi_package": "crawl4ai",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "infiniflow/ragflow",
     "name": "RAGFlow",
     "category": "Memory & Knowledge",
-    "hn_search_term": "ragflow"
+    "hn_search_term": "ragflow",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "open-webui/open-webui",
     "name": "Open WebUI",
     "category": "Memory & Knowledge",
     "hn_search_term": "open-webui",
-    "pypi_package": "open-webui"
+    "pypi_package": "open-webui",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "danny-avila/LibreChat",
     "name": "LibreChat",
     "category": "Memory & Knowledge",
-    "hn_search_term": "librechat"
+    "hn_search_term": "librechat",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "QuivrHQ/quivr",
     "name": "Quivr",
     "category": "Memory & Knowledge",
-    "hn_search_term": "quivr"
+    "hn_search_term": "quivr",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "imartinez/privateGPT",
     "name": "PrivateGPT",
     "category": "Memory & Knowledge",
-    "hn_search_term": "privategpt"
+    "hn_search_term": "privategpt",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "chroma-core/chroma",
     "name": "Chroma",
     "category": "Memory & Knowledge",
     "hn_search_term": "chromadb",
-    "pypi_package": "chromadb"
+    "pypi_package": "chromadb",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "weaviate/weaviate",
     "name": "Weaviate",
     "category": "Memory & Knowledge",
     "hn_search_term": "weaviate",
-    "pypi_package": "weaviate-client"
+    "pypi_package": "weaviate-client",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "qdrant/qdrant",
     "name": "Qdrant",
     "category": "Memory & Knowledge",
     "hn_search_term": "qdrant",
-    "pypi_package": "qdrant-client"
+    "pypi_package": "qdrant-client",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "milvus-io/milvus",
     "name": "Milvus",
     "category": "Memory & Knowledge",
     "hn_search_term": "milvus",
-    "pypi_package": "pymilvus"
+    "pypi_package": "pymilvus",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "pgvector/pgvector",
     "name": "pgvector",
     "category": "Memory & Knowledge",
-    "hn_search_term": "pgvector"
+    "hn_search_term": "pgvector",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "lancedb/lancedb",
     "name": "LanceDB",
     "category": "Memory & Knowledge",
     "hn_search_term": "lancedb",
-    "pypi_package": "lancedb"
+    "pypi_package": "lancedb",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "neuml/txtai",
     "name": "txtai",
     "category": "Memory & Knowledge",
     "hn_search_term": "txtai",
-    "pypi_package": "txtai"
+    "pypi_package": "txtai",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "vespa-engine/vespa",
     "name": "Vespa",
     "category": "Memory & Knowledge",
     "hn_search_term": "vespa engine",
-    "pypi_package": "pyvespa"
+    "pypi_package": "pyvespa",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "langfuse/langfuse",
     "name": "Langfuse",
     "category": "Observability & Evaluation",
     "hn_search_term": "langfuse",
-    "pypi_package": "langfuse"
+    "pypi_package": "langfuse",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "Arize-AI/phoenix",
     "name": "Arize Phoenix",
     "category": "Observability & Evaluation",
     "hn_search_term": "arize phoenix",
-    "pypi_package": "arize-phoenix"
+    "pypi_package": "arize-phoenix",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "agentops-ai/agentops",
     "name": "AgentOps",
     "category": "Observability & Evaluation",
     "hn_search_term": "agentops",
-    "pypi_package": "agentops"
+    "pypi_package": "agentops",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "Helicone/helicone",
     "name": "Helicone",
     "category": "Observability & Evaluation",
-    "hn_search_term": "helicone"
+    "hn_search_term": "helicone",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "Agenta-AI/agenta",
     "name": "Agenta",
     "category": "Observability & Evaluation",
     "hn_search_term": "agenta",
-    "pypi_package": "agenta"
+    "pypi_package": "agenta",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "promptfoo/promptfoo",
     "name": "Promptfoo",
     "category": "Observability & Evaluation",
     "hn_search_term": "promptfoo",
-    "npm_package": "promptfoo"
+    "npm_package": "promptfoo",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "explodinggradients/ragas",
     "name": "Ragas",
     "category": "Observability & Evaluation",
     "hn_search_term": "ragas",
-    "pypi_package": "ragas"
+    "pypi_package": "ragas",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "confident-ai/deepeval",
     "name": "DeepEval",
     "category": "Observability & Evaluation",
     "hn_search_term": "deepeval",
-    "pypi_package": "deepeval"
+    "pypi_package": "deepeval",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "truera/trulens",
     "name": "TruLens",
     "category": "Observability & Evaluation",
     "hn_search_term": "trulens",
-    "pypi_package": "trulens-core"
+    "pypi_package": "trulens-core",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "guardrails-ai/guardrails",
     "name": "Guardrails AI",
     "category": "Security & Guardrails",
     "hn_search_term": "guardrails ai",
-    "pypi_package": "guardrails-ai"
+    "pypi_package": "guardrails-ai",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "Giskard-AI/giskard-oss",
     "name": "Giskard",
     "category": "Observability & Evaluation",
     "hn_search_term": "giskard ai",
-    "pypi_package": "giskard"
+    "pypi_package": "giskard",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "wandb/weave",
     "name": "Weights & Biases Weave",
     "category": "Observability & Evaluation",
     "hn_search_term": "wandb weave",
-    "pypi_package": "weave"
+    "pypi_package": "weave",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "langwatch/langwatch",
     "name": "LangWatch",
     "category": "Observability & Evaluation",
     "hn_search_term": "langwatch",
-    "pypi_package": "langwatch"
+    "pypi_package": "langwatch",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "NVIDIA/NeMo-Guardrails",
     "name": "NeMo Guardrails",
     "category": "Security & Guardrails",
     "hn_search_term": "nemo guardrails",
-    "pypi_package": "nemoguardrails"
+    "pypi_package": "nemoguardrails",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "meta-llama/PurpleLlama",
     "name": "Llama Guard",
     "category": "Security & Guardrails",
-    "hn_search_term": "llama guard"
+    "hn_search_term": "llama guard",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "leondz/garak",
     "name": "Garak",
     "category": "Security & Guardrails",
     "hn_search_term": "garak llm",
-    "pypi_package": "garak"
+    "pypi_package": "garak",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "protectai/rebuff",
     "name": "Rebuff",
     "category": "Security & Guardrails",
     "hn_search_term": "rebuff prompt injection",
-    "pypi_package": "rebuff"
+    "pypi_package": "rebuff",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "protectai/llm-guard",
     "name": "LLM Guard",
     "category": "Security & Guardrails",
     "hn_search_term": "llm-guard",
-    "pypi_package": "llm-guard"
+    "pypi_package": "llm-guard",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "modelcontextprotocol/servers",
     "name": "Model Context Protocol / MCP",
     "category": "Protocols & Tool Integration",
-    "hn_search_term": "model context protocol mcp"
+    "hn_search_term": "model context protocol mcp",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "modelcontextprotocol/registry",
     "name": "MCP Registry",
     "category": "Protocols & Tool Integration",
-    "hn_search_term": "mcp registry"
+    "hn_search_term": "mcp registry",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "google/A2A",
     "name": "A2A / Agent2Agent Protocol",
     "category": "Protocols & Tool Integration",
     "hn_search_term": "agent2agent a2a",
-    "pypi_package": "a2a-sdk"
+    "pypi_package": "a2a-sdk",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "crewAIInc/crewAI-tools",
     "name": "CrewAI tools",
     "category": "Protocols & Tool Integration",
     "hn_search_term": "crewai tools",
-    "pypi_package": "crewai-tools"
+    "pypi_package": "crewai-tools",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "daytonaio/daytona",
     "name": "Daytona",
     "category": "Sandboxes & Runtimes",
     "hn_search_term": "daytona sandbox",
-    "pypi_package": "daytona-sdk"
+    "pypi_package": "daytona-sdk",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "pipecat-ai/pipecat",
     "name": "Pipecat",
     "category": "Voice & Conversational",
     "hn_search_term": "pipecat",
-    "pypi_package": "pipecat-ai"
+    "pypi_package": "pipecat-ai",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "huggingface/lerobot",
     "name": "LeRobot",
     "category": "Robotics & Embodied",
     "hn_search_term": "lerobot huggingface",
-    "pypi_package": "lerobot"
+    "pypi_package": "lerobot",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "SalesforceAIResearch/AgentLite",
     "name": "AgentLite",
     "category": "Agent Frameworks",
-    "hn_search_term": "agentlite salesforce"
+    "hn_search_term": "agentlite salesforce",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "idosal/AgentLLM",
     "name": "AgentLLM",
     "category": "Agent Frameworks",
-    "hn_search_term": "agentllm"
+    "hn_search_term": "agentllm",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "OpenBMB/XAgent",
     "name": "XAgent",
     "category": "Agent Frameworks",
-    "hn_search_term": "xagent"
+    "hn_search_term": "xagent",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "agiresearch/OpenAGI",
     "name": "OpenAGI",
     "category": "Agent Frameworks",
     "hn_search_term": "openagi",
-    "pypi_package": "openagi"
+    "pypi_package": "openagi",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "xlang-ai/OpenAgents",
     "name": "OpenAgents",
     "category": "Agent Frameworks",
-    "hn_search_term": "openagents xlang"
+    "hn_search_term": "openagents xlang",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "myshell-ai/AIlice",
     "name": "AIlice",
     "category": "Agent Frameworks",
     "hn_search_term": "ailice",
-    "pypi_package": "ailice"
+    "pypi_package": "ailice",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "microsoft/JARVIS",
     "name": "JARVIS / HuggingGPT",
     "category": "Agent Frameworks",
-    "hn_search_term": "jarvis hugginggpt"
+    "hn_search_term": "jarvis hugginggpt",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "MineDojo/Voyager",
     "name": "Voyager Minecraft Agent",
     "category": "Agent Frameworks",
-    "hn_search_term": "voyager minecraft"
+    "hn_search_term": "voyager minecraft",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "joonspk-research/generative_agents",
     "name": "Generative Agents",
     "category": "Agent Frameworks",
-    "hn_search_term": "generative agents park"
+    "hn_search_term": "generative agents park",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "sotopia-lab/sotopia",
     "name": "Sotopia agents",
     "category": "Agent Frameworks",
     "hn_search_term": "sotopia",
-    "pypi_package": "sotopia"
+    "pypi_package": "sotopia",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "albertvillanova/tinyagents",
     "name": "TinyAgents",
     "category": "Agent Frameworks",
-    "hn_search_term": "tinyagents"
+    "hn_search_term": "tinyagents",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "microsoft/TinyTroupe",
     "name": "TinyTroupe",
     "category": "Agent Frameworks",
     "hn_search_term": "tinytroupe",
-    "pypi_package": "tinytroupe"
+    "pypi_package": "tinytroupe",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "SamuelSchmidgall/AgentLaboratory",
     "name": "Agent Laboratory",
     "category": "Agent Frameworks",
-    "hn_search_term": "agent laboratory"
+    "hn_search_term": "agent laboratory",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   },
   {
     "repo": "wisdom-pan/Agent_Hospital",
     "name": "Agent Hospital",
     "category": "Agent Frameworks",
-    "hn_search_term": "agent hospital"
+    "hn_search_term": "agent hospital",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
   }
 ]

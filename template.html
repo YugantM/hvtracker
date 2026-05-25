@@ -134,11 +134,28 @@
     .site-nav a:hover { color: var(--accent); }
 
     /* ── Category filter bar ── */
+    .filter-bar {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .search-input {
+      width: 100%;
+      max-width: 320px;
+      padding: 7px 12px;
+      margin-bottom: 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface-2);
+      color: var(--text);
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--muted); }
     .cat-bar {
       display: flex;
       gap: 8px;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border);
       flex-wrap: wrap;
       align-items: center;
     }
@@ -381,6 +398,24 @@
       margin-left: 4px;
     }
 
+    .evidence-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      line-height: 16px;
+      text-align: center;
+      border-radius: 3px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    .grade-A { background: #22c55e; color: #fff; }
+    .grade-B { background: #3b82f6; color: #fff; }
+    .grade-C { background: #f59e0b; color: #fff; }
+    .grade-D { background: var(--surface-2); color: var(--muted); }
+
     /* ── Numbers ── */
     .num {
       font-family: var(--font-mono);
@@ -581,14 +616,15 @@
       </div>
     </header>
 
-    {% if categories %}
-    <div class="cat-bar" id="catBar">
-      <span class="cat-pill active" data-category="">All ({{ total }})</span>
-      {% for cat in categories %}
-      <span class="cat-pill" data-category="{{ cat.name }}">{{ cat.name }} ({{ cat.count }})</span>
-      {% endfor %}
+    <div class="filter-bar" id="filterBar">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search agents…" autocomplete="off">
+      <div class="cat-bar" id="catBar">
+        <span class="cat-pill active" data-category="">All ({{ total }})</span>
+        {% for cat in categories %}
+        <span class="cat-pill" data-category="{{ cat.name }}">{{ cat.name }} ({{ cat.count }})</span>
+        {% endfor %}
+      </div>
     </div>
-    {% endif %}
 
     <div class="legend">
       <span style="color: var(--text); font-weight:600; font-size:12px;">Last push:</span>
@@ -656,6 +692,7 @@
             data-rank="{{ row.rank }}"
             data-rank_delta="{{ row.rank_delta_sort }}"
             data-name="{{ row.name }}"
+            data-repo="{{ row.repo }}"
             data-stars="{{ row.stars }}"
             data-last_push="{{ row.last_push }}"
             data-weekly_commits="{{ row.weekly_commits }}"
@@ -677,6 +714,7 @@
               {% if row.description %}<span class="agent-desc" title="{{ row.description }}">{{ row.description }}</span>{% endif %}
               {% if row.language %}<span class="lang">{{ row.language }}</span>{% endif %}
               {% if row.category %}<span class="cat-badge">{{ row.category }}</span>{% endif %}
+              <span class="evidence-badge grade-{{ row.evidence_grade }}" title="Evidence grade {{ row.evidence_grade }}">{{ row.evidence_grade }}</span>
             </td>
             <td class="r num">{{ row.stars_fmt }}</td>
             <td>
@@ -900,6 +938,56 @@
           sortRows();
           if (col === "rank") updateRankDisplay();
         });
+      });
+
+      // ── Text search ──
+      const searchInput = document.getElementById("searchInput");
+      let searchTerm = "";
+      function applySearch() {
+        searchTerm = searchInput.value.trim().toLowerCase();
+        currentPage = 0;
+        tbody.querySelectorAll("tr").forEach(row => {
+          const name = (row.dataset.name || "").toLowerCase();
+          const repo = (row.dataset.repo || "").toLowerCase();
+          const cat = (row.dataset.category || "").toLowerCase();
+          const matchesSearch = !searchTerm || name.includes(searchTerm) || repo.includes(searchTerm) || cat.includes(searchTerm);
+          const matchesCat = !activeCategory || row.dataset.category === activeCategory;
+          if (matchesSearch && matchesCat) {
+            row.classList.remove("hidden");
+          } else {
+            row.classList.add("hidden");
+          }
+        });
+        sortRows();
+      }
+      searchInput.addEventListener("input", applySearch);
+
+      // Override applyFilter to respect search
+      function applyFilterWithSearch(category) {
+        activeCategory = category;
+        currentPage = 0;
+        tbody.querySelectorAll("tr").forEach(row => {
+          const name = (row.dataset.name || "").toLowerCase();
+          const repo = (row.dataset.repo || "").toLowerCase();
+          const cat = (row.dataset.category || "").toLowerCase();
+          const matchesSearch = !searchTerm || name.includes(searchTerm) || repo.includes(searchTerm) || cat.includes(searchTerm);
+          const matchesCat = !category || row.dataset.category === category;
+          if (matchesSearch && matchesCat) {
+            row.classList.remove("hidden");
+          } else {
+            row.classList.add("hidden");
+          }
+        });
+        updateRankDisplay();
+        sortRows();
+      }
+      // Re-bind pills to use combined filter
+      pills.forEach(pill => {
+        pill.onclick = () => {
+          pills.forEach(p => p.classList.remove("active"));
+          pill.classList.add("active");
+          applyFilterWithSearch(pill.dataset.category);
+        };
       });
 
       // Initial render

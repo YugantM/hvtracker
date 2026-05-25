@@ -220,6 +220,7 @@
       <div class="badges">
         {% if row.category %}<span class="badge cat">{{ row.category }}</span>{% endif %}
         {% if row.language %}<span class="badge lang">{{ row.language }}</span>{% endif %}
+        {% if row.evidence_grade %}<span class="badge" style="background:{% if row.evidence_grade == 'A' %}#22c55e{% elif row.evidence_grade == 'B' %}#3b82f6{% elif row.evidence_grade == 'C' %}#f59e0b{% else %}#666{% endif %};color:#fff;" title="Evidence Grade {{ row.evidence_grade }}: {% if row.evidence_grade == 'A' %}5+ signal types{% elif row.evidence_grade == 'B' %}4 signal types{% elif row.evidence_grade == 'C' %}3 signal types{% else %}1-2 signal types{% endif %}">Grade {{ row.evidence_grade }}</span>{% endif %}
       </div>
     </section>
 
