@@ -299,7 +299,7 @@
   {
     "name": "DeerFlow",
     "repo": "bytedance/deer-flow",
-    "category": "Agent Frameworks",
+    "category": "Research & Data",
     "source_category": "Agent frameworks",
     "tracking_code": "D",
     "status": "already_tracked",
@@ -433,12 +433,12 @@
   },
   {
     "name": "Goose",
-    "repo": "aaif-goose/goose",
+    "repo": "block/goose",
     "category": "Coding Agents",
     "source_category": "Coding agents",
     "tracking_code": "D",
     "status": "new",
-    "notes": "Found via GitHub search \u2014 verify before import"
+    "notes": "AI coding agent by Block \u2014 verify before import"
   },
   {
     "name": "GPT Pilot",
@@ -565,15 +565,6 @@
     "tracking_code": "D",
     "status": "new",
     "notes": "Found via GitHub search \u2014 verify before import"
-  },
-  {
-    "name": "Open Interpreter",
-    "repo": "OpenInterpreter/open-interpreter",
-    "category": "Browser & Computer Use",
-    "source_category": "Browser and computer-use agents",
-    "tracking_code": "D",
-    "status": "already_tracked",
-    "notes": ""
   },
   {
     "name": "UI-TARS",
@@ -712,25 +703,16 @@
   },
   {
     "name": "Superagent",
-    "repo": "forwardemail/superagent",
+    "repo": "homanp/superagent",
     "category": "Workflow Platforms",
     "source_category": "Workflow and no-code agent builders",
     "tracking_code": "D/H",
     "status": "new",
-    "notes": "Found via GitHub search \u2014 verify before import"
+    "notes": "Correct repo \u2014 verify before import"
   },
   {
     "name": "GPT Researcher",
     "repo": "assafelovic/gpt-researcher",
-    "category": "Research & Data",
-    "source_category": "Research, data, and web agents",
-    "tracking_code": "D",
-    "status": "already_tracked",
-    "notes": ""
-  },
-  {
-    "name": "DeerFlow",
-    "repo": "bytedance/deer-flow",
     "category": "Research & Data",
     "source_category": "Research, data, and web agents",
     "tracking_code": "D",
@@ -748,30 +730,21 @@
   },
   {
     "name": "Open Deep Research",
-    "repo": "langchain-ai/open_deep_research",
+    "repo": "nickscamara/open-deep-research",
     "category": "Research & Data",
     "source_category": "Research, data, and web agents",
     "tracking_code": "D",
     "status": "new",
-    "notes": "Found via GitHub search \u2014 verify before import"
+    "notes": "Open source deep research agent \u2014 verify before import"
   },
   {
     "name": "Hugging Face Open Deep Research",
-    "repo": "RyuseiTakahashi/hugging_face_open_deep_research",
+    "repo": null,
     "category": "Research & Data",
     "source_category": "Research, data, and web agents",
     "tracking_code": "D",
-    "status": "new",
-    "notes": "Found via GitHub search \u2014 verify before import"
-  },
-  {
-    "name": "OpenManus",
-    "repo": "FoundationAgents/OpenManus",
-    "category": "Research & Data",
-    "source_category": "Research, data, and web agents",
-    "tracking_code": "D",
-    "status": "new",
-    "notes": "Verify: FoundationAgents fork has 56k stars"
+    "status": "unresolved",
+    "notes": "GitHub search matched wrong repo \u2014 official HF repo not confirmed"
   },
   {
     "name": "Firecrawl",
@@ -820,12 +793,12 @@
   },
   {
     "name": "Zep",
-    "repo": "zephyrproject-rtos/zephyr",
+    "repo": "getzep/zep",
     "category": "Memory & Knowledge",
     "source_category": "Memory, RAG, and context systems",
     "tracking_code": "D/H",
-    "status": "new",
-    "notes": "Found via GitHub search \u2014 verify before import"
+    "status": "already_tracked",
+    "notes": "Same repo as existing Zep entry"
   },
   {
     "name": "RAGFlow",
@@ -883,39 +856,21 @@
   },
   {
     "name": "PrivateGPT",
-    "repo": "Michael-Sebero/PrivateGPT4Linux-CLI",
+    "repo": "imartinez/privateGPT",
     "category": "Memory & Knowledge",
     "source_category": "Memory, RAG, and context systems",
     "tracking_code": "D",
     "status": "new",
-    "notes": "Found via GitHub search \u2014 verify before import"
-  },
-  {
-    "name": "LlamaIndex",
-    "repo": "run-llama/llama_index",
-    "category": "Memory & Knowledge",
-    "source_category": "Memory, RAG, and context systems",
-    "tracking_code": "D/H",
-    "status": "new",
-    "notes": "Known repo"
-  },
-  {
-    "name": "Haystack",
-    "repo": "deepset-ai/haystack",
-    "category": "Memory & Knowledge",
-    "source_category": "Memory, RAG, and context systems",
-    "tracking_code": "D/H",
-    "status": "already_tracked",
-    "notes": ""
+    "notes": "Private local RAG \u2014 correct repo"
   },
   {
     "name": "OpenMemory",
-    "repo": "CaviraOSS/OpenMemory",
+    "repo": null,
     "category": "Memory & Knowledge",
     "source_category": "Memory, RAG, and context systems",
     "tracking_code": "D",
-    "status": "new",
-    "notes": "Found via GitHub search \u2014 verify before import"
+    "status": "unresolved",
+    "notes": "GitHub search matched unofficial fork \u2014 real mem0 OpenMemory is a product, not a separate OSS repo"
   },
   {
     "name": "Chroma",
@@ -1073,7 +1028,7 @@
   {
     "name": "Guardrails AI",
     "repo": "guardrails-ai/guardrails",
-    "category": "Observability & Evaluation",
+    "category": "Security & Guardrails",
     "source_category": "Agent observability, evaluation, and tracing",
     "tracking_code": "D/H",
     "status": "new",
@@ -1117,30 +1072,21 @@
   },
   {
     "name": "Literal AI",
-    "repo": "Titanfall2-T/LiteralAimbot",
+    "repo": null,
     "category": "Observability & Evaluation",
     "source_category": "Agent observability, evaluation, and tracing",
     "tracking_code": "D/H",
-    "status": "new",
-    "notes": "Found via GitHub search \u2014 verify before import"
-  },
-  {
-    "name": "Guardrails AI",
-    "repo": "guardrails-ai/guardrails",
-    "category": "Security & Guardrails",
-    "source_category": "Agent security and guardrails",
-    "tracking_code": "D/H",
-    "status": "new",
-    "notes": "Found via GitHub search \u2014 verify before import"
+    "status": "unresolved",
+    "notes": "GitHub search matched wrong repo \u2014 real repo is literalai/literalai (verify)"
   },
   {
     "name": "NeMo Guardrails",
-    "repo": "NVIDIA-NeMo/Guardrails",
+    "repo": "NVIDIA/NeMo-Guardrails",
     "category": "Security & Guardrails",
     "source_category": "Agent security and guardrails",
     "tracking_code": "D",
     "status": "new",
-    "notes": "Found via GitHub search \u2014 verify before import"
+    "notes": "Correct NVIDIA NeMo Guardrails repo"
   },
   {
     "name": "Llama Guard",
@@ -1152,31 +1098,13 @@
     "notes": "Meta safety toolset including Llama Guard"
   },
   {
-    "name": "Giskard",
-    "repo": "Giskard-AI/giskard-oss",
-    "category": "Security & Guardrails",
-    "source_category": "Agent security and guardrails",
-    "tracking_code": "D/H",
-    "status": "new",
-    "notes": "Found via GitHub search \u2014 verify before import"
-  },
-  {
-    "name": "Promptfoo red teaming",
-    "repo": "promptfoo/promptfoo",
-    "category": "Security & Guardrails",
-    "source_category": "Agent security and guardrails",
-    "tracking_code": "D/H",
-    "status": "new",
-    "notes": "Same codebase as Promptfoo entry \u2014 check for duplicate"
-  },
-  {
     "name": "Garak",
-    "repo": "NVIDIA/garak",
+    "repo": "leondz/garak",
     "category": "Security & Guardrails",
     "source_category": "Agent security and guardrails",
     "tracking_code": "D",
     "status": "new",
-    "notes": "Found via GitHub search \u2014 verify before import"
+    "notes": "LLM vulnerability scanner"
   },
   {
     "name": "Rebuff",
@@ -1185,7 +1113,7 @@
     "source_category": "Agent security and guardrails",
     "tracking_code": "D",
     "status": "new",
-    "notes": "Found via GitHub search \u2014 verify before import"
+    "notes": "Prompt injection detection"
   },
   {
     "name": "LLM Guard",
@@ -1222,15 +1150,6 @@
     "tracking_code": "D/H",
     "status": "already_tracked",
     "notes": ""
-  },
-  {
-    "name": "Playwright MCP",
-    "repo": null,
-    "category": "Protocols & Tool Integration",
-    "source_category": "MCP, agent protocols, and tool integration",
-    "tracking_code": "D",
-    "status": "unresolved",
-    "notes": "Duplicate entry \u2014 check against MCP servers list"
   },
   {
     "name": "GitHub MCP server",
@@ -1391,15 +1310,6 @@
     "category": "Voice & Conversational",
     "source_category": "Voice and conversational agents",
     "tracking_code": "D/H",
-    "status": "new",
-    "notes": "Found via GitHub search \u2014 verify before import"
-  },
-  {
-    "name": "OpenClaw",
-    "repo": "openclaw/openclaw",
-    "category": "Personal Assistants",
-    "source_category": "Personal assistant and productivity agents",
-    "tracking_code": "D",
     "status": "new",
     "notes": "Found via GitHub search \u2014 verify before import"
   },

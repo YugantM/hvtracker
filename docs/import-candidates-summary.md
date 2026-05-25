@@ -8,40 +8,36 @@
 
 | | Count |
 |---|---|
-| Trackable entries (D + D/H) | 193 |
-| Already tracked (skip) | 49 |
-| **New candidates — ready to add** | **110** |
-| Unresolved (need manual resolution) | 34 |
+| Trackable entries (D + D/H) | 183 |
+| Already tracked — skip | 47 |
+| **New candidates — ready to add** | **100** |
+| Unresolved — need manual resolution | 36 |
 | Closed/hybrid excluded | 298 |
 
 ---
 
 ## New Candidates by Category
 
-| Category | New agents | Status |
+| Category | Count | Status |
 |---|---|---|
 | Agent Frameworks | 40 | existing |
-| Memory & Knowledge | 16 | existing |
-| Observability & Evaluation | 14 | new category |
+| Memory & Knowledge | 13 | existing |
+| Observability & Evaluation | 12 | new category |
 | Browser & Computer Use | 8 | existing |
-| Security & Guardrails | 8 | new category |
 | Coding Agents | 6 | existing |
+| Security & Guardrails | 6 | new category |
 | Workflow Platforms | 5 | existing |
-| Research & Data | 5 | existing |
 | Protocols & Tool Integration | 4 | new category |
+| Research & Data | 3 | existing |
 | Sandboxes & Runtimes | 1 | new category |
 | Voice & Conversational | 1 | new category |
-| Personal Assistants | 1 | new category |
 | Robotics & Embodied | 1 | new category |
 
 ---
 
-## New Categories (will be created in Phase 2)
-
-These 7 categories don't exist in the UI yet:
+## New Categories (Phase 2 will create these)
 
 - **Observability & Evaluation**
-- **Personal Assistants**
 - **Protocols & Tool Integration**
 - **Robotics & Embodied**
 - **Sandboxes & Runtimes**
@@ -103,7 +99,7 @@ These 7 categories don't exist in the UI yet:
 | Stagehand | [browserbase/stagehand](https://github.com/browserbase/stagehand) | Browser & Computer Use | D/H | Found via GitHub search — verify before import |
 | WebVoyager | [MinorJerry/WebVoyager](https://github.com/MinorJerry/WebVoyager) | Browser & Computer Use | D | Found via GitHub search — verify before import |
 | CodeAct | [langchain-ai/langgraph-codeact](https://github.com/langchain-ai/langgraph-codeact) | Coding Agents | D | Found via GitHub search — verify before import |
-| Goose | [aaif-goose/goose](https://github.com/aaif-goose/goose) | Coding Agents | D | Found via GitHub search — verify before import |
+| Goose | [block/goose](https://github.com/block/goose) | Coding Agents | D | AI coding agent by Block — verify before import |
 | Mentat | [AbanteAI/archive-old-cli-mentat](https://github.com/AbanteAI/archive-old-cli-mentat) | Coding Agents | D | Found via GitHub search — verify before import |
 | PearAI | [trypear/pearai-master](https://github.com/trypear/pearai-master) | Coding Agents | D/H | Found via GitHub search — verify before import |
 | Tabby | [TabbyML/tabby](https://github.com/TabbyML/tabby) | Coding Agents | D/H | Self-hosted AI coding assistant |
@@ -111,17 +107,14 @@ These 7 categories don't exist in the UI yet:
 | Chroma | [chroma-core/chroma](https://github.com/chroma-core/chroma) | Memory & Knowledge | D/H | Found via GitHub search — verify before import |
 | LanceDB | [lancedb/lancedb](https://github.com/lancedb/lancedb) | Memory & Knowledge | D/H | Found via GitHub search — verify before import |
 | LibreChat | [danny-avila/LibreChat](https://github.com/danny-avila/LibreChat) | Memory & Knowledge | D | Found via GitHub search — verify before import |
-| LlamaIndex | [run-llama/llama_index](https://github.com/run-llama/llama_index) | Memory & Knowledge | D/H | Known repo |
 | Milvus | [milvus-io/milvus](https://github.com/milvus-io/milvus) | Memory & Knowledge | D/H | Found via GitHub search — verify before import |
 | Open WebUI | [open-webui/open-webui](https://github.com/open-webui/open-webui) | Memory & Knowledge | D | Found via GitHub search — verify before import |
-| OpenMemory | [CaviraOSS/OpenMemory](https://github.com/CaviraOSS/OpenMemory) | Memory & Knowledge | D | Found via GitHub search — verify before import |
-| PrivateGPT | [Michael-Sebero/PrivateGPT4Linux-CLI](https://github.com/Michael-Sebero/PrivateGPT4Linux-CLI) | Memory & Knowledge | D | Found via GitHub search — verify before import |
+| PrivateGPT | [imartinez/privateGPT](https://github.com/imartinez/privateGPT) | Memory & Knowledge | D | Private local RAG — correct repo |
 | Qdrant | [qdrant/qdrant](https://github.com/qdrant/qdrant) | Memory & Knowledge | D/H | Found via GitHub search — verify before import |
 | Quivr | [QuivrHQ/quivr](https://github.com/QuivrHQ/quivr) | Memory & Knowledge | D | Found via GitHub search — verify before import |
 | RAGFlow | [infiniflow/ragflow](https://github.com/infiniflow/ragflow) | Memory & Knowledge | D/H | Found via GitHub search — verify before import |
 | Vespa | [vespa-engine/vespa](https://github.com/vespa-engine/vespa) | Memory & Knowledge | D/H | Found via GitHub search — verify before import |
 | Weaviate | [weaviate/weaviate](https://github.com/weaviate/weaviate) | Memory & Knowledge | D/H | Found via GitHub search — verify before import |
-| Zep | [zephyrproject-rtos/zephyr](https://github.com/zephyrproject-rtos/zephyr) | Memory & Knowledge | D/H | Found via GitHub search — verify before import |
 | pgvector | [pgvector/pgvector](https://github.com/pgvector/pgvector) | Memory & Knowledge | D | Found via GitHub search — verify before import |
 | txtai | [neuml/txtai](https://github.com/neuml/txtai) | Memory & Knowledge | D | Found via GitHub search — verify before import |
 | AgentOps | [agentops-ai/agentops](https://github.com/agentops-ai/agentops) | Observability & Evaluation | D/H | Agent observability and evaluation SDK |
@@ -129,47 +122,38 @@ These 7 categories don't exist in the UI yet:
 | Arize Phoenix | [Arize-AI/phoenix](https://github.com/Arize-AI/phoenix) | Observability & Evaluation | D/H | Known repo |
 | DeepEval | [confident-ai/deepeval](https://github.com/confident-ai/deepeval) | Observability & Evaluation | D/H | Known repo |
 | Giskard | [Giskard-AI/giskard-oss](https://github.com/Giskard-AI/giskard-oss) | Observability & Evaluation | D/H | Found via GitHub search — verify before import |
-| Guardrails AI | [guardrails-ai/guardrails](https://github.com/guardrails-ai/guardrails) | Observability & Evaluation | D/H | Found via GitHub search — verify before import |
 | Helicone | [Helicone/helicone](https://github.com/Helicone/helicone) | Observability & Evaluation | D/H | Known repo |
 | LangWatch | [langwatch/langwatch](https://github.com/langwatch/langwatch) | Observability & Evaluation | D/H | Found via GitHub search — verify before import |
 | Langfuse | [langfuse/langfuse](https://github.com/langfuse/langfuse) | Observability & Evaluation | D/H | Known repo |
-| Literal AI | [Titanfall2-T/LiteralAimbot](https://github.com/Titanfall2-T/LiteralAimbot) | Observability & Evaluation | D/H | Found via GitHub search — verify before import |
 | Promptfoo | [promptfoo/promptfoo](https://github.com/promptfoo/promptfoo) | Observability & Evaluation | D/H | Found via GitHub search — verify before import |
 | Ragas | [explodinggradients/ragas](https://github.com/explodinggradients/ragas) | Observability & Evaluation | D | Known repo |
 | TruLens | [truera/trulens](https://github.com/truera/trulens) | Observability & Evaluation | D/H | Known repo |
 | Weights & Biases Weave | [wandb/weave](https://github.com/wandb/weave) | Observability & Evaluation | D/H | W&B LLM evaluation and observability |
-| OpenClaw | [openclaw/openclaw](https://github.com/openclaw/openclaw) | Personal Assistants | D | Found via GitHub search — verify before import |
 | A2A / Agent2Agent Protocol | [google/A2A](https://github.com/google/A2A) | Protocols & Tool Integration | D/H | Google Agent2Agent protocol spec and SDK |
 | CrewAI tools | [crewAIInc/crewAI-tools](https://github.com/crewAIInc/crewAI-tools) | Protocols & Tool Integration | D/H | Found via GitHub search — verify before import |
 | MCP Registry | [modelcontextprotocol/registry](https://github.com/modelcontextprotocol/registry) | Protocols & Tool Integration | D/H | MCP server registry |
 | Model Context Protocol / MCP | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) | Protocols & Tool Integration | D | Official MCP server implementations |
 | Crawl4AI | [unclecode/crawl4ai](https://github.com/unclecode/crawl4ai) | Research & Data | D | Found via GitHub search — verify before import |
-| Hugging Face Open Deep Research | [RyuseiTakahashi/hugging_face_open_deep_research](https://github.com/RyuseiTakahashi/hugging_face_open_deep_research) | Research & Data | D | Found via GitHub search — verify before import |
-| Open Deep Research | [langchain-ai/open_deep_research](https://github.com/langchain-ai/open_deep_research) | Research & Data | D | Found via GitHub search — verify before import |
-| OpenManus | [FoundationAgents/OpenManus](https://github.com/FoundationAgents/OpenManus) | Research & Data | D | Verify: FoundationAgents fork has 56k stars |
+| Open Deep Research | [nickscamara/open-deep-research](https://github.com/nickscamara/open-deep-research) | Research & Data | D | Open source deep research agent — verify before import |
 | STORM | [stanford-oval/storm](https://github.com/stanford-oval/storm) | Research & Data | D | Found via GitHub search — verify before import |
 | LeRobot | [huggingface/lerobot](https://github.com/huggingface/lerobot) | Robotics & Embodied | D | Found via GitHub search — verify before import |
 | Daytona | [daytonaio/daytona](https://github.com/daytonaio/daytona) | Sandboxes & Runtimes | D/H | Found via GitHub search — verify before import |
-| Garak | [NVIDIA/garak](https://github.com/NVIDIA/garak) | Security & Guardrails | D | Found via GitHub search — verify before import |
-| Giskard | [Giskard-AI/giskard-oss](https://github.com/Giskard-AI/giskard-oss) | Security & Guardrails | D/H | Found via GitHub search — verify before import |
+| Garak | [leondz/garak](https://github.com/leondz/garak) | Security & Guardrails | D | LLM vulnerability scanner |
 | Guardrails AI | [guardrails-ai/guardrails](https://github.com/guardrails-ai/guardrails) | Security & Guardrails | D/H | Found via GitHub search — verify before import |
 | LLM Guard | [protectai/llm-guard](https://github.com/protectai/llm-guard) | Security & Guardrails | D | Found via GitHub search — verify before import |
 | Llama Guard | [meta-llama/PurpleLlama](https://github.com/meta-llama/PurpleLlama) | Security & Guardrails | D/H | Meta safety toolset including Llama Guard |
-| NeMo Guardrails | [NVIDIA-NeMo/Guardrails](https://github.com/NVIDIA-NeMo/Guardrails) | Security & Guardrails | D | Found via GitHub search — verify before import |
-| Promptfoo red teaming | [promptfoo/promptfoo](https://github.com/promptfoo/promptfoo) | Security & Guardrails | D/H | Same codebase as Promptfoo entry — check for duplicate |
-| Rebuff | [protectai/rebuff](https://github.com/protectai/rebuff) | Security & Guardrails | D | Found via GitHub search — verify before import |
+| NeMo Guardrails | [NVIDIA/NeMo-Guardrails](https://github.com/NVIDIA/NeMo-Guardrails) | Security & Guardrails | D | Correct NVIDIA NeMo Guardrails repo |
+| Rebuff | [protectai/rebuff](https://github.com/protectai/rebuff) | Security & Guardrails | D | Prompt injection detection |
 | Pipecat | [pipecat-ai/pipecat](https://github.com/pipecat-ai/pipecat) | Voice & Conversational | D/H | Found via GitHub search — verify before import |
 | Botpress | [botpress/botpress](https://github.com/botpress/botpress) | Workflow Platforms | D/H | Found via GitHub search — verify before import |
 | Langflow | [langflow-ai/langflow](https://github.com/langflow-ai/langflow) | Workflow Platforms | D/H | Found via GitHub search — verify before import |
 | Rasa | [RasaHQ/rasa](https://github.com/RasaHQ/rasa) | Workflow Platforms | D/H | Found via GitHub search — verify before import |
-| Superagent | [forwardemail/superagent](https://github.com/forwardemail/superagent) | Workflow Platforms | D/H | Found via GitHub search — verify before import |
+| Superagent | [homanp/superagent](https://github.com/homanp/superagent) | Workflow Platforms | D/H | Correct repo — verify before import |
 | n8n | [n8n-io/n8n](https://github.com/n8n-io/n8n) | Workflow Platforms | D/H | Known repo |
 
 ---
 
-## Unresolved Candidates
-
-These need manual resolution before Phase 2. Most are benchmarks, sub-projects, or ambiguous entries.
+## Unresolved — Need Manual Resolution
 
 | Name | Category | TC | Notes |
 |---|---|---|---|
@@ -189,6 +173,8 @@ These need manual resolution before Phase 2. Most are benchmarks, sub-projects, 
 | MiniWoB agents | Browser & Computer Use | D | Research benchmark — not a standalone agent tool |
 | OSWorld agents | Browser & Computer Use | D | Research benchmark environment — not a standalone agent tool |
 | Playwright MCP | Browser & Computer Use | D | Duplicate entry — check against MCP servers list |
+| OpenMemory | Memory & Knowledge | D | GitHub search matched unofficial fork — real mem0 OpenMemory is a product, not a separate OSS repo |
+| Literal AI | Observability & Evaluation | D/H | GitHub search matched wrong repo — real repo is literalai/literalai (verify) |
 | OpenTelemetry agent integrations | Observability & Evaluation | D/H | Too generic — OTEL spans across many repos |
 | Filesystem MCP server | Protocols & Tool Integration | D | Part of modelcontextprotocol/servers — not separately trackable |
 | GitHub MCP server | Protocols & Tool Integration | D/H | Part of modelcontextprotocol/servers — not separately trackable |
@@ -196,10 +182,10 @@ These need manual resolution before Phase 2. Most are benchmarks, sub-projects, 
 | Linear MCP server | Protocols & Tool Integration | D/H | Part of modelcontextprotocol/servers — not separately trackable |
 | LlamaIndex tools | Protocols & Tool Integration | D/H | Submodule of llama_index — not separately trackable |
 | OpenAPI tool specs | Protocols & Tool Integration | D | Spec/standard, not a specific repo |
-| Playwright MCP | Protocols & Tool Integration | D | Duplicate entry — check against MCP servers list |
 | Postgres MCP server | Protocols & Tool Integration | D | Part of modelcontextprotocol/servers — not separately trackable |
 | Semantic Kernel plugins | Protocols & Tool Integration | D/H | Submodule of semantic-kernel — not separately trackable |
 | Slack MCP server | Protocols & Tool Integration | D/H | Part of modelcontextprotocol/servers — not separately trackable |
+| Hugging Face Open Deep Research | Research & Data | D | GitHub search matched wrong repo — official HF repo not confirmed |
 | Habitat agents | Robotics & Embodied | D | Research simulator — benchmark, not agent tool |
 | Isaac Lab agents | Robotics & Embodied | D/H | Research simulator — benchmark, not agent tool |
 | Open X-Embodiment agents | Robotics & Embodied | D/H | Research dataset, not a standalone agent tool |
@@ -210,7 +196,7 @@ These need manual resolution before Phase 2. Most are benchmarks, sub-projects, 
 
 ---
 
-## Already Tracked (no action needed)
+## Already Tracked
 
 | Name | Repo | Category |
 |---|---|---|
@@ -227,7 +213,6 @@ These need manual resolution before Phase 2. Most are benchmarks, sub-projects, 
 | Composio | [composiohq/composio](https://github.com/composiohq/composio) | Protocols & Tool Integration |
 | Continue | [continuedev/continue](https://github.com/continuedev/continue) | Coding Agents |
 | CrewAI | [CrewAIInc/crewAI](https://github.com/CrewAIInc/crewAI) | Agent Frameworks |
-| DeerFlow | [bytedance/deer-flow](https://github.com/bytedance/deer-flow) | Agent Frameworks |
 | DeerFlow | [bytedance/deer-flow](https://github.com/bytedance/deer-flow) | Research & Data |
 | Devika | [stitionai/devika](https://github.com/stitionai/devika) | Coding Agents |
 | Dify | [langgenius/dify](https://github.com/langgenius/dify) | Workflow Platforms |
@@ -238,7 +223,6 @@ These need manual resolution before Phase 2. Most are benchmarks, sub-projects, 
 | GPT Researcher | [assafelovic/gpt-researcher](https://github.com/assafelovic/gpt-researcher) | Research & Data |
 | Gemini CLI | [google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli) | Coding Agents |
 | Haystack | [deepset-ai/haystack](https://github.com/deepset-ai/haystack) | Agent Frameworks |
-| Haystack | [deepset-ai/haystack](https://github.com/deepset-ai/haystack) | Memory & Knowledge |
 | Khoj | [khoj-ai/khoj](https://github.com/khoj-ai/khoj) | Memory & Knowledge |
 | LaVague | [lavague-ai/LaVague](https://github.com/lavague-ai/LaVague) | Browser & Computer Use |
 | LangGraph | [langchain-ai/langgraph](https://github.com/langchain-ai/langgraph) | Agent Frameworks |
@@ -249,7 +233,6 @@ These need manual resolution before Phase 2. Most are benchmarks, sub-projects, 
 | Microsoft AutoGen | [microsoft/autogen](https://github.com/microsoft/autogen) | Agent Frameworks |
 | Microsoft Semantic Kernel | [microsoft/semantic-kernel](https://github.com/microsoft/semantic-kernel) | Agent Frameworks |
 | Open Interpreter | [OpenInterpreter/open-interpreter](https://github.com/OpenInterpreter/open-interpreter) | Coding Agents |
-| Open Interpreter | [OpenInterpreter/open-interpreter](https://github.com/OpenInterpreter/open-interpreter) | Browser & Computer Use |
 | OpenDevin | [All-Hands-AI/OpenHands](https://github.com/All-Hands-AI/OpenHands) | Coding Agents |
 | OpenHands | [All-Hands-AI/OpenHands](https://github.com/All-Hands-AI/OpenHands) | Coding Agents |
 | Plandex | [plandex-ai/plandex](https://github.com/plandex-ai/plandex) | Coding Agents |
@@ -260,6 +243,7 @@ These need manual resolution before Phase 2. Most are benchmarks, sub-projects, 
 | SuperAGI | [TransformerOptimus/SuperAGI](https://github.com/TransformerOptimus/SuperAGI) | Agent Frameworks |
 | UI-TARS | [bytedance/UI-TARS](https://github.com/bytedance/UI-TARS) | Browser & Computer Use |
 | VoltAgent | [VoltAgent/voltagent](https://github.com/VoltAgent/voltagent) | Agent Frameworks |
+| Zep | [getzep/zep](https://github.com/getzep/zep) | Memory & Knowledge |
 | aider | [paul-gauthier/aider](https://github.com/paul-gauthier/aider) | Coding Agents |
 | browser-use | [browser-use/browser-use](https://github.com/browser-use/browser-use) | Browser & Computer Use |
 | mem0 | [mem0ai/mem0](https://github.com/mem0ai/mem0) | Memory & Knowledge |
