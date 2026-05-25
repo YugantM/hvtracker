@@ -460,6 +460,21 @@
     .score-mid  { background: var(--score-mid-bg); color: var(--score-mid-fg); }
     .score-low  { background: var(--score-lo-bg); color: var(--score-lo-fg); }
 
+    /* ── Trust score pill ── */
+    .trust-pill {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      min-width: 44px;
+      text-align: center;
+    }
+    .trust-high { background: rgba(52,211,153,0.12); color: #34d399; }
+    .trust-mid  { background: rgba(59,130,246,0.12); color: #60a5fa; }
+    .trust-low  { background: var(--score-lo-bg); color: var(--score-lo-fg); }
+
     /* ── Score formula tooltip ── */
     .formula-row {
       padding: 10px 12px 6px;
@@ -683,6 +698,7 @@
             <th class="r" data-col="hn_mentions_30d">HN<span class="sort-arrow"></span></th>
             <th class="r" data-col="actions_30d" title="Public actions (commits/PRs) detected via agent fingerprint in last 30 days">Actions<span class="sort-arrow"></span></th>
             <th class="c" data-col="scorecard">Trust<span class="sort-arrow"></span></th>
+            <th class="r" data-col="trust_score">HVTrust<span class="sort-arrow"></span></th>
             <th class="r sorted" data-col="score">Score<span class="sort-arrow">↓</span></th>
           </tr>
         </thead>
@@ -701,6 +717,7 @@
             data-actions_30d="{{ row.public_actions.actions_30d if row.public_actions else -1 }}"
             data-scorecard="{{ row.scorecard_score if row.scorecard_score is not none else -1 }}"
             data-score="{{ row.score }}"
+            data-trust_score="{{ row.trust_score }}"
             data-category="{{ row.category }}"
             data-category_rank="{{ row.category_rank }}"
           >
@@ -747,6 +764,9 @@
                 {% if row.signed_commits_pct is not none and row.signed_commits_pct >= 50 %}<span class="trust-badge trust-sig">sig</span>{% endif %}
                 {% if not row.has_provenance and not row.scorecard_fmt and (row.signed_commits_pct is none or row.signed_commits_pct < 50) %}<span class="trust-none">—</span>{% endif %}
               </div>
+            </td>
+            <td class="r">
+              <span class="trust-pill {% if row.trust_score >= 55 %}trust-high{% elif row.trust_score >= 30 %}trust-mid{% else %}trust-low{% endif %}" title="Activity {{ row.trust_breakdown.activity }} · Adoption {{ row.trust_breakdown.adoption }} · Transparency {{ row.trust_breakdown.transparency }} · Safety {{ row.trust_breakdown.safety }} · Identity {{ row.trust_breakdown.identity }}">{{ row.trust_score }}</span>
             </td>
             <td class="r">
               <span class="score-pill {{ row.score_class }}">{{ row.score }}</span>

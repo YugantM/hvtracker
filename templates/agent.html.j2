@@ -227,8 +227,14 @@
     <section class="rank-block">
       <div>
         <div class="score-pill {{ row.score_class }}">{{ row.score }}</div>
-        <div class="rank-label">Health Score · out of 100</div>
+        <div class="rank-label">Activity Score · out of 100</div>
       </div>
+      {% if row.trust_score is defined %}
+      <div>
+        <div class="score-pill" style="background:rgba(52,211,153,0.12);color:{% if row.trust_score >= 55 %}#34d399{% elif row.trust_score >= 30 %}#60a5fa{% else %}var(--score-lo-fg){% endif %};">{{ row.trust_score }}</div>
+        <div class="rank-label">HVTrust Score · out of 100</div>
+      </div>
+      {% endif %}
       <div>
         <div class="rank-big">#{{ row.rank }}</div>
         <div class="rank-label">Global Rank · of {{ total }}</div>
@@ -320,6 +326,37 @@
         <span class="breakdown-value">{{ row.score_breakdown.community }}</span>
       </div>
     </section>
+
+    {% if row.trust_breakdown is defined %}
+    <section class="breakdown">
+      <h2 class="section-title">HVTrust Breakdown <span style="font-weight:400;color:var(--muted);font-size:11px;margin-left:6px">{{ row.trust_score }} / 100</span></h2>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Activity (max 25)</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.activity / 25 * 100) | round(1) }}%;background:#34d399"></div></div>
+        <span class="breakdown-value">{{ row.trust_breakdown.activity }}</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Adoption (max 20)</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.adoption / 20 * 100) | round(1) }}%;background:#3b82f6"></div></div>
+        <span class="breakdown-value">{{ row.trust_breakdown.adoption }}</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Transparency (max 20)</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.transparency / 20 * 100) | round(1) }}%;background:#f59e0b"></div></div>
+        <span class="breakdown-value">{{ row.trust_breakdown.transparency }}</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Safety (max 20)</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.safety / 20 * 100) | round(1) }}%;background:#ef4444"></div></div>
+        <span class="breakdown-value">{{ row.trust_breakdown.safety }}</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Identity (max 15)</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.identity / 15 * 100) | round(1) }}%;background:var(--accent)"></div></div>
+        <span class="breakdown-value">{{ row.trust_breakdown.identity }}</span>
+      </div>
+    </section>
+    {% endif %}
 
     <section class="provenance">
       <h2 class="section-title">Supply Chain Trust</h2>

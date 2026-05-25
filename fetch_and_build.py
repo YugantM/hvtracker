@@ -308,6 +308,65 @@ def fetch_signed_commit_ratio(owner_repo: str, sample: int = 100) -> float | Non
         return None
 
 
+def compute_trust_score(row: dict) -> dict:
+    """Compute the HVTrust composite score (0–100) from five dimensions.
+
+    Dimensions:
+      Activity    (max 25): freshness + recent commit activity
+      Adoption    (max 20): stars + weekly downloads
+      Transparency(max 20): license exists + OSSF score contribution
+      Safety      (max 20): OSSF Scorecard + provenance + signed commits
+      Identity    (max 15): evidence grade + listing status
+    """
+    # ── Activity (25) ──
+    days = row.get("days_ago", 999)
+    freshness_pts = max(0.0, 15 * (1 - days / 180))
+    commits = row.get("weekly_commits") or 0
+    activity_pts = min(10, math.log1p(commits) / math.log1p(100) * 10)
+    activity = round(freshness_pts + activity_pts, 1)
+
+    # ── Adoption (20) ──
+    stars = row.get("stars", 0)
+    stars_pts = min(12, math.log1p(stars) / math.log1p(100_000) * 12)
+    dl = row.get("weekly_downloads") or 0
+    dl_pts = min(8, math.log1p(dl) / math.log1p(1_000_000) * 8) if dl > 0 else 0
+    adoption = round(stars_pts + dl_pts, 1)
+
+    # ── Transparency (20) ──
+    license_pts = 8 if row.get("license_spdx") else 0
+    sc = row.get("scorecard_score")
+    # OSSF score contributes to transparency via specific checks awareness
+    ossf_transparency_pts = min(12, (sc / 10) * 12) if sc is not None else 0
+    transparency = round(license_pts + ossf_transparency_pts, 1)
+
+    # ── Safety (20) ──
+    ossf_safety_pts = min(10, (sc / 10) * 10) if sc is not None else 0
+    prov_pts = 5 if row.get("has_provenance") else 0
+    sr = row.get("signed_commits_ratio")
+    sig_pts = min(5, sr * 5) if sr is not None else 0
+    safety = round(ossf_safety_pts + prov_pts + sig_pts, 1)
+
+    # ── Identity (15) ──
+    grade = row.get("evidence_grade", "D")
+    grade_pts = {"A": 10, "B": 7, "C": 4, "D": 1}.get(grade, 1)
+    # listing_status: listed=5, legacy=2, others=0
+    ls = row.get("listing_status", "")
+    ls_pts = 5 if ls == "listed" else (2 if ls == "legacy" else 0)
+    identity = round(grade_pts + ls_pts, 1)
+
+    total = round(activity + adoption + transparency + safety + identity, 1)
+    return {
+        "trust_score": min(total, 100),
+        "trust_breakdown": {
+            "activity": activity,
+            "adoption": adoption,
+            "transparency": transparency,
+            "safety": safety,
+            "identity": identity,
+        },
+    }
+
+
 def score_components(stars: int, days_since: int, recent_commits: int, forks: int) -> dict:
     """Compute the four score components. Reused by the leaderboard and profile pages."""
     stars_score = min(30, math.log1p(stars) / math.log1p(100_000) * 30)
@@ -796,6 +855,7 @@ def main() -> None:
             "signed_commits_ratio": signed_ratio,
             "weekly_downloads": None,  # filled in serial pass below
             "dl_source": "",
+            "listing_status": agent.get("listing_status", "listed"),
         }
 
     rows = []
@@ -959,6 +1019,11 @@ def main() -> None:
         else:
             row["evidence_grade"] = "D"
 
+        # HVTrust composite score
+        trust = compute_trust_score(row)
+        row["trust_score"] = trust["trust_score"]
+        row["trust_breakdown"] = trust["trust_breakdown"]
+
     # Compute category ranks (within each category, sorted by score)
     cat_groups: dict[str, list[dict]] = {}
     for row in rows:
@@ -1055,6 +1120,8 @@ def main() -> None:
                 "scorecard_checks": r.get("scorecard_checks", {}),
                 "public_actions": r.get("public_actions"),
                 "evidence_grade": r.get("evidence_grade", "D"),
+                "trust_score": r.get("trust_score"),
+                "trust_breakdown": r.get("trust_breakdown", {}),
             }
             for r in rows
         ],
@@ -1104,7 +1171,7 @@ def main() -> None:
     os.makedirs(os.path.dirname(report_path), exist_ok=True)
     with open(report_path, "w", encoding="utf-8") as f:
         json.dump(build_report, f, indent=2, ensure_ascii=False)
-    print(f"Wrote data/build_report.json (active={len(rows)}, legacy={len(legacy_rows)}, warnings={len(violations)}, failed={len(failed_repos)}).")
+    print(f"Wrote data/build_report.json (active={len(rows)}, legacy={len(legacy_rows)}, warnings={len(eligibility_violations)}, failed={len(failed_repos)}).")
 
     templates_dir = os.path.join(script_dir, "templates")
     env = Environment(
@@ -1137,6 +1204,10 @@ def main() -> None:
         lr["rank_delta_class"] = ""
         lr["freshness_class"] = freshness_class(lr["days_ago"])
         lr["public_actions"] = None
+        lr["evidence_grade"] = "D"
+        trust = compute_trust_score(lr)
+        lr["trust_score"] = trust["trust_score"]
+        lr["trust_breakdown"] = trust["trust_breakdown"]
     legacy_rows.sort(key=lambda x: x.get("stars", 0), reverse=True)
 
     tmpl = env.get_template("template.html")
