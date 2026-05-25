@@ -221,6 +221,8 @@
         {% if row.category %}<span class="badge cat">{{ row.category }}</span>{% endif %}
         {% if row.language %}<span class="badge lang">{{ row.language }}</span>{% endif %}
         {% if row.evidence_grade %}<span class="badge" style="background:{% if row.evidence_grade == 'A' %}#22c55e{% elif row.evidence_grade == 'B' %}#3b82f6{% elif row.evidence_grade == 'C' %}#f59e0b{% else %}#666{% endif %};color:#fff;" title="Evidence Grade {{ row.evidence_grade }}: {% if row.evidence_grade == 'A' %}5+ signal types{% elif row.evidence_grade == 'B' %}4 signal types{% elif row.evidence_grade == 'C' %}3 signal types{% else %}1-2 signal types{% endif %}">Grade {{ row.evidence_grade }}</span>{% endif %}
+        {% if row.listing_status %}<span class="badge" style="{% if row.listing_status == 'legacy' %}background:rgba(107,114,128,0.15);color:var(--stale);{% endif %}">{{ row.listing_status }}</span>{% endif %}
+        {% if row.license_spdx %}<span class="badge">{{ row.license_spdx }}</span>{% endif %}
       </div>
     </section>
 
@@ -466,6 +468,12 @@
       </ul>
     </section>
     {% endif %}
+
+    <section style="padding:20px 0;border-top:1px solid var(--border);font-size:11px;color:var(--muted);line-height:1.7;">
+      <strong style="color:var(--text);font-size:12px;">Data sources</strong><br>
+      GitHub REST API (repo, commits, stars, forks, license){% if row.npm_package %} · npm Registry (downloads, provenance){% endif %}{% if row.pypi_package %} · PyPI / pypistats (downloads, provenance){% endif %}{% if row.scorecard_score is not none %} · OSSF Scorecard via deps.dev{% endif %}{% if row.hn_mentions_30d is not none %} · Algolia HN Search API{% endif %}{% if row.public_actions %} · GitHub Search API (fingerprint actions){% endif %}
+      <br>Signals refresh daily at 06:00 UTC. <a href="/methodology" style="color:var(--accent);">Methodology {{ "v2.0" }}</a> · <a href="/data/agents/{{ row.slug }}.json" style="color:var(--accent);">Raw JSON</a>
+    </section>
 
     <footer>
       <span>Updated {{ updated }}</span>
