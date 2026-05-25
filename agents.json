@@ -1,5 +1,17 @@
 [
   {
+    "repo": "anthropics/claude-code",
+    "name": "Claude Code",
+    "category": "Coding Agents",
+    "npm_package": "@anthropic-ai/claude-code",
+    "hn_search_term": "claude code",
+    "fingerprints": {
+      "type": "pr_body",
+      "pattern": "Co-Authored-By: Claude",
+      "search_endpoint": "pulls"
+    }
+  },
+  {
     "repo": "All-Hands-AI/OpenHands",
     "name": "OpenHands",
     "category": "Coding Agents",
