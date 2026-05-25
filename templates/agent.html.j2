@@ -366,6 +366,46 @@
       {% endif %}
     </section>
 
+    {% if row.public_actions %}
+    <section class="provenance">
+      <h2 class="section-title">Public Actions</h2>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;margin-bottom:16px">
+        <div>
+          <div class="prov-label">Actions (30d)</div>
+          <div class="prov-value" style="color:var(--accent)">{{ row.public_actions.actions_30d }}</div>
+        </div>
+        {% if row.public_actions.actions_30d_merged is not none %}
+        <div>
+          <div class="prov-label">Merged (30d)</div>
+          <div class="prov-value" style="color:var(--accent)">{{ row.public_actions.actions_30d_merged }}</div>
+        </div>
+        {% if row.public_actions.actions_30d > 0 %}
+        <div>
+          <div class="prov-label">Merge rate</div>
+          <div class="prov-value">{{ ((row.public_actions.actions_30d_merged / row.public_actions.actions_30d) * 100) | round | int }}%</div>
+        </div>
+        {% endif %}
+        {% endif %}
+      </div>
+      {% if row.public_actions.actions_30d_by_repo %}
+      <div class="prov-label" style="margin-bottom:8px">Top repos (sampled)</div>
+      <ul style="margin:0;padding:0;list-style:none;font-size:13px">
+        {% for entry in row.public_actions.actions_30d_by_repo[:5] %}
+        <li style="margin-bottom:4px">
+          <a href="https://github.com/{{ entry.repo }}" target="_blank" rel="noopener" style="color:var(--accent)">{{ entry.repo }}</a>
+          <span style="color:var(--text-muted);margin-left:6px">{{ entry.count }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      <p style="font-size:11px;color:var(--text-muted);margin-top:16px;line-height:1.5">
+        Action counts reflect activity on public repos where this agent left detectable fingerprints.
+        Private repo usage is invisible. Counts are approximate (GitHub Search API caps at 1,000 results per query).
+        Methodology described in the <a href="/spec/provenance/v0.1">Provenance Profile spec</a>.
+      </p>
+    </section>
+    {% endif %}
+
     <section class="links">
       <a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">GitHub →</a>
       {% if row.pypi_package %}<a href="https://pypi.org/project/{{ row.pypi_package }}/" target="_blank" rel="noopener noreferrer">PyPI: {{ row.pypi_package }}</a>{% endif %}

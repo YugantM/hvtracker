@@ -320,6 +320,8 @@
         
         <a href="#s6-4" class="toc-sub">6.4 Signed Commit Ratio</a>
         
+        <a href="#s6-5" class="toc-sub">6.5 Public Action Tracking (Behavioral Signals)</a>
+        
         
         
         <a href="#s7" >
@@ -486,6 +488,30 @@ freshness_score = max(0.0, 25 × (1 − days_since / 180))</pre>
 <p><strong>Interpretation:</strong> The fraction of recent commits carrying a verified GPG, SSH, or S/MIME signature as reported by GitHub's signature verification API.</p>
 <p><strong>Limitation:</strong> Web-based commits made through GitHub's UI are signed by GitHub's own key and counted as verified, which may inflate the ratio for projects that accept many web-based edits. This signal measures signature <em>presence</em>, not signature quality or key trust level.</p>
 
+<h3 id="s6-5"><span class="sec-num">6.5</span> Public Action Tracking (Behavioral Signals)</h3>
+<p><strong>Field:</strong> <code>public_actions</code> (object or null)</p>
+<p><strong>Source:</strong> GitHub Search API — <code>GET /search/commits</code> and <code>GET /search/issues</code></p>
+<p><strong>Signal:</strong> For agents with a configured fingerprint, counts the number of public commits or merged PRs created by that agent on GitHub in the trailing 30 days. Fingerprints are one of:</p>
+<ul>
+  <li><strong>commit_trailer</strong> — a standardized co-author or attribution string appended to commit messages (e.g., Aider's <code>Co-authored-by: aider</code>).</li>
+  <li><strong>pr_body</strong> — a standardized footer string appended to PR descriptions (e.g., <code>Generated with Gemini CLI</code>).</li>
+  <li><strong>bot_account</strong> — a GitHub App bot account that authors commits or PRs (e.g., <code>openhands-agent</code>).</li>
+</ul>
+<p><strong>Sub-fields:</strong></p>
+<ul>
+  <li><code>actions_30d</code> — total count of detected actions in the trailing 30 days.</li>
+  <li><code>actions_30d_merged</code> — count of merged PRs specifically (null for commit-based fingerprints).</li>
+  <li><code>actions_30d_by_repo</code> — top repos where this agent was active (sampled from first page of search results).</li>
+</ul>
+<p><strong>NOT included in health score.</strong> Public action counts are displayed on the leaderboard and agent profile pages but do not contribute to the composite health score computed in Section 5. They are an informational signal only.</p>
+<p><strong>Limitations:</strong></p>
+<ul>
+  <li>Only agents with a confirmed, unique fingerprint pattern are tracked. Agents without a detectable fingerprint report <code>null</code>.</li>
+  <li>Private repository usage is entirely invisible to this signal.</li>
+  <li>GitHub Search API caps results at 1,000 per query. Counts above 1,000 are lower bounds.</li>
+  <li>Fingerprint patterns may produce false positives if the pattern string is not sufficiently unique. Each fingerprint is documented and validated in <code>docs/research/agent-fingerprints.md</code>.</li>
+</ul>
+
 <h2 id="s7"><span class="sec-num">7.</span> Update Process and Cadence</h2>
 <p>The reference implementation <span class="must">MUST</span> execute at least once per calendar day. The production deployment runs at <strong>06:00 UTC</strong> daily via GitHub Actions.</p>
 <p>Each Daily Run <span class="must">MUST</span>:</p>
@@ -493,8 +519,10 @@ freshness_score = max(0.0, 25 × (1 − days_since / 180))</pre>
   <li>Fetch fresh data for all agents in <code>agents.json</code> from sources defined in Section 4.</li>
   <li>Compute health scores per Section 5.</li>
   <li>Collect all supply chain trust signals per Section 6.</li>
+  <li>Collect behavioral signals per Section 6.5 (for agents with configured fingerprints).</li>
   <li>Write a Snapshot to <code>output/history/YYYY-MM-DD.json</code>. Existing Snapshots <span class="must">MUST NOT</span> be modified or deleted.</li>
   <li>Update <code>data.json</code>, <code>index.html</code>, <code>feed.json</code>, <code>sitemap.xml</code>, and all agent profile pages.</li>
+  <li>Generate stable data endpoints under <code>data/</code> per the Data Schema Specification v0.1.</li>
 </ol>
 <p>Rank deltas are computed by comparing the current run's ranks against the most recent prior Snapshot. If no prior Snapshot exists, all rank deltas are marked as "NEW".</p>
 

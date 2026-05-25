@@ -116,6 +116,80 @@ def fetch_npm_downloads(package_name: str) -> int | None:
         return None
 
 
+def fetch_agent_actions(agent_config: dict, days: int = 30) -> dict | None:
+    """Fetch public action counts for an agent using its fingerprint config."""
+    fp = agent_config.get("fingerprints")
+    if not fp:
+        return None
+
+    pattern = fp["pattern"]
+    endpoint = fp["search_endpoint"]
+    fp_type = fp["type"]
+
+    since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
+
+    try:
+        if endpoint == "commits":
+            # Commit trailer search
+            q = f'"{pattern}" committer-date:>{since}'
+            r = requests.get(f"{GITHUB_API}/search/commits",
+                params={"q": q, "per_page": 5}, headers=HEADERS, timeout=20)
+            if r.status_code != 200:
+                return None
+            d = r.json()
+            total = d.get("total_count", 0)
+            top_repos: dict[str, int] = {}
+            for item in d.get("items", []):
+                repo = item.get("repository", {}).get("full_name", "")
+                if repo:
+                    top_repos[repo] = top_repos.get(repo, 0) + 1
+            return {
+                "actions_30d": total,
+                "actions_30d_merged": None,
+                "actions_30d_by_repo": [{"repo": k, "count": v} for k, v in
+                                         sorted(top_repos.items(), key=lambda x: -x[1])[:10]],
+            }
+
+        elif endpoint == "pulls":
+            # PR body / bot account search — merged PRs
+            if fp_type == "bot_account":
+                q = f"type:pr is:merged author:{pattern} created:>{since}"
+            else:
+                q = f'type:pr is:merged "{pattern}" created:>{since}'
+            r_merged = requests.get(f"{GITHUB_API}/search/issues",
+                params={"q": q, "per_page": 5}, headers=HEADERS, timeout=20)
+            if r_merged.status_code != 200:
+                return None
+            d_merged = r_merged.json()
+            merged = d_merged.get("total_count", 0)
+
+            # Also get total (merged + open + closed)
+            if fp_type == "bot_account":
+                q_total = f"type:pr author:{pattern} created:>{since}"
+            else:
+                q_total = f'type:pr "{pattern}" created:>{since}'
+            time.sleep(2)
+            r_total = requests.get(f"{GITHUB_API}/search/issues",
+                params={"q": q_total, "per_page": 5}, headers=HEADERS, timeout=20)
+            total = r_total.json().get("total_count", merged) if r_total.status_code == 200 else merged
+
+            top_repos: dict[str, int] = {}
+            for item in d_merged.get("items", []):
+                repo = item.get("repository_url", "").split("/repos/")[-1]
+                if repo:
+                    top_repos[repo] = top_repos.get(repo, 0) + 1
+
+            return {
+                "actions_30d": total,
+                "actions_30d_merged": merged,
+                "actions_30d_by_repo": [{"repo": k, "count": v} for k, v in
+                                         sorted(top_repos.items(), key=lambda x: -x[1])[:10]],
+            }
+    except Exception as e:
+        print(f"  fetch_agent_actions error ({fp.get('pattern')}): {e}", file=sys.stderr)
+        return None
+
+
 def fetch_hn_mentions(search_term: str, days: int = 30) -> int:
     """Count HN stories matching search_term in the last `days` days."""
     # Algolia HN Search API allows 10,000 requests/hour (~65 calls per build).
@@ -755,6 +829,24 @@ def main() -> None:
         else:
             row["hn_mentions_30d"] = None
 
+    # Fetch public action counts for agents with fingerprint configs (GitHub Search API).
+    # Rate limit: 30 req/min; each agent uses 1-2 calls + 2s sleep between.
+    fp_map = {a["repo"].lower(): a for a in agents if a.get("fingerprints")}
+    if fp_map:
+        print("\nFetching public action counts (fingerprint-based)...")
+        for row in rows:
+            agent_cfg = fp_map.get(row["repo"].lower())
+            if agent_cfg:
+                actions = fetch_agent_actions(agent_cfg)
+                row["public_actions"] = actions
+                print(f"  actions {row['repo']}: {actions}")
+                time.sleep(2.5)
+            else:
+                row["public_actions"] = None
+    else:
+        for row in rows:
+            row["public_actions"] = None
+
     # Fetch PyPI downloads serially to respect pypistats ~1 req/s rate limit.
     # (npm was already fetched in parallel above; combine here.)
     # On 429, fall back to the previous run's cached value so the table never goes blank.
@@ -932,6 +1024,7 @@ def main() -> None:
                 "signed_commits_ratio": r.get("signed_commits_ratio"),
                 "scorecard_score": r.get("scorecard_score"),
                 "scorecard_checks": r.get("scorecard_checks", {}),
+                "public_actions": r.get("public_actions"),
             }
             for r in rows
         ],

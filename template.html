@@ -234,6 +234,7 @@
     col.col-commits  { width: 115px; }
     col.col-dl       { width: 130px; }
     col.col-hn       { width: 70px; }
+    col.col-actions  { width: 85px; }
     col.col-trust    { width: 90px; }
     col.col-score    { width: 70px; }
 
@@ -630,6 +631,7 @@
           <col class="col-commits">
           <col class="col-dl">
           <col class="col-hn">
+          <col class="col-actions">
           <col class="col-trust">
           <col class="col-score">
         </colgroup>
@@ -643,6 +645,7 @@
             <th class="r" data-col="weekly_commits">4-wk commits<span class="sort-arrow"></span></th>
             <th class="r" data-col="downloads">Downloads (7d)<span class="sort-arrow"></span></th>
             <th class="r" data-col="hn_mentions_30d">HN (30d)<span class="sort-arrow"></span></th>
+            <th class="r" data-col="actions_30d" title="Public actions (commits/PRs) detected via agent fingerprint in last 30 days">Actions (30d)<span class="sort-arrow"></span></th>
             <th class="c" data-col="scorecard">Trust<span class="sort-arrow"></span></th>
             <th class="r sorted" data-col="score">Score<span class="sort-arrow">↓</span></th>
           </tr>
@@ -658,6 +661,7 @@
             data-weekly_commits="{{ row.weekly_commits }}"
             data-downloads="{{ row.weekly_downloads or 0 }}"
             data-hn_mentions_30d="{{ row.hn_mentions_30d if row.hn_mentions_30d is not none else -1 }}"
+            data-actions_30d="{{ row.public_actions.actions_30d if row.public_actions else -1 }}"
             data-scorecard="{{ row.scorecard_score if row.scorecard_score is not none else -1 }}"
             data-score="{{ row.score }}"
             data-category="{{ row.category }}"
@@ -692,6 +696,11 @@
             </td>
             <td class="r num">
               {% if row.hn_mentions_30d is not none %}{{ row.hn_mentions_30d }}{% else %}<span style="color: var(--stale);">—</span>{% endif %}
+            </td>
+            <td class="r num">
+              {% if row.public_actions %}
+                <span title="{% if row.public_actions.actions_30d_merged is not none %}{{ row.public_actions.actions_30d_merged }} merged / {{ row.public_actions.actions_30d }} total PRs{% else %}{{ row.public_actions.actions_30d }} commits{% endif %}">{% set n = row.public_actions.actions_30d %}{% if n >= 1000 %}{{ (n / 1000) | round(1) }}k{% else %}{{ n }}{% endif %}</span>
+              {% else %}<span style="color: var(--stale);">—</span>{% endif %}
             </td>
             <td class="c">
               <div class="trust-cell" style="justify-content:center;" title="{% if row.has_provenance %}Pkg provenance: {{ row.provenance_sources|join(', ') }}{% endif %}{% if row.scorecard_fmt %} · OSSF {{ row.scorecard_fmt }}/10{% endif %}{% if row.signed_commits_pct is not none %} · {{ row.signed_commits_pct }}% signed commits{% endif %}">

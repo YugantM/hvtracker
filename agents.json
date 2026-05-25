@@ -4,7 +4,12 @@
     "name": "OpenHands",
     "category": "Coding Agents",
     "pypi_package": "openhands-ai",
-    "hn_search_term": "openhands"
+    "hn_search_term": "openhands",
+    "fingerprints": {
+      "type": "bot_account",
+      "pattern": "openhands-agent",
+      "search_endpoint": "pulls"
+    }
   },
   {
     "repo": "princeton-nlp/SWE-agent",
@@ -18,7 +23,12 @@
     "name": "Aider",
     "category": "Coding Agents",
     "pypi_package": "aider-chat",
-    "hn_search_term": "aider"
+    "hn_search_term": "aider",
+    "fingerprints": {
+      "type": "commit_trailer",
+      "pattern": "Co-authored-by: aider",
+      "search_endpoint": "commits"
+    }
   },
   {
     "repo": "continuedev/continue",
@@ -362,7 +372,12 @@
   {
     "repo": "google-gemini/gemini-cli",
     "name": "Gemini CLI",
-    "category": "Coding Agents"
+    "category": "Coding Agents",
+    "fingerprints": {
+      "type": "pr_body",
+      "pattern": "Generated with Gemini CLI",
+      "search_endpoint": "pulls"
+    }
   },
   {
     "repo": "openai/codex",
@@ -372,7 +387,12 @@
   {
     "repo": "QwenLM/qwen-code",
     "name": "Qwen Code",
-    "category": "Coding Agents"
+    "category": "Coding Agents",
+    "fingerprints": {
+      "type": "pr_body",
+      "pattern": "Generated with Qwen Code",
+      "search_endpoint": "pulls"
+    }
   },
   {
     "repo": "github/copilot-cli",
