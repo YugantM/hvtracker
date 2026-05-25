@@ -1,100 +1,535 @@
 [
-  {"repo": "All-Hands-AI/OpenHands",           "name": "OpenHands",             "category": "Coding Agents",        "pypi_package": "openhands-ai", "hn_search_term": "openhands"},
-  {"repo": "princeton-nlp/SWE-agent",           "name": "SWE-agent",             "category": "Coding Agents",        "pypi_package": "sweagent", "hn_search_term": "swe-agent"},
-  {"repo": "paul-gauthier/aider",               "name": "Aider",                 "category": "Coding Agents",        "pypi_package": "aider-chat", "hn_search_term": "aider"},
-  {"repo": "continuedev/continue",              "name": "Continue",              "category": "Coding Agents",        "npm_package": "continue"},
-  {"repo": "cline/cline",                       "name": "Cline",                 "category": "Coding Agents",        "npm_package": "cline", "hn_search_term": "cline ai"},
-  {"repo": "RooVetGit/Roo-Code",                "name": "Roo Code",              "category": "Coding Agents",        "npm_package": "roo-cline"},
-  {"repo": "geekan/MetaGPT",                    "name": "MetaGPT",               "category": "Multi-Agent Systems",   "pypi_package": "metagpt", "hn_search_term": "metagpt"},
-  {"repo": "microsoft/autogen",                 "name": "AutoGen",               "category": "Agent Frameworks",     "pypi_package": "autogen-agentchat", "hn_search_term": "microsoft autogen"},
-  {"repo": "CrewAIInc/crewAI",                  "name": "CrewAI",                "category": "Agent Frameworks",     "pypi_package": "crewai", "hn_search_term": "crewai"},
-  {"repo": "langchain-ai/langgraph",            "name": "LangGraph",             "category": "Agent Frameworks",     "pypi_package": "langgraph", "npm_package": "@langchain/langgraph", "hn_search_term": "langgraph"},
-  {"repo": "AntonOsika/gpt-engineer",           "name": "GPT Engineer",          "category": "Coding Agents",        "pypi_package": "gpt-engineer", "hn_search_term": "gpt-engineer"},
-  {"repo": "Significant-Gravitas/AutoGPT",      "name": "AutoGPT",               "category": "Agent Frameworks",     "pypi_package": "agpt", "hn_search_term": "autogpt"},
-  {"repo": "yoheinakajima/babyagi",             "name": "BabyAGI",               "category": "Agent Frameworks",     "pypi_package": "babyagi", "hn_search_term": "babyagi"},
-  {"repo": "assafelovic/gpt-researcher",        "name": "GPT Researcher",        "category": "Research & Data",      "pypi_package": "gpt-researcher", "hn_search_term": "gpt-researcher"},
-  {"repo": "pydantic/pydantic-ai",              "name": "PydanticAI",            "category": "Agent Frameworks",     "pypi_package": "pydantic-ai", "hn_search_term": "pydantic-ai"},
-  {"repo": "OpenBMB/ChatDev",                   "name": "ChatDev",               "category": "Multi-Agent Systems",   "pypi_package": "chatdev", "hn_search_term": "chatdev"},
-  {"repo": "TransformerOptimus/SuperAGI",       "name": "SuperAGI",              "category": "Agent Frameworks",     "pypi_package": "superagi", "hn_search_term": "superagi"},
-  {"repo": "e2b-dev/e2b",                       "name": "E2B",                   "category": "LLM Gateways & Infra",  "pypi_package": "e2b", "npm_package": "@e2b/sdk", "hn_search_term": "e2b-dev"},
-  {"repo": "microsoft/TaskWeaver",              "name": "TaskWeaver",            "category": "Agent Frameworks", "hn_search_term": "taskweaver"},
-  {"repo": "OpenInterpreter/open-interpreter",  "name": "Open Interpreter",      "category": "Coding Agents",        "pypi_package": "open-interpreter", "hn_search_term": "open-interpreter"},
-  {"repo": "letta-ai/letta",                    "name": "Letta",                 "category": "Memory & Knowledge",   "pypi_package": "letta", "hn_search_term": "letta ai"},
-  {"repo": "camel-ai/camel",                    "name": "CAMEL",                 "category": "Multi-Agent Systems",   "pypi_package": "camel-ai", "hn_search_term": "camel-ai"},
-  {"repo": "microsoft/semantic-kernel",         "name": "Semantic Kernel",       "category": "Agent Frameworks",     "pypi_package": "semantic-kernel", "hn_search_term": "semantic kernel"},
-  {"repo": "browser-use/browser-use",           "name": "Browser Use",           "category": "Browser & Computer Use", "pypi_package": "browser-use", "hn_search_term": "browser-use agent"},
-  {"repo": "composiohq/composio",               "name": "Composio",              "category": "Agent Frameworks",     "pypi_package": "composio-core", "npm_package": "composio-core", "hn_search_term": "composio"},
-  {"repo": "smol-ai/developer",                 "name": "smol developer",        "category": "Coding Agents",        "pypi_package": "smol-dev", "hn_search_term": "smol developer"},
-  {"repo": "kuafuai/DevOpsGPT",                 "name": "DevOpsGPT",             "category": "Workflow Platforms", "hn_search_term": "devopsgpt"},
-  {"repo": "biobootloader/wolverine",           "name": "Wolverine",             "category": "Coding Agents"},
-  {"repo": "ai-christianson/RA.Aid",            "name": "RA.Aid",                "category": "Coding Agents",        "pypi_package": "ra-aid", "hn_search_term": "ra-aid"},
-  {"repo": "AgentOps-AI/agentops",              "name": "AgentOps",              "category": "LLM Gateways & Infra",  "pypi_package": "agentops", "hn_search_term": "agentops"},
-  {"repo": "microsoft/UFO",                     "name": "UFO",                   "category": "Browser & Computer Use"},
-  {"repo": "lavague-ai/LaVague",                "name": "LaVague",               "category": "Browser & Computer Use", "pypi_package": "lavague", "hn_search_term": "lavague"},
-  {"repo": "bytedance/UI-TARS",                 "name": "UI-TARS",               "category": "Browser & Computer Use", "pypi_package": "ui-tars", "hn_search_term": "ui-tars"},
-  {"repo": "landing-ai/vision-agent",           "name": "Vision Agent",          "category": "Browser & Computer Use", "pypi_package": "vision-agent", "hn_search_term": "landing-ai vision-agent"},
-  {"repo": "mem0ai/mem0",                       "name": "Mem0",                  "category": "Memory & Knowledge",   "pypi_package": "mem0ai", "hn_search_term": "mem0"},
-  {"repo": "microsoft/promptflow",              "name": "PromptFlow",            "category": "Workflow Platforms",    "pypi_package": "promptflow", "hn_search_term": "promptflow"},
-  {"repo": "deepset-ai/haystack",               "name": "Haystack",              "category": "Workflow Platforms",    "pypi_package": "haystack-ai"},
-  {"repo": "entropy-research/Devon",            "name": "Devon",                 "category": "Coding Agents",        "pypi_package": "devon-agent", "hn_search_term": "devon ai agent"},
-  {"repo": "microsoft/guidance",                "name": "Guidance",              "category": "Agent Frameworks",     "pypi_package": "guidance"},
-  {"repo": "getmaxun/maxun",                    "name": "Maxun",                 "category": "Research & Data",      "pypi_package": "maxun", "hn_search_term": "maxun"},
-  {"repo": "THUDM/AgentBench",                  "name": "AgentBench",            "category": "Agent Frameworks", "hn_search_term": "agentbench"},
-  {"repo": "agno-agi/agno",                     "name": "Agno",                  "category": "Agent Frameworks",     "pypi_package": "agno", "hn_search_term": "agno"},
-  {"repo": "langchain-ai/opengpts",             "name": "OpenGPTs",              "category": "Memory & Knowledge", "hn_search_term": "opengpts"},
-  {"repo": "emrgnt-cmplxty/Automata",           "name": "Automata",              "category": "Coding Agents"},
-  {"repo": "SylphAI-Inc/AdalFlow",              "name": "AdalFlow",              "category": "Agent Frameworks",     "pypi_package": "adalflow", "hn_search_term": "adalflow"},
-  {"repo": "aymenfurter/microagents",           "name": "Microagents",           "category": "Coding Agents"},
-  {"repo": "microsoft/OmniParser",              "name": "OmniParser",            "category": "Browser & Computer Use", "hn_search_term": "omniparser"},
-  {"repo": "stitionai/devika",                  "name": "Devika",                "category": "Coding Agents", "hn_search_term": "devika"},
-  {"repo": "OpenBMB/AgentVerse",                "name": "AgentVerse",            "category": "Multi-Agent Systems",   "pypi_package": "agentverse", "hn_search_term": "agentverse"},
-  {"repo": "hiyouga/LLaMA-Factory",             "name": "LLaMA-Factory",         "category": "Research & Data",      "pypi_package": "llamafactory", "hn_search_term": "llamafactory"},
-  {"repo": "srbhr/Resume-Matcher",              "name": "Resume Matcher",        "category": "Research & Data",      "pypi_package": "resume-matcher"},
-  {"repo": "Mintplex-Labs/anything-llm",        "name": "AnythingLLM",           "category": "Memory & Knowledge",   "npm_package": "anything-llm", "hn_search_term": "anythingllm"},
-  {"repo": "BerriAI/litellm",                   "name": "LiteLLM",               "category": "LLM Gateways & Infra",  "pypi_package": "litellm", "hn_search_term": "litellm"},
-  {"repo": "BuilderIO/gpt-crawler",              "name": "GPT Crawler",           "category": "Research & Data",      "npm_package": "@builder.io/gpt-crawler", "hn_search_term": "gpt-crawler"},
-  {"repo": "CopilotKit/CopilotKit",              "name": "CopilotKit",            "category": "Agent Frameworks", "npm_package": "@copilotkit/react-core", "hn_search_term": "copilotkit"},
-  {"repo": "langgenius/dify",                    "name": "Dify",                  "category": "Workflow Platforms",    "pypi_package": "dify-client", "hn_search_term": "dify"},
-  {"repo": "Pythagora-io/gpt-pilot",             "name": "GPT Pilot",             "category": "Coding Agents",        "pypi_package": "gpt-pilot", "hn_search_term": "gpt-pilot"},
-  {"repo": "gptme/gptme",                        "name": "GPTMe",                 "category": "Coding Agents",        "pypi_package": "gptme", "hn_search_term": "gptme"},
-  {"repo": "khoj-ai/khoj",                       "name": "Khoj",                  "category": "Memory & Knowledge",   "pypi_package": "khoj", "hn_search_term": "khoj"},
-  {"repo": "simonw/llm",                         "name": "LLM",                   "category": "LLM Gateways & Infra",  "pypi_package": "llm"},
-  {"repo": "Nutlope/llamacoder",                 "name": "LlamaCoder",            "category": "Coding Agents", "hn_search_term": "llamacoder"},
-  {"repo": "QwenLM/Qwen-Agent",                  "name": "Qwen Agent",            "category": "Agent Frameworks",     "pypi_package": "qwen-agent", "hn_search_term": "qwen-agent"},
-  {"repo": "sweepai/sweep",                      "name": "Sweep",                 "category": "Coding Agents",        "pypi_package": "sweepai"},
-  {"repo": "TabbyML/tabby",                      "name": "Tabby",                 "category": "Coding Agents",        "npm_package": "tabby-cli", "hn_search_term": "tabbyml"},
-  {"repo": "vercel/ai",                          "name": "Vercel AI SDK",         "category": "Agent Frameworks", "npm_package": "ai", "hn_search_term": "vercel ai sdk"},
-  {"repo": "google-gemini/gemini-cli",            "name": "Gemini CLI",            "category": "Coding Agents"},
-  {"repo": "openai/codex",                        "name": "Codex",                 "category": "Coding Agents"},
-  {"repo": "QwenLM/qwen-code",                    "name": "Qwen Code",             "category": "Coding Agents"},
-  {"repo": "github/copilot-cli",                  "name": "GitHub Copilot CLI",    "category": "Coding Agents"},
-  {"repo": "plandex-ai/plandex",                  "name": "Plandex",               "category": "Coding Agents",        "pypi_package": "plandex"},
-  {"repo": "langchain-ai/open-swe",               "name": "Open SWE",              "category": "Coding Agents"},
-  {"repo": "microsoft/agent-framework",           "name": "Microsoft Agent Framework", "category": "Agent Frameworks"},
-  {"repo": "google/adk-python",                   "name": "Google ADK (Python)",   "category": "Agent Frameworks",     "pypi_package": "google-adk"},
-  {"repo": "google/adk-go",                       "name": "Google ADK (Go)",       "category": "Agent Frameworks"},
-  {"repo": "agentscope-ai/agentscope",            "name": "AgentScope",            "category": "Agent Frameworks",     "pypi_package": "agentscope"},
-  {"repo": "elizaOS/eliza",                       "name": "Eliza",                 "category": "Agent Frameworks",     "npm_package": "@elizaos/core"},
-  {"repo": "VoltAgent/voltagent",                 "name": "VoltAgent",             "category": "Agent Frameworks",     "npm_package": "@voltagent/core"},
-  {"repo": "MervinPraison/PraisonAI",             "name": "PraisonAI",             "category": "Agent Frameworks",     "pypi_package": "praisonai"},
-  {"repo": "strands-agents/sdk-python",           "name": "Strands Agents",        "category": "Agent Frameworks",     "pypi_package": "strands-agents"},
-  {"repo": "alibaba/spring-ai-alibaba",           "name": "Spring AI Alibaba",     "category": "Agent Frameworks"},
-  {"repo": "FlowiseAI/Flowise",                   "name": "Flowise",               "category": "Workflow Platforms",    "npm_package": "flowise"},
-  {"repo": "coze-dev/coze-studio",                "name": "Coze Studio",           "category": "Workflow Platforms"},
-  {"repo": "activepieces/activepieces",           "name": "Activepieces",          "category": "Workflow Platforms",    "npm_package": "@activepieces/shared"},
-  {"repo": "triggerdotdev/trigger.dev",           "name": "Trigger.dev",           "category": "Workflow Platforms",    "npm_package": "@trigger.dev/sdk"},
-  {"repo": "flyteorg/flyte",                      "name": "Flyte",                 "category": "Workflow Platforms",    "pypi_package": "flytekit"},
-  {"repo": "bytedance/UI-TARS-desktop",           "name": "UI-TARS Desktop",       "category": "Browser & Computer Use"},
-  {"repo": "trycua/cua",                          "name": "Cua",                   "category": "Browser & Computer Use", "pypi_package": "cua"},
-  {"repo": "browser-use/web-ui",                  "name": "Browser Use Web UI",    "category": "Browser & Computer Use"},
-  {"repo": "steel-dev/steel-browser",             "name": "Steel Browser",         "category": "Browser & Computer Use", "npm_package": "steel-sdk"},
-  {"repo": "ChromeDevTools/chrome-devtools-mcp",   "name": "Chrome DevTools MCP",   "category": "Browser & Computer Use"},
-  {"repo": "topoteretes/cognee",                  "name": "Cognee",                "category": "Memory & Knowledge",   "pypi_package": "cognee"},
-  {"repo": "getzep/graphiti",                     "name": "Graphiti",              "category": "Memory & Knowledge",   "pypi_package": "graphiti-core"},
-  {"repo": "leon-ai/leon",                        "name": "Leon",                  "category": "Memory & Knowledge",   "npm_package": "@leon-ai/leon"},
-  {"repo": "firecrawl/firecrawl",                 "name": "Firecrawl",             "category": "Research & Data",      "pypi_package": "firecrawl-py", "npm_package": "@mendable/firecrawl-js"},
-  {"repo": "bytedance/deer-flow",                 "name": "DeerFlow",              "category": "Research & Data"},
-  {"repo": "Canner/WrenAI",                       "name": "WrenAI",                "category": "Research & Data"},
-  {"repo": "livekit/agents",                      "name": "LiveKit Agents",        "category": "LLM Gateways & Infra", "pypi_package": "livekit-agents"},
-  {"repo": "TEN-framework/ten-framework",         "name": "TEN Framework",         "category": "LLM Gateways & Infra"}
+  {
+    "repo": "All-Hands-AI/OpenHands",
+    "name": "OpenHands",
+    "category": "Coding Agents",
+    "pypi_package": "openhands-ai",
+    "hn_search_term": "openhands"
+  },
+  {
+    "repo": "princeton-nlp/SWE-agent",
+    "name": "SWE-agent",
+    "category": "Coding Agents",
+    "pypi_package": "sweagent",
+    "hn_search_term": "swe-agent"
+  },
+  {
+    "repo": "paul-gauthier/aider",
+    "name": "Aider",
+    "category": "Coding Agents",
+    "pypi_package": "aider-chat",
+    "hn_search_term": "aider"
+  },
+  {
+    "repo": "continuedev/continue",
+    "name": "Continue",
+    "category": "Coding Agents",
+    "npm_package": "continue"
+  },
+  {
+    "repo": "cline/cline",
+    "name": "Cline",
+    "category": "Coding Agents",
+    "npm_package": "cline",
+    "hn_search_term": "cline ai"
+  },
+  {
+    "repo": "RooVetGit/Roo-Code",
+    "name": "Roo Code",
+    "category": "Coding Agents",
+    "npm_package": "roo-cline"
+  },
+  {
+    "repo": "geekan/MetaGPT",
+    "name": "MetaGPT",
+    "category": "Multi-Agent Systems",
+    "pypi_package": "metagpt",
+    "hn_search_term": "metagpt"
+  },
+  {
+    "repo": "microsoft/autogen",
+    "name": "AutoGen",
+    "category": "Agent Frameworks",
+    "pypi_package": "autogen-agentchat",
+    "hn_search_term": "microsoft autogen"
+  },
+  {
+    "repo": "CrewAIInc/crewAI",
+    "name": "CrewAI",
+    "category": "Agent Frameworks",
+    "pypi_package": "crewai",
+    "hn_search_term": "crewai"
+  },
+  {
+    "repo": "langchain-ai/langgraph",
+    "name": "LangGraph",
+    "category": "Agent Frameworks",
+    "pypi_package": "langgraph",
+    "npm_package": "@langchain/langgraph",
+    "hn_search_term": "langgraph"
+  },
+  {
+    "repo": "Significant-Gravitas/AutoGPT",
+    "name": "AutoGPT",
+    "category": "Agent Frameworks",
+    "pypi_package": "agpt",
+    "hn_search_term": "autogpt"
+  },
+  {
+    "repo": "yoheinakajima/babyagi",
+    "name": "BabyAGI",
+    "category": "Agent Frameworks",
+    "pypi_package": "babyagi",
+    "hn_search_term": "babyagi"
+  },
+  {
+    "repo": "assafelovic/gpt-researcher",
+    "name": "GPT Researcher",
+    "category": "Research & Data",
+    "pypi_package": "gpt-researcher",
+    "hn_search_term": "gpt-researcher"
+  },
+  {
+    "repo": "pydantic/pydantic-ai",
+    "name": "PydanticAI",
+    "category": "Agent Frameworks",
+    "pypi_package": "pydantic-ai",
+    "hn_search_term": "pydantic-ai"
+  },
+  {
+    "repo": "OpenBMB/ChatDev",
+    "name": "ChatDev",
+    "category": "Multi-Agent Systems",
+    "pypi_package": "chatdev",
+    "hn_search_term": "chatdev"
+  },
+  {
+    "repo": "TransformerOptimus/SuperAGI",
+    "name": "SuperAGI",
+    "category": "Agent Frameworks",
+    "pypi_package": "superagi",
+    "hn_search_term": "superagi",
+    "status": "legacy"
+  },
+  {
+    "repo": "e2b-dev/e2b",
+    "name": "E2B",
+    "category": "LLM Gateways & Infra",
+    "pypi_package": "e2b",
+    "npm_package": "@e2b/sdk",
+    "hn_search_term": "e2b-dev"
+  },
+  {
+    "repo": "OpenInterpreter/open-interpreter",
+    "name": "Open Interpreter",
+    "category": "Coding Agents",
+    "pypi_package": "open-interpreter",
+    "hn_search_term": "open-interpreter"
+  },
+  {
+    "repo": "letta-ai/letta",
+    "name": "Letta",
+    "category": "Memory & Knowledge",
+    "pypi_package": "letta",
+    "hn_search_term": "letta ai"
+  },
+  {
+    "repo": "camel-ai/camel",
+    "name": "CAMEL",
+    "category": "Multi-Agent Systems",
+    "pypi_package": "camel-ai",
+    "hn_search_term": "camel-ai"
+  },
+  {
+    "repo": "microsoft/semantic-kernel",
+    "name": "Semantic Kernel",
+    "category": "Agent Frameworks",
+    "pypi_package": "semantic-kernel",
+    "hn_search_term": "semantic kernel"
+  },
+  {
+    "repo": "browser-use/browser-use",
+    "name": "Browser Use",
+    "category": "Browser & Computer Use",
+    "pypi_package": "browser-use",
+    "hn_search_term": "browser-use agent"
+  },
+  {
+    "repo": "composiohq/composio",
+    "name": "Composio",
+    "category": "Agent Frameworks",
+    "pypi_package": "composio-core",
+    "npm_package": "composio-core",
+    "hn_search_term": "composio"
+  },
+  {
+    "repo": "smol-ai/developer",
+    "name": "smol developer",
+    "category": "Coding Agents",
+    "pypi_package": "smol-dev",
+    "hn_search_term": "smol developer",
+    "status": "legacy"
+  },
+  {
+    "repo": "kuafuai/DevOpsGPT",
+    "name": "DevOpsGPT",
+    "category": "Workflow Platforms",
+    "hn_search_term": "devopsgpt",
+    "status": "legacy"
+  },
+  {
+    "repo": "biobootloader/wolverine",
+    "name": "Wolverine",
+    "category": "Coding Agents",
+    "status": "legacy"
+  },
+  {
+    "repo": "ai-christianson/RA.Aid",
+    "name": "RA.Aid",
+    "category": "Coding Agents",
+    "pypi_package": "ra-aid",
+    "hn_search_term": "ra-aid"
+  },
+  {
+    "repo": "microsoft/UFO",
+    "name": "UFO",
+    "category": "Browser & Computer Use"
+  },
+  {
+    "repo": "lavague-ai/LaVague",
+    "name": "LaVague",
+    "category": "Browser & Computer Use",
+    "pypi_package": "lavague",
+    "hn_search_term": "lavague",
+    "status": "legacy"
+  },
+  {
+    "repo": "bytedance/UI-TARS",
+    "name": "UI-TARS",
+    "category": "Browser & Computer Use",
+    "pypi_package": "ui-tars",
+    "hn_search_term": "ui-tars"
+  },
+  {
+    "repo": "mem0ai/mem0",
+    "name": "Mem0",
+    "category": "Memory & Knowledge",
+    "pypi_package": "mem0ai",
+    "hn_search_term": "mem0"
+  },
+  {
+    "repo": "microsoft/promptflow",
+    "name": "PromptFlow",
+    "category": "Workflow Platforms",
+    "pypi_package": "promptflow",
+    "hn_search_term": "promptflow"
+  },
+  {
+    "repo": "deepset-ai/haystack",
+    "name": "Haystack",
+    "category": "Workflow Platforms",
+    "pypi_package": "haystack-ai"
+  },
+  {
+    "repo": "entropy-research/Devon",
+    "name": "Devon",
+    "category": "Coding Agents",
+    "pypi_package": "devon-agent",
+    "hn_search_term": "devon ai agent"
+  },
+  {
+    "repo": "microsoft/guidance",
+    "name": "Guidance",
+    "category": "Agent Frameworks",
+    "pypi_package": "guidance"
+  },
+  {
+    "repo": "getmaxun/maxun",
+    "name": "Maxun",
+    "category": "Research & Data",
+    "pypi_package": "maxun",
+    "hn_search_term": "maxun"
+  },
+  {
+    "repo": "agno-agi/agno",
+    "name": "Agno",
+    "category": "Agent Frameworks",
+    "pypi_package": "agno",
+    "hn_search_term": "agno"
+  },
+  {
+    "repo": "SylphAI-Inc/AdalFlow",
+    "name": "AdalFlow",
+    "category": "Agent Frameworks",
+    "pypi_package": "adalflow",
+    "hn_search_term": "adalflow"
+  },
+  {
+    "repo": "aymenfurter/microagents",
+    "name": "Microagents",
+    "category": "Coding Agents",
+    "status": "legacy"
+  },
+  {
+    "repo": "microsoft/OmniParser",
+    "name": "OmniParser",
+    "category": "Browser & Computer Use",
+    "hn_search_term": "omniparser"
+  },
+  {
+    "repo": "stitionai/devika",
+    "name": "Devika",
+    "category": "Coding Agents",
+    "hn_search_term": "devika"
+  },
+  {
+    "repo": "OpenBMB/AgentVerse",
+    "name": "AgentVerse",
+    "category": "Multi-Agent Systems",
+    "pypi_package": "agentverse",
+    "hn_search_term": "agentverse",
+    "status": "legacy"
+  },
+  {
+    "repo": "Mintplex-Labs/anything-llm",
+    "name": "AnythingLLM",
+    "category": "Memory & Knowledge",
+    "npm_package": "anything-llm",
+    "hn_search_term": "anythingllm"
+  },
+  {
+    "repo": "BerriAI/litellm",
+    "name": "LiteLLM",
+    "category": "LLM Gateways & Infra",
+    "pypi_package": "litellm",
+    "hn_search_term": "litellm"
+  },
+  {
+    "repo": "CopilotKit/CopilotKit",
+    "name": "CopilotKit",
+    "category": "Agent Frameworks",
+    "npm_package": "@copilotkit/react-core",
+    "hn_search_term": "copilotkit"
+  },
+  {
+    "repo": "langgenius/dify",
+    "name": "Dify",
+    "category": "Workflow Platforms",
+    "pypi_package": "dify-client",
+    "hn_search_term": "dify"
+  },
+  {
+    "repo": "Pythagora-io/gpt-pilot",
+    "name": "GPT Pilot",
+    "category": "Coding Agents",
+    "pypi_package": "gpt-pilot",
+    "hn_search_term": "gpt-pilot"
+  },
+  {
+    "repo": "gptme/gptme",
+    "name": "GPTMe",
+    "category": "Coding Agents",
+    "pypi_package": "gptme",
+    "hn_search_term": "gptme"
+  },
+  {
+    "repo": "khoj-ai/khoj",
+    "name": "Khoj",
+    "category": "Memory & Knowledge",
+    "pypi_package": "khoj",
+    "hn_search_term": "khoj"
+  },
+  {
+    "repo": "QwenLM/Qwen-Agent",
+    "name": "Qwen Agent",
+    "category": "Agent Frameworks",
+    "pypi_package": "qwen-agent",
+    "hn_search_term": "qwen-agent"
+  },
+  {
+    "repo": "sweepai/sweep",
+    "name": "Sweep",
+    "category": "Coding Agents",
+    "pypi_package": "sweepai"
+  },
+  {
+    "repo": "vercel/ai",
+    "name": "Vercel AI SDK",
+    "category": "Agent Frameworks",
+    "npm_package": "ai",
+    "hn_search_term": "vercel ai sdk"
+  },
+  {
+    "repo": "google-gemini/gemini-cli",
+    "name": "Gemini CLI",
+    "category": "Coding Agents"
+  },
+  {
+    "repo": "openai/codex",
+    "name": "Codex",
+    "category": "Coding Agents"
+  },
+  {
+    "repo": "QwenLM/qwen-code",
+    "name": "Qwen Code",
+    "category": "Coding Agents"
+  },
+  {
+    "repo": "github/copilot-cli",
+    "name": "GitHub Copilot CLI",
+    "category": "Coding Agents"
+  },
+  {
+    "repo": "plandex-ai/plandex",
+    "name": "Plandex",
+    "category": "Coding Agents",
+    "pypi_package": "plandex"
+  },
+  {
+    "repo": "langchain-ai/open-swe",
+    "name": "Open SWE",
+    "category": "Coding Agents"
+  },
+  {
+    "repo": "microsoft/agent-framework",
+    "name": "Microsoft Agent Framework",
+    "category": "Agent Frameworks"
+  },
+  {
+    "repo": "google/adk-python",
+    "name": "Google ADK (Python)",
+    "category": "Agent Frameworks",
+    "pypi_package": "google-adk"
+  },
+  {
+    "repo": "google/adk-go",
+    "name": "Google ADK (Go)",
+    "category": "Agent Frameworks"
+  },
+  {
+    "repo": "agentscope-ai/agentscope",
+    "name": "AgentScope",
+    "category": "Agent Frameworks",
+    "pypi_package": "agentscope"
+  },
+  {
+    "repo": "elizaOS/eliza",
+    "name": "Eliza",
+    "category": "Agent Frameworks",
+    "npm_package": "@elizaos/core"
+  },
+  {
+    "repo": "VoltAgent/voltagent",
+    "name": "VoltAgent",
+    "category": "Agent Frameworks",
+    "npm_package": "@voltagent/core"
+  },
+  {
+    "repo": "MervinPraison/PraisonAI",
+    "name": "PraisonAI",
+    "category": "Agent Frameworks",
+    "pypi_package": "praisonai"
+  },
+  {
+    "repo": "strands-agents/sdk-python",
+    "name": "Strands Agents",
+    "category": "Agent Frameworks",
+    "pypi_package": "strands-agents"
+  },
+  {
+    "repo": "alibaba/spring-ai-alibaba",
+    "name": "Spring AI Alibaba",
+    "category": "Agent Frameworks"
+  },
+  {
+    "repo": "FlowiseAI/Flowise",
+    "name": "Flowise",
+    "category": "Workflow Platforms",
+    "npm_package": "flowise"
+  },
+  {
+    "repo": "coze-dev/coze-studio",
+    "name": "Coze Studio",
+    "category": "Workflow Platforms"
+  },
+  {
+    "repo": "activepieces/activepieces",
+    "name": "Activepieces",
+    "category": "Workflow Platforms",
+    "npm_package": "@activepieces/shared"
+  },
+  {
+    "repo": "triggerdotdev/trigger.dev",
+    "name": "Trigger.dev",
+    "category": "Workflow Platforms",
+    "npm_package": "@trigger.dev/sdk"
+  },
+  {
+    "repo": "flyteorg/flyte",
+    "name": "Flyte",
+    "category": "Workflow Platforms",
+    "pypi_package": "flytekit"
+  },
+  {
+    "repo": "bytedance/UI-TARS-desktop",
+    "name": "UI-TARS Desktop",
+    "category": "Browser & Computer Use"
+  },
+  {
+    "repo": "trycua/cua",
+    "name": "Cua",
+    "category": "Browser & Computer Use",
+    "pypi_package": "cua"
+  },
+  {
+    "repo": "browser-use/web-ui",
+    "name": "Browser Use Web UI",
+    "category": "Browser & Computer Use"
+  },
+  {
+    "repo": "topoteretes/cognee",
+    "name": "Cognee",
+    "category": "Memory & Knowledge",
+    "pypi_package": "cognee"
+  },
+  {
+    "repo": "getzep/graphiti",
+    "name": "Graphiti",
+    "category": "Memory & Knowledge",
+    "pypi_package": "graphiti-core"
+  },
+  {
+    "repo": "leon-ai/leon",
+    "name": "Leon",
+    "category": "Memory & Knowledge",
+    "npm_package": "@leon-ai/leon"
+  },
+  {
+    "repo": "firecrawl/firecrawl",
+    "name": "Firecrawl",
+    "category": "Research & Data",
+    "pypi_package": "firecrawl-py",
+    "npm_package": "@mendable/firecrawl-js"
+  },
+  {
+    "repo": "bytedance/deer-flow",
+    "name": "DeerFlow",
+    "category": "Research & Data"
+  },
+  {
+    "repo": "Canner/WrenAI",
+    "name": "WrenAI",
+    "category": "Research & Data"
+  },
+  {
+    "repo": "livekit/agents",
+    "name": "LiveKit Agents",
+    "category": "LLM Gateways & Infra",
+    "pypi_package": "livekit-agents"
+  },
+  {
+    "repo": "TEN-framework/ten-framework",
+    "name": "TEN Framework",
+    "category": "LLM Gateways & Infra"
+  }
 ]

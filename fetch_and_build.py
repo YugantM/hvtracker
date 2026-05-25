@@ -515,6 +515,10 @@ def main() -> None:
             deduped.append(a)
     agents = deduped
 
+    # Split active vs legacy agents — legacy entries are fetched but rendered separately
+    legacy_agents = [a for a in agents if a.get("status") == "legacy"]
+    agents = [a for a in agents if a.get("status") != "legacy"]
+
     # Load previous rankings and downloads from the most recent daily history snapshot.
     # Using history/ (not data.json) means deltas always compare against the prior
     # calendar day's run — unaffected by manual commits or code pushes during the day.
@@ -596,6 +600,16 @@ def main() -> None:
             result = future.result()
             if result:
                 rows.append(result)
+
+    legacy_rows = []
+    if legacy_agents:
+        with ThreadPoolExecutor(max_workers=5) as pool:
+            futures = {pool.submit(fetch_one, a): a for a in legacy_agents}
+            for future in as_completed(futures):
+                result = future.result()
+                if result:
+                    result["status"] = "legacy"
+                    legacy_rows.append(result)
 
     hn_terms = {
         a["repo"].lower(): a["hn_search_term"]
@@ -812,9 +826,15 @@ def main() -> None:
 
     movers = compute_movers(history)
 
+    # Sort legacy rows by stars descending for display
+    for lr in legacy_rows:
+        lr["slug"] = slugify(lr["name"])
+    legacy_rows.sort(key=lambda x: x.get("stars", 0), reverse=True)
+
     tmpl = env.get_template("template.html")
     html = tmpl.render(
         rows=rows,
+        legacy_rows=legacy_rows,
         updated=now_str,
         total=len(rows),
         categories=categories,
@@ -855,7 +875,18 @@ def main() -> None:
         os.makedirs(slug_dir, exist_ok=True)
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
             f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str))
-    print(f"Built {len(rows)} agent profile pages under agents/.")
+
+    for row in legacy_rows:
+        repo_key = row["repo"].lower()
+        points = sparkline_data.get(repo_key, [])
+        row["sparkline_svg"] = render_sparkline_svg(points)
+        row["rank_history"] = points
+        row["siblings"] = []
+        slug_dir = os.path.join(agents_dir, row["slug"])
+        os.makedirs(slug_dir, exist_ok=True)
+        with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str))
+    print(f"Built {len(rows)} active + {len(legacy_rows)} legacy agent profile pages under agents/.")
 
     # sitemap.xml — /, /methodology, all /agents/<slug>
     today_iso = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -872,6 +903,8 @@ def main() -> None:
         ))
     for row in rows:
         sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}", "0.8", "daily"))
+    for row in legacy_rows:
+        sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}", "0.4", "monthly"))
     sitemap_lines = ['<?xml version="1.0" encoding="UTF-8"?>',
                      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for loc, prio, freq in sitemap_urls:
