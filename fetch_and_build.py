@@ -1052,9 +1052,29 @@ def main() -> None:
 
     movers = compute_movers(history)
 
-    # Sort legacy rows by stars descending for display
+    # Sort legacy rows by stars descending for display; populate fields needed by templates
     for lr in legacy_rows:
         lr["slug"] = slugify(lr["name"])
+        dl = lr.get("weekly_downloads")
+        lr["downloads_fmt"] = f"{dl:,}" if dl is not None else "—"
+        lr["score_breakdown"] = score_components(
+            lr["stars"], lr["days_ago"], lr.get("weekly_commits") or 0, lr["forks"]
+        )
+        prov_signals = []
+        if lr.get("npm_provenance"):
+            prov_signals.append("npm")
+        if lr.get("pypi_provenance"):
+            prov_signals.append("pypi")
+        lr["provenance_sources"] = prov_signals
+        lr["has_provenance"] = len(prov_signals) > 0
+        sc = lr.get("scorecard_score")
+        lr["scorecard_fmt"] = f"{sc:.1f}" if sc is not None else None
+        sr = lr.get("signed_commits_ratio")
+        lr["signed_commits_pct"] = round(sr * 100) if sr is not None else None
+        lr["rank_delta_display"] = "—"
+        lr["rank_delta_class"] = ""
+        lr["freshness_class"] = freshness_class(lr["days_ago"])
+        lr["public_actions"] = None
     legacy_rows.sort(key=lambda x: x.get("stars", 0), reverse=True)
 
     tmpl = env.get_template("template.html")
