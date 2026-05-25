@@ -27,6 +27,7 @@ if TOKEN:
     HEADERS["Authorization"] = f"Bearer {TOKEN}"
 
 METHODOLOGY_VERSION = "v2.0"
+DATA_SCHEMA_VERSION = "v0.1"
 
 
 def get_repo(owner_repo: str) -> dict:
@@ -495,6 +496,136 @@ def load_scorecard_cache(script_dir: str) -> dict:
         return {}
 
 
+def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict], history_dir: str, now_str: str) -> None:
+    """Generate stable /data/ endpoint files."""
+    data_dir = os.path.join(script_dir, "data")
+    os.makedirs(os.path.join(data_dir, "agents"), exist_ok=True)
+    os.makedirs(os.path.join(data_dir, "signals"), exist_ok=True)
+    os.makedirs(os.path.join(data_dir, "history"), exist_ok=True)
+
+    meta = {
+        "schema_version": DATA_SCHEMA_VERSION,
+        "generated_at": now_str,
+        "methodology_version": METHODOLOGY_VERSION,
+        "license": "CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/",
+    }
+
+    # /data/latest.json — full snapshot
+    latest = {**meta, **data_output}
+    with open(os.path.join(data_dir, "latest.json"), "w", encoding="utf-8") as f:
+        json.dump(latest, f, separators=(",", ":"), ensure_ascii=False)
+
+    # /data/history/<YYYY-MM-DD>.json — copy of today's snapshot
+    today_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    with open(os.path.join(data_dir, "history", f"{today_utc}.json"), "w", encoding="utf-8") as f:
+        json.dump({**meta, **data_output}, f, separators=(",", ":"), ensure_ascii=False)
+
+    # Load last 90 days of history for per-agent files
+    history_by_date: dict[str, dict] = {}
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=90)).strftime("%Y-%m-%d")
+    for fname in sorted(os.listdir(history_dir)):
+        if not fname.endswith(".json"):
+            continue
+        date_str = fname[:-5]
+        if date_str < cutoff:
+            continue
+        try:
+            with open(os.path.join(history_dir, fname), encoding="utf-8") as f:
+                snap = json.load(f)
+            history_by_date[date_str] = {a["repo"].lower(): a for a in snap.get("agents", [])}
+        except Exception:
+            pass
+
+    # /data/agents/<slug>.json — per-agent with 90d history
+    slug_map = {r["repo"].lower(): r["slug"] for r in rows}
+    for agent in data_output["agents"]:
+        repo_key = agent["repo"].lower()
+        slug = slug_map.get(repo_key, repo_key.replace("/", "-"))
+        history_points = []
+        for date_str in sorted(history_by_date.keys()):
+            snap_agent = history_by_date[date_str].get(repo_key)
+            if snap_agent:
+                history_points.append({
+                    "date": date_str,
+                    "rank": snap_agent.get("rank"),
+                    "score": snap_agent.get("score"),
+                    "stars": snap_agent.get("stars"),
+                })
+        agent_doc = {**meta, **agent, "history": history_points}
+        with open(os.path.join(data_dir, "agents", f"{slug}.json"), "w", encoding="utf-8") as f:
+            json.dump(agent_doc, f, separators=(",", ":"), ensure_ascii=False)
+
+    # /data/signals/scorecard.json
+    scorecard_list = [
+        {
+            "repo": a["repo"],
+            "name": a["name"],
+            "scorecard_score": a.get("scorecard_score"),
+            "scorecard_checks": a.get("scorecard_checks", {}),
+            "signed_commits_ratio": a.get("signed_commits_ratio"),
+        }
+        for a in data_output["agents"]
+    ]
+    with open(os.path.join(data_dir, "signals", "scorecard.json"), "w", encoding="utf-8") as f:
+        json.dump({**meta, "agents": scorecard_list}, f, separators=(",", ":"), ensure_ascii=False)
+
+    # /data/signals/provenance.json
+    provenance_list = [
+        {
+            "repo": a["repo"],
+            "name": a["name"],
+            "has_provenance": a.get("has_provenance"),
+            "npm_provenance": a.get("npm_provenance"),
+            "pypi_provenance": a.get("pypi_provenance"),
+        }
+        for a in data_output["agents"]
+    ]
+    with open(os.path.join(data_dir, "signals", "provenance.json"), "w", encoding="utf-8") as f:
+        json.dump({**meta, "agents": provenance_list}, f, separators=(",", ":"), ensure_ascii=False)
+
+    # /data/index.html
+    agent_links = "\n".join(
+        f'    <li><a href="/data/agents/{slug_map.get(a["repo"].lower(), a["repo"].replace("/","-"))}.json">'
+        f'/data/agents/{slug_map.get(a["repo"].lower(), a["repo"].replace("/","-"))}.json</a> — {a["name"]}</li>'
+        for a in data_output["agents"]
+    )
+    index_html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>HVTracker — Data Endpoints</title>
+  <link rel="stylesheet" href="/spec/spec.css">
+  <style>body{{max-width:800px;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif}}</style>
+</head>
+<body>
+  <h1>HVTracker Data Endpoints</h1>
+  <p>All endpoints are static JSON files updated daily at 06:00 UTC. CORS is open (<code>Access-Control-Allow-Origin: *</code>). License: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p>
+  <p>Schema version: <strong>{DATA_SCHEMA_VERSION}</strong> · Methodology: <strong>{METHODOLOGY_VERSION}</strong> · Last generated: {now_str}</p>
+
+  <h2>Core</h2>
+  <ul>
+    <li><a href="/data/latest.json">/data/latest.json</a> — Full current snapshot (all agents, all fields)</li>
+    <li><a href="/data/history/{today_utc}.json">/data/history/YYYY-MM-DD.json</a> — Daily snapshots (e.g. <a href="/data/history/{today_utc}.json">{today_utc}</a>)</li>
+  </ul>
+
+  <h2>Signal Subsets</h2>
+  <ul>
+    <li><a href="/data/signals/scorecard.json">/data/signals/scorecard.json</a> — OSSF Scorecard + signed commits for all agents</li>
+    <li><a href="/data/signals/provenance.json">/data/signals/provenance.json</a> — Supply-chain provenance signals for all agents</li>
+  </ul>
+
+  <h2>Per-Agent (with 90-day history)</h2>
+  <ul>
+{agent_links}
+  </ul>
+</body>
+</html>"""
+    with open(os.path.join(data_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(index_html)
+
+    print(f"Generated data endpoints under data/ ({len(data_output['agents'])} agent files).")
+
+
 def main() -> None:
     script_dir = os.path.dirname(os.path.abspath(__file__))
     agents_path = os.path.join(script_dir, "agents.json")
@@ -818,6 +949,8 @@ def main() -> None:
         json.dump(data_output, f, indent=2, ensure_ascii=False)
     print(f"Wrote history snapshot {history_path}.")
 
+    generate_data_endpoints(script_dir, data_output, rows, history_dir, now_str)
+
     templates_dir = os.path.join(script_dir, "templates")
     env = Environment(
         loader=FileSystemLoader([templates_dir, script_dir]),
@@ -905,6 +1038,12 @@ def main() -> None:
         sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}", "0.8", "daily"))
     for row in legacy_rows:
         sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}", "0.4", "monthly"))
+    sitemap_urls += [
+        ("https://hvtracker.net/data/", "0.6", "daily"),
+        ("https://hvtracker.net/data/latest.json", "0.7", "daily"),
+        ("https://hvtracker.net/data/signals/scorecard.json", "0.5", "daily"),
+        ("https://hvtracker.net/data/signals/provenance.json", "0.5", "daily"),
+    ]
     sitemap_lines = ['<?xml version="1.0" encoding="UTF-8"?>',
                      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for loc, prio, freq in sitemap_urls:
