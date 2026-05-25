@@ -1,0 +1,102 @@
+name: Agent Listing Request
+description: Submit an AI agent for inclusion in HVTracker
+title: "[Agent] "
+labels: ["agent-listing"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for submitting an agent to HVTracker! We review submissions manually.
+        All listed agents must meet the [Eligibility Spec](https://hvtracker.net/spec/eligibility/v1.0).
+
+  - type: input
+    id: agent_name
+    attributes:
+      label: Agent name
+      placeholder: e.g. "Devin" or "SWE-agent"
+    validations:
+      required: true
+
+  - type: input
+    id: github_repo
+    attributes:
+      label: GitHub repository
+      description: Full owner/repo path
+      placeholder: e.g. princeton-nlp/SWE-agent
+    validations:
+      required: true
+
+  - type: input
+    id: website
+    attributes:
+      label: Website (optional)
+      placeholder: https://...
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Coding Agents
+        - Agent Frameworks
+        - Workflow Platforms
+        - Browser & Computer Use
+        - Memory & Knowledge
+        - Research & Data
+        - Observability & Evaluation
+        - Security & Guardrails
+        - Protocols & Tool Integration
+        - Voice & Conversational
+        - Sandboxes & Runtimes
+        - Robotics & Embodied
+        - LLM Gateways & Infra
+        - Multi-Agent Systems
+    validations:
+      required: true
+
+  - type: input
+    id: npm_package
+    attributes:
+      label: npm package (optional)
+      placeholder: e.g. @anthropic-ai/claude-code
+
+  - type: input
+    id: pypi_package
+    attributes:
+      label: PyPI package (optional)
+      placeholder: e.g. swe-agent
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Brief description
+      description: What does this agent do? (1-2 sentences)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: license
+    attributes:
+      label: License
+      options:
+        - MIT
+        - Apache-2.0
+        - GPL-3.0
+        - BSD-3-Clause
+        - Other OSI-approved
+        - Proprietary / Source-available
+        - Unknown
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Eligibility checklist
+      options:
+        - label: Repository is public and not archived
+          required: true
+        - label: Repository has had at least one commit in the last 12 months
+          required: true
+        - label: This agent is not already listed on HVTracker
+          required: true
