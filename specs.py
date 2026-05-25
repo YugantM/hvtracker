@@ -984,5 +984,138 @@ BUILD_REPORT_V01 = {
 """,
 }
 
+LISTING_V01 = {
+    "title": "HVTracker Listing Lifecycle Specification",
+    "slug": "listing",
+    "version": "v0.1",
+    "status": "Published",
+    "date": "2026-05-26",
+    "authors": ["HVTracker"],
+    "abstract": (
+        "This document defines the lifecycle states for agent listings in the "
+        "HVTracker registry. It specifies how agents are discovered, listed, "
+        "verified, and potentially delisted, along with the criteria and evidence "
+        "requirements for each state transition. It also defines the evidence "
+        "grade system and trust score methodology."
+    ),
+    "sections": [
+        {"id": "s1", "num": "1.", "title": "Abstract"},
+        {"id": "s2", "num": "2.", "title": "Motivation"},
+        {"id": "s3", "num": "3.", "title": "Listing States"},
+        {"id": "s4", "num": "4.", "title": "State Transitions"},
+        {"id": "s5", "num": "5.", "title": "Evidence Grade"},
+        {"id": "s6", "num": "6.", "title": "HVTrust Score"},
+        {"id": "s7", "num": "7.", "title": "Versioning and Changelog"},
+    ],
+    "appendices": [
+        {"id": "app-a", "num": "A.", "title": "State Diagram"},
+    ],
+    "body": """
+<h2 id="s1"><span class="sec-num">1.</span> Abstract</h2>
+<p>This document defines the lifecycle states for agent listings in the HVTracker registry. It specifies how agents transition between states, the evidence required at each stage, the evidence grade system, and the HVTrust composite score methodology.</p>
+<p>The key words <span class="must">MUST</span>, <span class="must">MUST NOT</span>, <span class="should">SHOULD</span>, <span class="should">SHOULD NOT</span>, and <span class="may">MAY</span> in this document are to be interpreted as described in <a href="https://www.rfc-editor.org/rfc/rfc2119" target="_blank" rel="noopener">RFC 2119</a>.</p>
+
+<h2 id="s2"><span class="sec-num">2.</span> Motivation</h2>
+<p>As HVTracker evolves from a leaderboard into a trust registry, agents need a formal lifecycle beyond "tracked or not." A project may be discovered but unreviewed, listed but not yet verified, or previously listed but now delisted due to archival or license changes. The listing lifecycle provides a vocabulary for these states and defines the evidence thresholds for transitions.</p>
+
+<h2 id="s3"><span class="sec-num">3.</span> Listing States</h2>
+<p>Every agent in the HVTracker registry <span class="must">MUST</span> be in exactly one of the following states:</p>
+<table class="spec-table">
+  <thead><tr><th>State</th><th>Description</th><th>Visible on site</th></tr></thead>
+  <tbody>
+    <tr><td><code>discovered</code></td><td>Agent identified but not yet reviewed for eligibility.</td><td>No</td></tr>
+    <tr><td><code>candidate</code></td><td>Submitted for listing (via issue template or discovery). Under review.</td><td>No</td></tr>
+    <tr><td><code>listed</code></td><td>Meets eligibility criteria. Tracked with daily signal collection.</td><td>Yes — full leaderboard entry</td></tr>
+    <tr><td><code>verified</code></td><td>Listed + additional manual verification of agent identity and capabilities.</td><td>Yes — with verified badge (future)</td></tr>
+    <tr><td><code>warning</code></td><td>Listed but flagged for eligibility issues (archived, no license, stale).</td><td>Yes — with warning indicator</td></tr>
+    <tr><td><code>legacy</code></td><td>Historically significant but no longer actively maintained (&gt;365 days inactive).</td><td>Yes — in legacy section</td></tr>
+    <tr><td><code>delisted</code></td><td>Removed from active tracking due to disqualification criteria.</td><td>No (historical data preserved)</td></tr>
+    <tr><td><code>rejected</code></td><td>Reviewed and determined not to meet eligibility criteria.</td><td>No</td></tr>
+  </tbody>
+</table>
+
+<h2 id="s4"><span class="sec-num">4.</span> State Transitions</h2>
+<p>State transitions are triggered either automatically by the daily build or manually by the registry owner.</p>
+
+<table class="spec-table">
+  <thead><tr><th>From</th><th>To</th><th>Trigger</th><th>Type</th></tr></thead>
+  <tbody>
+    <tr><td>—</td><td><code>discovered</code></td><td>Agent identified in universe scan or external source</td><td>Manual</td></tr>
+    <tr><td><code>discovered</code></td><td><code>candidate</code></td><td>GitHub issue submitted or owner initiates review</td><td>Manual</td></tr>
+    <tr><td><code>candidate</code></td><td><code>listed</code></td><td>Passes all MUST criteria in <a href="/spec/eligibility/v1.0">Eligibility Spec</a></td><td>Manual</td></tr>
+    <tr><td><code>candidate</code></td><td><code>rejected</code></td><td>Fails eligibility review</td><td>Manual</td></tr>
+    <tr><td><code>listed</code></td><td><code>verified</code></td><td>Owner manually confirms identity and capabilities</td><td>Manual</td></tr>
+    <tr><td><code>listed</code></td><td><code>warning</code></td><td>Automated eligibility check fires (§4.1.1, §4.2.1, §5.1)</td><td>Automatic</td></tr>
+    <tr><td><code>warning</code></td><td><code>listed</code></td><td>Warning condition resolved (e.g., license added, repo unarchived)</td><td>Automatic</td></tr>
+    <tr><td><code>listed</code></td><td><code>legacy</code></td><td>No meaningful activity in 365+ days</td><td>Manual</td></tr>
+    <tr><td><code>listed</code></td><td><code>delisted</code></td><td>Disqualification criterion met (§5.1–5.5 in Eligibility Spec)</td><td>Manual</td></tr>
+    <tr><td><code>legacy</code></td><td><code>listed</code></td><td>Project resumes activity</td><td>Manual</td></tr>
+  </tbody>
+</table>
+
+<div class="note"><strong>Current implementation:</strong> As of v0.1, only <code>listed</code> and <code>legacy</code> states are used in production. Other states are defined for future use. Transitions are manual; automated state changes will be added in a future version.</div>
+
+<h2 id="s5"><span class="sec-num">5.</span> Evidence Grade</h2>
+<p>Every listed agent receives an evidence grade (A–D) based on how many independent signal types contribute data for that agent. The grade reflects data coverage, not quality.</p>
+<table class="spec-table">
+  <thead><tr><th>Grade</th><th>Signal types required</th><th>Interpretation</th></tr></thead>
+  <tbody>
+    <tr><td><strong>A</strong></td><td>≥5</td><td>Comprehensive coverage — GitHub + downloads + trust signals + fingerprints + HN</td></tr>
+    <tr><td><strong>B</strong></td><td>4</td><td>Strong coverage — multiple independent signal families</td></tr>
+    <tr><td><strong>C</strong></td><td>3</td><td>Moderate coverage — GitHub + two additional signal types</td></tr>
+    <tr><td><strong>D</strong></td><td>1–2</td><td>Limited coverage — GitHub only or GitHub + one other source</td></tr>
+  </tbody>
+</table>
+<p><strong>Signal types counted:</strong></p>
+<ol>
+  <li><strong>GitHub</strong> — always present (stars, commits, freshness, forks, license)</li>
+  <li><strong>Package downloads</strong> — npm and/or PyPI weekly downloads are non-null</li>
+  <li><strong>Trust infrastructure</strong> — OSSF Scorecard score is non-null OR package provenance is present</li>
+  <li><strong>Behavioral fingerprints</strong> — public action tracking returns data</li>
+  <li><strong>Community signals</strong> — Hacker News mention count is non-null</li>
+</ol>
+
+<h2 id="s6"><span class="sec-num">6.</span> HVTrust Score</h2>
+<p>The HVTrust Score is a composite metric (0–100) that measures trust across five dimensions. It is computed alongside the existing health score but uses different inputs and weights.</p>
+
+<table class="spec-table">
+  <thead><tr><th>Dimension</th><th>Max</th><th>Inputs</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Activity</strong></td><td>25</td><td>Freshness (days since push, linear decay over 180d, max 15) + commit activity (log-scaled, max 10)</td></tr>
+    <tr><td><strong>Adoption</strong></td><td>20</td><td>Stars (log-scaled vs 100k, max 12) + weekly downloads (log-scaled vs 1M, max 8)</td></tr>
+    <tr><td><strong>Transparency</strong></td><td>20</td><td>License present (8 pts) + OSSF Scorecard contribution (scaled to 12 pts)</td></tr>
+    <tr><td><strong>Safety</strong></td><td>20</td><td>OSSF Scorecard (scaled to 10 pts) + package provenance (5 pts) + signed commits ratio (scaled to 5 pts)</td></tr>
+    <tr><td><strong>Identity</strong></td><td>15</td><td>Evidence grade (A=10, B=7, C=4, D=1) + listing status (listed=5, legacy=2)</td></tr>
+  </tbody>
+</table>
+
+<pre>trust_score = activity + adoption + transparency + safety + identity</pre>
+
+<p><strong>Relationship to health score:</strong> The health score (stars + freshness + activity + community = 100) measures <em>momentum</em>. The HVTrust score measures <em>trustworthiness</em>. Both are displayed; the leaderboard can be sorted by either. The health score formula is unchanged — HVTrust is purely additive.</p>
+
+<div class="note"><strong>v0.1 status:</strong> The HVTrust score is experimental. Dimension weights and input scaling may change in future versions. The score is computed daily but does not yet affect default sort order.</div>
+
+<h2 id="s7"><span class="sec-num">7.</span> Versioning and Changelog</h2>
+<table class="spec-table">
+  <thead><tr><th>Version</th><th>Date</th><th>Summary</th></tr></thead>
+  <tbody>
+    <tr><td><strong>v0.1</strong></td><td>2026-05-26</td><td>Initial publication. Defines 8 listing states, transition triggers, evidence grade system (A–D), and HVTrust composite score (5 dimensions, 100 points).</td></tr>
+  </tbody>
+</table>
+
+<h2 id="app-a"><span class="sec-num">A.</span> State Diagram</h2>
+<pre style="font-family:var(--font-mono);font-size:12px;line-height:1.5;color:var(--text)">
+  discovered → candidate → listed → verified
+                  ↓           ↓ ↑
+               rejected    warning
+                              ↓
+                           legacy ↔ listed
+                              ↓
+                           delisted
+</pre>
+<p>Arrows indicate valid transitions. Bidirectional arrows (↔) indicate the transition can go either way. The <code>delisted</code> state is terminal in practice but historical data is preserved.</p>
+""",
+}
+
 # All published specs, in display order (newest first)
-ALL_SPECS = [BUILD_REPORT_V01, DATA_SCHEMA_V01, ELIGIBILITY_V1, PROVENANCE_V01, METHODOLOGY_V2]
+ALL_SPECS = [LISTING_V01, BUILD_REPORT_V01, DATA_SCHEMA_V01, ELIGIBILITY_V1, PROVENANCE_V01, METHODOLOGY_V2]
