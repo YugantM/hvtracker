@@ -88,22 +88,24 @@
 
 ### 4. OpenHands (All-Hands-AI/OpenHands)
 
-**Fingerprint type:** `bot_account`  
-**Pattern:** `author:openhands-agent` (GitHub App bot account)  
-**Search query:** `author:openhands-agent type:pr` via `GET /search/issues`  
-**Estimated total volume:** ~190 PRs (merged), ~77,178 commits  
-**Sample PRs:**
-- `Fix issue #9655: [Bug]: CodeActAgent is incompatible with xAI Grok-4`
-- `Fix issue #8682: [Bug]: Terminal tab not showing content until page refresh`
-- Both are from the `All-Hands-AI/OpenHands` repo itself — issue-fixing PRs
+**Fingerprint type:** `pr_body`  
+**Pattern:** `Authored by OpenHands` (footer added to PR descriptions)  
+**Search query:** `"Authored by OpenHands" type:pr is:merged` via `GET /search/issues`  
+**Estimated total volume:** ~72 merged PRs in 30 days  
+**Sample PRs (May 2026):**
+- `fix: Add teacher detail page at /teachers/[id]`
+- `feat: add Loxa routing layer (v0)`
+- `feat: security and UI upgrades`
 
-**How OpenHands adds this:** OpenHands (formerly OpenDevin) uses the `openhands-agent` GitHub App to author commits and PRs.
+**How OpenHands adds this:** OpenHands adds "Authored by OpenHands" to the body of every PR it creates.
+
+**History note:** The original fingerprint was `author:openhands-agent` (GitHub App bot account). That bot has been inactive since ~July 2025 (most recent PR: 2025-07-11). OpenHands switched to the PR body marker for external deployments. The bot account fingerprint returned 0 for 30-day queries. Updated 2026-05-25.
 
 **Limitations:**
-- The 77,178 commit count is suspicious — most of these may be internal CI or content commits. The PR count (190) is more meaningful since PRs represent distinct agent actions.
-- The bot account may be used in test environments as well as production runs.
+- Some false positives possible if users manually write "Authored by OpenHands" in PR bodies.
+- The phrase is specific enough to be low-noise in practice.
 
-**Recommendation: Include, use PR count as primary metric. High confidence on fingerprint; volume needs monitoring.**
+**Recommendation: Include with updated fingerprint. High confidence.**
 
 ---
 
