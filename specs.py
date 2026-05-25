@@ -924,5 +924,65 @@ DATA_SCHEMA_V01 = {
 """,
 }
 
+BUILD_REPORT_V01 = {
+    "title": "Build Integrity Report",
+    "slug": "build-report",
+    "version": "v0.1",
+    "date": "2026-05-26",
+    "status": "Draft",
+    "sections": [
+        {"id": "s1", "num": "1", "title": "Purpose"},
+        {"id": "s2", "num": "2", "title": "Endpoint"},
+        {"id": "s3", "num": "3", "title": "Fields"},
+        {"id": "s4", "num": "4", "title": "Usage"},
+    ],
+    "body": """
+<h2 id="s1">1. Purpose</h2>
+<p>The build integrity report provides a machine-readable summary of each HVTracker data pipeline run. It answers: <em>"What exactly was generated, from what source, how many succeeded, and what failed?"</em></p>
+<p>If HVTracker is to serve as a trust registry, its own data pipeline must be transparent. This report is the self-audit.</p>
+
+<h2 id="s2">2. Endpoint</h2>
+<p><code>GET /data/build_report.json</code></p>
+<p>Generated during every cron run by <code>fetch_and_build.py</code>. Refreshes daily at 06:00 UTC alongside all other data endpoints.</p>
+
+<h2 id="s3">3. Fields</h2>
+<table>
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>generated_at</code></td><td>string (ISO 8601)</td><td>Timestamp when the report was generated</td></tr>
+    <tr><td><code>data_timestamp</code></td><td>string</td><td>Human-readable timestamp shown on the leaderboard</td></tr>
+    <tr><td><code>schema_version</code></td><td>string</td><td>Data schema version (e.g. "v0.1")</td></tr>
+    <tr><td><code>methodology_version</code></td><td>string</td><td>Methodology version (e.g. "v2.0")</td></tr>
+    <tr><td><code>configured_agents</code></td><td>integer</td><td>Total entries in agents.json (active + legacy)</td></tr>
+    <tr><td><code>active_agents</code></td><td>integer</td><td>Successfully fetched and scored agents</td></tr>
+    <tr><td><code>legacy_agents</code></td><td>integer</td><td>Legacy agents (inactive &ge;365 days, rendered separately)</td></tr>
+    <tr><td><code>total_generated</code></td><td>integer</td><td>Total agent profile pages generated (active + legacy)</td></tr>
+    <tr><td><code>categories</code></td><td>object</td><td>Map of category name &rarr; agent count</td></tr>
+    <tr><td><code>warnings</code></td><td>array</td><td>Eligibility violations (criterion, repo, detail)</td></tr>
+    <tr><td><code>warning_count</code></td><td>integer</td><td>Number of eligibility warnings</td></tr>
+    <tr><td><code>failed_fetches</code></td><td>array</td><td>Repos that could not be fetched (404, rate limit, etc.)</td></tr>
+    <tr><td><code>missing_repos_count</code></td><td>integer</td><td>Count of failed fetches</td></tr>
+    <tr><td><code>package_failures</code></td><td>array</td><td>Repos with configured package but no download data</td></tr>
+    <tr><td><code>package_failure_count</code></td><td>integer</td><td>Count of package lookup failures</td></tr>
+    <tr><td><code>scorecard_unavailable_count</code></td><td>integer</td><td>Agents without OSSF Scorecard data</td></tr>
+    <tr><td><code>fingerprint_agents</code></td><td>array</td><td>Repos with fingerprint-based action tracking configured</td></tr>
+    <tr><td><code>fingerprint_agent_count</code></td><td>integer</td><td>Count of fingerprint-tracked agents</td></tr>
+  </tbody>
+</table>
+
+<h2 id="s4">4. Usage</h2>
+<p>Consumers can use this report to:</p>
+<ul>
+  <li>Monitor pipeline health (failed fetch count trending up = API issue)</li>
+  <li>Verify data freshness (compare <code>generated_at</code> against expectations)</li>
+  <li>Audit signal coverage (scorecard unavailable count, package failures)</li>
+  <li>Track growth (configured vs active agents over time)</li>
+</ul>
+<p>This report is public. It is part of HVTracker's commitment to transparent data sourcing.</p>
+""",
+}
+
 # All published specs, in display order (newest first)
-ALL_SPECS = [DATA_SCHEMA_V01, ELIGIBILITY_V1, PROVENANCE_V01, METHODOLOGY_V2]
+ALL_SPECS = [BUILD_REPORT_V01, DATA_SCHEMA_V01, ELIGIBILITY_V1, PROVENANCE_V01, METHODOLOGY_V2]

@@ -914,7 +914,7 @@ def main() -> None:
     for i, row in enumerate(rows, 1):
         row["rank"] = i
 
-    run_eligibility_checks(rows)
+    eligibility_violations = run_eligibility_checks(rows)
 
     # Add formatted download counts and slug/breakdown for template rendering
     for row in rows:
@@ -976,14 +976,24 @@ def main() -> None:
         "Agent Frameworks",
         "Workflow Platforms",
         "Browser & Computer Use",
-        "LLM Gateways & Infra",
         "Memory & Knowledge",
         "Research & Data",
+        "Observability & Evaluation",
+        "Security & Guardrails",
+        "Protocols & Tool Integration",
+        "Voice & Conversational",
+        "Sandboxes & Runtimes",
+        "Robotics & Embodied",
+        "LLM Gateways & Infra",
         "Multi-Agent Systems",
     ]
     categories = []
     for cat in category_order:
         if cat in cat_groups:
+            categories.append({"name": cat, "count": len(cat_groups[cat])})
+    # Include any categories not in the explicit order (future-proof)
+    for cat in sorted(cat_groups.keys()):
+        if cat not in category_order and cat:
             categories.append({"name": cat, "count": len(cat_groups[cat])})
 
     # Write data.json (machine-readable leaderboard)
@@ -1043,6 +1053,38 @@ def main() -> None:
     print(f"Wrote history snapshot {history_path}.")
 
     generate_data_endpoints(script_dir, data_output, rows, history_dir, now_str)
+
+    # ── Build Integrity Report ────────────────────────────────────────────────
+    fp_agents = [a["repo"] for a in agents if a.get("fingerprints")]
+    failed_repos = set(a["repo"] for a in agents + legacy_agents) - set(r["repo"] for r in rows + legacy_rows)
+    pkg_failures = [r["repo"] for r in rows if (r.get("pypi_package") or r.get("npm_package")) and r.get("weekly_downloads") is None]
+    sc_unavailable = [r["repo"] for r in rows if r.get("scorecard_score") is None]
+
+    build_report = {
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "data_timestamp": now_str,
+        "schema_version": DATA_SCHEMA_VERSION,
+        "methodology_version": METHODOLOGY_VERSION,
+        "configured_agents": len(agents) + len(legacy_agents),
+        "active_agents": len(rows),
+        "legacy_agents": len(legacy_rows),
+        "total_generated": len(rows) + len(legacy_rows),
+        "categories": {cat["name"]: cat["count"] for cat in categories},
+        "warnings": eligibility_violations,
+        "warning_count": len(eligibility_violations),
+        "failed_fetches": sorted(failed_repos),
+        "missing_repos_count": len(failed_repos),
+        "package_failures": pkg_failures,
+        "package_failure_count": len(pkg_failures),
+        "scorecard_unavailable_count": len(sc_unavailable),
+        "fingerprint_agents": fp_agents,
+        "fingerprint_agent_count": len(fp_agents),
+    }
+    report_path = os.path.join(script_dir, "data", "build_report.json")
+    os.makedirs(os.path.dirname(report_path), exist_ok=True)
+    with open(report_path, "w", encoding="utf-8") as f:
+        json.dump(build_report, f, indent=2, ensure_ascii=False)
+    print(f"Wrote data/build_report.json (active={len(rows)}, legacy={len(legacy_rows)}, warnings={len(violations)}, failed={len(failed_repos)}).")
 
     templates_dir = os.path.join(script_dir, "templates")
     env = Environment(
@@ -1173,8 +1215,8 @@ def main() -> None:
     now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     feed = {
         "version": "https://jsonfeed.org/version/1.1",
-        "title": "HVTracker — Open-Source AI Agent Leaderboard",
-        "description": "Daily health scores and rankings for open-source AI agents.",
+        "title": "HVTracker — AI Agent Trust Registry",
+        "description": "AI agent trust registry — daily signals for trust, activity, safety, and adoption.",
         "home_page_url": "https://hvtracker.net/",
         "feed_url": "https://hvtracker.net/feed.json",
         "language": "en",
