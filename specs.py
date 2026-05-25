@@ -651,5 +651,251 @@ PROVENANCE_V01 = {
 """,
 }
 
+DATA_SCHEMA_V01 = {
+    "title": "HVTracker Data Schema Specification",
+    "slug": "data-schema",
+    "version": "v0.1",
+    "status": "Published",
+    "date": "2026-05-25",
+    "authors": ["HVTracker"],
+    "abstract": (
+        "This document defines the schema for all machine-readable data published "
+        "by HVTracker at the /data/ endpoint family. It specifies the URL catalog, "
+        "field definitions, data types, nullability rules, refresh cadence, and "
+        "the versioning policy governing schema evolution. Consumers implementing "
+        "integrations against HVTracker data SHOULD validate against this specification "
+        "to ensure compatibility across schema versions."
+    ),
+    "sections": [
+        {"id": "s1", "num": "1.", "title": "Abstract"},
+        {"id": "s2", "num": "2.", "title": "Motivation"},
+        {"id": "s3", "num": "3.", "title": "Terminology"},
+        {"id": "s4", "num": "4.", "title": "Endpoint Catalog",
+         "subsections": [
+             {"id": "s4-1", "num": "4.1", "title": "/data/latest.json"},
+             {"id": "s4-2", "num": "4.2", "title": "/data/agents/<slug>.json"},
+             {"id": "s4-3", "num": "4.3", "title": "/data/signals/scorecard.json"},
+             {"id": "s4-4", "num": "4.4", "title": "/data/signals/provenance.json"},
+             {"id": "s4-5", "num": "4.5", "title": "/data/history/<YYYY-MM-DD>.json"},
+             {"id": "s4-6", "num": "4.6", "title": "/data/index.html"},
+         ]},
+        {"id": "s5", "num": "5.", "title": "Field Definitions",
+         "subsections": [
+             {"id": "s5-1", "num": "5.1", "title": "Envelope Fields"},
+             {"id": "s5-2", "num": "5.2", "title": "Agent Record Fields"},
+             {"id": "s5-3", "num": "5.3", "title": "History Point Fields"},
+             {"id": "s5-4", "num": "5.4", "title": "Signal Subset Fields"},
+         ]},
+        {"id": "s6", "num": "6.", "title": "Schema Evolution"},
+        {"id": "s7", "num": "7.", "title": "Data License"},
+        {"id": "s8", "num": "8.", "title": "Versioning and Changelog"},
+    ],
+    "appendices": [
+        {"id": "app-a", "num": "A.", "title": "Field Quick Reference"},
+    ],
+    "body": """
+<h2 id="s1"><span class="sec-num">1.</span> Abstract</h2>
+<p>This document defines the schema for all machine-readable data published by HVTracker at the <code>/data/</code> endpoint family. It specifies the URL catalog, field definitions, data types, nullability rules, refresh cadence, and the versioning policy governing schema evolution.</p>
+<p>The key words <span class="must">MUST</span>, <span class="must">MUST NOT</span>, <span class="should">SHOULD</span>, <span class="should">SHOULD NOT</span>, and <span class="may">MAY</span> in this document are to be interpreted as described in <a href="https://www.rfc-editor.org/rfc/rfc2119" target="_blank" rel="noopener">RFC 2119</a>.</p>
+
+<h2 id="s2"><span class="sec-num">2.</span> Motivation</h2>
+<p>HVTracker publishes daily health scores and trust signals for open-source AI agent projects. As third-party consumers begin building integrations — dashboards, alerts, research pipelines — the absence of a formal schema creates fragility: a field rename or type change silently breaks downstream consumers.</p>
+<p>A formal data schema specification serves three purposes:</p>
+<ul>
+  <li><strong>Stability contract:</strong> Consumers can depend on documented fields not changing without a version increment.</li>
+  <li><strong>Discovery:</strong> The endpoint catalog and field definitions document what data exists, removing the need to reverse-engineer <code>data.json</code>.</li>
+  <li><strong>Trust:</strong> A versioned, published schema signals that the dataset is intended as infrastructure, not just a build artifact.</li>
+</ul>
+
+<h2 id="s3"><span class="sec-num">3.</span> Terminology</h2>
+<dl>
+  <dt><strong>Snapshot</strong></dt>
+  <dd>A complete dataset capture as of a single daily cron run. Each snapshot contains all agent records with values reflecting the state of the world at generation time.</dd>
+  <dt><strong>Agent record</strong></dt>
+  <dd>A JSON object representing a single tracked project. Every agent record contains at minimum the fields defined in Section 5.2.</dd>
+  <dt><strong>Signal</strong></dt>
+  <dd>A measured attribute of an agent record. Signals are either activity signals (stars, commits, HN mentions), trust signals (provenance, scorecard, signed commits), or behavioral signals (future: public action counts).</dd>
+  <dt><strong>Envelope</strong></dt>
+  <dd>The top-level fields present in every endpoint response, defined in Section 5.1. Envelope fields carry metadata about the response itself rather than about individual agents.</dd>
+  <dt><strong>Slug</strong></dt>
+  <dd>A URL-safe identifier derived from the agent name by lowercasing and replacing non-alphanumeric characters with hyphens. Used to construct per-agent endpoint URLs.</dd>
+  <dt><strong>Null</strong></dt>
+  <dd>A JSON <code>null</code> value indicating the signal could not be collected during this cron run. <code>null</code> is semantically distinct from zero and from the absence of a field.</dd>
+</dl>
+
+<h2 id="s4"><span class="sec-num">4.</span> Endpoint Catalog</h2>
+<p>All endpoints are static JSON files (except the HTML index) served from <code>https://hvtracker.net/data/</code>. Files are regenerated on each daily cron run at 06:00 UTC. CORS header <code>Access-Control-Allow-Origin: *</code> is set on all <code>/data/*</code> responses.</p>
+
+<h3 id="s4-1"><span class="sec-num">4.1</span> /data/latest.json</h3>
+<p><strong>Content:</strong> Full snapshot — envelope fields plus an <code>agents</code> array containing all active agent records.</p>
+<p><strong>Refresh:</strong> Daily at 06:00 UTC, atomically replaced.</p>
+<p><strong>Use case:</strong> Primary integration point. Fetch once daily to get the complete leaderboard.</p>
+<p><strong>Size bound:</strong> <span class="should">SHOULD</span> remain under 500 KB. If the dataset grows beyond this, the maintainer <span class="must">MUST</span> split the endpoint or switch to pagination before the next schema version.</p>
+
+<h3 id="s4-2"><span class="sec-num">4.2</span> /data/agents/&lt;slug&gt;.json</h3>
+<p><strong>Content:</strong> Single agent record (all fields from Section 5.2) plus a <code>history</code> array containing the last 90 days of daily snapshots for this agent (Section 5.3).</p>
+<p><strong>URL construction:</strong> <code>https://hvtracker.net/data/agents/{slug}.json</code> where <code>{slug}</code> is the agent's slug as defined in Section 3.</p>
+<p><strong>Refresh:</strong> Daily at 06:00 UTC.</p>
+<p><strong>Size bound:</strong> <span class="should">SHOULD</span> remain under 50 KB per file.</p>
+<p><strong>Note:</strong> Files for legacy agents are also generated but tagged with <code>"status": "legacy"</code> in the agent record.</p>
+
+<h3 id="s4-3"><span class="sec-num">4.3</span> /data/signals/scorecard.json</h3>
+<p><strong>Content:</strong> Envelope fields plus an <code>agents</code> array where each element contains only the fields: <code>repo</code>, <code>name</code>, <code>scorecard_score</code>, <code>scorecard_checks</code>, <code>signed_commits_ratio</code>.</p>
+<p><strong>Use case:</strong> Supply-chain security consumers who need trust signals without the full dataset.</p>
+
+<h3 id="s4-4"><span class="sec-num">4.4</span> /data/signals/provenance.json</h3>
+<p><strong>Content:</strong> Envelope fields plus an <code>agents</code> array where each element contains: <code>repo</code>, <code>name</code>, <code>has_provenance</code>, <code>npm_provenance</code>, <code>pypi_provenance</code>.</p>
+<p><strong>Use case:</strong> Package provenance monitoring, SBOM pipelines.</p>
+
+<h3 id="s4-5"><span class="sec-num">4.5</span> /data/history/&lt;YYYY-MM-DD&gt;.json</h3>
+<p><strong>Content:</strong> Full snapshot for the named calendar date (UTC). Same structure as <code>/data/latest.json</code>.</p>
+<p><strong>Permanence:</strong> Historical files are never deleted or overwritten. A file at <code>/data/history/2026-05-25.json</code> will remain accessible indefinitely.</p>
+<p><strong>Availability:</strong> Files exist for every date on which the cron ran successfully. Gaps are possible during outages.</p>
+
+<h3 id="s4-6"><span class="sec-num">4.6</span> /data/index.html</h3>
+<p><strong>Content:</strong> Human-readable HTML catalog listing all available endpoints with descriptions, links, and generation metadata. Not machine-readable.</p>
+
+<h2 id="s5"><span class="sec-num">5.</span> Field Definitions</h2>
+
+<h3 id="s5-1"><span class="sec-num">5.1</span> Envelope Fields</h3>
+<p>Every endpoint response (except <code>/data/index.html</code>) is a JSON object containing the following envelope fields at the top level.</p>
+<table class="spec-table">
+  <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>schema_version</code></td><td><code>string</code></td><td>No</td><td>Schema version string, e.g. <code>"v0.1"</code>. Incremented per Section 6.</td></tr>
+    <tr><td><code>generated_at</code></td><td><code>string</code></td><td>No</td><td>ISO 8601 UTC timestamp of this cron run, e.g. <code>"2026-05-25 06:00 UTC"</code>.</td></tr>
+    <tr><td><code>methodology_version</code></td><td><code>string</code></td><td>No</td><td>Methodology spec version used to compute scores, e.g. <code>"v2.0"</code>.</td></tr>
+    <tr><td><code>license</code></td><td><code>string</code></td><td>No</td><td>Data license declaration. Current value: <code>"CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/"</code>.</td></tr>
+    <tr><td><code>updated</code></td><td><code>string</code></td><td>No</td><td>Human-readable generation time (same as <code>generated_at</code>).</td></tr>
+    <tr><td><code>total</code></td><td><code>integer</code></td><td>No</td><td>Count of active (non-legacy) agent records in this snapshot.</td></tr>
+    <tr><td><code>agents</code></td><td><code>array</code></td><td>No</td><td>Array of agent records. See Section 5.2.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s5-2"><span class="sec-num">5.2</span> Agent Record Fields</h3>
+<p>Each element of the <code>agents</code> array is an agent record with the following fields.</p>
+<table class="spec-table">
+  <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>name</code></td><td><code>string</code></td><td>No</td><td>Display name of the project.</td></tr>
+    <tr><td><code>repo</code></td><td><code>string</code></td><td>No</td><td>GitHub repository path, e.g. <code>"All-Hands-AI/OpenHands"</code>.</td></tr>
+    <tr><td><code>url</code></td><td><code>string</code></td><td>No</td><td>Canonical GitHub URL.</td></tr>
+    <tr><td><code>rank</code></td><td><code>integer</code></td><td>No</td><td>Global rank by health score (1 = highest). Active agents only.</td></tr>
+    <tr><td><code>previous_rank</code></td><td><code>integer | null</code></td><td>Yes</td><td>Rank from the previous daily snapshot. <code>null</code> for newly added agents.</td></tr>
+    <tr><td><code>rank_delta</code></td><td><code>integer | null</code></td><td>Yes</td><td>Change in rank since previous snapshot. Positive = improved rank.</td></tr>
+    <tr><td><code>stars</code></td><td><code>integer</code></td><td>No</td><td>GitHub star count at collection time.</td></tr>
+    <tr><td><code>stars_fmt</code></td><td><code>string</code></td><td>No</td><td>Human-formatted star count, e.g. <code>"45.2k"</code>.</td></tr>
+    <tr><td><code>forks</code></td><td><code>integer</code></td><td>No</td><td>GitHub fork count at collection time.</td></tr>
+    <tr><td><code>forks_fmt</code></td><td><code>string</code></td><td>No</td><td>Human-formatted fork count.</td></tr>
+    <tr><td><code>last_push</code></td><td><code>string</code></td><td>No</td><td>ISO 8601 UTC timestamp of the most recent push to the default branch.</td></tr>
+    <tr><td><code>days_ago</code></td><td><code>integer</code></td><td>No</td><td>Days since <code>last_push</code> as of the collection date.</td></tr>
+    <tr><td><code>weekly_commits</code></td><td><code>integer | null</code></td><td>Yes</td><td>Commit count in the trailing 4 weeks. <code>null</code> if the GitHub stats API did not return data.</td></tr>
+    <tr><td><code>commits_low_confidence</code></td><td><code>boolean</code></td><td>No</td><td><code>true</code> when <code>weekly_commits</code> was derived from a single-page estimate rather than a full count.</td></tr>
+    <tr><td><code>score</code></td><td><code>number</code></td><td>No</td><td>Health score [0–100] computed per Methodology v2.0. One decimal place.</td></tr>
+    <tr><td><code>description</code></td><td><code>string | null</code></td><td>Yes</td><td>Repository description from GitHub API.</td></tr>
+    <tr><td><code>language</code></td><td><code>string | null</code></td><td>Yes</td><td>Primary programming language reported by GitHub.</td></tr>
+    <tr><td><code>open_issues</code></td><td><code>integer</code></td><td>No</td><td>Open issue count at collection time.</td></tr>
+    <tr><td><code>category</code></td><td><code>string</code></td><td>No</td><td>HVTracker category. One of: <code>Coding Agents</code>, <code>Agent Frameworks</code>, <code>Workflow Platforms</code>, <code>Browser &amp; Computer Use</code>, <code>LLM Gateways &amp; Infra</code>, <code>Memory &amp; Knowledge</code>, <code>Research &amp; Data</code>, <code>Multi-Agent Systems</code>.</td></tr>
+    <tr><td><code>category_rank</code></td><td><code>integer | null</code></td><td>Yes</td><td>Rank within the agent's category.</td></tr>
+    <tr><td><code>npm_package</code></td><td><code>string</code></td><td>No</td><td>npm package name if tracked, else empty string.</td></tr>
+    <tr><td><code>pypi_package</code></td><td><code>string</code></td><td>No</td><td>PyPI package name if tracked, else empty string.</td></tr>
+    <tr><td><code>weekly_downloads</code></td><td><code>integer | null</code></td><td>Yes</td><td>Combined weekly download count (npm + PyPI). <code>null</code> if no package is tracked or download fetch failed.</td></tr>
+    <tr><td><code>dl_source</code></td><td><code>string</code></td><td>No</td><td>Source label for <code>weekly_downloads</code>, e.g. <code>"pypi"</code>, <code>"npm+pypi"</code>. Empty string if no downloads tracked.</td></tr>
+    <tr><td><code>hn_mentions_30d</code></td><td><code>integer | null</code></td><td>Yes</td><td>Count of Hacker News story mentions in the trailing 30 days. <code>null</code> if no search term configured.</td></tr>
+    <tr><td><code>has_provenance</code></td><td><code>boolean | null</code></td><td>Yes</td><td>Derived: <code>true</code> if <code>npm_provenance</code> or <code>pypi_provenance</code> is <code>true</code>.</td></tr>
+    <tr><td><code>npm_provenance</code></td><td><code>boolean | null</code></td><td>Yes</td><td>SLSA provenance attestation detected on npm package. <code>null</code> if no npm package tracked.</td></tr>
+    <tr><td><code>pypi_provenance</code></td><td><code>boolean | null</code></td><td>Yes</td><td>PEP 740 attestation detected on PyPI package. <code>null</code> if no PyPI package tracked.</td></tr>
+    <tr><td><code>signed_commits_ratio</code></td><td><code>number | null</code></td><td>Yes</td><td>Fraction of recent commits with GPG/SSH signatures [0.0–1.0]. <code>null</code> if unavailable.</td></tr>
+    <tr><td><code>scorecard_score</code></td><td><code>number | null</code></td><td>Yes</td><td>OSSF Scorecard overall score [0.0–10.0]. <code>null</code> if not yet scanned.</td></tr>
+    <tr><td><code>scorecard_checks</code></td><td><code>object</code></td><td>No</td><td>Per-check Scorecard scores as a flat object. Empty object <code>{}</code> if no scorecard data.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s5-3"><span class="sec-num">5.3</span> History Point Fields</h3>
+<p>Each element of the <code>history</code> array in per-agent endpoint responses (Section 4.2) is a history point:</p>
+<table class="spec-table">
+  <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>date</code></td><td><code>string</code></td><td>No</td><td>Calendar date of this snapshot, <code>YYYY-MM-DD</code> format (UTC).</td></tr>
+    <tr><td><code>rank</code></td><td><code>integer | null</code></td><td>Yes</td><td>Global rank on this date.</td></tr>
+    <tr><td><code>score</code></td><td><code>number | null</code></td><td>Yes</td><td>Health score on this date.</td></tr>
+    <tr><td><code>stars</code></td><td><code>integer | null</code></td><td>Yes</td><td>Star count on this date.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s5-4"><span class="sec-num">5.4</span> Signal Subset Fields</h3>
+<p>Signal subset endpoints (Sections 4.3 and 4.4) use the same envelope as Section 5.1 but their <code>agents</code> array contains a reduced record. The exact field set for each subset is defined in Sections 4.3 and 4.4 respectively.</p>
+
+<h2 id="s6"><span class="sec-num">6.</span> Schema Evolution</h2>
+<p>The schema is versioned as <code>v{major}.{minor}</code>. The <code>schema_version</code> envelope field carries the current version string.</p>
+
+<h3>6.1 Additive changes (minor version bump)</h3>
+<p>The following changes increment the minor version and are considered non-breaking:</p>
+<ul>
+  <li>Adding a new field to agent records or envelope.</li>
+  <li>Adding a new endpoint to the catalog.</li>
+  <li>Widening a type (e.g., <code>integer</code> → <code>integer | null</code>).</li>
+  <li>Adding new allowed values to an enum field.</li>
+</ul>
+<p>Consumers <span class="should">SHOULD</span> be written to ignore unknown fields so that minor version bumps do not break integrations.</p>
+
+<h3>6.2 Breaking changes (major version bump)</h3>
+<p>The following changes increment the major version:</p>
+<ul>
+  <li>Removing or renaming an existing field.</li>
+  <li>Changing a field's type in a non-widening way.</li>
+  <li>Changing the meaning of an existing field.</li>
+  <li>Removing an endpoint from the catalog.</li>
+  <li>Changing the URL structure of an existing endpoint.</li>
+</ul>
+<p>When a major version is published, the previous major version's <code>/data/latest.json</code> remains accessible for a minimum of 90 days at a versioned URL (e.g., <code>/data/v0/latest.json</code>).</p>
+
+<h3>6.3 Adding new signal classes</h3>
+<p>New signal classes (e.g., behavioral signals introduced in Task 3 of the roadmap) are always introduced as additive fields and result in a minor version bump. They are not included in the health score formula without a Methodology spec version bump.</p>
+
+<h2 id="s7"><span class="sec-num">7.</span> Data License</h2>
+<p>All data published at <code>https://hvtracker.net/data/</code> is released under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>.</p>
+<p>You are free to share and adapt the data for any purpose, including commercial use, provided you give appropriate credit to HVTracker and link to <code>https://hvtracker.net</code>.</p>
+<p>Source data (GitHub stars, commit activity, etc.) is sourced from the GitHub REST API and is subject to GitHub's terms of service. HVTracker does not grant rights to data that it does not own.</p>
+
+<h2 id="s8"><span class="sec-num">8.</span> Versioning and Changelog</h2>
+<table class="spec-table">
+  <thead><tr><th>Version</th><th>Date</th><th>Summary</th></tr></thead>
+  <tbody>
+    <tr><td>v0.1</td><td>2026-05-25</td><td>Initial publication. Defines 5 endpoints, 30 agent record fields, envelope format, history points, and schema evolution policy.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="app-a"><span class="sec-num">A.</span> Field Quick Reference</h2>
+<table class="spec-table">
+  <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Category</th></tr></thead>
+  <tbody>
+    <tr><td><code>name</code></td><td>string</td><td>No</td><td>Identity</td></tr>
+    <tr><td><code>repo</code></td><td>string</td><td>No</td><td>Identity</td></tr>
+    <tr><td><code>url</code></td><td>string</td><td>No</td><td>Identity</td></tr>
+    <tr><td><code>rank</code></td><td>integer</td><td>No</td><td>Ranking</td></tr>
+    <tr><td><code>previous_rank</code></td><td>integer | null</td><td>Yes</td><td>Ranking</td></tr>
+    <tr><td><code>rank_delta</code></td><td>integer | null</td><td>Yes</td><td>Ranking</td></tr>
+    <tr><td><code>score</code></td><td>number</td><td>No</td><td>Score</td></tr>
+    <tr><td><code>stars</code></td><td>integer</td><td>No</td><td>Activity</td></tr>
+    <tr><td><code>forks</code></td><td>integer</td><td>No</td><td>Activity</td></tr>
+    <tr><td><code>last_push</code></td><td>string</td><td>No</td><td>Activity</td></tr>
+    <tr><td><code>days_ago</code></td><td>integer</td><td>No</td><td>Activity</td></tr>
+    <tr><td><code>weekly_commits</code></td><td>integer | null</td><td>Yes</td><td>Activity</td></tr>
+    <tr><td><code>weekly_downloads</code></td><td>integer | null</td><td>Yes</td><td>Activity</td></tr>
+    <tr><td><code>hn_mentions_30d</code></td><td>integer | null</td><td>Yes</td><td>Community</td></tr>
+    <tr><td><code>category</code></td><td>string</td><td>No</td><td>Classification</td></tr>
+    <tr><td><code>language</code></td><td>string | null</td><td>Yes</td><td>Classification</td></tr>
+    <tr><td><code>has_provenance</code></td><td>boolean | null</td><td>Yes</td><td>Trust</td></tr>
+    <tr><td><code>npm_provenance</code></td><td>boolean | null</td><td>Yes</td><td>Trust</td></tr>
+    <tr><td><code>pypi_provenance</code></td><td>boolean | null</td><td>Yes</td><td>Trust</td></tr>
+    <tr><td><code>signed_commits_ratio</code></td><td>number | null</td><td>Yes</td><td>Trust</td></tr>
+    <tr><td><code>scorecard_score</code></td><td>number | null</td><td>Yes</td><td>Trust</td></tr>
+    <tr><td><code>scorecard_checks</code></td><td>object</td><td>No</td><td>Trust</td></tr>
+  </tbody>
+</table>
+""",
+}
+
 # All published specs, in display order (newest first)
-ALL_SPECS = [ELIGIBILITY_V1, PROVENANCE_V01, METHODOLOGY_V2]
+ALL_SPECS = [DATA_SCHEMA_V01, ELIGIBILITY_V1, PROVENANCE_V01, METHODOLOGY_V2]

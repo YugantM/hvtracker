@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HVTracker Data Schema Specification — HVTracker Specifications</title>
+  <meta name="description" content="This document defines the schema for all machine-readable data published by HVTracker at the /data/ endpoint family. It specifies the URL catalog, field definit">
+  <link rel="canonical" href="https://hvtracker.net/spec/data-schema/v0.1">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="HVTracker Data Schema Specification">
+  <meta property="og:description" content="This document defines the schema for all machine-readable data published by HVTracker at the /data/ endpoint family. It specifies the URL catalog, field definit">
+  <meta property="og:url" content="https://hvtracker.net/spec/data-schema/v0.1">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0c0c15;
+      --surface:   #13131f;
+      --surface-2: #1a1a2a;
+      --border:    #252538;
+      --text:      #eeeef5;
+      --muted:     #8a87a8;
+      --accent:    #7c6af6;
+      --accent-lt: rgba(124,106,246,0.10);
+      --accent-dim:#4a3fa0;
+      --mocha:     #c4a882;
+      --fresh:     #34d399;
+      --aging:     #f59e0b;
+      --stale:     #6b7280;
+      --font-mono: "JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans: "Inter",system-ui,-apple-system,sans-serif;
+      --font-serif: "Georgia","Times New Roman",serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Layout ── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── Header ── */
+    header {
+      padding: 28px 0 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap;
+      position: relative;
+    }
+    header::after {
+      content: ""; position: absolute; bottom: -1px; left: 0;
+      width: 220px; height: 1px;
+      background: linear-gradient(to right, var(--accent), transparent);
+    }
+    .logo { font-family: var(--font-mono); font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .site-nav { margin-left: auto; font-family: var(--font-mono); font-size: 12px; display: flex; gap: 16px; align-items: baseline; }
+    .site-nav a { color: var(--muted); }
+    .site-nav a:hover { color: var(--accent); text-decoration: none; }
+    .site-nav .active { color: var(--accent); font-weight: 600; }
+
+    /* ── Two-column layout ── */
+    .spec-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 0 48px;
+      padding: 40px 0 60px;
+      align-items: start;
+    }
+    @media (max-width: 760px) {
+      .spec-layout { grid-template-columns: 1fr; }
+      .toc { display: none; }
+    }
+
+    /* ── Table of contents ── */
+    .toc {
+      position: sticky;
+      top: 24px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      line-height: 1.6;
+    }
+    .toc-title {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); margin-bottom: 10px; font-weight: 600;
+    }
+    .toc a {
+      display: block; color: var(--muted); padding: 3px 0;
+      border-left: 2px solid var(--border); padding-left: 10px;
+      transition: all 0.1s;
+    }
+    .toc a:hover { color: var(--accent); border-color: var(--accent-dim); text-decoration: none; }
+    .toc a.active { color: var(--accent); border-color: var(--accent); }
+    .toc-sub { padding-left: 22px !important; font-size: 11px; }
+
+    /* ── Spec document ── */
+    .spec-doc { min-width: 0; max-width: 720px; }
+
+    /* Cover block */
+    .spec-cover {
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+    .spec-cover h1 {
+      font-family: var(--font-mono);
+      font-size: 26px; font-weight: 700; letter-spacing: -0.5px;
+      line-height: 1.25; margin-bottom: 12px;
+    }
+    .spec-meta {
+      font-family: var(--font-mono); font-size: 11.5px;
+      color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 18px;
+      margin-bottom: 14px;
+    }
+    .spec-meta span { white-space: nowrap; }
+
+    /* Status badge */
+    .status-badge {
+      display: inline-block;
+      font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+      padding: 2px 8px; border-radius: 3px;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .status-published  { background: rgba(52,211,153,0.15); color: var(--fresh); }
+    .status-draft      { background: rgba(245,158,11,0.15);  color: var(--aging); }
+    .status-review     { background: var(--accent-lt);        color: var(--accent); }
+    .status-superseded { background: rgba(107,114,128,0.15); color: var(--stale); }
+
+    /* Permalink */
+    .permalink {
+      font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+      margin-top: 10px;
+    }
+    .permalink code { color: var(--accent); }
+
+    /* ── Section headings ── */
+    .spec-doc h2 {
+      font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--accent); margin: 36px 0 14px;
+      padding-bottom: 8px; border-bottom: 1px solid var(--border);
+      scroll-margin-top: 24px;
+    }
+    .spec-doc h3 {
+      font-family: var(--font-mono); font-size: 12.5px; font-weight: 600;
+      color: var(--text); margin: 24px 0 10px;
+      scroll-margin-top: 24px;
+    }
+    .spec-doc h4 {
+      font-size: 13px; font-weight: 600; color: var(--mocha);
+      margin: 18px 0 8px;
+    }
+
+    /* ── Body copy ── */
+    .spec-doc p { margin-bottom: 14px; color: var(--text); font-size: 14.5px; }
+    .spec-doc p:last-child { margin-bottom: 0; }
+
+    /* ── Normative keywords ── */
+    .must   { font-weight: 700; color: #f87171; }  /* red  */
+    .should { font-weight: 700; color: var(--aging); }
+    .may    { font-weight: 700; color: var(--fresh); }
+
+    /* ── Code ── */
+    code {
+      font-family: var(--font-mono); font-size: 12.5px;
+      background: var(--surface-2); padding: 1px 5px; border-radius: 3px;
+      color: var(--mocha);
+    }
+    pre {
+      font-family: var(--font-mono); font-size: 12px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 16px 18px; overflow-x: auto;
+      margin: 14px 0; line-height: 1.6; color: var(--text);
+    }
+    pre code { background: none; padding: 0; color: inherit; }
+
+    /* ── Lists ── */
+    .spec-doc ul, .spec-doc ol {
+      padding-left: 1.4em; margin: 10px 0 14px;
+    }
+    .spec-doc li { margin-bottom: 6px; font-size: 14.5px; }
+    .spec-doc li:last-child { margin-bottom: 0; }
+
+    /* ── Definition list ── */
+    .spec-doc dl { margin: 10px 0 14px; }
+    .spec-doc dt {
+      font-family: var(--font-mono); font-size: 12.5px; font-weight: 600;
+      color: var(--text); margin-top: 12px;
+    }
+    .spec-doc dd { margin-left: 1.4em; font-size: 14px; color: var(--muted); }
+
+    /* ── Callout ── */
+    .note {
+      font-size: 13.5px; color: var(--text);
+      padding: 12px 16px; background: var(--accent-lt);
+      border-left: 3px solid var(--accent); border-radius: 0 4px 4px 0;
+      margin: 16px 0;
+    }
+
+    /* ── Data table ── */
+    .spec-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 13px; margin: 14px 0;
+    }
+    .spec-table th {
+      font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted); background: var(--surface);
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .spec-table td {
+      padding: 9px 12px; border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .spec-table tr:last-child td { border-bottom: none; }
+    .spec-table tr:nth-child(even) { background: rgba(255,255,255,0.018); }
+
+    /* ── Section number ── */
+    .sec-num { color: var(--muted); margin-right: 8px; font-family: var(--font-mono); }
+
+    /* ── Footer ── */
+    footer {
+      padding: 28px 0 48px; border-top: 1px solid var(--border);
+      font-size: 12px; color: var(--muted);
+      display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
+    }
+    footer a { color: var(--accent); }
+    .footer-sep { color: var(--border); }
+  </style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+</head>
+<body>
+  <div class="page">
+
+    <header>
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/methodology">Methodology</a>
+        <span class="active">Specifications</span>
+      </nav>
+    </header>
+
+    <div class="spec-layout">
+
+      <!-- Table of contents -->
+      <nav class="toc" aria-label="Table of contents">
+        <div class="toc-title">Contents</div>
+        
+        <a href="#s1" class="active">
+          1. Abstract
+        </a>
+        
+        
+        <a href="#s2" >
+          2. Motivation
+        </a>
+        
+        
+        <a href="#s3" >
+          3. Terminology
+        </a>
+        
+        
+        <a href="#s4" >
+          4. Endpoint Catalog
+        </a>
+        
+        
+        <a href="#s4-1" class="toc-sub">4.1 /data/latest.json</a>
+        
+        <a href="#s4-2" class="toc-sub">4.2 /data/agents/&lt;slug&gt;.json</a>
+        
+        <a href="#s4-3" class="toc-sub">4.3 /data/signals/scorecard.json</a>
+        
+        <a href="#s4-4" class="toc-sub">4.4 /data/signals/provenance.json</a>
+        
+        <a href="#s4-5" class="toc-sub">4.5 /data/history/&lt;YYYY-MM-DD&gt;.json</a>
+        
+        <a href="#s4-6" class="toc-sub">4.6 /data/index.html</a>
+        
+        
+        
+        <a href="#s5" >
+          5. Field Definitions
+        </a>
+        
+        
+        <a href="#s5-1" class="toc-sub">5.1 Envelope Fields</a>
+        
+        <a href="#s5-2" class="toc-sub">5.2 Agent Record Fields</a>
+        
+        <a href="#s5-3" class="toc-sub">5.3 History Point Fields</a>
+        
+        <a href="#s5-4" class="toc-sub">5.4 Signal Subset Fields</a>
+        
+        
+        
+        <a href="#s6" >
+          6. Schema Evolution
+        </a>
+        
+        
+        <a href="#s7" >
+          7. Data License
+        </a>
+        
+        
+        <a href="#s8" >
+          8. Versioning and Changelog
+        </a>
+        
+        
+        
+        
+        <a href="#app-a">A. Field Quick Reference</a>
+        
+        
+      </nav>
+
+      <!-- Specification document -->
+      <article class="spec-doc">
+
+        <div class="spec-cover">
+          <h1>HVTracker Data Schema Specification</h1>
+          <div class="spec-meta">
+            <span>Version: <strong>v0.1</strong></span>
+            <span>Status: <span class="status-badge status-published">Published</span></span>
+            <span>Published: 2026-05-25</span>
+            <span>Authors: HVTracker</span>
+          </div>
+          <div class="permalink">
+            Permalink: <code>https://hvtracker.net/spec/data-schema/v0.1</code>
+          </div>
+        </div>
+
+        
+<h2 id="s1"><span class="sec-num">1.</span> Abstract</h2>
+<p>This document defines the schema for all machine-readable data published by HVTracker at the <code>/data/</code> endpoint family. It specifies the URL catalog, field definitions, data types, nullability rules, refresh cadence, and the versioning policy governing schema evolution.</p>
+<p>The key words <span class="must">MUST</span>, <span class="must">MUST NOT</span>, <span class="should">SHOULD</span>, <span class="should">SHOULD NOT</span>, and <span class="may">MAY</span> in this document are to be interpreted as described in <a href="https://www.rfc-editor.org/rfc/rfc2119" target="_blank" rel="noopener">RFC 2119</a>.</p>
+
+<h2 id="s2"><span class="sec-num">2.</span> Motivation</h2>
+<p>HVTracker publishes daily health scores and trust signals for open-source AI agent projects. As third-party consumers begin building integrations — dashboards, alerts, research pipelines — the absence of a formal schema creates fragility: a field rename or type change silently breaks downstream consumers.</p>
+<p>A formal data schema specification serves three purposes:</p>
+<ul>
+  <li><strong>Stability contract:</strong> Consumers can depend on documented fields not changing without a version increment.</li>
+  <li><strong>Discovery:</strong> The endpoint catalog and field definitions document what data exists, removing the need to reverse-engineer <code>data.json</code>.</li>
+  <li><strong>Trust:</strong> A versioned, published schema signals that the dataset is intended as infrastructure, not just a build artifact.</li>
+</ul>
+
+<h2 id="s3"><span class="sec-num">3.</span> Terminology</h2>
+<dl>
+  <dt><strong>Snapshot</strong></dt>
+  <dd>A complete dataset capture as of a single daily cron run. Each snapshot contains all agent records with values reflecting the state of the world at generation time.</dd>
+  <dt><strong>Agent record</strong></dt>
+  <dd>A JSON object representing a single tracked project. Every agent record contains at minimum the fields defined in Section 5.2.</dd>
+  <dt><strong>Signal</strong></dt>
+  <dd>A measured attribute of an agent record. Signals are either activity signals (stars, commits, HN mentions), trust signals (provenance, scorecard, signed commits), or behavioral signals (future: public action counts).</dd>
+  <dt><strong>Envelope</strong></dt>
+  <dd>The top-level fields present in every endpoint response, defined in Section 5.1. Envelope fields carry metadata about the response itself rather than about individual agents.</dd>
+  <dt><strong>Slug</strong></dt>
+  <dd>A URL-safe identifier derived from the agent name by lowercasing and replacing non-alphanumeric characters with hyphens. Used to construct per-agent endpoint URLs.</dd>
+  <dt><strong>Null</strong></dt>
+  <dd>A JSON <code>null</code> value indicating the signal could not be collected during this cron run. <code>null</code> is semantically distinct from zero and from the absence of a field.</dd>
+</dl>
+
+<h2 id="s4"><span class="sec-num">4.</span> Endpoint Catalog</h2>
+<p>All endpoints are static JSON files (except the HTML index) served from <code>https://hvtracker.net/data/</code>. Files are regenerated on each daily cron run at 06:00 UTC. CORS header <code>Access-Control-Allow-Origin: *</code> is set on all <code>/data/*</code> responses.</p>
+
+<h3 id="s4-1"><span class="sec-num">4.1</span> /data/latest.json</h3>
+<p><strong>Content:</strong> Full snapshot — envelope fields plus an <code>agents</code> array containing all active agent records.</p>
+<p><strong>Refresh:</strong> Daily at 06:00 UTC, atomically replaced.</p>
+<p><strong>Use case:</strong> Primary integration point. Fetch once daily to get the complete leaderboard.</p>
+<p><strong>Size bound:</strong> <span class="should">SHOULD</span> remain under 500 KB. If the dataset grows beyond this, the maintainer <span class="must">MUST</span> split the endpoint or switch to pagination before the next schema version.</p>
+
+<h3 id="s4-2"><span class="sec-num">4.2</span> /data/agents/&lt;slug&gt;.json</h3>
+<p><strong>Content:</strong> Single agent record (all fields from Section 5.2) plus a <code>history</code> array containing the last 90 days of daily snapshots for this agent (Section 5.3).</p>
+<p><strong>URL construction:</strong> <code>https://hvtracker.net/data/agents/{slug}.json</code> where <code>{slug}</code> is the agent's slug as defined in Section 3.</p>
+<p><strong>Refresh:</strong> Daily at 06:00 UTC.</p>
+<p><strong>Size bound:</strong> <span class="should">SHOULD</span> remain under 50 KB per file.</p>
+<p><strong>Note:</strong> Files for legacy agents are also generated but tagged with <code>"status": "legacy"</code> in the agent record.</p>
+
+<h3 id="s4-3"><span class="sec-num">4.3</span> /data/signals/scorecard.json</h3>
+<p><strong>Content:</strong> Envelope fields plus an <code>agents</code> array where each element contains only the fields: <code>repo</code>, <code>name</code>, <code>scorecard_score</code>, <code>scorecard_checks</code>, <code>signed_commits_ratio</code>.</p>
+<p><strong>Use case:</strong> Supply-chain security consumers who need trust signals without the full dataset.</p>
+
+<h3 id="s4-4"><span class="sec-num">4.4</span> /data/signals/provenance.json</h3>
+<p><strong>Content:</strong> Envelope fields plus an <code>agents</code> array where each element contains: <code>repo</code>, <code>name</code>, <code>has_provenance</code>, <code>npm_provenance</code>, <code>pypi_provenance</code>.</p>
+<p><strong>Use case:</strong> Package provenance monitoring, SBOM pipelines.</p>
+
+<h3 id="s4-5"><span class="sec-num">4.5</span> /data/history/&lt;YYYY-MM-DD&gt;.json</h3>
+<p><strong>Content:</strong> Full snapshot for the named calendar date (UTC). Same structure as <code>/data/latest.json</code>.</p>
+<p><strong>Permanence:</strong> Historical files are never deleted or overwritten. A file at <code>/data/history/2026-05-25.json</code> will remain accessible indefinitely.</p>
+<p><strong>Availability:</strong> Files exist for every date on which the cron ran successfully. Gaps are possible during outages.</p>
+
+<h3 id="s4-6"><span class="sec-num">4.6</span> /data/index.html</h3>
+<p><strong>Content:</strong> Human-readable HTML catalog listing all available endpoints with descriptions, links, and generation metadata. Not machine-readable.</p>
+
+<h2 id="s5"><span class="sec-num">5.</span> Field Definitions</h2>
+
+<h3 id="s5-1"><span class="sec-num">5.1</span> Envelope Fields</h3>
+<p>Every endpoint response (except <code>/data/index.html</code>) is a JSON object containing the following envelope fields at the top level.</p>
+<table class="spec-table">
+  <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>schema_version</code></td><td><code>string</code></td><td>No</td><td>Schema version string, e.g. <code>"v0.1"</code>. Incremented per Section 6.</td></tr>
+    <tr><td><code>generated_at</code></td><td><code>string</code></td><td>No</td><td>ISO 8601 UTC timestamp of this cron run, e.g. <code>"2026-05-25 06:00 UTC"</code>.</td></tr>
+    <tr><td><code>methodology_version</code></td><td><code>string</code></td><td>No</td><td>Methodology spec version used to compute scores, e.g. <code>"v2.0"</code>.</td></tr>
+    <tr><td><code>license</code></td><td><code>string</code></td><td>No</td><td>Data license declaration. Current value: <code>"CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/"</code>.</td></tr>
+    <tr><td><code>updated</code></td><td><code>string</code></td><td>No</td><td>Human-readable generation time (same as <code>generated_at</code>).</td></tr>
+    <tr><td><code>total</code></td><td><code>integer</code></td><td>No</td><td>Count of active (non-legacy) agent records in this snapshot.</td></tr>
+    <tr><td><code>agents</code></td><td><code>array</code></td><td>No</td><td>Array of agent records. See Section 5.2.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s5-2"><span class="sec-num">5.2</span> Agent Record Fields</h3>
+<p>Each element of the <code>agents</code> array is an agent record with the following fields.</p>
+<table class="spec-table">
+  <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>name</code></td><td><code>string</code></td><td>No</td><td>Display name of the project.</td></tr>
+    <tr><td><code>repo</code></td><td><code>string</code></td><td>No</td><td>GitHub repository path, e.g. <code>"All-Hands-AI/OpenHands"</code>.</td></tr>
+    <tr><td><code>url</code></td><td><code>string</code></td><td>No</td><td>Canonical GitHub URL.</td></tr>
+    <tr><td><code>rank</code></td><td><code>integer</code></td><td>No</td><td>Global rank by health score (1 = highest). Active agents only.</td></tr>
+    <tr><td><code>previous_rank</code></td><td><code>integer | null</code></td><td>Yes</td><td>Rank from the previous daily snapshot. <code>null</code> for newly added agents.</td></tr>
+    <tr><td><code>rank_delta</code></td><td><code>integer | null</code></td><td>Yes</td><td>Change in rank since previous snapshot. Positive = improved rank.</td></tr>
+    <tr><td><code>stars</code></td><td><code>integer</code></td><td>No</td><td>GitHub star count at collection time.</td></tr>
+    <tr><td><code>stars_fmt</code></td><td><code>string</code></td><td>No</td><td>Human-formatted star count, e.g. <code>"45.2k"</code>.</td></tr>
+    <tr><td><code>forks</code></td><td><code>integer</code></td><td>No</td><td>GitHub fork count at collection time.</td></tr>
+    <tr><td><code>forks_fmt</code></td><td><code>string</code></td><td>No</td><td>Human-formatted fork count.</td></tr>
+    <tr><td><code>last_push</code></td><td><code>string</code></td><td>No</td><td>ISO 8601 UTC timestamp of the most recent push to the default branch.</td></tr>
+    <tr><td><code>days_ago</code></td><td><code>integer</code></td><td>No</td><td>Days since <code>last_push</code> as of the collection date.</td></tr>
+    <tr><td><code>weekly_commits</code></td><td><code>integer | null</code></td><td>Yes</td><td>Commit count in the trailing 4 weeks. <code>null</code> if the GitHub stats API did not return data.</td></tr>
+    <tr><td><code>commits_low_confidence</code></td><td><code>boolean</code></td><td>No</td><td><code>true</code> when <code>weekly_commits</code> was derived from a single-page estimate rather than a full count.</td></tr>
+    <tr><td><code>score</code></td><td><code>number</code></td><td>No</td><td>Health score [0–100] computed per Methodology v2.0. One decimal place.</td></tr>
+    <tr><td><code>description</code></td><td><code>string | null</code></td><td>Yes</td><td>Repository description from GitHub API.</td></tr>
+    <tr><td><code>language</code></td><td><code>string | null</code></td><td>Yes</td><td>Primary programming language reported by GitHub.</td></tr>
+    <tr><td><code>open_issues</code></td><td><code>integer</code></td><td>No</td><td>Open issue count at collection time.</td></tr>
+    <tr><td><code>category</code></td><td><code>string</code></td><td>No</td><td>HVTracker category. One of: <code>Coding Agents</code>, <code>Agent Frameworks</code>, <code>Workflow Platforms</code>, <code>Browser &amp; Computer Use</code>, <code>LLM Gateways &amp; Infra</code>, <code>Memory &amp; Knowledge</code>, <code>Research &amp; Data</code>, <code>Multi-Agent Systems</code>.</td></tr>
+    <tr><td><code>category_rank</code></td><td><code>integer | null</code></td><td>Yes</td><td>Rank within the agent's category.</td></tr>
+    <tr><td><code>npm_package</code></td><td><code>string</code></td><td>No</td><td>npm package name if tracked, else empty string.</td></tr>
+    <tr><td><code>pypi_package</code></td><td><code>string</code></td><td>No</td><td>PyPI package name if tracked, else empty string.</td></tr>
+    <tr><td><code>weekly_downloads</code></td><td><code>integer | null</code></td><td>Yes</td><td>Combined weekly download count (npm + PyPI). <code>null</code> if no package is tracked or download fetch failed.</td></tr>
+    <tr><td><code>dl_source</code></td><td><code>string</code></td><td>No</td><td>Source label for <code>weekly_downloads</code>, e.g. <code>"pypi"</code>, <code>"npm+pypi"</code>. Empty string if no downloads tracked.</td></tr>
+    <tr><td><code>hn_mentions_30d</code></td><td><code>integer | null</code></td><td>Yes</td><td>Count of Hacker News story mentions in the trailing 30 days. <code>null</code> if no search term configured.</td></tr>
+    <tr><td><code>has_provenance</code></td><td><code>boolean | null</code></td><td>Yes</td><td>Derived: <code>true</code> if <code>npm_provenance</code> or <code>pypi_provenance</code> is <code>true</code>.</td></tr>
+    <tr><td><code>npm_provenance</code></td><td><code>boolean | null</code></td><td>Yes</td><td>SLSA provenance attestation detected on npm package. <code>null</code> if no npm package tracked.</td></tr>
+    <tr><td><code>pypi_provenance</code></td><td><code>boolean | null</code></td><td>Yes</td><td>PEP 740 attestation detected on PyPI package. <code>null</code> if no PyPI package tracked.</td></tr>
+    <tr><td><code>signed_commits_ratio</code></td><td><code>number | null</code></td><td>Yes</td><td>Fraction of recent commits with GPG/SSH signatures [0.0–1.0]. <code>null</code> if unavailable.</td></tr>
+    <tr><td><code>scorecard_score</code></td><td><code>number | null</code></td><td>Yes</td><td>OSSF Scorecard overall score [0.0–10.0]. <code>null</code> if not yet scanned.</td></tr>
+    <tr><td><code>scorecard_checks</code></td><td><code>object</code></td><td>No</td><td>Per-check Scorecard scores as a flat object. Empty object <code>{}</code> if no scorecard data.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s5-3"><span class="sec-num">5.3</span> History Point Fields</h3>
+<p>Each element of the <code>history</code> array in per-agent endpoint responses (Section 4.2) is a history point:</p>
+<table class="spec-table">
+  <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>date</code></td><td><code>string</code></td><td>No</td><td>Calendar date of this snapshot, <code>YYYY-MM-DD</code> format (UTC).</td></tr>
+    <tr><td><code>rank</code></td><td><code>integer | null</code></td><td>Yes</td><td>Global rank on this date.</td></tr>
+    <tr><td><code>score</code></td><td><code>number | null</code></td><td>Yes</td><td>Health score on this date.</td></tr>
+    <tr><td><code>stars</code></td><td><code>integer | null</code></td><td>Yes</td><td>Star count on this date.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s5-4"><span class="sec-num">5.4</span> Signal Subset Fields</h3>
+<p>Signal subset endpoints (Sections 4.3 and 4.4) use the same envelope as Section 5.1 but their <code>agents</code> array contains a reduced record. The exact field set for each subset is defined in Sections 4.3 and 4.4 respectively.</p>
+
+<h2 id="s6"><span class="sec-num">6.</span> Schema Evolution</h2>
+<p>The schema is versioned as <code>v{major}.{minor}</code>. The <code>schema_version</code> envelope field carries the current version string.</p>
+
+<h3>6.1 Additive changes (minor version bump)</h3>
+<p>The following changes increment the minor version and are considered non-breaking:</p>
+<ul>
+  <li>Adding a new field to agent records or envelope.</li>
+  <li>Adding a new endpoint to the catalog.</li>
+  <li>Widening a type (e.g., <code>integer</code> → <code>integer | null</code>).</li>
+  <li>Adding new allowed values to an enum field.</li>
+</ul>
+<p>Consumers <span class="should">SHOULD</span> be written to ignore unknown fields so that minor version bumps do not break integrations.</p>
+
+<h3>6.2 Breaking changes (major version bump)</h3>
+<p>The following changes increment the major version:</p>
+<ul>
+  <li>Removing or renaming an existing field.</li>
+  <li>Changing a field's type in a non-widening way.</li>
+  <li>Changing the meaning of an existing field.</li>
+  <li>Removing an endpoint from the catalog.</li>
+  <li>Changing the URL structure of an existing endpoint.</li>
+</ul>
+<p>When a major version is published, the previous major version's <code>/data/latest.json</code> remains accessible for a minimum of 90 days at a versioned URL (e.g., <code>/data/v0/latest.json</code>).</p>
+
+<h3>6.3 Adding new signal classes</h3>
+<p>New signal classes (e.g., behavioral signals introduced in Task 3 of the roadmap) are always introduced as additive fields and result in a minor version bump. They are not included in the health score formula without a Methodology spec version bump.</p>
+
+<h2 id="s7"><span class="sec-num">7.</span> Data License</h2>
+<p>All data published at <code>https://hvtracker.net/data/</code> is released under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>.</p>
+<p>You are free to share and adapt the data for any purpose, including commercial use, provided you give appropriate credit to HVTracker and link to <code>https://hvtracker.net</code>.</p>
+<p>Source data (GitHub stars, commit activity, etc.) is sourced from the GitHub REST API and is subject to GitHub's terms of service. HVTracker does not grant rights to data that it does not own.</p>
+
+<h2 id="s8"><span class="sec-num">8.</span> Versioning and Changelog</h2>
+<table class="spec-table">
+  <thead><tr><th>Version</th><th>Date</th><th>Summary</th></tr></thead>
+  <tbody>
+    <tr><td>v0.1</td><td>2026-05-25</td><td>Initial publication. Defines 5 endpoints, 30 agent record fields, envelope format, history points, and schema evolution policy.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="app-a"><span class="sec-num">A.</span> Field Quick Reference</h2>
+<table class="spec-table">
+  <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Category</th></tr></thead>
+  <tbody>
+    <tr><td><code>name</code></td><td>string</td><td>No</td><td>Identity</td></tr>
+    <tr><td><code>repo</code></td><td>string</td><td>No</td><td>Identity</td></tr>
+    <tr><td><code>url</code></td><td>string</td><td>No</td><td>Identity</td></tr>
+    <tr><td><code>rank</code></td><td>integer</td><td>No</td><td>Ranking</td></tr>
+    <tr><td><code>previous_rank</code></td><td>integer | null</td><td>Yes</td><td>Ranking</td></tr>
+    <tr><td><code>rank_delta</code></td><td>integer | null</td><td>Yes</td><td>Ranking</td></tr>
+    <tr><td><code>score</code></td><td>number</td><td>No</td><td>Score</td></tr>
+    <tr><td><code>stars</code></td><td>integer</td><td>No</td><td>Activity</td></tr>
+    <tr><td><code>forks</code></td><td>integer</td><td>No</td><td>Activity</td></tr>
+    <tr><td><code>last_push</code></td><td>string</td><td>No</td><td>Activity</td></tr>
+    <tr><td><code>days_ago</code></td><td>integer</td><td>No</td><td>Activity</td></tr>
+    <tr><td><code>weekly_commits</code></td><td>integer | null</td><td>Yes</td><td>Activity</td></tr>
+    <tr><td><code>weekly_downloads</code></td><td>integer | null</td><td>Yes</td><td>Activity</td></tr>
+    <tr><td><code>hn_mentions_30d</code></td><td>integer | null</td><td>Yes</td><td>Community</td></tr>
+    <tr><td><code>category</code></td><td>string</td><td>No</td><td>Classification</td></tr>
+    <tr><td><code>language</code></td><td>string | null</td><td>Yes</td><td>Classification</td></tr>
+    <tr><td><code>has_provenance</code></td><td>boolean | null</td><td>Yes</td><td>Trust</td></tr>
+    <tr><td><code>npm_provenance</code></td><td>boolean | null</td><td>Yes</td><td>Trust</td></tr>
+    <tr><td><code>pypi_provenance</code></td><td>boolean | null</td><td>Yes</td><td>Trust</td></tr>
+    <tr><td><code>signed_commits_ratio</code></td><td>number | null</td><td>Yes</td><td>Trust</td></tr>
+    <tr><td><code>scorecard_score</code></td><td>number | null</td><td>Yes</td><td>Trust</td></tr>
+    <tr><td><code>scorecard_checks</code></td><td>object</td><td>No</td><td>Trust</td></tr>
+  </tbody>
+</table>
+
+
+      </article>
+    </div>
+
+    <footer>
+      <a href="/spec/">← All Specifications</a>
+      <span class="footer-sep">·</span>
+      <a href="/">Leaderboard</a>
+      <span class="footer-sep">·</span>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+
+  </div>
+
+  <script>
+    // Active ToC highlighting on scroll
+    (function () {
+      const headings = document.querySelectorAll('.spec-doc h2[id], .spec-doc h3[id]');
+      const links = document.querySelectorAll('.toc a');
+      if (!headings.length || !links.length) return;
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const active = document.querySelector('.toc a[href="#' + e.target.id + '"]');
+            if (active) active.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -60% 0px' });
+      headings.forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>
