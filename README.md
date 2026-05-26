@@ -1,119 +1,141 @@
-# HVTracker — AI Agent Leaderboard
+# HVTracker — AI Agent Trust Registry
 
 **Live:** [hvtracker.net](https://hvtracker.net)  
-**Repo:** [github.com/YugantM/hvtracker](https://github.com/YugantM/hvtracker)
+**Data API:** [hvtracker.net/data/latest.json](https://hvtracker.net/data/latest.json)
 
-HVTracker is an open-source leaderboard that tracks the health and momentum of 65+ open-source AI agent repositories on GitHub. Scores update daily at 06:00 UTC, with rank-change deltas (▲▼) computed between runs.
-
----
-
-## Table of contents
-
-- [What it tracks](#what-it-tracks)
-- [By category](#by-category)
-- [How it works](#how-it-works)
-- [Scoring formula](#scoring-formula)
-- [Project structure](#project-structure)
-- [Running locally](#running-locally)
-- [Adding an agent](#adding-an-agent)
-- [CI/CD (GitHub Actions)](#cicd-github-actions)
-- [data.json API](#datajson-api)
-- [License & contributing](#license--contributing)
+HVTracker tracks **171 open-source AI agents** across 14 categories and ranks them by evidence-weighted trust — not just stars or popularity. Signals refresh every 4 hours via staggered batch builds.
 
 ---
 
-## What it tracks
+## What makes it different
 
-For every agent repo in [`agents.json`](./agents.json), HVTracker fetches:
+Most "awesome lists" count stars. HVTracker measures **trust** across 5 dimensions:
 
-| Field | Source |
-|---|---|
-| **Stars** | `stargazers_count` |
-| **Forks** | `forks_count` |
-| **Last push** | `pushed_at` (shown with freshness dot: green ≤7d, olive ≤30d, brown ≤90d, gray >90d) |
-| **4-week commits** | Sum of weekly commits from `/stats/commit_activity` |
-| **Downloads (7d)** | Weekly downloads from npm and/or PyPI (summed if both), shown with source label ("npm", "pypi", or "npm+pypi") |
-| **Language** | Primary language from GitHub |
-| **Description** | Repo description (truncated to 120 chars) |
-| **Open issues** | `open_issues_count` |
-
-The **rank-change (Δ) column** compares the current ranking to the ranking stored in the previous `data.json`. Deltas display as:
-
-- **▲N** (green) — moved up N positions
-- **▼N** (red) — moved down N positions
-- **—** (gray) — unchanged
-- **NEW** (green badge) — first appearance in the leaderboard
-
-Each agent also belongs to one of **8 categories** (shown as a badge in the table). Click a category pill at the top of the page to filter the leaderboard to a single category — ranks switch to **category rank** with the global rank displayed in small muted text beside it.
-
----
-
-## By category
-
-HVTracker organizes agents into 8 curated categories. The taxonomy is maintained in [`agents.json`](./agents.json) via a `category` field on each entry.
-
-| Category | Count | Description |
+| Dimension | Max | What it measures |
 |---|---|---|
-| **Coding Agents** | 20 | AI pair programmers, code-generation agents, and IDE assistants that write, edit, and debug code |
-| **Agent Frameworks** | 17 | Libraries and SDKs for building, orchestrating, and deploying AI agents |
-| **Workflow Platforms** | 4 | End-to-end platforms for building LLM-powered applications with visual or declarative pipelines |
-| **Browser & Computer Use** | 6 | Agents that interact with web browsers, desktop GUIs, or perform computer-use tasks |
-| **LLM Gateways & Infra** | 4 | API gateways, sandboxes, monitoring, and infrastructure for LLM-powered agents |
-| **Memory & Knowledge** | 5 | Persistent memory layers, knowledge bases, and personal AI assistants with long-term context |
-| **Research & Data** | 5 | Autonomous research agents, web crawlers, data extraction, and model fine-tuning tools |
-| **Multi-Agent Systems** | 4 | Frameworks for multi-agent collaboration, role-playing, and emergent agent societies |
+| **Activity** | 25 | Commit freshness + 4-week commit volume |
+| **Adoption** | 20 | Stars + weekly downloads (npm/PyPI) |
+| **Transparency** | 20 | License exists + docs + OSSF Scorecard |
+| **Safety** | 20 | OSSF Scorecard + package provenance + signed commits |
+| **Identity** | 15 | Evidence grade + listing verification status |
 
-### Proposing a new category
+Each agent also gets an **evidence grade** (A/B/C/D) based on how many independent signal types are available — an agent with GitHub stats, downloads, OSSF Scorecard, provenance, and HN mentions earns an A; one with only GitHub data gets a D.
 
-Categories are not automatically assigned — they're curated by the maintainers. To propose a new category:
+---
 
-1. Open a [GitHub issue](https://github.com/YugantM/hvtracker/issues) with the title `Category proposal: <name>`.
-2. Explain what the new category covers, why existing categories don't fit, and list 3+ existing agents that would belong to it.
-3. Maintainers will review and either add the category or suggest an alternative fit.
+## Categories
 
-When adding a new agent to [`agents.json`](./agents.json), pick the most specific existing category. If unsure, mention it in your PR and maintainers will assign one.
+| Category | Count |
+|---|---|
+| Agent Frameworks | 57 |
+| Coding Agents | 26 |
+| Memory & Knowledge | 20 |
+| Browser & Computer Use | 15 |
+| Workflow Platforms | 13 |
+| Observability & Evaluation | 12 |
+| Research & Data | 8 |
+| Security & Guardrails | 6 |
+| LLM Gateways & Infra | 4 |
+| Protocols & Tool Integration | 4 |
+| Multi-Agent Systems | 3 |
+| Voice & Conversational | 1 |
+| Sandboxes & Runtimes | 1 |
+| Robotics & Embodied | 1 |
+
+---
+
+## Data signals
+
+For every agent, HVTracker collects:
+
+| Signal | Source |
+|---|---|
+| Stars, forks, language, license | GitHub REST API |
+| 4-week commit activity | GitHub Stats API |
+| Weekly downloads | npm Registry + PyPI (pypistats) |
+| OSSF Scorecard | deps.dev API + weekly CLI scan |
+| Package provenance | npm + PyPI attestation endpoints |
+| Signed commit ratio | GitHub Commits API |
+| HN mentions (30d) | Algolia HN Search API |
+| Public actions (fingerprint) | GitHub Search API |
 
 ---
 
 ## How it works
 
 ```
-agents.json   ──┐
-                 ├──►  fetch_and_build.py  ──►  index.html   (published via GitHub Pages)
-previous         │                              data.json    (machine-readable API + delta baseline)
-data.json (opt) ─┘
+agents.json ──┐
+               ├──► fetch_and_build.py ──► index.html    (GitHub Pages)
+history/    ───┤                           data.json     (public API)
+scorecard-  ───┘                           data/agents/  (per-agent endpoints)
+cache.json                                 data/build_report.json
 ```
 
-1. **`fetch_and_build.py`** reads the agent list from `agents.json`.
-2. For each repo, it calls the GitHub API (parallel, 10 threads) to fetch stars, forks, commit activity, last push date, language, and description. If the agent has `npm_package` and/or `pypi_package` fields, it also fetches weekly download counts from the npm registry and PyPI (pypistats) APIs, summing them if both are present.
-3. A **health score** (0–100) is computed from four sub-scores (see below).
-4. Agents are sorted by score descending and assigned ranks.
-5. The previous `data.json` is loaded to compute **rank deltas** (▲▼/—/NEW).
-6. `index.html` is rendered from `template.html` via Jinja2.
-7. `data.json` is written as a machine-readable snapshot of the full leaderboard.
+1. `fetch_and_build.py` reads agents from `agents.json`
+2. Fetches signals in parallel (10 threads for GitHub, serial for rate-limited APIs)
+3. Computes health score (activity-based, 0-100) and HVTrust score (trust-based, 0-100)
+4. Derives evidence grades and reputation events by diffing against prior snapshots
+5. Renders `index.html` via Jinja2, writes `data.json` and per-agent endpoints
+6. GitHub Pages serves the static site; signals refresh every 4 hours via staggered cron batches
 
-The site is a single static HTML file served by **GitHub Pages**. Cloudflare provides DNS (CNAME record → GitHub Pages) and edge caching.
+### Staggered builds
+
+171 agents are split into 6 batches (~29 each). Each batch runs every 4 hours, merging fresh data into `data.json`. Full refresh cycle completes in 24 hours. Each agent updates within 4 hours.
 
 ---
 
-## Scoring formula
+## Running locally
 
-Each agent receives a composite **0–100** score from four components:
+```bash
+git clone https://github.com/YugantM/hvtracker.git
+cd hvtracker
+pip install -r requirements.txt
 
+export GITHUB_TOKEN=$(gh auth token)  # or a personal access token
+python fetch_and_build.py             # full build (~35 min for all agents)
+python fetch_and_build.py --batch 1/6 # or just one batch (~6 min)
+
+open index.html
 ```
-Score = stars(30) + freshness(25) + activity(25) + community(20)
-```
 
-| Component | Max | Formula |
-|---|---|---|
-| **Stars** | 30 | `min(30, ln(1 + stars) / ln(1 + 100000) × 30)` — logarithmic scale; 100k stars = 30 pts |
-| **Freshness** | 25 | `max(0, 25 × (1 − days_since_push / 180))` — linear decay over 6 months |
-| **Activity** | 25 | `min(25, ln(1 + recent_commits) / ln(1 + 100) × 25)` — commits in last 4 weeks; 100 = 25 pts |
-| **Community** | 20 | `min(20, ln(1 + forks) / ln(1 + 20000) × 20)` — logarithmic scale; 20k forks = 20 pts |
+---
 
-Score pills on the table are color-coded: green (≥70), amber (≥45), gray (<45).
+## Submitting an agent
 
-On viewports narrower than 640 px, the description column hides to keep the table usable on mobile screens. All columns remain horizontally scrollable.
+Use the [agent listing issue template](https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml) to submit. Requirements:
+
+- Public, non-archived GitHub repo
+- At least one commit in the last 12 months
+- Not already listed
+
+Submissions are reviewed manually. See the [Listing Specification](https://hvtracker.net/spec/listing/v0.1) for lifecycle details.
+
+---
+
+## Data API
+
+All data is open under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). CORS is open.
+
+| Endpoint | Description |
+|---|---|
+| [`/data/latest.json`](https://hvtracker.net/data/latest.json) | Full snapshot — all agents with scores, signals, trust breakdowns |
+| [`/data/agents/{slug}.json`](https://hvtracker.net/data/agents/dify.json) | Per-agent detail with 90-day history and reputation events |
+| [`/data/build_report.json`](https://hvtracker.net/data/build_report.json) | Build integrity report — agent counts, warnings, failures |
+| [`/data/signals/scorecard.json`](https://hvtracker.net/data/signals/scorecard.json) | OSSF Scorecard data for all agents |
+| [`/data/signals/provenance.json`](https://hvtracker.net/data/signals/provenance.json) | Supply-chain provenance signals |
+
+---
+
+## Specifications
+
+HVTracker publishes formal specs for its methodology and processes:
+
+- [Methodology v2.2](https://hvtracker.net/spec/methodology/v2.2) — scoring formula
+- [Eligibility v1.0](https://hvtracker.net/spec/eligibility/v1.0) — listing requirements
+- [Listing v0.1](https://hvtracker.net/spec/listing/v0.1) — lifecycle states and transitions
+- [Data Schema v2.0](https://hvtracker.net/spec/data-schema/v2.0) — API schema
+- [Provenance v0.1](https://hvtracker.net/spec/provenance/v0.1) — provenance detection
+- [Build Report v0.1](https://hvtracker.net/spec/build-report/v0.1) — build transparency
 
 ---
 
@@ -121,171 +143,22 @@ On viewports narrower than 640 px, the description column hides to keep the tabl
 
 ```
 hvtracker/
-├── fetch_and_build.py      # Main build script — fetches GitHub data, scores, renders site
-├── template.html           # Jinja2 template — design, CSS, client-side sort JS
-├── agents.json             # Flat list of {repo, name} objects to track
-├── index.html              # Generated output — the live leaderboard (committed to repo)
-├── data.json               # Machine-readable snapshot — used as delta baseline (committed to repo)
-├── scan_scorecards.py      # Run OSSF Scorecard CLI against all agents; writes scorecard-cache.json
-├── scorecard-cache.json    # Weekly CLI scan results (cache for daily builds)
-├── discover_agents.py      # Search GitHub for new agent candidates; writes candidates.json
-├── requirements.txt        # Python dependencies (requests + jinja2 only)
-├── CNAME                   # hvtracker.net → GitHub Pages
+├── fetch_and_build.py        # Core build — fetches, scores, renders
+├── template.html             # Jinja2 template (leaderboard UI)
+├── templates/agent.html.j2   # Per-agent profile template
+├── agents.json               # Agent registry (171 active + 7 legacy)
+├── specs.py                  # Specification page generator
+├── scan_scorecards.py        # Weekly OSSF Scorecard CLI scan
+├── discover_agents.py        # Weekly agent discovery via GitHub search
 ├── .github/workflows/
-│   ├── update.yml          # GitHub Actions — daily cron at 06:00 UTC + manual trigger
-│   ├── scorecard-scan.yml  # GitHub Actions — weekly OSSF Scorecard CLI scan (Wednesdays 04:00 UTC)
-│   └── discover-agents.yml # GitHub Actions — weekly agent discovery (Sundays 12:00 UTC)
-└── CLAUDE.md               # Behavioral guidelines (simplicity, surgical changes, goal-driven)
+│   ├── update.yml            # Staggered builds — 6 batches every 4 hours
+│   ├── scorecard-scan.yml    # Weekly OSSF scan (Wed 04:00 UTC)
+│   └── discover-agents.yml   # Weekly discovery (Sun 12:00 UTC)
+└── data/                     # Generated data endpoints (API)
 ```
 
 ---
 
-## Running locally
+## License
 
-### Prerequisites
-
-- Python 3.9+
-- A [GitHub personal access token](https://github.com/settings/tokens) (classic) with `public_repo` scope (or `gh auth token` if GitHub CLI is installed)
-
-### Steps
-
-```bash
-# 1. Clone the repo
-git clone https://github.com/YugantM/hvtracker.git
-cd hvtracker
-
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Run the build
-# Option A: using GitHub CLI
-export GITHUB_TOKEN=$(gh auth token)
-# Option B: using a personal access token directly
-export GITHUB_TOKEN=ghp_your_token_here
-
-python fetch_and_build.py
-
-# 4. Open the result
-open index.html
-```
-
-The script prints one line per agent (`OK  owner/repo  score=NN.N`) and finishes with:
-
-```
-Wrote data.json with 65 agents.
-Built index.html with 65 agents.
-```
-
-On the first run (no `data.json` exists), all agents show **NEW** in the delta column. Run it a second time to establish a baseline and see **—** (unchanged) for stable agents.
-
----
-
-## Automated agent discovery
-
-New agents are discovered weekly via automated GitHub search. Every Sunday at 12:00 UTC, a GitHub Actions workflow searches for repositories matching AI agent topics and keywords, filters them against automated eligibility pre-checks (500+ stars, active in the last 365 days, open-source license, not archived, not a fork), and opens a GitHub Issue labeled `agent-candidate` listing the candidates found that week.
-
-**Candidates are proposals only.** Each candidate must be evaluated against the [Eligibility Specification](https://hvtracker.net/spec/eligibility/v1.0) before being added to `agents.json`. Category assignment is manual. The workflow never auto-adds agents.
-
-To review candidates: look for open issues labeled [`agent-candidate`](https://github.com/YugantM/hvtracker/labels/agent-candidate).
-
----
-
-## Adding an agent
-
-Edit [`agents.json`](./agents.json) and add a new entry:
-
-```json
-{ "repo": "owner/repo-name", "name": "Display Name" }
-```
-
-- **`repo`** — the GitHub owner/repo path (exactly as it appears in the URL)
-- **`name`** — the display name shown in the leaderboard
-- **`npm_package`** (optional) — the npm package name for fetching weekly download counts
-- **`pypi_package`** (optional) — the PyPI package name for fetching weekly download counts
-
-After adding, rebuild (`python fetch_and_build.py`) and open a pull request. Alternatively, the workflow will auto-rebuild and deploy when the PR is merged.
-
----
-
-## CI/CD (GitHub Actions)
-
-| Workflow | Schedule | Description |
-|---|---|---|
-| [`update.yml`](.github/workflows/update.yml) | Daily 06:00 UTC | Fetches latest data, regenerates `index.html` + `data.json`, commits + pushes |
-| [`scorecard-scan.yml`](.github/workflows/scorecard-scan.yml) | Weekly Wed 04:00 UTC | Downloads OSSF Scorecard CLI, scans all agents, commits `scorecard-cache.json` |
-| [`discover-agents.yml`](.github/workflows/discover-agents.yml) | Weekly Sun 12:00 UTC | Searches GitHub for new agent candidates, opens an issue if any are found |
-
-All workflows support `workflow_dispatch` for manual runs. They prefer `secrets.GH_PAT` (5,000 req/hr) and fall back to `secrets.GITHUB_TOKEN` (1,000 req/hr). Daily build commit messages follow the format: `chore: regenerate leaderboard YYYY-MM-DD`.
-
----
-
-## data.json API
-
-The `data.json` file serves double duty:
-
-1. **Delta baseline** — previous rankings are loaded on each run to compute ▲▼/—/NEW deltas.
-2. **Machine-readable API** — consumers can fetch the raw JSON for their own tooling.
-
-**Endpoint:** `https://raw.githubusercontent.com/YugantM/hvtracker/main/data.json`
-
-**Schema:**
-
-```jsonc
-{
-  "updated": "2026-05-23 02:47 UTC",
-  "total": 65,
-  "agents": [
-    {
-      "name": "Dify",
-      "repo": "langgenius/dify",
-      "url": "https://github.com/langgenius/dify",
-      "rank": 1,
-      "previous_rank": null,    // null if new (no previous entry)
-      "rank_delta": null,       // null if new; positive = improved; negative = declined; 0 = unchanged
-      "stars": 142288,
-      "forks": 22379,
-      "last_push": "2026-05-23",
-      "days_ago": 0,
-      "weekly_commits": 539,
-      "score": 100.0,
-      "description": "Production-ready platform for agentic workflow development.",
-      "language": "TypeScript",
-      "open_issues": 820,
-      "npm_package": "",
-      "pypi_package": "",
-      "weekly_downloads": null
-    }
-    // ... more agents
-  ]
-}
-```
-
----
-
-## License & contributing
-
-This project is open source. To contribute:
-
-1. Add or update agents in [`agents.json`](./agents.json).
-2. Rebuild locally to verify (`python fetch_and_build.py`).
-3. Open a pull request.
-
-When adding agents, follow these guidelines:
-
-- The repo must be a legitimate, open-source AI agent project.
-- Choose the most specific `category` from the 8 listed above. If unsure, leave a comment in your PR. Category assignments are validated against the canonical list.
-- Verify the repo exists and is active on GitHub before adding.
-- Keep the list sorted roughly by notability — the build script will sort by score automatically, but the source list should be curated.
-
----
-
-## Constraints
-
-- **No new dependencies** beyond `requests` + `jinja2` (no npm, no frameworks).
-- **Page weight under 100 KB** (currently ~99 KB with 65 agents).
-- **Free tiers only** — GitHub Pages, Cloudflare DNS, no paid services.
-- **No secrets in the repo** — the workflow uses `secrets.GITHUB_TOKEN`.
-
----
-
-Built with ♥ for the open-source AI agent community.
+Open source. Data licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
