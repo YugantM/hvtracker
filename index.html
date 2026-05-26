@@ -141,6 +141,7 @@
     }
     .site-nav a { color: var(--muted); }
     .site-nav a:hover { color: var(--accent); }
+    .site-nav a.active { color: var(--accent); }
 
     .intro {
       padding: 18px 0 16px;
@@ -484,6 +485,23 @@
       align-items: center;
       margin-top: 2px;
     }
+    .agent-compare {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      border: 1px solid var(--accent-dim);
+      color: var(--accent);
+      margin-top: 3px;
+    }
+    .agent-compare:hover {
+      color: var(--text);
+      border-color: var(--accent);
+      text-decoration: none;
+      background: var(--accent-lt);
+    }
     .evidence-badge {
       display: inline-block;
       font-family: var(--font-mono);
@@ -678,6 +696,7 @@
       <span class="tagline">AI Agent Trust Registry</span>
       <nav class="site-nav" aria-label="Site">
         <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
       </nav>
       <div class="meta">
         171 agents tracked &nbsp;·&nbsp; updated 2026-05-26 15:05 UTC<br>
@@ -690,6 +709,7 @@
       <p>HVTracker tracks 171 open-source AI agents, coding agents, frameworks, browser agents, memory systems, and agent infrastructure. Rankings combine public signals for activity, adoption, transparency, safety, provenance, signed commits, OSSF Scorecard, and evidence quality.</p>
       <div class="intro-links" aria-label="Key HVTracker resources">
         <a href="/methodology">How the ranking works</a>
+        <a href="/compare/">Compare agents</a>
         <a href="/data.json">Download data.json</a>
         <a href="/spec/">Specifications</a>
       </div>
@@ -885,6 +905,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Workflow Platforms</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -932,6 +953,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -979,6 +1001,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -1026,6 +1049,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -1073,6 +1097,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">LLM Gateways &amp; Infra</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -1120,6 +1145,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -1167,6 +1193,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Workflow Platforms</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -1214,6 +1241,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -1261,6 +1289,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Observability &amp; Evaluation</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -1308,6 +1337,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -1355,6 +1385,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -1402,6 +1433,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Workflow Platforms</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -1449,6 +1481,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -1496,6 +1529,7 @@
                 <span class="lang">Shell</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -1543,6 +1577,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -1590,6 +1625,7 @@
                 <span class="lang">Rust</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -1637,6 +1673,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -1684,6 +1721,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Workflow Platforms</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -1731,6 +1769,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Workflow Platforms</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -1778,6 +1817,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Research &amp; Data</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -1825,6 +1865,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -1872,6 +1913,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Protocols &amp; Tool Integration</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -1919,6 +1961,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -1966,6 +2009,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Research &amp; Data</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -2013,6 +2057,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Research &amp; Data</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -2060,6 +2105,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Sandboxes &amp; Runtimes</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -2107,6 +2153,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -2154,6 +2201,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -2201,6 +2249,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -2248,6 +2297,7 @@
                 <span class="lang">JavaScript</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -2295,6 +2345,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -2342,6 +2393,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -2389,6 +2441,7 @@
                 <span class="lang">Rust</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -2436,6 +2489,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -2483,6 +2537,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -2530,6 +2585,7 @@
                 <span class="lang">Go</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -2577,6 +2633,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -2624,6 +2681,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -2671,6 +2729,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Multi-Agent Systems</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -2718,6 +2777,7 @@
                 <span class="lang">C#</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -2765,6 +2825,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -2812,6 +2873,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -2859,6 +2921,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -2906,6 +2969,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Robotics &amp; Embodied</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -2953,6 +3017,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -3000,6 +3065,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Workflow Platforms</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -3047,6 +3113,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Observability &amp; Evaluation</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -3094,6 +3161,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -3141,6 +3209,7 @@
                 <span class="lang">Rust</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -3188,6 +3257,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -3235,6 +3305,7 @@
                 <span class="lang">MDX</span>
                 <span class="cat-badge">Workflow Platforms</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -3282,6 +3353,7 @@
                 <span class="lang">Rust</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -3329,6 +3401,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -3376,6 +3449,7 @@
                 <span class="lang">Shell</span>
                 <span class="cat-badge">Protocols &amp; Tool Integration</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -3423,6 +3497,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -3470,6 +3545,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -3517,6 +3593,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -3564,6 +3641,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -3611,6 +3689,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -3658,6 +3737,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -3705,6 +3785,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Observability &amp; Evaluation</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -3752,6 +3833,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -3799,6 +3881,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -3846,6 +3929,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -3893,6 +3977,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Multi-Agent Systems</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -3940,6 +4025,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -3987,6 +4073,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Workflow Platforms</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -4034,6 +4121,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -4081,6 +4169,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">LLM Gateways &amp; Infra</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -4128,6 +4217,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Research &amp; Data</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -4175,6 +4265,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -4222,6 +4313,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Voice &amp; Conversational</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -4269,6 +4361,7 @@
                 <span class="lang">Go</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -4316,6 +4409,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Observability &amp; Evaluation</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -4363,6 +4457,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -4410,6 +4505,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Research &amp; Data</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -4457,6 +4553,7 @@
                 <span class="lang">Jupyter Notebook</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -4504,6 +4601,7 @@
                 <span class="lang">HTML</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -4551,6 +4649,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Workflow Platforms</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -4598,6 +4697,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -4645,6 +4745,7 @@
                 <span class="lang">Java</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -4692,6 +4793,7 @@
                 <span class="lang">Shell</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -4739,6 +4841,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">LLM Gateways &amp; Infra</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -4786,6 +4889,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">LLM Gateways &amp; Infra</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -4833,6 +4937,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -4880,6 +4985,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -4927,6 +5033,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Research &amp; Data</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -4974,6 +5081,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Observability &amp; Evaluation</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -5021,6 +5129,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -5068,6 +5177,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -5115,6 +5225,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -5162,6 +5273,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -5209,6 +5321,7 @@
                 <span class="lang">HTML</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -5256,6 +5369,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Workflow Platforms</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -5303,6 +5417,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Workflow Platforms</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -5350,6 +5465,7 @@
                 <span class="lang">Go</span>
                 <span class="cat-badge">Workflow Platforms</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -5397,6 +5513,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Security &amp; Guardrails</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -5444,6 +5561,7 @@
                 <span class="lang">Go</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -5491,6 +5609,7 @@
                 <span class="lang">Go</span>
                 <span class="cat-badge">Protocols &amp; Tool Integration</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -5538,6 +5657,7 @@
                 <span class="lang">C</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -5585,6 +5705,7 @@
                 <span class="lang">Java</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -5632,6 +5753,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -5679,6 +5801,7 @@
                 <span class="lang">Jupyter Notebook</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -5726,6 +5849,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -5773,6 +5897,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -5820,6 +5945,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Security &amp; Guardrails</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -5867,6 +5993,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -5914,6 +6041,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Security &amp; Guardrails</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -5961,6 +6089,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -6008,6 +6137,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Observability &amp; Evaluation</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -6055,6 +6185,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Security &amp; Guardrails</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -6102,6 +6233,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Observability &amp; Evaluation</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -6149,6 +6281,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -6196,6 +6329,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -6243,6 +6377,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -6290,6 +6425,7 @@
                 <span class="lang">Jupyter Notebook</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -6337,6 +6473,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -6384,6 +6521,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -6431,6 +6569,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -6478,6 +6617,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -6525,6 +6665,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Observability &amp; Evaluation</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -6572,6 +6713,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Observability &amp; Evaluation</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -6619,6 +6761,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -6666,6 +6809,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -6713,6 +6857,7 @@
                 <span class="lang">Rust</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -6760,6 +6905,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Workflow Platforms</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -6807,6 +6953,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Multi-Agent Systems</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -6854,6 +7001,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -6901,6 +7049,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -6948,6 +7097,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -6995,6 +7145,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Observability &amp; Evaluation</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -7042,6 +7193,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -7089,6 +7241,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Observability &amp; Evaluation</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -7136,6 +7289,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -7183,6 +7337,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -7230,6 +7385,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Observability &amp; Evaluation</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -7277,6 +7433,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -7324,6 +7481,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -7371,6 +7529,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -7418,6 +7577,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -7465,6 +7625,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Research &amp; Data</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -7559,6 +7720,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -7606,6 +7768,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -7653,6 +7816,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -7700,6 +7864,7 @@
                 <span class="lang">Go</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -7747,6 +7912,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -7794,6 +7960,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -7841,6 +8008,7 @@
                 <span class="lang">JavaScript</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -7888,6 +8056,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Research &amp; Data</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -7935,6 +8104,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -7982,6 +8152,7 @@
                 <span class="lang">Jupyter Notebook</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -8029,6 +8200,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Security &amp; Guardrails</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -8076,6 +8248,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -8123,6 +8296,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -8170,6 +8344,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Protocols &amp; Tool Integration</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -8217,6 +8392,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -8264,6 +8440,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -8311,6 +8488,7 @@
                 <span class="lang">Shell</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -8358,6 +8536,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -8405,6 +8584,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -8452,6 +8632,7 @@
                 <span class="lang">TypeScript</span>
                 <span class="cat-badge">Security &amp; Guardrails</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -8499,6 +8680,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
@@ -8546,6 +8728,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Browser &amp; Computer Use</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -8593,6 +8776,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Coding Agents</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -8640,6 +8824,7 @@
                 <span class="lang">Jupyter Notebook</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -8687,6 +8872,7 @@
                 <span class="lang">JavaScript</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -8734,6 +8920,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
@@ -8781,6 +8968,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -8828,6 +9016,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -8875,6 +9064,7 @@
                 <span class="lang">Python</span>
                 <span class="cat-badge">Agent Frameworks</span>
               </div>
+              <a class="agent-compare" href="/compare/?a=">Compare</a>
             </td>
             <td class="c">
               <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
@@ -9020,6 +9210,15 @@
   <script>
     // ── Category filtering, sorting & pagination ──
     (function () {
+      document.querySelectorAll(".agent-cell").forEach((cell) => {
+        const compareLink = cell.querySelector(".agent-compare");
+        const profileLink = cell.querySelector(".agent-name");
+        if (!compareLink || !profileLink) return;
+        const href = profileLink.getAttribute("href") || "";
+        const match = href.match(/\/agents\/([^/?#]+)/);
+        if (match) compareLink.setAttribute("href", `/compare/?a=${match[1]}`);
+      });
+
       const PAGE_SIZE = 15;
       let currentPage = 0;
 
