@@ -1,0 +1,191 @@
+{
+  "generated_at": "2026-05-26T10:35:11Z",
+  "data_timestamp": "2026-05-26 10:35 UTC",
+  "schema_version": "v0.1",
+  "methodology_version": "v2.0",
+  "configured_agents": 178,
+  "active_agents": 171,
+  "legacy_agents": 7,
+  "total_generated": 178,
+  "categories": {
+    "Coding Agents": 26,
+    "Agent Frameworks": 57,
+    "Workflow Platforms": 13,
+    "Browser & Computer Use": 15,
+    "Memory & Knowledge": 20,
+    "Research & Data": 8,
+    "Observability & Evaluation": 12,
+    "Security & Guardrails": 6,
+    "Protocols & Tool Integration": 4,
+    "Voice & Conversational": 1,
+    "Sandboxes & Runtimes": 1,
+    "Robotics & Embodied": 1,
+    "LLM Gateways & Infra": 4,
+    "Multi-Agent Systems": 3
+  },
+  "warnings": [
+    {
+      "repo": "anthropics/claude-code",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "RooVetGit/Roo-Code",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
+      "repo": "browserbase/open-operator",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
+      "repo": "browserbase/open-operator",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "microsoft/TaskWeaver",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
+      "repo": "yoheinakajima/babyagi",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "joonspk-research/generative_agents",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2024-08-05)"
+    },
+    {
+      "repo": "OpenBMB/XAgent",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2024-08-12)"
+    },
+    {
+      "repo": "MineDojo/Voyager",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2024-04-03)"
+    },
+    {
+      "repo": "nickscamara/open-deep-research",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2025-05-07)"
+    },
+    {
+      "repo": "xlang-ai/OpenAgents",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2024-11-18)"
+    },
+    {
+      "repo": "entropy-research/Devon",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2025-05-26)"
+    },
+    {
+      "repo": "crewAIInc/crewAI-tools",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
+      "repo": "AbanteAI/archive-old-cli-mentat",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
+      "repo": "AbanteAI/archive-old-cli-mentat",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2025-01-07)"
+    },
+    {
+      "repo": "agiresearch/OpenAGI",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2024-11-28)"
+    },
+    {
+      "repo": "trypear/pearai-master",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "protectai/rebuff",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
+      "repo": "protectai/rebuff",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2024-08-07)"
+    },
+    {
+      "repo": "PrefectHQ/ControlFlow",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
+      "repo": "MinorJerry/WebVoyager",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2024-03-04)"
+    },
+    {
+      "repo": "langchain-ai/langgraph-codeact",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
+      "repo": "langchain-ai/langgraph-codeact",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2025-05-16)"
+    },
+    {
+      "repo": "idosal/AgentLLM",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2023-07-31)"
+    },
+    {
+      "repo": "albertvillanova/tinyagents",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2025-05-19)"
+    },
+    {
+      "repo": "wisdom-pan/Agent_Hospital",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2024-09-26)"
+    }
+  ],
+  "warning_count": 26,
+  "failed_fetches": [],
+  "missing_repos_count": 0,
+  "package_failures": [
+    "sst/opencode",
+    "mastra-ai/mastra",
+    "open-webui/open-webui",
+    "langflow-ai/langflow",
+    "Mintplex-Labs/anything-llm",
+    "run-llama/llama_index",
+    "milvus-io/milvus",
+    "leon-ai/leon",
+    "lancedb/lancedb",
+    "vespa-engine/vespa",
+    "openai/swarm",
+    "NVIDIA/NeMo-Guardrails",
+    "microsoft/TaskWeaver",
+    "plandex-ai/plandex",
+    "protectai/llm-guard",
+    "crewAIInc/crewAI-tools",
+    "myshell-ai/AIlice",
+    "swarmzero/swarmzero"
+  ],
+  "package_failure_count": 18,
+  "scorecard_unavailable_count": 147,
+  "fingerprint_agents": [
+    "anthropics/claude-code",
+    "All-Hands-AI/OpenHands",
+    "paul-gauthier/aider",
+    "google-gemini/gemini-cli",
+    "QwenLM/qwen-code"
+  ],
+  "fingerprint_agent_count": 5
+}
