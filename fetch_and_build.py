@@ -845,10 +845,52 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
     return all_events
 
 
+def parse_batch_arg() -> tuple[int, int] | None:
+    """Parse --batch N/M from sys.argv. Returns (batch_num, total_batches) or None."""
+    for i, arg in enumerate(sys.argv[1:], 1):
+        if arg == "--batch" and i < len(sys.argv) - 1:
+            parts = sys.argv[i + 1].split("/")
+            if len(parts) == 2:
+                return int(parts[0]), int(parts[1])
+    return None
+
+
+def select_batch(agents: list[dict], batch_num: int, total_batches: int) -> list[dict]:
+    """Select the Nth batch of agents (1-indexed). Deterministic by repo name."""
+    # Sort by repo for stable assignment across runs
+    sorted_agents = sorted(agents, key=lambda a: a["repo"].lower())
+    batch_size = math.ceil(len(sorted_agents) / total_batches)
+    start = (batch_num - 1) * batch_size
+    return sorted_agents[start:start + batch_size]
+
+
+def merge_batch_into_data(data_path: str, fresh_rows: list[dict]) -> list[dict]:
+    """Merge freshly-fetched rows into existing data.json, replacing stale entries.
+
+    Returns the full merged agent list (fresh + unchanged old entries).
+    """
+    try:
+        with open(data_path) as f:
+            existing = json.load(f)
+        old_agents = existing.get("agents", [])
+    except (FileNotFoundError, json.JSONDecodeError):
+        old_agents = []
+
+    fresh_keys = {r["repo"].lower() for r in fresh_rows}
+    # Keep old entries that weren't in this batch
+    kept = [a for a in old_agents if a["repo"].lower() not in fresh_keys]
+    return kept  # caller will add fresh rows after scoring
+
+
 def main() -> None:
     script_dir = os.path.dirname(os.path.abspath(__file__))
     agents_path = os.path.join(script_dir, "agents.json")
     data_path = os.path.join(script_dir, "data.json")
+
+    batch = parse_batch_arg()
+    if batch:
+        batch_num, total_batches = batch
+        print(f"\n=== BATCH MODE: {batch_num}/{total_batches} ===\n")
 
     scorecard_cache = load_scorecard_cache(script_dir)
 
@@ -868,6 +910,15 @@ def main() -> None:
     # Split active vs legacy agents — legacy entries are fetched but rendered separately
     legacy_agents = [a for a in agents if a.get("status") == "legacy"]
     agents = [a for a in agents if a.get("status") != "legacy"]
+
+    # In batch mode, only fetch a slice of active agents
+    all_agents = agents  # keep full list for context
+    if batch:
+        agents = select_batch(agents, batch_num, total_batches)
+        print(f"Batch {batch_num}/{total_batches}: fetching {len(agents)} of {len(all_agents)} active agents")
+        # Legacy agents: only fetch in batch 1 (they rarely change)
+        if batch_num != 1:
+            legacy_agents = []
 
     # Load previous rankings and downloads from the most recent daily history snapshot.
     # Using history/ (not data.json) means deltas always compare against the prior
@@ -1056,7 +1107,33 @@ def main() -> None:
     print(f"  Scorecard: {cache_hits} from cache, {api_hits} from API, "
           f"{len(rows)-cache_hits-api_hits} unavailable.")
 
-    rows.sort(key=lambda x: x["score"], reverse=True)
+    # In batch mode, merge freshly-fetched rows with existing data.json entries
+    if batch:
+        old_agents = merge_batch_into_data(data_path, rows)
+        # old_agents have pre-computed fields from prior runs; rows are fresh
+        # Re-compute display fields on fresh rows to match old format
+        for row in rows:
+            dl = row.get("weekly_downloads")
+            row["downloads_fmt"] = f"{dl:,}" if dl is not None else "—"
+            row["slug"] = slugify(row["name"])
+            prov_signals = []
+            if row.get("npm_provenance"):
+                prov_signals.append("npm")
+            if row.get("pypi_provenance"):
+                prov_signals.append("pypi")
+            row["provenance_sources"] = prov_signals
+            row["has_provenance"] = len(prov_signals) > 0
+            sc = row.get("scorecard_score")
+            row["scorecard_fmt"] = f"{sc:.1f}" if sc is not None else None
+            sr = row.get("signed_commits_ratio")
+            row["signed_commits_pct"] = round(sr * 100) if sr is not None else None
+        # Combine: fresh rows replace old, keep rest from prior build
+        fresh_keys = {r["repo"].lower() for r in rows}
+        merged = rows + [a for a in old_agents if a["repo"].lower() not in fresh_keys]
+        rows = merged
+        print(f"\nMerged batch: {len(rows)} total agents ({len(rows) - len(old_agents)} refreshed, {len(old_agents)} carried forward)")
+
+    rows.sort(key=lambda x: x.get("score", 0) or 0, reverse=True)
     for i, row in enumerate(rows, 1):
         row["rank"] = i
 
@@ -1067,6 +1144,11 @@ def main() -> None:
         dl = row.get("weekly_downloads")
         row["downloads_fmt"] = f"{dl:,}" if dl is not None else "—"
         row["slug"] = slugify(row["name"])
+        # Ensure template-only fields exist (needed for carried-forward batch rows)
+        if "freshness_class" not in row:
+            row["freshness_class"] = freshness_class(row.get("days_ago") or 999)
+        if "score_class" not in row:
+            row["score_class"] = score_class(row.get("score") or 0)
         row["score_breakdown"] = score_components(
             row["stars"],
             row["days_ago"],

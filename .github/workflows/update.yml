@@ -2,9 +2,23 @@ name: Update leaderboard
 
 on:
   schedule:
-    # Every day at 06:00 UTC
-    - cron: "0 6 * * *"
-  workflow_dispatch:  # allow manual trigger from Actions tab
+    # Staggered batches — each batch refreshes ~29 agents, full cycle in 24h
+    - cron: "0 0 * * *"   # Batch 1/6 at 00:00 UTC
+    - cron: "0 4 * * *"   # Batch 2/6 at 04:00 UTC
+    - cron: "0 8 * * *"   # Batch 3/6 at 08:00 UTC
+    - cron: "0 12 * * *"  # Batch 4/6 at 12:00 UTC
+    - cron: "0 16 * * *"  # Batch 5/6 at 16:00 UTC
+    - cron: "0 20 * * *"  # Batch 6/6 at 20:00 UTC
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Run mode"
+        required: false
+        default: "full"
+        type: choice
+        options:
+          - full
+          - batch
 
 permissions:
   contents: write
@@ -29,19 +43,48 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Determine batch number
+        id: batch
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            HOUR=$(date -u +%H)
+            case $HOUR in
+              00) BATCH="1/6" ;;
+              04) BATCH="2/6" ;;
+              08) BATCH="3/6" ;;
+              12) BATCH="4/6" ;;
+              16) BATCH="5/6" ;;
+              20) BATCH="6/6" ;;
+              *)  BATCH="1/6" ;;
+            esac
+            echo "args=--batch $BATCH" >> $GITHUB_OUTPUT
+            echo "Running batch $BATCH"
+          elif [ "${{ inputs.mode }}" = "batch" ]; then
+            # Manual batch trigger — pick batch based on current hour
+            HOUR=$(date -u +%H)
+            BATCH_NUM=$(( (HOUR / 4) + 1 ))
+            [ $BATCH_NUM -gt 6 ] && BATCH_NUM=6
+            echo "args=--batch $BATCH_NUM/6" >> $GITHUB_OUTPUT
+            echo "Running manual batch $BATCH_NUM/6"
+          else
+            echo "args=" >> $GITHUB_OUTPUT
+            echo "Running full rebuild"
+          fi
+
       - name: Fetch data and build index.html
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        run: python fetch_and_build.py
+        run: python fetch_and_build.py ${{ steps.batch.outputs.args }}
 
       - name: Commit and push if changed
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main || true
           git add index.html data.json methodology.html output/history/ output/methodology.html agents/ sitemap.xml feed.json data/ spec/
           if git diff --cached --quiet; then
             echo "No changes — skipping commit."
           else
-            git commit -m "chore: regenerate leaderboard $(date -u '+%Y-%m-%d')"
+            git commit -m "chore: regenerate leaderboard $(date -u '+%Y-%m-%d %H:%M') ${{ steps.batch.outputs.args }}"
             git push
           fi
