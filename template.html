@@ -301,6 +301,7 @@
     col.col-rank     { width: 40px; }
     col.col-delta    { width: 50px; }
     col.col-agent    { width: auto; min-width: 200px; }
+    col.col-grade    { width: 55px; }
     col.col-stars    { width: 70px; }
     col.col-push     { width: 110px; }
     col.col-commits  { width: 115px; }
@@ -439,11 +440,6 @@
       margin-left: 4px;
     }
 
-    .agent-top {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
     .agent-tags {
       display: flex;
       gap: 4px;
@@ -705,6 +701,7 @@
           <col class="col-rank">
           <col class="col-delta">
           <col class="col-agent">
+          <col class="col-grade">
           <col class="col-stars">
           <col class="col-push">
           <col class="col-commits">
@@ -715,6 +712,7 @@
             <th class="r" data-col="rank">#<span class="sort-arrow">↑</span></th>
             <th class="c" data-col="rank_delta">Δ<span class="sort-arrow"></span></th>
             <th data-col="name">Agent</th>
+            <th class="c" data-col="evidence_grade">Grade<span class="sort-arrow"></span></th>
             <th class="r" data-col="stars">Stars<span class="sort-arrow"></span></th>
             <th data-col="last_push">Last Push<span class="sort-arrow"></span></th>
             <th class="r" data-col="weekly_commits">4-wk Commits<span class="sort-arrow"></span></th>
@@ -740,22 +738,23 @@
             data-trust_score="{{ row.trust_score }}"
             data-category="{{ row.category }}"
             data-category_rank="{{ row.category_rank }}"
+            data-evidence_grade="{{ row.evidence_grade }}"
           >
             <td class="rank r">
               <span class="rank-num">{{ row.rank }}</span>
             </td>
             <td class="delta {{ row.rank_delta_class }}">{{ row.rank_delta_display }}</td>
             <td class="agent-cell">
-              <div class="agent-top">
-                <a class="agent-name" href="/agents/{{ row.slug }}">{{ row.name }}</a>
-                <span class="evidence-badge grade-{{ row.evidence_grade }}" title="Evidence grade {{ row.evidence_grade }}">{{ row.evidence_grade }}</span>
-              </div>
+              <a class="agent-name" href="/agents/{{ row.slug }}">{{ row.name }}</a>
               <a class="agent-repo" href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>
               {% if row.description %}<span class="agent-desc" title="{{ row.description }}">{{ row.description }}</span>{% endif %}
               <div class="agent-tags">
                 {% if row.language %}<span class="lang">{{ row.language }}</span>{% endif %}
                 {% if row.category %}<span class="cat-badge">{{ row.category }}</span>{% endif %}
               </div>
+            </td>
+            <td class="c">
+              <span class="evidence-badge grade-{{ row.evidence_grade }}" title="Evidence grade {{ row.evidence_grade }}">{{ row.evidence_grade }}</span>
             </td>
             <td class="r num">{{ row.stars_fmt }}</td>
             <td>
