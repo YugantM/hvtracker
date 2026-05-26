@@ -638,8 +638,9 @@
     gtag('js', new Date());
     gtag('config', 'G-TZ8921LR0K');
   </script>
+  <script defer src="/analytics.js"></script>
 </head>
-<body>
+<body data-page-type="leaderboard">
   <div class="page">
 
     <header>
@@ -932,6 +933,7 @@
       // ── Combined filter: search + categories ──
       const searchInput = document.getElementById("searchInput");
       let searchTerm = "";
+      let searchTimer = null;
 
       function applyFilters() {
         currentPage = 0;
@@ -955,6 +957,15 @@
       searchInput.addEventListener("input", () => {
         searchTerm = searchInput.value.trim().toLowerCase();
         applyFilters();
+        clearTimeout(searchTimer);
+        if (searchTerm.length >= 2) {
+          searchTimer = setTimeout(() => {
+            hvtTrack("search_used", {
+              search_length: searchTerm.length,
+              result_count: getFilteredRows().length
+            });
+          }, 900);
+        }
       });
 
       // ── Dropdown toggle ──
@@ -990,6 +1001,12 @@
           clearBtn.classList.add("visible");
         }
         applyFilters();
+        hvtTrack("category_filter", {
+          selected_count: selectedCats.size,
+          selected_category: selectedCats.size === 1 ? [...selectedCats][0] : "",
+          all_selected: selectedCats.size === totalCats,
+          result_count: getFilteredRows().length
+        });
       }
 
       catAllCb.addEventListener("change", () => {
@@ -1017,11 +1034,21 @@
 
       // ── Pagination ──
       prevBtn.addEventListener("click", () => {
-        if (currentPage > 0) { currentPage--; renderPage(); window.scrollTo(0, table.offsetTop - 20); }
+        if (currentPage > 0) {
+          currentPage--;
+          renderPage();
+          hvtTrack("page_change", { direction: "previous", page_number: currentPage + 1 });
+          window.scrollTo(0, table.offsetTop - 20);
+        }
       });
       nextBtn.addEventListener("click", () => {
         const total = getFilteredRows().length;
-        if ((currentPage + 1) * PAGE_SIZE < total) { currentPage++; renderPage(); window.scrollTo(0, table.offsetTop - 20); }
+        if ((currentPage + 1) * PAGE_SIZE < total) {
+          currentPage++;
+          renderPage();
+          hvtTrack("page_change", { direction: "next", page_number: currentPage + 1 });
+          window.scrollTo(0, table.offsetTop - 20);
+        }
       });
 
       // ── Column sort ──
@@ -1036,6 +1063,11 @@
           currentPage = 0;
           sortRows();
           if (col === "rank") updateRankDisplay();
+          hvtTrack("sort_change", {
+            sort_col: col,
+            sort_dir: sortAsc ? "asc" : "desc",
+            result_count: getFilteredRows().length
+          });
         });
       });
 
