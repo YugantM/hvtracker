@@ -578,6 +578,81 @@ def rank_delta_class(delta: int | None, is_new: bool) -> str:
     return "delta-down"
 
 
+def derive_agent_events(history_by_date: dict[str, dict[str, dict]], today_agents: dict[str, dict]) -> dict[str, list[dict]]:
+    """Derive reputation events per agent by comparing daily snapshots.
+
+    Args:
+        history_by_date: {date_str: {repo_lower: agent_dict}} — past snapshots
+        today_agents: {repo_lower: agent_dict} — today's build output
+
+    Returns:
+        {repo_lower: [event_dict, ...]} sorted chronologically
+    """
+    all_dates = sorted(history_by_date.keys())
+    events: dict[str, list[dict]] = {}
+
+    # Walk consecutive date pairs to detect changes
+    for i in range(1, len(all_dates)):
+        prev_date, curr_date = all_dates[i - 1], all_dates[i]
+        prev_snap = history_by_date[prev_date]
+        curr_snap = history_by_date[curr_date]
+        all_repos = set(prev_snap.keys()) | set(curr_snap.keys())
+
+        for repo in all_repos:
+            prev = prev_snap.get(repo)
+            curr = curr_snap.get(repo)
+            repo_events = events.setdefault(repo, [])
+
+            # First appearance → listed
+            if curr and not prev:
+                repo_events.append({"date": curr_date, "type": "listed", "detail": f"First tracked at rank #{curr.get('rank', '?')}"})
+                continue
+
+            # Disappeared → delisted
+            if prev and not curr:
+                repo_events.append({"date": curr_date, "type": "delisted", "detail": "Removed from active tracking"})
+                continue
+
+            if not prev or not curr:
+                continue
+
+            # Score change ≥ 5 points
+            ps, cs = prev.get("score", 0) or 0, curr.get("score", 0) or 0
+            delta_score = cs - ps
+            if abs(delta_score) >= 5:
+                direction = "up" if delta_score > 0 else "down"
+                repo_events.append({"date": curr_date, "type": "score_changed", "detail": f"Score {direction} {abs(delta_score):.0f}pts ({ps:.0f} → {cs:.0f})"})
+
+            # Rank change ≥ 10 positions
+            pr, cr = prev.get("rank", 0) or 0, curr.get("rank", 0) or 0
+            delta_rank = pr - cr  # positive = improved
+            if abs(delta_rank) >= 10:
+                direction = "rose" if delta_rank > 0 else "dropped"
+                repo_events.append({"date": curr_date, "type": "rank_changed", "detail": f"Rank {direction} {abs(delta_rank)} spots (#{pr} → #{cr})"})
+
+            # Stale warning: crossed 90 days
+            prev_days = prev.get("days_ago") or 0
+            curr_days = curr.get("days_ago") or 0
+            if prev_days < 90 and curr_days >= 90:
+                repo_events.append({"date": curr_date, "type": "stale_warning", "detail": f"No commits for {curr_days} days"})
+            elif prev_days >= 90 and curr_days < 90:
+                repo_events.append({"date": curr_date, "type": "freshness_restored", "detail": "Activity resumed"})
+
+            # Scorecard added
+            if not prev.get("scorecard_score") and curr.get("scorecard_score"):
+                repo_events.append({"date": curr_date, "type": "scorecard_added", "detail": f"OSSF Scorecard: {curr['scorecard_score']:.1f}/10"})
+
+            # Provenance added
+            if not prev.get("has_provenance") and curr.get("has_provenance"):
+                repo_events.append({"date": curr_date, "type": "provenance_added", "detail": "Package provenance attestation detected"})
+
+    # Sort each agent's events chronologically
+    for repo in events:
+        events[repo].sort(key=lambda e: e["date"])
+
+    return events
+
+
 def run_eligibility_checks(rows: list[dict]) -> list[dict]:
     """Check automated eligibility criteria from the Eligibility Spec v1.0.
 
@@ -629,8 +704,8 @@ def load_scorecard_cache(script_dir: str) -> dict:
         return {}
 
 
-def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict], history_dir: str, now_str: str) -> None:
-    """Generate stable /data/ endpoint files."""
+def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict], history_dir: str, now_str: str) -> dict[str, list[dict]]:
+    """Generate stable /data/ endpoint files. Returns per-agent events keyed by repo_lower."""
     data_dir = os.path.join(script_dir, "data")
     os.makedirs(os.path.join(data_dir, "agents"), exist_ok=True)
     os.makedirs(os.path.join(data_dir, "signals"), exist_ok=True)
@@ -669,7 +744,14 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
         except Exception:
             pass
 
-    # /data/agents/<slug>.json — per-agent with 90d history
+    # Add today's data to history for event derivation
+    today_agents = {a["repo"].lower(): a for a in data_output["agents"]}
+    history_by_date[today_utc] = today_agents
+
+    # Derive reputation events from history diffs
+    all_events = derive_agent_events(history_by_date, today_agents)
+
+    # /data/agents/<slug>.json — per-agent with 90d history + events
     slug_map = {r["repo"].lower(): r["slug"] for r in rows}
     for agent in data_output["agents"]:
         repo_key = agent["repo"].lower()
@@ -684,7 +766,8 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
                     "score": snap_agent.get("score"),
                     "stars": snap_agent.get("stars"),
                 })
-        agent_doc = {**meta, **agent, "history": history_points}
+        agent_events = all_events.get(repo_key, [])
+        agent_doc = {**meta, **agent, "history": history_points, "events": agent_events}
         with open(os.path.join(data_dir, "agents", f"{slug}.json"), "w", encoding="utf-8") as f:
             json.dump(agent_doc, f, separators=(",", ":"), ensure_ascii=False)
 
@@ -756,7 +839,10 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
     with open(os.path.join(data_dir, "index.html"), "w", encoding="utf-8") as f:
         f.write(index_html)
 
-    print(f"Generated data endpoints under data/ ({len(data_output['agents'])} agent files).")
+    event_count = sum(len(v) for v in all_events.values())
+    print(f"Generated data endpoints under data/ ({len(data_output['agents'])} agent files, {event_count} events).")
+
+    return all_events
 
 
 def main() -> None:
@@ -1139,7 +1225,7 @@ def main() -> None:
         json.dump(data_output, f, indent=2, ensure_ascii=False)
     print(f"Wrote history snapshot {history_path}.")
 
-    generate_data_endpoints(script_dir, data_output, rows, history_dir, now_str)
+    agent_events = generate_data_endpoints(script_dir, data_output, rows, history_dir, now_str)
 
     # ── Build Integrity Report ────────────────────────────────────────────────
     fp_agents = [a["repo"] for a in agents if a.get("fingerprints")]
@@ -1250,10 +1336,11 @@ def main() -> None:
         points = sparkline_data.get(repo_key, [])
         row["sparkline_svg"] = render_sparkline_svg(points)
         row["rank_history"] = points
+        events = agent_events.get(repo_key, [])
         slug_dir = os.path.join(agents_dir, row["slug"])
         os.makedirs(slug_dir, exist_ok=True)
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str))
+            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events))
 
     for row in legacy_rows:
         repo_key = row["repo"].lower()
@@ -1261,10 +1348,11 @@ def main() -> None:
         row["sparkline_svg"] = render_sparkline_svg(points)
         row["rank_history"] = points
         row["siblings"] = []
+        events = agent_events.get(repo_key, [])
         slug_dir = os.path.join(agents_dir, row["slug"])
         os.makedirs(slug_dir, exist_ok=True)
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str))
+            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events))
     print(f"Built {len(rows)} active + {len(legacy_rows)} legacy agent profile pages under agents/.")
 
     # sitemap.xml — /, /methodology, all /agents/<slug>

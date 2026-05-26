@@ -446,6 +446,24 @@
     </section>
     {% endif %}
 
+    {% if events %}
+    <section class="provenance">
+      <h2 class="section-title">Reputation Timeline</h2>
+      <div style="display:flex;flex-direction:column;gap:0;">
+        {% for e in events|reverse %}
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;{% if not loop.last %}border-bottom:1px solid var(--border);{% endif %}">
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);white-space:nowrap;min-width:80px;">{{ e.date }}</span>
+          <span style="font-size:14px;width:20px;text-align:center;flex-shrink:0;">{% if e.type == 'listed' %}🟢{% elif e.type == 'delisted' %}🔴{% elif e.type == 'score_changed' %}📊{% elif e.type == 'rank_changed' %}🔄{% elif e.type == 'stale_warning' %}⚠️{% elif e.type == 'freshness_restored' %}✅{% elif e.type == 'scorecard_added' %}🛡️{% elif e.type == 'provenance_added' %}🔏{% else %}📌{% endif %}</span>
+          <div>
+            <span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;">{{ e.type|replace('_', ' ') }}</span>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">{{ e.detail }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
     <section class="links">
       <a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">GitHub →</a>
       {% if row.pypi_package %}<a href="https://pypi.org/project/{{ row.pypi_package }}/" target="_blank" rel="noopener noreferrer">PyPI: {{ row.pypi_package }}</a>{% endif %}
