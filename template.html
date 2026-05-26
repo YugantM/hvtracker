@@ -298,20 +298,19 @@
       font-size: 13px;
     }
 
-    col.col-rank     { width: 40px; }
-    col.col-delta    { width: 50px; }
-    col.col-agent    { width: auto; min-width: 200px; }
-    col.col-grade    { width: 55px; }
-    col.col-stars    { width: 70px; }
-    col.col-push     { width: 110px; }
-    col.col-commits  { width: 115px; }
-    col.col-score    { width: 70px; }
+    col.col-rank     { width: 44px; }
+    col.col-delta    { width: 44px; }
+    col.col-agent    { width: auto; }
+    col.col-grade    { width: 52px; }
+    col.col-stars    { width: 72px; }
+    col.col-push     { width: 100px; }
+    col.col-commits  { width: 90px; }
+    col.col-hvtrust  { width: 72px; }
 
-    /* Prevent table squeezing below usable width; horizontal scroll takes over */
-    table { min-width: 700px; }
+    table { width: 100%; min-width: 640px; table-layout: fixed; }
 
     thead th {
-      padding: 10px 11px;
+      padding: 10px 8px;
       text-align: left;
       font-family: var(--font-mono);
       font-size: 11px;
@@ -346,7 +345,7 @@
     tbody tr.pg-hidden { display: none; }
     tbody tr.top-row td:first-child { border-left: 2px solid var(--accent); }
 
-    td { padding: 10px 11px; vertical-align: middle; }
+    td { padding: 10px 8px; vertical-align: middle; }
 
     /* ── Rank ── */
     .rank {
@@ -392,23 +391,25 @@
     .agent-cell { min-width: 0; overflow: hidden; }
     .agent-name {
       font-weight: 600;
-      font-size: 13.5px;
+      font-size: 13px;
       color: var(--text);
     }
     .agent-name:hover { color: var(--accent); }
     .agent-repo {
       display: block;
       font-family: var(--font-mono);
-      font-size: 10.5px;
+      font-size: 10px;
       color: var(--muted);
       margin-top: 1px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .agent-desc {
       display: block;
-      font-size: 11.5px;
+      font-size: 11px;
       color: var(--muted);
-      margin-top: 3px;
-      max-width: 380px;
+      margin-top: 2px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -705,6 +706,7 @@
           <col class="col-stars">
           <col class="col-push">
           <col class="col-commits">
+          <col class="col-hvtrust">
         </colgroup>
         <thead>
           <tr>
@@ -714,7 +716,7 @@
             <th class="c" data-col="evidence_grade">Grade<span class="sort-arrow"></span></th>
             <th class="r" data-col="stars">Stars<span class="sort-arrow"></span></th>
             <th data-col="last_push">Last Push<span class="sort-arrow"></span></th>
-            <th class="r" data-col="weekly_commits">4-wk Commits<span class="sort-arrow"></span></th>
+            <th class="r" data-col="weekly_commits" title="Commits in the last 4 weeks">Commits<span class="sort-arrow"></span></th>
             <th class="r sorted" data-col="trust_score">HVTrust<span class="sort-arrow">↓</span></th>
           </tr>
         </thead>
