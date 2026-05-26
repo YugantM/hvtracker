@@ -133,16 +133,20 @@
     .site-nav a { color: var(--muted); }
     .site-nav a:hover { color: var(--accent); }
 
-    /* ── Category filter bar ── */
+    /* ── Filter bar ── */
     .filter-bar {
       padding: 14px 0;
       border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      flex-wrap: wrap;
     }
     .search-input {
-      width: 100%;
+      flex: 1;
+      min-width: 180px;
       max-width: 320px;
       padding: 7px 12px;
-      margin-bottom: 10px;
       font-family: var(--font-mono);
       font-size: 12px;
       border: 1px solid var(--border);
@@ -153,36 +157,87 @@
     }
     .search-input:focus { border-color: var(--accent); }
     .search-input::placeholder { color: var(--muted); }
-    .cat-bar {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+
+    /* ── Category multi-select dropdown ── */
+    .cat-dropdown { position: relative; }
+    .cat-toggle {
+      display: inline-flex;
       align-items: center;
-    }
-    .cat-pill {
-      display: inline-block;
+      gap: 6px;
       font-family: var(--font-mono);
-      font-size: 11px;
-      padding: 5px 12px;
-      border-radius: 16px;
-      cursor: pointer;
-      user-select: none;
+      font-size: 12px;
+      padding: 7px 12px;
       border: 1px solid var(--border);
+      border-radius: 6px;
       background: var(--surface-2);
       color: var(--muted);
-      transition: all 0.15s;
+      cursor: pointer;
+      user-select: none;
       white-space: nowrap;
     }
-    .cat-pill:hover {
-      border-color: var(--accent-dim);
-      color: var(--accent);
+    .cat-toggle:hover { border-color: var(--accent-dim); color: var(--accent); }
+    .cat-toggle.has-selection { color: var(--accent); border-color: var(--accent); }
+    .cat-toggle .arrow { font-size: 9px; transition: transform 0.15s; }
+    .cat-dropdown.open .cat-toggle .arrow { transform: rotate(180deg); }
+    .cat-panel {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      z-index: 100;
+      min-width: 240px;
+      max-height: 360px;
+      overflow-y: auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      padding: 6px 0;
     }
-    .cat-pill.active {
-      background: var(--accent-lt);
-      color: var(--accent);
-      border-color: var(--accent);
+    .cat-dropdown.open .cat-panel { display: block; }
+    .cat-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+    }
+    .cat-option:hover { background: var(--surface-2); color: var(--text); }
+    .cat-option input[type="checkbox"] {
+      accent-color: var(--accent);
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+    }
+    .cat-option .cat-count {
+      margin-left: auto;
+      font-size: 10px;
+      color: var(--stale);
+    }
+    .cat-option.checked { color: var(--accent); }
+    .cat-option.all-opt {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin-bottom: 4px;
       font-weight: 600;
     }
+    .cat-clear {
+      display: none;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 5px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface-2);
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .cat-clear:hover { color: var(--accent); border-color: var(--accent-dim); }
+    .cat-clear.visible { display: inline-block; }
 
     /* ── Score legend ── */
     .legend {
@@ -633,12 +688,22 @@
 
     <div class="filter-bar" id="filterBar">
       <input type="text" class="search-input" id="searchInput" placeholder="Search agents…" autocomplete="off">
-      <div class="cat-bar" id="catBar">
-        <span class="cat-pill active" data-category="">All ({{ total }})</span>
-        {% for cat in categories %}
-        <span class="cat-pill" data-category="{{ cat.name }}">{{ cat.name }} ({{ cat.count }})</span>
-        {% endfor %}
+      <div class="cat-dropdown" id="catDropdown">
+        <span class="cat-toggle" id="catToggle">Categories <span class="arrow">▾</span></span>
+        <div class="cat-panel" id="catPanel">
+          <label class="cat-option all-opt">
+            <input type="checkbox" id="catAll" checked> All ({{ total }})
+          </label>
+          {% for cat in categories %}
+          <label class="cat-option" data-category="{{ cat.name }}">
+            <input type="checkbox" class="cat-cb" value="{{ cat.name }}" checked>
+            {{ cat.name }}
+            <span class="cat-count">{{ cat.count }}</span>
+          </label>
+          {% endfor %}
+        </div>
       </div>
+      <span class="cat-clear" id="catClear">✕ Clear filters</span>
     </div>
 
     <div class="legend">
@@ -841,16 +906,22 @@
       const table = document.getElementById("leaderboard");
       const tbody = table.querySelector("tbody");
       const headers = table.querySelectorAll("thead th[data-col]");
-      const pills = document.querySelectorAll("#catBar .cat-pill");
       const rankHeader = document.querySelector("thead th[data-col='rank']");
       const prevBtn = document.getElementById("prevBtn");
       const nextBtn = document.getElementById("nextBtn");
       const pgInfo = document.getElementById("pgInfo");
-      let activeCategory = "";
       let sortCol = "score";
       let sortAsc = false;
 
-      // Rows not filtered out by category
+      // ── Category multi-select state ──
+      const dropdown = document.getElementById("catDropdown");
+      const toggle = document.getElementById("catToggle");
+      const catAllCb = document.getElementById("catAll");
+      const catCbs = Array.from(document.querySelectorAll(".cat-cb"));
+      const clearBtn = document.getElementById("catClear");
+      const totalCats = catCbs.length;
+      let selectedCats = new Set(); // empty = all
+
       function getFilteredRows() {
         return Array.from(tbody.querySelectorAll("tr:not(.hidden)"));
       }
@@ -877,7 +948,7 @@
         const rows = getFilteredRows();
         rows.sort((a, b) => {
           let col = sortCol;
-          if (col === "rank" && activeCategory) {
+          if (col === "rank" && selectedCats.size === 1) {
             let av = parseFloat(a.dataset.category_rank) || 0;
             let bv = parseFloat(b.dataset.category_rank) || 0;
             if (av < bv) return sortAsc ? -1 : 1;
@@ -901,11 +972,38 @@
         renderPage();
       }
 
-      function applyFilter(category) {
-        activeCategory = category;
+      function updateRankDisplay() {
+        const rows = getFilteredRows();
+        rankHeader.innerHTML = '#<span class="sort-arrow"></span>';
+        if (sortCol === "rank") {
+          const arrow = rankHeader.querySelector(".sort-arrow");
+          if (arrow) arrow.textContent = sortAsc ? "↑" : "↓";
+        }
+        const singleCat = selectedCats.size === 1;
+        rows.forEach(row => {
+          const rankCell = row.querySelector(".rank");
+          const catRank = row.dataset.category_rank || "";
+          const globalRank = row.dataset.rank || "";
+          rankCell.innerHTML = singleCat
+            ? '<span class="rank-num">' + catRank + '</span> <span class="rank-global-muted">#' + globalRank + '</span>'
+            : '<span class="rank-num">' + globalRank + '</span>';
+        });
+      }
+
+      // ── Combined filter: search + categories ──
+      const searchInput = document.getElementById("searchInput");
+      let searchTerm = "";
+
+      function applyFilters() {
         currentPage = 0;
+        const allSelected = selectedCats.size === 0;
         tbody.querySelectorAll("tr").forEach(row => {
-          if (!category || row.dataset.category === category) {
+          const name = (row.dataset.name || "").toLowerCase();
+          const repo = (row.dataset.repo || "").toLowerCase();
+          const cat = row.dataset.category || "";
+          const matchesSearch = !searchTerm || name.includes(searchTerm) || repo.includes(searchTerm) || cat.toLowerCase().includes(searchTerm);
+          const matchesCat = allSelected || selectedCats.has(cat);
+          if (matchesSearch && matchesCat) {
             row.classList.remove("hidden");
           } else {
             row.classList.add("hidden");
@@ -915,23 +1013,66 @@
         sortRows();
       }
 
-      function updateRankDisplay() {
-        const rows = getFilteredRows();
-        rankHeader.innerHTML = '#<span class="sort-arrow"></span>';
-        if (sortCol === "rank") {
-          const arrow = rankHeader.querySelector(".sort-arrow");
-          if (arrow) arrow.textContent = sortAsc ? "↑" : "↓";
-        }
-        rows.forEach(row => {
-          const rankCell = row.querySelector(".rank");
-          const catRank = row.dataset.category_rank || "";
-          const globalRank = row.dataset.rank || "";
-          rankCell.innerHTML = activeCategory
-            ? '<span class="rank-num">' + catRank + '</span> <span class="rank-global-muted">#' + globalRank + '</span>'
-            : '<span class="rank-num">' + globalRank + '</span>';
+      searchInput.addEventListener("input", () => {
+        searchTerm = searchInput.value.trim().toLowerCase();
+        applyFilters();
+      });
+
+      // ── Dropdown toggle ──
+      toggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle("open");
+      });
+      document.addEventListener("click", (e) => {
+        if (!dropdown.contains(e.target)) dropdown.classList.remove("open");
+      });
+
+      // ── Category checkbox logic ──
+      function syncUI() {
+        const allSelected = selectedCats.size === 0;
+        catAllCb.checked = allSelected;
+        catCbs.forEach(cb => {
+          cb.checked = allSelected || selectedCats.has(cb.value);
+          cb.closest(".cat-option").classList.toggle("checked", cb.checked);
         });
+        // Update toggle label
+        if (allSelected) {
+          toggle.classList.remove("has-selection");
+          toggle.innerHTML = 'Categories <span class="arrow">▾</span>';
+          clearBtn.classList.remove("visible");
+        } else {
+          toggle.classList.add("has-selection");
+          const label = selectedCats.size === 1 ? [...selectedCats][0] : selectedCats.size + " categories";
+          toggle.innerHTML = label + ' <span class="arrow">▾</span>';
+          clearBtn.classList.add("visible");
+        }
+        applyFilters();
       }
 
+      catAllCb.addEventListener("change", () => {
+        selectedCats.clear();
+        syncUI();
+      });
+
+      catCbs.forEach(cb => {
+        cb.addEventListener("change", () => {
+          if (cb.checked) {
+            selectedCats.add(cb.value);
+          } else {
+            selectedCats.delete(cb.value);
+          }
+          // If all are checked individually, treat as "All"
+          if (selectedCats.size === totalCats) selectedCats.clear();
+          syncUI();
+        });
+      });
+
+      clearBtn.addEventListener("click", () => {
+        selectedCats.clear();
+        syncUI();
+      });
+
+      // ── Pagination ──
       prevBtn.addEventListener("click", () => {
         if (currentPage > 0) { currentPage--; renderPage(); window.scrollTo(0, table.offsetTop - 20); }
       });
@@ -940,14 +1081,7 @@
         if ((currentPage + 1) * PAGE_SIZE < total) { currentPage++; renderPage(); window.scrollTo(0, table.offsetTop - 20); }
       });
 
-      pills.forEach(pill => {
-        pill.addEventListener("click", () => {
-          pills.forEach(p => p.classList.remove("active"));
-          pill.classList.add("active");
-          applyFilter(pill.dataset.category);
-        });
-      });
-
+      // ── Column sort ──
       headers.forEach(th => {
         th.addEventListener("click", () => {
           const col = th.dataset.col;
@@ -960,56 +1094,6 @@
           sortRows();
           if (col === "rank") updateRankDisplay();
         });
-      });
-
-      // ── Text search ──
-      const searchInput = document.getElementById("searchInput");
-      let searchTerm = "";
-      function applySearch() {
-        searchTerm = searchInput.value.trim().toLowerCase();
-        currentPage = 0;
-        tbody.querySelectorAll("tr").forEach(row => {
-          const name = (row.dataset.name || "").toLowerCase();
-          const repo = (row.dataset.repo || "").toLowerCase();
-          const cat = (row.dataset.category || "").toLowerCase();
-          const matchesSearch = !searchTerm || name.includes(searchTerm) || repo.includes(searchTerm) || cat.includes(searchTerm);
-          const matchesCat = !activeCategory || row.dataset.category === activeCategory;
-          if (matchesSearch && matchesCat) {
-            row.classList.remove("hidden");
-          } else {
-            row.classList.add("hidden");
-          }
-        });
-        sortRows();
-      }
-      searchInput.addEventListener("input", applySearch);
-
-      // Override applyFilter to respect search
-      function applyFilterWithSearch(category) {
-        activeCategory = category;
-        currentPage = 0;
-        tbody.querySelectorAll("tr").forEach(row => {
-          const name = (row.dataset.name || "").toLowerCase();
-          const repo = (row.dataset.repo || "").toLowerCase();
-          const cat = (row.dataset.category || "").toLowerCase();
-          const matchesSearch = !searchTerm || name.includes(searchTerm) || repo.includes(searchTerm) || cat.includes(searchTerm);
-          const matchesCat = !category || row.dataset.category === category;
-          if (matchesSearch && matchesCat) {
-            row.classList.remove("hidden");
-          } else {
-            row.classList.add("hidden");
-          }
-        });
-        updateRankDisplay();
-        sortRows();
-      }
-      // Re-bind pills to use combined filter
-      pills.forEach(pill => {
-        pill.onclick = () => {
-          pills.forEach(p => p.classList.remove("active"));
-          pill.classList.add("active");
-          applyFilterWithSearch(pill.dataset.category);
-        };
       });
 
       // Initial render
