@@ -169,6 +169,17 @@
       color:var(--muted);
     }
     .links a:hover { color:var(--accent); border-color:var(--accent-dim); text-decoration:none; }
+    .links a.compare-link {
+      background:var(--accent);
+      color:var(--bg);
+      border-color:var(--accent);
+      font-weight:700;
+    }
+    .links a.compare-link:hover {
+      color:var(--bg);
+      border-color:var(--accent);
+      background:#6f7cff;
+    }
 
     .siblings { padding:24px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
     .siblings ul { list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px 18px; }
@@ -419,7 +430,7 @@
 
 
     <section class="links">
-      <a href="/compare/?a=guidance">Compare This Agent</a>
+      <a class="compare-link" href="/compare/?a=guidance">Compare This Agent</a>
       <a href="https://github.com/guidance-ai/guidance" target="_blank" rel="noopener noreferrer">GitHub →</a>
       <a href="https://pypi.org/project/guidance/" target="_blank" rel="noopener noreferrer">PyPI: guidance</a>
 
