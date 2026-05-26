@@ -141,7 +141,6 @@
     }
     .site-nav a { color: var(--muted); }
     .site-nav a:hover { color: var(--accent); }
-    .site-nav a.active { color: var(--accent); }
 
     .intro {
       padding: 18px 0 16px;
@@ -485,23 +484,6 @@
       align-items: center;
       margin-top: 2px;
     }
-    .agent-compare {
-      display: inline-flex;
-      align-items: center;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      padding: 1px 6px;
-      border-radius: 3px;
-      border: 1px solid var(--accent-dim);
-      color: var(--accent);
-      margin-top: 3px;
-    }
-    .agent-compare:hover {
-      color: var(--text);
-      border-color: var(--accent);
-      text-decoration: none;
-      background: var(--accent-lt);
-    }
     .evidence-badge {
       display: inline-block;
       font-family: var(--font-mono);
@@ -706,7 +688,6 @@
       <span class="tagline">AI Agent Trust Registry</span>
       <nav class="site-nav" aria-label="Site">
         <a href="/methodology">Methodology</a>
-        <a href="/compare/">Compare</a>
       </nav>
       <div class="meta">
         {{ total }} agents tracked &nbsp;·&nbsp; updated {{ updated }}<br>
@@ -719,7 +700,6 @@
       <p>HVTracker tracks {{ total }} open-source AI agents, coding agents, frameworks, browser agents, memory systems, and agent infrastructure. Rankings combine public signals for activity, adoption, transparency, safety, provenance, signed commits, OSSF Scorecard, and evidence quality.</p>
       <div class="intro-links" aria-label="Key HVTracker resources">
         <a href="/methodology">How the ranking works</a>
-        <a href="/compare/">Compare agents</a>
         <a href="/data.json">Download data.json</a>
         <a href="/spec/">Specifications</a>
       </div>
@@ -830,7 +810,6 @@
               <div class="agent-tags">
                 {% if row.language %}<span class="lang">{{ row.language }}</span>{% endif %}
                 {% if row.category %}<span class="cat-badge">{{ row.category }}</span>{% endif %}
-                <a class="agent-compare" href="/compare/?a={{ row.slug }}">Compare</a>
               </div>
             </td>
             <td class="c">
@@ -920,15 +899,6 @@
   <script>
     // ── Category filtering, sorting & pagination ──
     (function () {
-      document.querySelectorAll(".agent-cell").forEach((cell) => {
-        const compareLink = cell.querySelector(".agent-compare");
-        const profileLink = cell.querySelector(".agent-name");
-        if (!compareLink || !profileLink) return;
-        const href = profileLink.getAttribute("href") || "";
-        const match = href.match(/\/agents\/([^/?#]+)/);
-        if (match) compareLink.setAttribute("href", `/compare/?a=${match[1]}`);
-      });
-
       const PAGE_SIZE = 15;
       let currentPage = 0;
 

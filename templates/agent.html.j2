@@ -466,6 +466,7 @@
     {% endif %}
 
     <section class="links">
+      <a href="/compare/?a={{ row.slug }}">Compare This Agent</a>
       <a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">GitHub →</a>
       {% if row.pypi_package %}<a href="https://pypi.org/project/{{ row.pypi_package }}/" target="_blank" rel="noopener noreferrer">PyPI: {{ row.pypi_package }}</a>{% endif %}
       {% if row.npm_package %}<a href="https://www.npmjs.com/package/{{ row.npm_package }}" target="_blank" rel="noopener noreferrer">npm: {{ row.npm_package }}</a>{% endif %}
