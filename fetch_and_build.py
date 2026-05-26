@@ -764,6 +764,8 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
                     "date": date_str,
                     "rank": snap_agent.get("rank"),
                     "score": snap_agent.get("score"),
+                    "trust_score": snap_agent.get("trust_score"),
+                    "evidence_grade": snap_agent.get("evidence_grade"),
                     "stars": snap_agent.get("stars"),
                 })
         agent_events = all_events.get(repo_key, [])
@@ -843,6 +845,46 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
     print(f"Generated data endpoints under data/ ({len(data_output['agents'])} agent files, {event_count} events).")
 
     return all_events
+
+
+def compute_trust_trends(history_dir: str, today_agents: dict[str, dict]) -> dict[str, dict]:
+    """Compute 7-day trust score trends from history snapshots.
+
+    Returns {repo_lower: {"trust_trend_7d": float|None, "trust_7d_ago": float|None}}
+    """
+    target_date = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d")
+    # Find the closest snapshot on or before the target date
+    best_date = None
+    for fname in sorted(os.listdir(history_dir)):
+        if not fname.endswith(".json"):
+            continue
+        date_str = fname[:-5]
+        if date_str <= target_date:
+            best_date = fname
+    if not best_date:
+        return {}
+
+    try:
+        with open(os.path.join(history_dir, best_date), encoding="utf-8") as f:
+            snap = json.load(f)
+        old_agents = {a["repo"].lower(): a for a in snap.get("agents", [])}
+    except Exception:
+        return {}
+
+    trends: dict[str, dict] = {}
+    for repo_key, current in today_agents.items():
+        old = old_agents.get(repo_key)
+        curr_trust = current.get("trust_score")
+        if old and curr_trust is not None:
+            old_trust = old.get("trust_score")
+            if old_trust is not None:
+                delta = round(curr_trust - old_trust, 1)
+                trends[repo_key] = {"trust_trend_7d": delta, "trust_7d_ago": old_trust}
+            else:
+                trends[repo_key] = {"trust_trend_7d": None, "trust_7d_ago": None}
+        else:
+            trends[repo_key] = {"trust_trend_7d": None, "trust_7d_ago": None}
+    return trends
 
 
 def parse_batch_arg() -> tuple[int, int] | None:
@@ -1309,6 +1351,33 @@ def main() -> None:
 
     agent_events = generate_data_endpoints(script_dir, data_output, rows, history_dir, now_str)
 
+    # ── Trust Trends (7-day delta) ───────────────────────────────────────────
+    today_agents_map = {r["repo"].lower(): r for r in rows}
+    trust_trends = compute_trust_trends(history_dir, today_agents_map)
+    for row in rows:
+        repo_key = row["repo"].lower()
+        trend = trust_trends.get(repo_key, {})
+        row["trust_trend_7d"] = trend.get("trust_trend_7d")
+
+    # ── Inject recent_events into latest.json ────────────────────────────────
+    cutoff_30d = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%d")
+    for agent_dict in data_output["agents"]:
+        repo_key = agent_dict["repo"].lower()
+        all_evts = agent_events.get(repo_key, [])
+        agent_dict["recent_events"] = [e for e in all_evts if e["date"] >= cutoff_30d]
+    # Re-write latest.json with events included
+    latest_path = os.path.join(script_dir, "data", "latest.json")
+    with open(latest_path, "w", encoding="utf-8") as f:
+        json.dump({
+            "schema_version": DATA_SCHEMA_VERSION,
+            "generated_at": now_str,
+            "methodology_version": METHODOLOGY_VERSION,
+            "license": "CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/",
+            **data_output,
+        }, f, separators=(",", ":"), ensure_ascii=False)
+    event_total = sum(len(a.get("recent_events", [])) for a in data_output["agents"])
+    print(f"Injected recent_events into latest.json ({event_total} events across agents).")
+
     # ── Build Integrity Report ────────────────────────────────────────────────
     fp_agents = [a["repo"] for a in agents if a.get("fingerprints")]
     failed_repos = set(a["repo"] for a in agents + legacy_agents) - set(r["repo"] for r in rows + legacy_rows)
@@ -1376,6 +1445,7 @@ def main() -> None:
         trust = compute_trust_score(lr)
         lr["trust_score"] = trust["trust_score"]
         lr["trust_breakdown"] = trust["trust_breakdown"]
+        lr["trust_trend_7d"] = None
     legacy_rows.sort(key=lambda x: x.get("stars", 0), reverse=True)
 
     tmpl = env.get_template("template.html")

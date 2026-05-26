@@ -341,7 +341,7 @@
     col.col-stars    { width: 72px; }
     col.col-push     { width: 100px; }
     col.col-commits  { width: 90px; }
-    col.col-hvtrust  { width: 72px; }
+    col.col-hvtrust  { width: 82px; }
 
     table { width: 100%; min-width: 640px; table-layout: fixed; }
 
@@ -559,6 +559,16 @@
     .trust-high { background: rgba(52,211,153,0.12); color: #34d399; }
     .trust-mid  { background: rgba(59,130,246,0.12); color: #60a5fa; }
     .trust-low  { background: var(--score-lo-bg); color: var(--score-lo-fg); }
+    .trust-trend {
+      display: block;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      margin-top: 1px;
+      text-align: center;
+    }
+    .trust-trend-up   { color: #34d399; }
+    .trust-trend-down { color: #f87171; }
+    .trust-trend-flat { color: var(--muted); }
 
     /* ── Score formula tooltip ── */
     .formula-row {
@@ -815,6 +825,11 @@
             <td class="r num">{{ row.weekly_commits }}{% if row.commits_low_confidence %}<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span>{% endif %}</td>
             <td class="r">
               <span class="trust-pill {% if row.trust_score >= 55 %}trust-high{% elif row.trust_score >= 30 %}trust-mid{% else %}trust-low{% endif %}" title="Activity {{ row.trust_breakdown.activity }} · Adoption {{ row.trust_breakdown.adoption }} · Transparency {{ row.trust_breakdown.transparency }} · Safety {{ row.trust_breakdown.safety }} · Identity {{ row.trust_breakdown.identity }}">{{ row.trust_score }}</span>
+              {% if row.trust_trend_7d is not none and row.trust_trend_7d != 0 %}
+              <span class="trust-trend {% if row.trust_trend_7d > 0 %}trust-trend-up{% else %}trust-trend-down{% endif %}">{{ "▲" if row.trust_trend_7d > 0 else "▼" }}{{ row.trust_trend_7d|abs }}</span>
+              {% elif row.trust_trend_7d == 0 %}
+              <span class="trust-trend trust-trend-flat">—</span>
+              {% endif %}
             </td>
           </tr>
           {% endfor %}

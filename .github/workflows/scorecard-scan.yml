@@ -47,5 +47,6 @@ jobs:
             echo "No changes to scorecard cache."
           else
             git commit -m "chore: update scorecard cache $(date -u '+%Y-%m-%d')"
+            git pull --rebase origin main || true
             git push
           fi
