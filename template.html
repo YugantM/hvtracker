@@ -304,14 +304,10 @@
     col.col-stars    { width: 70px; }
     col.col-push     { width: 110px; }
     col.col-commits  { width: 115px; }
-    col.col-dl       { width: 130px; }
-    col.col-hn       { width: 70px; }
-    col.col-actions  { width: 85px; }
-    col.col-trust    { width: 90px; }
     col.col-score    { width: 70px; }
 
     /* Prevent table squeezing below usable width; horizontal scroll takes over */
-    table { min-width: 965px; }
+    table { min-width: 700px; }
 
     thead th {
       padding: 10px 11px;
@@ -430,16 +426,6 @@
     }
 
     /* ── Downloads source label ── */
-    .dl-source {
-      display: block;
-      font-family: var(--font-mono);
-      font-size: 9.5px;
-      color: var(--stale);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-top: 1px;
-    }
-
     /* ── Category badge ── */
     .cat-badge {
       display: inline-block;
@@ -601,40 +587,6 @@
     .formula strong { color: var(--text); }
 
     /* ── Trust signals ── */
-    .trust-cell {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 3px;
-      align-items: center;
-    }
-    .trust-badge {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 9px;
-      padding: 1px 5px;
-      border-radius: 3px;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      line-height: 1.5;
-    }
-    .trust-prov {
-      background: rgba(52,211,153,0.12);
-      color: var(--fresh);
-    }
-    .trust-sc {
-      background: var(--accent-lt);
-      color: var(--accent);
-    }
-    .trust-sig {
-      background: var(--mocha-lt);
-      color: var(--mocha);
-    }
-    .trust-none {
-      color: var(--stale);
-      font-family: var(--font-mono);
-      font-size: 11px;
-    }
-
     /* ── Mobile ── */
     @media (max-width: 985px) {
       .table-wrap {
@@ -745,10 +697,6 @@
           <col class="col-stars">
           <col class="col-push">
           <col class="col-commits">
-          <col class="col-dl">
-          <col class="col-hn">
-          <col class="col-actions">
-          <col class="col-trust">
           <col class="col-score">
         </colgroup>
         <thead>
@@ -758,11 +706,7 @@
             <th data-col="name">Agent</th>
             <th class="r" data-col="stars">Stars<span class="sort-arrow"></span></th>
             <th data-col="last_push">Last Push<span class="sort-arrow"></span></th>
-            <th class="r" data-col="weekly_commits">4-wk commits<span class="sort-arrow"></span></th>
-            <th class="r" data-col="downloads">Downloads (7d)<span class="sort-arrow"></span></th>
-            <th class="r" data-col="hn_mentions_30d">HN<span class="sort-arrow"></span></th>
-            <th class="r" data-col="actions_30d" title="Public actions (commits/PRs) detected via agent fingerprint in last 30 days">Actions<span class="sort-arrow"></span></th>
-            <th class="c" data-col="scorecard">Trust<span class="sort-arrow"></span></th>
+            <th class="r" data-col="weekly_commits">4-wk Commits<span class="sort-arrow"></span></th>
             <th class="r" data-col="trust_score">HVTrust<span class="sort-arrow"></span></th>
             <th class="r sorted" data-col="score">Score<span class="sort-arrow">↓</span></th>
           </tr>
@@ -806,30 +750,6 @@
               </div>
             </td>
             <td class="r num">{{ row.weekly_commits }}{% if row.commits_low_confidence %}<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span>{% endif %}</td>
-            <td class="r">
-              {% if row.weekly_downloads is not none %}
-              <span class="num">{{ row.downloads_fmt }}</span>
-              <span class="dl-source">{{ row.dl_source }}</span>
-              {% else %}
-              <span class="num" style="color: var(--stale);">—</span>
-              {% endif %}
-            </td>
-            <td class="r num">
-              {% if row.hn_mentions_30d is not none %}{{ row.hn_mentions_30d }}{% else %}<span style="color: var(--stale);">—</span>{% endif %}
-            </td>
-            <td class="r num">
-              {% if row.public_actions %}
-                <span title="{% if row.public_actions.actions_30d_merged is not none %}{{ row.public_actions.actions_30d_merged }} merged / {{ row.public_actions.actions_30d }} total PRs{% else %}{{ row.public_actions.actions_30d }} commits{% endif %}">{% set n = row.public_actions.actions_30d %}{% if n >= 1000 %}{{ (n / 1000) | round(1) }}k{% else %}{{ n }}{% endif %}</span>
-              {% else %}<span style="color: var(--stale);">—</span>{% endif %}
-            </td>
-            <td class="c">
-              <div class="trust-cell" style="justify-content:center;" title="{% if row.has_provenance %}Pkg provenance: {{ row.provenance_sources|join(', ') }}{% endif %}{% if row.scorecard_fmt %} · OSSF {{ row.scorecard_fmt }}/10{% endif %}{% if row.signed_commits_pct is not none %} · {{ row.signed_commits_pct }}% signed commits{% endif %}">
-                {% if row.has_provenance %}<span class="trust-badge trust-prov">prov</span>{% endif %}
-                {% if row.scorecard_fmt %}<span class="trust-badge trust-sc">{{ row.scorecard_fmt }}</span>{% endif %}
-                {% if row.signed_commits_pct is not none and row.signed_commits_pct >= 50 %}<span class="trust-badge trust-sig">sig</span>{% endif %}
-                {% if not row.has_provenance and not row.scorecard_fmt and (row.signed_commits_pct is none or row.signed_commits_pct < 50) %}<span class="trust-none">—</span>{% endif %}
-              </div>
-            </td>
             <td class="r">
               <span class="trust-pill {% if row.trust_score >= 55 %}trust-high{% elif row.trust_score >= 30 %}trust-mid{% else %}trust-low{% endif %}" title="Activity {{ row.trust_breakdown.activity }} · Adoption {{ row.trust_breakdown.adoption }} · Transparency {{ row.trust_breakdown.transparency }} · Safety {{ row.trust_breakdown.safety }} · Identity {{ row.trust_breakdown.identity }}">{{ row.trust_score }}</span>
             </td>
