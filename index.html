@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AI agent trust registry — ranking agents by trust, transparency, activity, safety, adoption, and evidence. Covers coding agents, frameworks, browser agents, memory tools, and agent infrastructure.">
-  <title>HVTracker — AI Agent Trust Registry</title>
+  <meta name="description" content="HVTracker is an open-source AI agent leaderboard and trust registry ranking agents by activity, adoption, transparency, safety, provenance, OSSF Scorecard, signed commits, and evidence.">
+  <title>HVTracker — Open-Source AI Agent Trust Registry</title>
   <link rel="canonical" href="https://hvtracker.net/">
   <link rel="alternate" type="application/feed+json" title="HVTracker — JSON Feed" href="/feed.json">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="HVTracker — AI Agent Trust Registry">
-  <meta property="og:description" content="AI agent trust registry — ranking agents by trust, transparency, activity, safety, adoption, and evidence. Covers coding agents, frameworks, browser agents, memory tools, and agent infrastructure.">
+  <meta property="og:title" content="HVTracker — Open-Source AI Agent Trust Registry">
+  <meta property="og:description" content="HVTracker is an open-source AI agent leaderboard and trust registry ranking agents by activity, adoption, transparency, safety, provenance, OSSF Scorecard, signed commits, and evidence.">
   <meta property="og:url" content="https://hvtracker.net/">
   <meta property="og:image" content="https://hvtracker.net/og-v1.png">
   <meta property="og:image:secure_url" content="https://hvtracker.net/og-v1.png">
@@ -20,8 +20,8 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:domain" content="hvtracker.net">
   <meta name="twitter:url" content="https://hvtracker.net/">
-  <meta name="twitter:title" content="HVTracker — AI Agent Trust Registry">
-  <meta name="twitter:description" content="AI agent trust registry — ranking agents by trust, transparency, activity, safety, adoption, and evidence. Covers coding agents, frameworks, browser agents, memory tools, and agent infrastructure.">
+  <meta name="twitter:title" content="HVTracker — Open-Source AI Agent Trust Registry">
+  <meta name="twitter:description" content="HVTracker is an open-source AI agent leaderboard and trust registry ranking agents by activity, adoption, transparency, safety, provenance, OSSF Scorecard, signed commits, and evidence.">
   <meta name="twitter:image" content="https://hvtracker.net/og-v1.png">
   <meta name="twitter:image:alt" content="HVTracker AI Agent Trust Registry preview">
   <script type="application/ld+json">
@@ -29,8 +29,9 @@
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "HVTracker",
+    "alternateName": "HVTracker AI Agent Trust Registry",
     "url": "https://hvtracker.net/",
-    "description": "AI agent trust registry — ranking agents by trust, transparency, activity, safety, adoption, and evidence. Covers coding agents, frameworks, browser agents, memory tools, and agent infrastructure.",
+    "description": "HVTracker is an open-source AI agent leaderboard and trust registry ranking agents by activity, adoption, transparency, safety, provenance, OSSF Scorecard, signed commits, and evidence.",
     "inLanguage": "en"
   }
   </script>
@@ -113,7 +114,7 @@
       font-family: var(--font-mono);
       font-size: 24px;
       font-weight: 700;
-      letter-spacing: -0.5px;
+      letter-spacing: 0;
       color: var(--text);
     }
     .logo span { color: var(--accent); }
@@ -140,6 +141,33 @@
     }
     .site-nav a { color: var(--muted); }
     .site-nav a:hover { color: var(--accent); }
+
+    .intro {
+      padding: 18px 0 16px;
+      border-bottom: 1px solid var(--border);
+      max-width: 880px;
+    }
+    .intro h2 {
+      font-size: 18px;
+      line-height: 1.35;
+      font-weight: 650;
+      color: var(--text);
+      margin-bottom: 7px;
+    }
+    .intro p {
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 820px;
+    }
+    .intro-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      margin-top: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+    .intro-links a { color: var(--accent); }
 
     /* ── Filter bar ── */
     .filter-bar {
@@ -626,6 +654,8 @@
       header { flex-direction: column; gap: 6px; }
       .meta { margin-left: 0; text-align: left; }
       .site-nav { order: 3; }
+      .intro { padding: 14px 0; }
+      .intro h2 { font-size: 16px; }
       .cat-bar { gap: 5px; }
       .cat-pill { font-size: 10px; padding: 4px 10px; }
     }
@@ -644,7 +674,7 @@
   <div class="page">
 
     <header>
-      <span class="logo">HV<span>Tracker</span></span>
+      <h1 class="logo">HV<span>Tracker</span></h1>
       <span class="tagline">AI Agent Trust Registry</span>
       <nav class="site-nav" aria-label="Site">
         <a href="/methodology">Methodology</a>
@@ -654,6 +684,16 @@
         staggered 4-hour signal refresh
       </div>
     </header>
+
+    <section class="intro" aria-labelledby="intro-title">
+      <h2 id="intro-title">Open-source AI agent rankings based on trust signals, not hype.</h2>
+      <p>HVTracker tracks 171 open-source AI agents, coding agents, frameworks, browser agents, memory systems, and agent infrastructure. Rankings combine public signals for activity, adoption, transparency, safety, provenance, signed commits, OSSF Scorecard, and evidence quality.</p>
+      <div class="intro-links" aria-label="Key HVTracker resources">
+        <a href="/methodology">How the ranking works</a>
+        <a href="/data.json">Download data.json</a>
+        <a href="/spec/">Specifications</a>
+      </div>
+    </section>
 
     <div class="filter-bar" id="filterBar">
       <input type="text" class="search-input" id="searchInput" placeholder="Search agents…" autocomplete="off">
