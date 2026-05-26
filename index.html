@@ -642,7 +642,7 @@
       </nav>
       <div class="meta">
         171 agents tracked &nbsp;·&nbsp; updated 2026-05-26 10:35 UTC<br>
-        signals refresh daily
+        staggered 4-hour signal refresh
       </div>
     </header>
 
@@ -757,38 +757,38 @@
       <span class="movers-title">Biggest movers (7-day window)</span>
       <div class="movers-row">
         
-        <a href="/agents/microsoft-ufo" class="mover mover-up">
+        <a href="/agents/ufo" class="mover mover-up">
           <span class="mover-arrow">▲15</span>
           <span class="mover-name">UFO</span>
           <span class="mover-rank">#87</span>
         </a>
         
-        <a href="/agents/paul-gauthier-aider" class="mover mover-up">
+        <a href="/agents/aider" class="mover mover-up">
           <span class="mover-arrow">▲8</span>
           <span class="mover-name">Aider</span>
           <span class="mover-rank">#9</span>
         </a>
         
-        <a href="/agents/significant-gravitas-autogpt" class="mover mover-up">
+        <a href="/agents/autogpt" class="mover mover-up">
           <span class="mover-arrow">▲8</span>
           <span class="mover-name">AutoGPT</span>
           <span class="mover-rank">#10</span>
         </a>
         
         
-        <a href="/agents/agenta-ai-agenta" class="mover mover-down">
+        <a href="/agents/agenta" class="mover mover-down">
           <span class="mover-arrow">▼96</span>
           <span class="mover-name">Agenta</span>
           <span class="mover-rank">#111</span>
         </a>
         
-        <a href="/agents/giskard-ai-giskard-oss" class="mover mover-down">
+        <a href="/agents/giskard" class="mover mover-down">
           <span class="mover-arrow">▼93</span>
           <span class="mover-name">Giskard</span>
           <span class="mover-rank">#109</span>
         </a>
         
-        <a href="/agents/vespa-engine-vespa" class="mover mover-down">
+        <a href="/agents/vespa" class="mover mover-down">
           <span class="mover-arrow">▼86</span>
           <span class="mover-name">Vespa</span>
           <span class="mover-rank">#100</span>
@@ -812,14 +812,14 @@
         </colgroup>
         <thead>
           <tr>
-            <th class="r" data-col="rank">#<span class="sort-arrow">↑</span></th>
+            <th class="r sorted" data-col="rank">#<span class="sort-arrow">↑</span></th>
             <th class="c" data-col="rank_delta">Δ<span class="sort-arrow"></span></th>
             <th data-col="name">Agent</th>
             <th class="c" data-col="evidence_grade">Grade<span class="sort-arrow"></span></th>
             <th class="r" data-col="stars">Stars<span class="sort-arrow"></span></th>
             <th data-col="last_push">Last Push<span class="sort-arrow"></span></th>
             <th class="r" data-col="weekly_commits" title="Commits in the last 4 weeks">Commits<span class="sort-arrow"></span></th>
-            <th class="r sorted" data-col="trust_score">HVTrust<span class="sort-arrow">↓</span></th>
+            <th class="r" data-col="trust_score">HVTrust<span class="sort-arrow"></span></th>
           </tr>
         </thead>
         <tbody>
@@ -847,7 +847,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/langgenius-dify">Dify</a>
+              <a class="agent-name" href="/agents/dify">Dify</a>
               <a class="agent-repo" href="https://github.com/langgenius/dify" target="_blank" rel="noopener noreferrer">langgenius/dify</a>
               <span class="agent-desc" title="Production-ready platform for agentic workflow development.">Production-ready platform for agentic workflow development.</span>
               <div class="agent-tags">
@@ -894,7 +894,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/langchain-ai-langchain">LangChain</a>
+              <a class="agent-name" href="/agents/langchain">LangChain</a>
               <a class="agent-repo" href="https://github.com/langchain-ai/langchain" target="_blank" rel="noopener noreferrer">langchain-ai/langchain</a>
               <span class="agent-desc" title="The agent engineering platform.">The agent engineering platform.</span>
               <div class="agent-tags">
@@ -941,7 +941,7 @@
             </td>
             <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/sst-opencode">opencode</a>
+              <a class="agent-name" href="/agents/opencode">opencode</a>
               <a class="agent-repo" href="https://github.com/anomalyco/opencode" target="_blank" rel="noopener noreferrer">sst/opencode</a>
               <span class="agent-desc" title="The open source coding agent.">The open source coding agent.</span>
               <div class="agent-tags">
@@ -988,7 +988,7 @@
             </td>
             <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/openclaw-openclaw">OpenClaw</a>
+              <a class="agent-name" href="/agents/openclaw">OpenClaw</a>
               <a class="agent-repo" href="https://github.com/openclaw/openclaw" target="_blank" rel="noopener noreferrer">openclaw/openclaw</a>
               <span class="agent-desc" title="Your own personal AI assistant. Any OS. Any Platform. The lobster way. 🦞 ">Your own personal AI assistant. Any OS. Any Platform. The lobster way. 🦞 </span>
               <div class="agent-tags">
@@ -1035,7 +1035,7 @@
             </td>
             <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/berriai-litellm">LiteLLM</a>
+              <a class="agent-name" href="/agents/litellm">LiteLLM</a>
               <a class="agent-repo" href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener noreferrer">BerriAI/litellm</a>
               <span class="agent-desc" title="Python SDK, Proxy Server (AI Gateway) to call 100+ LLM APIs in OpenAI (or native) format, with cost tracking, guardrails">Python SDK, Proxy Server (AI Gateway) to call 100+ LLM APIs in OpenAI (or native) format, with cost tracking, guardrails</span>
               <div class="agent-tags">
@@ -1082,7 +1082,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/elizaos-eliza">Eliza</a>
+              <a class="agent-name" href="/agents/eliza">Eliza</a>
               <a class="agent-repo" href="https://github.com/elizaOS/eliza" target="_blank" rel="noopener noreferrer">elizaOS/eliza</a>
               <span class="agent-desc" title="Open source agentic operating system">Open source agentic operating system</span>
               <div class="agent-tags">
@@ -1129,7 +1129,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/activepieces-activepieces">Activepieces</a>
+              <a class="agent-name" href="/agents/activepieces">Activepieces</a>
               <a class="agent-repo" href="https://github.com/activepieces/activepieces" target="_blank" rel="noopener noreferrer">activepieces/activepieces</a>
               <span class="agent-desc" title="AI Agents & MCPs & AI Workflow Automation • (~400 MCP servers for AI agents) • AI Automation / AI Agent with MCPs • AI W">AI Agents & MCPs & AI Workflow Automation • (~400 MCP servers for AI agents) • AI Automation / AI Agent with MCPs • AI W</span>
               <div class="agent-tags">
@@ -1176,7 +1176,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/mastra-ai-mastra">Mastra</a>
+              <a class="agent-name" href="/agents/mastra">Mastra</a>
               <a class="agent-repo" href="https://github.com/mastra-ai/mastra" target="_blank" rel="noopener noreferrer">mastra-ai/mastra</a>
               <span class="agent-desc" title="From the team behind Gatsby, Mastra is a framework for building AI-powered applications and agents with a modern TypeScr">From the team behind Gatsby, Mastra is a framework for building AI-powered applications and agents with a modern TypeScr</span>
               <div class="agent-tags">
@@ -1223,7 +1223,7 @@
             </td>
             <td class="delta delta-up">▲8</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/paul-gauthier-aider">Aider</a>
+              <a class="agent-name" href="/agents/aider">Aider</a>
               <a class="agent-repo" href="https://github.com/Aider-AI/aider" target="_blank" rel="noopener noreferrer">paul-gauthier/aider</a>
               <span class="agent-desc" title="aider is AI pair programming in your terminal">aider is AI pair programming in your terminal</span>
               <div class="agent-tags">
@@ -1270,7 +1270,7 @@
             </td>
             <td class="delta delta-up">▲8</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/significant-gravitas-autogpt">AutoGPT</a>
+              <a class="agent-name" href="/agents/autogpt">AutoGPT</a>
               <a class="agent-repo" href="https://github.com/Significant-Gravitas/AutoGPT" target="_blank" rel="noopener noreferrer">Significant-Gravitas/AutoGPT</a>
               <span class="agent-desc" title="AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so tha">AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so tha</span>
               <div class="agent-tags">
@@ -1317,7 +1317,7 @@
             </td>
             <td class="delta delta-down">▼7</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/n8n-io-n8n">n8n</a>
+              <a class="agent-name" href="/agents/n8n">n8n</a>
               <a class="agent-repo" href="https://github.com/n8n-io/n8n" target="_blank" rel="noopener noreferrer">n8n-io/n8n</a>
               <span class="agent-desc" title="Fair-code workflow automation platform with native AI capabilities. Combine visual building with custom code, self-host ">Fair-code workflow automation platform with native AI capabilities. Combine visual building with custom code, self-host </span>
               <div class="agent-tags">
@@ -1364,7 +1364,7 @@
             </td>
             <td class="delta delta-down">▼7</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/open-webui-open-webui">Open WebUI</a>
+              <a class="agent-name" href="/agents/open-webui">Open WebUI</a>
               <a class="agent-repo" href="https://github.com/open-webui/open-webui" target="_blank" rel="noopener noreferrer">open-webui/open-webui</a>
               <span class="agent-desc" title="User-friendly AI Interface (Supports Ollama, OpenAI API, ...)">User-friendly AI Interface (Supports Ollama, OpenAI API, ...)</span>
               <div class="agent-tags">
@@ -1411,7 +1411,7 @@
             </td>
             <td class="delta delta-up">▲6</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/anthropics-claude-code">Claude Code</a>
+              <a class="agent-name" href="/agents/claude-code">Claude Code</a>
               <a class="agent-repo" href="https://github.com/anthropics/claude-code" target="_blank" rel="noopener noreferrer">anthropics/claude-code</a>
               <span class="agent-desc" title="Claude Code is an agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster ">Claude Code is an agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster </span>
               <div class="agent-tags">
@@ -1458,7 +1458,7 @@
             </td>
             <td class="delta delta-up">▲6</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/google-gemini-gemini-cli">Gemini CLI</a>
+              <a class="agent-name" href="/agents/gemini-cli">Gemini CLI</a>
               <a class="agent-repo" href="https://github.com/google-gemini/gemini-cli" target="_blank" rel="noopener noreferrer">google-gemini/gemini-cli</a>
               <span class="agent-desc" title="An open-source AI agent that brings the power of Gemini directly into your terminal.">An open-source AI agent that brings the power of Gemini directly into your terminal.</span>
               <div class="agent-tags">
@@ -1505,7 +1505,7 @@
             </td>
             <td class="delta delta-up">▲7</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/openai-codex">Codex</a>
+              <a class="agent-name" href="/agents/codex">Codex</a>
               <a class="agent-repo" href="https://github.com/openai/codex" target="_blank" rel="noopener noreferrer">openai/codex</a>
               <span class="agent-desc" title="Lightweight coding agent that runs in your terminal">Lightweight coding agent that runs in your terminal</span>
               <div class="agent-tags">
@@ -1552,7 +1552,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/browser-use-browser-use">Browser Use</a>
+              <a class="agent-name" href="/agents/browser-use">Browser Use</a>
               <a class="agent-repo" href="https://github.com/browser-use/browser-use" target="_blank" rel="noopener noreferrer">browser-use/browser-use</a>
               <span class="agent-desc" title="🌐 Make websites accessible for AI agents. Automate tasks online with ease.">🌐 Make websites accessible for AI agents. Automate tasks online with ease.</span>
               <div class="agent-tags">
@@ -1599,7 +1599,7 @@
             </td>
             <td class="delta delta-down">▼8</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/langflow-ai-langflow">Langflow</a>
+              <a class="agent-name" href="/agents/langflow">Langflow</a>
               <a class="agent-repo" href="https://github.com/langflow-ai/langflow" target="_blank" rel="noopener noreferrer">langflow-ai/langflow</a>
               <span class="agent-desc" title="Langflow is a powerful tool for building and deploying AI-powered agents and workflows.">Langflow is a powerful tool for building and deploying AI-powered agents and workflows.</span>
               <div class="agent-tags">
@@ -1646,7 +1646,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/flowiseai-flowise">Flowise</a>
+              <a class="agent-name" href="/agents/flowise">Flowise</a>
               <a class="agent-repo" href="https://github.com/FlowiseAI/Flowise" target="_blank" rel="noopener noreferrer">FlowiseAI/Flowise</a>
               <span class="agent-desc" title="Build AI Agents, Visually">Build AI Agents, Visually</span>
               <div class="agent-tags">
@@ -1693,7 +1693,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/firecrawl-firecrawl">Firecrawl</a>
+              <a class="agent-name" href="/agents/firecrawl">Firecrawl</a>
               <a class="agent-repo" href="https://github.com/firecrawl/firecrawl" target="_blank" rel="noopener noreferrer">firecrawl/firecrawl</a>
               <span class="agent-desc" title="🔥 Search, scrape, and clean the web for AI agents.">🔥 Search, scrape, and clean the web for AI agents.</span>
               <div class="agent-tags">
@@ -1740,7 +1740,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/infiniflow-ragflow">RAGFlow</a>
+              <a class="agent-name" href="/agents/ragflow">RAGFlow</a>
               <a class="agent-repo" href="https://github.com/infiniflow/ragflow" target="_blank" rel="noopener noreferrer">infiniflow/ragflow</a>
               <span class="agent-desc" title="RAGFlow is a leading open-source Retrieval-Augmented Generation (RAG) engine that fuses cutting-edge RAG with Agent capa">RAGFlow is a leading open-source Retrieval-Augmented Generation (RAG) engine that fuses cutting-edge RAG with Agent capa</span>
               <div class="agent-tags">
@@ -1787,7 +1787,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/modelcontextprotocol-servers">Model Context Protocol / MCP</a>
+              <a class="agent-name" href="/agents/model-context-protocol-mcp">Model Context Protocol / MCP</a>
               <a class="agent-repo" href="https://github.com/modelcontextprotocol/servers" target="_blank" rel="noopener noreferrer">modelcontextprotocol/servers</a>
               <span class="agent-desc" title="Model Context Protocol Servers">Model Context Protocol Servers</span>
               <div class="agent-tags">
@@ -1834,7 +1834,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/all-hands-ai-openhands">OpenHands</a>
+              <a class="agent-name" href="/agents/openhands">OpenHands</a>
               <a class="agent-repo" href="https://github.com/OpenHands/OpenHands" target="_blank" rel="noopener noreferrer">All-Hands-AI/OpenHands</a>
               <span class="agent-desc" title="🙌 OpenHands: AI-Driven Development">🙌 OpenHands: AI-Driven Development</span>
               <div class="agent-tags">
@@ -1881,7 +1881,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/bytedance-deer-flow">DeerFlow</a>
+              <a class="agent-name" href="/agents/deerflow">DeerFlow</a>
               <a class="agent-repo" href="https://github.com/bytedance/deer-flow" target="_blank" rel="noopener noreferrer">bytedance/deer-flow</a>
               <span class="agent-desc" title="An open-source long-horizon SuperAgent harness that researches, codes, and creates. With the help of sandboxes, memories">An open-source long-horizon SuperAgent harness that researches, codes, and creates. With the help of sandboxes, memories</span>
               <div class="agent-tags">
@@ -1928,7 +1928,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/unclecode-crawl4ai">Crawl4AI</a>
+              <a class="agent-name" href="/agents/crawl4ai">Crawl4AI</a>
               <a class="agent-repo" href="https://github.com/unclecode/crawl4ai" target="_blank" rel="noopener noreferrer">unclecode/crawl4ai</a>
               <span class="agent-desc" title="🚀🤖 Crawl4AI: Open-source LLM Friendly Web Crawler & Scraper. Don't be shy, join here: https://discord.gg/jP8KfhDhyN">🚀🤖 Crawl4AI: Open-source LLM Friendly Web Crawler & Scraper. Don't be shy, join here: https://discord.gg/jP8KfhDhyN</span>
               <div class="agent-tags">
@@ -1975,7 +1975,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/daytonaio-daytona">Daytona</a>
+              <a class="agent-name" href="/agents/daytona">Daytona</a>
               <a class="agent-repo" href="https://github.com/daytonaio/daytona" target="_blank" rel="noopener noreferrer">daytonaio/daytona</a>
               <span class="agent-desc" title="Daytona is a Secure and Elastic Infrastructure for Running AI-Generated Code">Daytona is a Secure and Elastic Infrastructure for Running AI-Generated Code</span>
               <div class="agent-tags">
@@ -2022,7 +2022,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/cline-cline">Cline</a>
+              <a class="agent-name" href="/agents/cline">Cline</a>
               <a class="agent-repo" href="https://github.com/cline/cline" target="_blank" rel="noopener noreferrer">cline/cline</a>
               <span class="agent-desc" title="Autonomous coding agent as an SDK, IDE extension, or CLI assistant.">Autonomous coding agent as an SDK, IDE extension, or CLI assistant.</span>
               <div class="agent-tags">
@@ -2069,7 +2069,7 @@
             </td>
             <td class="delta delta-up">▲6</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/crewaiinc-crewai">CrewAI</a>
+              <a class="agent-name" href="/agents/crewai">CrewAI</a>
               <a class="agent-repo" href="https://github.com/crewAIInc/crewAI" target="_blank" rel="noopener noreferrer">CrewAIInc/crewAI</a>
               <span class="agent-desc" title="Framework for orchestrating role-playing, autonomous AI agents. By fostering collaborative intelligence, CrewAI empowers">Framework for orchestrating role-playing, autonomous AI agents. By fostering collaborative intelligence, CrewAI empowers</span>
               <div class="agent-tags">
@@ -2116,7 +2116,7 @@
             </td>
             <td class="delta delta-up">▲6</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/mem0ai-mem0">Mem0</a>
+              <a class="agent-name" href="/agents/mem0">Mem0</a>
               <a class="agent-repo" href="https://github.com/mem0ai/mem0" target="_blank" rel="noopener noreferrer">mem0ai/mem0</a>
               <span class="agent-desc" title="Universal memory layer for AI Agents">Universal memory layer for AI Agents</span>
               <div class="agent-tags">
@@ -2163,7 +2163,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/mintplex-labs-anything-llm">AnythingLLM</a>
+              <a class="agent-name" href="/agents/anythingllm">AnythingLLM</a>
               <a class="agent-repo" href="https://github.com/Mintplex-Labs/anything-llm" target="_blank" rel="noopener noreferrer">Mintplex-Labs/anything-llm</a>
               <span class="agent-desc" title="The all-in-one AI productivity accelerator. On device and privacy first with no annoying setup or configuration.">The all-in-one AI productivity accelerator. On device and privacy first with no annoying setup or configuration.</span>
               <div class="agent-tags">
@@ -2210,7 +2210,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/run-llama-llama-index">LlamaIndex</a>
+              <a class="agent-name" href="/agents/llamaindex">LlamaIndex</a>
               <a class="agent-repo" href="https://github.com/run-llama/llama_index" target="_blank" rel="noopener noreferrer">run-llama/llama_index</a>
               <span class="agent-desc" title="LlamaIndex is the leading document agent and OCR platform">LlamaIndex is the leading document agent and OCR platform</span>
               <div class="agent-tags">
@@ -2257,7 +2257,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/danny-avila-librechat">LibreChat</a>
+              <a class="agent-name" href="/agents/librechat">LibreChat</a>
               <a class="agent-repo" href="https://github.com/danny-avila/LibreChat" target="_blank" rel="noopener noreferrer">danny-avila/LibreChat</a>
               <span class="agent-desc" title="Enhanced ChatGPT Clone: Features Agents, MCP, DeepSeek, Anthropic, AWS, OpenAI, Responses API, Azure, Groq, o1, GPT-5, M">Enhanced ChatGPT Clone: Features Agents, MCP, DeepSeek, Anthropic, AWS, OpenAI, Responses API, Azure, Groq, o1, GPT-5, M</span>
               <div class="agent-tags">
@@ -2304,7 +2304,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/openinterpreter-open-interpreter">Open Interpreter</a>
+              <a class="agent-name" href="/agents/open-interpreter">Open Interpreter</a>
               <a class="agent-repo" href="https://github.com/openinterpreter/open-interpreter" target="_blank" rel="noopener noreferrer">OpenInterpreter/open-interpreter</a>
               <span class="agent-desc" title="A natural language interface for computers">A natural language interface for computers</span>
               <div class="agent-tags">
@@ -2351,7 +2351,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/block-goose">Goose</a>
+              <a class="agent-name" href="/agents/goose">Goose</a>
               <a class="agent-repo" href="https://github.com/aaif-goose/goose" target="_blank" rel="noopener noreferrer">block/goose</a>
               <span class="agent-desc" title="an open source, extensible AI agent that goes beyond code suggestions - install, execute, edit, and test with any LLM">an open source, extensible AI agent that goes beyond code suggestions - install, execute, edit, and test with any LLM</span>
               <div class="agent-tags">
@@ -2398,7 +2398,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/agno-agi-agno">Agno</a>
+              <a class="agent-name" href="/agents/agno">Agno</a>
               <a class="agent-repo" href="https://github.com/agno-agi/agno" target="_blank" rel="noopener noreferrer">agno-agi/agno</a>
               <span class="agent-desc" title="Build, run, and manage agent platforms.">Build, run, and manage agent platforms.</span>
               <div class="agent-tags">
@@ -2445,7 +2445,7 @@
             </td>
             <td class="delta delta-down">▼27</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/milvus-io-milvus">Milvus</a>
+              <a class="agent-name" href="/agents/milvus">Milvus</a>
               <a class="agent-repo" href="https://github.com/milvus-io/milvus" target="_blank" rel="noopener noreferrer">milvus-io/milvus</a>
               <span class="agent-desc" title="Milvus is a high-performance, cloud-native vector database built for scalable vector ANN search">Milvus is a high-performance, cloud-native vector database built for scalable vector ANN search</span>
               <div class="agent-tags">
@@ -2492,7 +2492,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/langchain-ai-langgraph">LangGraph</a>
+              <a class="agent-name" href="/agents/langgraph">LangGraph</a>
               <a class="agent-repo" href="https://github.com/langchain-ai/langgraph" target="_blank" rel="noopener noreferrer">langchain-ai/langgraph</a>
               <span class="agent-desc" title="Build resilient agents.">Build resilient agents.</span>
               <div class="agent-tags">
@@ -2539,7 +2539,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/continuedev-continue">Continue</a>
+              <a class="agent-name" href="/agents/continue">Continue</a>
               <a class="agent-repo" href="https://github.com/continuedev/continue" target="_blank" rel="noopener noreferrer">continuedev/continue</a>
               <span class="agent-desc" title="⏩ Source-controlled AI checks, enforceable in CI. Powered by the open-source Continue CLI">⏩ Source-controlled AI checks, enforceable in CI. Powered by the open-source Continue CLI</span>
               <div class="agent-tags">
@@ -2586,7 +2586,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/openbmb-chatdev">ChatDev</a>
+              <a class="agent-name" href="/agents/chatdev">ChatDev</a>
               <a class="agent-repo" href="https://github.com/OpenBMB/ChatDev" target="_blank" rel="noopener noreferrer">OpenBMB/ChatDev</a>
               <span class="agent-desc" title="ChatDev 2.0: Dev All through LLM-powered Multi-Agent Collaboration">ChatDev 2.0: Dev All through LLM-powered Multi-Agent Collaboration</span>
               <div class="agent-tags">
@@ -2633,7 +2633,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/microsoft-semantic-kernel">Semantic Kernel</a>
+              <a class="agent-name" href="/agents/semantic-kernel">Semantic Kernel</a>
               <a class="agent-repo" href="https://github.com/microsoft/semantic-kernel" target="_blank" rel="noopener noreferrer">microsoft/semantic-kernel</a>
               <span class="agent-desc" title="Integrate cutting-edge LLM technology quickly and easily into your apps">Integrate cutting-edge LLM technology quickly and easily into your apps</span>
               <div class="agent-tags">
@@ -2680,7 +2680,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/copilotkit-copilotkit">CopilotKit</a>
+              <a class="agent-name" href="/agents/copilotkit">CopilotKit</a>
               <a class="agent-repo" href="https://github.com/CopilotKit/CopilotKit" target="_blank" rel="noopener noreferrer">CopilotKit/CopilotKit</a>
               <span class="agent-desc" title="The Frontend Stack for Agents & Generative UI. React + Angular.  Makers of the AG-UI Protocol">The Frontend Stack for Agents & Generative UI. React + Angular.  Makers of the AG-UI Protocol</span>
               <div class="agent-tags">
@@ -2727,7 +2727,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/openai-openai-agents-python">OpenAI Agents SDK</a>
+              <a class="agent-name" href="/agents/openai-agents-sdk">OpenAI Agents SDK</a>
               <a class="agent-repo" href="https://github.com/openai/openai-agents-python" target="_blank" rel="noopener noreferrer">openai/openai-agents-python</a>
               <span class="agent-desc" title="A lightweight, powerful framework for multi-agent workflows">A lightweight, powerful framework for multi-agent workflows</span>
               <div class="agent-tags">
@@ -2774,7 +2774,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/vercel-ai">Vercel AI SDK</a>
+              <a class="agent-name" href="/agents/vercel-ai-sdk">Vercel AI SDK</a>
               <a class="agent-repo" href="https://github.com/vercel/ai" target="_blank" rel="noopener noreferrer">vercel/ai</a>
               <span class="agent-desc" title="The AI Toolkit for TypeScript. From the creators of Next.js, the AI SDK is a free open-source library for building AI-po">The AI Toolkit for TypeScript. From the creators of Next.js, the AI SDK is a free open-source library for building AI-po</span>
               <div class="agent-tags">
@@ -2821,7 +2821,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/huggingface-lerobot">LeRobot</a>
+              <a class="agent-name" href="/agents/lerobot">LeRobot</a>
               <a class="agent-repo" href="https://github.com/huggingface/lerobot" target="_blank" rel="noopener noreferrer">huggingface/lerobot</a>
               <span class="agent-desc" title="🤗 LeRobot: Making AI for Robotics more accessible with end-to-end learning">🤗 LeRobot: Making AI for Robotics more accessible with end-to-end learning</span>
               <div class="agent-tags">
@@ -2868,7 +2868,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/composiohq-composio">Composio</a>
+              <a class="agent-name" href="/agents/composio">Composio</a>
               <a class="agent-repo" href="https://github.com/ComposioHQ/composio" target="_blank" rel="noopener noreferrer">composiohq/composio</a>
               <span class="agent-desc" title="Composio powers 1000+ toolkits, tool search, context management, authentication, and a sandboxed workbench to help you b">Composio powers 1000+ toolkits, tool search, context management, authentication, and a sandboxed workbench to help you b</span>
               <div class="agent-tags">
@@ -2915,7 +2915,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/rasahq-rasa">Rasa</a>
+              <a class="agent-name" href="/agents/rasa">Rasa</a>
               <a class="agent-repo" href="https://github.com/RasaHQ/rasa" target="_blank" rel="noopener noreferrer">RasaHQ/rasa</a>
               <span class="agent-desc" title="💬   Open source machine learning framework to automate text- and voice-based conversations: NLU, dialogue management, co">💬   Open source machine learning framework to automate text- and voice-based conversations: NLU, dialogue management, co</span>
               <div class="agent-tags">
@@ -2962,7 +2962,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/langfuse-langfuse">Langfuse</a>
+              <a class="agent-name" href="/agents/langfuse">Langfuse</a>
               <a class="agent-repo" href="https://github.com/langfuse/langfuse" target="_blank" rel="noopener noreferrer">langfuse/langfuse</a>
               <span class="agent-desc" title="🪢 Open source LLM engineering platform: LLM Observability, metrics, evals, prompt management, playground, datasets. Inte">🪢 Open source LLM engineering platform: LLM Observability, metrics, evals, prompt management, playground, datasets. Inte</span>
               <div class="agent-tags">
@@ -3009,7 +3009,7 @@
             </td>
             <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/bytedance-ui-tars-desktop">UI-TARS Desktop</a>
+              <a class="agent-name" href="/agents/ui-tars-desktop">UI-TARS Desktop</a>
               <a class="agent-repo" href="https://github.com/bytedance/UI-TARS-desktop" target="_blank" rel="noopener noreferrer">bytedance/UI-TARS-desktop</a>
               <span class="agent-desc" title="The Open-Source Multimodal AI Agent Stack: Connecting Cutting-Edge AI Models and Agent Infra">The Open-Source Multimodal AI Agent Stack: Connecting Cutting-Edge AI Models and Agent Infra</span>
               <div class="agent-tags">
@@ -3056,7 +3056,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/qdrant-qdrant">Qdrant</a>
+              <a class="agent-name" href="/agents/qdrant">Qdrant</a>
               <a class="agent-repo" href="https://github.com/qdrant/qdrant" target="_blank" rel="noopener noreferrer">qdrant/qdrant</a>
               <span class="agent-desc" title="Qdrant - High-performance, massive-scale Vector Database and Vector Search Engine for the next generation of AI. Also av">Qdrant - High-performance, massive-scale Vector Database and Vector Search Engine for the next generation of AI. Also av</span>
               <div class="agent-tags">
@@ -3103,7 +3103,7 @@
             </td>
             <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/agentscope-ai-agentscope">AgentScope</a>
+              <a class="agent-name" href="/agents/agentscope">AgentScope</a>
               <a class="agent-repo" href="https://github.com/agentscope-ai/agentscope" target="_blank" rel="noopener noreferrer">agentscope-ai/agentscope</a>
               <span class="agent-desc" title="Build and run agents you can see, understand and trust.">Build and run agents you can see, understand and trust.</span>
               <div class="agent-tags">
@@ -3150,7 +3150,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/deepset-ai-haystack">Haystack</a>
+              <a class="agent-name" href="/agents/haystack">Haystack</a>
               <a class="agent-repo" href="https://github.com/deepset-ai/haystack" target="_blank" rel="noopener noreferrer">deepset-ai/haystack</a>
               <span class="agent-desc" title="Open-source AI orchestration framework for building context-engineered, production-ready LLM applications. Design modula">Open-source AI orchestration framework for building context-engineered, production-ready LLM applications. Design modula</span>
               <div class="agent-tags">
@@ -3197,7 +3197,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/chroma-core-chroma">Chroma</a>
+              <a class="agent-name" href="/agents/chroma">Chroma</a>
               <a class="agent-repo" href="https://github.com/chroma-core/chroma" target="_blank" rel="noopener noreferrer">chroma-core/chroma</a>
               <span class="agent-desc" title="Search infrastructure for AI">Search infrastructure for AI</span>
               <div class="agent-tags">
@@ -3244,7 +3244,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/qwenlm-qwen-code">Qwen Code</a>
+              <a class="agent-name" href="/agents/qwen-code">Qwen Code</a>
               <a class="agent-repo" href="https://github.com/QwenLM/qwen-code" target="_blank" rel="noopener noreferrer">QwenLM/qwen-code</a>
               <span class="agent-desc" title="An open-source AI agent that lives in your terminal.">An open-source AI agent that lives in your terminal.</span>
               <div class="agent-tags">
@@ -3291,7 +3291,7 @@
             </td>
             <td class="delta delta-up">▲7</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/google-a2a">A2A / Agent2Agent Protocol</a>
+              <a class="agent-name" href="/agents/a2a-agent2agent-protocol">A2A / Agent2Agent Protocol</a>
               <a class="agent-repo" href="https://github.com/a2aproject/A2A" target="_blank" rel="noopener noreferrer">google/A2A</a>
               <span class="agent-desc" title="Agent2Agent (A2A) is an open protocol enabling communication and interoperability between opaque agentic applications.">Agent2Agent (A2A) is an open protocol enabling communication and interoperability between opaque agentic applications.</span>
               <div class="agent-tags">
@@ -3385,7 +3385,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/getzep-graphiti">Graphiti</a>
+              <a class="agent-name" href="/agents/graphiti">Graphiti</a>
               <a class="agent-repo" href="https://github.com/getzep/graphiti" target="_blank" rel="noopener noreferrer">getzep/graphiti</a>
               <span class="agent-desc" title="Build Real-Time Knowledge Graphs for AI Agents">Build Real-Time Knowledge Graphs for AI Agents</span>
               <div class="agent-tags">
@@ -3432,7 +3432,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/huggingface-smolagents">smolagents</a>
+              <a class="agent-name" href="/agents/smolagents">smolagents</a>
               <a class="agent-repo" href="https://github.com/huggingface/smolagents" target="_blank" rel="noopener noreferrer">huggingface/smolagents</a>
               <span class="agent-desc" title="🤗 smolagents: a barebones library for agents that think in code.">🤗 smolagents: a barebones library for agents that think in code.</span>
               <div class="agent-tags">
@@ -3479,7 +3479,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/skyvern-ai-skyvern">Skyvern</a>
+              <a class="agent-name" href="/agents/skyvern">Skyvern</a>
               <a class="agent-repo" href="https://github.com/Skyvern-AI/skyvern" target="_blank" rel="noopener noreferrer">Skyvern-AI/skyvern</a>
               <span class="agent-desc" title="Automate browser based workflows with AI">Automate browser based workflows with AI</span>
               <div class="agent-tags">
@@ -3526,7 +3526,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/microsoft-autogen">AutoGen</a>
+              <a class="agent-name" href="/agents/autogen">AutoGen</a>
               <a class="agent-repo" href="https://github.com/microsoft/autogen" target="_blank" rel="noopener noreferrer">microsoft/autogen</a>
               <span class="agent-desc" title="A programming framework for agentic AI">A programming framework for agentic AI</span>
               <div class="agent-tags">
@@ -3573,7 +3573,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/roovetgit-roo-code">Roo Code</a>
+              <a class="agent-name" href="/agents/roo-code">Roo Code</a>
               <a class="agent-repo" href="https://github.com/RooCodeInc/Roo-Code" target="_blank" rel="noopener noreferrer">RooVetGit/Roo-Code</a>
               <span class="agent-desc" title="Roo Code gives you a whole dev team of AI agents in your code editor.">Roo Code gives you a whole dev team of AI agents in your code editor.</span>
               <div class="agent-tags">
@@ -3620,7 +3620,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/promptfoo-promptfoo">Promptfoo</a>
+              <a class="agent-name" href="/agents/promptfoo">Promptfoo</a>
               <a class="agent-repo" href="https://github.com/promptfoo/promptfoo" target="_blank" rel="noopener noreferrer">promptfoo/promptfoo</a>
               <span class="agent-desc" title="Test your prompts, agents, and RAGs. Red teaming/pentesting/vulnerability scanning for AI. Compare performance of GPT, C">Test your prompts, agents, and RAGs. Red teaming/pentesting/vulnerability scanning for AI. Compare performance of GPT, C</span>
               <div class="agent-tags">
@@ -3667,7 +3667,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/princeton-nlp-swe-agent">SWE-agent</a>
+              <a class="agent-name" href="/agents/swe-agent">SWE-agent</a>
               <a class="agent-repo" href="https://github.com/SWE-agent/SWE-agent" target="_blank" rel="noopener noreferrer">princeton-nlp/SWE-agent</a>
               <span class="agent-desc" title="SWE-agent takes a GitHub issue and tries to automatically fix it, using your LM of choice. It can also be employed for o">SWE-agent takes a GitHub issue and tries to automatically fix it, using your LM of choice. It can also be employed for o</span>
               <div class="agent-tags">
@@ -3714,7 +3714,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/pydantic-pydantic-ai">PydanticAI</a>
+              <a class="agent-name" href="/agents/pydanticai">PydanticAI</a>
               <a class="agent-repo" href="https://github.com/pydantic/pydantic-ai" target="_blank" rel="noopener noreferrer">pydantic/pydantic-ai</a>
               <span class="agent-desc" title="AI Agent Framework, the Pydantic way">AI Agent Framework, the Pydantic way</span>
               <div class="agent-tags">
@@ -3761,7 +3761,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/browserbase-stagehand">Stagehand</a>
+              <a class="agent-name" href="/agents/stagehand">Stagehand</a>
               <a class="agent-repo" href="https://github.com/browserbase/stagehand" target="_blank" rel="noopener noreferrer">browserbase/stagehand</a>
               <span class="agent-desc" title="The SDK For Browser Agents">The SDK For Browser Agents</span>
               <div class="agent-tags">
@@ -3808,7 +3808,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/camel-ai-camel">CAMEL</a>
+              <a class="agent-name" href="/agents/camel">CAMEL</a>
               <a class="agent-repo" href="https://github.com/camel-ai/camel" target="_blank" rel="noopener noreferrer">camel-ai/camel</a>
               <span class="agent-desc" title="🐫 CAMEL: The first and the best multi-agent framework. Finding the Scaling Law of Agents. https://www.camel-ai.org">🐫 CAMEL: The first and the best multi-agent framework. Finding the Scaling Law of Agents. https://www.camel-ai.org</span>
               <div class="agent-tags">
@@ -3855,7 +3855,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/topoteretes-cognee">Cognee</a>
+              <a class="agent-name" href="/agents/cognee">Cognee</a>
               <a class="agent-repo" href="https://github.com/topoteretes/cognee" target="_blank" rel="noopener noreferrer">topoteretes/cognee</a>
               <span class="agent-desc" title="Memory control plane for AI Agents in 6 lines of code">Memory control plane for AI Agents in 6 lines of code</span>
               <div class="agent-tags">
@@ -3902,7 +3902,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/botpress-botpress">Botpress</a>
+              <a class="agent-name" href="/agents/botpress">Botpress</a>
               <a class="agent-repo" href="https://github.com/botpress/botpress" target="_blank" rel="noopener noreferrer">botpress/botpress</a>
               <span class="agent-desc" title="The open-source hub to build & deploy GPT/LLM Agents ⚡️">The open-source hub to build & deploy GPT/LLM Agents ⚡️</span>
               <div class="agent-tags">
@@ -3949,7 +3949,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/letta-ai-letta">Letta</a>
+              <a class="agent-name" href="/agents/letta">Letta</a>
               <a class="agent-repo" href="https://github.com/letta-ai/letta" target="_blank" rel="noopener noreferrer">letta-ai/letta</a>
               <span class="agent-desc" title="Letta is the platform for building stateful agents: AI with advanced memory that can learn and self-improve over time.">Letta is the platform for building stateful agents: AI with advanced memory that can learn and self-improve over time.</span>
               <div class="agent-tags">
@@ -4043,7 +4043,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/canner-wrenai">WrenAI</a>
+              <a class="agent-name" href="/agents/wrenai">WrenAI</a>
               <a class="agent-repo" href="https://github.com/Canner/WrenAI" target="_blank" rel="noopener noreferrer">Canner/WrenAI</a>
               <span class="agent-desc" title="Give AI agents the context to query business data correctly through the open context layer that gives AI agents grounded">Give AI agents the context to query business data correctly through the open context layer that gives AI agents grounded</span>
               <div class="agent-tags">
@@ -4090,7 +4090,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/leon-ai-leon">Leon</a>
+              <a class="agent-name" href="/agents/leon">Leon</a>
               <a class="agent-repo" href="https://github.com/leon-ai/leon" target="_blank" rel="noopener noreferrer">leon-ai/leon</a>
               <span class="agent-desc" title="🧠 Leon is your open-source personal assistant.">🧠 Leon is your open-source personal assistant.</span>
               <div class="agent-tags">
@@ -4137,7 +4137,7 @@
             </td>
             <td class="delta delta-up">▲4</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/pipecat-ai-pipecat">Pipecat</a>
+              <a class="agent-name" href="/agents/pipecat">Pipecat</a>
               <a class="agent-repo" href="https://github.com/pipecat-ai/pipecat" target="_blank" rel="noopener noreferrer">pipecat-ai/pipecat</a>
               <span class="agent-desc" title="Open Source framework for voice and multimodal conversational AI">Open Source framework for voice and multimodal conversational AI</span>
               <div class="agent-tags">
@@ -4184,7 +4184,7 @@
             </td>
             <td class="delta delta-down">▼59</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/weaviate-weaviate">Weaviate</a>
+              <a class="agent-name" href="/agents/weaviate">Weaviate</a>
               <a class="agent-repo" href="https://github.com/weaviate/weaviate" target="_blank" rel="noopener noreferrer">weaviate/weaviate</a>
               <span class="agent-desc" title="Weaviate is an open-source vector database that stores both objects and vectors, allowing for the combination of vector ">Weaviate is an open-source vector database that stores both objects and vectors, allowing for the combination of vector </span>
               <div class="agent-tags">
@@ -4231,7 +4231,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/confident-ai-deepeval">DeepEval</a>
+              <a class="agent-name" href="/agents/deepeval">DeepEval</a>
               <a class="agent-repo" href="https://github.com/confident-ai/deepeval" target="_blank" rel="noopener noreferrer">confident-ai/deepeval</a>
               <span class="agent-desc" title="The LLM Evaluation Framework">The LLM Evaluation Framework</span>
               <div class="agent-tags">
@@ -4278,7 +4278,7 @@
             </td>
             <td class="delta delta-up">▲7</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/getmaxun-maxun">Maxun</a>
+              <a class="agent-name" href="/agents/maxun">Maxun</a>
               <a class="agent-repo" href="https://github.com/getmaxun/maxun" target="_blank" rel="noopener noreferrer">getmaxun/maxun</a>
               <span class="agent-desc" title="🔥 The open-source no-code platform for web scraping, crawling, search and AI data extraction • Turn websites into struct">🔥 The open-source no-code platform for web scraping, crawling, search and AI data extraction • Turn websites into struct</span>
               <div class="agent-tags">
@@ -4325,7 +4325,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/microsoft-guidance">Guidance</a>
+              <a class="agent-name" href="/agents/guidance">Guidance</a>
               <a class="agent-repo" href="https://github.com/guidance-ai/guidance" target="_blank" rel="noopener noreferrer">microsoft/guidance</a>
               <span class="agent-desc" title="A guidance language for controlling large language models.">A guidance language for controlling large language models.</span>
               <div class="agent-tags">
@@ -4419,7 +4419,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/trycua-cua">Cua</a>
+              <a class="agent-name" href="/agents/cua">Cua</a>
               <a class="agent-repo" href="https://github.com/trycua/cua" target="_blank" rel="noopener noreferrer">trycua/cua</a>
               <span class="agent-desc" title="Open-source infrastructure for Computer-Use Agents. Sandboxes, SDKs, and benchmarks to train and evaluate AI agents that">Open-source infrastructure for Computer-Use Agents. Sandboxes, SDKs, and benchmarks to train and evaluate AI agents that</span>
               <div class="agent-tags">
@@ -4466,7 +4466,7 @@
             </td>
             <td class="delta delta-up">▲1</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/triggerdotdev-trigger-dev">Trigger.dev</a>
+              <a class="agent-name" href="/agents/trigger-dev">Trigger.dev</a>
               <a class="agent-repo" href="https://github.com/triggerdotdev/trigger.dev" target="_blank" rel="noopener noreferrer">triggerdotdev/trigger.dev</a>
               <span class="agent-desc" title="Trigger.dev – build and deploy fully‑managed AI agents and workflows">Trigger.dev – build and deploy fully‑managed AI agents and workflows</span>
               <div class="agent-tags">
@@ -4560,7 +4560,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/alibaba-spring-ai-alibaba">Spring AI Alibaba</a>
+              <a class="agent-name" href="/agents/spring-ai-alibaba">Spring AI Alibaba</a>
               <a class="agent-repo" href="https://github.com/alibaba/spring-ai-alibaba" target="_blank" rel="noopener noreferrer">alibaba/spring-ai-alibaba</a>
               <span class="agent-desc" title="Agentic AI Framework for Java Developers">Agentic AI Framework for Java Developers</span>
               <div class="agent-tags">
@@ -4654,7 +4654,7 @@
             </td>
             <td class="delta delta-up">▲6</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/ten-framework-ten-framework">TEN Framework</a>
+              <a class="agent-name" href="/agents/ten-framework">TEN Framework</a>
               <a class="agent-repo" href="https://github.com/TEN-framework/ten-framework" target="_blank" rel="noopener noreferrer">TEN-framework/ten-framework</a>
               <span class="agent-desc" title=" Open-source framework for conversational voice AI agents"> Open-source framework for conversational voice AI agents</span>
               <div class="agent-tags">
@@ -4701,7 +4701,7 @@
             </td>
             <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/e2b-dev-e2b">E2B</a>
+              <a class="agent-name" href="/agents/e2b">E2B</a>
               <a class="agent-repo" href="https://github.com/e2b-dev/E2B" target="_blank" rel="noopener noreferrer">e2b-dev/e2b</a>
               <span class="agent-desc" title="Open-source, secure environment with real-world tools for enterprise-grade agents.">Open-source, secure environment with real-world tools for enterprise-grade agents.</span>
               <div class="agent-tags">
@@ -4748,7 +4748,7 @@
             </td>
             <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/pythagora-io-gpt-pilot">GPT Pilot</a>
+              <a class="agent-name" href="/agents/gpt-pilot">GPT Pilot</a>
               <a class="agent-repo" href="https://github.com/Pythagora-io/gpt-pilot" target="_blank" rel="noopener noreferrer">Pythagora-io/gpt-pilot</a>
               <span class="agent-desc" title="The first real AI developer">The first real AI developer</span>
               <div class="agent-tags">
@@ -4795,7 +4795,7 @@
             </td>
             <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/langchain-ai-open-swe">Open SWE</a>
+              <a class="agent-name" href="/agents/open-swe">Open SWE</a>
               <a class="agent-repo" href="https://github.com/langchain-ai/open-swe" target="_blank" rel="noopener noreferrer">langchain-ai/open-swe</a>
               <span class="agent-desc" title="An Open-Source Asynchronous Coding Agent">An Open-Source Asynchronous Coding Agent</span>
               <div class="agent-tags">
@@ -4842,7 +4842,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/assafelovic-gpt-researcher">GPT Researcher</a>
+              <a class="agent-name" href="/agents/gpt-researcher">GPT Researcher</a>
               <a class="agent-repo" href="https://github.com/assafelovic/gpt-researcher" target="_blank" rel="noopener noreferrer">assafelovic/gpt-researcher</a>
               <span class="agent-desc" title="An autonomous agent that conducts deep research on any data using any LLM providers">An autonomous agent that conducts deep research on any data using any LLM providers</span>
               <div class="agent-tags">
@@ -4889,7 +4889,7 @@
             </td>
             <td class="delta delta-up">▲15</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/microsoft-ufo">UFO</a>
+              <a class="agent-name" href="/agents/ufo">UFO</a>
               <a class="agent-repo" href="https://github.com/microsoft/UFO" target="_blank" rel="noopener noreferrer">microsoft/UFO</a>
               <span class="agent-desc" title="UFO³: Weaving the Digital Agent Galaxy">UFO³: Weaving the Digital Agent Galaxy</span>
               <div class="agent-tags">
@@ -4936,7 +4936,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/mervinpraison-praisonai">PraisonAI</a>
+              <a class="agent-name" href="/agents/praisonai">PraisonAI</a>
               <a class="agent-repo" href="https://github.com/MervinPraison/PraisonAI" target="_blank" rel="noopener noreferrer">MervinPraison/PraisonAI</a>
               <span class="agent-desc" title="PraisonAI 🦞 — Hire a 24/7 AI Workforce. Stop writing boilerplate and start shipping autonomous self-improving agents tha">PraisonAI 🦞 — Hire a 24/7 AI Workforce. Stop writing boilerplate and start shipping autonomous self-improving agents tha</span>
               <div class="agent-tags">
@@ -4983,7 +4983,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/arize-ai-phoenix">Arize Phoenix</a>
+              <a class="agent-name" href="/agents/arize-phoenix">Arize Phoenix</a>
               <a class="agent-repo" href="https://github.com/Arize-ai/phoenix" target="_blank" rel="noopener noreferrer">Arize-AI/phoenix</a>
               <span class="agent-desc" title="AI Observability & Evaluation">AI Observability & Evaluation</span>
               <div class="agent-tags">
@@ -5030,7 +5030,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/voltagent-voltagent">VoltAgent</a>
+              <a class="agent-name" href="/agents/voltagent">VoltAgent</a>
               <a class="agent-repo" href="https://github.com/VoltAgent/voltagent" target="_blank" rel="noopener noreferrer">VoltAgent/voltagent</a>
               <span class="agent-desc" title="AI Agent Engineering Platform built on an Open Source TypeScript AI Agent Framework">AI Agent Engineering Platform built on an Open Source TypeScript AI Agent Framework</span>
               <div class="agent-tags">
@@ -5077,7 +5077,7 @@
             </td>
             <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/neuml-txtai">txtai</a>
+              <a class="agent-name" href="/agents/txtai">txtai</a>
               <a class="agent-repo" href="https://github.com/neuml/txtai" target="_blank" rel="noopener noreferrer">neuml/txtai</a>
               <span class="agent-desc" title="💡 All-in-one AI framework for semantic search, LLM orchestration and language model workflows">💡 All-in-one AI framework for semantic search, LLM orchestration and language model workflows</span>
               <div class="agent-tags">
@@ -5124,7 +5124,7 @@
             </td>
             <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/lancedb-lancedb">LanceDB</a>
+              <a class="agent-name" href="/agents/lancedb">LanceDB</a>
               <a class="agent-repo" href="https://github.com/lancedb/lancedb" target="_blank" rel="noopener noreferrer">lancedb/lancedb</a>
               <span class="agent-desc" title="Developer-friendly OSS embedded retrieval library for multimodal AI. Search More; Manage Less.">Developer-friendly OSS embedded retrieval library for multimodal AI. Search More; Manage Less.</span>
               <div class="agent-tags">
@@ -5171,7 +5171,7 @@
             </td>
             <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/coze-dev-coze-studio">Coze Studio</a>
+              <a class="agent-name" href="/agents/coze-studio">Coze Studio</a>
               <a class="agent-repo" href="https://github.com/coze-dev/coze-studio" target="_blank" rel="noopener noreferrer">coze-dev/coze-studio</a>
               <span class="agent-desc" title="An AI agent development platform with all-in-one visual tools, simplifying agent creation, debugging, and deployment lik">An AI agent development platform with all-in-one visual tools, simplifying agent creation, debugging, and deployment lik</span>
               <div class="agent-tags">
@@ -5218,7 +5218,7 @@
             </td>
             <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/microsoft-promptflow">PromptFlow</a>
+              <a class="agent-name" href="/agents/promptflow">PromptFlow</a>
               <a class="agent-repo" href="https://github.com/microsoft/promptflow" target="_blank" rel="noopener noreferrer">microsoft/promptflow</a>
               <span class="agent-desc" title="Build high-quality LLM apps - from prototyping, testing to production deployment and monitoring.">Build high-quality LLM apps - from prototyping, testing to production deployment and monitoring.</span>
               <div class="agent-tags">
@@ -5265,7 +5265,7 @@
             </td>
             <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/flyteorg-flyte">Flyte</a>
+              <a class="agent-name" href="/agents/flyte">Flyte</a>
               <a class="agent-repo" href="https://github.com/flyteorg/flyte" target="_blank" rel="noopener noreferrer">flyteorg/flyte</a>
               <span class="agent-desc" title="Dynamic, resilient AI orchestration. Coordinate data, models, and compute as you build AI workflows.">Dynamic, resilient AI orchestration. Coordinate data, models, and compute as you build AI workflows.</span>
               <div class="agent-tags">
@@ -5312,7 +5312,7 @@
             </td>
             <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/leondz-garak">Garak</a>
+              <a class="agent-name" href="/agents/garak">Garak</a>
               <a class="agent-repo" href="https://github.com/NVIDIA/garak" target="_blank" rel="noopener noreferrer">leondz/garak</a>
               <span class="agent-desc" title="the LLM vulnerability scanner">the LLM vulnerability scanner</span>
               <div class="agent-tags">
@@ -5406,7 +5406,7 @@
             </td>
             <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/modelcontextprotocol-registry">MCP Registry</a>
+              <a class="agent-name" href="/agents/mcp-registry">MCP Registry</a>
               <a class="agent-repo" href="https://github.com/modelcontextprotocol/registry" target="_blank" rel="noopener noreferrer">modelcontextprotocol/registry</a>
               <span class="agent-desc" title="A community driven registry service for Model Context Protocol (MCP) servers.">A community driven registry service for Model Context Protocol (MCP) servers.</span>
               <div class="agent-tags">
@@ -5453,7 +5453,7 @@
             </td>
             <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/pgvector-pgvector">pgvector</a>
+              <a class="agent-name" href="/agents/pgvector">pgvector</a>
               <a class="agent-repo" href="https://github.com/pgvector/pgvector" target="_blank" rel="noopener noreferrer">pgvector/pgvector</a>
               <span class="agent-desc" title="Open-source vector similarity search for Postgres">Open-source vector similarity search for Postgres</span>
               <div class="agent-tags">
@@ -5500,7 +5500,7 @@
             </td>
             <td class="delta delta-down">▼86</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/vespa-engine-vespa">Vespa</a>
+              <a class="agent-name" href="/agents/vespa">Vespa</a>
               <a class="agent-repo" href="https://github.com/vespa-engine/vespa" target="_blank" rel="noopener noreferrer">vespa-engine/vespa</a>
               <span class="agent-desc" title="AI + Data, online. https://vespa.ai">AI + Data, online. https://vespa.ai</span>
               <div class="agent-tags">
@@ -5547,7 +5547,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/strands-agents-sdk-python">Strands Agents</a>
+              <a class="agent-name" href="/agents/strands-agents">Strands Agents</a>
               <a class="agent-repo" href="https://github.com/strands-agents/sdk-python" target="_blank" rel="noopener noreferrer">strands-agents/sdk-python</a>
               <span class="agent-desc" title="A model-driven approach to building AI agents in just a few lines of code.">A model-driven approach to building AI agents in just a few lines of code.</span>
               <div class="agent-tags">
@@ -5594,7 +5594,7 @@
             </td>
             <td class="delta delta-up">▲1</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/microsoft-omniparser">OmniParser</a>
+              <a class="agent-name" href="/agents/omniparser">OmniParser</a>
               <a class="agent-repo" href="https://github.com/microsoft/OmniParser" target="_blank" rel="noopener noreferrer">microsoft/OmniParser</a>
               <span class="agent-desc" title="A simple screen parsing tool towards pure vision based GUI agent">A simple screen parsing tool towards pure vision based GUI agent</span>
               <div class="agent-tags">
@@ -5641,7 +5641,7 @@
             </td>
             <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/firebase-genkit">Google Genkit</a>
+              <a class="agent-name" href="/agents/google-genkit">Google Genkit</a>
               <a class="agent-repo" href="https://github.com/genkit-ai/genkit" target="_blank" rel="noopener noreferrer">firebase/genkit</a>
               <span class="agent-desc" title="Open-source framework for building AI-powered apps in JavaScript, Go, and Python, built and used in production by Google">Open-source framework for building AI-powered apps in JavaScript, Go, and Python, built and used in production by Google</span>
               <div class="agent-tags">
@@ -5688,7 +5688,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/openai-swarm">Swarm by OpenAI</a>
+              <a class="agent-name" href="/agents/swarm-by-openai">Swarm by OpenAI</a>
               <a class="agent-repo" href="https://github.com/openai/swarm" target="_blank" rel="noopener noreferrer">openai/swarm</a>
               <span class="agent-desc" title="Educational framework exploring ergonomic, lightweight multi-agent orchestration. Managed by OpenAI Solution team.">Educational framework exploring ergonomic, lightweight multi-agent orchestration. Managed by OpenAI Solution team.</span>
               <div class="agent-tags">
@@ -5735,7 +5735,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/nvidia-nemo-guardrails">NeMo Guardrails</a>
+              <a class="agent-name" href="/agents/nemo-guardrails">NeMo Guardrails</a>
               <a class="agent-repo" href="https://github.com/NVIDIA-NeMo/Guardrails" target="_blank" rel="noopener noreferrer">NVIDIA/NeMo-Guardrails</a>
               <span class="agent-desc" title="NeMo Guardrails is an open-source toolkit for easily adding programmable guardrails to LLM-based conversational systems.">NeMo Guardrails is an open-source toolkit for easily adding programmable guardrails to LLM-based conversational systems.</span>
               <div class="agent-tags">
@@ -5782,7 +5782,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/vrsen-agency-swarm">Agency Swarm</a>
+              <a class="agent-name" href="/agents/agency-swarm">Agency Swarm</a>
               <a class="agent-repo" href="https://github.com/VRSEN/agency-swarm" target="_blank" rel="noopener noreferrer">VRSEN/agency-swarm</a>
               <span class="agent-desc" title="Reliable Multi-Agent Orchestration Framework">Reliable Multi-Agent Orchestration Framework</span>
               <div class="agent-tags">
@@ -5829,7 +5829,7 @@
             </td>
             <td class="delta delta-up">▲3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/guardrails-ai-guardrails">Guardrails AI</a>
+              <a class="agent-name" href="/agents/guardrails-ai">Guardrails AI</a>
               <a class="agent-repo" href="https://github.com/guardrails-ai/guardrails" target="_blank" rel="noopener noreferrer">guardrails-ai/guardrails</a>
               <span class="agent-desc" title="Adding guardrails to large language models.">Adding guardrails to large language models.</span>
               <div class="agent-tags">
@@ -5876,7 +5876,7 @@
             </td>
             <td class="delta delta-up">▲1</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/brainblend-ai-atomic-agents">Atomic Agents</a>
+              <a class="agent-name" href="/agents/atomic-agents">Atomic Agents</a>
               <a class="agent-repo" href="https://github.com/BrainBlend-AI/atomic-agents" target="_blank" rel="noopener noreferrer">BrainBlend-AI/atomic-agents</a>
               <span class="agent-desc" title="Building AI agents, atomically">Building AI agents, atomically</span>
               <div class="agent-tags">
@@ -5923,7 +5923,7 @@
             </td>
             <td class="delta delta-down">▼93</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/giskard-ai-giskard-oss">Giskard</a>
+              <a class="agent-name" href="/agents/giskard">Giskard</a>
               <a class="agent-repo" href="https://github.com/Giskard-AI/giskard-oss" target="_blank" rel="noopener noreferrer">Giskard-AI/giskard-oss</a>
               <span class="agent-desc" title="🐢 Open-Source Evaluation & Testing library for LLM Agents">🐢 Open-Source Evaluation & Testing library for LLM Agents</span>
               <div class="agent-tags">
@@ -5970,7 +5970,7 @@
             </td>
             <td class="delta delta-up">▲1</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/meta-llama-purplellama">Llama Guard</a>
+              <a class="agent-name" href="/agents/llama-guard">Llama Guard</a>
               <a class="agent-repo" href="https://github.com/meta-llama/PurpleLlama" target="_blank" rel="noopener noreferrer">meta-llama/PurpleLlama</a>
               <span class="agent-desc" title="Set of tools to assess and improve LLM security.">Set of tools to assess and improve LLM security.</span>
               <div class="agent-tags">
@@ -6017,7 +6017,7 @@
             </td>
             <td class="delta delta-down">▼96</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/agenta-ai-agenta">Agenta</a>
+              <a class="agent-name" href="/agents/agenta">Agenta</a>
               <a class="agent-repo" href="https://github.com/Agenta-AI/agenta" target="_blank" rel="noopener noreferrer">Agenta-AI/agenta</a>
               <span class="agent-desc" title="The open-source LLMOps platform: prompt playground, prompt management, LLM evaluation, and LLM observability all in one ">The open-source LLMOps platform: prompt playground, prompt management, LLM evaluation, and LLM observability all in one </span>
               <div class="agent-tags">
@@ -6064,7 +6064,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/helicone-helicone">Helicone</a>
+              <a class="agent-name" href="/agents/helicone">Helicone</a>
               <a class="agent-repo" href="https://github.com/Helicone/helicone" target="_blank" rel="noopener noreferrer">Helicone/helicone</a>
               <span class="agent-desc" title="🧊 Open source LLM observability platform. One line of code to monitor, evaluate, and experiment. YC W23 🍓">🧊 Open source LLM observability platform. One line of code to monitor, evaluate, and experiment. YC W23 🍓</span>
               <div class="agent-tags">
@@ -6111,7 +6111,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/khoj-ai-khoj">Khoj</a>
+              <a class="agent-name" href="/agents/khoj">Khoj</a>
               <a class="agent-repo" href="https://github.com/khoj-ai/khoj" target="_blank" rel="noopener noreferrer">khoj-ai/khoj</a>
               <span class="agent-desc" title="Your AI second brain. Self-hostable. Get answers from the web or your docs. Build custom agents, schedule automations, d">Your AI second brain. Self-hostable. Get answers from the web or your docs. Build custom agents, schedule automations, d</span>
               <div class="agent-tags">
@@ -6158,7 +6158,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/imartinez-privategpt">PrivateGPT</a>
+              <a class="agent-name" href="/agents/privategpt">PrivateGPT</a>
               <a class="agent-repo" href="https://github.com/zylon-ai/private-gpt" target="_blank" rel="noopener noreferrer">imartinez/privateGPT</a>
               <span class="agent-desc" title="Interact with your documents using the power of GPT, 100% privately, no data leaks">Interact with your documents using the power of GPT, 100% privately, no data leaks</span>
               <div class="agent-tags">
@@ -6205,7 +6205,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/gptme-gptme">GPTMe</a>
+              <a class="agent-name" href="/agents/gptme">GPTMe</a>
               <a class="agent-repo" href="https://github.com/gptme/gptme" target="_blank" rel="noopener noreferrer">gptme/gptme</a>
               <span class="agent-desc" title="Your agent in your terminal, equipped with local tools: writes code, uses the terminal, browses the web. Make your own p">Your agent in your terminal, equipped with local tools: writes code, uses the terminal, browses the web. Make your own p</span>
               <div class="agent-tags">
@@ -6252,7 +6252,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/microsoft-tinytroupe">TinyTroupe</a>
+              <a class="agent-name" href="/agents/tinytroupe">TinyTroupe</a>
               <a class="agent-repo" href="https://github.com/microsoft/TinyTroupe" target="_blank" rel="noopener noreferrer">microsoft/TinyTroupe</a>
               <span class="agent-desc" title="LLM-powered multiagent persona simulation for imagination enhancement and business insights.">LLM-powered multiagent persona simulation for imagination enhancement and business insights.</span>
               <div class="agent-tags">
@@ -6299,7 +6299,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/sylphai-inc-adalflow">AdalFlow</a>
+              <a class="agent-name" href="/agents/adalflow">AdalFlow</a>
               <a class="agent-repo" href="https://github.com/SylphAI-Inc/AdalFlow" target="_blank" rel="noopener noreferrer">SylphAI-Inc/AdalFlow</a>
               <span class="agent-desc" title="AdalFlow: The library to build & auto-optimize LLM applications.">AdalFlow: The library to build & auto-optimize LLM applications.</span>
               <div class="agent-tags">
@@ -6346,7 +6346,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/prefecthq-marvin">Marvin</a>
+              <a class="agent-name" href="/agents/marvin">Marvin</a>
               <a class="agent-repo" href="https://github.com/PrefectHQ/marvin" target="_blank" rel="noopener noreferrer">PrefectHQ/marvin</a>
               <span class="agent-desc" title="an ambient intelligence library">an ambient intelligence library</span>
               <div class="agent-tags">
@@ -6393,7 +6393,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/langroid-langroid">Langroid</a>
+              <a class="agent-name" href="/agents/langroid">Langroid</a>
               <a class="agent-repo" href="https://github.com/langroid/langroid" target="_blank" rel="noopener noreferrer">langroid/langroid</a>
               <span class="agent-desc" title="Harness LLMs with Multi-Agent Programming">Harness LLMs with Multi-Agent Programming</span>
               <div class="agent-tags">
@@ -6440,7 +6440,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/foundationagents-openmanus">OpenManus</a>
+              <a class="agent-name" href="/agents/openmanus">OpenManus</a>
               <a class="agent-repo" href="https://github.com/FoundationAgents/OpenManus" target="_blank" rel="noopener noreferrer">FoundationAgents/OpenManus</a>
               <span class="agent-desc" title="No fortress, purely open ground.  OpenManus is Coming.">No fortress, purely open ground.  OpenManus is Coming.</span>
               <div class="agent-tags">
@@ -6487,7 +6487,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/langwatch-langwatch">LangWatch</a>
+              <a class="agent-name" href="/agents/langwatch">LangWatch</a>
               <a class="agent-repo" href="https://github.com/langwatch/langwatch" target="_blank" rel="noopener noreferrer">langwatch/langwatch</a>
               <span class="agent-desc" title="The platform for LLM evaluations and AI agent testing">The platform for LLM evaluations and AI agent testing</span>
               <div class="agent-tags">
@@ -6534,7 +6534,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/truera-trulens">TruLens</a>
+              <a class="agent-name" href="/agents/trulens">TruLens</a>
               <a class="agent-repo" href="https://github.com/truera/trulens" target="_blank" rel="noopener noreferrer">truera/trulens</a>
               <span class="agent-desc" title="Evaluation and Tracking for LLM Experiments and AI Agents">Evaluation and Tracking for LLM Experiments and AI Agents</span>
               <div class="agent-tags">
@@ -6581,7 +6581,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/i-am-bee-bee-agent-framework">Bee Agent Framework</a>
+              <a class="agent-name" href="/agents/bee-agent-framework">Bee Agent Framework</a>
               <a class="agent-repo" href="https://github.com/i-am-bee/beeai-framework" target="_blank" rel="noopener noreferrer">i-am-bee/bee-agent-framework</a>
               <span class="agent-desc" title="Build production-ready AI agents in both Python and Typescript.">Build production-ready AI agents in both Python and Typescript.</span>
               <div class="agent-tags">
@@ -6628,7 +6628,7 @@
             </td>
             <td class="delta delta-up">▲1</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/griptape-ai-griptape">Griptape</a>
+              <a class="agent-name" href="/agents/griptape">Griptape</a>
               <a class="agent-repo" href="https://github.com/griptape-ai/griptape" target="_blank" rel="noopener noreferrer">griptape-ai/griptape</a>
               <span class="agent-desc" title="Modular Python framework for AI agents and workflows with chain-of-thought reasoning, tools, and memory. ">Modular Python framework for AI agents and workflows with chain-of-thought reasoning, tools, and memory. </span>
               <div class="agent-tags">
@@ -6675,7 +6675,7 @@
             </td>
             <td class="delta delta-up">▲1</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/tabbyml-tabby">Tabby</a>
+              <a class="agent-name" href="/agents/tabby">Tabby</a>
               <a class="agent-repo" href="https://github.com/TabbyML/tabby" target="_blank" rel="noopener noreferrer">TabbyML/tabby</a>
               <span class="agent-desc" title="Self-hosted AI coding assistant">Self-hosted AI coding assistant</span>
               <div class="agent-tags">
@@ -6722,7 +6722,7 @@
             </td>
             <td class="delta delta-down">▼2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/homanp-superagent">Superagent</a>
+              <a class="agent-name" href="/agents/superagent">Superagent</a>
               <a class="agent-repo" href="https://github.com/superagent-ai/superagent" target="_blank" rel="noopener noreferrer">homanp/superagent</a>
               <span class="agent-desc" title="Superagent protects your AI applications against prompt injections, data leaks, and harmful outputs. Embed safety direct">Superagent protects your AI applications against prompt injections, data leaks, and harmful outputs. Embed safety direct</span>
               <div class="agent-tags">
@@ -6769,7 +6769,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/geekan-metagpt">MetaGPT</a>
+              <a class="agent-name" href="/agents/metagpt">MetaGPT</a>
               <a class="agent-repo" href="https://github.com/FoundationAgents/MetaGPT" target="_blank" rel="noopener noreferrer">geekan/MetaGPT</a>
               <span class="agent-desc" title="🌟 The Multi-Agent Framework: First AI Software Company, Towards Natural Language Programming">🌟 The Multi-Agent Framework: First AI Software Company, Towards Natural Language Programming</span>
               <div class="agent-tags">
@@ -6816,7 +6816,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/dagworks-inc-burr">Burr</a>
+              <a class="agent-name" href="/agents/burr">Burr</a>
               <a class="agent-repo" href="https://github.com/apache/burr" target="_blank" rel="noopener noreferrer">dagworks-inc/burr</a>
               <span class="agent-desc" title="Build applications that make decisions (chatbots, agents, simulations, etc...). Monitor, trace, persist, and execute on ">Build applications that make decisions (chatbots, agents, simulations, etc...). Monitor, trace, persist, and execute on </span>
               <div class="agent-tags">
@@ -6863,7 +6863,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/qwenlm-qwen-agent">Qwen Agent</a>
+              <a class="agent-name" href="/agents/qwen-agent">Qwen Agent</a>
               <a class="agent-repo" href="https://github.com/QwenLM/Qwen-Agent" target="_blank" rel="noopener noreferrer">QwenLM/Qwen-Agent</a>
               <span class="agent-desc" title="Agent framework and applications built upon Qwen>=3.0, featuring Function Calling, MCP, Code Interpreter, RAG, Chrome ex">Agent framework and applications built upon Qwen>=3.0, featuring Function Calling, MCP, Code Interpreter, RAG, Chrome ex</span>
               <div class="agent-tags">
@@ -6910,7 +6910,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/browserbase-open-operator">Open Operator</a>
+              <a class="agent-name" href="/agents/open-operator">Open Operator</a>
               <a class="agent-repo" href="https://github.com/browserbase/open-operator" target="_blank" rel="noopener noreferrer">browserbase/open-operator</a>
               <span class="agent-desc" title="A template for building web agents with Stagehand on Browserbase">A template for building web agents with Stagehand on Browserbase</span>
               <div class="agent-tags">
@@ -6957,7 +6957,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/wandb-weave">Weights & Biases Weave</a>
+              <a class="agent-name" href="/agents/weights-biases-weave">Weights & Biases Weave</a>
               <a class="agent-repo" href="https://github.com/wandb/weave" target="_blank" rel="noopener noreferrer">wandb/weave</a>
               <span class="agent-desc" title="Weave is a toolkit for developing AI-powered applications, built by Weights & Biases.">Weave is a toolkit for developing AI-powered applications, built by Weights & Biases.</span>
               <div class="agent-tags">
@@ -7004,7 +7004,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/microsoft-taskweaver">TaskWeaver</a>
+              <a class="agent-name" href="/agents/taskweaver">TaskWeaver</a>
               <a class="agent-repo" href="https://github.com/microsoft/TaskWeaver" target="_blank" rel="noopener noreferrer">microsoft/TaskWeaver</a>
               <span class="agent-desc" title="The first "code-first" agent framework for seamlessly planning and executing data analytics tasks. ">The first "code-first" agent framework for seamlessly planning and executing data analytics tasks. </span>
               <div class="agent-tags">
@@ -7051,7 +7051,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/explodinggradients-ragas">Ragas</a>
+              <a class="agent-name" href="/agents/ragas">Ragas</a>
               <a class="agent-repo" href="https://github.com/vibrantlabsai/ragas" target="_blank" rel="noopener noreferrer">explodinggradients/ragas</a>
               <span class="agent-desc" title="Supercharge Your LLM Application Evaluations 🚀">Supercharge Your LLM Application Evaluations 🚀</span>
               <div class="agent-tags">
@@ -7098,7 +7098,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/xlang-ai-opencua">OpenCUA</a>
+              <a class="agent-name" href="/agents/opencua">OpenCUA</a>
               <a class="agent-repo" href="https://github.com/xlang-ai/OpenCUA" target="_blank" rel="noopener noreferrer">xlang-ai/OpenCUA</a>
               <span class="agent-desc" title="[NeurIPS 2025 Spotlight] OpenCUA: Open Foundations for Computer-Use Agents">[NeurIPS 2025 Spotlight] OpenCUA: Open Foundations for Computer-Use Agents</span>
               <div class="agent-tags">
@@ -7145,7 +7145,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/yoheinakajima-babyagi">BabyAGI</a>
+              <a class="agent-name" href="/agents/babyagi">BabyAGI</a>
               <a class="agent-repo" href="https://github.com/yoheinakajima/babyagi" target="_blank" rel="noopener noreferrer">yoheinakajima/babyagi</a>
               
               <div class="agent-tags">
@@ -7192,7 +7192,7 @@
             </td>
             <td class="delta delta-up">▲1</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/agentops-ai-agentops">AgentOps</a>
+              <a class="agent-name" href="/agents/agentops">AgentOps</a>
               <a class="agent-repo" href="https://github.com/AgentOps-AI/agentops" target="_blank" rel="noopener noreferrer">agentops-ai/agentops</a>
               <span class="agent-desc" title="Python SDK for AI agent monitoring, LLM cost tracking, benchmarking, and more. Integrates with most LLMs and agent frame">Python SDK for AI agent monitoring, LLM cost tracking, benchmarking, and more. Integrates with most LLMs and agent frame</span>
               <div class="agent-tags">
@@ -7239,7 +7239,7 @@
             </td>
             <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/emergenceai-agent-e">Agent-E</a>
+              <a class="agent-name" href="/agents/agent-e">Agent-E</a>
               <a class="agent-repo" href="https://github.com/EmergenceAI/Agent-E" target="_blank" rel="noopener noreferrer">EmergenceAI/agent-e</a>
               <span class="agent-desc" title="Agent driven automation starting with the web. Try it: https://www.emergence.ai/web-automation-api">Agent driven automation starting with the web. Try it: https://www.emergence.ai/web-automation-api</span>
               <div class="agent-tags">
@@ -7286,7 +7286,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/bytedance-ui-tars">UI-TARS</a>
+              <a class="agent-name" href="/agents/ui-tars">UI-TARS</a>
               <a class="agent-repo" href="https://github.com/bytedance/UI-TARS" target="_blank" rel="noopener noreferrer">bytedance/UI-TARS</a>
               <span class="agent-desc" title="Pioneering Automated GUI Interaction with Native Agents">Pioneering Automated GUI Interaction with Native Agents</span>
               <div class="agent-tags">
@@ -7333,7 +7333,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/servicenow-browsergym">BrowserGym agents</a>
+              <a class="agent-name" href="/agents/browsergym-agents">BrowserGym agents</a>
               <a class="agent-repo" href="https://github.com/ServiceNow/BrowserGym" target="_blank" rel="noopener noreferrer">ServiceNow/BrowserGym</a>
               <span class="agent-desc" title="🌎💪 BrowserGym, a Gym environment for web task automation">🌎💪 BrowserGym, a Gym environment for web task automation</span>
               <div class="agent-tags">
@@ -7380,7 +7380,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/quivrhq-quivr">Quivr</a>
+              <a class="agent-name" href="/agents/quivr">Quivr</a>
               <a class="agent-repo" href="https://github.com/QuivrHQ/quivr" target="_blank" rel="noopener noreferrer">QuivrHQ/quivr</a>
               <span class="agent-desc" title="Opiniated RAG for integrating GenAI in your apps 🧠   Focus on your product rather than the RAG. Easy integration in exis">Opiniated RAG for integrating GenAI in your apps 🧠   Focus on your product rather than the RAG. Easy integration in exis</span>
               <div class="agent-tags">
@@ -7427,7 +7427,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/stanford-oval-storm">STORM</a>
+              <a class="agent-name" href="/agents/storm">STORM</a>
               <a class="agent-repo" href="https://github.com/stanford-oval/storm" target="_blank" rel="noopener noreferrer">stanford-oval/storm</a>
               <span class="agent-desc" title="An LLM-powered knowledge curation system that researches a topic and generates a full-length report with citations.">An LLM-powered knowledge curation system that researches a topic and generates a full-length report with citations.</span>
               <div class="agent-tags">
@@ -7474,7 +7474,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/joonspk-research-generative-agents">Generative Agents</a>
+              <a class="agent-name" href="/agents/generative-agents">Generative Agents</a>
               <a class="agent-repo" href="https://github.com/joonspk-research/generative_agents" target="_blank" rel="noopener noreferrer">joonspk-research/generative_agents</a>
               <span class="agent-desc" title="Generative Agents: Interactive Simulacra of Human Behavior">Generative Agents: Interactive Simulacra of Human Behavior</span>
               <div class="agent-tags">
@@ -7521,7 +7521,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/microsoft-jarvis">JARVIS / HuggingGPT</a>
+              <a class="agent-name" href="/agents/jarvis-hugginggpt">JARVIS / HuggingGPT</a>
               <a class="agent-repo" href="https://github.com/microsoft/JARVIS" target="_blank" rel="noopener noreferrer">microsoft/JARVIS</a>
               <span class="agent-desc" title="JARVIS, a system to connect LLMs with ML community. Paper: https://arxiv.org/pdf/2303.17580.pdf">JARVIS, a system to connect LLMs with ML community. Paper: https://arxiv.org/pdf/2303.17580.pdf</span>
               <div class="agent-tags">
@@ -7568,7 +7568,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/stitionai-devika">Devika</a>
+              <a class="agent-name" href="/agents/devika">Devika</a>
               <a class="agent-repo" href="https://github.com/stitionai/devika" target="_blank" rel="noopener noreferrer">stitionai/devika</a>
               <span class="agent-desc" title="Devika is the first open-source implementation of an Agentic Software Engineer. Initially started as an open-source alte">Devika is the first open-source implementation of an Agentic Software Engineer. Initially started as an open-source alte</span>
               <div class="agent-tags">
@@ -7615,7 +7615,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/ai-christianson-ra-aid">RA.Aid</a>
+              <a class="agent-name" href="/agents/ra-aid">RA.Aid</a>
               <a class="agent-repo" href="https://github.com/ai-christianson/RA.Aid" target="_blank" rel="noopener noreferrer">ai-christianson/RA.Aid</a>
               <span class="agent-desc" title="Develop software autonomously.">Develop software autonomously.</span>
               <div class="agent-tags">
@@ -7662,7 +7662,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/plandex-ai-plandex">Plandex</a>
+              <a class="agent-name" href="/agents/plandex">Plandex</a>
               <a class="agent-repo" href="https://github.com/plandex-ai/plandex" target="_blank" rel="noopener noreferrer">plandex-ai/plandex</a>
               <span class="agent-desc" title="Open source AI coding agent. Designed for large projects and real world tasks.">Open source AI coding agent. Designed for large projects and real world tasks.</span>
               <div class="agent-tags">
@@ -7709,7 +7709,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/openbmb-xagent">XAgent</a>
+              <a class="agent-name" href="/agents/xagent">XAgent</a>
               <a class="agent-repo" href="https://github.com/OpenBMB/XAgent" target="_blank" rel="noopener noreferrer">OpenBMB/XAgent</a>
               <span class="agent-desc" title="An Autonomous LLM Agent for Complex Task Solving">An Autonomous LLM Agent for Complex Task Solving</span>
               <div class="agent-tags">
@@ -7756,7 +7756,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/ag2ai-fastagency">FastAgency</a>
+              <a class="agent-name" href="/agents/fastagency">FastAgency</a>
               <a class="agent-repo" href="https://github.com/ag2ai/fastagency" target="_blank" rel="noopener noreferrer">ag2ai/fastagency</a>
               <span class="agent-desc" title="The fastest way to bring multi-agent workflows to production.">The fastest way to bring multi-agent workflows to production.</span>
               <div class="agent-tags">
@@ -7803,7 +7803,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/minedojo-voyager">Voyager Minecraft Agent</a>
+              <a class="agent-name" href="/agents/voyager-minecraft-agent">Voyager Minecraft Agent</a>
               <a class="agent-repo" href="https://github.com/MineDojo/Voyager" target="_blank" rel="noopener noreferrer">MineDojo/Voyager</a>
               <span class="agent-desc" title="An Open-Ended Embodied Agent with Large Language Models">An Open-Ended Embodied Agent with Large Language Models</span>
               <div class="agent-tags">
@@ -7850,7 +7850,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/nickscamara-open-deep-research">Open Deep Research</a>
+              <a class="agent-name" href="/agents/open-deep-research">Open Deep Research</a>
               <a class="agent-repo" href="https://github.com/nickscamara/open-deep-research" target="_blank" rel="noopener noreferrer">nickscamara/open-deep-research</a>
               <span class="agent-desc" title="An open source deep research clone. AI Agent that reasons large amounts of web data extracted with Firecrawl">An open source deep research clone. AI Agent that reasons large amounts of web data extracted with Firecrawl</span>
               <div class="agent-tags">
@@ -7897,7 +7897,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/samuelschmidgall-agentlaboratory">Agent Laboratory</a>
+              <a class="agent-name" href="/agents/agent-laboratory">Agent Laboratory</a>
               <a class="agent-repo" href="https://github.com/SamuelSchmidgall/AgentLaboratory" target="_blank" rel="noopener noreferrer">SamuelSchmidgall/AgentLaboratory</a>
               <span class="agent-desc" title="Agent Laboratory is an end-to-end autonomous research workflow meant to assist you as the human researcher toward implem">Agent Laboratory is an end-to-end autonomous research workflow meant to assist you as the human researcher toward implem</span>
               <div class="agent-tags">
@@ -7944,7 +7944,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/sweepai-sweep">Sweep</a>
+              <a class="agent-name" href="/agents/sweep">Sweep</a>
               <a class="agent-repo" href="https://github.com/sweepai/sweep" target="_blank" rel="noopener noreferrer">sweepai/sweep</a>
               <span class="agent-desc" title="Sweep: AI coding assistant for JetBrains">Sweep: AI coding assistant for JetBrains</span>
               <div class="agent-tags">
@@ -7991,7 +7991,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/protectai-llm-guard">LLM Guard</a>
+              <a class="agent-name" href="/agents/llm-guard">LLM Guard</a>
               <a class="agent-repo" href="https://github.com/protectai/llm-guard" target="_blank" rel="noopener noreferrer">protectai/llm-guard</a>
               <span class="agent-desc" title="The Security Toolkit for LLM Interactions">The Security Toolkit for LLM Interactions</span>
               <div class="agent-tags">
@@ -8038,7 +8038,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/xlang-ai-openagents">OpenAgents</a>
+              <a class="agent-name" href="/agents/openagents">OpenAgents</a>
               <a class="agent-repo" href="https://github.com/xlang-ai/OpenAgents" target="_blank" rel="noopener noreferrer">xlang-ai/OpenAgents</a>
               <span class="agent-desc" title="[COLM 2024] OpenAgents: An Open Platform for Language Agents in the Wild">[COLM 2024] OpenAgents: An Open Platform for Language Agents in the Wild</span>
               <div class="agent-tags">
@@ -8085,7 +8085,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/entropy-research-devon">Devon</a>
+              <a class="agent-name" href="/agents/devon">Devon</a>
               <a class="agent-repo" href="https://github.com/entropy-research/Devon" target="_blank" rel="noopener noreferrer">entropy-research/Devon</a>
               <span class="agent-desc" title="Devon: An open-source pair programmer">Devon: An open-source pair programmer</span>
               <div class="agent-tags">
@@ -8132,7 +8132,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/crewaiinc-crewai-tools">CrewAI tools</a>
+              <a class="agent-name" href="/agents/crewai-tools">CrewAI tools</a>
               <a class="agent-repo" href="https://github.com/crewAIInc/crewAI-tools" target="_blank" rel="noopener noreferrer">crewAIInc/crewAI-tools</a>
               <span class="agent-desc" title="Extend the capabilities of your CrewAI agents with Tools">Extend the capabilities of your CrewAI agents with Tools</span>
               <div class="agent-tags">
@@ -8179,7 +8179,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/abanteai-archive-old-cli-mentat">Mentat</a>
+              <a class="agent-name" href="/agents/mentat">Mentat</a>
               <a class="agent-repo" href="https://github.com/AbanteAI/archive-old-cli-mentat" target="_blank" rel="noopener noreferrer">AbanteAI/archive-old-cli-mentat</a>
               
               <div class="agent-tags">
@@ -8226,7 +8226,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/agiresearch-openagi">OpenAGI</a>
+              <a class="agent-name" href="/agents/openagi">OpenAGI</a>
               <a class="agent-repo" href="https://github.com/agiresearch/OpenAGI" target="_blank" rel="noopener noreferrer">agiresearch/OpenAGI</a>
               <span class="agent-desc" title="OpenAGI: When LLM Meets Domain Experts">OpenAGI: When LLM Meets Domain Experts</span>
               <div class="agent-tags">
@@ -8273,7 +8273,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/trypear-pearai-master">PearAI</a>
+              <a class="agent-name" href="/agents/pearai">PearAI</a>
               <a class="agent-repo" href="https://github.com/trypear/pearai-master" target="_blank" rel="noopener noreferrer">trypear/pearai-master</a>
               <span class="agent-desc" title="Master Repo For PearAI">Master Repo For PearAI</span>
               <div class="agent-tags">
@@ -8320,7 +8320,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/sotopia-lab-sotopia">Sotopia agents</a>
+              <a class="agent-name" href="/agents/sotopia-agents">Sotopia agents</a>
               <a class="agent-repo" href="https://github.com/sotopia-lab/sotopia" target="_blank" rel="noopener noreferrer">sotopia-lab/sotopia</a>
               <span class="agent-desc" title="Sotopia: an Open-ended Social Learning Environment (ICLR 2024 spotlight)">Sotopia: an Open-ended Social Learning Environment (ICLR 2024 spotlight)</span>
               <div class="agent-tags">
@@ -8367,7 +8367,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/myshell-ai-ailice">AIlice</a>
+              <a class="agent-name" href="/agents/ailice">AIlice</a>
               <a class="agent-repo" href="https://github.com/myshell-ai/AIlice" target="_blank" rel="noopener noreferrer">myshell-ai/AIlice</a>
               <span class="agent-desc" title="AIlice is a fully autonomous, general-purpose AI agent.">AIlice is a fully autonomous, general-purpose AI agent.</span>
               <div class="agent-tags">
@@ -8414,7 +8414,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/protectai-rebuff">Rebuff</a>
+              <a class="agent-name" href="/agents/rebuff">Rebuff</a>
               <a class="agent-repo" href="https://github.com/protectai/rebuff" target="_blank" rel="noopener noreferrer">protectai/rebuff</a>
               <span class="agent-desc" title="LLM Prompt Injection Detector">LLM Prompt Injection Detector</span>
               <div class="agent-tags">
@@ -8461,7 +8461,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/prefecthq-controlflow">ControlFlow</a>
+              <a class="agent-name" href="/agents/controlflow">ControlFlow</a>
               <a class="agent-repo" href="https://github.com/prefect-archive/ControlFlow" target="_blank" rel="noopener noreferrer">PrefectHQ/ControlFlow</a>
               <span class="agent-desc" title="🦾 Take control of your AI agents">🦾 Take control of your AI agents</span>
               <div class="agent-tags">
@@ -8508,7 +8508,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/minorjerry-webvoyager">WebVoyager</a>
+              <a class="agent-name" href="/agents/webvoyager">WebVoyager</a>
               <a class="agent-repo" href="https://github.com/MinorJerry/WebVoyager" target="_blank" rel="noopener noreferrer">MinorJerry/WebVoyager</a>
               <span class="agent-desc" title="Code for "WebVoyager: WebVoyager: Building an End-to-End Web Agent with Large Multimodal Models"">Code for "WebVoyager: WebVoyager: Building an End-to-End Web Agent with Large Multimodal Models"</span>
               <div class="agent-tags">
@@ -8555,7 +8555,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/langchain-ai-langgraph-codeact">CodeAct</a>
+              <a class="agent-name" href="/agents/codeact">CodeAct</a>
               <a class="agent-repo" href="https://github.com/langchain-ai/langgraph-codeact" target="_blank" rel="noopener noreferrer">langchain-ai/langgraph-codeact</a>
               
               <div class="agent-tags">
@@ -8602,7 +8602,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/salesforceairesearch-agentlite">AgentLite</a>
+              <a class="agent-name" href="/agents/agentlite">AgentLite</a>
               <a class="agent-repo" href="https://github.com/SalesforceAIResearch/AgentLite" target="_blank" rel="noopener noreferrer">SalesforceAIResearch/AgentLite</a>
               
               <div class="agent-tags">
@@ -8649,7 +8649,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/idosal-agentllm">AgentLLM</a>
+              <a class="agent-name" href="/agents/agentllm">AgentLLM</a>
               <a class="agent-repo" href="https://github.com/idosal/AgentLLM" target="_blank" rel="noopener noreferrer">idosal/AgentLLM</a>
               <span class="agent-desc" title="AgentLLM is a PoC for browser-native autonomous agents">AgentLLM is a PoC for browser-native autonomous agents</span>
               <div class="agent-tags">
@@ -8696,7 +8696,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/aitomatic-openssa">OpenSSA</a>
+              <a class="agent-name" href="/agents/openssa">OpenSSA</a>
               <a class="agent-repo" href="https://github.com/aitomatic/openssa" target="_blank" rel="noopener noreferrer">aitomatic/openssa</a>
               <span class="agent-desc" title="OpenSSA: Small Specialist Agents based on Domain-Aware Neurosymbolic Agent (DANA) architecture for industrial problem-so">OpenSSA: Small Specialist Agents based on Domain-Aware Neurosymbolic Agent (DANA) architecture for industrial problem-so</span>
               <div class="agent-tags">
@@ -8743,7 +8743,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/swarmzero-swarmzero">SwarmZero</a>
+              <a class="agent-name" href="/agents/swarmzero">SwarmZero</a>
               <a class="agent-repo" href="https://github.com/swarmzero/swarmzero" target="_blank" rel="noopener noreferrer">swarmzero/swarmzero</a>
               <span class="agent-desc" title="SwarmZero's SDK for building AI agents, swarms of agents and much more.">SwarmZero's SDK for building AI agents, swarms of agents and much more.</span>
               <div class="agent-tags">
@@ -8790,7 +8790,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/albertvillanova-tinyagents">TinyAgents</a>
+              <a class="agent-name" href="/agents/tinyagents">TinyAgents</a>
               <a class="agent-repo" href="https://github.com/albertvillanova/tinyagents" target="_blank" rel="noopener noreferrer">albertvillanova/tinyagents</a>
               <span class="agent-desc" title="Tiny Agents: LLM + MCP Tools">Tiny Agents: LLM + MCP Tools</span>
               <div class="agent-tags">
@@ -8837,7 +8837,7 @@
             </td>
             <td class="delta ">–</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/wisdom-pan-agent-hospital">Agent Hospital</a>
+              <a class="agent-name" href="/agents/agent-hospital">Agent Hospital</a>
               <a class="agent-repo" href="https://github.com/wisdom-pan/Agent_Hospital" target="_blank" rel="noopener noreferrer">wisdom-pan/Agent_Hospital</a>
               <span class="agent-desc" title="## AI医院: Multi-Agent 医学智能体 与患者进行多轮对话，提出相关和探索性的问题，推荐适当的医学检查，并在收集足够的信息后做出诊断。设置检查员，他们专门负责与患者互动并提供相关的医学检查结果，确保医生能够获得患者必要的客观信">## AI医院: Multi-Agent 医学智能体 与患者进行多轮对话，提出相关和探索性的问题，推荐适当的医学检查，并在收集足够的信息后做出诊断。设置检查员，他们专门负责与患者互动并提供相关的医学检查结果，确保医生能够获得患者必要的客观信</span>
               <div class="agent-tags">
@@ -8873,7 +8873,7 @@
     
 
     <footer>
-      <span>171 agents tracked · signals refresh daily at 06:00 UTC</span>
+      <span>171 agents tracked · staggered 4-hour signal refresh at 06:00 UTC</span>
       <span class="footer-sep">·</span>
       <a href="/methodology">Methodology</a>
       <span class="footer-sep">·</span>
@@ -8901,8 +8901,8 @@
       const prevBtn = document.getElementById("prevBtn");
       const nextBtn = document.getElementById("nextBtn");
       const pgInfo = document.getElementById("pgInfo");
-      let sortCol = "trust_score";
-      let sortAsc = false;
+      let sortCol = "rank";
+      let sortAsc = true;
 
       // ── Category multi-select state ──
       const dropdown = document.getElementById("catDropdown");
@@ -8911,7 +8911,7 @@
       const catCbs = Array.from(document.querySelectorAll(".cat-cb"));
       const clearBtn = document.getElementById("catClear");
       const totalCats = catCbs.length;
-      let selectedCats = new Set(); // empty = all
+      let selectedCats = new Set(catCbs.map(cb => cb.value));
 
       function getFilteredRows() {
         return Array.from(tbody.querySelectorAll("tr:not(.hidden)"));
@@ -8987,7 +8987,7 @@
 
       function applyFilters() {
         currentPage = 0;
-        const allSelected = selectedCats.size === 0;
+        const allSelected = selectedCats.size === totalCats;
         tbody.querySelectorAll("tr").forEach(row => {
           const name = (row.dataset.name || "").toLowerCase();
           const repo = (row.dataset.repo || "").toLowerCase();
@@ -9020,10 +9020,10 @@
 
       // ── Category checkbox logic ──
       function syncUI() {
-        const allSelected = selectedCats.size === 0;
+        const allSelected = selectedCats.size === totalCats;
         catAllCb.checked = allSelected;
         catCbs.forEach(cb => {
-          cb.checked = allSelected || selectedCats.has(cb.value);
+          cb.checked = selectedCats.has(cb.value);
           cb.closest(".cat-option").classList.toggle("checked", cb.checked);
         });
         // Update toggle label
@@ -9031,6 +9031,10 @@
           toggle.classList.remove("has-selection");
           toggle.innerHTML = 'Categories <span class="arrow">▾</span>';
           clearBtn.classList.remove("visible");
+        } else if (selectedCats.size === 0) {
+          toggle.classList.add("has-selection");
+          toggle.innerHTML = 'No categories <span class="arrow">▾</span>';
+          clearBtn.classList.add("visible");
         } else {
           toggle.classList.add("has-selection");
           const label = selectedCats.size === 1 ? [...selectedCats][0] : selectedCats.size + " categories";
@@ -9041,7 +9045,9 @@
       }
 
       catAllCb.addEventListener("change", () => {
-        selectedCats.clear();
+        selectedCats = catAllCb.checked
+          ? new Set(catCbs.map(cb => cb.value))
+          : new Set();
         syncUI();
       });
 
@@ -9050,21 +9056,14 @@
           if (cb.checked) {
             selectedCats.add(cb.value);
           } else {
-            // Unchecking from "All" mode: select everything except this one
-            if (selectedCats.size === 0) {
-              catCbs.forEach(other => { if (other !== cb) selectedCats.add(other.value); });
-            } else {
-              selectedCats.delete(cb.value);
-            }
+            selectedCats.delete(cb.value);
           }
-          // If all are checked individually, treat as "All"
-          if (selectedCats.size === totalCats) selectedCats.clear();
           syncUI();
         });
       });
 
       clearBtn.addEventListener("click", () => {
-        selectedCats.clear();
+        selectedCats = new Set(catCbs.map(cb => cb.value));
         syncUI();
       });
 

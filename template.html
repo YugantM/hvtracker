@@ -642,7 +642,7 @@
       </nav>
       <div class="meta">
         {{ total }} agents tracked &nbsp;·&nbsp; updated {{ updated }}<br>
-        signals refresh daily
+        staggered 4-hour signal refresh
       </div>
     </header>
 
@@ -710,14 +710,14 @@
         </colgroup>
         <thead>
           <tr>
-            <th class="r" data-col="rank">#<span class="sort-arrow">↑</span></th>
+            <th class="r sorted" data-col="rank">#<span class="sort-arrow">↑</span></th>
             <th class="c" data-col="rank_delta">Δ<span class="sort-arrow"></span></th>
             <th data-col="name">Agent</th>
             <th class="c" data-col="evidence_grade">Grade<span class="sort-arrow"></span></th>
             <th class="r" data-col="stars">Stars<span class="sort-arrow"></span></th>
             <th data-col="last_push">Last Push<span class="sort-arrow"></span></th>
             <th class="r" data-col="weekly_commits" title="Commits in the last 4 weeks">Commits<span class="sort-arrow"></span></th>
-            <th class="r sorted" data-col="trust_score">HVTrust<span class="sort-arrow">↓</span></th>
+            <th class="r" data-col="trust_score">HVTrust<span class="sort-arrow"></span></th>
           </tr>
         </thead>
         <tbody>
@@ -813,7 +813,7 @@
     {% endif %}
 
     <footer>
-      <span>{{ total }} agents tracked · signals refresh daily at 06:00 UTC</span>
+      <span>{{ total }} agents tracked · staggered 4-hour signal refresh</span>
       <span class="footer-sep">·</span>
       <a href="/methodology">Methodology</a>
       <span class="footer-sep">·</span>
@@ -841,8 +841,8 @@
       const prevBtn = document.getElementById("prevBtn");
       const nextBtn = document.getElementById("nextBtn");
       const pgInfo = document.getElementById("pgInfo");
-      let sortCol = "trust_score";
-      let sortAsc = false;
+      let sortCol = "rank";
+      let sortAsc = true;
 
       // ── Category multi-select state ──
       const dropdown = document.getElementById("catDropdown");
@@ -851,7 +851,7 @@
       const catCbs = Array.from(document.querySelectorAll(".cat-cb"));
       const clearBtn = document.getElementById("catClear");
       const totalCats = catCbs.length;
-      let selectedCats = new Set(); // empty = all
+      let selectedCats = new Set(catCbs.map(cb => cb.value));
 
       function getFilteredRows() {
         return Array.from(tbody.querySelectorAll("tr:not(.hidden)"));
@@ -927,7 +927,7 @@
 
       function applyFilters() {
         currentPage = 0;
-        const allSelected = selectedCats.size === 0;
+        const allSelected = selectedCats.size === totalCats;
         tbody.querySelectorAll("tr").forEach(row => {
           const name = (row.dataset.name || "").toLowerCase();
           const repo = (row.dataset.repo || "").toLowerCase();
@@ -960,10 +960,10 @@
 
       // ── Category checkbox logic ──
       function syncUI() {
-        const allSelected = selectedCats.size === 0;
+        const allSelected = selectedCats.size === totalCats;
         catAllCb.checked = allSelected;
         catCbs.forEach(cb => {
-          cb.checked = allSelected || selectedCats.has(cb.value);
+          cb.checked = selectedCats.has(cb.value);
           cb.closest(".cat-option").classList.toggle("checked", cb.checked);
         });
         // Update toggle label
@@ -971,6 +971,10 @@
           toggle.classList.remove("has-selection");
           toggle.innerHTML = 'Categories <span class="arrow">▾</span>';
           clearBtn.classList.remove("visible");
+        } else if (selectedCats.size === 0) {
+          toggle.classList.add("has-selection");
+          toggle.innerHTML = 'No categories <span class="arrow">▾</span>';
+          clearBtn.classList.add("visible");
         } else {
           toggle.classList.add("has-selection");
           const label = selectedCats.size === 1 ? [...selectedCats][0] : selectedCats.size + " categories";
@@ -981,7 +985,9 @@
       }
 
       catAllCb.addEventListener("change", () => {
-        selectedCats.clear();
+        selectedCats = catAllCb.checked
+          ? new Set(catCbs.map(cb => cb.value))
+          : new Set();
         syncUI();
       });
 
@@ -990,21 +996,14 @@
           if (cb.checked) {
             selectedCats.add(cb.value);
           } else {
-            // Unchecking from "All" mode: select everything except this one
-            if (selectedCats.size === 0) {
-              catCbs.forEach(other => { if (other !== cb) selectedCats.add(other.value); });
-            } else {
-              selectedCats.delete(cb.value);
-            }
+            selectedCats.delete(cb.value);
           }
-          // If all are checked individually, treat as "All"
-          if (selectedCats.size === totalCats) selectedCats.clear();
           syncUI();
         });
       });
 
       clearBtn.addEventListener("click", () => {
-        selectedCats.clear();
+        selectedCats = new Set(catCbs.map(cb => cb.value));
         syncUI();
       });
 
