@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-26T15:05:25Z",
-  "data_timestamp": "2026-05-26 15:05 UTC",
+  "generated_at": "2026-05-26T21:49:15Z",
+  "data_timestamp": "2026-05-26 21:49 UTC",
   "schema_version": "v0.1",
   "methodology_version": "v2.0",
   "configured_agents": 36,
@@ -60,6 +60,11 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
+      "repo": "anthropics/claude-code",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
       "repo": "Significant-Gravitas/AutoGPT",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -71,11 +76,6 @@
     },
     {
       "repo": "open-webui/open-webui",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "anthropics/claude-code",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -575,17 +575,17 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
+      "repo": "wandb/weave",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
       "repo": "browserbase/open-operator",
       "criterion": "5.1",
       "detail": "repository is archived"
     },
     {
       "repo": "browserbase/open-operator",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "wandb/weave",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -841,7 +841,6 @@
     "vespa-engine/vespa",
     "openai/swarm",
     "NVIDIA/NeMo-Guardrails",
-    "BrainBlend-AI/atomic-agents",
     "microsoft/TaskWeaver",
     "plandex-ai/plandex",
     "protectai/llm-guard",
@@ -849,7 +848,7 @@
     "myshell-ai/AIlice",
     "swarmzero/swarmzero"
   ],
-  "package_failure_count": 19,
+  "package_failure_count": 18,
   "scorecard_unavailable_count": 147,
   "fingerprint_agents": [
     "All-Hands-AI/OpenHands",
