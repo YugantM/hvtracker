@@ -152,7 +152,7 @@ The richest, most queryable set of signals — and all already inside our existi
 ### OSSF Scorecard
 - Independent project, also queryable via its own `api.securityscorecards.dev` endpoint.
 - Returns a score 0–10 plus per-check breakdown: `Binary-Artifacts`, `Branch-Protection`, `CI-Tests`, `CII-Best-Practices`, `Code-Review`, `Dangerous-Workflow`, `Dependency-Update-Tool`, `Fuzzing`, `License`, `Maintained`, `Packaging`, `Pinned-Dependencies`, `SAST`, `Security-Policy`, `Signed-Releases`, `Token-Permissions`, `Vulnerabilities`, `Webhooks`.
-- **Already runs daily on every popular GitHub repo.** Coverage of our 65 agents is likely >90%.
+- **Already runs daily on every popular GitHub repo.** Coverage of the tracked agent set is likely high, though not guaranteed for every repository.
 - **Lesson:** they have invested years in computing exactly the kind of signals we want. We should consume their score, surface the sub-checks we care about (`Signed-Releases`, `Pinned-Dependencies`, `Branch-Protection`, `Code-Review`) as their own columns, and credit Scorecard. **Don't reinvent.**
 - **Effort: S.**
 - **Strategic value: ★★★.** Possibly the highest-ROI integration in this whole document, alongside §3/§4.
@@ -192,7 +192,7 @@ The richest, most queryable set of signals — and all already inside our existi
 **Suggested first signal to ship (Priority 2):** **OSSF Scorecard integration** as the foundation column, **plus npm + PyPI package provenance** as the first HVTracker-original column.
 
 Rationale:
-- Scorecard gives us an immediate credible "supply chain hygiene" baseline for ~60/65 agents in one afternoon.
+- Scorecard gives us an immediate credible "supply chain hygiene" baseline for a large share of tracked agents.
 - Package provenance (#3 + #4) is the first column that is *uniquely* HVTracker — nobody surfaces it per AI agent today, and it's the truest cryptographic signal in the document.
 - Combined effort: **~1–2 days of focused work**, well within the cadence we've been operating at.
 - The combination naturally seeds Spec v2.0 §5 (Provenance Signals) with concrete, defensible, formally-defined content.

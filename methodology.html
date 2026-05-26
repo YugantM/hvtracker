@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Learn how HVTracker ranks open-source AI agents using public signals like GitHub activity, freshness, stars, downloads, community attention, and trust indicators.">
-  <title>Methodology — How HVTracker Scores Open-Source AI Agents</title>
+  <meta name="description" content="Learn how HVTracker ranks open-source AI agents using public signals for activity, adoption, transparency, safety, identity, provenance, and evidence quality.">
+  <title>Methodology — How HVTracker Ranks Open-Source AI Agents</title>
   <link rel="canonical" href="https://hvtracker.net/methodology">
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Methodology — How HVTracker Scores Open-Source AI Agents">
-  <meta property="og:description" content="Learn how HVTracker ranks open-source AI agents using public signals like GitHub activity, freshness, stars, downloads, community attention, and trust indicators.">
+  <meta property="og:title" content="Methodology — How HVTracker Ranks Open-Source AI Agents">
+  <meta property="og:description" content="Learn how HVTracker ranks open-source AI agents using public signals for activity, adoption, transparency, safety, identity, provenance, and evidence quality.">
   <meta property="og:url" content="https://hvtracker.net/methodology">
   <meta property="og:image" content="https://hvtracker.net/og.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Methodology — How HVTracker Scores Open-Source AI Agents">
-  <meta name="twitter:description" content="Learn how HVTracker ranks open-source AI agents using public signals like GitHub activity, freshness, stars, downloads, community attention, and trust indicators.">
+  <meta name="twitter:title" content="Methodology — How HVTracker Ranks Open-Source AI Agents">
+  <meta name="twitter:description" content="Learn how HVTracker ranks open-source AI agents using public signals for activity, adoption, transparency, safety, identity, provenance, and evidence quality.">
   <meta name="twitter:image" content="https://hvtracker.net/og.png">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -247,7 +247,7 @@
 
     <header>
       <a href="/" class="logo">HV<span>Tracker</span></a>
-      <span class="tagline">Health scores for open-source AI agents</span>
+      <span class="tagline">Trust signals for open-source AI agents</span>
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
         <span class="active">Methodology</span>
@@ -266,7 +266,7 @@
       </section>
 
       <section id="scoring">
-        <h2>Health Score</h2>
+        <h2>Health Score And Trust Score</h2>
         <p>The health score is a 0-100 composite. It is intentionally simple and based only on four GitHub-derived components:</p>
         <div class="formula-block">
           Score = stars(30) + freshness(25) + activity(25) + community(20)
@@ -277,7 +277,7 @@
           <li><strong>Activity · 25%</strong> — Activity uses commits from the last four weeks. It rewards active development, but also log-scales the value so unusually busy repos do not overwhelm the rest of the score.</li>
           <li><strong>Community · 20%</strong> — Forks are used as a proxy for downstream reuse and developer interest. Like stars, forks are log-scaled.</li>
         </ul>
-        <p class="note">Downloads, Hacker News mentions, and trust signals are displayed for context but are <strong>not</strong> currently included in the 0-100 health score.</p>
+        <p class="note">HVTrust is a separate trust-oriented score that combines activity, adoption, transparency, safety, and identity signals. Downloads, Hacker News mentions, and supply-chain signals are displayed for context and auditability.</p>
       </section>
 
       <section id="data-sources">
@@ -332,7 +332,7 @@
 
       <section id="updates">
         <h2>How Often Data Updates</h2>
-        <p>The GitHub Actions workflow refreshes the leaderboard daily at 06:00 UTC. The workflow can also be run manually from GitHub Actions. Each successful run regenerates the leaderboard, agent pages, <code>data.json</code>, <code>feed.json</code>, <code>sitemap.xml</code>, and a dated history snapshot.</p>
+        <p>The GitHub Actions workflow refreshes six staggered batches every 4 hours. A full refresh cycle completes in 24 hours. Each successful run regenerates the leaderboard, agent pages, public JSON endpoints, <code>feed.json</code>, <code>sitemap.xml</code>, and a dated history snapshot.</p>
       </section>
 
       <section id="limitations">

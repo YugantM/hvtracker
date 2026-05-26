@@ -120,8 +120,8 @@ Generated data/public files:
 
 Current snapshot characteristics observed during handover:
 
-- 65 agents
-- 8 categories
+- 171 agents
+- 14 categories
 - 50 agents with weekly download data
 - 54 agents with HN terms/results
 - Trust fields include npm provenance, PyPI provenance, signed commit ratio, OSSF Scorecard score/checks
