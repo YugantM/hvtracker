@@ -930,6 +930,12 @@ BUILD_REPORT_V01 = {
     "version": "v0.1",
     "date": "2026-05-26",
     "status": "Draft",
+    "authors": ["HVTracker"],
+    "abstract": (
+        "Machine-readable self-audit of the HVTracker build pipeline. Generated "
+        "on each cron run, reporting configured agents, active agents, eligibility "
+        "warnings, failed fetches, and signal coverage statistics."
+    ),
     "sections": [
         {"id": "s1", "num": "1", "title": "Purpose"},
         {"id": "s2", "num": "2", "title": "Endpoint"},
