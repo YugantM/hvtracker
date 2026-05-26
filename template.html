@@ -1059,7 +1059,12 @@
           if (cb.checked) {
             selectedCats.add(cb.value);
           } else {
-            selectedCats.delete(cb.value);
+            // Unchecking from "All" mode: select everything except this one
+            if (selectedCats.size === 0) {
+              catCbs.forEach(other => { if (other !== cb) selectedCats.add(other.value); });
+            } else {
+              selectedCats.delete(cb.value);
+            }
           }
           // If all are checked individually, treat as "All"
           if (selectedCats.size === totalCats) selectedCats.clear();
