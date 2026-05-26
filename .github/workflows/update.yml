@@ -81,7 +81,7 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git pull --rebase origin main || true
-          git add index.html data.json methodology.html output/history/ output/methodology.html agents/ sitemap.xml feed.json data/ spec/
+          git add index.html data.json methodology.html output/history/ output/methodology.html agents/ sitemap.xml feed.json data/ spec/ badge/
           if git diff --cached --quiet; then
             echo "No changes — skipping commit."
           else

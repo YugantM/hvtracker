@@ -847,6 +847,65 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
     return all_events
 
 
+def generate_badges(script_dir: str, rows: list[dict]) -> None:
+    """Generate shields.io-style SVG badges under /badge/{slug}.svg."""
+    badge_dir = os.path.join(script_dir, "badge")
+    os.makedirs(badge_dir, exist_ok=True)
+
+    def _color_for_trust(score: float) -> str:
+        if score >= 55:
+            return "34d399"  # green
+        if score >= 30:
+            return "60a5fa"  # blue
+        return "f87171"  # red
+
+    def _color_for_grade(grade: str) -> str:
+        return {"A": "34d399", "B": "60a5fa", "C": "fbbf24", "D": "f87171"}.get(grade, "9ca3af")
+
+    def _make_badge(label: str, value: str, color: str) -> str:
+        """Generate a flat shields.io-style SVG badge."""
+        # Approximate text widths (6.1px per char at 11px Verdana)
+        char_w = 6.1
+        label_w = len(label) * char_w + 12
+        value_w = len(value) * char_w + 12
+        total_w = label_w + value_w
+        return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{total_w:.0f}" height="20" role="img" aria-label="{label}: {value}">
+  <title>{label}: {value}</title>
+  <linearGradient id="s" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient>
+  <clipPath id="r"><rect width="{total_w:.0f}" height="20" rx="3" fill="#fff"/></clipPath>
+  <g clip-path="url(#r)">
+    <rect width="{label_w:.0f}" height="20" fill="#555"/>
+    <rect x="{label_w:.0f}" width="{value_w:.0f}" height="20" fill="#{color}"/>
+    <rect width="{total_w:.0f}" height="20" fill="url(#s)"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="11">
+    <text x="{label_w / 2:.0f}" y="15" fill="#010101" fill-opacity=".3">{label}</text>
+    <text x="{label_w / 2:.0f}" y="14">{label}</text>
+    <text x="{label_w + value_w / 2:.0f}" y="15" fill="#010101" fill-opacity=".3">{value}</text>
+    <text x="{label_w + value_w / 2:.0f}" y="14">{value}</text>
+  </g>
+</svg>'''
+
+    count = 0
+    for row in rows:
+        slug = row.get("slug", slugify(row["name"]))
+        trust = row.get("trust_score", 0) or 0
+        grade = row.get("evidence_grade", "D")
+
+        # Trust score badge
+        svg = _make_badge("HVTrust", str(trust), _color_for_trust(trust))
+        with open(os.path.join(badge_dir, f"{slug}.svg"), "w") as f:
+            f.write(svg)
+
+        # Grade badge
+        svg_grade = _make_badge("Grade", grade, _color_for_grade(grade))
+        with open(os.path.join(badge_dir, f"{slug}-grade.svg"), "w") as f:
+            f.write(svg_grade)
+        count += 1
+
+    print(f"Generated {count * 2} badges under badge/ ({count} agents × 2 badge types).")
+
+
 def compute_trust_trends(history_dir: str, today_agents: dict[str, dict]) -> dict[str, dict]:
     """Compute 7-day trust score trends from history snapshots.
 
@@ -1410,6 +1469,9 @@ def main() -> None:
         json.dump(build_report, f, indent=2, ensure_ascii=False)
     print(f"Wrote data/build_report.json (active={len(rows)}, legacy={len(legacy_rows)}, warnings={len(eligibility_violations)}, failed={len(failed_repos)}).")
 
+    # ── SVG Badges (/badge/<slug>.svg) ───────────────────────────────────────
+    generate_badges(script_dir, rows)
+
     templates_dir = os.path.join(script_dir, "templates")
     env = Environment(
         loader=FileSystemLoader([templates_dir, script_dir]),
@@ -1525,6 +1587,8 @@ def main() -> None:
     for row in legacy_rows:
         sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}", "0.4", "monthly"))
     sitemap_urls += [
+        ("https://hvtracker.net/compare/", "0.7", "daily"),
+        ("https://hvtracker.net/changelog/", "0.6", "weekly"),
         ("https://hvtracker.net/data/", "0.6", "daily"),
         ("https://hvtracker.net/data/latest.json", "0.7", "daily"),
         ("https://hvtracker.net/data/signals/scorecard.json", "0.5", "daily"),

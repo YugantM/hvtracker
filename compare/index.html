@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Compare AI Agents — HVTracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Compare trust scores, evidence grades, and signals side-by-side for open-source AI agents.">
+  <link rel="canonical" href="https://hvtracker.net/compare/">
+  <style>
+    :root {
+      --bg: #0a0f1e; --surface: #111827; --border: #1e293b;
+      --text: #e2e8f0; --muted: #64748b; --accent: #00b4a0;
+      --green: #34d399; --blue: #60a5fa; --yellow: #fbbf24; --red: #f87171;
+      --font: system-ui, -apple-system, sans-serif;
+      --mono: 'SF Mono', Consolas, monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
+    .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+
+    header { margin-bottom: 32px; }
+    header h1 { font-size: 24px; color: var(--accent); margin-bottom: 4px; }
+    header p { color: var(--muted); font-size: 14px; }
+    header a { color: var(--accent); text-decoration: none; }
+
+    .search-bar { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+    .search-bar input {
+      flex: 1; min-width: 200px; padding: 10px 14px; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--surface); color: var(--text);
+      font-size: 14px; outline: none;
+    }
+    .search-bar input:focus { border-color: var(--accent); }
+    .search-bar button {
+      padding: 10px 20px; border-radius: 6px; border: none;
+      background: var(--accent); color: var(--bg); font-weight: 600;
+      cursor: pointer; font-size: 14px;
+    }
+    .search-bar button:hover { opacity: 0.9; }
+
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 24px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 5px 12px; border-radius: 16px; font-size: 13px;
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    }
+    .chip .remove {
+      cursor: pointer; color: var(--muted); font-size: 16px; line-height: 1;
+      margin-left: 2px;
+    }
+    .chip .remove:hover { color: var(--red); }
+
+    .grid { display: grid; gap: 16px; }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 640px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 20px; position: relative;
+    }
+    .card-name { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+    .card-name a { color: var(--text); text-decoration: none; }
+    .card-name a:hover { color: var(--accent); }
+    .card-repo { font-size: 12px; color: var(--muted); font-family: var(--mono); margin-bottom: 16px; }
+
+    .score-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .big-score {
+      font-size: 36px; font-weight: 700; font-family: var(--mono);
+    }
+    .big-score.high { color: var(--green); }
+    .big-score.mid { color: var(--blue); }
+    .big-score.low { color: var(--red); }
+    .grade-badge {
+      font-size: 14px; font-weight: 700; padding: 3px 10px;
+      border-radius: 4px; font-family: var(--mono);
+    }
+    .grade-A { background: rgba(52,211,153,0.15); color: var(--green); }
+    .grade-B { background: rgba(96,165,250,0.15); color: var(--blue); }
+    .grade-C { background: rgba(251,191,36,0.15); color: var(--yellow); }
+    .grade-D { background: rgba(248,113,113,0.15); color: var(--red); }
+
+    .dims { margin-top: 12px; }
+    .dim-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+    }
+    .dim-row:last-child { border-bottom: none; }
+    .dim-label { color: var(--muted); }
+    .dim-val { font-family: var(--mono); font-weight: 600; }
+    .dim-bar { flex: 1; margin: 0 12px; height: 4px; background: var(--border); border-radius: 2px; }
+    .dim-bar-fill { height: 100%; border-radius: 2px; }
+
+    .signals { margin-top: 16px; }
+    .sig-row { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; color: var(--muted); }
+    .sig-val { color: var(--text); font-family: var(--mono); }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-state h2 { color: var(--text); font-size: 20px; margin-bottom: 8px; }
+
+    .suggestions { position: absolute; z-index: 10; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; max-height: 200px; overflow-y: auto; width: 100%; display: none; }
+    .suggestions.visible { display: block; }
+    .sug-item { padding: 8px 14px; cursor: pointer; font-size: 13px; }
+    .sug-item:hover { background: var(--border); }
+    .sug-item .sug-repo { color: var(--muted); font-size: 11px; }
+
+    .input-wrap { flex: 1; min-width: 200px; position: relative; }
+
+    footer { margin-top: 40px; text-align: center; font-size: 12px; color: var(--muted); }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><a href="/">HVTracker</a> — Compare Agents</h1>
+      <p>Select 2–3 agents to compare trust scores, evidence grades, and signals side-by-side.</p>
+    </header>
+
+    <div class="search-bar">
+      <div class="input-wrap">
+        <input type="text" id="searchInput" placeholder="Search agents by name…" autocomplete="off">
+        <div class="suggestions" id="suggestions"></div>
+      </div>
+      <button onclick="clearAll()">Clear all</button>
+    </div>
+
+    <div class="chips" id="chips"></div>
+    <div id="compareGrid"></div>
+
+    <div class="empty-state" id="emptyState">
+      <h2>Pick agents to compare</h2>
+      <p>Start typing a name above — you can compare up to 3 agents.</p>
+    </div>
+
+    <footer>
+      <a href="/">← Back to leaderboard</a> · Data from <a href="/data/latest.json">latest.json</a> · <a href="https://github.com/YugantM/hvtracker">GitHub</a>
+    </footer>
+  </div>
+
+  <script>
+    let allAgents = [];
+    let selected = []; // array of agent objects
+
+    // Load data
+    fetch('/data/latest.json')
+      .then(r => r.json())
+      .then(data => {
+        allAgents = (data.agents || data).map(a => ({
+          ...a,
+          slug: a.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+        }));
+        // Check URL params
+        const params = new URLSearchParams(location.search);
+        const names = (params.get('a') || '').split(',').filter(Boolean);
+        names.forEach(n => {
+          const agent = allAgents.find(a => a.slug === n || a.name.toLowerCase() === n.toLowerCase());
+          if (agent && selected.length < 3) selected.push(agent);
+        });
+        render();
+      })
+      .catch(() => {
+        document.getElementById('emptyState').innerHTML = '<h2>Failed to load data</h2><p>Could not fetch /data/latest.json</p>';
+      });
+
+    const searchInput = document.getElementById('searchInput');
+    const sugBox = document.getElementById('suggestions');
+
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      if (q.length < 1) { sugBox.classList.remove('visible'); return; }
+      const matches = allAgents
+        .filter(a => a.name.toLowerCase().includes(q) || a.repo.toLowerCase().includes(q))
+        .filter(a => !selected.find(s => s.repo === a.repo))
+        .slice(0, 8);
+      if (matches.length === 0) { sugBox.classList.remove('visible'); return; }
+      sugBox.innerHTML = matches.map(a =>
+        `<div class="sug-item" onclick="addAgent('${a.repo}')">${a.name} <span class="sug-repo">${a.repo}</span></div>`
+      ).join('');
+      sugBox.classList.add('visible');
+    });
+
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Escape') sugBox.classList.remove('visible');
+    });
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.input-wrap')) sugBox.classList.remove('visible');
+    });
+
+    function addAgent(repo) {
+      const agent = allAgents.find(a => a.repo === repo);
+      if (!agent || selected.length >= 3 || selected.find(s => s.repo === repo)) return;
+      selected.push(agent);
+      searchInput.value = '';
+      sugBox.classList.remove('visible');
+      updateURL();
+      render();
+    }
+
+    function removeAgent(repo) {
+      selected = selected.filter(a => a.repo !== repo);
+      updateURL();
+      render();
+    }
+
+    function clearAll() {
+      selected = [];
+      updateURL();
+      render();
+    }
+
+    function updateURL() {
+      const slugs = selected.map(a => a.slug).join(',');
+      const url = slugs ? `?a=${slugs}` : location.pathname;
+      history.replaceState(null, '', url);
+    }
+
+    function dimColor(dim) {
+      return { activity: '#0d9488', adoption: '#6366f1', transparency: '#d97706', safety: '#dc2626', identity: '#7c3aed' }[dim] || '#64748b';
+    }
+
+    function dimMax(dim) {
+      return { activity: 25, adoption: 20, transparency: 20, safety: 20, identity: 15 }[dim] || 20;
+    }
+
+    function render() {
+      const chipsEl = document.getElementById('chips');
+      const gridEl = document.getElementById('compareGrid');
+      const emptyEl = document.getElementById('emptyState');
+
+      // Chips
+      chipsEl.innerHTML = selected.map(a =>
+        `<span class="chip">${a.name} <span class="remove" onclick="removeAgent('${a.repo}')">&times;</span></span>`
+      ).join('');
+
+      if (selected.length === 0) {
+        gridEl.innerHTML = '';
+        emptyEl.style.display = '';
+        return;
+      }
+      emptyEl.style.display = 'none';
+
+      const gridClass = selected.length === 3 ? 'grid-3' : selected.length === 2 ? 'grid-2' : 'grid-2';
+      gridEl.className = `grid ${gridClass}`;
+
+      gridEl.innerHTML = selected.map(a => {
+        const ts = a.trust_score || 0;
+        const scoreClass = ts >= 55 ? 'high' : ts >= 30 ? 'mid' : 'low';
+        const g = a.evidence_grade || 'D';
+        const tb = a.trust_breakdown || {};
+
+        const dims = ['activity', 'adoption', 'transparency', 'safety', 'identity'].map(d => {
+          const val = tb[d] || 0;
+          const max = dimMax(d);
+          const pct = Math.min(100, (val / max) * 100);
+          return `<div class="dim-row">
+            <span class="dim-label">${d.charAt(0).toUpperCase() + d.slice(1)}</span>
+            <div class="dim-bar"><div class="dim-bar-fill" style="width:${pct}%;background:${dimColor(d)}"></div></div>
+            <span class="dim-val">${val}/${max}</span>
+          </div>`;
+        }).join('');
+
+        const signals = [
+          ['Stars', a.stars_fmt || a.stars],
+          ['Downloads/wk', a.weekly_downloads != null ? a.weekly_downloads.toLocaleString() : '—'],
+          ['Commits/4wk', a.weekly_commits || '—'],
+          ['Last push', a.last_push || '—'],
+          ['OSSF Score', a.scorecard_score != null ? a.scorecard_score.toFixed(1) + '/10' : '—'],
+          ['Signed commits', a.signed_commits_ratio != null ? (a.signed_commits_ratio * 100).toFixed(0) + '%' : '—'],
+          ['Provenance', a.has_provenance ? 'Yes' : 'No'],
+          ['HN mentions', a.hn_mentions_30d != null ? a.hn_mentions_30d : '—'],
+        ].map(([l, v]) => `<div class="sig-row"><span>${l}</span><span class="sig-val">${v}</span></div>`).join('');
+
+        return `<div class="card">
+          <div class="card-name"><a href="/agents/${a.slug}">${a.name}</a></div>
+          <div class="card-repo">${a.repo}</div>
+          <div class="score-row">
+            <span class="big-score ${scoreClass}">${ts}</span>
+            <span class="grade-badge grade-${g}">Grade ${g}</span>
+          </div>
+          <div class="dims">${dims}</div>
+          <div class="signals">${signals}</div>
+        </div>`;
+      }).join('');
+    }
+  </script>
+</body>
+</html>

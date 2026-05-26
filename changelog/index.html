@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Changelog — HVTracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="HVTracker changelog — methodology updates, new agents, scoring changes, and registry milestones.">
+  <link rel="canonical" href="https://hvtracker.net/changelog/">
+  <style>
+    :root {
+      --bg: #0a0f1e; --surface: #111827; --border: #1e293b;
+      --text: #e2e8f0; --muted: #64748b; --accent: #00b4a0;
+      --green: #34d399; --blue: #60a5fa; --yellow: #fbbf24; --red: #f87171;
+      --font: system-ui, -apple-system, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.6; }
+    .container { max-width: 720px; margin: 0 auto; padding: 24px 16px; }
+    header h1 { font-size: 24px; color: var(--accent); margin-bottom: 4px; }
+    header p { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+    header a { color: var(--accent); text-decoration: none; }
+
+    .entry { border-left: 3px solid var(--border); padding-left: 20px; margin-bottom: 32px; position: relative; }
+    .entry::before {
+      content: ''; position: absolute; left: -6px; top: 6px;
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--accent); border: 2px solid var(--bg);
+    }
+    .entry-date { font-size: 12px; color: var(--muted); font-family: monospace; margin-bottom: 4px; }
+    .entry-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .entry-body { font-size: 14px; color: var(--muted); }
+    .entry-body ul { margin: 6px 0 0 18px; }
+    .entry-body li { margin-bottom: 4px; }
+    .entry-body code { background: var(--surface); padding: 1px 5px; border-radius: 3px; font-size: 13px; color: var(--text); }
+
+    .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; }
+    .tag-feat { background: rgba(52,211,153,0.15); color: var(--green); }
+    .tag-fix { background: rgba(96,165,250,0.15); color: var(--blue); }
+    .tag-data { background: rgba(251,191,36,0.15); color: var(--yellow); }
+    .tag-breaking { background: rgba(248,113,113,0.15); color: var(--red); }
+
+    footer { margin-top: 40px; text-align: center; font-size: 12px; color: var(--muted); }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><a href="/">HVTracker</a> — Changelog</h1>
+      <p>Methodology updates, new features, scoring changes, and registry milestones.</p>
+    </header>
+
+    <div class="entry">
+      <div class="entry-date">2026-05-26</div>
+      <div class="entry-title">Phase 3: Badges, comparison, changelog <span class="tag tag-feat">feature</span></div>
+      <div class="entry-body">
+        <ul>
+          <li>SVG badges for every agent — embed <code>![HVTrust](https://hvtracker.net/badge/{slug}.svg)</code> in READMEs</li>
+          <li>Agent comparison page — compare 2–3 agents side-by-side at <code>/compare?a=langchain,crewai</code></li>
+          <li>This changelog page for tracking methodology and registry changes</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">2026-05-26</div>
+      <div class="entry-title">Phase 2: Trust trends & API events <span class="tag tag-feat">feature</span></div>
+      <div class="entry-body">
+        <ul>
+          <li>7-day trust score trend indicator (▲/▼) on the leaderboard</li>
+          <li><code>recent_events</code> field added to <code>/data/latest.json</code> per agent</li>
+          <li><code>trust_score</code> and <code>evidence_grade</code> added to history data points</li>
+          <li>Fixed push failures in scorecard-scan and discover-agents workflows</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">2026-05-26</div>
+      <div class="entry-title">v1 Launch <span class="tag tag-feat">feature</span> <span class="tag tag-data">data</span></div>
+      <div class="entry-body">
+        <ul>
+          <li>171 active agents across 14 categories</li>
+          <li>HVTrust score: 5-dimension composite (Activity 25 + Adoption 20 + Transparency 20 + Safety 20 + Identity 15 = 100)</li>
+          <li>Evidence grades A/B/C/D based on independent signal coverage</li>
+          <li>Staggered batch builds — 6 batches every 4 hours, full refresh in 24h</li>
+          <li>Build integrity report at <code>/data/build_report.json</code></li>
+          <li>Agent submission via GitHub issue template</li>
+          <li>7 formal specifications published</li>
+          <li>Open data API under CC BY 4.0</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">2026-05-24</div>
+      <div class="entry-title">Methodology v2.2 — HVTrust scoring <span class="tag tag-breaking">methodology</span></div>
+      <div class="entry-body">
+        <ul>
+          <li>Replaced single health score with 5-dimension HVTrust composite</li>
+          <li>Added transparency dimension (license + docs + OSSF Scorecard)</li>
+          <li>Added safety dimension (OSSF + provenance + signed commits)</li>
+          <li>Added identity dimension (listing status + evidence grade)</li>
+          <li>Old health score preserved as <code>score</code> field for backwards compatibility</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">2026-05-23</div>
+      <div class="entry-title">Initial build — 171 agents catalogued <span class="tag tag-data">data</span></div>
+      <div class="entry-body">
+        <ul>
+          <li>First full signal fetch for all 171 active + 7 legacy agents</li>
+          <li>GitHub stats, npm/PyPI downloads, OSSF Scorecard, provenance, HN mentions</li>
+          <li>Reputation event derivation from history snapshots</li>
+        </ul>
+      </div>
+    </div>
+
+    <footer>
+      <a href="/">← Back to leaderboard</a> · <a href="/data/latest.json">API</a> · <a href="https://github.com/YugantM/hvtracker">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>

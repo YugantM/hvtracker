@@ -471,6 +471,20 @@
       {% if row.npm_package %}<a href="https://www.npmjs.com/package/{{ row.npm_package }}" target="_blank" rel="noopener noreferrer">npm: {{ row.npm_package }}</a>{% endif %}
     </section>
 
+    <section class="provenance" style="margin-top:0;">
+      <h2 class="section-title">Embed Badge</h2>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+        <img src="/badge/{{ row.slug }}.svg" alt="HVTrust {{ row.trust_score }}" height="20">
+        <img src="/badge/{{ row.slug }}-grade.svg" alt="Grade {{ row.evidence_grade }}" height="20">
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--muted);word-break:break-all;line-height:1.6;">
+        <span style="color:var(--text);">Markdown:</span><br>
+        [![HVTrust](https://hvtracker.net/badge/{{ row.slug }}.svg)](https://hvtracker.net/agents/{{ row.slug }})<br>
+        <span style="color:var(--text);margin-top:6px;display:inline-block;">HTML:</span><br>
+        &lt;a href="https://hvtracker.net/agents/{{ row.slug }}"&gt;&lt;img src="https://hvtracker.net/badge/{{ row.slug }}.svg" alt="HVTrust"&gt;&lt;/a&gt;
+      </div>
+    </section>
+
     {% if row.siblings %}
     <section class="siblings">
       <h2 class="section-title">Other agents in {{ row.category }}</h2>
