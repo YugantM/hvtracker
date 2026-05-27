@@ -876,6 +876,15 @@
     </div>
     {% endif %}
 
+    <nav style="padding:24px 0;border-top:1px solid var(--border);margin-top:12px;">
+      <div style="font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Browse by Category</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        {% for cat in categories %}
+        <a href="/categories/{{ cat.slug }}" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">{{ cat.name }} ({{ cat.count }})</a>
+        {% endfor %}
+      </div>
+    </nav>
+
     <footer>
       <span>{{ total }} agents tracked · staggered 4-hour signal refresh</span>
       <span class="footer-sep">·</span>
@@ -888,6 +897,8 @@
       <a href="/compare/">Compare</a>
       <span class="footer-sep">·</span>
       <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">·</span>
+      <a href="/blog/">Blog</a>
       <span class="footer-sep">·</span>
       <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
       <span class="footer-sep">·</span>

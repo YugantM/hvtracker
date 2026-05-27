@@ -253,7 +253,7 @@
       </div>
       {% if row.description %}<p class="desc">{{ row.description }}</p>{% endif %}
       <div class="badges">
-        {% if row.category %}<span class="badge cat">{{ row.category }}</span>{% endif %}
+        {% if row.category %}<a href="/categories/{{ row.category_slug }}" class="badge cat" style="text-decoration:none">{{ row.category }}</a>{% endif %}
         {% if row.language %}<span class="badge lang">{{ row.language }}</span>{% endif %}
         {% if row.evidence_grade %}<span class="badge" style="background:{% if row.evidence_grade == 'A' %}#22c55e{% elif row.evidence_grade == 'B' %}#3b82f6{% elif row.evidence_grade == 'C' %}#f59e0b{% else %}#666{% endif %};color:#fff;" title="Evidence Grade {{ row.evidence_grade }}: {% if row.evidence_grade == 'A' %}5+ signal types{% elif row.evidence_grade == 'B' %}4 signal types{% elif row.evidence_grade == 'C' %}3 signal types{% else %}1-2 signal types{% endif %}">Grade {{ row.evidence_grade }}</span>{% endif %}
         {% if row.listing_status %}<span class="badge" style="{% if row.listing_status == 'legacy' %}background:rgba(107,114,128,0.15);color:var(--stale);{% endif %}">{{ row.listing_status }}</span>{% endif %}
@@ -286,7 +286,7 @@
       {% if row.category_rank and row.category %}
       <div>
         <div class="rank-big" style="color:var(--mocha)">#{{ row.category_rank }}</div>
-        <div class="rank-label">In {{ row.category }}</div>
+        <div class="rank-label">In <a href="/categories/{{ row.category_slug }}" style="color:var(--mocha);text-decoration:underline">{{ row.category }}</a></div>
       </div>
       {% endif %}
     </section>

@@ -1343,11 +1343,11 @@ def main() -> None:
     categories = []
     for cat in category_order:
         if cat in cat_groups:
-            categories.append({"name": cat, "count": len(cat_groups[cat])})
+            categories.append({"name": cat, "slug": slugify(cat), "count": len(cat_groups[cat])})
     # Include any categories not in the explicit order (future-proof)
     for cat in sorted(cat_groups.keys()):
         if cat not in category_order and cat:
-            categories.append({"name": cat, "count": len(cat_groups[cat])})
+            categories.append({"name": cat, "slug": slugify(cat), "count": len(cat_groups[cat])})
 
     # Write data.json (machine-readable leaderboard)
     data_output = {
@@ -1545,6 +1545,9 @@ def main() -> None:
     agent_tmpl = env.get_template("agent.html.j2")
     agents_dir = os.path.join(script_dir, "agents")
     os.makedirs(agents_dir, exist_ok=True)
+    # Add category_slug so agent pages can link to category pages
+    for row in rows + legacy_rows:
+        row["category_slug"] = slugify(row.get("category", "")) if row.get("category") else ""
     for row in rows:
         repo_key = row["repo"].lower()
         points = sparkline_data.get(repo_key, [])
@@ -1569,6 +1572,40 @@ def main() -> None:
             f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events))
     print(f"Built {len(rows)} active + {len(legacy_rows)} legacy agent profile pages under agents/.")
 
+    # ── Category landing pages — /categories/<slug>/index.html ───────────
+    cat_tmpl = env.get_template("category.html.j2")
+    categories_dir = os.path.join(script_dir, "categories")
+    os.makedirs(categories_dir, exist_ok=True)
+    all_cat_meta = categories  # already has name, slug, count
+    for cat_info in all_cat_meta:
+        cat_name = cat_info["name"]
+        cat_slug = cat_info["slug"]
+        cat_agents = sorted(
+            [r for r in rows if r.get("category") == cat_name],
+            key=lambda x: x.get("category_rank") or 9999,
+        )
+        if not cat_agents:
+            continue
+        total_stars_raw = sum(a.get("stars", 0) for a in cat_agents)
+        avg_trust = round(sum(a.get("trust_score", 0) for a in cat_agents) / len(cat_agents))
+        grade_a = sum(1 for a in cat_agents if a.get("evidence_grade") == "A")
+        top3 = [a["name"] for a in cat_agents[:3]]
+        cat_dir = os.path.join(categories_dir, cat_slug)
+        os.makedirs(cat_dir, exist_ok=True)
+        with open(os.path.join(cat_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(cat_tmpl.render(
+                category=cat_name,
+                slug=cat_slug,
+                agents=cat_agents,
+                all_categories=all_cat_meta,
+                updated=now_str,
+                avg_trust=avg_trust,
+                total_stars=fmt_num(total_stars_raw),
+                grade_a_count=grade_a,
+                top3_names=", ".join(top3),
+            ))
+    print(f"Built {len(all_cat_meta)} category pages under categories/.")
+
     # sitemap.xml — /, /methodology, all /agents/<slug>
     today_iso = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     from specs import ALL_SPECS as _ALL_SPECS
@@ -1582,6 +1619,11 @@ def main() -> None:
             f"https://hvtracker.net/spec/{spec['slug']}/{spec['version']}",
             "0.4", "monthly"
         ))
+    for cat_m in all_cat_meta:
+        sitemap_urls.append((f"https://hvtracker.net/categories/{cat_m['slug']}", "0.7", "daily"))
+    # Blog pages (static, not generated — manually maintained)
+    sitemap_urls.append(("https://hvtracker.net/blog/", "0.6", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety", "0.8", "monthly"))
     for row in rows:
         sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}", "0.8", "daily"))
     for row in legacy_rows:

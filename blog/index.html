@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — AI Agent Trust Insights | HVTracker</title>
+  <meta name="description" content="Research and insights on AI agent safety, trust, and adoption. Learn how to evaluate open-source AI agents using evidence-based signals.">
+  <link rel="canonical" href="https://hvtracker.net/blog/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Blog — AI Agent Trust Insights | HVTracker">
+  <meta property="og:description" content="Research and insights on AI agent safety, trust, and adoption.">
+  <meta property="og:url" content="https://hvtracker.net/blog/">
+  <meta property="og:image" content="https://hvtracker.net/og-v1.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "HVTracker Blog",
+    "description": "Research and insights on AI agent safety, trust, and adoption.",
+    "url": "https://hvtracker.net/blog/",
+    "publisher": {
+      "@type": "Organization",
+      "name": "HVTracker",
+      "url": "https://hvtracker.net"
+    }
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#0c0c15; --surface:#13131f; --surface-2:#1a1a2a; --border:#252538;
+      --text:#eeeef5; --muted:#8a87a8;
+      --accent:#7c6af6; --accent-lt:rgba(124,106,246,0.10);
+      --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Inter",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:15px; line-height:1.6; min-height:100vh; }
+    a { color:inherit; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:720px; margin:0 auto; padding:0 20px; }
+
+    header {
+      padding:28px 0 20px; border-bottom:1px solid var(--border);
+      display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; position:relative;
+    }
+    header::after {
+      content:""; position:absolute; bottom:-1px; left:0;
+      width:180px; height:1px;
+      background:linear-gradient(to right, var(--accent), transparent);
+    }
+    .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; }
+    .logo span { color:var(--accent); }
+    .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; }
+    .back:hover { color:var(--accent); }
+
+    .hero { padding:36px 0 24px; border-bottom:1px solid var(--border); }
+    h1 { font-size:28px; font-weight:700; letter-spacing:-0.5px; margin-bottom:6px; }
+    .subtitle { font-size:14px; color:var(--muted); }
+
+    .post-list { padding:24px 0; }
+    .post-card {
+      background:var(--surface); border:1px solid var(--border); border-radius:6px;
+      padding:24px; margin-bottom:16px; transition:border-color 0.15s;
+    }
+    .post-card:hover { border-color:var(--accent); }
+    .post-card h2 { font-size:20px; font-weight:700; margin-bottom:6px; }
+    .post-card h2 a { color:var(--text); }
+    .post-card h2 a:hover { color:var(--accent); text-decoration:none; }
+    .post-card .post-meta { font-size:12px; color:var(--muted); font-family:var(--font-mono); margin-bottom:10px; }
+    .post-card .post-excerpt { font-size:14px; color:var(--muted); line-height:1.6; }
+    .post-card .read-more { display:inline-block; margin-top:12px; font-size:13px; color:var(--accent); font-weight:600; }
+
+    footer {
+      padding:28px 0; border-top:1px solid var(--border);
+      font-size:11px; color:var(--muted); text-align:center;
+    }
+    footer a { color:var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <a href="/" class="back">&larr; Trust Registry</a>
+    </header>
+
+    <section class="hero">
+      <h1>Insights</h1>
+      <p class="subtitle">Research on AI agent safety, trust, and adoption</p>
+    </section>
+
+    <div class="post-list">
+      <div class="post-card">
+        <h2><a href="/blog/how-to-evaluate-ai-agent-safety">How to Evaluate AI Agent Safety: 5 Signals That Actually Matter</a></h2>
+        <div class="post-meta">May 27, 2026 &middot; 6 min read</div>
+        <p class="post-excerpt">GitHub stars measure popularity, not trustworthiness. Here are the 5 evidence-based signals that actually predict whether an open-source AI agent is safe to adopt: OSSF Scorecard, package provenance, signed commits, activity patterns, and transparency indicators.</p>
+        <a href="/blog/how-to-evaluate-ai-agent-safety" class="read-more">Read article &rarr;</a>
+      </div>
+    </div>
+
+    <footer>
+      <a href="/">HVTracker</a> &middot; AI Agent Trust Registry &middot;
+      <a href="/methodology">Methodology</a> &middot;
+      <a href="https://github.com/harsidd/hv_tracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>
