@@ -40,13 +40,17 @@
 
     :root {
       /* Base */
-      --bg:          #0c0c15;
-      --surface:     #13131f;
-      --surface-2:   #1a1a2a;
-      --border:      #252538;
+      --bg:          #080a10;
+      --surface:     rgba(20, 23, 34, 0.72);
+      --surface-2:   rgba(31, 35, 50, 0.76);
+      --border:      rgba(184, 197, 224, 0.16);
+      --hairline:    rgba(184, 197, 224, 0.10);
+      --glass:       rgba(16, 19, 29, 0.68);
+      --glass-hi:    rgba(255, 255, 255, 0.055);
+      --metal:       linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.018) 34%, rgba(124,106,246,0.055) 72%, rgba(196,168,130,0.06));
       /* Text */
       --text:        #eeeef5;
-      --muted:       #8a87a8;
+      --muted:       #9aa3b7;
       /* Accent — Indigo/Violet */
       --accent:      #7c6af6;
       --accent-lt:   rgba(124,106,246,0.10);
@@ -70,34 +74,43 @@
       --delta-up:    #34d399;
       --delta-down:  #c9818e;
       /* Row */
-      --row-alt:     rgba(255,255,255,0.018);
+      --row-alt:     rgba(255,255,255,0.024);
       --font-mono: "JetBrains Mono", "Fira Mono", "Cascadia Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
       --font-sans: "Inter", system-ui, -apple-system, sans-serif;
     }
 
     body {
-      background: var(--bg);
+      background-color: var(--bg);
       color: var(--text);
       font-family: var(--font-sans);
       font-size: 14px;
       line-height: 1.5;
       min-height: 100vh;
-      /* Subtle grain texture — removes flat digital feel */
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      background-repeat: repeat;
-      background-size: 256px 256px;
+      /* Subtle grain texture and graphite sheen remove the flat dashboard feel. */
+      background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
+        radial-gradient(circle at 18% -10%, rgba(124,106,246,0.20), transparent 30%),
+        radial-gradient(circle at 86% 6%, rgba(196,168,130,0.13), transparent 26%),
+        linear-gradient(135deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 11px),
+        linear-gradient(180deg, #0d1018 0%, var(--bg) 54%, #05060b 100%);
+      background-repeat: repeat, no-repeat, no-repeat, repeat, no-repeat;
+      background-size: 256px 256px, auto, auto, auto, auto;
     }
 
     a { color: inherit; text-decoration: none; }
     a:hover { text-decoration: underline; }
 
     /* ── Layout ── */
-    .page { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+    .page { max-width: 1120px; margin: 0 auto; padding: 24px 20px 0; }
 
     /* ── Header ── */
     header {
-      padding: 36px 0 24px;
-      border-bottom: 1px solid var(--border);
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--metal), var(--glass);
+      box-shadow: inset 0 1px 0 var(--glass-hi), 0 18px 54px rgba(0,0,0,0.28);
+      backdrop-filter: blur(18px) saturate(120%);
       position: relative;
       display: flex;
       align-items: baseline;
@@ -108,8 +121,8 @@
       content: "";
       position: absolute;
       bottom: -1px;
-      left: 0;
-      width: 220px;
+      left: 20px;
+      width: 170px;
       height: 2px;
       background: linear-gradient(90deg, var(--accent), var(--mocha), transparent);
       background-size: 200% 100%;
@@ -153,9 +166,42 @@
     .site-nav a:hover { color: var(--accent); }
 
     .intro {
-      padding: 18px 0 16px;
-      border-bottom: 1px solid var(--border);
-      max-width: 880px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.014)), var(--glass);
+      box-shadow: inset 0 1px 0 var(--glass-hi);
+      margin: 14px 0;
+      max-width: none;
+      position: relative;
+      overflow: hidden;
+    }
+    .intro::before {
+      content: "TRUST BY EVIDENCE";
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      color: rgba(238,238,245,0.18);
+      padding: 6px 10px;
+      border: 1px solid rgba(184,197,224,0.10);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.025);
+    }
+    .intro::after,
+    .filter-bar::after,
+    .legend::after,
+    .movers::after,
+    footer::before {
+      content: "";
+      position: absolute;
+      left: 20px;
+      bottom: -1px;
+      width: 150px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent), rgba(196,168,130,0.72), transparent);
     }
     .intro h2 {
       font-size: 18px;
@@ -181,8 +227,12 @@
 
     /* ── Filter bar ── */
     .filter-bar {
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(12, 15, 23, 0.62);
+      box-shadow: inset 0 1px 0 var(--glass-hi);
+      position: relative;
       display: flex;
       gap: 10px;
       align-items: flex-start;
@@ -197,7 +247,7 @@
       font-size: 12px;
       border: 1px solid var(--border);
       border-radius: 6px;
-      background: var(--surface-2);
+      background: rgba(255,255,255,0.045);
       color: var(--text);
       outline: none;
     }
@@ -234,10 +284,11 @@
       min-width: 240px;
       max-height: 360px;
       overflow-y: auto;
-      background: var(--surface);
+      background: rgba(17, 20, 31, 0.96);
       border: 1px solid var(--border);
       border-radius: 8px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45), inset 0 1px 0 var(--glass-hi);
+      backdrop-filter: blur(16px);
       padding: 6px 0;
     }
     .cat-dropdown.open .cat-panel { display: block; }
@@ -289,11 +340,15 @@
     .legend {
       display: flex;
       gap: 20px;
-      padding: 12px 0;
+      padding: 12px 16px;
       font-size: 12px;
       color: var(--muted);
-      border-bottom: 1px solid var(--border);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(12, 15, 23, 0.52);
+      position: relative;
       flex-wrap: wrap;
+      margin-top: 10px;
     }
     .legend-item { display: flex; align-items: center; gap: 5px; }
     .dot {
@@ -308,8 +363,21 @@
     /* ── Table wrapper ── */
     .table-wrap {
       position: relative;
-      overflow-x: visible;
-      margin-top: 0;
+      overflow-x: auto;
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012)), rgba(12,15,23,0.76);
+      box-shadow: inset 0 1px 0 var(--glass-hi), 0 24px 70px rgba(0,0,0,0.30);
+    }
+    .table-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.26), rgba(124,106,246,0.32), transparent);
+      pointer-events: none;
+      z-index: 3;
     }
 
     /* ── Pagination bar ── */
@@ -317,13 +385,13 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 4px 4px;
+      padding: 12px 14px 14px;
       font-family: var(--font-mono);
       font-size: 12px;
       color: var(--muted);
     }
     .pg-btn {
-      background: var(--surface);
+      background: rgba(255,255,255,0.045);
       border: 1px solid var(--border);
       color: var(--text);
       font-family: var(--font-mono);
@@ -340,7 +408,8 @@
     table {
       width: 100%;
       table-layout: fixed;
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
       font-size: 13px;
     }
 
@@ -364,8 +433,8 @@
       letter-spacing: 0.06em;
       text-transform: uppercase;
       color: var(--muted);
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
+      background: rgba(13, 16, 25, 0.94);
+      border-bottom: 1px solid var(--hairline);
       white-space: nowrap;
       cursor: pointer;
       user-select: none;
@@ -382,7 +451,7 @@
     thead th.c, td.c { text-align: center; }
 
     tbody tr {
-      border-bottom: 1px solid var(--border);
+      border-bottom: 0;
       transition: background 0.1s;
     }
     tbody tr:nth-child(even) { background: var(--row-alt); }
@@ -391,7 +460,7 @@
     tbody tr.pg-hidden { display: none; }
     tbody tr.top-row td:first-child { border-left: 2px solid var(--accent); }
 
-    td { padding: 10px 8px; vertical-align: middle; }
+    td { padding: 10px 8px; vertical-align: middle; border-bottom: 1px solid var(--hairline); }
 
     /* ── Rank ── */
     .rank {
@@ -590,7 +659,7 @@
     /* ── Footer ── */
     footer {
       padding: 28px 0 40px;
-      border-top: 1px solid var(--border);
+      border-top: 0;
       margin-top: 12px;
       display: flex;
       gap: 16px;
@@ -598,6 +667,7 @@
       flex-wrap: wrap;
       font-size: 12px;
       color: var(--muted);
+      position: relative;
     }
     footer a { color: var(--accent); }
     footer a:hover { text-decoration: underline; }
@@ -605,8 +675,13 @@
 
     /* ── Biggest movers strip ── */
     .movers {
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(12, 15, 23, 0.50);
+      box-shadow: inset 0 1px 0 var(--glass-hi);
+      position: relative;
+      margin-top: 10px;
     }
     .movers-title {
       font-family: var(--font-mono);
@@ -630,7 +705,7 @@
       border-radius: 4px;
       font-family: var(--font-mono);
       font-size: 12px;
-      background: var(--surface);
+      background: rgba(255,255,255,0.040);
       text-decoration: none;
       transition: border-color 0.15s;
     }
@@ -649,6 +724,25 @@
       font-family: var(--font-mono);
     }
     .formula strong { color: var(--text); }
+
+    .category-panel {
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(12, 15, 23, 0.52);
+      box-shadow: inset 0 1px 0 var(--glass-hi);
+      margin-top: 14px;
+      position: relative;
+    }
+    .category-panel::after {
+      content: "";
+      position: absolute;
+      left: 20px;
+      bottom: -1px;
+      width: 150px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--mocha), transparent);
+    }
 
     /* ── Live pulse dot ── */
     .live-dot {
@@ -716,7 +810,7 @@
     }
     .mover:hover {
       transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.28);
     }
 
     /* ── Stagger fade-in for table rows ── */
@@ -755,7 +849,7 @@
         right: 0;
         width: 28px;
         height: 100%;
-        background: linear-gradient(to right, rgba(12, 12, 21, 0), var(--bg) 70%);
+        background: linear-gradient(to right, rgba(8, 10, 16, 0), var(--bg) 70%);
         pointer-events: none;
       }
       .agent-desc { max-width: 220px; }
@@ -765,7 +859,8 @@
       header { flex-direction: column; gap: 6px; }
       .meta { margin-left: 0; text-align: left; }
       .site-nav { order: 3; }
-      .intro { padding: 14px 0; }
+      .intro { padding: 16px; }
+      .intro::before { display: none; }
       .intro h2 { font-size: 16px; }
       .cat-bar { gap: 5px; }
       .cat-pill { font-size: 10px; padding: 4px 10px; }
@@ -9283,7 +9378,7 @@
     </div>
     
 
-    <nav style="padding:24px 0;border-top:1px solid var(--border);margin-top:12px;">
+    <nav class="category-panel">
       <div style="font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Browse by Category</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
         
