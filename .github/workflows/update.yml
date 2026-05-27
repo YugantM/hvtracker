@@ -19,6 +19,7 @@ on:
         options:
           - full
           - batch
+          - mega
 
 permissions:
   contents: write
@@ -47,21 +48,24 @@ jobs:
         id: batch
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            HOUR=$(date -u +%H)
-            case $HOUR in
-              00) BATCH="1/6" ;;
-              04) BATCH="2/6" ;;
-              08) BATCH="3/6" ;;
-              12) BATCH="4/6" ;;
-              16) BATCH="5/6" ;;
-              20) BATCH="6/6" ;;
-              *)  BATCH="1/6" ;;
-            esac
+            # Use hour ranges to tolerate GitHub's cron delays (up to ~4h late)
+            HOUR=$(date -u +%-H)
+            if   [ $HOUR -ge 0  ] && [ $HOUR -lt 4  ]; then BATCH="1/6"
+            elif [ $HOUR -ge 4  ] && [ $HOUR -lt 8  ]; then BATCH="2/6"
+            elif [ $HOUR -ge 8  ] && [ $HOUR -lt 12 ]; then BATCH="3/6"
+            elif [ $HOUR -ge 12 ] && [ $HOUR -lt 16 ]; then BATCH="4/6"
+            elif [ $HOUR -ge 16 ] && [ $HOUR -lt 20 ]; then BATCH="5/6"
+            else BATCH="6/6"
+            fi
             echo "args=--batch $BATCH" >> $GITHUB_OUTPUT
-            echo "Running batch $BATCH"
+            echo "Running batch $BATCH (hour=$HOUR)"
+          elif [ "${{ inputs.mode }}" = "mega" ]; then
+            # Mega mode: full rebuild with no batch — refreshes ALL agents
+            echo "args=" >> $GITHUB_OUTPUT
+            echo "Running MEGA full rebuild (all agents)"
           elif [ "${{ inputs.mode }}" = "batch" ]; then
             # Manual batch trigger — pick batch based on current hour
-            HOUR=$(date -u +%H)
+            HOUR=$(date -u +%-H)
             BATCH_NUM=$(( (HOUR / 4) + 1 ))
             [ $BATCH_NUM -gt 6 ] && BATCH_NUM=6
             echo "args=--batch $BATCH_NUM/6" >> $GITHUB_OUTPUT

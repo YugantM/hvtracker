@@ -68,7 +68,10 @@
       --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
       --font-sans:"Inter",system-ui,-apple-system,sans-serif;
     }
-    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:14px; line-height:1.55; min-height:100vh; }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:14px; line-height:1.55; min-height:100vh;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      background-repeat:repeat; background-size:256px 256px;
+    }
     a { color:inherit; text-decoration:none; }
     a:hover { text-decoration:underline; }
     .page { max-width:760px; margin:0 auto; padding:0 20px; }
@@ -79,9 +82,12 @@
     }
     header::after {
       content:""; position:absolute; bottom:-1px; left:0;
-      width:180px; height:1px;
-      background:linear-gradient(to right, var(--accent), transparent);
+      width:180px; height:2px;
+      background:linear-gradient(90deg, var(--accent), var(--mocha), transparent);
+      background-size:200% 100%;
+      animation:header-shimmer 6s ease-in-out infinite alternate;
     }
+    @keyframes header-shimmer { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
     .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; }
     .logo span { color:var(--accent); }
     .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; }
@@ -110,6 +116,7 @@
     }
     .rank-big {
       font-family:var(--font-mono); font-size:54px; font-weight:700; line-height:1;
+      text-shadow:0 0 24px rgba(124,106,246,0.2);
       color:var(--accent); letter-spacing:-2px;
     }
     .rank-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-top:6px; }
