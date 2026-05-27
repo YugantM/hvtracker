@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Best Open-Source Observability &amp; Evaluation — 12 Agents Ranked by Trust Score | HVTracker</title>
+  <meta name="description" content="Compare 12 open-source observability &amp; evaluation ranked by independent trust scores. Agenta, Langfuse, Promptfoo. Updated daily with security, activity, and adoption signals.">
+  <link rel="canonical" href="https://hvtracker.net/categories/observability-evaluation">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Best Open-Source Observability &amp; Evaluation — Ranked by Trust Score | HVTracker">
+  <meta property="og:description" content="Compare 12 open-source observability &amp; evaluation ranked by trust score. Updated daily.">
+  <meta property="og:url" content="https://hvtracker.net/categories/observability-evaluation">
+  <meta property="og:image" content="https://hvtracker.net/og-v1.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Best Open-Source Observability &amp; Evaluation — Ranked by Trust Score | HVTracker">
+  <meta name="twitter:description" content="Compare 12 open-source observability &amp; evaluation ranked by trust score. Updated daily.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v1.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Best Open-Source Observability &amp; Evaluation",
+    "description": "12 open-source observability &amp; evaluation ranked by independent trust scores on HVTracker.",
+    "url": "https://hvtracker.net/categories/observability-evaluation",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "HVTracker",
+      "url": "https://hvtracker.net/"
+    },
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": 12,
+      "itemListElement": [
+        
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Agenta",
+          "url": "https://hvtracker.net/agents/agenta"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Langfuse",
+          "url": "https://hvtracker.net/agents/langfuse"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Promptfoo",
+          "url": "https://hvtracker.net/agents/promptfoo"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "DeepEval",
+          "url": "https://hvtracker.net/agents/deepeval"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "Arize Phoenix",
+          "url": "https://hvtracker.net/agents/arize-phoenix"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 6,
+          "name": "Giskard",
+          "url": "https://hvtracker.net/agents/giskard"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 7,
+          "name": "Helicone",
+          "url": "https://hvtracker.net/agents/helicone"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 8,
+          "name": "LangWatch",
+          "url": "https://hvtracker.net/agents/langwatch"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 9,
+          "name": "TruLens",
+          "url": "https://hvtracker.net/agents/trulens"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 10,
+          "name": "Weights &amp; Biases Weave",
+          "url": "https://hvtracker.net/agents/weights-biases-weave"
+        }
+        
+      ]
+    }
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#0c0c15; --surface:#13131f; --surface-2:#1a1a2a; --border:#252538;
+      --text:#eeeef5; --muted:#8a87a8;
+      --accent:#7c6af6; --accent-lt:rgba(124,106,246,0.10); --accent-dim:#4a3fa0;
+      --mocha:#c4a882; --mocha-lt:rgba(157,124,90,0.15);
+      --fresh:#34d399; --aging:#f59e0b; --stale:#6b7280;
+      --score-hi-bg:rgba(124,106,246,0.15); --score-hi-fg:#a5a0ff;
+      --score-mid-bg:rgba(157,124,90,0.15); --score-mid-fg:#c4a882;
+      --score-lo-bg:rgba(100,100,120,0.12); --score-lo-fg:#6b7280;
+      --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Inter",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:14px; line-height:1.55; min-height:100vh; }
+    a { color:inherit; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:860px; margin:0 auto; padding:0 20px; }
+
+    header {
+      padding:28px 0 20px; border-bottom:1px solid var(--border);
+      display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; position:relative;
+    }
+    header::after {
+      content:""; position:absolute; bottom:-1px; left:0;
+      width:180px; height:1px;
+      background:linear-gradient(to right, var(--accent), transparent);
+    }
+    .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; }
+    .logo span { color:var(--accent); }
+    .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; }
+    .back:hover { color:var(--accent); }
+
+    .hero { padding:32px 0 18px; border-bottom:1px solid var(--border); }
+    h1 { font-size:28px; font-weight:700; letter-spacing:-0.5px; margin-bottom:6px; }
+    .hero .subtitle { font-size:14px; color:var(--muted); margin-top:4px; }
+    .hero .seo-intro {
+      margin-top:18px; font-size:14px; color:var(--muted); line-height:1.7; max-width:680px;
+    }
+    .hero .seo-intro strong { color:var(--text); }
+
+    .stats-bar {
+      display:flex; gap:24px; padding:18px 0; border-bottom:1px solid var(--border);
+      flex-wrap:wrap;
+    }
+    .stat { text-align:center; }
+    .stat .num { font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--accent); }
+    .stat .lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
+
+    table { width:100%; border-collapse:collapse; margin-top:8px; }
+    th {
+      text-align:left; font-family:var(--font-mono); font-size:10px;
+      text-transform:uppercase; letter-spacing:1px; color:var(--muted);
+      padding:10px 8px; border-bottom:1px solid var(--border);
+    }
+    td { padding:10px 8px; border-bottom:1px solid var(--border); font-size:13px; }
+    tr:hover td { background:var(--surface); }
+
+    .rank-cell { font-family:var(--font-mono); font-size:12px; color:var(--muted); width:36px; }
+    .name-cell a { font-weight:600; }
+    .name-cell a:hover { color:var(--accent); }
+    .name-cell .desc { font-size:11px; color:var(--muted); margin-top:2px; display:block; max-width:380px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .grade {
+      display:inline-block; font-family:var(--font-mono); font-size:10px; font-weight:700;
+      padding:1px 5px; border-radius:2px; margin-left:6px;
+    }
+    .grade-A { background:rgba(52,211,153,0.15); color:#34d399; }
+    .grade-B { background:rgba(163,230,53,0.15); color:#a3e635; }
+    .grade-C { background:rgba(245,158,11,0.15); color:#f59e0b; }
+    .grade-D { background:var(--score-lo-bg); color:var(--score-lo-fg); }
+
+    .score-cell { font-family:var(--font-mono); font-size:13px; font-weight:600; }
+    .score-hi { color:var(--score-hi-fg); }
+    .score-mid { color:var(--score-mid-fg); }
+    .score-lo { color:var(--score-lo-fg); }
+
+    .stars-cell { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
+    .lang-cell { font-size:11px; color:var(--muted); }
+
+    .cat-nav { padding:24px 0; border-bottom:1px solid var(--border); }
+    .cat-nav h2 { font-size:16px; font-weight:600; margin-bottom:12px; }
+    .cat-pills { display:flex; gap:6px; flex-wrap:wrap; }
+    .cat-pill {
+      font-family:var(--font-mono); font-size:11px; padding:4px 10px;
+      border-radius:3px; background:var(--surface-2); color:var(--muted);
+      transition:all 0.15s;
+    }
+    .cat-pill:hover { background:var(--accent-lt); color:var(--accent); text-decoration:none; }
+    .cat-pill.active { background:var(--accent-lt); color:var(--accent); }
+
+    footer {
+      padding:28px 0; margin-top:20px; border-top:1px solid var(--border);
+      font-size:11px; color:var(--muted); text-align:center;
+    }
+    footer a:hover { color:var(--accent); }
+
+    @media (max-width:600px) {
+      h1 { font-size:22px; }
+      .stats-bar { gap:16px; }
+      .stat .num { font-size:18px; }
+      td, th { padding:8px 4px; }
+      .name-cell .desc { max-width:200px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <a href="/" class="back">&larr; All agents</a>
+    </header>
+
+    <section class="hero">
+      <h1>Observability &amp; Evaluation</h1>
+      <p class="subtitle">12 open-source agents tracked &middot; Ranked by trust score &middot; Updated 2026-05-27 18:35 UTC</p>
+
+      <div class="seo-intro">
+        <p>HVTracker independently evaluates <strong>12 open-source observability &amp; evaluation</strong> using daily signals from GitHub, package registries, and security databases.
+        Each agent is scored on activity, adoption, transparency, safety, and identity.
+        The top-ranked observability &amp; evaluation is <strong>Agenta</strong> with a trust score of 43.9/100 (Grade C).
+        Other leading projects include Langfuse and Promptfoo.
+        </p>
+      </div>
+    </section>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="num">12</div>
+        <div class="lbl">Agents</div>
+      </div>
+      <div class="stat">
+        <div class="num">47</div>
+        <div class="lbl">Avg Trust</div>
+      </div>
+      <div class="stat">
+        <div class="num">117.9k</div>
+        <div class="lbl">Total Stars</div>
+      </div>
+      <div class="stat">
+        <div class="num">0</div>
+        <div class="lbl">Grade A</div>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Agent</th>
+          <th>Trust</th>
+          <th>Stars</th>
+          <th>Language</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td class="rank-cell">1</td>
+          <td class="name-cell">
+            <a href="/agents/agenta">Agenta</a>
+            <span class="grade grade-C">C</span>
+            <span class="desc">The open-source LLMOps platform: prompt playground, prompt management, LLM evaluation, and LLM observability all in one </span>
+          </td>
+          <td class="score-cell score-mid">43.9</td>
+          <td class="stars-cell">4.2k</td>
+          <td class="lang-cell">TypeScript</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">2</td>
+          <td class="name-cell">
+            <a href="/agents/langfuse">Langfuse</a>
+            <span class="grade grade-B">B</span>
+            <span class="desc">🪢 Open source LLM engineering platform: LLM Observability, metrics, evals, prompt management, playground, datasets. Inte</span>
+          </td>
+          <td class="score-cell score-hi">70.5</td>
+          <td class="stars-cell">28.1k</td>
+          <td class="lang-cell">TypeScript</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">3</td>
+          <td class="name-cell">
+            <a href="/agents/promptfoo">Promptfoo</a>
+            <span class="grade grade-B">B</span>
+            <span class="desc">Test your prompts, agents, and RAGs. Red teaming/pentesting/vulnerability scanning for AI. Compare performance of GPT, C</span>
+          </td>
+          <td class="score-cell score-hi">72.6</td>
+          <td class="stars-cell">21.7k</td>
+          <td class="lang-cell">TypeScript</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">4</td>
+          <td class="name-cell">
+            <a href="/agents/deepeval">DeepEval</a>
+            <span class="grade grade-C">C</span>
+            <span class="desc">The LLM Evaluation Framework</span>
+          </td>
+          <td class="score-cell score-mid">36.8</td>
+          <td class="stars-cell">15.7k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">5</td>
+          <td class="name-cell">
+            <a href="/agents/arize-phoenix">Arize Phoenix</a>
+            <span class="grade grade-B">B</span>
+            <span class="desc">AI Observability &amp; Evaluation</span>
+          </td>
+          <td class="score-cell score-mid">59.0</td>
+          <td class="stars-cell">9.9k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">6</td>
+          <td class="name-cell">
+            <a href="/agents/giskard">Giskard</a>
+            <span class="grade grade-C">C</span>
+            <span class="desc">🐢 Open-Source Evaluation &amp; Testing library for LLM Agents</span>
+          </td>
+          <td class="score-cell score-lo">32.9</td>
+          <td class="stars-cell">5.4k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">7</td>
+          <td class="name-cell">
+            <a href="/agents/helicone">Helicone</a>
+            <span class="grade grade-C">C</span>
+            <span class="desc">🧊 Open source LLM observability platform. One line of code to monitor, evaluate, and experiment. YC W23 🍓</span>
+          </td>
+          <td class="score-cell score-mid">48.1</td>
+          <td class="stars-cell">5.7k</td>
+          <td class="lang-cell">TypeScript</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">8</td>
+          <td class="name-cell">
+            <a href="/agents/langwatch">LangWatch</a>
+            <span class="grade grade-B">B</span>
+            <span class="desc">The platform for LLM evaluations and AI agent testing</span>
+          </td>
+          <td class="score-cell score-hi">62.9</td>
+          <td class="stars-cell">3.3k</td>
+          <td class="lang-cell">TypeScript</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">9</td>
+          <td class="name-cell">
+            <a href="/agents/trulens">TruLens</a>
+            <span class="grade grade-C">C</span>
+            <span class="desc">Evaluation and Tracking for LLM Experiments and AI Agents</span>
+          </td>
+          <td class="score-cell score-lo">33.2</td>
+          <td class="stars-cell">3.3k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">10</td>
+          <td class="name-cell">
+            <a href="/agents/weights-biases-weave">Weights &amp; Biases Weave</a>
+            <span class="grade grade-B">B</span>
+            <span class="desc">Weave is a toolkit for developing AI-powered applications, built by Weights &amp; Biases.</span>
+          </td>
+          <td class="score-cell score-mid">41.4</td>
+          <td class="stars-cell">1.1k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">11</td>
+          <td class="name-cell">
+            <a href="/agents/ragas">Ragas</a>
+            <span class="grade grade-C">C</span>
+            <span class="desc">Supercharge Your LLM Application Evaluations 🚀</span>
+          </td>
+          <td class="score-cell score-lo">28.8</td>
+          <td class="stars-cell">14.1k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">12</td>
+          <td class="name-cell">
+            <a href="/agents/agentops">AgentOps</a>
+            <span class="grade grade-C">C</span>
+            <span class="desc">Python SDK for AI agent monitoring, LLM cost tracking, benchmarking, and more. Integrates with most LLMs and agent frame</span>
+          </td>
+          <td class="score-cell score-lo">34.0</td>
+          <td class="stars-cell">5.6k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+      </tbody>
+    </table>
+
+    <nav class="cat-nav">
+      <h2>All Categories</h2>
+      <div class="cat-pills">
+        
+        <a href="/categories/coding-agents" class="cat-pill ">Coding Agents (26)</a>
+        
+        <a href="/categories/agent-frameworks" class="cat-pill ">Agent Frameworks (57)</a>
+        
+        <a href="/categories/workflow-platforms" class="cat-pill ">Workflow Platforms (13)</a>
+        
+        <a href="/categories/browser-computer-use" class="cat-pill ">Browser &amp; Computer Use (15)</a>
+        
+        <a href="/categories/memory-knowledge" class="cat-pill ">Memory &amp; Knowledge (20)</a>
+        
+        <a href="/categories/research-data" class="cat-pill ">Research &amp; Data (8)</a>
+        
+        <a href="/categories/observability-evaluation" class="cat-pill active">Observability &amp; Evaluation (12)</a>
+        
+        <a href="/categories/security-guardrails" class="cat-pill ">Security &amp; Guardrails (6)</a>
+        
+        <a href="/categories/protocols-tool-integration" class="cat-pill ">Protocols &amp; Tool Integration (4)</a>
+        
+        <a href="/categories/voice-conversational" class="cat-pill ">Voice &amp; Conversational (1)</a>
+        
+        <a href="/categories/sandboxes-runtimes" class="cat-pill ">Sandboxes &amp; Runtimes (1)</a>
+        
+        <a href="/categories/robotics-embodied" class="cat-pill ">Robotics &amp; Embodied (1)</a>
+        
+        <a href="/categories/llm-gateways-infra" class="cat-pill ">LLM Gateways &amp; Infra (4)</a>
+        
+        <a href="/categories/multi-agent-systems" class="cat-pill ">Multi-Agent Systems (3)</a>
+        
+      </div>
+    </nav>
+
+    <footer>
+      <a href="/">HVTracker</a> &middot; AI Agent Trust Registry &middot;
+      <a href="/methodology">Methodology</a> &middot;
+      <a href="https://github.com/harsidd/hv_tracker" target="_blank">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>

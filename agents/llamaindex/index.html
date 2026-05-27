@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LlamaIndex — AI Agent Trust Score & Safety Profile | HVTracker</title>
-  <meta name="description" content="LlamaIndex trust score 40.5/100 (Grade D). Ranked #31 of 171 AI agents. 49.7k GitHub stars, Agent Frameworks category. Independent safety, transparency & adoption signals.">
+  <title>LlamaIndex Review — Trust Score 53.9/100, Is It Safe? | HVTracker</title>
+  <meta name="description" content="Is LlamaIndex safe? Independent trust score 53.9/100 (Grade D). Ranked #30 of 171 open-source AI agents. 49.7k GitHub stars, Agent Frameworks. Security, transparency & adoption signals reviewed.">
   <link rel="canonical" href="https://hvtracker.net/agents/llamaindex">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="LlamaIndex — Trust Score 40.5/100 | HVTracker">
-  <meta property="og:description" content="Grade D · HVTrust 40.5/100 · 49.7k stars · Agent Frameworks. Independent trust signals for AI agents.">
+  <meta property="og:title" content="LlamaIndex — Trust Score 53.9/100 | HVTracker">
+  <meta property="og:description" content="Grade D · HVTrust 53.9/100 · 49.7k stars · Agent Frameworks. Independent trust signals for AI agents.">
   <meta property="og:url" content="https://hvtracker.net/agents/llamaindex">
   <meta property="og:image" content="https://hvtracker.net/badge/llamaindex.svg">
   <meta name="twitter:card" content="summary">
@@ -24,11 +24,32 @@
     "operatingSystem": "Cross-platform",
     "url": "https://github.com/run-llama/llama_index",
     "description": "LlamaIndex is the leading document agent and OCR platform",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "70.5",
+      "ratingValue": "53.9",
       "bestRating": "100",
-      "ratingCount": "49673"
+      "worstRating": "0",
+      "ratingCount": "49703"
+    },
+    "review": {
+      "@type": "Review",
+      "author": {
+        "@type": "Organization",
+        "name": "HVTracker",
+        "url": "https://hvtracker.net"
+      },
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": "53.9",
+        "bestRating": "100",
+        "worstRating": "0"
+      },
+      "reviewBody": "LlamaIndex receives a trust score of 53.9/100 (Grade D) based on independent analysis of activity, adoption, transparency, safety, and identity signals."
     }
   }
   </script>
@@ -47,7 +68,10 @@
       --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
       --font-sans:"Inter",system-ui,-apple-system,sans-serif;
     }
-    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:14px; line-height:1.55; min-height:100vh; }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:14px; line-height:1.55; min-height:100vh;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      background-repeat:repeat; background-size:256px 256px;
+    }
     a { color:inherit; text-decoration:none; }
     a:hover { text-decoration:underline; }
     .page { max-width:760px; margin:0 auto; padding:0 20px; }
@@ -58,9 +82,12 @@
     }
     header::after {
       content:""; position:absolute; bottom:-1px; left:0;
-      width:180px; height:1px;
-      background:linear-gradient(to right, var(--accent), transparent);
+      width:180px; height:2px;
+      background:linear-gradient(90deg, var(--accent), var(--mocha), transparent);
+      background-size:200% 100%;
+      animation:header-shimmer 6s ease-in-out infinite alternate;
     }
+    @keyframes header-shimmer { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
     .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; }
     .logo span { color:var(--accent); }
     .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; }
@@ -89,6 +116,7 @@
     }
     .rank-big {
       font-family:var(--font-mono); font-size:54px; font-weight:700; line-height:1;
+      text-shadow:0 0 24px rgba(124,106,246,0.2);
       color:var(--accent); letter-spacing:-2px;
     }
     .rank-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-top:6px; }
@@ -217,7 +245,7 @@
   </script>
   <script defer src="/analytics.js"></script>
 </head>
-<body data-page-type="agent_profile" data-agent-slug="llamaindex" data-agent-name="LlamaIndex" data-category="Agent Frameworks" data-global-rank="31" data-trust-score="40.5">
+<body data-page-type="agent_profile" data-agent-slug="llamaindex" data-agent-name="LlamaIndex" data-category="Agent Frameworks" data-global-rank="30" data-trust-score="53.9">
   <div class="page">
 
     <header>
@@ -232,33 +260,40 @@
       </div>
       <p class="desc">LlamaIndex is the leading document agent and OCR platform</p>
       <div class="badges">
-        <span class="badge cat">Agent Frameworks</span>
+        <a href="/categories/agent-frameworks" class="badge cat" style="text-decoration:none">Agent Frameworks</a>
         <span class="badge lang">Python</span>
         <span class="badge" style="background:#666;color:#fff;" title="Evidence Grade D: 1-2 signal types">Grade D</span>
+        <span class="badge" style="">listed</span>
+        <span class="badge">MIT</span>
+      </div>
+      <div class="seo-summary" style="margin-top:18px;font-size:14px;color:var(--muted);line-height:1.7;max-width:640px;">
+        <p>LlamaIndex is an open-source AI agent in the Agent Frameworks category with 49.7k GitHub stars — LlamaIndex is the leading document agent and OCR platform.
+        HVTracker independently evaluates LlamaIndex with a <strong style="color:var(--text)">Trust Score of 53.9/100</strong> (Grade D), ranking it <strong style="color:var(--text)">#30 of 171</strong> tracked AI agents.
         
         
+        Signals are refreshed daily from GitHub, package registries, and security databases.</p>
       </div>
     </section>
 
     <section class="rank-block">
       <div>
-        <div class="score-pill score-high">70.5</div>
+        <div class="score-pill score-high">71.1</div>
         <div class="rank-label">Activity Score · out of 100</div>
       </div>
       
       <div>
-        <div class="score-pill" style="background:rgba(52,211,153,0.12);color:#60a5fa;">40.5</div>
+        <div class="score-pill" style="background:rgba(52,211,153,0.12);color:#60a5fa;">53.9</div>
         <div class="rank-label">HVTrust Score · out of 100</div>
       </div>
       
       <div>
-        <div class="rank-big">#31</div>
+        <div class="rank-big">#30</div>
         <div class="rank-label">Global Rank · of 171</div>
       </div>
       
       <div>
         <div class="rank-big" style="color:var(--mocha)">#6</div>
-        <div class="rank-label">In Agent Frameworks</div>
+        <div class="rank-label">In <a href="/categories/agent-frameworks" style="color:var(--mocha);text-decoration:underline">Agent Frameworks</a></div>
       </div>
       
     </section>
@@ -291,12 +326,12 @@
         </div>
         <div class="fresh">
           <div class="stat-label">Last Push</div>
-          <div class="stat-value"><span class="fresh-dot"></span>2026-05-20</div>
-          <div class="stat-sub">5 days ago</div>
+          <div class="stat-value"><span class="fresh-dot"></span>2026-05-26</div>
+          <div class="stat-sub">yesterday</div>
         </div>
         <div>
           <div class="stat-label">Commits (4 wk)</div>
-          <div class="stat-value">52</div>
+          <div class="stat-value">53</div>
         </div>
         <div>
           <div class="stat-label">Downloads (7d)</div>
@@ -305,15 +340,15 @@
         </div>
         <div>
           <div class="stat-label">HN mentions (30d)</div>
-          <div class="stat-value">2</div>
+          <div class="stat-value">3</div>
         </div>
         <div>
           <div class="stat-label">Open Issues</div>
-          <div class="stat-value">396</div>
+          <div class="stat-value">402</div>
         </div>
         <div>
           <div class="stat-label">Rank Change</div>
-          <div class="stat-value">—</div>
+          <div class="stat-value">▲1</div>
           <div class="stat-sub">was #31</div>
         </div>
       </div>
@@ -328,28 +363,28 @@
       </div>
       <div class="breakdown-row">
         <span class="breakdown-label">Freshness (max 25)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:97.2%"></div></div>
-        <span class="breakdown-value">24.3</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:99.4%"></div></div>
+        <span class="breakdown-value">24.9</span>
       </div>
       <div class="breakdown-row">
         <span class="breakdown-label">Activity (max 25)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:86.0%"></div></div>
-        <span class="breakdown-value">21.5</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:86.4%"></div></div>
+        <span class="breakdown-value">21.6</span>
       </div>
       <div class="breakdown-row">
         <span class="breakdown-label">Community (max 20)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:90.0%"></div></div>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:90.1%"></div></div>
         <span class="breakdown-value">18.0</span>
       </div>
     </section>
 
     
     <section class="breakdown">
-      <h2 class="section-title">HVTrust Breakdown <span style="font-weight:400;color:var(--muted);font-size:11px;margin-left:6px">40.5 / 100</span></h2>
+      <h2 class="section-title">HVTrust Breakdown <span style="font-weight:400;color:var(--muted);font-size:11px;margin-left:6px">53.9 / 100</span></h2>
       <div class="breakdown-row">
         <span class="breakdown-label">Activity (max 25)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:92.8%;background:#34d399"></div></div>
-        <span class="breakdown-value">23.2</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:94.4%;background:#34d399"></div></div>
+        <span class="breakdown-value">23.6</span>
       </div>
       <div class="breakdown-row">
         <span class="breakdown-label">Adoption (max 20)</span>
@@ -358,8 +393,8 @@
       </div>
       <div class="breakdown-row">
         <span class="breakdown-label">Transparency (max 20)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:0.0%;background:#f59e0b"></div></div>
-        <span class="breakdown-value">0</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:40.0%;background:#f59e0b"></div></div>
+        <span class="breakdown-value">8</span>
       </div>
       <div class="breakdown-row">
         <span class="breakdown-label">Safety (max 20)</span>
@@ -368,8 +403,8 @@
       </div>
       <div class="breakdown-row">
         <span class="breakdown-label">Identity (max 15)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:6.7%;background:var(--accent)"></div></div>
-        <span class="breakdown-value">1</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:40.0%;background:var(--accent)"></div></div>
+        <span class="breakdown-value">6</span>
       </div>
     </section>
     
@@ -432,7 +467,7 @@
     <section class="provenance" style="margin-top:0;">
       <h2 class="section-title">Embed Badge</h2>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-        <img src="/badge/llamaindex.svg" alt="HVTrust 40.5" height="20">
+        <img src="/badge/llamaindex.svg" alt="HVTrust 53.9" height="20">
         <img src="/badge/llamaindex-grade.svg" alt="Grade D" height="20">
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--muted);word-break:break-all;line-height:1.6;">
@@ -450,7 +485,7 @@
         
         <li>
           <a href="/agents/langchain">
-            <span class="sib-rank">#1</span>
+            <span class="sib-rank">#2</span>
             <span class="sib-name">LangChain</span>
             <span class="sib-score">100.0</span>
           </a>
@@ -474,7 +509,7 @@
         
         <li>
           <a href="/agents/autogpt">
-            <span class="sib-rank">#13</span>
+            <span class="sib-rank">#12</span>
             <span class="sib-name">AutoGPT</span>
             <span class="sib-score">75.0</span>
           </a>
@@ -499,7 +534,7 @@
     </section>
 
     <footer>
-      <span>Updated 2026-05-27 15:33 UTC</span>
+      <span>Updated 2026-05-27 18:35 UTC</span>
       <span class="footer-sep">·</span>
       <a href="/methodology">methodology</a>
       <span class="footer-sep">·</span>

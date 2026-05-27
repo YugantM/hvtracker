@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mem0 — AI Agent Trust Score & Safety Profile | HVTracker</title>
-  <meta name="description" content="Mem0 trust score 59.5/100 (Grade B). Ranked #29 of 171 AI agents. 56.7k GitHub stars, Memory &amp; Knowledge category. Independent safety, transparency & adoption signals.">
+  <title>Mem0 Review — Trust Score 59.5/100, Is It Safe? | HVTracker</title>
+  <meta name="description" content="Is Mem0 safe? Independent trust score 59.5/100 (Grade B). Ranked #29 of 171 open-source AI agents. 56.7k GitHub stars, Memory &amp; Knowledge. Security, transparency & adoption signals reviewed.">
   <link rel="canonical" href="https://hvtracker.net/agents/mem0">
 
   <meta property="og:type" content="website">
@@ -24,11 +24,32 @@
     "operatingSystem": "Cross-platform",
     "url": "https://github.com/mem0ai/mem0",
     "description": "Universal memory layer for AI Agents",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "71.2",
+      "ratingValue": "59.5",
       "bestRating": "100",
+      "worstRating": "0",
       "ratingCount": "56740"
+    },
+    "review": {
+      "@type": "Review",
+      "author": {
+        "@type": "Organization",
+        "name": "HVTracker",
+        "url": "https://hvtracker.net"
+      },
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": "59.5",
+        "bestRating": "100",
+        "worstRating": "0"
+      },
+      "reviewBody": "Mem0 receives a trust score of 59.5/100 (Grade B) based on independent analysis of activity, adoption, transparency, safety, and identity signals."
     }
   }
   </script>
@@ -47,7 +68,10 @@
       --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
       --font-sans:"Inter",system-ui,-apple-system,sans-serif;
     }
-    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:14px; line-height:1.55; min-height:100vh; }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:14px; line-height:1.55; min-height:100vh;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      background-repeat:repeat; background-size:256px 256px;
+    }
     a { color:inherit; text-decoration:none; }
     a:hover { text-decoration:underline; }
     .page { max-width:760px; margin:0 auto; padding:0 20px; }
@@ -58,9 +82,12 @@
     }
     header::after {
       content:""; position:absolute; bottom:-1px; left:0;
-      width:180px; height:1px;
-      background:linear-gradient(to right, var(--accent), transparent);
+      width:180px; height:2px;
+      background:linear-gradient(90deg, var(--accent), var(--mocha), transparent);
+      background-size:200% 100%;
+      animation:header-shimmer 6s ease-in-out infinite alternate;
     }
+    @keyframes header-shimmer { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
     .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; }
     .logo span { color:var(--accent); }
     .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; }
@@ -89,6 +116,7 @@
     }
     .rank-big {
       font-family:var(--font-mono); font-size:54px; font-weight:700; line-height:1;
+      text-shadow:0 0 24px rgba(124,106,246,0.2);
       color:var(--accent); letter-spacing:-2px;
     }
     .rank-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-top:6px; }
@@ -232,11 +260,18 @@
       </div>
       <p class="desc">Universal memory layer for AI Agents</p>
       <div class="badges">
-        <span class="badge cat">Memory &amp; Knowledge</span>
+        <a href="/categories/memory-knowledge" class="badge cat" style="text-decoration:none">Memory &amp; Knowledge</a>
         <span class="badge lang">Python</span>
         <span class="badge" style="background:#3b82f6;color:#fff;" title="Evidence Grade B: 4 signal types">Grade B</span>
         
         
+      </div>
+      <div class="seo-summary" style="margin-top:18px;font-size:14px;color:var(--muted);line-height:1.7;max-width:640px;">
+        <p>Mem0 is an open-source AI agent in the Memory &amp; Knowledge category with 56.7k GitHub stars — Universal memory layer for AI Agents.
+        HVTracker independently evaluates Mem0 with a <strong style="color:var(--text)">Trust Score of 59.5/100</strong> (Grade B), ranking it <strong style="color:var(--text)">#29 of 171</strong> tracked AI agents.
+        
+        Package provenance is verified.
+        Signals are refreshed daily from GitHub, package registries, and security databases.</p>
       </div>
     </section>
 
@@ -258,7 +293,7 @@
       
       <div>
         <div class="rank-big" style="color:var(--mocha)">#3</div>
-        <div class="rank-label">In Memory &amp; Knowledge</div>
+        <div class="rank-label">In <a href="/categories/memory-knowledge" style="color:var(--mocha);text-decoration:underline">Memory &amp; Knowledge</a></div>
       </div>
       
     </section>
@@ -475,7 +510,7 @@
         
         <li>
           <a href="/agents/anythingllm">
-            <span class="sib-rank">#30</span>
+            <span class="sib-rank">#31</span>
             <span class="sib-name">AnythingLLM</span>
             <span class="sib-score">71.1</span>
           </a>
@@ -508,7 +543,7 @@
     </section>
 
     <footer>
-      <span>Updated 2026-05-27 15:33 UTC</span>
+      <span>Updated 2026-05-27 18:35 UTC</span>
       <span class="footer-sep">·</span>
       <a href="/methodology">methodology</a>
       <span class="footer-sep">·</span>

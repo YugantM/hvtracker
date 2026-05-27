@@ -82,6 +82,10 @@
       font-size: 14px;
       line-height: 1.5;
       min-height: 100vh;
+      /* Subtle grain texture — removes flat digital feel */
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 256px 256px;
     }
 
     a { color: inherit; text-decoration: none; }
@@ -106,8 +110,14 @@
       bottom: -1px;
       left: 0;
       width: 220px;
-      height: 1px;
-      background: linear-gradient(to right, var(--accent), transparent);
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--mocha), transparent);
+      background-size: 200% 100%;
+      animation: header-shimmer 6s ease-in-out infinite alternate;
+    }
+    @keyframes header-shimmer {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
     }
 
     .logo {
@@ -640,6 +650,97 @@
     }
     .formula strong { color: var(--text); }
 
+    /* ── Live pulse dot ── */
+    .live-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      background: var(--fresh);
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+      animation: pulse-live 2.5s ease-in-out infinite;
+    }
+    @keyframes pulse-live {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(52,211,153,0.4); }
+      50%      { opacity: 0.6; box-shadow: 0 0 0 4px rgba(52,211,153,0); }
+    }
+
+    /* ── Top-3 row ambient glow ── */
+    tbody tr.top-row {
+      background: linear-gradient(90deg, rgba(124,106,246,0.04) 0%, transparent 60%);
+    }
+    tbody tr.top-row:hover {
+      background: linear-gradient(90deg, rgba(124,106,246,0.10) 0%, rgba(124,106,246,0.03) 60%);
+    }
+    tbody tr.top-row td:first-child {
+      border-left: 2px solid var(--accent);
+      box-shadow: -4px 0 12px -4px rgba(124,106,246,0.25);
+    }
+
+    /* ── Score pill hover micro-interaction ── */
+    .trust-pill {
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .trust-pill:hover {
+      transform: scale(1.08);
+    }
+    .trust-high:hover { box-shadow: 0 0 8px rgba(52,211,153,0.3); }
+    .trust-mid:hover  { box-shadow: 0 0 8px rgba(59,130,246,0.25); }
+
+    .score-pill {
+      transition: transform 0.15s ease;
+    }
+    .score-pill:hover { transform: scale(1.06); }
+
+    /* ── Search glow on focus ── */
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(124,106,246,0.12), 0 0 12px rgba(124,106,246,0.08);
+    }
+
+    /* ── Evidence badge hover ── */
+    .evidence-badge {
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      cursor: default;
+    }
+    .evidence-badge:hover {
+      transform: scale(1.15);
+    }
+    .grade-A:hover { box-shadow: 0 0 8px rgba(34,197,94,0.4); }
+    .grade-B:hover { box-shadow: 0 0 8px rgba(59,130,246,0.4); }
+    .grade-C:hover { box-shadow: 0 0 8px rgba(245,158,11,0.35); }
+
+    /* ── Mover chip hover lift ── */
+    .mover {
+      transition: border-color 0.15s, transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .mover:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    /* ── Stagger fade-in for table rows ── */
+    @keyframes row-fadein {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    tbody tr {
+      animation: row-fadein 0.3s ease both;
+    }
+    tbody tr:nth-child(1)  { animation-delay: 0.02s; }
+    tbody tr:nth-child(2)  { animation-delay: 0.04s; }
+    tbody tr:nth-child(3)  { animation-delay: 0.06s; }
+    tbody tr:nth-child(4)  { animation-delay: 0.08s; }
+    tbody tr:nth-child(5)  { animation-delay: 0.10s; }
+    tbody tr:nth-child(6)  { animation-delay: 0.12s; }
+    tbody tr:nth-child(7)  { animation-delay: 0.14s; }
+    tbody tr:nth-child(8)  { animation-delay: 0.16s; }
+    tbody tr:nth-child(9)  { animation-delay: 0.18s; }
+    tbody tr:nth-child(10) { animation-delay: 0.20s; }
+
+    /* ── Subtle row separator gradient (top few rows) ── */
+    tbody tr:nth-child(3) td { border-bottom: 1px solid rgba(124,106,246,0.15); }
+
     /* ── Trust signals ── */
     /* ── Mobile ── */
     @media (max-width: 985px) {
@@ -690,7 +791,7 @@
         <a href="/methodology">Methodology</a>
       </nav>
       <div class="meta">
-        171 agents tracked &nbsp;·&nbsp; updated 2026-05-27 15:33 UTC<br>
+        171 agents tracked &nbsp;·&nbsp; <span class="live-dot"></span>updated 2026-05-27 18:35 UTC<br>
         staggered 4-hour signal refresh
       </div>
     </header>
@@ -706,7 +807,7 @@
     </section>
 
     <div class="filter-bar" id="filterBar">
-      <input type="text" class="search-input" id="searchInput" placeholder="Search agents…" autocomplete="off">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search agents…  ⌘K" autocomplete="off">
       <div class="cat-dropdown" id="catDropdown">
         <span class="cat-toggle" id="catToggle">Categories <span class="arrow">▾</span></span>
         <div class="cat-panel" id="catPanel">
@@ -867,7 +968,55 @@
           
           <tr class="top-row"
             data-rank="1"
-            data-rank_delta="1"
+            data-rank_delta="3"
+            data-name="OpenClaw"
+            data-repo="openclaw/openclaw"
+            data-stars="375049"
+            data-last_push="2026-05-27"
+            data-weekly_commits="12541"
+            data-downloads="0"
+            data-hn_mentions_30d="82"
+            data-actions_30d="-1"
+            data-scorecard="4.9"
+            data-score="100.0"
+            data-trust_score="69.1"
+            data-category="Browser &amp; Computer Use"
+            data-category_rank="1"
+            data-evidence_grade="C"
+          >
+            <td class="rank r">
+              <span class="rank-num">1</span>
+            </td>
+            <td class="delta delta-up">▲3</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="/agents/openclaw">OpenClaw</a>
+              <a class="agent-repo" href="https://github.com/openclaw/openclaw" target="_blank" rel="noopener noreferrer">openclaw/openclaw</a>
+              <span class="agent-desc" title="Your own personal AI assistant. Any OS. Any Platform. The lobster way. 🦞 ">Your own personal AI assistant. Any OS. Any Platform. The lobster way. 🦞 </span>
+              <div class="agent-tags">
+                <span class="lang">TypeScript</span>
+                <span class="cat-badge">Browser &amp; Computer Use</span>
+              </div>
+            </td>
+            <td class="c">
+              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
+            </td>
+            <td class="r num">375.0k</td>
+            <td>
+              <div class="push-date fresh">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-05-27</span>
+              </div>
+            </td>
+            <td class="r num">12541</td>
+            <td class="r">
+              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 12 · Transparency 13.9 · Safety 9.2 · Identity 9">69.1</span>
+              
+            </td>
+          </tr>
+          
+          <tr class="top-row"
+            data-rank="2"
+            data-rank_delta="0"
             data-name="LangChain"
             data-repo="langchain-ai/langchain"
             data-stars="137768"
@@ -884,9 +1033,9 @@
             data-evidence_grade="B"
           >
             <td class="rank r">
-              <span class="rank-num">1</span>
+              <span class="rank-num">2</span>
             </td>
-            <td class="delta delta-up">▲1</td>
+            <td class="delta delta-same">—</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/langchain">LangChain</a>
               <a class="agent-repo" href="https://github.com/langchain-ai/langchain" target="_blank" rel="noopener noreferrer">langchain-ai/langchain</a>
@@ -914,8 +1063,8 @@
           </tr>
           
           <tr class="top-row"
-            data-rank="2"
-            data-rank_delta="-1"
+            data-rank="3"
+            data-rank_delta="-2"
             data-name="Dify"
             data-repo="langgenius/dify"
             data-stars="142845"
@@ -932,9 +1081,9 @@
             data-evidence_grade="B"
           >
             <td class="rank r">
-              <span class="rank-num">2</span>
+              <span class="rank-num">3</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-down">▼2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/dify">Dify</a>
               <a class="agent-repo" href="https://github.com/langgenius/dify" target="_blank" rel="noopener noreferrer">langgenius/dify</a>
@@ -961,9 +1110,9 @@
             </td>
           </tr>
           
-          <tr class="top-row"
-            data-rank="3"
-            data-rank_delta="0"
+          <tr
+            data-rank="4"
+            data-rank_delta="-1"
             data-name="opencode"
             data-repo="sst/opencode"
             data-stars="165469"
@@ -980,9 +1129,9 @@
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">3</span>
+              <span class="rank-num">4</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/opencode">opencode</a>
               <a class="agent-repo" href="https://github.com/anomalyco/opencode" target="_blank" rel="noopener noreferrer">sst/opencode</a>
@@ -1010,54 +1159,6 @@
           </tr>
           
           <tr
-            data-rank="4"
-            data-rank_delta="0"
-            data-name="OpenClaw"
-            data-repo="openclaw/openclaw"
-            data-stars="374739"
-            data-last_push="2026-05-26"
-            data-weekly_commits="11852"
-            data-downloads="0"
-            data-hn_mentions_30d="78"
-            data-actions_30d="-1"
-            data-scorecard="-1"
-            data-score="100.0"
-            data-trust_score="43.0"
-            data-category="Browser &amp; Computer Use"
-            data-category_rank="1"
-            data-evidence_grade="D"
-          >
-            <td class="rank r">
-              <span class="rank-num">4</span>
-            </td>
-            <td class="delta delta-same">—</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="/agents/openclaw">OpenClaw</a>
-              <a class="agent-repo" href="https://github.com/openclaw/openclaw" target="_blank" rel="noopener noreferrer">openclaw/openclaw</a>
-              <span class="agent-desc" title="Your own personal AI assistant. Any OS. Any Platform. The lobster way. 🦞 ">Your own personal AI assistant. Any OS. Any Platform. The lobster way. 🦞 </span>
-              <div class="agent-tags">
-                <span class="lang">TypeScript</span>
-                <span class="cat-badge">Browser &amp; Computer Use</span>
-              </div>
-            </td>
-            <td class="c">
-              <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
-            </td>
-            <td class="r num">374.7k</td>
-            <td>
-              <div class="push-date stale">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-05-26</span>
-              </div>
-            </td>
-            <td class="r num">11852</td>
-            <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 25.0 · Adoption 12 · Transparency 0 · Safety 5 · Identity 1">43.0</span>
-              
-            </td>
-          </tr>
-          
-          <tr
             data-rank="5"
             data-rank_delta="0"
             data-name="LiteLLM"
@@ -1070,7 +1171,7 @@
             data-actions_30d="-1"
             data-scorecard="6.2"
             data-score="96.3"
-            data-trust_score="82.8"
+            data-trust_score="69.8"
             data-category="LLM Gateways &amp; Infra"
             data-category_rank="1"
             data-evidence_grade="B"
@@ -1093,14 +1194,14 @@
             </td>
             <td class="r num">48.4k</td>
             <td>
-              <div class="push-date fresh">
+              <div class="push-date stale">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-27</span>
               </div>
             </td>
             <td class="r num">1057</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 19.2 · Transparency 15.4 · Safety 11.2 · Identity 12">82.8</span>
+              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 19.2 · Transparency 7.4 · Safety 11.2 · Identity 7">69.8</span>
               
             </td>
           </tr>
@@ -1214,7 +1315,7 @@
             data-actions_30d="-1"
             data-scorecard="-1"
             data-score="92.7"
-            data-trust_score="62.3"
+            data-trust_score="49.3"
             data-category="Workflow Platforms"
             data-category_rank="3"
             data-evidence_grade="D"
@@ -1237,14 +1338,14 @@
             </td>
             <td class="r num">22.4k</td>
             <td>
-              <div class="push-date fresh">
+              <div class="push-date stale">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-27</span>
               </div>
             </td>
             <td class="r num">355</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 18.3 · Transparency 8 · Safety 5.0 · Identity 6">62.3</span>
+              <span class="trust-pill trust-mid" title="Activity 25.0 · Adoption 18.3 · Transparency 0 · Safety 5.0 · Identity 1">49.3</span>
               
             </td>
           </tr>
@@ -1310,7 +1411,7 @@
             data-actions_30d="-1"
             data-scorecard="-1"
             data-score="84.4"
-            data-trust_score="56.9"
+            data-trust_score="43.9"
             data-category="Observability &amp; Evaluation"
             data-category_rank="1"
             data-evidence_grade="C"
@@ -1333,14 +1434,14 @@
             </td>
             <td class="r num">4.2k</td>
             <td>
-              <div class="push-date fresh">
+              <div class="push-date stale">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-27</span>
               </div>
             </td>
             <td class="r num">923</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 13.5 · Transparency 8 · Safety 1.4 · Identity 9">56.9</span>
+              <span class="trust-pill trust-mid" title="Activity 25.0 · Adoption 13.5 · Transparency 0 · Safety 1.4 · Identity 4">43.9</span>
               
             </td>
           </tr>
@@ -1350,18 +1451,18 @@
             data-rank_delta="-1"
             data-name="Aider"
             data-repo="paul-gauthier/aider"
-            data-stars="45341"
+            data-stars="45422"
             data-last_push="2026-05-22"
             data-weekly_commits="5"
             data-downloads="237172"
-            data-hn_mentions_30d="155"
-            data-actions_30d="8891"
-            data-scorecard="-1"
-            data-score="79.2"
-            data-trust_score="44.7"
+            data-hn_mentions_30d="132"
+            data-actions_30d="8738"
+            data-scorecard="3.8"
+            data-score="78.9"
+            data-trust_score="69.0"
             data-category="Coding Agents"
             data-category_rank="2"
-            data-evidence_grade="B"
+            data-evidence_grade="A"
           >
             <td class="rank r">
               <span class="rank-num">11</span>
@@ -1377,9 +1478,9 @@
               </div>
             </td>
             <td class="c">
-              <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
+              <span class="evidence-badge grade-A" title="Evidence grade A">A</span>
             </td>
-            <td class="r num">45.3k</td>
+            <td class="r num">45.4k</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
@@ -1388,14 +1489,62 @@
             </td>
             <td class="r num">5<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span></td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 18.6 · Adoption 18.3 · Transparency 0 · Safety 0.8 · Identity 7">44.7</span>
+              <span class="trust-pill trust-high" title="Activity 18.5 · Adoption 18.3 · Transparency 12.6 · Safety 4.6 · Identity 15">69.0</span>
               
             </td>
           </tr>
           
           <tr
             data-rank="12"
-            data-rank_delta="-1"
+            data-rank_delta="0"
+            data-name="AutoGPT"
+            data-repo="Significant-Gravitas/AutoGPT"
+            data-stars="184591"
+            data-last_push="2026-05-27"
+            data-weekly_commits="149"
+            data-downloads="44"
+            data-hn_mentions_30d="377"
+            data-actions_30d="-1"
+            data-scorecard="5.7"
+            data-score="75.0"
+            data-trust_score="76.3"
+            data-category="Agent Frameworks"
+            data-category_rank="4"
+            data-evidence_grade="B"
+          >
+            <td class="rank r">
+              <span class="rank-num">12</span>
+            </td>
+            <td class="delta delta-same">—</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="/agents/autogpt">AutoGPT</a>
+              <a class="agent-repo" href="https://github.com/Significant-Gravitas/AutoGPT" target="_blank" rel="noopener noreferrer">Significant-Gravitas/AutoGPT</a>
+              <span class="agent-desc" title="AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so tha">AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so tha</span>
+              <div class="agent-tags">
+                <span class="lang">Python</span>
+                <span class="cat-badge">Agent Frameworks</span>
+              </div>
+            </td>
+            <td class="c">
+              <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
+            </td>
+            <td class="r num">184.6k</td>
+            <td>
+              <div class="push-date fresh">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-05-27</span>
+              </div>
+            </td>
+            <td class="r num">149</td>
+            <td class="r">
+              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 14.2 · Transparency 14.8 · Safety 10.3 · Identity 12">76.3</span>
+              
+            </td>
+          </tr>
+          
+          <tr
+            data-rank="13"
+            data-rank_delta="-2"
             data-name="Claude Code"
             data-repo="anthropics/claude-code"
             data-stars="126959"
@@ -1406,15 +1555,15 @@
             data-actions_30d="37752"
             data-scorecard="5.6"
             data-score="75.0"
-            data-trust_score="71.2"
+            data-trust_score="66.2"
             data-category="Coding Agents"
             data-category_rank="3"
             data-evidence_grade="A"
           >
             <td class="rank r">
-              <span class="rank-num">12</span>
+              <span class="rank-num">13</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-down">▼2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/claude-code">Claude Code</a>
               <a class="agent-repo" href="https://github.com/anthropics/claude-code" target="_blank" rel="noopener noreferrer">anthropics/claude-code</a>
@@ -1429,62 +1578,14 @@
             </td>
             <td class="r num">127.0k</td>
             <td>
-              <div class="push-date fresh">
+              <div class="push-date stale">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-27</span>
               </div>
             </td>
             <td class="r num">39</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 23.0 · Adoption 20 · Transparency 6.7 · Safety 6.5 · Identity 15">71.2</span>
-              
-            </td>
-          </tr>
-          
-          <tr
-            data-rank="13"
-            data-rank_delta="-1"
-            data-name="AutoGPT"
-            data-repo="Significant-Gravitas/AutoGPT"
-            data-stars="184559"
-            data-last_push="2026-05-26"
-            data-weekly_commits="156"
-            data-downloads="50"
-            data-hn_mentions_30d="26"
-            data-actions_30d="-1"
-            data-scorecard="-1"
-            data-score="75.0"
-            data-trust_score="47.9"
-            data-category="Agent Frameworks"
-            data-category_rank="4"
-            data-evidence_grade="C"
-          >
-            <td class="rank r">
-              <span class="rank-num">13</span>
-            </td>
-            <td class="delta delta-down">▼1</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="/agents/autogpt">AutoGPT</a>
-              <a class="agent-repo" href="https://github.com/Significant-Gravitas/AutoGPT" target="_blank" rel="noopener noreferrer">Significant-Gravitas/AutoGPT</a>
-              <span class="agent-desc" title="AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so tha">AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so tha</span>
-              <div class="agent-tags">
-                <span class="lang">Python</span>
-                <span class="cat-badge">Agent Frameworks</span>
-              </div>
-            </td>
-            <td class="c">
-              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
-            </td>
-            <td class="r num">184.6k</td>
-            <td>
-              <div class="push-date stale">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-05-26</span>
-              </div>
-            </td>
-            <td class="r num">156</td>
-            <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 25.0 · Adoption 14.3 · Transparency 0 · Safety 4.6 · Identity 4">47.9</span>
+              <span class="trust-pill trust-high" title="Activity 23.0 · Adoption 20 · Transparency 6.7 · Safety 6.5 · Identity 10">66.2</span>
               
             </td>
           </tr>
@@ -1694,7 +1795,7 @@
             data-actions_30d="-1"
             data-scorecard="4.6"
             data-score="73.6"
-            data-trust_score="77.6"
+            data-trust_score="64.6"
             data-category="Browser &amp; Computer Use"
             data-category_rank="2"
             data-evidence_grade="B"
@@ -1724,7 +1825,7 @@
             </td>
             <td class="r num">97</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 24.9 · Adoption 20.0 · Transparency 13.5 · Safety 7.2 · Identity 12">77.6</span>
+              <span class="trust-pill trust-high" title="Activity 24.9 · Adoption 20.0 · Transparency 5.5 · Safety 7.2 · Identity 7">64.6</span>
               
             </td>
           </tr>
@@ -1886,7 +1987,7 @@
             data-actions_30d="85"
             data-scorecard="5.9"
             data-score="72.8"
-            data-trust_score="85.1"
+            data-trust_score="72.1"
             data-category="Coding Agents"
             data-category_rank="6"
             data-evidence_grade="A"
@@ -1909,14 +2010,14 @@
             </td>
             <td class="r num">75.0k</td>
             <td>
-              <div class="push-date fresh">
+              <div class="push-date stale">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-27</span>
               </div>
             </td>
             <td class="r num">190</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 19.1 · Transparency 15.1 · Safety 10.9 · Identity 15">85.1</span>
+              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 19.1 · Transparency 7.1 · Safety 10.9 · Identity 10">72.1</span>
               
             </td>
           </tr>
@@ -1982,7 +2083,7 @@
             data-actions_30d="-1"
             data-scorecard="7.1"
             data-score="72.6"
-            data-trust_score="71.2"
+            data-trust_score="58.2"
             data-category="Research &amp; Data"
             data-category_rank="2"
             data-evidence_grade="D"
@@ -2005,14 +2106,14 @@
             </td>
             <td class="r num">69.8k</td>
             <td>
-              <div class="push-date fresh">
+              <div class="push-date stale">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-27</span>
               </div>
             </td>
             <td class="r num">169</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 11.6 · Transparency 16.5 · Safety 12.1 · Identity 6">71.2</span>
+              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 11.6 · Transparency 8.5 · Safety 12.1 · Identity 1">58.2</span>
               
             </td>
           </tr>
@@ -2259,7 +2360,55 @@
           
           <tr
             data-rank="30"
-            data-rank_delta="0"
+            data-rank_delta="1"
+            data-name="LlamaIndex"
+            data-repo="run-llama/llama_index"
+            data-stars="49703"
+            data-last_push="2026-05-26"
+            data-weekly_commits="53"
+            data-downloads="0"
+            data-hn_mentions_30d="3"
+            data-actions_30d="-1"
+            data-scorecard="-1"
+            data-score="71.1"
+            data-trust_score="53.9"
+            data-category="Agent Frameworks"
+            data-category_rank="6"
+            data-evidence_grade="D"
+          >
+            <td class="rank r">
+              <span class="rank-num">30</span>
+            </td>
+            <td class="delta delta-up">▲1</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="/agents/llamaindex">LlamaIndex</a>
+              <a class="agent-repo" href="https://github.com/run-llama/llama_index" target="_blank" rel="noopener noreferrer">run-llama/llama_index</a>
+              <span class="agent-desc" title="LlamaIndex is the leading document agent and OCR platform">LlamaIndex is the leading document agent and OCR platform</span>
+              <div class="agent-tags">
+                <span class="lang">Python</span>
+                <span class="cat-badge">Agent Frameworks</span>
+              </div>
+            </td>
+            <td class="c">
+              <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
+            </td>
+            <td class="r num">49.7k</td>
+            <td>
+              <div class="push-date fresh">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-05-26</span>
+              </div>
+            </td>
+            <td class="r num">53</td>
+            <td class="r">
+              <span class="trust-pill trust-mid" title="Activity 23.6 · Adoption 11.3 · Transparency 8 · Safety 5 · Identity 6">53.9</span>
+              
+            </td>
+          </tr>
+          
+          <tr
+            data-rank="31"
+            data-rank_delta="-1"
             data-name="AnythingLLM"
             data-repo="Mintplex-Labs/anything-llm"
             data-stars="60628"
@@ -2276,9 +2425,9 @@
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">30</span>
+              <span class="rank-num">31</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/anythingllm">AnythingLLM</a>
               <a class="agent-repo" href="https://github.com/Mintplex-Labs/anything-llm" target="_blank" rel="noopener noreferrer">Mintplex-Labs/anything-llm</a>
@@ -2301,54 +2450,6 @@
             <td class="r num">46</td>
             <td class="r">
               <span class="trust-pill trust-mid" title="Activity 23.2 · Adoption 11.5 · Transparency 0 · Safety 3.0 · Identity 1">38.7</span>
-              
-            </td>
-          </tr>
-          
-          <tr
-            data-rank="31"
-            data-rank_delta="0"
-            data-name="LlamaIndex"
-            data-repo="run-llama/llama_index"
-            data-stars="49673"
-            data-last_push="2026-05-20"
-            data-weekly_commits="52"
-            data-downloads="0"
-            data-hn_mentions_30d="2"
-            data-actions_30d="-1"
-            data-scorecard="-1"
-            data-score="70.5"
-            data-trust_score="40.5"
-            data-category="Agent Frameworks"
-            data-category_rank="6"
-            data-evidence_grade="D"
-          >
-            <td class="rank r">
-              <span class="rank-num">31</span>
-            </td>
-            <td class="delta delta-same">—</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="/agents/llamaindex">LlamaIndex</a>
-              <a class="agent-repo" href="https://github.com/run-llama/llama_index" target="_blank" rel="noopener noreferrer">run-llama/llama_index</a>
-              <span class="agent-desc" title="LlamaIndex is the leading document agent and OCR platform">LlamaIndex is the leading document agent and OCR platform</span>
-              <div class="agent-tags">
-                <span class="lang">Python</span>
-                <span class="cat-badge">Agent Frameworks</span>
-              </div>
-            </td>
-            <td class="c">
-              <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
-            </td>
-            <td class="r num">49.7k</td>
-            <td>
-              <div class="push-date fresh">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-05-20</span>
-              </div>
-            </td>
-            <td class="r num">52</td>
-            <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 23.2 · Adoption 11.3 · Transparency 0 · Safety 5 · Identity 1">40.5</span>
               
             </td>
           </tr>
@@ -2414,7 +2515,7 @@
             data-actions_30d="-1"
             data-scorecard="5.6"
             data-score="70.1"
-            data-trust_score="70.5"
+            data-trust_score="57.5"
             data-category="Coding Agents"
             data-category_rank="8"
             data-evidence_grade="C"
@@ -2437,69 +2538,21 @@
             </td>
             <td class="r num">46.0k</td>
             <td>
-              <div class="push-date fresh">
+              <div class="push-date stale">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-27</span>
               </div>
             </td>
             <td class="r num">320</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 11.2 · Transparency 14.7 · Safety 10.6 · Identity 9">70.5</span>
+              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 11.2 · Transparency 6.7 · Safety 10.6 · Identity 4">57.5</span>
               
             </td>
           </tr>
           
           <tr
             data-rank="34"
-            data-rank_delta="0"
-            data-name="Open Interpreter"
-            data-repo="OpenInterpreter/open-interpreter"
-            data-stars="63675"
-            data-last_push="2026-05-17"
-            data-weekly_commits="5"
-            data-downloads="47288"
-            data-hn_mentions_30d="0"
-            data-actions_30d="-1"
-            data-scorecard="-1"
-            data-score="70.1"
-            data-trust_score="42.0"
-            data-category="Coding Agents"
-            data-category_rank="9"
-            data-evidence_grade="C"
-          >
-            <td class="rank r">
-              <span class="rank-num">34</span>
-            </td>
-            <td class="delta delta-same">—</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="/agents/open-interpreter">Open Interpreter</a>
-              <a class="agent-repo" href="https://github.com/openinterpreter/open-interpreter" target="_blank" rel="noopener noreferrer">OpenInterpreter/open-interpreter</a>
-              <span class="agent-desc" title="A natural language interface for computers">A natural language interface for computers</span>
-              <div class="agent-tags">
-                <span class="lang">Python</span>
-                <span class="cat-badge">Coding Agents</span>
-              </div>
-            </td>
-            <td class="c">
-              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
-            </td>
-            <td class="r num">63.7k</td>
-            <td>
-              <div class="push-date recent">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-05-17</span>
-              </div>
-            </td>
-            <td class="r num">5</td>
-            <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 18.2 · Adoption 17.8 · Transparency 0 · Safety 2.0 · Identity 4">42.0</span>
-              
-            </td>
-          </tr>
-          
-          <tr
-            data-rank="35"
-            data-rank_delta="0"
+            data-rank_delta="1"
             data-name="Agno"
             data-repo="agno-agi/agno"
             data-stars="40379"
@@ -2510,15 +2563,15 @@
             data-actions_30d="-1"
             data-scorecard="4.7"
             data-score="70.0"
-            data-trust_score="78.3"
+            data-trust_score="65.3"
             data-category="Agent Frameworks"
             data-category_rank="7"
             data-evidence_grade="B"
           >
             <td class="rank r">
-              <span class="rank-num">35</span>
+              <span class="rank-num">34</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-up">▲1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/agno">Agno</a>
               <a class="agent-repo" href="https://github.com/agno-agi/agno" target="_blank" rel="noopener noreferrer">agno-agi/agno</a>
@@ -2533,14 +2586,62 @@
             </td>
             <td class="r num">40.4k</td>
             <td>
-              <div class="push-date fresh">
+              <div class="push-date stale">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-27</span>
               </div>
             </td>
             <td class="r num">174</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 19.1 · Transparency 13.6 · Safety 8.6 · Identity 12">78.3</span>
+              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 19.1 · Transparency 5.6 · Safety 8.6 · Identity 7">65.3</span>
+              
+            </td>
+          </tr>
+          
+          <tr
+            data-rank="35"
+            data-rank_delta="-1"
+            data-name="Open Interpreter"
+            data-repo="OpenInterpreter/open-interpreter"
+            data-stars="63703"
+            data-last_push="2026-05-17"
+            data-weekly_commits="4"
+            data-downloads="47288"
+            data-hn_mentions_30d="0"
+            data-actions_30d="-1"
+            data-scorecard="5.6"
+            data-score="69.8"
+            data-trust_score="69.8"
+            data-category="Coding Agents"
+            data-category_rank="9"
+            data-evidence_grade="B"
+          >
+            <td class="rank r">
+              <span class="rank-num">35</span>
+            </td>
+            <td class="delta delta-down">▼1</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="/agents/open-interpreter">Open Interpreter</a>
+              <a class="agent-repo" href="https://github.com/openinterpreter/open-interpreter" target="_blank" rel="noopener noreferrer">OpenInterpreter/open-interpreter</a>
+              <span class="agent-desc" title="A natural language interface for computers">A natural language interface for computers</span>
+              <div class="agent-tags">
+                <span class="lang">Python</span>
+                <span class="cat-badge">Coding Agents</span>
+              </div>
+            </td>
+            <td class="c">
+              <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
+            </td>
+            <td class="r num">63.7k</td>
+            <td>
+              <div class="push-date recent">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-05-17</span>
+              </div>
+            </td>
+            <td class="r num">4</td>
+            <td class="r">
+              <span class="trust-pill trust-high" title="Activity 17.7 · Adoption 17.8 · Transparency 14.7 · Safety 7.6 · Identity 12">69.8</span>
               
             </td>
           </tr>
@@ -2694,18 +2795,18 @@
             data-rank_delta="0"
             data-name="ChatDev"
             data-repo="OpenBMB/ChatDev"
-            data-stars="33207"
-            data-last_push="2026-05-25"
-            data-weekly_commits="6"
-            data-downloads="24"
-            data-hn_mentions_30d="4"
+            data-stars="33226"
+            data-last_push="2026-05-27"
+            data-weekly_commits="13"
+            data-downloads="23"
+            data-hn_mentions_30d="12"
             data-actions_30d="-1"
-            data-scorecard="-1"
-            data-score="68.8"
-            data-trust_score="38.0"
+            data-scorecard="4.0"
+            data-score="68.9"
+            data-trust_score="64.4"
             data-category="Multi-Agent Systems"
             data-category_rank="1"
-            data-evidence_grade="C"
+            data-evidence_grade="B"
           >
             <td class="rank r">
               <span class="rank-num">39</span>
@@ -2721,18 +2822,18 @@
               </div>
             </td>
             <td class="c">
-              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
+              <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
             </td>
             <td class="r num">33.2k</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
-                <span class="push-text">2026-05-25</span>
+                <span class="push-text">2026-05-27</span>
               </div>
             </td>
-            <td class="r num">6<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span></td>
+            <td class="r num">13</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 19.1 · Adoption 12.7 · Transparency 0 · Safety 2.2 · Identity 4">38.0</span>
+              <span class="trust-pill trust-high" title="Activity 20.7 · Adoption 12.7 · Transparency 12.8 · Safety 6.2 · Identity 12">64.4</span>
               
             </td>
           </tr>
@@ -3075,48 +3176,48 @@
           
           <tr
             data-rank="47"
-            data-rank_delta="-1"
-            data-name="Rasa"
-            data-repo="RasaHQ/rasa"
-            data-stars="21178"
-            data-last_push="2026-05-22"
-            data-weekly_commits="None"
-            data-downloads="54219"
-            data-hn_mentions_30d="143"
+            data-rank_delta="2"
+            data-name="Qdrant"
+            data-repo="qdrant/qdrant"
+            data-stars="31602"
+            data-last_push="2026-05-27"
+            data-weekly_commits="413"
+            data-downloads="5632909"
+            data-hn_mentions_30d="1"
             data-actions_30d="-1"
-            data-scorecard="5.3"
-            data-score="67.8"
-            data-trust_score="50.2"
-            data-category="Workflow Platforms"
-            data-category_rank="6"
+            data-scorecard="5.0"
+            data-score="67.6"
+            data-trust_score="79.8"
+            data-category="Memory &amp; Knowledge"
+            data-category_rank="7"
             data-evidence_grade="B"
           >
             <td class="rank r">
               <span class="rank-num">47</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/rasa">Rasa</a>
-              <a class="agent-repo" href="https://github.com/RasaHQ/rasa" target="_blank" rel="noopener noreferrer">RasaHQ/rasa</a>
-              <span class="agent-desc" title="💬   Open source machine learning framework to automate text- and voice-based conversations: NLU, dialogue management, co">💬   Open source machine learning framework to automate text- and voice-based conversations: NLU, dialogue management, co</span>
+              <a class="agent-name" href="/agents/qdrant">Qdrant</a>
+              <a class="agent-repo" href="https://github.com/qdrant/qdrant" target="_blank" rel="noopener noreferrer">qdrant/qdrant</a>
+              <span class="agent-desc" title="Qdrant - High-performance, massive-scale Vector Database and Vector Search Engine for the next generation of AI. Also av">Qdrant - High-performance, massive-scale Vector Database and Vector Search Engine for the next generation of AI. Also av</span>
               <div class="agent-tags">
-                <span class="lang">Python</span>
-                <span class="cat-badge">Workflow Platforms</span>
+                <span class="lang">Rust</span>
+                <span class="cat-badge">Memory &amp; Knowledge</span>
               </div>
             </td>
             <td class="c">
               <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
             </td>
-            <td class="r num">21.2k</td>
+            <td class="r num">31.6k</td>
             <td>
               <div class="push-date fresh">
                 <span class="push-dot"></span>
-                <span class="push-text">2026-05-22</span>
+                <span class="push-text">2026-05-27</span>
               </div>
             </td>
-            <td class="r num">None<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span></td>
+            <td class="r num">413</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 14.8 · Adoption 16.7 · Transparency 6.4 · Safety 5.3 · Identity 7">50.2</span>
+              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 18.8 · Transparency 14.0 · Safety 10.0 · Identity 12">79.8</span>
               
             </td>
           </tr>
@@ -3134,7 +3235,7 @@
             data-actions_30d="-1"
             data-scorecard="4.9"
             data-score="67.6"
-            data-trust_score="56.5"
+            data-trust_score="43.5"
             data-category="Browser &amp; Computer Use"
             data-category_rank="3"
             data-evidence_grade="D"
@@ -3164,55 +3265,55 @@
             </td>
             <td class="r num">1</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 15.8 · Adoption 10.9 · Transparency 13.9 · Safety 9.9 · Identity 6">56.5</span>
+              <span class="trust-pill trust-mid" title="Activity 15.8 · Adoption 10.9 · Transparency 5.9 · Safety 9.9 · Identity 1">43.5</span>
               
             </td>
           </tr>
           
           <tr
             data-rank="49"
-            data-rank_delta="0"
-            data-name="Qdrant"
-            data-repo="qdrant/qdrant"
-            data-stars="31576"
-            data-last_push="2026-05-26"
-            data-weekly_commits="None"
-            data-downloads="5960942"
-            data-hn_mentions_30d="2"
+            data-rank_delta="-3"
+            data-name="Rasa"
+            data-repo="RasaHQ/rasa"
+            data-stars="21182"
+            data-last_push="2026-05-22"
+            data-weekly_commits="0"
+            data-downloads="54219"
+            data-hn_mentions_30d="256"
             data-actions_30d="-1"
-            data-scorecard="-1"
-            data-score="67.6"
-            data-trust_score="37.8"
-            data-category="Memory &amp; Knowledge"
-            data-category_rank="7"
-            data-evidence_grade="C"
+            data-scorecard="5.2"
+            data-score="67.5"
+            data-trust_score="65.7"
+            data-category="Workflow Platforms"
+            data-category_rank="6"
+            data-evidence_grade="B"
           >
             <td class="rank r">
               <span class="rank-num">49</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼3</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/qdrant">Qdrant</a>
-              <a class="agent-repo" href="https://github.com/qdrant/qdrant" target="_blank" rel="noopener noreferrer">qdrant/qdrant</a>
-              <span class="agent-desc" title="Qdrant - High-performance, massive-scale Vector Database and Vector Search Engine for the next generation of AI. Also av">Qdrant - High-performance, massive-scale Vector Database and Vector Search Engine for the next generation of AI. Also av</span>
+              <a class="agent-name" href="/agents/rasa">Rasa</a>
+              <a class="agent-repo" href="https://github.com/RasaHQ/rasa" target="_blank" rel="noopener noreferrer">RasaHQ/rasa</a>
+              <span class="agent-desc" title="💬   Open source machine learning framework to automate text- and voice-based conversations: NLU, dialogue management, co">💬   Open source machine learning framework to automate text- and voice-based conversations: NLU, dialogue management, co</span>
               <div class="agent-tags">
-                <span class="lang">Rust</span>
-                <span class="cat-badge">Memory &amp; Knowledge</span>
+                <span class="lang">Python</span>
+                <span class="cat-badge">Workflow Platforms</span>
               </div>
             </td>
             <td class="c">
-              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
+              <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
             </td>
-            <td class="r num">31.6k</td>
+            <td class="r num">21.2k</td>
             <td>
-              <div class="push-date stale">
+              <div class="push-date fresh">
                 <span class="push-dot"></span>
-                <span class="push-text">2026-05-26</span>
+                <span class="push-text">2026-05-22</span>
               </div>
             </td>
-            <td class="r num">None<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span></td>
+            <td class="r num">0<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span></td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 15.0 · Adoption 18.8 · Transparency 0 · Safety 0 · Identity 4">37.8</span>
+              <span class="trust-pill trust-high" title="Activity 14.6 · Adoption 16.7 · Transparency 14.2 · Safety 8.2 · Identity 12">65.7</span>
               
             </td>
           </tr>
@@ -3278,7 +3379,7 @@
             data-actions_30d="-1"
             data-scorecard="5.0"
             data-score="67.4"
-            data-trust_score="72.7"
+            data-trust_score="59.7"
             data-category="Agent Frameworks"
             data-category_rank="15"
             data-evidence_grade="C"
@@ -3308,7 +3409,7 @@
             </td>
             <td class="r num">33</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 22.6 · Adoption 17.1 · Transparency 14.0 · Safety 10.0 · Identity 9">72.7</span>
+              <span class="trust-pill trust-high" title="Activity 22.6 · Adoption 17.1 · Transparency 6.0 · Safety 10.0 · Identity 4">59.7</span>
               
             </td>
           </tr>
@@ -3462,15 +3563,15 @@
             data-rank_delta="-2"
             data-name="Qwen Code"
             data-repo="QwenLM/qwen-code"
-            data-stars="24681"
-            data-last_push="2026-05-26"
-            data-weekly_commits="381"
+            data-stars="24707"
+            data-last_push="2026-05-27"
+            data-weekly_commits="374"
             data-downloads="0"
             data-hn_mentions_30d="-1"
-            data-actions_30d="269"
-            data-scorecard="5.6"
+            data-actions_30d="263"
+            data-scorecard="6.3"
             data-score="67.1"
-            data-trust_score="56.8"
+            data-trust_score="71.4"
             data-category="Coding Agents"
             data-category_rank="11"
             data-evidence_grade="C"
@@ -3493,14 +3594,14 @@
             </td>
             <td class="r num">24.7k</td>
             <td>
-              <div class="push-date stale">
+              <div class="push-date fresh">
                 <span class="push-dot"></span>
-                <span class="push-text">2026-05-26</span>
+                <span class="push-text">2026-05-27</span>
               </div>
             </td>
-            <td class="r num">381</td>
+            <td class="r num">374</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 10.5 · Transparency 6.7 · Safety 10.6 · Identity 4">56.8</span>
+              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 10.5 · Transparency 15.6 · Safety 11.3 · Identity 9">71.4</span>
               
             </td>
           </tr>
@@ -3606,18 +3707,18 @@
             data-rank_delta="0"
             data-name="Skyvern"
             data-repo="Skyvern-AI/skyvern"
-            data-stars="21733"
-            data-last_push="2026-05-26"
-            data-weekly_commits="None"
+            data-stars="21755"
+            data-last_push="2026-05-27"
+            data-weekly_commits="382"
             data-downloads="2141"
-            data-hn_mentions_30d="0"
+            data-hn_mentions_30d="1"
             data-actions_30d="-1"
-            data-scorecard="-1"
+            data-scorecard="7.0"
             data-score="66.4"
-            data-trust_score="33.9"
+            data-trust_score="80.3"
             data-category="Browser &amp; Computer Use"
             data-category_rank="4"
-            data-evidence_grade="C"
+            data-evidence_grade="B"
           >
             <td class="rank r">
               <span class="rank-num">58</span>
@@ -3633,25 +3734,73 @@
               </div>
             </td>
             <td class="c">
-              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
+              <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
             </td>
-            <td class="r num">21.7k</td>
+            <td class="r num">21.8k</td>
             <td>
-              <div class="push-date stale">
+              <div class="push-date fresh">
                 <span class="push-dot"></span>
-                <span class="push-text">2026-05-26</span>
+                <span class="push-text">2026-05-27</span>
               </div>
             </td>
-            <td class="r num">None<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span></td>
+            <td class="r num">382</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 15.0 · Adoption 14.9 · Transparency 0 · Safety 0 · Identity 4">33.9</span>
+              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 14.9 · Transparency 16.4 · Safety 12.0 · Identity 12">80.3</span>
               
             </td>
           </tr>
           
           <tr
             data-rank="59"
-            data-rank_delta="0"
+            data-rank_delta="2"
+            data-name="Promptfoo"
+            data-repo="promptfoo/promptfoo"
+            data-stars="21660"
+            data-last_push="2026-05-27"
+            data-weekly_commits="426"
+            data-downloads="257693"
+            data-hn_mentions_30d="1"
+            data-actions_30d="-1"
+            data-scorecard="-1"
+            data-score="66.3"
+            data-trust_score="72.6"
+            data-category="Observability &amp; Evaluation"
+            data-category_rank="3"
+            data-evidence_grade="B"
+          >
+            <td class="rank r">
+              <span class="rank-num">59</span>
+            </td>
+            <td class="delta delta-up">▲2</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="/agents/promptfoo">Promptfoo</a>
+              <a class="agent-repo" href="https://github.com/promptfoo/promptfoo" target="_blank" rel="noopener noreferrer">promptfoo/promptfoo</a>
+              <span class="agent-desc" title="Test your prompts, agents, and RAGs. Red teaming/pentesting/vulnerability scanning for AI. Compare performance of GPT, C">Test your prompts, agents, and RAGs. Red teaming/pentesting/vulnerability scanning for AI. Compare performance of GPT, C</span>
+              <div class="agent-tags">
+                <span class="lang">TypeScript</span>
+                <span class="cat-badge">Observability &amp; Evaluation</span>
+              </div>
+            </td>
+            <td class="c">
+              <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
+            </td>
+            <td class="r num">21.7k</td>
+            <td>
+              <div class="push-date fresh">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-05-27</span>
+              </div>
+            </td>
+            <td class="r num">426</td>
+            <td class="r">
+              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 17.6 · Transparency 8 · Safety 10 · Identity 12">72.6</span>
+              
+            </td>
+          </tr>
+          
+          <tr
+            data-rank="60"
+            data-rank_delta="-1"
             data-name="AutoGen"
             data-repo="microsoft/autogen"
             data-stars="58411"
@@ -3668,9 +3817,9 @@
             data-evidence_grade="B"
           >
             <td class="rank r">
-              <span class="rank-num">59</span>
+              <span class="rank-num">60</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/autogen">AutoGen</a>
               <a class="agent-repo" href="https://github.com/microsoft/autogen" target="_blank" rel="noopener noreferrer">microsoft/autogen</a>
@@ -3698,123 +3847,27 @@
           </tr>
           
           <tr
-            data-rank="60"
-            data-rank_delta="0"
-            data-name="Roo Code"
-            data-repo="RooVetGit/Roo-Code"
-            data-stars="24153"
-            data-last_push="2026-05-15"
-            data-weekly_commits="17"
-            data-downloads="6"
-            data-hn_mentions_30d="-1"
+            data-rank="61"
+            data-rank_delta="1"
+            data-name="SWE-agent"
+            data-repo="princeton-nlp/SWE-agent"
+            data-stars="19340"
+            data-last_push="2026-05-25"
+            data-weekly_commits="0"
+            data-downloads="113"
+            data-hn_mentions_30d="1"
             data-actions_30d="-1"
-            data-scorecard="-1"
-            data-score="66.2"
-            data-trust_score="38.0"
+            data-scorecard="5.9"
+            data-score="66.1"
+            data-trust_score="65.2"
             data-category="Coding Agents"
             data-category_rank="12"
-            data-evidence_grade="D"
-          >
-            <td class="rank r">
-              <span class="rank-num">60</span>
-            </td>
-            <td class="delta delta-same">—</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="/agents/roo-code">Roo Code</a>
-              <a class="agent-repo" href="https://github.com/RooCodeInc/Roo-Code" target="_blank" rel="noopener noreferrer">RooVetGit/Roo-Code</a>
-              <span class="agent-desc" title="Roo Code gives you a whole dev team of AI agents in your code editor.">Roo Code gives you a whole dev team of AI agents in your code editor.</span>
-              <div class="agent-tags">
-                <span class="lang">TypeScript</span>
-                <span class="cat-badge">Coding Agents</span>
-              </div>
-            </td>
-            <td class="c">
-              <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
-            </td>
-            <td class="r num">24.2k</td>
-            <td>
-              <div class="push-date recent">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-05-15</span>
-              </div>
-            </td>
-            <td class="r num">17</td>
-            <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 20.4 · Adoption 11.6 · Transparency 0 · Safety 5 · Identity 1">38.0</span>
-              
-            </td>
-          </tr>
-          
-          <tr
-            data-rank="61"
-            data-rank_delta="0"
-            data-name="Promptfoo"
-            data-repo="promptfoo/promptfoo"
-            data-stars="21608"
-            data-last_push="2026-05-26"
-            data-weekly_commits="None"
-            data-downloads="280295"
-            data-hn_mentions_30d="0"
-            data-actions_30d="-1"
-            data-scorecard="-1"
-            data-score="66.2"
-            data-trust_score="44.7"
-            data-category="Observability &amp; Evaluation"
-            data-category_rank="3"
             data-evidence_grade="B"
           >
             <td class="rank r">
               <span class="rank-num">61</span>
             </td>
-            <td class="delta delta-same">—</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="/agents/promptfoo">Promptfoo</a>
-              <a class="agent-repo" href="https://github.com/promptfoo/promptfoo" target="_blank" rel="noopener noreferrer">promptfoo/promptfoo</a>
-              <span class="agent-desc" title="Test your prompts, agents, and RAGs. Red teaming/pentesting/vulnerability scanning for AI. Compare performance of GPT, C">Test your prompts, agents, and RAGs. Red teaming/pentesting/vulnerability scanning for AI. Compare performance of GPT, C</span>
-              <div class="agent-tags">
-                <span class="lang">TypeScript</span>
-                <span class="cat-badge">Observability &amp; Evaluation</span>
-              </div>
-            </td>
-            <td class="c">
-              <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
-            </td>
-            <td class="r num">21.6k</td>
-            <td>
-              <div class="push-date stale">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-05-26</span>
-              </div>
-            </td>
-            <td class="r num">None<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span></td>
-            <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 15.0 · Adoption 17.7 · Transparency 0 · Safety 5 · Identity 7">44.7</span>
-              
-            </td>
-          </tr>
-          
-          <tr
-            data-rank="62"
-            data-rank_delta="0"
-            data-name="SWE-agent"
-            data-repo="princeton-nlp/SWE-agent"
-            data-stars="19315"
-            data-last_push="2026-05-25"
-            data-weekly_commits="0"
-            data-downloads="98"
-            data-hn_mentions_30d="1"
-            data-actions_30d="-1"
-            data-scorecard="-1"
-            data-score="66.1"
-            data-trust_score="36.2"
-            data-category="Coding Agents"
-            data-category_rank="13"
-            data-evidence_grade="C"
-          >
-            <td class="rank r">
-              <span class="rank-num">62</span>
-            </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-up">▲1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/swe-agent">SWE-agent</a>
               <a class="agent-repo" href="https://github.com/SWE-agent/SWE-agent" target="_blank" rel="noopener noreferrer">princeton-nlp/SWE-agent</a>
@@ -3825,25 +3878,25 @@
               </div>
             </td>
             <td class="c">
-              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
+              <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
             </td>
             <td class="r num">19.3k</td>
             <td>
-              <div class="push-date stale">
+              <div class="push-date fresh">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-25</span>
               </div>
             </td>
             <td class="r num">0<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span></td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 15.0 · Adoption 12.9 · Transparency 0 · Safety 4.3 · Identity 4">36.2</span>
+              <span class="trust-pill trust-high" title="Activity 14.9 · Adoption 13.0 · Transparency 15.1 · Safety 10.2 · Identity 12">65.2</span>
               
             </td>
           </tr>
           
           <tr
-            data-rank="63"
-            data-rank_delta="0"
+            data-rank="62"
+            data-rank_delta="1"
             data-name="Stagehand"
             data-repo="browserbase/stagehand"
             data-stars="22823"
@@ -3854,15 +3907,15 @@
             data-actions_30d="-1"
             data-scorecard="5.2"
             data-score="66.0"
-            data-trust_score="83.6"
+            data-trust_score="70.6"
             data-category="Browser &amp; Computer Use"
             data-category_rank="5"
             data-evidence_grade="B"
           >
             <td class="rank r">
-              <span class="rank-num">63</span>
+              <span class="rank-num">62</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-up">▲1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/stagehand">Stagehand</a>
               <a class="agent-repo" href="https://github.com/browserbase/stagehand" target="_blank" rel="noopener noreferrer">browserbase/stagehand</a>
@@ -3877,40 +3930,40 @@
             </td>
             <td class="r num">22.8k</td>
             <td>
-              <div class="push-date fresh">
+              <div class="push-date stale">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-27</span>
               </div>
             </td>
             <td class="r num">56</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 23.8 · Adoption 18.4 · Transparency 14.2 · Safety 15.2 · Identity 12">83.6</span>
+              <span class="trust-pill trust-high" title="Activity 23.8 · Adoption 18.4 · Transparency 6.2 · Safety 15.2 · Identity 7">70.6</span>
               
             </td>
           </tr>
           
           <tr
-            data-rank="64"
-            data-rank_delta="0"
+            data-rank="63"
+            data-rank_delta="1"
             data-name="PydanticAI"
             data-repo="pydantic/pydantic-ai"
-            data-stars="17311"
-            data-last_push="2026-05-26"
-            data-weekly_commits="146"
+            data-stars="17339"
+            data-last_push="2026-05-27"
+            data-weekly_commits="150"
             data-downloads="8898673"
             data-hn_mentions_30d="1"
             data-actions_30d="-1"
             data-scorecard="6.4"
             data-score="65.9"
-            data-trust_score="74.3"
+            data-trust_score="87.3"
             data-category="Agent Frameworks"
             data-category_rank="18"
             data-evidence_grade="B"
           >
             <td class="rank r">
-              <span class="rank-num">64</span>
+              <span class="rank-num">63</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-up">▲1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/pydanticai">PydanticAI</a>
               <a class="agent-repo" href="https://github.com/pydantic/pydantic-ai" target="_blank" rel="noopener noreferrer">pydantic/pydantic-ai</a>
@@ -3925,14 +3978,62 @@
             </td>
             <td class="r num">17.3k</td>
             <td>
-              <div class="push-date stale">
+              <div class="push-date fresh">
                 <span class="push-dot"></span>
-                <span class="push-text">2026-05-26</span>
+                <span class="push-text">2026-05-27</span>
               </div>
             </td>
-            <td class="r num">146</td>
+            <td class="r num">150</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 18.2 · Transparency 7.7 · Safety 16.4 · Identity 7">74.3</span>
+              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 18.2 · Transparency 15.7 · Safety 16.4 · Identity 12">87.3</span>
+              
+            </td>
+          </tr>
+          
+          <tr
+            data-rank="64"
+            data-rank_delta="-4"
+            data-name="Roo Code"
+            data-repo="RooVetGit/Roo-Code"
+            data-stars="24160"
+            data-last_push="2026-05-15"
+            data-weekly_commits="17"
+            data-downloads="6"
+            data-hn_mentions_30d="-1"
+            data-actions_30d="-1"
+            data-scorecard="3.4"
+            data-score="65.9"
+            data-trust_score="61.4"
+            data-category="Coding Agents"
+            data-category_rank="13"
+            data-evidence_grade="C"
+          >
+            <td class="rank r">
+              <span class="rank-num">64</span>
+            </td>
+            <td class="delta delta-down">▼4</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="/agents/roo-code">Roo Code</a>
+              <a class="agent-repo" href="https://github.com/RooCodeInc/Roo-Code" target="_blank" rel="noopener noreferrer">RooVetGit/Roo-Code</a>
+              <span class="agent-desc" title="Roo Code gives you a whole dev team of AI agents in your code editor.">Roo Code gives you a whole dev team of AI agents in your code editor.</span>
+              <div class="agent-tags">
+                <span class="lang">TypeScript</span>
+                <span class="cat-badge">Coding Agents</span>
+              </div>
+            </td>
+            <td class="c">
+              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
+            </td>
+            <td class="r num">24.2k</td>
+            <td>
+              <div class="push-date recent">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-05-15</span>
+              </div>
+            </td>
+            <td class="r num">17</td>
+            <td class="r">
+              <span class="trust-pill trust-high" title="Activity 20.3 · Adoption 11.6 · Transparency 12.1 · Safety 8.4 · Identity 9">61.4</span>
               
             </td>
           </tr>
@@ -3998,7 +4099,7 @@
             data-actions_30d="-1"
             data-scorecard="5.4"
             data-score="65.6"
-            data-trust_score="81.9"
+            data-trust_score="68.9"
             data-category="Workflow Platforms"
             data-category_rank="8"
             data-evidence_grade="B"
@@ -4021,14 +4122,14 @@
             </td>
             <td class="r num">14.7k</td>
             <td>
-              <div class="push-date fresh">
+              <div class="push-date stale">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-27</span>
               </div>
             </td>
             <td class="r num">62</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 24.0 · Adoption 16.2 · Transparency 14.5 · Safety 15.2 · Identity 12">81.9</span>
+              <span class="trust-pill trust-high" title="Activity 24.0 · Adoption 16.2 · Transparency 6.5 · Safety 15.2 · Identity 7">68.9</span>
               
             </td>
           </tr>
@@ -4046,7 +4147,7 @@
             data-actions_30d="-1"
             data-scorecard="6.9"
             data-score="65.6"
-            data-trust_score="77.0"
+            data-trust_score="64.0"
             data-category="Multi-Agent Systems"
             data-category_rank="2"
             data-evidence_grade="B"
@@ -4076,7 +4177,7 @@
             </td>
             <td class="r num">36</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 22.7 · Adoption 16.3 · Transparency 16.3 · Safety 9.7 · Identity 12">77.0</span>
+              <span class="trust-pill trust-high" title="Activity 22.7 · Adoption 16.3 · Transparency 8.3 · Safety 9.7 · Identity 7">64.0</span>
               
             </td>
           </tr>
@@ -4131,7 +4232,55 @@
           
           <tr
             data-rank="69"
-            data-rank_delta="-1"
+            data-rank_delta="31"
+            data-name="pgvector"
+            data-repo="pgvector/pgvector"
+            data-stars="21496"
+            data-last_push="2026-05-26"
+            data-weekly_commits="3"
+            data-downloads="0"
+            data-hn_mentions_30d="10"
+            data-actions_30d="-1"
+            data-scorecard="4.5"
+            data-score="65.3"
+            data-trust_score="55.6"
+            data-category="Memory &amp; Knowledge"
+            data-category_rank="11"
+            data-evidence_grade="C"
+          >
+            <td class="rank r">
+              <span class="rank-num">69</span>
+            </td>
+            <td class="delta delta-up">▲31</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="/agents/pgvector">pgvector</a>
+              <a class="agent-repo" href="https://github.com/pgvector/pgvector" target="_blank" rel="noopener noreferrer">pgvector/pgvector</a>
+              <span class="agent-desc" title="Open-source vector similarity search for Postgres">Open-source vector similarity search for Postgres</span>
+              <div class="agent-tags">
+                <span class="lang">C</span>
+                <span class="cat-badge">Memory &amp; Knowledge</span>
+              </div>
+            </td>
+            <td class="c">
+              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
+            </td>
+            <td class="r num">21.5k</td>
+            <td>
+              <div class="push-date fresh">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-05-26</span>
+              </div>
+            </td>
+            <td class="r num">3<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span></td>
+            <td class="r">
+              <span class="trust-pill trust-high" title="Activity 18.0 · Adoption 10.4 · Transparency 13.4 · Safety 4.8 · Identity 9">55.6</span>
+              
+            </td>
+          </tr>
+          
+          <tr
+            data-rank="70"
+            data-rank_delta="-2"
             data-name="Letta"
             data-repo="letta-ai/letta"
             data-stars="22985"
@@ -4144,13 +4293,13 @@
             data-score="65.3"
             data-trust_score="47.6"
             data-category="Memory &amp; Knowledge"
-            data-category_rank="11"
+            data-category_rank="12"
             data-evidence_grade="B"
           >
             <td class="rank r">
-              <span class="rank-num">69</span>
+              <span class="rank-num">70</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-down">▼2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/letta">Letta</a>
               <a class="agent-repo" href="https://github.com/letta-ai/letta" target="_blank" rel="noopener noreferrer">letta-ai/letta</a>
@@ -4178,8 +4327,8 @@
           </tr>
           
           <tr
-            data-rank="70"
-            data-rank_delta="0"
+            data-rank="71"
+            data-rank_delta="-1"
             data-name="WrenAI"
             data-repo="Canner/WrenAI"
             data-stars="15349"
@@ -4190,15 +4339,15 @@
             data-actions_30d="-1"
             data-scorecard="5.7"
             data-score="65.2"
-            data-trust_score="65.4"
+            data-trust_score="52.4"
             data-category="Research &amp; Data"
             data-category_rank="4"
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">70</span>
+              <span class="rank-num">71</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/wrenai">WrenAI</a>
               <a class="agent-repo" href="https://github.com/Canner/WrenAI" target="_blank" rel="noopener noreferrer">Canner/WrenAI</a>
@@ -4213,40 +4362,40 @@
             </td>
             <td class="r num">15.3k</td>
             <td>
-              <div class="push-date fresh">
+              <div class="push-date stale">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-27</span>
               </div>
             </td>
             <td class="r num">88</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 24.7 · Adoption 10.0 · Transparency 14.8 · Safety 9.9 · Identity 6">65.4</span>
+              <span class="trust-pill trust-mid" title="Activity 24.7 · Adoption 10.0 · Transparency 6.8 · Safety 9.9 · Identity 1">52.4</span>
               
             </td>
           </tr>
           
           <tr
-            data-rank="71"
-            data-rank_delta="1"
+            data-rank="72"
+            data-rank_delta="0"
             data-name="Pipecat"
             data-repo="pipecat-ai/pipecat"
-            data-stars="12482"
-            data-last_push="2026-05-25"
-            data-weekly_commits="None"
+            data-stars="12507"
+            data-last_push="2026-05-27"
+            data-weekly_commits="382"
             data-downloads="207893"
-            data-hn_mentions_30d="0"
+            data-hn_mentions_30d="3"
             data-actions_30d="-1"
-            data-scorecard="-1"
+            data-scorecard="6.4"
             data-score="65.1"
-            data-trust_score="43.9"
+            data-trust_score="83.0"
             data-category="Voice &amp; Conversational"
             data-category_rank="1"
             data-evidence_grade="B"
           >
             <td class="rank r">
-              <span class="rank-num">71</span>
+              <span class="rank-num">72</span>
             </td>
-            <td class="delta delta-up">▲1</td>
+            <td class="delta delta-same">—</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/pipecat">Pipecat</a>
               <a class="agent-repo" href="https://github.com/pipecat-ai/pipecat" target="_blank" rel="noopener noreferrer">pipecat-ai/pipecat</a>
@@ -4261,21 +4410,21 @@
             </td>
             <td class="r num">12.5k</td>
             <td>
-              <div class="push-date stale">
+              <div class="push-date fresh">
                 <span class="push-dot"></span>
-                <span class="push-text">2026-05-25</span>
+                <span class="push-text">2026-05-27</span>
               </div>
             </td>
-            <td class="r num">None<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span></td>
+            <td class="r num">382</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 15.0 · Adoption 16.9 · Transparency 0 · Safety 5 · Identity 7">43.9</span>
+              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 16.9 · Transparency 15.7 · Safety 13.4 · Identity 12">83.0</span>
               
             </td>
           </tr>
           
           <tr
-            data-rank="72"
-            data-rank_delta="-1"
+            data-rank="73"
+            data-rank_delta="-2"
             data-name="Leon"
             data-repo="leon-ai/leon"
             data-stars="17267"
@@ -4288,13 +4437,13 @@
             data-score="65.0"
             data-trust_score="50.0"
             data-category="Memory &amp; Knowledge"
-            data-category_rank="12"
+            data-category_rank="13"
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">72</span>
+              <span class="rank-num">73</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-down">▼2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/leon">Leon</a>
               <a class="agent-repo" href="https://github.com/leon-ai/leon" target="_blank" rel="noopener noreferrer">leon-ai/leon</a>
@@ -4322,8 +4471,8 @@
           </tr>
           
           <tr
-            data-rank="73"
-            data-rank_delta="0"
+            data-rank="74"
+            data-rank_delta="-1"
             data-name="Weaviate"
             data-repo="weaviate/weaviate"
             data-stars="16235"
@@ -4336,13 +4485,13 @@
             data-score="64.8"
             data-trust_score="55.1"
             data-category="Memory &amp; Knowledge"
-            data-category_rank="13"
+            data-category_rank="14"
             data-evidence_grade="B"
           >
             <td class="rank r">
-              <span class="rank-num">73</span>
+              <span class="rank-num">74</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/weaviate">Weaviate</a>
               <a class="agent-repo" href="https://github.com/weaviate/weaviate" target="_blank" rel="noopener noreferrer">weaviate/weaviate</a>
@@ -4370,8 +4519,8 @@
           </tr>
           
           <tr
-            data-rank="74"
-            data-rank_delta="0"
+            data-rank="75"
+            data-rank_delta="-1"
             data-name="DeepEval"
             data-repo="confident-ai/deepeval"
             data-stars="15705"
@@ -4388,9 +4537,9 @@
             data-evidence_grade="C"
           >
             <td class="rank r">
-              <span class="rank-num">74</span>
+              <span class="rank-num">75</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/deepeval">DeepEval</a>
               <a class="agent-repo" href="https://github.com/confident-ai/deepeval" target="_blank" rel="noopener noreferrer">confident-ai/deepeval</a>
@@ -4418,8 +4567,8 @@
           </tr>
           
           <tr
-            data-rank="75"
-            data-rank_delta="1"
+            data-rank="76"
+            data-rank_delta="0"
             data-name="Maxun"
             data-repo="getmaxun/maxun"
             data-stars="15620"
@@ -4436,9 +4585,9 @@
             data-evidence_grade="C"
           >
             <td class="rank r">
-              <span class="rank-num">75</span>
+              <span class="rank-num">76</span>
             </td>
-            <td class="delta delta-up">▲1</td>
+            <td class="delta delta-same">—</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/maxun">Maxun</a>
               <a class="agent-repo" href="https://github.com/getmaxun/maxun" target="_blank" rel="noopener noreferrer">getmaxun/maxun</a>
@@ -4466,8 +4615,8 @@
           </tr>
           
           <tr
-            data-rank="76"
-            data-rank_delta="1"
+            data-rank="77"
+            data-rank_delta="0"
             data-name="Guidance"
             data-repo="microsoft/guidance"
             data-stars="21478"
@@ -4484,9 +4633,9 @@
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">76</span>
+              <span class="rank-num">77</span>
             </td>
-            <td class="delta delta-up">▲1</td>
+            <td class="delta delta-same">—</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/guidance">Guidance</a>
               <a class="agent-repo" href="https://github.com/guidance-ai/guidance" target="_blank" rel="noopener noreferrer">microsoft/guidance</a>
@@ -4514,8 +4663,8 @@
           </tr>
           
           <tr
-            data-rank="77"
-            data-rank_delta="-2"
+            data-rank="78"
+            data-rank_delta="-3"
             data-name="Browser Use Web UI"
             data-repo="browser-use/web-ui"
             data-stars="16009"
@@ -4526,15 +4675,15 @@
             data-actions_30d="-1"
             data-scorecard="4.2"
             data-score="64.5"
-            data-trust_score="52.6"
+            data-trust_score="39.6"
             data-category="Browser &amp; Computer Use"
             data-category_rank="6"
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">77</span>
+              <span class="rank-num">78</span>
             </td>
-            <td class="delta delta-down">▼2</td>
+            <td class="delta delta-down">▼3</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/browser-use-web-ui">Browser Use Web UI</a>
               <a class="agent-repo" href="https://github.com/browser-use/web-ui" target="_blank" rel="noopener noreferrer">browser-use/web-ui</a>
@@ -4556,14 +4705,14 @@
             </td>
             <td class="r num">3</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 17.0 · Adoption 10.1 · Transparency 13.0 · Safety 6.5 · Identity 6">52.6</span>
+              <span class="trust-pill trust-mid" title="Activity 17.0 · Adoption 10.1 · Transparency 5.0 · Safety 6.5 · Identity 1">39.6</span>
               
             </td>
           </tr>
           
           <tr
-            data-rank="78"
-            data-rank_delta="0"
+            data-rank="79"
+            data-rank_delta="-1"
             data-name="Cua"
             data-repo="trycua/cua"
             data-stars="17105"
@@ -4580,9 +4729,9 @@
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">78</span>
+              <span class="rank-num">79</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/cua">Cua</a>
               <a class="agent-repo" href="https://github.com/trycua/cua" target="_blank" rel="noopener noreferrer">trycua/cua</a>
@@ -4610,8 +4759,8 @@
           </tr>
           
           <tr
-            data-rank="79"
-            data-rank_delta="0"
+            data-rank="80"
+            data-rank_delta="-1"
             data-name="Trigger.dev"
             data-repo="triggerdotdev/trigger.dev"
             data-stars="15103"
@@ -4628,9 +4777,9 @@
             data-evidence_grade="C"
           >
             <td class="rank r">
-              <span class="rank-num">79</span>
+              <span class="rank-num">80</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/trigger-dev">Trigger.dev</a>
               <a class="agent-repo" href="https://github.com/triggerdotdev/trigger.dev" target="_blank" rel="noopener noreferrer">triggerdotdev/trigger.dev</a>
@@ -4658,8 +4807,8 @@
           </tr>
           
           <tr
-            data-rank="80"
-            data-rank_delta="0"
+            data-rank="81"
+            data-rank_delta="-1"
             data-name="Microsoft Agent Framework"
             data-repo="microsoft/agent-framework"
             data-stars="10748"
@@ -4676,9 +4825,9 @@
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">80</span>
+              <span class="rank-num">81</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/microsoft-agent-framework">Microsoft Agent Framework</a>
               <a class="agent-repo" href="https://github.com/microsoft/agent-framework" target="_blank" rel="noopener noreferrer">microsoft/agent-framework</a>
@@ -4706,8 +4855,8 @@
           </tr>
           
           <tr
-            data-rank="81"
-            data-rank_delta="0"
+            data-rank="82"
+            data-rank_delta="-1"
             data-name="Spring AI Alibaba"
             data-repo="alibaba/spring-ai-alibaba"
             data-stars="9774"
@@ -4718,15 +4867,15 @@
             data-actions_30d="-1"
             data-scorecard="4.7"
             data-score="64.0"
-            data-trust_score="59.9"
+            data-trust_score="46.9"
             data-category="Agent Frameworks"
             data-category_rank="21"
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">81</span>
+              <span class="rank-num">82</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/spring-ai-alibaba">Spring AI Alibaba</a>
               <a class="agent-repo" href="https://github.com/alibaba/spring-ai-alibaba" target="_blank" rel="noopener noreferrer">alibaba/spring-ai-alibaba</a>
@@ -4748,14 +4897,14 @@
             </td>
             <td class="r num">25</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 21.8 · Adoption 9.6 · Transparency 13.6 · Safety 8.9 · Identity 6">59.9</span>
+              <span class="trust-pill trust-mid" title="Activity 21.8 · Adoption 9.6 · Transparency 5.6 · Safety 8.9 · Identity 1">46.9</span>
               
             </td>
           </tr>
           
           <tr
-            data-rank="82"
-            data-rank_delta="0"
+            data-rank="83"
+            data-rank_delta="-1"
             data-name="GitHub Copilot CLI"
             data-repo="github/copilot-cli"
             data-stars="10612"
@@ -4772,9 +4921,9 @@
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">82</span>
+              <span class="rank-num">83</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/github-copilot-cli">GitHub Copilot CLI</a>
               <a class="agent-repo" href="https://github.com/github/copilot-cli" target="_blank" rel="noopener noreferrer">github/copilot-cli</a>
@@ -4802,8 +4951,8 @@
           </tr>
           
           <tr
-            data-rank="83"
-            data-rank_delta="0"
+            data-rank="84"
+            data-rank_delta="-1"
             data-name="TEN Framework"
             data-repo="TEN-framework/ten-framework"
             data-stars="10610"
@@ -4820,9 +4969,9 @@
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">83</span>
+              <span class="rank-num">84</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/ten-framework">TEN Framework</a>
               <a class="agent-repo" href="https://github.com/TEN-framework/ten-framework" target="_blank" rel="noopener noreferrer">TEN-framework/ten-framework</a>
@@ -4850,8 +4999,8 @@
           </tr>
           
           <tr
-            data-rank="84"
-            data-rank_delta="0"
+            data-rank="85"
+            data-rank_delta="-1"
             data-name="E2B"
             data-repo="e2b-dev/e2b"
             data-stars="12362"
@@ -4868,9 +5017,9 @@
             data-evidence_grade="C"
           >
             <td class="rank r">
-              <span class="rank-num">84</span>
+              <span class="rank-num">85</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/e2b">E2B</a>
               <a class="agent-repo" href="https://github.com/e2b-dev/E2B" target="_blank" rel="noopener noreferrer">e2b-dev/e2b</a>
@@ -4898,54 +5047,6 @@
           </tr>
           
           <tr
-            data-rank="85"
-            data-rank_delta="0"
-            data-name="GPT Pilot"
-            data-repo="Pythagora-io/gpt-pilot"
-            data-stars="33768"
-            data-last_push="2026-04-17"
-            data-weekly_commits="0"
-            data-downloads="32"
-            data-hn_mentions_30d="0"
-            data-actions_30d="-1"
-            data-scorecard="-1"
-            data-score="63.3"
-            data-trust_score="28.8"
-            data-category="Coding Agents"
-            data-category_rank="15"
-            data-evidence_grade="C"
-          >
-            <td class="rank r">
-              <span class="rank-num">85</span>
-            </td>
-            <td class="delta delta-same">—</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="/agents/gpt-pilot">GPT Pilot</a>
-              <a class="agent-repo" href="https://github.com/Pythagora-io/gpt-pilot" target="_blank" rel="noopener noreferrer">Pythagora-io/gpt-pilot</a>
-              <span class="agent-desc" title="The first real AI developer">The first real AI developer</span>
-              <div class="agent-tags">
-                <span class="lang">Python</span>
-                <span class="cat-badge">Coding Agents</span>
-              </div>
-            </td>
-            <td class="c">
-              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
-            </td>
-            <td class="r num">33.8k</td>
-            <td>
-              <div class="push-date aging">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-04-17</span>
-              </div>
-            </td>
-            <td class="r num">0</td>
-            <td class="r">
-              <span class="trust-pill trust-low" title="Activity 11.8 · Adoption 12.9 · Transparency 0 · Safety 0.1 · Identity 4">28.8</span>
-              
-            </td>
-          </tr>
-          
-          <tr
             data-rank="86"
             data-rank_delta="0"
             data-name="Open SWE"
@@ -4960,7 +5061,7 @@
             data-score="63.2"
             data-trust_score="54.7"
             data-category="Coding Agents"
-            data-category_rank="16"
+            data-category_rank="15"
             data-evidence_grade="D"
           >
             <td class="rank r">
@@ -4995,7 +5096,55 @@
           
           <tr
             data-rank="87"
-            data-rank_delta="6"
+            data-rank_delta="-2"
+            data-name="GPT Pilot"
+            data-repo="Pythagora-io/gpt-pilot"
+            data-stars="33763"
+            data-last_push="2026-04-17"
+            data-weekly_commits="0"
+            data-downloads="28"
+            data-hn_mentions_30d="0"
+            data-actions_30d="-1"
+            data-scorecard="2.5"
+            data-score="63.1"
+            data-trust_score="50.0"
+            data-category="Coding Agents"
+            data-category_rank="16"
+            data-evidence_grade="B"
+          >
+            <td class="rank r">
+              <span class="rank-num">87</span>
+            </td>
+            <td class="delta delta-down">▼2</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="/agents/gpt-pilot">GPT Pilot</a>
+              <a class="agent-repo" href="https://github.com/Pythagora-io/gpt-pilot" target="_blank" rel="noopener noreferrer">Pythagora-io/gpt-pilot</a>
+              <span class="agent-desc" title="The first real AI developer">The first real AI developer</span>
+              <div class="agent-tags">
+                <span class="lang">Python</span>
+                <span class="cat-badge">Coding Agents</span>
+              </div>
+            </td>
+            <td class="c">
+              <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
+            </td>
+            <td class="r num">33.8k</td>
+            <td>
+              <div class="push-date aging">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-04-17</span>
+              </div>
+            </td>
+            <td class="r num">0</td>
+            <td class="r">
+              <span class="trust-pill trust-mid" title="Activity 11.7 · Adoption 12.8 · Transparency 11.0 · Safety 2.5 · Identity 12">50.0</span>
+              
+            </td>
+          </tr>
+          
+          <tr
+            data-rank="88"
+            data-rank_delta="5"
             data-name="LanceDB"
             data-repo="lancedb/lancedb"
             data-stars="10414"
@@ -5008,13 +5157,13 @@
             data-score="62.8"
             data-trust_score="54.6"
             data-category="Memory &amp; Knowledge"
-            data-category_rank="14"
+            data-category_rank="15"
             data-evidence_grade="C"
           >
             <td class="rank r">
-              <span class="rank-num">87</span>
+              <span class="rank-num">88</span>
             </td>
-            <td class="delta delta-up">▲6</td>
+            <td class="delta delta-up">▲5</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/lancedb">LanceDB</a>
               <a class="agent-repo" href="https://github.com/lancedb/lancedb" target="_blank" rel="noopener noreferrer">lancedb/lancedb</a>
@@ -5042,8 +5191,8 @@
           </tr>
           
           <tr
-            data-rank="88"
-            data-rank_delta="-1"
+            data-rank="89"
+            data-rank_delta="-2"
             data-name="Arize Phoenix"
             data-repo="Arize-AI/phoenix"
             data-stars="9867"
@@ -5054,15 +5203,15 @@
             data-actions_30d="-1"
             data-scorecard="-1"
             data-score="62.7"
-            data-trust_score="72.0"
+            data-trust_score="59.0"
             data-category="Observability &amp; Evaluation"
             data-category_rank="5"
             data-evidence_grade="B"
           >
             <td class="rank r">
-              <span class="rank-num">88</span>
+              <span class="rank-num">89</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-down">▼2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/arize-phoenix">Arize Phoenix</a>
               <a class="agent-repo" href="https://github.com/Arize-ai/phoenix" target="_blank" rel="noopener noreferrer">Arize-AI/phoenix</a>
@@ -5077,21 +5226,21 @@
             </td>
             <td class="r num">9.9k</td>
             <td>
-              <div class="push-date fresh">
+              <div class="push-date stale">
                 <span class="push-dot"></span>
                 <span class="push-text">2026-05-27</span>
               </div>
             </td>
             <td class="r num">279</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 17.2 · Transparency 8 · Safety 9.8 · Identity 12">72.0</span>
+              <span class="trust-pill trust-high" title="Activity 25.0 · Adoption 17.2 · Transparency 0 · Safety 9.8 · Identity 7">59.0</span>
               
             </td>
           </tr>
           
           <tr
-            data-rank="89"
-            data-rank_delta="-1"
+            data-rank="90"
+            data-rank_delta="-2"
             data-name="UFO"
             data-repo="microsoft/UFO"
             data-stars="8763"
@@ -5108,9 +5257,9 @@
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">89</span>
+              <span class="rank-num">90</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-down">▼2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/ufo">UFO</a>
               <a class="agent-repo" href="https://github.com/microsoft/UFO" target="_blank" rel="noopener noreferrer">microsoft/UFO</a>
@@ -5138,8 +5287,8 @@
           </tr>
           
           <tr
-            data-rank="90"
-            data-rank_delta="-1"
+            data-rank="91"
+            data-rank_delta="-2"
             data-name="PraisonAI"
             data-repo="MervinPraison/PraisonAI"
             data-stars="7970"
@@ -5156,9 +5305,9 @@
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">90</span>
+              <span class="rank-num">91</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-down">▼2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/praisonai">PraisonAI</a>
               <a class="agent-repo" href="https://github.com/MervinPraison/PraisonAI" target="_blank" rel="noopener noreferrer">MervinPraison/PraisonAI</a>
@@ -5186,8 +5335,8 @@
           </tr>
           
           <tr
-            data-rank="91"
-            data-rank_delta="-1"
+            data-rank="92"
+            data-rank_delta="-2"
             data-name="GPT Researcher"
             data-repo="assafelovic/gpt-researcher"
             data-stars="27340"
@@ -5198,15 +5347,15 @@
             data-actions_30d="-1"
             data-scorecard="6.7"
             data-score="62.6"
-            data-trust_score="65.9"
+            data-trust_score="52.9"
             data-category="Research &amp; Data"
             data-category_rank="6"
             data-evidence_grade="B"
           >
             <td class="rank r">
-              <span class="rank-num">91</span>
+              <span class="rank-num">92</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-down">▼2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/gpt-researcher">GPT Researcher</a>
               <a class="agent-repo" href="https://github.com/assafelovic/gpt-researcher" target="_blank" rel="noopener noreferrer">assafelovic/gpt-researcher</a>
@@ -5228,14 +5377,14 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 11.7 · Adoption 16.5 · Transparency 16.0 · Safety 9.7 · Identity 12">65.9</span>
+              <span class="trust-pill trust-mid" title="Activity 11.7 · Adoption 16.5 · Transparency 8.0 · Safety 9.7 · Identity 7">52.9</span>
               
             </td>
           </tr>
           
           <tr
-            data-rank="92"
-            data-rank_delta="-1"
+            data-rank="93"
+            data-rank_delta="-2"
             data-name="VoltAgent"
             data-repo="VoltAgent/voltagent"
             data-stars="9166"
@@ -5252,9 +5401,9 @@
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">92</span>
+              <span class="rank-num">93</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-down">▼2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/voltagent">VoltAgent</a>
               <a class="agent-repo" href="https://github.com/VoltAgent/voltagent" target="_blank" rel="noopener noreferrer">VoltAgent/voltagent</a>
@@ -5282,8 +5431,8 @@
           </tr>
           
           <tr
-            data-rank="93"
-            data-rank_delta="-1"
+            data-rank="94"
+            data-rank_delta="-2"
             data-name="txtai"
             data-repo="neuml/txtai"
             data-stars="12607"
@@ -5296,13 +5445,13 @@
             data-score="62.6"
             data-trust_score="46.8"
             data-category="Memory &amp; Knowledge"
-            data-category_rank="15"
+            data-category_rank="16"
             data-evidence_grade="B"
           >
             <td class="rank r">
-              <span class="rank-num">93</span>
+              <span class="rank-num">94</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-down">▼2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/txtai">txtai</a>
               <a class="agent-repo" href="https://github.com/neuml/txtai" target="_blank" rel="noopener noreferrer">neuml/txtai</a>
@@ -5330,8 +5479,8 @@
           </tr>
           
           <tr
-            data-rank="94"
-            data-rank_delta="3"
+            data-rank="95"
+            data-rank_delta="2"
             data-name="Garak"
             data-repo="leondz/garak"
             data-stars="7943"
@@ -5348,9 +5497,9 @@
             data-evidence_grade="B"
           >
             <td class="rank r">
-              <span class="rank-num">94</span>
+              <span class="rank-num">95</span>
             </td>
-            <td class="delta delta-up">▲3</td>
+            <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/garak">Garak</a>
               <a class="agent-repo" href="https://github.com/NVIDIA/garak" target="_blank" rel="noopener noreferrer">leondz/garak</a>
@@ -5378,8 +5527,8 @@
           </tr>
           
           <tr
-            data-rank="95"
-            data-rank_delta="-1"
+            data-rank="96"
+            data-rank_delta="-2"
             data-name="Coze Studio"
             data-repo="coze-dev/coze-studio"
             data-stars="20846"
@@ -5396,9 +5545,9 @@
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">95</span>
+              <span class="rank-num">96</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-down">▼2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/coze-studio">Coze Studio</a>
               <a class="agent-repo" href="https://github.com/coze-dev/coze-studio" target="_blank" rel="noopener noreferrer">coze-dev/coze-studio</a>
@@ -5426,8 +5575,8 @@
           </tr>
           
           <tr
-            data-rank="96"
-            data-rank_delta="-1"
+            data-rank="97"
+            data-rank_delta="-2"
             data-name="PromptFlow"
             data-repo="microsoft/promptflow"
             data-stars="11130"
@@ -5444,9 +5593,9 @@
             data-evidence_grade="C"
           >
             <td class="rank r">
-              <span class="rank-num">96</span>
+              <span class="rank-num">97</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-down">▼2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/promptflow">PromptFlow</a>
               <a class="agent-repo" href="https://github.com/microsoft/promptflow" target="_blank" rel="noopener noreferrer">microsoft/promptflow</a>
@@ -5474,8 +5623,8 @@
           </tr>
           
           <tr
-            data-rank="97"
-            data-rank_delta="-1"
+            data-rank="98"
+            data-rank_delta="-2"
             data-name="Flyte"
             data-repo="flyteorg/flyte"
             data-stars="7047"
@@ -5492,9 +5641,9 @@
             data-evidence_grade="C"
           >
             <td class="rank r">
-              <span class="rank-num">97</span>
+              <span class="rank-num">98</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-down">▼2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/flyte">Flyte</a>
               <a class="agent-repo" href="https://github.com/flyteorg/flyte" target="_blank" rel="noopener noreferrer">flyteorg/flyte</a>
@@ -5522,8 +5671,8 @@
           </tr>
           
           <tr
-            data-rank="98"
-            data-rank_delta="0"
+            data-rank="99"
+            data-rank_delta="-1"
             data-name="Google ADK (Go)"
             data-repo="google/adk-go"
             data-stars="8014"
@@ -5540,9 +5689,9 @@
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">98</span>
+              <span class="rank-num">99</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/google-adk-go">Google ADK (Go)</a>
               <a class="agent-repo" href="https://github.com/google/adk-go" target="_blank" rel="noopener noreferrer">google/adk-go</a>
@@ -5570,8 +5719,8 @@
           </tr>
           
           <tr
-            data-rank="99"
-            data-rank_delta="0"
+            data-rank="100"
+            data-rank_delta="-1"
             data-name="MCP Registry"
             data-repo="modelcontextprotocol/registry"
             data-stars="6857"
@@ -5588,9 +5737,9 @@
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">99</span>
+              <span class="rank-num">100</span>
             </td>
-            <td class="delta delta-same">—</td>
+            <td class="delta delta-down">▼1</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/mcp-registry">MCP Registry</a>
               <a class="agent-repo" href="https://github.com/modelcontextprotocol/registry" target="_blank" rel="noopener noreferrer">modelcontextprotocol/registry</a>
@@ -5613,54 +5762,6 @@
             <td class="r num">None<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span></td>
             <td class="r">
               <span class="trust-pill trust-low" title="Activity 15.0 · Adoption 9.2 · Transparency 0 · Safety 0 · Identity 1">25.2</span>
-              
-            </td>
-          </tr>
-          
-          <tr
-            data-rank="100"
-            data-rank_delta="0"
-            data-name="pgvector"
-            data-repo="pgvector/pgvector"
-            data-stars="21475"
-            data-last_push="2026-04-27"
-            data-weekly_commits="None"
-            data-downloads="0"
-            data-hn_mentions_30d="19"
-            data-actions_30d="-1"
-            data-scorecard="4.4"
-            data-score="61.4"
-            data-trust_score="36.8"
-            data-category="Memory &amp; Knowledge"
-            data-category_rank="16"
-            data-evidence_grade="C"
-          >
-            <td class="rank r">
-              <span class="rank-num">100</span>
-            </td>
-            <td class="delta delta-same">—</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="/agents/pgvector">pgvector</a>
-              <a class="agent-repo" href="https://github.com/pgvector/pgvector" target="_blank" rel="noopener noreferrer">pgvector/pgvector</a>
-              <span class="agent-desc" title="Open-source vector similarity search for Postgres">Open-source vector similarity search for Postgres</span>
-              <div class="agent-tags">
-                <span class="lang">C</span>
-                <span class="cat-badge">Memory &amp; Knowledge</span>
-              </div>
-            </td>
-            <td class="c">
-              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
-            </td>
-            <td class="r num">21.5k</td>
-            <td>
-              <div class="push-date recent">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-04-27</span>
-              </div>
-            </td>
-            <td class="r num">None</td>
-            <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 12.7 · Adoption 10.4 · Transparency 5.3 · Safety 4.4 · Identity 4">36.8</span>
               
             </td>
           </tr>
@@ -5907,55 +6008,7 @@
           
           <tr
             data-rank="106"
-            data-rank_delta="-1"
-            data-name="Swarm by OpenAI"
-            data-repo="openai/swarm"
-            data-stars="21527"
-            data-last_push="2026-04-15"
-            data-weekly_commits="0"
-            data-downloads="0"
-            data-hn_mentions_30d="0"
-            data-actions_30d="-1"
-            data-scorecard="-1"
-            data-score="61.0"
-            data-trust_score="26.7"
-            data-category="Agent Frameworks"
-            data-category_rank="27"
-            data-evidence_grade="D"
-          >
-            <td class="rank r">
-              <span class="rank-num">106</span>
-            </td>
-            <td class="delta delta-down">▼1</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="/agents/swarm-by-openai">Swarm by OpenAI</a>
-              <a class="agent-repo" href="https://github.com/openai/swarm" target="_blank" rel="noopener noreferrer">openai/swarm</a>
-              <span class="agent-desc" title="Educational framework exploring ergonomic, lightweight multi-agent orchestration. Managed by OpenAI Solution team.">Educational framework exploring ergonomic, lightweight multi-agent orchestration. Managed by OpenAI Solution team.</span>
-              <div class="agent-tags">
-                <span class="lang">Python</span>
-                <span class="cat-badge">Agent Frameworks</span>
-              </div>
-            </td>
-            <td class="c">
-              <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
-            </td>
-            <td class="r num">21.5k</td>
-            <td>
-              <div class="push-date aging">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-04-15</span>
-              </div>
-            </td>
-            <td class="r num">0</td>
-            <td class="r">
-              <span class="trust-pill trust-low" title="Activity 11.7 · Adoption 10.4 · Transparency 0 · Safety 3.6 · Identity 1">26.7</span>
-              
-            </td>
-          </tr>
-          
-          <tr
-            data-rank="107"
-            data-rank_delta="-1"
+            data-rank_delta="0"
             data-name="NeMo Guardrails"
             data-repo="NVIDIA/NeMo-Guardrails"
             data-stars="6258"
@@ -5972,9 +6025,9 @@
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">107</span>
+              <span class="rank-num">106</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-same">—</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/nemo-guardrails">NeMo Guardrails</a>
               <a class="agent-repo" href="https://github.com/NVIDIA-NeMo/Guardrails" target="_blank" rel="noopener noreferrer">NVIDIA/NeMo-Guardrails</a>
@@ -6002,8 +6055,8 @@
           </tr>
           
           <tr
-            data-rank="108"
-            data-rank_delta="-1"
+            data-rank="107"
+            data-rank_delta="0"
             data-name="Agency Swarm"
             data-repo="VRSEN/agency-swarm"
             data-stars="4417"
@@ -6016,13 +6069,13 @@
             data-score="60.9"
             data-trust_score="42.8"
             data-category="Agent Frameworks"
-            data-category_rank="28"
+            data-category_rank="27"
             data-evidence_grade="C"
           >
             <td class="rank r">
-              <span class="rank-num">108</span>
+              <span class="rank-num">107</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-same">—</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/agency-swarm">Agency Swarm</a>
               <a class="agent-repo" href="https://github.com/VRSEN/agency-swarm" target="_blank" rel="noopener noreferrer">VRSEN/agency-swarm</a>
@@ -6050,6 +6103,54 @@
           </tr>
           
           <tr
+            data-rank="108"
+            data-rank_delta="-3"
+            data-name="Swarm by OpenAI"
+            data-repo="openai/swarm"
+            data-stars="21534"
+            data-last_push="2026-04-15"
+            data-weekly_commits="0"
+            data-downloads="0"
+            data-hn_mentions_30d="0"
+            data-actions_30d="-1"
+            data-scorecard="3.5"
+            data-score="60.8"
+            data-trust_score="50.2"
+            data-category="Agent Frameworks"
+            data-category_rank="28"
+            data-evidence_grade="C"
+          >
+            <td class="rank r">
+              <span class="rank-num">108</span>
+            </td>
+            <td class="delta delta-down">▼3</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="/agents/swarm-by-openai">Swarm by OpenAI</a>
+              <a class="agent-repo" href="https://github.com/openai/swarm" target="_blank" rel="noopener noreferrer">openai/swarm</a>
+              <span class="agent-desc" title="Educational framework exploring ergonomic, lightweight multi-agent orchestration. Managed by OpenAI Solution team.">Educational framework exploring ergonomic, lightweight multi-agent orchestration. Managed by OpenAI Solution team.</span>
+              <div class="agent-tags">
+                <span class="lang">Python</span>
+                <span class="cat-badge">Agent Frameworks</span>
+              </div>
+            </td>
+            <td class="c">
+              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
+            </td>
+            <td class="r num">21.5k</td>
+            <td>
+              <div class="push-date aging">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-04-15</span>
+              </div>
+            </td>
+            <td class="r num">0</td>
+            <td class="r">
+              <span class="trust-pill trust-mid" title="Activity 11.5 · Adoption 10.4 · Transparency 12.2 · Safety 7.1 · Identity 9">50.2</span>
+              
+            </td>
+          </tr>
+          
+          <tr
             data-rank="109"
             data-rank_delta="0"
             data-name="Atomic Agents"
@@ -6062,7 +6163,7 @@
             data-actions_30d="-1"
             data-scorecard="5.2"
             data-score="59.9"
-            data-trust_score="68.4"
+            data-trust_score="55.4"
             data-category="Agent Frameworks"
             data-category_rank="29"
             data-evidence_grade="B"
@@ -6092,7 +6193,7 @@
             </td>
             <td class="r num">19</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 21.3 · Adoption 14.1 · Transparency 14.2 · Safety 6.8 · Identity 12">68.4</span>
+              <span class="trust-pill trust-high" title="Activity 21.3 · Adoption 14.1 · Transparency 6.2 · Safety 6.8 · Identity 7">55.4</span>
               
             </td>
           </tr>
@@ -6531,55 +6632,7 @@
           
           <tr
             data-rank="119"
-            data-rank_delta="-1"
-            data-name="Marvin"
-            data-repo="PrefectHQ/marvin"
-            data-stars="6159"
-            data-last_push="2026-05-12"
-            data-weekly_commits="5"
-            data-downloads="20817"
-            data-hn_mentions_30d="1"
-            data-actions_30d="-1"
-            data-scorecard="-1"
-            data-score="58.0"
-            data-trust_score="41.2"
-            data-category="Agent Frameworks"
-            data-category_rank="33"
-            data-evidence_grade="C"
-          >
-            <td class="rank r">
-              <span class="rank-num">119</span>
-            </td>
-            <td class="delta delta-down">▼1</td>
-            <td class="agent-cell">
-              <a class="agent-name" href="/agents/marvin">Marvin</a>
-              <a class="agent-repo" href="https://github.com/PrefectHQ/marvin" target="_blank" rel="noopener noreferrer">PrefectHQ/marvin</a>
-              <span class="agent-desc" title="an ambient intelligence library">an ambient intelligence library</span>
-              <div class="agent-tags">
-                <span class="lang">Python</span>
-                <span class="cat-badge">Agent Frameworks</span>
-              </div>
-            </td>
-            <td class="c">
-              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
-            </td>
-            <td class="r num">6.2k</td>
-            <td>
-              <div class="push-date recent">
-                <span class="push-dot"></span>
-                <span class="push-text">2026-05-12</span>
-              </div>
-            </td>
-            <td class="r num">5</td>
-            <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 17.8 · Adoption 14.9 · Transparency 0 · Safety 4.5 · Identity 4">41.2</span>
-              
-            </td>
-          </tr>
-          
-          <tr
-            data-rank="120"
-            data-rank_delta="1"
+            data-rank_delta="2"
             data-name="LangWatch"
             data-repo="langwatch/langwatch"
             data-stars="3269"
@@ -6596,9 +6649,9 @@
             data-evidence_grade="B"
           >
             <td class="rank r">
-              <span class="rank-num">120</span>
+              <span class="rank-num">119</span>
             </td>
-            <td class="delta delta-up">▲1</td>
+            <td class="delta delta-up">▲2</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/langwatch">LangWatch</a>
               <a class="agent-repo" href="https://github.com/langwatch/langwatch" target="_blank" rel="noopener noreferrer">langwatch/langwatch</a>
@@ -6626,8 +6679,8 @@
           </tr>
           
           <tr
-            data-rank="121"
-            data-rank_delta="-1"
+            data-rank="120"
+            data-rank_delta="0"
             data-name="OpenManus"
             data-repo="FoundationAgents/OpenManus"
             data-stars="56366"
@@ -6640,13 +6693,13 @@
             data-score="57.8"
             data-trust_score="20.0"
             data-category="Agent Frameworks"
-            data-category_rank="34"
+            data-category_rank="33"
             data-evidence_grade="D"
           >
             <td class="rank r">
-              <span class="rank-num">121</span>
+              <span class="rank-num">120</span>
             </td>
-            <td class="delta delta-down">▼1</td>
+            <td class="delta delta-same">—</td>
             <td class="agent-cell">
               <a class="agent-name" href="/agents/openmanus">OpenManus</a>
               <a class="agent-repo" href="https://github.com/FoundationAgents/OpenManus" target="_blank" rel="noopener noreferrer">FoundationAgents/OpenManus</a>
@@ -6669,6 +6722,54 @@
             <td class="r num">0</td>
             <td class="r">
               <span class="trust-pill trust-low" title="Activity 6.4 · Adoption 11.4 · Transparency 0 · Safety 1.2 · Identity 1">20.0</span>
+              
+            </td>
+          </tr>
+          
+          <tr
+            data-rank="121"
+            data-rank_delta="-3"
+            data-name="Marvin"
+            data-repo="PrefectHQ/marvin"
+            data-stars="6160"
+            data-last_push="2026-05-12"
+            data-weekly_commits="5"
+            data-downloads="22524"
+            data-hn_mentions_30d="1"
+            data-actions_30d="-1"
+            data-scorecard="5.4"
+            data-score="57.7"
+            data-trust_score="68.9"
+            data-category="Agent Frameworks"
+            data-category_rank="34"
+            data-evidence_grade="B"
+          >
+            <td class="rank r">
+              <span class="rank-num">121</span>
+            </td>
+            <td class="delta delta-down">▼3</td>
+            <td class="agent-cell">
+              <a class="agent-name" href="/agents/marvin">Marvin</a>
+              <a class="agent-repo" href="https://github.com/PrefectHQ/marvin" target="_blank" rel="noopener noreferrer">PrefectHQ/marvin</a>
+              <span class="agent-desc" title="an ambient intelligence library">an ambient intelligence library</span>
+              <div class="agent-tags">
+                <span class="lang">Python</span>
+                <span class="cat-badge">Agent Frameworks</span>
+              </div>
+            </td>
+            <td class="c">
+              <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
+            </td>
+            <td class="r num">6.2k</td>
+            <td>
+              <div class="push-date recent">
+                <span class="push-dot"></span>
+                <span class="push-text">2026-05-12</span>
+              </div>
+            </td>
+            <td class="r num">5</td>
+            <td class="r">
+              <span class="trust-pill trust-high" title="Activity 17.6 · Adoption 14.9 · Transparency 14.5 · Safety 9.9 · Identity 12">68.9</span>
               
             </td>
           </tr>
@@ -7014,15 +7115,15 @@
             data-rank_delta="0"
             data-name="Qwen Agent"
             data-repo="QwenLM/Qwen-Agent"
-            data-stars="16401"
+            data-stars="16411"
             data-last_push="2026-03-04"
             data-weekly_commits="0"
             data-downloads="88154"
             data-hn_mentions_30d="0"
             data-actions_30d="-1"
-            data-scorecard="4.5"
-            data-score="53.7"
-            data-trust_score="42.4"
+            data-scorecard="3.7"
+            data-score="53.5"
+            data-trust_score="53.5"
             data-category="Agent Frameworks"
             data-category_rank="38"
             data-evidence_grade="B"
@@ -7052,7 +7153,7 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 8.1 · Adoption 16.7 · Transparency 5.4 · Safety 5.2 · Identity 7">42.4</span>
+              <span class="trust-pill trust-mid" title="Activity 8.0 · Adoption 16.7 · Transparency 12.4 · Safety 4.4 · Identity 12">53.5</span>
               
             </td>
           </tr>
@@ -7118,7 +7219,7 @@
             data-actions_30d="-1"
             data-scorecard="2.4"
             data-score="53.3"
-            data-trust_score="38.1"
+            data-trust_score="33.1"
             data-category="Browser &amp; Computer Use"
             data-category_rank="10"
             data-evidence_grade="C"
@@ -7148,7 +7249,7 @@
             </td>
             <td class="r num">1</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 14.7 · Adoption 7.9 · Transparency 2.9 · Safety 3.6 · Identity 9">38.1</span>
+              <span class="trust-pill trust-mid" title="Activity 14.7 · Adoption 7.9 · Transparency 2.9 · Safety 3.6 · Identity 4">33.1</span>
               
             </td>
           </tr>
@@ -7406,7 +7507,7 @@
             data-actions_30d="-1"
             data-scorecard="-1"
             data-score="51.0"
-            data-trust_score="47.0"
+            data-trust_score="34.0"
             data-category="Observability &amp; Evaluation"
             data-category_rank="12"
             data-evidence_grade="C"
@@ -7436,7 +7537,7 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 9.3 · Adoption 15.7 · Transparency 8 · Safety 5 · Identity 9">47.0</span>
+              <span class="trust-pill trust-mid" title="Activity 9.3 · Adoption 15.7 · Transparency 0 · Safety 5 · Identity 4">34.0</span>
               
             </td>
           </tr>
@@ -7454,7 +7555,7 @@
             data-actions_30d="-1"
             data-scorecard="3.1"
             data-score="46.0"
-            data-trust_score="46.8"
+            data-trust_score="33.8"
             data-category="Browser &amp; Computer Use"
             data-category_rank="13"
             data-evidence_grade="B"
@@ -7484,7 +7585,7 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 5.0 · Adoption 14.1 · Transparency 11.7 · Safety 4.0 · Identity 12">46.8</span>
+              <span class="trust-pill trust-mid" title="Activity 5.0 · Adoption 14.1 · Transparency 3.7 · Safety 4.0 · Identity 7">33.8</span>
               
             </td>
           </tr>
@@ -7494,15 +7595,15 @@
             data-rank_delta="0"
             data-name="BrowserGym agents"
             data-repo="ServiceNow/BrowserGym"
-            data-stars="1229"
+            data-stars="1231"
             data-last_push="2026-03-17"
-            data-weekly_commits="None"
-            data-downloads="13845"
+            data-weekly_commits="0"
+            data-downloads="12946"
             data-hn_mentions_30d="0"
             data-actions_30d="-1"
             data-scorecard="-1"
-            data-score="44.4"
-            data-trust_score="34.1"
+            data-score="44.3"
+            data-trust_score="51.8"
             data-category="Browser &amp; Computer Use"
             data-category_rank="14"
             data-evidence_grade="B"
@@ -7530,9 +7631,9 @@
                 <span class="push-text">2026-03-17</span>
               </div>
             </td>
-            <td class="r num">None</td>
+            <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 9.2 · Adoption 12.9 · Transparency 0 · Safety 5 · Identity 7">34.1</span>
+              <span class="trust-pill trust-mid" title="Activity 9.2 · Adoption 12.9 · Transparency 8 · Safety 9.7 · Identity 12">51.8</span>
               
             </td>
           </tr>
@@ -7542,18 +7643,18 @@
             data-rank_delta="0"
             data-name="Quivr"
             data-repo="QuivrHQ/quivr"
-            data-stars="39160"
+            data-stars="39163"
             data-last_push="2025-07-09"
-            data-weekly_commits="None"
+            data-weekly_commits="0"
             data-downloads="0"
-            data-hn_mentions_30d="9"
+            data-hn_mentions_30d="8"
             data-actions_30d="-1"
-            data-scorecard="-1"
+            data-scorecard="4.4"
             data-score="44.2"
-            data-trust_score="12.0"
+            data-trust_score="42.0"
             data-category="Memory &amp; Knowledge"
             data-category_rank="20"
-            data-evidence_grade="D"
+            data-evidence_grade="C"
           >
             <td class="rank r">
               <span class="rank-num">140</span>
@@ -7569,7 +7670,7 @@
               </div>
             </td>
             <td class="c">
-              <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
+              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
             </td>
             <td class="r num">39.2k</td>
             <td>
@@ -7578,9 +7679,9 @@
                 <span class="push-text">2025-07-09</span>
               </div>
             </td>
-            <td class="r num">None</td>
+            <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-low" title="Activity 0.0 · Adoption 11.0 · Transparency 0 · Safety 0 · Identity 1">12.0</span>
+              <span class="trust-pill trust-mid" title="Activity 0.0 · Adoption 11.0 · Transparency 13.3 · Safety 8.7 · Identity 9">42.0</span>
               
             </td>
           </tr>
@@ -7790,7 +7891,7 @@
             data-actions_30d="-1"
             data-scorecard="4.4"
             data-score="39.8"
-            data-trust_score="47.1"
+            data-trust_score="34.1"
             data-category="Coding Agents"
             data-category_rank="20"
             data-evidence_grade="B"
@@ -7820,7 +7921,7 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 5.3 · Adoption 11.3 · Transparency 13.3 · Safety 5.2 · Identity 12">47.1</span>
+              <span class="trust-pill trust-mid" title="Activity 5.3 · Adoption 11.3 · Transparency 5.3 · Safety 5.2 · Identity 7">34.1</span>
               
             </td>
           </tr>
@@ -7830,15 +7931,15 @@
             data-rank_delta="0"
             data-name="Plandex"
             data-repo="plandex-ai/plandex"
-            data-stars="15396"
+            data-stars="15408"
             data-last_push="2025-10-03"
             data-weekly_commits="0"
             data-downloads="0"
             data-hn_mentions_30d="-1"
             data-actions_30d="-1"
-            data-scorecard="-1"
+            data-scorecard="2.8"
             data-score="39.3"
-            data-trust_score="11.1"
+            data-trust_score="30.4"
             data-category="Coding Agents"
             data-category_rank="21"
             data-evidence_grade="D"
@@ -7868,7 +7969,7 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-low" title="Activity 0.0 · Adoption 10.0 · Transparency 0 · Safety 0.1 · Identity 1">11.1</span>
+              <span class="trust-pill trust-mid" title="Activity 0.0 · Adoption 10.1 · Transparency 11.4 · Safety 2.9 · Identity 6">30.4</span>
               
             </td>
           </tr>
@@ -7878,18 +7979,18 @@
             data-rank_delta="0"
             data-name="XAgent"
             data-repo="OpenBMB/XAgent"
-            data-stars="8532"
+            data-stars="8533"
             data-last_push="2024-08-12"
-            data-weekly_commits="None"
+            data-weekly_commits="0"
             data-downloads="0"
-            data-hn_mentions_30d="140"
+            data-hn_mentions_30d="124"
             data-actions_30d="-1"
-            data-scorecard="-1"
-            data-score="37.3"
-            data-trust_score="10.4"
+            data-scorecard="2.1"
+            data-score="37.4"
+            data-trust_score="33.6"
             data-category="Agent Frameworks"
             data-category_rank="43"
-            data-evidence_grade="D"
+            data-evidence_grade="C"
           >
             <td class="rank r">
               <span class="rank-num">147</span>
@@ -7905,7 +8006,7 @@
               </div>
             </td>
             <td class="c">
-              <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
+              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
             </td>
             <td class="r num">8.5k</td>
             <td>
@@ -7914,9 +8015,9 @@
                 <span class="push-text">2024-08-12</span>
               </div>
             </td>
-            <td class="r num">None</td>
+            <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-low" title="Activity 0.0 · Adoption 9.4 · Transparency 0 · Safety 0 · Identity 1">10.4</span>
+              <span class="trust-pill trust-mid" title="Activity 0.0 · Adoption 9.4 · Transparency 10.5 · Safety 4.7 · Identity 9">33.6</span>
               
             </td>
           </tr>
@@ -7934,7 +8035,7 @@
             data-actions_30d="-1"
             data-scorecard="6.1"
             data-score="36.9"
-            data-trust_score="55.4"
+            data-trust_score="42.4"
             data-category="Agent Frameworks"
             data-category_rank="44"
             data-evidence_grade="B"
@@ -7964,7 +8065,7 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-high" title="Activity 7.2 · Adoption 9.8 · Transparency 15.3 · Safety 11.1 · Identity 12">55.4</span>
+              <span class="trust-pill trust-mid" title="Activity 7.2 · Adoption 9.8 · Transparency 7.3 · Safety 11.1 · Identity 7">42.4</span>
               
             </td>
           </tr>
@@ -8070,18 +8171,18 @@
             data-rank_delta="0"
             data-name="Agent Laboratory"
             data-repo="SamuelSchmidgall/AgentLaboratory"
-            data-stars="5620"
+            data-stars="5623"
             data-last_push="2025-08-20"
-            data-weekly_commits="None"
+            data-weekly_commits="0"
             data-downloads="0"
             data-hn_mentions_30d="0"
             data-actions_30d="-1"
-            data-scorecard="-1"
+            data-scorecard="1.8"
             data-score="36.0"
-            data-trust_score="10.0"
+            data-trust_score="31.9"
             data-category="Agent Frameworks"
             data-category_rank="46"
-            data-evidence_grade="D"
+            data-evidence_grade="C"
           >
             <td class="rank r">
               <span class="rank-num">151</span>
@@ -8097,7 +8198,7 @@
               </div>
             </td>
             <td class="c">
-              <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
+              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
             </td>
             <td class="r num">5.6k</td>
             <td>
@@ -8106,9 +8207,9 @@
                 <span class="push-text">2025-08-20</span>
               </div>
             </td>
-            <td class="r num">None</td>
+            <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-low" title="Activity 0.0 · Adoption 9.0 · Transparency 0 · Safety 0 · Identity 1">10.0</span>
+              <span class="trust-pill trust-mid" title="Activity 0.0 · Adoption 9.0 · Transparency 10.2 · Safety 3.7 · Identity 9">31.9</span>
               
             </td>
           </tr>
@@ -8166,18 +8267,18 @@
             data-rank_delta="0"
             data-name="LLM Guard"
             data-repo="protectai/llm-guard"
-            data-stars="2990"
+            data-stars="2995"
             data-last_push="2025-12-15"
-            data-weekly_commits="None"
+            data-weekly_commits="0"
             data-downloads="0"
             data-hn_mentions_30d="1"
             data-actions_30d="-1"
-            data-scorecard="-1"
-            data-score="35.6"
-            data-trust_score="10.9"
+            data-scorecard="6.0"
+            data-score="35.4"
+            data-trust_score="42.9"
             data-category="Security &amp; Guardrails"
             data-category_rank="5"
-            data-evidence_grade="D"
+            data-evidence_grade="C"
           >
             <td class="rank r">
               <span class="rank-num">153</span>
@@ -8193,7 +8294,7 @@
               </div>
             </td>
             <td class="c">
-              <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
+              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
             </td>
             <td class="r num">3.0k</td>
             <td>
@@ -8202,9 +8303,9 @@
                 <span class="push-text">2025-12-15</span>
               </div>
             </td>
-            <td class="r num">None</td>
+            <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-low" title="Activity 1.6 · Adoption 8.3 · Transparency 0 · Safety 0 · Identity 1">10.9</span>
+              <span class="trust-pill trust-mid" title="Activity 1.4 · Adoption 8.3 · Transparency 15.2 · Safety 9.0 · Identity 9">42.9</span>
               
             </td>
           </tr>
@@ -8366,7 +8467,7 @@
             data-actions_30d="-1"
             data-scorecard="2.5"
             data-score="31.5"
-            data-trust_score="35.7"
+            data-trust_score="22.7"
             data-category="Coding Agents"
             data-category_rank="24"
             data-evidence_grade="C"
@@ -8396,7 +8497,7 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 0.0 · Adoption 8.2 · Transparency 11.0 · Safety 7.5 · Identity 9">35.7</span>
+              <span class="trust-pill trust-low" title="Activity 0.0 · Adoption 8.2 · Transparency 3.0 · Safety 7.5 · Identity 4">22.7</span>
               
             </td>
           </tr>
@@ -8414,7 +8515,7 @@
             data-actions_30d="-1"
             data-scorecard="-1"
             data-score="30.9"
-            data-trust_score="28.9"
+            data-trust_score="15.9"
             data-category="Agent Frameworks"
             data-category_rank="48"
             data-evidence_grade="C"
@@ -8444,7 +8545,7 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-low" title="Activity 0.0 · Adoption 9.4 · Transparency 8 · Safety 2.5 · Identity 9">28.9</span>
+              <span class="trust-pill trust-low" title="Activity 0.0 · Adoption 9.4 · Transparency 0 · Safety 2.5 · Identity 4">15.9</span>
               
             </td>
           </tr>
@@ -8600,16 +8701,16 @@
             data-repo="protectai/rebuff"
             data-stars="1491"
             data-last_push="2024-08-07"
-            data-weekly_commits="None"
+            data-weekly_commits="0"
             data-downloads="1279"
             data-hn_mentions_30d="0"
             data-actions_30d="-1"
-            data-scorecard="-1"
+            data-scorecard="2.9"
             data-score="28.9"
-            data-trust_score="15.8"
+            data-trust_score="41.4"
             data-category="Security &amp; Guardrails"
             data-category_rank="6"
-            data-evidence_grade="C"
+            data-evidence_grade="B"
           >
             <td class="rank r">
               <span class="rank-num">162</span>
@@ -8625,7 +8726,7 @@
               </div>
             </td>
             <td class="c">
-              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
+              <span class="evidence-badge grade-B" title="Evidence grade B">B</span>
             </td>
             <td class="r num">1.5k</td>
             <td>
@@ -8634,9 +8735,9 @@
                 <span class="push-text">2024-08-07</span>
               </div>
             </td>
-            <td class="r num">None</td>
+            <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-low" title="Activity 0.0 · Adoption 11.8 · Transparency 0 · Safety 0 · Identity 4">15.8</span>
+              <span class="trust-pill trust-mid" title="Activity 0.0 · Adoption 11.8 · Transparency 11.5 · Safety 6.1 · Identity 12">41.4</span>
               
             </td>
           </tr>
@@ -8649,12 +8750,12 @@
             data-stars="1391"
             data-last_push="2025-08-22"
             data-weekly_commits="0"
-            data-downloads="1633"
+            data-downloads="1608"
             data-hn_mentions_30d="0"
             data-actions_30d="-1"
             data-scorecard="-1"
             data-score="28.5"
-            data-trust_score="25.3"
+            data-trust_score="38.3"
             data-category="Agent Frameworks"
             data-category_rank="51"
             data-evidence_grade="B"
@@ -8684,7 +8785,7 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-low" title="Activity 0.0 · Adoption 11.8 · Transparency 0 · Safety 6.5 · Identity 7">25.3</span>
+              <span class="trust-pill trust-mid" title="Activity 0.0 · Adoption 11.8 · Transparency 8 · Safety 6.5 · Identity 12">38.3</span>
               
             </td>
           </tr>
@@ -8792,16 +8893,16 @@
             data-repo="SalesforceAIResearch/AgentLite"
             data-stars="644"
             data-last_push="2025-11-10"
-            data-weekly_commits="None"
+            data-weekly_commits="0"
             data-downloads="0"
             data-hn_mentions_30d="0"
             data-actions_30d="-1"
-            data-scorecard="-1"
+            data-scorecard="3.4"
             data-score="25.7"
-            data-trust_score="7.7"
+            data-trust_score="32.4"
             data-category="Agent Frameworks"
             data-category_rank="52"
-            data-evidence_grade="D"
+            data-evidence_grade="C"
           >
             <td class="rank r">
               <span class="rank-num">166</span>
@@ -8817,7 +8918,7 @@
               </div>
             </td>
             <td class="c">
-              <span class="evidence-badge grade-D" title="Evidence grade D">D</span>
+              <span class="evidence-badge grade-C" title="Evidence grade C">C</span>
             </td>
             <td class="r num">644</td>
             <td>
@@ -8826,9 +8927,9 @@
                 <span class="push-text">2025-11-10</span>
               </div>
             </td>
-            <td class="r num">None</td>
+            <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-low" title="Activity 0.0 · Adoption 6.7 · Transparency 0 · Safety 0 · Identity 1">7.7</span>
+              <span class="trust-pill trust-mid" title="Activity 0.0 · Adoption 6.7 · Transparency 12.1 · Safety 4.6 · Identity 9">32.4</span>
               
             </td>
           </tr>
@@ -8894,7 +8995,7 @@
             data-actions_30d="-1"
             data-scorecard="4.0"
             data-score="23.1"
-            data-trust_score="38.0"
+            data-trust_score="25.0"
             data-category="Agent Frameworks"
             data-category_rank="54"
             data-evidence_grade="B"
@@ -8924,7 +9025,7 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 0.0 · Adoption 7.1 · Transparency 12.8 · Safety 6.1 · Identity 12">38.0</span>
+              <span class="trust-pill trust-low" title="Activity 0.0 · Adoption 7.1 · Transparency 4.8 · Safety 6.1 · Identity 7">25.0</span>
               
             </td>
           </tr>
@@ -8990,7 +9091,7 @@
             data-actions_30d="-1"
             data-scorecard="3.0"
             data-score="16.4"
-            data-trust_score="33.0"
+            data-trust_score="20.0"
             data-category="Agent Frameworks"
             data-category_rank="56"
             data-evidence_grade="C"
@@ -9020,7 +9121,7 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Activity 0.0 · Adoption 4.4 · Transparency 11.6 · Safety 8.0 · Identity 9">33.0</span>
+              <span class="trust-pill trust-low" title="Activity 0.0 · Adoption 4.4 · Transparency 3.6 · Safety 8.0 · Identity 4">20.0</span>
               
             </td>
           </tr>
@@ -9083,104 +9184,41 @@
     </div>
 
     
-    <div class="container" style="margin-top:3rem">
-      <h2 style="font-size:1rem;font-weight:600;color:var(--text-muted,#888);letter-spacing:.05em;text-transform:uppercase;margin-bottom:.75rem">
-        Legacy Agents
-        <span style="font-weight:400;font-size:.85em;margin-left:.5rem">— inactive ≥365 days, preserved for historical reference</span>
-      </h2>
-      <table style="width:100%;border-collapse:collapse;font-size:.85rem">
-        <thead>
-          <tr style="color:var(--text-muted,#888);border-bottom:1px solid var(--border,#e5e7eb)">
-            <th style="text-align:left;padding:.4rem .75rem">Agent</th>
-            <th style="text-align:left;padding:.4rem .75rem">Category</th>
-            <th style="text-align:right;padding:.4rem .75rem">Stars</th>
-            <th style="text-align:right;padding:.4rem .75rem">Last push</th>
-            <th style="text-align:right;padding:.4rem .75rem">Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          
-          <tr style="border-bottom:1px solid var(--border,#e5e7eb);opacity:.65">
-            <td style="padding:.4rem .75rem">
-              <a href="/agents/superagi" style="color:inherit;text-decoration:none;font-weight:500">SuperAGI</a>
-              <a href="https://github.com/TransformerOptimus/SuperAGI" target="_blank" rel="noopener" style="color:var(--text-muted,#888);font-size:.75em;margin-left:.4rem">↗</a>
-            </td>
-            <td style="padding:.4rem .75rem;color:var(--text-muted,#888)">Agent Frameworks</td>
-            <td style="padding:.4rem .75rem;text-align:right">17.5k</td>
-            <td style="padding:.4rem .75rem;text-align:right;color:var(--text-muted,#888)">2025-01-22</td>
-            <td style="padding:.4rem .75rem;text-align:right">41.1</td>
-          </tr>
-          
-          <tr style="border-bottom:1px solid var(--border,#e5e7eb);opacity:.65">
-            <td style="padding:.4rem .75rem">
-              <a href="/agents/smol-developer" style="color:inherit;text-decoration:none;font-weight:500">smol developer</a>
-              <a href="https://github.com/smol-ai/developer" target="_blank" rel="noopener" style="color:var(--text-muted,#888);font-size:.75em;margin-left:.4rem">↗</a>
-            </td>
-            <td style="padding:.4rem .75rem;color:var(--text-muted,#888)">Coding Agents</td>
-            <td style="padding:.4rem .75rem;text-align:right">12.2k</td>
-            <td style="padding:.4rem .75rem;text-align:right;color:var(--text-muted,#888)">2024-04-07</td>
-            <td style="padding:.4rem .75rem;text-align:right">38.6</td>
-          </tr>
-          
-          <tr style="border-bottom:1px solid var(--border,#e5e7eb);opacity:.65">
-            <td style="padding:.4rem .75rem">
-              <a href="/agents/lavague" style="color:inherit;text-decoration:none;font-weight:500">LaVague</a>
-              <a href="https://github.com/lavague-ai/LaVague" target="_blank" rel="noopener" style="color:var(--text-muted,#888);font-size:.75em;margin-left:.4rem">↗</a>
-            </td>
-            <td style="padding:.4rem .75rem;color:var(--text-muted,#888)">Browser &amp; Computer Use</td>
-            <td style="padding:.4rem .75rem;text-align:right">6.4k</td>
-            <td style="padding:.4rem .75rem;text-align:right;color:var(--text-muted,#888)">2025-01-21</td>
-            <td style="padding:.4rem .75rem;text-align:right">35.6</td>
-          </tr>
-          
-          <tr style="border-bottom:1px solid var(--border,#e5e7eb);opacity:.65">
-            <td style="padding:.4rem .75rem">
-              <a href="/agents/devopsgpt" style="color:inherit;text-decoration:none;font-weight:500">DevOpsGPT</a>
-              <a href="https://github.com/kuafuai/DevOpsGPT" target="_blank" rel="noopener" style="color:var(--text-muted,#888);font-size:.75em;margin-left:.4rem">↗</a>
-            </td>
-            <td style="padding:.4rem .75rem;color:var(--text-muted,#888)">Workflow Platforms</td>
-            <td style="padding:.4rem .75rem;text-align:right">6.0k</td>
-            <td style="padding:.4rem .75rem;text-align:right;color:var(--text-muted,#888)">2024-08-14</td>
-            <td style="padding:.4rem .75rem;text-align:right">36.0</td>
-          </tr>
-          
-          <tr style="border-bottom:1px solid var(--border,#e5e7eb);opacity:.65">
-            <td style="padding:.4rem .75rem">
-              <a href="/agents/wolverine" style="color:inherit;text-decoration:none;font-weight:500">Wolverine</a>
-              <a href="https://github.com/biobootloader/wolverine" target="_blank" rel="noopener" style="color:var(--text-muted,#888);font-size:.75em;margin-left:.4rem">↗</a>
-            </td>
-            <td style="padding:.4rem .75rem;color:var(--text-muted,#888)">Coding Agents</td>
-            <td style="padding:.4rem .75rem;text-align:right">5.1k</td>
-            <td style="padding:.4rem .75rem;text-align:right;color:var(--text-muted,#888)">2024-03-08</td>
-            <td style="padding:.4rem .75rem;text-align:right">35.2</td>
-          </tr>
-          
-          <tr style="border-bottom:1px solid var(--border,#e5e7eb);opacity:.65">
-            <td style="padding:.4rem .75rem">
-              <a href="/agents/agentverse" style="color:inherit;text-decoration:none;font-weight:500">AgentVerse</a>
-              <a href="https://github.com/OpenBMB/AgentVerse" target="_blank" rel="noopener" style="color:var(--text-muted,#888);font-size:.75em;margin-left:.4rem">↗</a>
-            </td>
-            <td style="padding:.4rem .75rem;color:var(--text-muted,#888)">Multi-Agent Systems</td>
-            <td style="padding:.4rem .75rem;text-align:right">5.0k</td>
-            <td style="padding:.4rem .75rem;text-align:right;color:var(--text-muted,#888)">2024-09-09</td>
-            <td style="padding:.4rem .75rem;text-align:right">34.8</td>
-          </tr>
-          
-          <tr style="border-bottom:1px solid var(--border,#e5e7eb);opacity:.65">
-            <td style="padding:.4rem .75rem">
-              <a href="/agents/microagents" style="color:inherit;text-decoration:none;font-weight:500">Microagents</a>
-              <a href="https://github.com/aymenfurter/microagents" target="_blank" rel="noopener" style="color:var(--text-muted,#888);font-size:.75em;margin-left:.4rem">↗</a>
-            </td>
-            <td style="padding:.4rem .75rem;color:var(--text-muted,#888)">Coding Agents</td>
-            <td style="padding:.4rem .75rem;text-align:right">813</td>
-            <td style="padding:.4rem .75rem;text-align:right;color:var(--text-muted,#888)">2024-03-15</td>
-            <td style="padding:.4rem .75rem;text-align:right">24.6</td>
-          </tr>
-          
-        </tbody>
-      </table>
-    </div>
-    
+
+    <nav style="padding:24px 0;border-top:1px solid var(--border);margin-top:12px;">
+      <div style="font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Browse by Category</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        
+        <a href="/categories/coding-agents" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">Coding Agents (26)</a>
+        
+        <a href="/categories/agent-frameworks" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">Agent Frameworks (57)</a>
+        
+        <a href="/categories/workflow-platforms" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">Workflow Platforms (13)</a>
+        
+        <a href="/categories/browser-computer-use" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">Browser &amp; Computer Use (15)</a>
+        
+        <a href="/categories/memory-knowledge" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">Memory &amp; Knowledge (20)</a>
+        
+        <a href="/categories/research-data" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">Research &amp; Data (8)</a>
+        
+        <a href="/categories/observability-evaluation" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">Observability &amp; Evaluation (12)</a>
+        
+        <a href="/categories/security-guardrails" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">Security &amp; Guardrails (6)</a>
+        
+        <a href="/categories/protocols-tool-integration" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">Protocols &amp; Tool Integration (4)</a>
+        
+        <a href="/categories/voice-conversational" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">Voice &amp; Conversational (1)</a>
+        
+        <a href="/categories/sandboxes-runtimes" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">Sandboxes &amp; Runtimes (1)</a>
+        
+        <a href="/categories/robotics-embodied" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">Robotics &amp; Embodied (1)</a>
+        
+        <a href="/categories/llm-gateways-infra" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">LLM Gateways &amp; Infra (4)</a>
+        
+        <a href="/categories/multi-agent-systems" style="font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:3px;background:var(--surface-2);color:var(--muted);text-decoration:none;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,106,246,0.10)';this.style.color='#7c6af6'" onmouseout="this.style.background='var(--surface-2)';this.style.color='var(--muted)'">Multi-Agent Systems (3)</a>
+        
+      </div>
+    </nav>
 
     <footer>
       <span>171 agents tracked · staggered 4-hour signal refresh</span>
@@ -9194,6 +9232,8 @@
       <a href="/compare/">Compare</a>
       <span class="footer-sep">·</span>
       <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">·</span>
+      <a href="/blog/">Blog</a>
       <span class="footer-sep">·</span>
       <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
       <span class="footer-sep">·</span>
@@ -9438,6 +9478,16 @@
 
       // Initial render
       renderPage();
+
+      // ⌘K / Ctrl+K → focus search
+      document.addEventListener("keydown", function(e) {
+        if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+          e.preventDefault();
+          var si = document.getElementById("searchInput");
+          si.focus();
+          si.select();
+        }
+      });
     })();
   </script>
 </body>
