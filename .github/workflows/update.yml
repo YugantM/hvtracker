@@ -85,10 +85,13 @@ jobs:
             echo "No changes — skipping commit."
           else
             git commit -m "chore: regenerate leaderboard $(date -u '+%Y-%m-%d %H:%M') ${{ steps.batch.outputs.args }}"
-            # Retry push up to 3 times — rebase onto any new remote commits
+            # Retry push up to 3 times — pull with ours strategy to avoid
+            # merge conflicts on auto-generated files
             for i in 1 2 3; do
               git push && break
-              echo "Push failed (attempt $i/3), rebasing..."
-              git pull --rebase origin main
+              echo "Push failed (attempt $i/3), pulling with auto-resolve..."
+              git fetch origin main
+              git reset --soft origin/main
+              git commit -m "chore: regenerate leaderboard $(date -u '+%Y-%m-%d %H:%M') ${{ steps.batch.outputs.args }}"
             done
           fi
