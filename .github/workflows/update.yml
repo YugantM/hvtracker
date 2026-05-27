@@ -80,11 +80,15 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main || true
           git add index.html data.json methodology.html output/history/ output/methodology.html agents/ sitemap.xml feed.json data/ spec/ badge/
           if git diff --cached --quiet; then
             echo "No changes — skipping commit."
           else
             git commit -m "chore: regenerate leaderboard $(date -u '+%Y-%m-%d %H:%M') ${{ steps.batch.outputs.args }}"
-            git push
+            # Retry push up to 3 times — rebase onto any new remote commits
+            for i in 1 2 3; do
+              git push && break
+              echo "Push failed (attempt $i/3), rebasing..."
+              git pull --rebase origin main
+            done
           fi
