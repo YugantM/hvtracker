@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ row.name }} — AI Agent Trust Score & Safety Profile | HVTracker</title>
-  <meta name="description" content="{{ row.name }} trust score {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}). Ranked #{{ row.rank }} of {{ total }} AI agents. {{ row.stars_fmt }} GitHub stars, {{ row.category }} category. Independent safety, transparency & adoption signals.">
+  <title>{{ row.name }} Review — Trust Score {{ row.trust_score }}/100, Is It Safe? | HVTracker</title>
+  <meta name="description" content="Is {{ row.name }} safe? Independent trust score {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}). Ranked #{{ row.rank }} of {{ total }} open-source AI agents. {{ row.stars_fmt }} GitHub stars, {{ row.category }}. Security, transparency & adoption signals reviewed.">
   <link rel="canonical" href="https://hvtracker.net/agents/{{ row.slug }}">
 
   <meta property="og:type" content="website">
@@ -24,11 +24,32 @@
     "operatingSystem": "Cross-platform",
     "url": "{{ row.url }}",
     {% if row.description %}"description": "{{ row.description }}",{% endif %}
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "{{ row.score }}",
+      "ratingValue": "{{ row.trust_score }}",
       "bestRating": "100",
+      "worstRating": "0",
       "ratingCount": "{{ row.stars }}"
+    },
+    "review": {
+      "@type": "Review",
+      "author": {
+        "@type": "Organization",
+        "name": "HVTracker",
+        "url": "https://hvtracker.net"
+      },
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": "{{ row.trust_score }}",
+        "bestRating": "100",
+        "worstRating": "0"
+      },
+      "reviewBody": "{{ row.name }} receives a trust score of {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}) based on independent analysis of activity, adoption, transparency, safety, and identity signals."
     }
   }
   </script>
@@ -237,6 +258,13 @@
         {% if row.evidence_grade %}<span class="badge" style="background:{% if row.evidence_grade == 'A' %}#22c55e{% elif row.evidence_grade == 'B' %}#3b82f6{% elif row.evidence_grade == 'C' %}#f59e0b{% else %}#666{% endif %};color:#fff;" title="Evidence Grade {{ row.evidence_grade }}: {% if row.evidence_grade == 'A' %}5+ signal types{% elif row.evidence_grade == 'B' %}4 signal types{% elif row.evidence_grade == 'C' %}3 signal types{% else %}1-2 signal types{% endif %}">Grade {{ row.evidence_grade }}</span>{% endif %}
         {% if row.listing_status %}<span class="badge" style="{% if row.listing_status == 'legacy' %}background:rgba(107,114,128,0.15);color:var(--stale);{% endif %}">{{ row.listing_status }}</span>{% endif %}
         {% if row.license_spdx %}<span class="badge">{{ row.license_spdx }}</span>{% endif %}
+      </div>
+      <div class="seo-summary" style="margin-top:18px;font-size:14px;color:var(--muted);line-height:1.7;max-width:640px;">
+        <p>{{ row.name }} is an open-source AI agent in the {{ row.category }} category with {{ row.stars_fmt }} GitHub stars{% if row.description %} — {{ row.description }}{% endif %}.
+        HVTracker independently evaluates {{ row.name }} with a <strong style="color:var(--text)">Trust Score of {{ row.trust_score }}/100</strong> (Grade {{ row.evidence_grade }}), ranking it <strong style="color:var(--text)">#{{ row.rank }} of {{ total }}</strong> tracked AI agents.
+        {% if row.scorecard_score %}It scores {{ row.scorecard_score }}/10 on the OpenSSF Scorecard for supply-chain security.{% endif %}
+        {% if row.has_provenance %}Package provenance is verified.{% endif %}
+        Signals are refreshed daily from GitHub, package registries, and security databases.</p>
       </div>
     </section>
 
