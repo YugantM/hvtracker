@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ row.name }} — trust profile, activity, stars | HVTracker</title>
-  <meta name="description" content="{{ row.name }} ranks #{{ row.rank }} of {{ total }} open-source AI agents on HVTracker. Health {{ row.score }}/100, HVTrust {{ row.trust_score }}/100, {{ row.stars_fmt }} stars, last push {{ row.last_push }}.">
+  <title>{{ row.name }} — AI Agent Trust Score & Safety Profile | HVTracker</title>
+  <meta name="description" content="{{ row.name }} trust score {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}). Ranked #{{ row.rank }} of {{ total }} AI agents. {{ row.stars_fmt }} GitHub stars, {{ row.category }} category. Independent safety, transparency & adoption signals.">
   <link rel="canonical" href="https://hvtracker.net/agents/{{ row.slug }}">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="{{ row.name }} — #{{ row.rank }} on HVTracker">
-  <meta property="og:description" content="Health {{ row.score }}/100 · HVTrust {{ row.trust_score }}/100 · {{ row.stars_fmt }} stars · last push {{ row.last_push }}">
+  <meta property="og:title" content="{{ row.name }} — Trust Score {{ row.trust_score }}/100 | HVTracker">
+  <meta property="og:description" content="Grade {{ row.evidence_grade }} · HVTrust {{ row.trust_score }}/100 · {{ row.stars_fmt }} stars · {{ row.category }}. Independent trust signals for AI agents.">
   <meta property="og:url" content="https://hvtracker.net/agents/{{ row.slug }}">
+  <meta property="og:image" content="https://hvtracker.net/badge/{{ row.slug }}.svg">
   <meta name="twitter:card" content="summary">
+  <meta name="twitter:image" content="https://hvtracker.net/badge/{{ row.slug }}.svg">
 
   <script type="application/ld+json">
   {
