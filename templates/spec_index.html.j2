@@ -26,17 +26,12 @@
       padding:28px 0 20px; border-bottom:1px solid var(--border);
       display:flex; align-items:baseline; gap:20px; flex-wrap:wrap; position:relative;
     }
-    header::after {
-      content:""; position:absolute; bottom:-1px; left:0;
-      width:220px; height:1px;
-      background:linear-gradient(to right, var(--accent), transparent);
-    }
     .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; letter-spacing:-0.5px; color:var(--text); }
     .logo span { color:var(--accent); }
-    .site-nav { margin-left:auto; font-family:var(--font-mono); font-size:12px; display:flex; gap:16px; align-items:baseline; }
-    .site-nav a { color:var(--muted); }
-    .site-nav a:hover { color:var(--accent); text-decoration:none; }
-    .site-nav .active { color:var(--accent); font-weight:600; }
+    .site-nav { margin-left:auto; font-family:var(--font-mono); font-size:12px; display:flex; gap:8px; align-items:baseline; }
+    .site-nav a { color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:5px 10px; background:rgba(255,255,255,0.03); }
+    .site-nav a:hover { color:var(--text); border-color:var(--accent); text-decoration:none; }
+    .site-nav .active { color:var(--text); border-color:var(--accent); font-weight:600; }
 
     /* ── Page header ── */
     .content { padding:36px 0 0; }

@@ -15,11 +15,12 @@
       --border: rgba(184, 197, 224, 0.16);
       --hairline: rgba(184, 197, 224, 0.10);
       --glass-hi: rgba(255, 255, 255, 0.055);
-      --metal: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.018) 34%, rgba(0,180,160,0.055) 72%, rgba(196,168,130,0.06));
+      --metal: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.018) 34%, rgba(124,106,246,0.055) 72%, rgba(196,168,130,0.06));
       --text: #e2e8f0;
       --muted: #9aa3b7;
-      --accent: #00b4a0;
-      --accent-soft: rgba(0, 180, 160, 0.12);
+      --accent: #7c6af6;
+      --accent-dim: #4a3fa0;
+      --accent-soft: rgba(124, 106, 246, 0.12);
       --green: #34d399;
       --blue: #60a5fa;
       --yellow: #fbbf24;
@@ -35,7 +36,7 @@
       background-color: var(--bg);
       background-image:
         url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
-        radial-gradient(circle at 18% -10%, rgba(0,180,160,0.18), transparent 30%),
+        radial-gradient(circle at 18% -10%, rgba(124,106,246,0.18), transparent 30%),
         radial-gradient(circle at 86% 6%, rgba(196,168,130,0.13), transparent 26%),
         linear-gradient(135deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 11px),
         linear-gradient(180deg, var(--bg-2), var(--bg) 54%, #05060b);
@@ -59,15 +60,6 @@
       backdrop-filter: blur(18px) saturate(120%);
       position: relative;
     }
-    header::after {
-      content: "";
-      position: absolute;
-      left: 20px;
-      bottom: -1px;
-      width: 150px;
-      height: 2px;
-      background: linear-gradient(90deg, var(--accent), rgba(196,168,130,0.72), transparent);
-    }
     header h1 {
       font-size: 29px;
       line-height: 1.1;
@@ -88,9 +80,19 @@
       font-size: 12px;
       font-family: var(--mono);
     }
-    .header-nav a { color: var(--muted); }
+    .header-nav a {
+      color: var(--muted);
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 5px 9px;
+    }
     .header-nav a:hover,
-    .header-nav a.active { color: var(--accent); }
+    .header-nav a.active {
+      color: var(--text);
+      border-color: var(--border);
+      background: rgba(255,255,255,0.035);
+      text-decoration: none;
+    }
 
     .search-panel,
     .report,
@@ -103,19 +105,6 @@
       backdrop-filter: blur(14px) saturate(115%);
       position: relative;
     }
-    .search-panel::after,
-    .report::after,
-    .chart-panel::after,
-    .cards-panel::after {
-      content: "";
-      position: absolute;
-      left: 18px;
-      bottom: -1px;
-      width: 136px;
-      height: 1px;
-      background: linear-gradient(90deg, var(--accent), rgba(196,168,130,0.70), transparent);
-    }
-
     .search-panel {
       padding: 18px;
       margin-bottom: 18px;
@@ -142,13 +131,14 @@
       padding: 12px 18px;
       border-radius: 8px;
       border: 1px solid transparent;
-      background: var(--accent);
-      color: #05131a;
+      background: rgba(255,255,255,0.045);
+      color: var(--muted);
+      border-color: var(--border);
       font-weight: 700;
       cursor: pointer;
       font-size: 13px;
     }
-    .search-bar button:hover { opacity: 0.92; }
+    .search-bar button:hover { color: var(--text); border-color: var(--accent-dim); }
     .search-hint {
       margin-top: 10px;
       color: var(--muted);
@@ -241,10 +231,11 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
     .report-card {
-      background: rgba(255,255,255,0.040);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
+      background: transparent;
+      border: 0;
+      border-top: 1px solid var(--hairline);
+      border-radius: 0;
+      padding: 12px 0 0;
     }
     .report-label {
       color: var(--muted);

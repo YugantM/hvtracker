@@ -85,44 +85,18 @@
       backdrop-filter:blur(18px) saturate(120%);
       display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; position:relative;
     }
-    header::after {
-      content:""; position:absolute; bottom:-1px; left:18px;
-      width:150px; height:2px;
-      background:linear-gradient(90deg, var(--accent), var(--mocha), transparent);
-      background-size:200% 100%;
-      animation:header-shimmer 6s ease-in-out infinite alternate;
-    }
-    @keyframes header-shimmer { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
     .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; }
     .logo span { color:var(--accent); }
     .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; }
     .back:hover { color:var(--accent); }
 
     .hero,
-    .rank-block,
-    .stats,
-    .breakdown,
-    .trend,
-    .provenance,
-    .siblings,
-    .terminal-note {
+    .rank-block {
       border:1px solid var(--border);
       border-radius:10px;
       background:linear-gradient(135deg, rgba(255,255,255,0.052), rgba(255,255,255,0.014)), var(--glass);
       box-shadow:inset 0 1px 0 var(--glass-hi);
       position:relative;
-    }
-    .hero::after,
-    .rank-block::after,
-    .stats::after,
-    .breakdown::after,
-    .trend::after,
-    .provenance::after,
-    .siblings::after,
-    .terminal-note::after {
-      content:""; position:absolute; left:18px; bottom:-1px;
-      width:136px; height:1px;
-      background:linear-gradient(90deg, var(--accent), rgba(196,168,130,0.70), transparent);
     }
     .hero { padding:24px 20px; margin:14px 0; border-bottom:1px solid var(--border); }
     h1 { font-size:32px; font-weight:700; letter-spacing:-0.5px; margin-bottom:6px; }
@@ -134,6 +108,7 @@
       margin-top:14px; font-size:14.5px; color:var(--text); max-width:640px;
     }
     .hero .badges { margin-top:14px; display:flex; gap:6px; flex-wrap:wrap; }
+    .hero-actions { margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; }
     .badge {
       display:inline-block; font-family:var(--font-mono); font-size:10.5px;
       padding:2px 8px; border-radius:3px; background:var(--surface-2); color:var(--muted);
@@ -143,7 +118,7 @@
 
     .rank-block {
       padding:20px; margin:14px 0; border-bottom:1px solid var(--border);
-      display:flex; gap:30px; align-items:flex-end; flex-wrap:wrap;
+      display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:20px; align-items:end;
     }
     .rank-big {
       font-family:var(--font-mono); font-size:54px; font-weight:700; line-height:1;
@@ -151,6 +126,8 @@
       color:var(--accent); letter-spacing:-2px;
     }
     .rank-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-top:6px; }
+    .rank-label a { color:var(--mocha); text-decoration:none; border-bottom:1px solid rgba(196,168,130,0.45); }
+    .rank-label a:hover { color:var(--text); border-color:var(--mocha); }
     .rank-sub { font-family:var(--font-mono); font-size:13px; color:var(--muted); }
     .score-pill {
       display:inline-block; font-family:var(--font-mono); font-size:22px; font-weight:700;
@@ -160,7 +137,7 @@
     .score-mid  { background:var(--score-mid-bg); color:var(--score-mid-fg); }
     .score-low  { background:var(--score-lo-bg); color:var(--score-lo-fg); }
 
-    .stats { padding:20px; margin:14px 0; border-bottom:1px solid var(--border); }
+    .stats { padding:22px 0; margin:0; border-top:1px solid var(--hairline); }
     .stats-grid {
       display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
       gap:18px 24px;
@@ -177,7 +154,7 @@
     .aging  .fresh-dot { background:var(--aging); }  .aging  .stat-value { color:var(--aging); }
     .stale  .fresh-dot { background:var(--stale); }  .stale  .stat-value { color:var(--stale); }
 
-    .breakdown { padding:20px; margin:14px 0; border-bottom:1px solid var(--border); }
+    .breakdown { padding:22px 0; margin:0; border-top:1px solid var(--hairline); }
     .section-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:14px; }
     .breakdown-row {
       display:grid; grid-template-columns:140px 1fr 60px;
@@ -191,7 +168,7 @@
     .breakdown-fill { height:100%; background:var(--accent); border-radius:3px; }
     .breakdown-value { text-align:right; color:var(--text); }
 
-    .trend { padding:20px; margin:14px 0; border-bottom:1px solid var(--border); }
+    .trend { padding:18px 0; margin:0; border-top:1px solid var(--hairline); }
     .sparkline-wrap { margin-top:10px; }
     .sparkline-labels {
       display:flex; justify-content:space-between;
@@ -199,7 +176,7 @@
       margin-top:4px;
     }
 
-    .provenance { padding:20px; margin:14px 0; border-bottom:1px solid var(--border); }
+    .provenance { padding:22px 0; margin:0; border-top:1px solid var(--hairline); }
     .prov-grid {
       display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
       gap:14px 24px;
@@ -230,19 +207,23 @@
       color:var(--muted);
     }
     .links a:hover { color:var(--accent); border-color:var(--accent-dim); text-decoration:none; }
-    .links a.compare-link {
-      background:var(--accent);
-      color:var(--bg);
+    .compare-link {
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:8px 14px; border:1px solid var(--accent);
+      border-radius:6px; background:rgba(124,106,246,0.16);
+      color:var(--text);
+      font-family:var(--font-mono); font-size:12px;
       border-color:var(--accent);
       font-weight:700;
     }
-    .links a.compare-link:hover {
-      color:var(--bg);
+    .compare-link:hover {
+      color:var(--text);
       border-color:var(--accent);
-      background:#6f7cff;
+      background:rgba(124,106,246,0.26);
+      text-decoration:none;
     }
 
-    .siblings { padding:20px; margin:14px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+    .siblings { padding:22px 0; margin:0; border-top:1px solid var(--hairline); }
     .siblings ul { list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px 18px; }
     .siblings li a {
       display:flex; align-items:baseline; gap:8px;
@@ -264,6 +245,10 @@
     }
     footer a { color:var(--accent); }
     .footer-sep { color:var(--border); }
+    .terminal-note { margin:0; border-top:1px solid var(--hairline); }
+    @media (max-width:720px) {
+      .rank-block { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    }
   </style>
 
   <!-- Google tag (gtag.js) -->
@@ -297,6 +282,9 @@
         <span class="badge" style="">listed</span>
         <span class="badge">Apache-2.0</span>
       </div>
+      <div class="hero-actions">
+        <a class="compare-link" href="/compare/?a=weights-biases-weave">Compare Agent</a>
+      </div>
       <div class="seo-summary" style="margin-top:18px;font-size:14px;color:var(--muted);line-height:1.7;max-width:640px;">
         <p>Weights &amp; Biases Weave is an open-source AI agent in the Observability &amp; Evaluation category with 1.1k GitHub stars — Weave is a toolkit for developing AI-powered applications, built by Weights &amp; Biases..
         HVTracker independently evaluates Weights &amp; Biases Weave with a <strong style="color:var(--text)">Trust Score of 80.6/100</strong> (Grade B), ranking it <strong style="color:var(--text)">#130 of 171</strong> tracked AI agents.
@@ -324,7 +312,7 @@
       
       <div>
         <div class="rank-big" style="color:var(--mocha)">#10</div>
-        <div class="rank-label">In <a href="/categories/observability-evaluation" style="color:var(--mocha);text-decoration:underline">Observability &amp; Evaluation</a></div>
+        <div class="rank-label">In <a href="/categories/observability-evaluation">Observability &amp; Evaluation</a></div>
       </div>
       
     </section>
@@ -592,7 +580,6 @@
     
 
     <section class="links">
-      <a class="compare-link" href="/compare/?a=weights-biases-weave">Compare This Agent</a>
       <a href="https://github.com/wandb/weave" target="_blank" rel="noopener noreferrer">GitHub →</a>
       <a href="https://pypi.org/project/weave/" target="_blank" rel="noopener noreferrer">PyPI: weave</a>
       

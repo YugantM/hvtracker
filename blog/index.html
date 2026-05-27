@@ -46,15 +46,10 @@
       padding:28px 0 20px; border-bottom:1px solid var(--border);
       display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; position:relative;
     }
-    header::after {
-      content:""; position:absolute; bottom:-1px; left:0;
-      width:180px; height:1px;
-      background:linear-gradient(to right, var(--accent), transparent);
-    }
     .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; }
     .logo span { color:var(--accent); }
-    .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; }
-    .back:hover { color:var(--accent); }
+    .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; border:1px solid var(--border); border-radius:999px; padding:5px 10px; background:rgba(255,255,255,0.03); }
+    .back:hover { color:var(--text); border-color:var(--accent); text-decoration:none; }
 
     .hero { padding:36px 0 24px; border-bottom:1px solid var(--border); }
     h1 { font-size:28px; font-weight:700; letter-spacing:-0.5px; margin-bottom:6px; }

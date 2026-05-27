@@ -10,14 +10,14 @@
     :root {
       --bg: #080a10; --surface: rgba(20,23,34,0.72); --border: rgba(184,197,224,0.16);
       --hairline: rgba(184,197,224,0.10); --glass-hi: rgba(255,255,255,0.055);
-      --text: #e2e8f0; --muted: #9aa3b7; --accent: #00b4a0;
+      --text: #e2e8f0; --muted: #9aa3b7; --accent: #7c6af6;
       --green: #34d399; --blue: #60a5fa; --yellow: #fbbf24; --red: #f87171;
       --font: system-ui, -apple-system, sans-serif;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background-color: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.6;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"), radial-gradient(circle at 18% -10%, rgba(0,180,160,0.18), transparent 30%), radial-gradient(circle at 86% 6%, rgba(196,168,130,0.13), transparent 26%), linear-gradient(135deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 11px), linear-gradient(180deg, #0d1018, var(--bg) 54%, #05060b);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"), radial-gradient(circle at 18% -10%, rgba(124,106,246,0.18), transparent 30%), radial-gradient(circle at 86% 6%, rgba(196,168,130,0.13), transparent 26%), linear-gradient(135deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 11px), linear-gradient(180deg, #0d1018, var(--bg) 54%, #05060b);
       background-repeat: repeat, no-repeat, no-repeat, repeat, no-repeat;
       background-size: 256px 256px, auto, auto, auto, auto;
     }
@@ -27,38 +27,26 @@
       margin-bottom: 24px;
       border: 1px solid var(--border);
       border-radius: 10px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.018) 34%, rgba(0,180,160,0.055) 72%, rgba(196,168,130,0.06)), rgba(16,19,29,0.68);
+      background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.018) 34%, rgba(124,106,246,0.055) 72%, rgba(196,168,130,0.06)), rgba(16,19,29,0.68);
       box-shadow: inset 0 1px 0 var(--glass-hi), 0 18px 54px rgba(0,0,0,0.28);
       position: relative;
-    }
-    header::after {
-      content: ""; position: absolute; left: 20px; bottom: -1px;
-      width: 150px; height: 2px;
-      background: linear-gradient(90deg, var(--accent), rgba(196,168,130,0.72), transparent);
     }
     header h1 { font-size: 24px; color: var(--accent); margin-bottom: 4px; }
     header p { color: var(--muted); font-size: 14px; margin-bottom: 0; }
     header a { color: var(--accent); text-decoration: none; }
 
     .entry {
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--border);
-      border-radius: 10px;
-      padding: 16px 18px 16px 22px;
-      margin-bottom: 14px;
+      border: 0;
+      border-top: 1px solid var(--hairline);
+      border-radius: 0;
+      padding: 18px 0;
+      margin-bottom: 0;
       position: relative;
-      background: linear-gradient(135deg, rgba(255,255,255,0.052), rgba(255,255,255,0.014)), rgba(16,19,29,0.68);
-      box-shadow: inset 0 1px 0 var(--glass-hi);
-    }
-    .entry::after {
-      content: ""; position: absolute; left: 18px; bottom: -1px;
-      width: 126px; height: 1px;
-      background: linear-gradient(90deg, var(--accent), rgba(196,168,130,0.70), transparent);
+      background: transparent;
+      box-shadow: none;
     }
     .entry::before {
-      content: ''; position: absolute; left: -6px; top: 6px;
-      width: 9px; height: 9px; border-radius: 50%;
-      background: var(--accent); border: 2px solid var(--bg);
+      content: none;
     }
     .entry-date { font-size: 12px; color: var(--muted); font-family: monospace; margin-bottom: 4px; }
     .entry-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
