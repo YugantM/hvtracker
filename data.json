@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-27 11:49 UTC",
+  "updated": "2026-05-27 15:33 UTC",
   "methodology_version": "v2.0",
   "total": 171,
   "agents": [
@@ -56,13 +56,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 85.0,
+      "trust_score": 72.0,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 20,
-        "transparency": 16.2,
+        "transparency": 8.2,
         "safety": 11.8,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -118,13 +118,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 79.1,
+      "trust_score": 66.1,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 15.5,
-        "transparency": 15.4,
+        "transparency": 7.4,
         "safety": 11.2,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -220,9 +220,9 @@
       "rank": 5,
       "previous_rank": 5,
       "rank_delta": 0,
-      "stars": 48413,
+      "stars": 48442,
       "stars_fmt": "48.4k",
-      "forks": 8392,
+      "forks": 8398,
       "forks_fmt": "8.4k",
       "last_push": "2026-05-27",
       "days_ago": 0,
@@ -231,14 +231,14 @@
       "score": 96.3,
       "description": "Python SDK, Proxy Server (AI Gateway) to call 100+ LLM APIs in OpenAI (or native) format, with cost tracking, guardrails",
       "language": "Python",
-      "open_issues": 3433,
+      "open_issues": 3439,
       "category": "LLM Gateways & Infra",
       "category_rank": 1,
       "npm_package": "",
       "pypi_package": "litellm",
       "weekly_downloads": 119634445,
       "dl_source": "pypi",
-      "hn_mentions_30d": 5,
+      "hn_mentions_30d": 3,
       "has_provenance": false,
       "npm_provenance": null,
       "pypi_provenance": false,
@@ -266,13 +266,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 69.8,
+      "trust_score": 82.8,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 19.2,
-        "transparency": 7.4,
+        "transparency": 15.4,
         "safety": 11.2,
-        "identity": 7
+        "identity": 12
       }
     },
     {
@@ -328,13 +328,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 77.2,
+      "trust_score": 64.2,
       "trust_breakdown": {
         "activity": 23.3,
         "adoption": 17.7,
-        "transparency": 14.4,
+        "transparency": 6.4,
         "safety": 9.8,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -387,13 +387,13 @@
       "rank": 8,
       "previous_rank": 7,
       "rank_delta": -1,
-      "stars": 22438,
+      "stars": 22441,
       "stars_fmt": "22.4k",
       "forks": 3709,
       "forks_fmt": "3.7k",
       "last_push": "2026-05-27",
       "days_ago": 0,
-      "weekly_commits": 352,
+      "weekly_commits": 355,
       "commits_low_confidence": false,
       "score": 92.7,
       "description": "AI Agents & MCPs & AI Workflow Automation • (~400 MCP servers for AI agents) • AI Automation / AI Agent with MCPs • AI W",
@@ -414,13 +414,13 @@
       "scorecard_checks": {},
       "public_actions": null,
       "evidence_grade": "D",
-      "trust_score": 49.3,
+      "trust_score": 62.3,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 18.3,
-        "transparency": 0,
+        "transparency": 8,
         "safety": 5.0,
-        "identity": 1
+        "identity": 6
       }
     },
     {
@@ -484,14 +484,14 @@
       "score": 84.4,
       "description": "The open-source LLMOps platform: prompt playground, prompt management, LLM evaluation, and LLM observability all in one ",
       "language": "TypeScript",
-      "open_issues": 86,
+      "open_issues": 87,
       "category": "Observability & Evaluation",
       "category_rank": 1,
       "npm_package": "",
       "pypi_package": "agenta",
-      "weekly_downloads": 4638,
+      "weekly_downloads": 4280,
       "dl_source": "pypi",
-      "hn_mentions_30d": 2148,
+      "hn_mentions_30d": 2156,
       "has_provenance": false,
       "npm_provenance": null,
       "pypi_provenance": false,
@@ -500,13 +500,13 @@
       "scorecard_checks": {},
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 44.0,
+      "trust_score": 56.9,
       "trust_breakdown": {
         "activity": 25.0,
-        "adoption": 13.6,
-        "transparency": 0,
+        "adoption": 13.5,
+        "transparency": 8,
         "safety": 1.4,
-        "identity": 4
+        "identity": 9
       }
     },
     {
@@ -584,25 +584,25 @@
       "rank": 12,
       "previous_rank": 11,
       "rank_delta": -1,
-      "stars": 126907,
-      "stars_fmt": "126.9k",
-      "forks": 20803,
+      "stars": 126959,
+      "stars_fmt": "127.0k",
+      "forks": 20809,
       "forks_fmt": "20.8k",
       "last_push": "2026-05-27",
       "days_ago": 0,
-      "weekly_commits": 40,
+      "weekly_commits": 39,
       "commits_low_confidence": false,
       "score": 75.0,
       "description": "Claude Code is an agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster ",
       "language": "Python",
-      "open_issues": 9370,
+      "open_issues": 9369,
       "category": "Coding Agents",
       "category_rank": 3,
       "npm_package": "@anthropic-ai/claude-code",
       "pypi_package": "",
       "weekly_downloads": 8198736,
       "dl_source": "npm",
-      "hn_mentions_30d": 580,
+      "hn_mentions_30d": 588,
       "has_provenance": false,
       "npm_provenance": false,
       "pypi_provenance": null,
@@ -629,8 +629,8 @@
         "Vulnerabilities": 10
       },
       "public_actions": {
-        "actions_30d": 37546,
-        "actions_30d_merged": 30156,
+        "actions_30d": 37752,
+        "actions_30d_merged": 30319,
         "actions_30d_by_repo": [
           {
             "repo": "berkmancenter/frankly",
@@ -651,13 +651,13 @@
         ]
       },
       "evidence_grade": "A",
-      "trust_score": 66.2,
+      "trust_score": 71.2,
       "trust_breakdown": {
         "activity": 23.0,
         "adoption": 20,
         "transparency": 6.7,
         "safety": 6.5,
-        "identity": 10
+        "identity": 15
       }
     },
     {
@@ -937,9 +937,9 @@
       "rank": 18,
       "previous_rank": 17,
       "rank_delta": -1,
-      "stars": 95804,
+      "stars": 95839,
       "stars_fmt": "95.8k",
-      "forks": 10779,
+      "forks": 10784,
       "forks_fmt": "10.8k",
       "last_push": "2026-05-26",
       "days_ago": 1,
@@ -953,7 +953,7 @@
       "category_rank": 2,
       "npm_package": "",
       "pypi_package": "browser-use",
-      "weekly_downloads": 8709937,
+      "weekly_downloads": 8522319,
       "dl_source": "pypi",
       "hn_mentions_30d": 9,
       "has_provenance": false,
@@ -983,13 +983,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 64.6,
+      "trust_score": 77.6,
       "trust_breakdown": {
         "activity": 24.9,
         "adoption": 20.0,
-        "transparency": 5.5,
+        "transparency": 13.5,
         "safety": 7.2,
-        "identity": 7
+        "identity": 12
       }
     },
     {
@@ -1088,13 +1088,13 @@
       },
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 70.9,
+      "trust_score": 57.9,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 11.8,
-        "transparency": 15.0,
+        "transparency": 7.0,
         "safety": 10.1,
-        "identity": 9
+        "identity": 4
       }
     },
     {
@@ -1147,13 +1147,13 @@
       "rank": 22,
       "previous_rank": 23,
       "rank_delta": 1,
-      "stars": 75022,
+      "stars": 75037,
       "stars_fmt": "75.0k",
-      "forks": 9512,
+      "forks": 9510,
       "forks_fmt": "9.5k",
       "last_push": "2026-05-27",
       "days_ago": 0,
-      "weekly_commits": 195,
+      "weekly_commits": 190,
       "commits_low_confidence": false,
       "score": 72.8,
       "description": "🙌 OpenHands: AI-Driven Development",
@@ -1163,7 +1163,7 @@
       "category_rank": 6,
       "npm_package": "",
       "pypi_package": "openhands-ai",
-      "weekly_downloads": 222559,
+      "weekly_downloads": 333594,
       "dl_source": "pypi",
       "hn_mentions_30d": 1,
       "has_provenance": false,
@@ -1192,7 +1192,7 @@
         "Vulnerabilities": 0
       },
       "public_actions": {
-        "actions_30d": 84,
+        "actions_30d": 85,
         "actions_30d_merged": 72,
         "actions_30d_by_repo": [
           {
@@ -1214,13 +1214,13 @@
         ]
       },
       "evidence_grade": "A",
-      "trust_score": 71.8,
+      "trust_score": 85.1,
       "trust_breakdown": {
         "activity": 25.0,
-        "adoption": 18.8,
-        "transparency": 7.1,
+        "adoption": 19.1,
+        "transparency": 15.1,
         "safety": 10.9,
-        "identity": 10
+        "identity": 15
       }
     },
     {
@@ -1273,9 +1273,9 @@
       "rank": 24,
       "previous_rank": 24,
       "rank_delta": 0,
-      "stars": 69737,
-      "stars_fmt": "69.7k",
-      "forks": 9396,
+      "stars": 69752,
+      "stars_fmt": "69.8k",
+      "forks": 9402,
       "forks_fmt": "9.4k",
       "last_push": "2026-05-27",
       "days_ago": 0,
@@ -1284,7 +1284,7 @@
       "score": 72.6,
       "description": "An open-source long-horizon SuperAgent harness that researches, codes, and creates. With the help of sandboxes, memories",
       "language": "Python",
-      "open_issues": 923,
+      "open_issues": 925,
       "category": "Research & Data",
       "category_rank": 2,
       "npm_package": "",
@@ -1319,13 +1319,13 @@
       },
       "public_actions": null,
       "evidence_grade": "D",
-      "trust_score": 58.2,
+      "trust_score": 71.2,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 11.6,
-        "transparency": 8.5,
+        "transparency": 16.5,
         "safety": 12.1,
-        "identity": 1
+        "identity": 6
       }
     },
     {
@@ -1679,13 +1679,13 @@
       "rank": 33,
       "previous_rank": 33,
       "rank_delta": 0,
-      "stars": 45945,
-      "stars_fmt": "45.9k",
-      "forks": 4735,
+      "stars": 45951,
+      "stars_fmt": "46.0k",
+      "forks": 4737,
       "forks_fmt": "4.7k",
       "last_push": "2026-05-27",
       "days_ago": 0,
-      "weekly_commits": 319,
+      "weekly_commits": 320,
       "commits_low_confidence": false,
       "score": 70.1,
       "description": "an open source, extensible AI agent that goes beyond code suggestions - install, execute, edit, and test with any LLM",
@@ -1725,13 +1725,13 @@
       },
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 57.5,
+      "trust_score": 70.5,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 11.2,
-        "transparency": 6.7,
+        "transparency": 14.7,
         "safety": 10.6,
-        "identity": 4
+        "identity": 9
       }
     },
     {
@@ -1784,25 +1784,25 @@
       "rank": 35,
       "previous_rank": 35,
       "rank_delta": 0,
-      "stars": 40377,
+      "stars": 40379,
       "stars_fmt": "40.4k",
       "forks": 5429,
       "forks_fmt": "5.4k",
       "last_push": "2026-05-27",
       "days_ago": 0,
-      "weekly_commits": 177,
+      "weekly_commits": 174,
       "commits_low_confidence": false,
       "score": 70.0,
       "description": "Build, run, and manage agent platforms.",
       "language": "Python",
-      "open_issues": 933,
+      "open_issues": 932,
       "category": "Agent Frameworks",
       "category_rank": 7,
       "npm_package": "",
       "pypi_package": "agno",
-      "weekly_downloads": 1174450,
+      "weekly_downloads": 1158292,
       "dl_source": "pypi",
-      "hn_mentions_30d": 209,
+      "hn_mentions_30d": 217,
       "has_provenance": false,
       "npm_provenance": null,
       "pypi_provenance": false,
@@ -1830,13 +1830,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 65.3,
+      "trust_score": 78.3,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 19.1,
-        "transparency": 5.6,
+        "transparency": 13.6,
         "safety": 8.6,
-        "identity": 7
+        "identity": 12
       }
     },
     {
@@ -1950,13 +1950,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 88.8,
+      "trust_score": 75.8,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 18.8,
-        "transparency": 16.2,
+        "transparency": 8.2,
         "safety": 16.8,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -2184,13 +2184,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 85.2,
+      "trust_score": 72.2,
       "trust_breakdown": {
         "activity": 23.7,
         "adoption": 16.8,
-        "transparency": 16.0,
+        "transparency": 8.0,
         "safety": 16.7,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -2375,13 +2375,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 83.5,
+      "trust_score": 70.5,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 18.7,
-        "transparency": 16.2,
+        "transparency": 8.2,
         "safety": 11.6,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -2449,9 +2449,9 @@
       "rank": 48,
       "previous_rank": 48,
       "rank_delta": 0,
-      "stars": 35445,
-      "stars_fmt": "35.4k",
-      "forks": 3561,
+      "stars": 35469,
+      "stars_fmt": "35.5k",
+      "forks": 3567,
       "forks_fmt": "3.6k",
       "last_push": "2026-05-18",
       "days_ago": 9,
@@ -2495,13 +2495,13 @@
       },
       "public_actions": null,
       "evidence_grade": "D",
-      "trust_score": 43.5,
+      "trust_score": 56.5,
       "trust_breakdown": {
         "activity": 15.8,
         "adoption": 10.9,
-        "transparency": 5.9,
+        "transparency": 13.9,
         "safety": 9.9,
-        "identity": 1
+        "identity": 6
       }
     },
     {
@@ -2581,13 +2581,13 @@
       "scorecard_checks": {},
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 59.0,
+      "trust_score": 46.0,
       "trust_breakdown": {
         "activity": 19.5,
         "adoption": 17.5,
-        "transparency": 8,
+        "transparency": 0,
         "safety": 5,
-        "identity": 9
+        "identity": 4
       }
     },
     {
@@ -2597,9 +2597,9 @@
       "rank": 51,
       "previous_rank": 50,
       "rank_delta": -1,
-      "stars": 25737,
-      "stars_fmt": "25.7k",
-      "forks": 2821,
+      "stars": 25753,
+      "stars_fmt": "25.8k",
+      "forks": 2822,
       "forks_fmt": "2.8k",
       "last_push": "2026-05-26",
       "days_ago": 1,
@@ -2608,12 +2608,12 @@
       "score": 67.4,
       "description": "Build and run agents you can see, understand and trust.",
       "language": "Python",
-      "open_issues": 238,
+      "open_issues": 239,
       "category": "Agent Frameworks",
       "category_rank": 15,
       "npm_package": "",
       "pypi_package": "agentscope",
-      "weekly_downloads": 74278,
+      "weekly_downloads": 71164,
       "dl_source": "pypi",
       "hn_mentions_30d": null,
       "has_provenance": false,
@@ -2643,13 +2643,13 @@
       },
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 59.7,
+      "trust_score": 72.7,
       "trust_breakdown": {
         "activity": 22.6,
         "adoption": 17.1,
-        "transparency": 6.0,
+        "transparency": 14.0,
         "safety": 10.0,
-        "identity": 4
+        "identity": 9
       }
     },
     {
@@ -2763,13 +2763,13 @@
       },
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 71.5,
+      "trust_score": 58.5,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 18.3,
-        "transparency": 14.1,
+        "transparency": 6.1,
         "safety": 5.1,
-        "identity": 9
+        "identity": 4
       }
     },
     {
@@ -2958,13 +2958,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 82.4,
+      "trust_score": 69.4,
       "trust_breakdown": {
         "activity": 18.9,
         "adoption": 18.5,
-        "transparency": 16.2,
+        "transparency": 8.2,
         "safety": 16.8,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -3251,7 +3251,7 @@
       "rank": 63,
       "previous_rank": 63,
       "rank_delta": 0,
-      "stars": 22821,
+      "stars": 22823,
       "stars_fmt": "22.8k",
       "forks": 1541,
       "forks_fmt": "1.5k",
@@ -3297,13 +3297,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 70.6,
+      "trust_score": 83.6,
       "trust_breakdown": {
         "activity": 23.8,
         "adoption": 18.4,
-        "transparency": 6.2,
+        "transparency": 14.2,
         "safety": 15.2,
-        "identity": 7
+        "identity": 12
       }
     },
     {
@@ -3441,7 +3441,7 @@
       "stars_fmt": "14.7k",
       "forks": 2266,
       "forks_fmt": "2.3k",
-      "last_push": "2026-05-26",
+      "last_push": "2026-05-27",
       "days_ago": 0,
       "weekly_commits": 62,
       "commits_low_confidence": false,
@@ -3455,7 +3455,7 @@
       "pypi_package": "",
       "weekly_downloads": 43702,
       "dl_source": "npm",
-      "hn_mentions_30d": 8,
+      "hn_mentions_30d": 7,
       "has_provenance": true,
       "npm_provenance": true,
       "pypi_provenance": null,
@@ -3483,13 +3483,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 68.9,
+      "trust_score": 81.9,
       "trust_breakdown": {
         "activity": 24.0,
         "adoption": 16.2,
-        "transparency": 6.5,
+        "transparency": 14.5,
         "safety": 15.2,
-        "identity": 7
+        "identity": 12
       }
     },
     {
@@ -3499,7 +3499,7 @@
       "rank": 67,
       "previous_rank": 65,
       "rank_delta": -2,
-      "stars": 17066,
+      "stars": 17068,
       "stars_fmt": "17.1k",
       "forks": 1916,
       "forks_fmt": "1.9k",
@@ -3545,13 +3545,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 64.0,
+      "trust_score": 77.0,
       "trust_breakdown": {
         "activity": 22.7,
         "adoption": 16.3,
-        "transparency": 8.3,
+        "transparency": 16.3,
         "safety": 9.7,
-        "identity": 7
+        "identity": 12
       }
     },
     {
@@ -3650,13 +3650,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 60.6,
+      "trust_score": 47.6,
       "trust_breakdown": {
         "activity": 15.5,
         "adoption": 15.7,
-        "transparency": 13.0,
+        "transparency": 5.0,
         "safety": 4.4,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -3666,7 +3666,7 @@
       "rank": 70,
       "previous_rank": 70,
       "rank_delta": 0,
-      "stars": 15348,
+      "stars": 15349,
       "stars_fmt": "15.3k",
       "forks": 1741,
       "forks_fmt": "1.7k",
@@ -3712,13 +3712,13 @@
       },
       "public_actions": null,
       "evidence_grade": "D",
-      "trust_score": 52.4,
+      "trust_score": 65.4,
       "trust_breakdown": {
         "activity": 24.7,
         "adoption": 10.0,
-        "transparency": 6.8,
+        "transparency": 14.8,
         "safety": 9.9,
-        "identity": 1
+        "identity": 6
       }
     },
     {
@@ -3817,13 +3817,13 @@
       },
       "public_actions": null,
       "evidence_grade": "D",
-      "trust_score": 63.0,
+      "trust_score": 50.0,
       "trust_breakdown": {
         "activity": 24.9,
         "adoption": 10.2,
-        "transparency": 13.4,
+        "transparency": 5.4,
         "safety": 8.5,
-        "identity": 6
+        "identity": 1
       }
     },
     {
@@ -4020,7 +4020,7 @@
       "rank": 77,
       "previous_rank": 75,
       "rank_delta": -2,
-      "stars": 16007,
+      "stars": 16009,
       "stars_fmt": "16.0k",
       "forks": 2713,
       "forks_fmt": "2.7k",
@@ -4066,13 +4066,13 @@
       },
       "public_actions": null,
       "evidence_grade": "D",
-      "trust_score": 39.6,
+      "trust_score": 52.6,
       "trust_breakdown": {
         "activity": 17.0,
         "adoption": 10.1,
-        "transparency": 5.0,
+        "transparency": 13.0,
         "safety": 6.5,
-        "identity": 1
+        "identity": 6
       }
     },
     {
@@ -4211,18 +4211,18 @@
       "rank": 81,
       "previous_rank": 81,
       "rank_delta": 0,
-      "stars": 9772,
+      "stars": 9774,
       "stars_fmt": "9.8k",
       "forks": 2181,
       "forks_fmt": "2.2k",
       "last_push": "2026-05-24",
       "days_ago": 3,
-      "weekly_commits": 28,
+      "weekly_commits": 25,
       "commits_low_confidence": false,
       "score": 64.0,
       "description": "Agentic AI Framework for Java Developers",
       "language": "Java",
-      "open_issues": 306,
+      "open_issues": 307,
       "category": "Agent Frameworks",
       "category_rank": 21,
       "npm_package": "",
@@ -4257,13 +4257,13 @@
       },
       "public_actions": null,
       "evidence_grade": "D",
-      "trust_score": 47.1,
+      "trust_score": 59.9,
       "trust_breakdown": {
-        "activity": 22.0,
+        "activity": 21.8,
         "adoption": 9.6,
-        "transparency": 5.6,
+        "transparency": 13.6,
         "safety": 8.9,
-        "identity": 1
+        "identity": 6
       }
     },
     {
@@ -4491,13 +4491,13 @@
       },
       "public_actions": null,
       "evidence_grade": "D",
-      "trust_score": 67.7,
+      "trust_score": 54.7,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 9.6,
-        "transparency": 15.7,
+        "transparency": 7.7,
         "safety": 11.4,
-        "identity": 6
+        "identity": 1
       }
     },
     {
@@ -4553,13 +4553,13 @@
       },
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 67.6,
+      "trust_score": 54.6,
       "trust_breakdown": {
         "activity": 24.1,
         "adoption": 9.6,
-        "transparency": 15.2,
+        "transparency": 7.2,
         "safety": 9.7,
-        "identity": 9
+        "identity": 4
       }
     },
     {
@@ -4569,23 +4569,23 @@
       "rank": 88,
       "previous_rank": 87,
       "rank_delta": -1,
-      "stars": 9863,
+      "stars": 9867,
       "stars_fmt": "9.9k",
       "forks": 894,
       "forks_fmt": "894",
       "last_push": "2026-05-27",
       "days_ago": 0,
-      "weekly_commits": 278,
+      "weekly_commits": 279,
       "commits_low_confidence": false,
       "score": 62.7,
       "description": "AI Observability & Evaluation",
       "language": "Python",
-      "open_issues": 536,
+      "open_issues": 532,
       "category": "Observability & Evaluation",
       "category_rank": 5,
       "npm_package": "",
       "pypi_package": "arize-phoenix",
-      "weekly_downloads": 546788,
+      "weekly_downloads": 518863,
       "dl_source": "pypi",
       "hn_mentions_30d": 0,
       "has_provenance": true,
@@ -4596,13 +4596,13 @@
       "scorecard_checks": {},
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 59.0,
+      "trust_score": 72.0,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 17.2,
-        "transparency": 0,
+        "transparency": 8,
         "safety": 9.8,
-        "identity": 7
+        "identity": 12
       }
     },
     {
@@ -4698,9 +4698,9 @@
       "rank": 91,
       "previous_rank": 90,
       "rank_delta": -1,
-      "stars": 27339,
+      "stars": 27340,
       "stars_fmt": "27.3k",
-      "forks": 3676,
+      "forks": 3677,
       "forks_fmt": "3.7k",
       "last_push": "2026-04-16",
       "days_ago": 40,
@@ -4709,12 +4709,12 @@
       "score": 62.6,
       "description": "An autonomous agent that conducts deep research on any data using any LLM providers",
       "language": "Python",
-      "open_issues": 232,
+      "open_issues": 233,
       "category": "Research & Data",
       "category_rank": 6,
       "npm_package": "",
       "pypi_package": "gpt-researcher",
-      "weekly_downloads": 27600,
+      "weekly_downloads": 23085,
       "dl_source": "pypi",
       "hn_mentions_30d": 0,
       "has_provenance": false,
@@ -4744,13 +4744,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 53.0,
+      "trust_score": 65.9,
       "trust_breakdown": {
         "activity": 11.7,
-        "adoption": 16.6,
-        "transparency": 8.0,
+        "adoption": 16.5,
+        "transparency": 16.0,
         "safety": 9.7,
-        "identity": 7
+        "identity": 12
       }
     },
     {
@@ -4907,13 +4907,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 75.2,
+      "trust_score": 62.2,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 14.8,
-        "transparency": 14.1,
+        "transparency": 6.1,
         "safety": 9.3,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -5113,13 +5113,13 @@
       },
       "public_actions": null,
       "evidence_grade": "D",
-      "trust_score": 65.2,
+      "trust_score": 52.2,
       "trust_breakdown": {
         "activity": 22.5,
         "adoption": 9.4,
-        "transparency": 15.8,
+        "transparency": 7.8,
         "safety": 11.5,
-        "identity": 6
+        "identity": 1
       }
     },
     {
@@ -5463,13 +5463,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 69.8,
+      "trust_score": 56.8,
       "trust_breakdown": {
         "activity": 19.5,
         "adoption": 13.9,
-        "transparency": 14.7,
+        "transparency": 6.7,
         "safety": 9.7,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -5608,8 +5608,8 @@
       "rank": 109,
       "previous_rank": 109,
       "rank_delta": 0,
-      "stars": 5949,
-      "stars_fmt": "5.9k",
+      "stars": 5950,
+      "stars_fmt": "6.0k",
       "forks": 510,
       "forks_fmt": "510",
       "last_push": "2026-05-25",
@@ -5654,13 +5654,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 55.4,
+      "trust_score": 68.4,
       "trust_breakdown": {
         "activity": 21.3,
         "adoption": 14.1,
-        "transparency": 6.2,
+        "transparency": 14.2,
         "safety": 6.8,
-        "identity": 7
+        "identity": 12
       }
     },
     {
@@ -5817,13 +5817,13 @@
       },
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 61.1,
+      "trust_score": 48.1,
       "trust_breakdown": {
         "activity": 18.5,
         "adoption": 9.0,
-        "transparency": 14.4,
+        "transparency": 6.4,
         "safety": 10.2,
-        "identity": 9
+        "identity": 4
       }
     },
     {
@@ -5879,13 +5879,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 59.5,
+      "trust_score": 46.5,
       "trust_breakdown": {
         "activity": 9.8,
         "adoption": 16.0,
-        "transparency": 12.3,
+        "transparency": 4.3,
         "safety": 9.4,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -5941,13 +5941,13 @@
       },
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 46.2,
+      "trust_score": 33.2,
       "trust_breakdown": {
         "activity": 7.5,
         "adoption": 11.4,
-        "transparency": 11.0,
+        "transparency": 3.0,
         "safety": 7.3,
-        "identity": 9
+        "identity": 4
       }
     },
     {
@@ -6003,13 +6003,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 74.6,
+      "trust_score": 61.6,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 13.8,
-        "transparency": 13.9,
+        "transparency": 5.9,
         "safety": 9.9,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -6151,13 +6151,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 65.2,
+      "trust_score": 52.2,
       "trust_breakdown": {
         "activity": 19.2,
         "adoption": 14.0,
-        "transparency": 13.3,
+        "transparency": 5.3,
         "safety": 6.7,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -6256,13 +6256,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 75.9,
+      "trust_score": 62.9,
       "trust_breakdown": {
         "activity": 25.0,
         "adoption": 14.9,
-        "transparency": 14.2,
+        "transparency": 6.2,
         "safety": 9.8,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -6385,13 +6385,13 @@
       "scorecard_checks": {},
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 50.6,
+      "trust_score": 37.6,
       "trust_breakdown": {
         "activity": 19.1,
         "adoption": 12.2,
-        "transparency": 8,
+        "transparency": 0,
         "safety": 2.3,
-        "identity": 9
+        "identity": 4
       }
     },
     {
@@ -6447,13 +6447,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 71.9,
+      "trust_score": 58.9,
       "trust_breakdown": {
         "activity": 20.1,
         "adoption": 12.9,
-        "transparency": 15.6,
+        "transparency": 7.6,
         "safety": 11.3,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -6552,13 +6552,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 52.4,
+      "trust_score": 39.4,
       "trust_breakdown": {
         "activity": 11.2,
         "adoption": 12.3,
-        "transparency": 11.4,
+        "transparency": 3.4,
         "safety": 5.5,
-        "identity": 12
+        "identity": 7
       }
     },
     {
@@ -6801,13 +6801,13 @@
       },
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 33.1,
+      "trust_score": 38.1,
       "trust_breakdown": {
         "activity": 14.7,
         "adoption": 7.9,
         "transparency": 2.9,
         "safety": 3.6,
-        "identity": 4
+        "identity": 9
       }
     },
     {
@@ -7032,7 +7032,7 @@
       "rank": 137,
       "previous_rank": 137,
       "rank_delta": 0,
-      "stars": 5579,
+      "stars": 5580,
       "stars_fmt": "5.6k",
       "forks": 587,
       "forks_fmt": "587",
@@ -7048,9 +7048,9 @@
       "category_rank": 12,
       "npm_package": "",
       "pypi_package": "agentops",
-      "weekly_downloads": 117208,
+      "weekly_downloads": 105659,
       "dl_source": "pypi",
-      "hn_mentions_30d": 1107,
+      "hn_mentions_30d": 1112,
       "has_provenance": false,
       "npm_provenance": null,
       "pypi_provenance": false,
@@ -7059,13 +7059,13 @@
       "scorecard_checks": {},
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 34.1,
+      "trust_score": 47.0,
       "trust_breakdown": {
         "activity": 9.3,
-        "adoption": 15.8,
-        "transparency": 0,
+        "adoption": 15.7,
+        "transparency": 8,
         "safety": 5,
-        "identity": 4
+        "identity": 9
       }
     },
     {
@@ -7121,13 +7121,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 33.8,
+      "trust_score": 46.8,
       "trust_breakdown": {
         "activity": 5.0,
         "adoption": 14.1,
-        "transparency": 3.7,
+        "transparency": 11.7,
         "safety": 4.0,
-        "identity": 7
+        "identity": 12
       }
     },
     {
@@ -7312,13 +7312,13 @@
       },
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 31.8,
+      "trust_score": 18.8,
       "trust_breakdown": {
         "activity": 0.0,
         "adoption": 10.4,
-        "transparency": 9.8,
+        "transparency": 1.8,
         "safety": 2.6,
-        "identity": 9
+        "identity": 4
       }
     },
     {
@@ -7460,13 +7460,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 34.1,
+      "trust_score": 47.1,
       "trust_breakdown": {
         "activity": 5.3,
         "adoption": 11.3,
-        "transparency": 5.3,
+        "transparency": 13.3,
         "safety": 5.2,
-        "identity": 7
+        "identity": 12
       }
     },
     {
@@ -7608,13 +7608,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 42.4,
+      "trust_score": 55.4,
       "trust_breakdown": {
         "activity": 7.2,
         "adoption": 9.8,
-        "transparency": 7.3,
+        "transparency": 15.3,
         "safety": 11.1,
-        "identity": 7
+        "identity": 12
       }
     },
     {
@@ -8014,13 +8014,13 @@
       },
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 22.7,
+      "trust_score": 35.7,
       "trust_breakdown": {
         "activity": 0.0,
         "adoption": 8.2,
-        "transparency": 3.0,
+        "transparency": 11.0,
         "safety": 7.5,
-        "identity": 4
+        "identity": 9
       }
     },
     {
@@ -8048,7 +8048,7 @@
       "pypi_package": "openagi",
       "weekly_downloads": 10,
       "dl_source": "pypi",
-      "hn_mentions_30d": 650,
+      "hn_mentions_30d": 643,
       "has_provenance": false,
       "npm_provenance": null,
       "pypi_provenance": false,
@@ -8057,13 +8057,13 @@
       "scorecard_checks": {},
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 15.9,
+      "trust_score": 28.9,
       "trust_breakdown": {
         "activity": 0.0,
         "adoption": 9.4,
-        "transparency": 0,
+        "transparency": 8,
         "safety": 2.5,
-        "identity": 4
+        "identity": 9
       }
     },
     {
@@ -8377,13 +8377,13 @@
       },
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 35.1,
+      "trust_score": 22.1,
       "trust_breakdown": {
         "activity": 0.0,
         "adoption": 6.9,
-        "transparency": 11.6,
+        "transparency": 3.6,
         "safety": 7.6,
-        "identity": 9
+        "identity": 4
       }
     },
     {
@@ -8482,13 +8482,13 @@
       },
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 33.5,
+      "trust_score": 20.5,
       "trust_breakdown": {
         "activity": 0.0,
         "adoption": 6.4,
-        "transparency": 12.8,
+        "transparency": 4.8,
         "safety": 5.3,
-        "identity": 9
+        "identity": 4
       }
     },
     {
@@ -8516,7 +8516,7 @@
       "pypi_package": "openssa",
       "weekly_downloads": 5,
       "dl_source": "pypi",
-      "hn_mentions_30d": 257,
+      "hn_mentions_30d": 736,
       "has_provenance": false,
       "npm_provenance": null,
       "pypi_provenance": false,
@@ -8544,13 +8544,13 @@
       },
       "public_actions": null,
       "evidence_grade": "B",
-      "trust_score": 25.0,
+      "trust_score": 38.0,
       "trust_breakdown": {
         "activity": 0.0,
         "adoption": 7.1,
-        "transparency": 4.8,
+        "transparency": 12.8,
         "safety": 6.1,
-        "identity": 7
+        "identity": 12
       }
     },
     {
@@ -8649,13 +8649,13 @@
       },
       "public_actions": null,
       "evidence_grade": "C",
-      "trust_score": 20.0,
+      "trust_score": 33.0,
       "trust_breakdown": {
         "activity": 0.0,
         "adoption": 4.4,
-        "transparency": 3.6,
+        "transparency": 11.6,
         "safety": 8.0,
-        "identity": 4
+        "identity": 9
       }
     },
     {
