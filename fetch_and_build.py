@@ -1715,6 +1715,29 @@ def main() -> None:
             ))
     print(f"Built {len(all_cat_meta)} category pages under categories/.")
 
+    # Comparison pages — /compare/<a>-vs-<b>/ for the top agents within each
+    # category. Targets high-intent "X vs Y" searches and gives LLMs citable
+    # head-to-head trust data. Scoped to top 3 per category (no thin N^2 blowup).
+    import itertools
+    cmp_tmpl = env.get_template("compare.html.j2")
+    compare_dir = os.path.join(script_dir, "compare")
+    os.makedirs(compare_dir, exist_ok=True)
+    compare_pairs = []
+    for cat_info in all_cat_meta:
+        cat_top = sorted(
+            [r for r in rows if r.get("category") == cat_info["name"]],
+            key=lambda x: x.get("category_rank") or 9999,
+        )[:3]
+        for a, b in itertools.combinations(cat_top, 2):
+            winner, loser = (a, b) if (a.get("trust_score") or 0) >= (b.get("trust_score") or 0) else (b, a)
+            pair_dir = os.path.join(compare_dir, f"{a['slug']}-vs-{b['slug']}")
+            os.makedirs(pair_dir, exist_ok=True)
+            with open(os.path.join(pair_dir, "index.html"), "w", encoding="utf-8") as f:
+                f.write(cmp_tmpl.render(a=a, b=b, winner=winner, loser=loser,
+                                        category_slug=cat_info["slug"], updated=now_str))
+            compare_pairs.append((a["slug"], b["slug"]))
+    print(f"Built {len(compare_pairs)} comparison pages under compare/.")
+
     # sitemap.xml — /, /methodology, all /agents/<slug>
     today_iso = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     from specs import ALL_SPECS as _ALL_SPECS
@@ -1737,6 +1760,8 @@ def main() -> None:
         sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}", "0.8", "daily"))
     for row in legacy_rows:
         sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}", "0.4", "monthly"))
+    for sa, sb in compare_pairs:
+        sitemap_urls.append((f"https://hvtracker.net/compare/{sa}-vs-{sb}/", "0.7", "weekly"))
     sitemap_urls += [
         ("https://hvtracker.net/compare/", "0.7", "daily"),
         ("https://hvtracker.net/changelog/", "0.6", "weekly"),

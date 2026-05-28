@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ a.name }} vs {{ b.name }}: Trust Score & Security Comparison | HVTracker</title>
+  <meta name="description" content="{{ a.name }} vs {{ b.name }} compared on independent trust signals: HVTrust score ({{ a.trust_score }} vs {{ b.trust_score }}), evidence grade, supply-chain safety, maintenance, and adoption. {{ winner.name }} ranks higher.">
+  <link rel="canonical" href="https://hvtracker.net/compare/{{ a.slug }}-vs-{{ b.slug }}/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ a.name }} vs {{ b.name }} — Trust Score Comparison">
+  <meta property="og:description" content="Independent trust comparison: HVTrust {{ a.trust_score }} vs {{ b.trust_score }}. Supply-chain safety, maintenance, adoption.">
+  <meta property="og:url" content="https://hvtracker.net/compare/{{ a.slug }}-vs-{{ b.slug }}/">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is {{ a.name }} or {{ b.name }} more trustworthy?",
+        "acceptedAnswer": { "@type": "Answer", "text": "On HVTracker's evidence-weighted HVTrust score, {{ winner.name }} ranks higher ({{ winner.trust_score }} vs {{ loser.trust_score }}/100). Trust reflects verifiable supply-chain, transparency, maintenance, and adoption signals — not popularity." }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between {{ a.name }} and {{ b.name }}?",
+        "acceptedAnswer": { "@type": "Answer", "text": "{{ a.name }} ({{ a.repo }}) has an HVTrust score of {{ a.trust_score }} (Grade {{ a.evidence_grade }}) with {{ a.stars_fmt }} GitHub stars; {{ b.name }} ({{ b.repo }}) scores {{ b.trust_score }} (Grade {{ b.evidence_grade }}) with {{ b.stars_fmt }} stars. Both are {{ a.category }}." }
+      }
+    ]
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0b0d10;--surface:rgba(21,25,32,.78);--surface-2:rgba(27,32,41,.82);--border:rgba(255,255,255,.09);--hairline:rgba(168,179,194,.12);--text:#e8ecf2;--muted:#8b97a7;--accent:#8fb3ff;--accent-dim:#5677aa;--green:#3dd68c;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;--font-mono:"IBM Plex Mono","SF Mono",Menlo,monospace}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+    .page{max-width:880px;margin:0 auto;padding:32px 20px 64px}
+    .crumbs{font-size:12px;color:var(--muted);margin-bottom:18px}
+    h1{font-size:30px;line-height:1.2;font-weight:700;letter-spacing:-.01em;margin-bottom:10px}
+    h1 .vs{color:var(--muted);font-weight:500}
+    .lede{color:var(--muted);font-size:15px;margin-bottom:24px}
+    .verdict{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:14px 18px;margin-bottom:28px;font-size:14px}
+    .verdict strong{color:var(--text)}
+    table{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:28px}
+    th,td{padding:11px 12px;border-bottom:1px solid var(--hairline);text-align:left}
+    thead th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+    tbody th{font-weight:500;color:var(--muted);width:38%}
+    td{font-family:var(--font-mono);font-size:13px}
+    td.win{color:var(--green);font-weight:600}
+    .name-col{font-family:var(--font-sans);font-weight:700;font-size:15px}
+    .name-col a{color:var(--text)}
+    .grade{display:inline-block;font-family:var(--font-mono);font-weight:700;font-size:11px;padding:2px 7px;border-radius:4px;color:#fff}
+    .ga{background:#22c55e}.gb{background:#3b82f6}.gc{background:#d8a657}.gd{background:#666}
+    .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+    .cta a{border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--text);background:var(--surface)}
+    .cta a:hover{border-color:var(--accent-dim);text-decoration:none}
+    footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--hairline);font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="crumbs"><a href="/">HVTracker</a> › <a href="/categories/{{ category_slug }}/">{{ a.category }}</a> › {{ a.name }} vs {{ b.name }}</div>
+    <h1>{{ a.name }} <span class="vs">vs</span> {{ b.name }}</h1>
+    <p class="lede">An independent, evidence-weighted trust comparison of two {{ a.category|lower }} — ranked on verifiable signals, not popularity.</p>
+
+    <div class="verdict">
+      <strong>{{ winner.name }} ranks higher</strong> with an HVTrust score of <strong>{{ winner.trust_score }}</strong> vs {{ loser.trust_score }}/100
+      {% if winner.evidence_grade != loser.evidence_grade %}(Grade {{ winner.evidence_grade }} vs {{ loser.evidence_grade }}){% endif %}.
+      HVTrust reflects supply-chain safety, transparency, maintenance, and adoption — weighted by how much verifiable evidence exists.
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Signal</th><th class="name-col"><a href="/agents/{{ a.slug }}/">{{ a.name }}</a></th><th class="name-col"><a href="/agents/{{ b.slug }}/">{{ b.name }}</a></th></tr>
+      </thead>
+      <tbody>
+        <tr><th>HVTrust score</th><td class="{{ 'win' if a.trust_score >= b.trust_score else '' }}">{{ a.trust_score }}</td><td class="{{ 'win' if b.trust_score > a.trust_score else '' }}">{{ b.trust_score }}</td></tr>
+        <tr><th>Evidence grade</th><td><span class="grade g{{ a.evidence_grade|lower }}">{{ a.evidence_grade }}</span></td><td><span class="grade g{{ b.evidence_grade|lower }}">{{ b.evidence_grade }}</span></td></tr>
+        <tr><th>Safety / Integrity (30)</th><td class="{{ 'win' if a.trust_breakdown.safety >= b.trust_breakdown.safety else '' }}">{{ a.trust_breakdown.safety }}</td><td class="{{ 'win' if b.trust_breakdown.safety > a.trust_breakdown.safety else '' }}">{{ b.trust_breakdown.safety }}</td></tr>
+        <tr><th>Transparency (20)</th><td class="{{ 'win' if a.trust_breakdown.transparency >= b.trust_breakdown.transparency else '' }}">{{ a.trust_breakdown.transparency }}</td><td class="{{ 'win' if b.trust_breakdown.transparency > a.trust_breakdown.transparency else '' }}">{{ b.trust_breakdown.transparency }}</td></tr>
+        <tr><th>Maintenance (20)</th><td class="{{ 'win' if a.trust_breakdown.maintenance >= b.trust_breakdown.maintenance else '' }}">{{ a.trust_breakdown.maintenance }}</td><td class="{{ 'win' if b.trust_breakdown.maintenance > a.trust_breakdown.maintenance else '' }}">{{ b.trust_breakdown.maintenance }}</td></tr>
+        <tr><th>Adoption (10)</th><td class="{{ 'win' if a.trust_breakdown.adoption >= b.trust_breakdown.adoption else '' }}">{{ a.trust_breakdown.adoption }}</td><td class="{{ 'win' if b.trust_breakdown.adoption > a.trust_breakdown.adoption else '' }}">{{ b.trust_breakdown.adoption }}</td></tr>
+        <tr><th>GitHub stars</th><td class="{{ 'win' if a.stars >= b.stars else '' }}">{{ a.stars_fmt }}</td><td class="{{ 'win' if b.stars > a.stars else '' }}">{{ b.stars_fmt }}</td></tr>
+        <tr><th>Weekly downloads</th><td>{{ a.downloads_fmt }}</td><td>{{ b.downloads_fmt }}</td></tr>
+        <tr><th>Last push</th><td>{{ a.last_push }}</td><td>{{ b.last_push }}</td></tr>
+        <tr><th>Language</th><td>{{ a.language or '—' }}</td><td>{{ b.language or '—' }}</td></tr>
+        <tr><th>OSSF Scorecard</th><td>{{ a.scorecard_fmt or '—' }}</td><td>{{ b.scorecard_fmt or '—' }}</td></tr>
+      </tbody>
+    </table>
+
+    <div class="cta">
+      <a href="/agents/{{ a.slug }}/">Full {{ a.name }} report →</a>
+      <a href="/agents/{{ b.slug }}/">Full {{ b.name }} report →</a>
+      <a href="/categories/{{ category_slug }}/">All {{ a.category }} →</a>
+    </div>
+
+    <footer>
+      Methodology: <a href="/methodology">how HVTrust is computed</a>. Data updated {{ updated }}. HVTracker is independent and not affiliated with these projects.
+    </footer>
+  </div>
+</body>
+</html>
