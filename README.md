@@ -27,13 +27,22 @@ Signals refresh every 4 hours in batches. A full refresh cycle completes in 24 h
 
 Most agent lists are manually curated directories or popularity rankings. HVTracker combines curation with independently checkable public signals:
 
-| Dimension | Max | What it measures |
-|---|---:|---|
-| **Activity** | 25 | Commit freshness and 4-week development activity |
-| **Adoption** | 20 | Stars and package downloads where available |
-| **Transparency** | 20 | License, documentation, and OSSF Scorecard visibility |
-| **Safety** | 20 | OSSF Scorecard, provenance, and signed commits |
-| **Identity** | 15 | Evidence grade and listing verification status |
+The leaderboard ranks by the **HVTrust score**, not by popularity. HVTrust is gated and confidence-scaled — dimensions are weighted by how hard each signal is to fake, missing evidence lowers the score, staleness is penalised, and unverified or deprecated listings are capped below the verified tier:
+
+```text
+HVTrust = gate( confidence × [ Safety(30) + Identity(20) + Transparency(20)
+                               + Maintenance(20) + Adoption(10) ] − penalties )
+```
+
+| Dimension | Max | What it measures | Forgeability |
+|---|---:|---|---|
+| **Safety / Integrity** | 30 | OSSF Scorecard, provenance, signed commits | very hard |
+| **Identity / Provenance** | 20 | Verified listing status and build provenance | hard |
+| **Transparency** | 20 | License and OSSF transparency checks | medium |
+| **Maintenance** | 20 | Commit freshness and 4-week activity | medium |
+| **Adoption** | 10 | Log-scaled, capped stars and downloads | easy |
+
+**Confidence** = independent signal-type coverage ÷ 5 (floored at 0.35), shown alongside each score: an agent we know little about cannot reach the top tier. See the [methodology](https://hvtracker.net/methodology) for the full model.
 
 Each agent also receives an **evidence grade**:
 
@@ -144,6 +153,19 @@ The v1 public dataset is available under [CC BY 4.0](https://creativecommons.org
 | [`/data/build_report.json`](https://hvtracker.net/data/build_report.json) | Build integrity report |
 | [`/data/signals/scorecard.json`](https://hvtracker.net/data/signals/scorecard.json) | OSSF Scorecard signal cache |
 | [`/data/signals/provenance.json`](https://hvtracker.net/data/signals/provenance.json) | Package provenance signal cache |
+
+---
+
+## Trust Badges
+
+Listed projects can display their live HVTrust score and evidence grade. Badges regenerate every build, so they always reflect current data.
+
+| Badge | Markdown |
+|---|---|
+| HVTrust score | `[![HVTrust](https://hvtracker.net/badge/<slug>.svg)](https://hvtracker.net/agents/<slug>/)` |
+| Evidence grade | `[![HVTrust Grade](https://hvtracker.net/badge/<slug>-grade.svg)](https://hvtracker.net/agents/<slug>/)` |
+
+Replace `<slug>` with your agent's slug (e.g. `langchain`, `aider`). The exact snippet for each agent is shown on its profile page.
 
 ---
 

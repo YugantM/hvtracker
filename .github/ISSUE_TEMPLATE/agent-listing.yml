@@ -89,6 +89,25 @@ body:
     validations:
       required: true
 
+  - type: input
+    id: security_policy
+    attributes:
+      label: Security policy URL (optional)
+      description: Link to SECURITY.md or a vulnerability disclosure policy. Feeds the Safety dimension.
+      placeholder: https://github.com/owner/repo/blob/main/SECURITY.md
+
+  - type: dropdown
+    id: maintainer_relationship
+    attributes:
+      label: Your relationship to this agent
+      description: Used for the identity/provenance signal. We may ask you to verify control of the repository.
+      options:
+        - I am a maintainer / on the core team
+        - I am a contributor
+        - I am an independent user submitting it
+    validations:
+      required: true
+
   - type: checkboxes
     id: checklist
     attributes:

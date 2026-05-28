@@ -402,16 +402,16 @@
 
     {% if row.trust_breakdown is defined %}
     <section class="breakdown">
-      <h2 class="section-title">HVTrust Breakdown <span style="font-weight:400;color:var(--muted);font-size:11px;margin-left:6px">{{ row.trust_score }} / 100</span></h2>
+      <h2 class="section-title">HVTrust Breakdown <span style="font-weight:400;color:var(--muted);font-size:11px;margin-left:6px">{{ row.trust_score }} / 100{% if row.trust_confidence is defined and row.trust_confidence %} · {{ (row.trust_confidence * 100) | round }}% confidence{% endif %}</span></h2>
       <div class="breakdown-row">
-        <span class="breakdown-label">Activity (max 25)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.activity / 25 * 100) | round(1) }}%;background:#2dd4bf"></div></div>
-        <span class="breakdown-value">{{ row.trust_breakdown.activity }}</span>
+        <span class="breakdown-label">Safety / Integrity (max 30)</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.safety / 30 * 100) | round(1) }}%;background:#ef4444"></div></div>
+        <span class="breakdown-value">{{ row.trust_breakdown.safety }}</span>
       </div>
       <div class="breakdown-row">
-        <span class="breakdown-label">Adoption (max 20)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.adoption / 20 * 100) | round(1) }}%;background:#3b82f6"></div></div>
-        <span class="breakdown-value">{{ row.trust_breakdown.adoption }}</span>
+        <span class="breakdown-label">Identity / Provenance (max 20)</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.identity / 20 * 100) | round(1) }}%;background:var(--accent)"></div></div>
+        <span class="breakdown-value">{{ row.trust_breakdown.identity }}</span>
       </div>
       <div class="breakdown-row">
         <span class="breakdown-label">Transparency (max 20)</span>
@@ -419,14 +419,14 @@
         <span class="breakdown-value">{{ row.trust_breakdown.transparency }}</span>
       </div>
       <div class="breakdown-row">
-        <span class="breakdown-label">Safety (max 20)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.safety / 20 * 100) | round(1) }}%;background:#ef4444"></div></div>
-        <span class="breakdown-value">{{ row.trust_breakdown.safety }}</span>
+        <span class="breakdown-label">Maintenance (max 20)</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.maintenance / 20 * 100) | round(1) }}%;background:#2dd4bf"></div></div>
+        <span class="breakdown-value">{{ row.trust_breakdown.maintenance }}</span>
       </div>
       <div class="breakdown-row">
-        <span class="breakdown-label">Identity (max 15)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.identity / 15 * 100) | round(1) }}%;background:var(--accent)"></div></div>
-        <span class="breakdown-value">{{ row.trust_breakdown.identity }}</span>
+        <span class="breakdown-label">Adoption (max 10)</span>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.adoption / 10 * 100) | round(1) }}%;background:#3b82f6"></div></div>
+        <span class="breakdown-value">{{ row.trust_breakdown.adoption }}</span>
       </div>
     </section>
     {% endif %}

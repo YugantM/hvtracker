@@ -272,17 +272,24 @@
 
       <section id="scoring">
         <h2>Health Score And Trust Score</h2>
-        <p>The health score is a 0-100 composite. It is intentionally simple and based only on four GitHub-derived components:</p>
+        <p><strong>The leaderboard ranks by the HVTrust score, not by popularity.</strong> HVTrust is a 0–100 composite designed so that the rank and the evidence grade tell the same story. It is built on four principles:</p>
+        <ul class="weights">
+          <li><strong>Trust is not popularity.</strong> Adoption (stars and downloads) is log-scaled, capped, and carries the lowest weight, so a widely used project cannot buy its way to the top.</li>
+          <li><strong>Harder-to-fake signals weigh more.</strong> Supply-chain integrity sits at the top; stars sit at the bottom.</li>
+          <li><strong>Missing evidence lowers trust.</strong> The raw score is multiplied by a confidence factor based on how many independent signal types are available. An agent we know little about cannot reach the top tier.</li>
+          <li><strong>Known-bad states are penalised and gated.</strong> Staleness subtracts points that adoption cannot offset; deprecated or unverified listings are capped below the verified tier.</li>
+        </ul>
         <div class="formula-block">
-          Score = stars(30) + freshness(25) + activity(25) + community(20)
+          HVTrust = gate( confidence × [ Safety(30) + Identity(20) + Transparency(20) + Maintenance(20) + Adoption(10) ] − penalties )
         </div>
         <ul class="weights">
-          <li><strong>Stars · 30%</strong> — Stars are a rough adoption signal. HVTracker log-scales stars so very large repositories do not dominate the leaderboard linearly.</li>
-          <li><strong>Freshness · 25%</strong> — Freshness rewards projects that have pushed recently. The score decays over roughly six months without a push.</li>
-          <li><strong>Activity · 25%</strong> — Activity uses commits from the last four weeks. It rewards active development, but also log-scales the value so unusually busy repos do not overwhelm the rest of the score.</li>
-          <li><strong>Community · 20%</strong> — Forks are used as a proxy for downstream reuse and developer interest. Like stars, forks are log-scaled.</li>
+          <li><strong>Safety / Integrity · 30</strong> — OSSF Scorecard, build provenance, and signed-commit ratio. The hardest signals to fake.</li>
+          <li><strong>Identity / Provenance · 20</strong> — verified listing status and build provenance binding the package to its source.</li>
+          <li><strong>Transparency · 20</strong> — a declared license and OSSF transparency checks.</li>
+          <li><strong>Maintenance · 20</strong> — recency of the last push and log-scaled recent commit activity (halved when commit data is low-confidence).</li>
+          <li><strong>Adoption · 10</strong> — log-scaled, capped stars and package downloads.</li>
         </ul>
-        <p class="note">HVTrust is a separate trust-oriented score that combines activity, adoption, transparency, safety, and identity signals. Downloads, Hacker News mentions, and supply-chain signals are displayed for context and auditability.</p>
+        <p class="note"><strong>Confidence</strong> = independent signal-type coverage ÷ 5 (floored at 0.35) and is shown alongside each score. The earlier four-part health score (stars, freshness, activity, community) is retained only as a tie-breaker and for historical continuity. Cryptographic identity verification will tighten the gate in a future revision.</p>
       </section>
 
       <section id="data-sources">
@@ -367,7 +374,8 @@
       <section id="changelog">
         <h2>Changelog</h2>
         <ul class="changelog">
-          <li><span class="ver">v2.0</span> (current) — Added supply chain trust signals: npm provenance, PyPI attestations (PEP 740), OSSF Scorecard (via deps.dev), signed commit ratio. These are displayed independently, not folded into the composite score.</li>
+          <li><span class="ver">v3.0</span> (current) — The leaderboard now ranks by HVTrust instead of the popularity-based health score. HVTrust is gated and confidence-scaled: dimensions are weighted by how hard each signal is to fake (Safety 30, Identity 20, Transparency 20, Maintenance 20, Adoption 10), missing evidence lowers the score via a confidence multiplier, staleness incurs a penalty, and deprecated or unverified listings are capped below the verified tier.</li>
+          <li><span class="ver">v2.0</span> — Added supply chain trust signals: npm provenance, PyPI attestations (PEP 740), OSSF Scorecard (via deps.dev), signed commit ratio. These are displayed independently, not folded into the composite score.</li>
           <li><span class="ver">v1.1</span> — Added npm, PyPI, and Hacker News data sources. Daily historical snapshots now archived.</li>
           <li><span class="ver">v1.0</span> (May 2026) — Initial methodology. GitHub-only signals: stars, freshness, activity, community (forks).</li>
         </ul>

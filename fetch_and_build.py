@@ -26,7 +26,7 @@ HEADERS = {
 if TOKEN:
     HEADERS["Authorization"] = f"Bearer {TOKEN}"
 
-METHODOLOGY_VERSION = "v2.0"
+METHODOLOGY_VERSION = "v3.0"
 DATA_SCHEMA_VERSION = "v0.1"
 
 
@@ -309,60 +309,99 @@ def fetch_signed_commit_ratio(owner_repo: str, sample: int = 100) -> float | Non
 
 
 def compute_trust_score(row: dict) -> dict:
-    """Compute the HVTrust composite score (0–100) from five dimensions.
+    """HVTrust composite (0–100) — gated and confidence-scaled.
 
-    Dimensions:
-      Activity    (max 25): freshness + recent commit activity
-      Adoption    (max 20): stars + weekly downloads
-      Transparency(max 20): license exists + OSSF score contribution
-      Safety      (max 20): OSSF Scorecard + provenance + signed commits
-      Identity    (max 15): evidence grade + listing status
+    Model:  trust = clamp( gate( confidence × Σ(wᵢ · dimᵢ) − penalties ) )
+
+    Trust is not popularity. Dimensions are weighted by how hard the signal
+    is to fake (Safety/Integrity highest, Adoption lowest), adoption is
+    logarithmic and capped so stars can't dominate, missing evidence lowers
+    the score via a confidence multiplier rather than being treated as
+    neutral, and known-bad states subtract penalties that popularity cannot
+    offset.
+
+      Safety/Integrity (30): OSSF Scorecard + provenance + signed commits
+      Identity/Provenance (20): verified listing + build provenance
+      Transparency (20): license + OSSF transparency checks
+      Maintenance (20): freshness + (confidence-adjusted) commit activity
+      Adoption (10): log(stars + downloads), capped
+
+      confidence: independent signal-type coverage / 5 (floored 0.35) —
+        thin evidence mathematically cannot reach the top tier.
+      penalties: staleness (>1y since last push).
+      gate: delisted/rejected capped at 25, legacy capped at 70.
+        (Cryptographic identity verification — Phase B — tightens this gate.)
     """
-    # ── Activity (25) ──
-    days = row.get("days_ago", 999)
-    freshness_pts = max(0.0, 15 * (1 - days / 180))
-    commits = row.get("weekly_commits") or 0
-    activity_pts = min(10, math.log1p(commits) / math.log1p(100) * 10)
-    activity = round(freshness_pts + activity_pts, 1)
+    sc = row.get("scorecard_score")
+    sc01 = (sc / 10) if sc is not None else 0.0
+    prov = 1.0 if row.get("has_provenance") else 0.0
+    sr = row.get("signed_commits_ratio")
+    sig01 = sr if sr is not None else 0.0
 
-    # ── Adoption (20) ──
-    stars = row.get("stars", 0)
-    stars_pts = min(12, math.log1p(stars) / math.log1p(100_000) * 12)
-    dl = row.get("weekly_downloads") or 0
-    dl_pts = min(8, math.log1p(dl) / math.log1p(1_000_000) * 8) if dl > 0 else 0
-    adoption = round(stars_pts + dl_pts, 1)
+    # ── Safety / Integrity (30) — hardest to fake ──
+    safety = round((0.5 * sc01 + 0.3 * prov + 0.2 * sig01) * 30, 1)
+
+    # ── Identity / Provenance (20) ──
+    ls = row.get("listing_status", "")
+    listed01 = 1.0 if ls == "listed" else 0.0
+    identity = round((0.6 * listed01 + 0.4 * prov) * 20, 1)
 
     # ── Transparency (20) ──
-    license_pts = 8 if row.get("license_spdx") else 0
-    sc = row.get("scorecard_score")
-    # OSSF score contributes to transparency via specific checks awareness
-    ossf_transparency_pts = min(12, (sc / 10) * 12) if sc is not None else 0
-    transparency = round(license_pts + ossf_transparency_pts, 1)
+    license01 = 1.0 if row.get("license_spdx") else 0.0
+    transparency = round((0.5 * license01 + 0.5 * sc01) * 20, 1)
 
-    # ── Safety (20) ──
-    ossf_safety_pts = min(10, (sc / 10) * 10) if sc is not None else 0
-    prov_pts = 5 if row.get("has_provenance") else 0
-    sr = row.get("signed_commits_ratio")
-    sig_pts = min(5, sr * 5) if sr is not None else 0
-    safety = round(ossf_safety_pts + prov_pts + sig_pts, 1)
+    # ── Maintenance (20) ──
+    days = row.get("days_ago", 999)
+    freshness01 = max(0.0, 1 - days / 180)
+    commits = row.get("weekly_commits") or 0
+    activity01 = math.log1p(commits) / math.log1p(100)
+    if row.get("commits_low_confidence"):
+        activity01 *= 0.5
+    maintenance = round((0.6 * freshness01 + 0.4 * min(1.0, activity01)) * 20, 1)
 
-    # ── Identity (15) ──
-    grade = row.get("evidence_grade", "D")
-    grade_pts = {"A": 10, "B": 7, "C": 4, "D": 1}.get(grade, 1)
-    # listing_status: listed=5, legacy=2, others=0
-    ls = row.get("listing_status", "")
-    ls_pts = 5 if ls == "listed" else (2 if ls == "legacy" else 0)
-    identity = round(grade_pts + ls_pts, 1)
+    # ── Adoption (10) — logarithmic, capped, low weight ──
+    stars = row.get("stars", 0) or 0
+    dl = row.get("weekly_downloads") or 0
+    stars01 = math.log1p(stars) / math.log1p(100_000)
+    dl01 = (math.log1p(dl) / math.log1p(1_000_000)) if dl > 0 else 0.0
+    adoption = round(min(1.0, 0.6 * stars01 + 0.4 * dl01) * 10, 1)
 
-    total = round(activity + adoption + transparency + safety + identity, 1)
+    raw = safety + identity + transparency + maintenance + adoption  # ≤ 100
+
+    # ── Confidence: independent signal-type coverage (floored) ──
+    coverage = 1  # GitHub repo data always present
+    if row.get("weekly_downloads") is not None:
+        coverage += 1
+    if sc is not None or row.get("has_provenance"):
+        coverage += 1
+    if row.get("public_actions"):
+        coverage += 1
+    if row.get("hn_mentions_30d") is not None:
+        coverage += 1
+    confidence = max(0.35, coverage / 5)
+
+    # ── Penalties: subtractive, cannot be offset by adoption ──
+    penalties = 10 if days > 365 else 0
+
+    score = confidence * raw - penalties
+
+    # ── Gate: ceiling for deprecated / unverified listings ──
+    if ls in ("delisted", "rejected"):
+        score = min(score, 25)
+    elif ls == "legacy":
+        score = min(score, 70)
+
+    score = max(0.0, min(100.0, score))
+
     return {
-        "trust_score": min(total, 100),
+        "trust_score": round(score, 1),
+        "trust_confidence": round(confidence, 2),
         "trust_breakdown": {
-            "activity": activity,
-            "adoption": adoption,
-            "transparency": transparency,
             "safety": safety,
             "identity": identity,
+            "transparency": transparency,
+            "maintenance": maintenance,
+            "adoption": adoption,
         },
     }
 
@@ -1236,9 +1275,9 @@ def main() -> None:
         rows = merged
         print(f"\nMerged batch: {len(rows)} total agents ({len(rows) - len(old_agents)} refreshed, {len(old_agents)} carried forward)")
 
+    # Provisional momentum ordering; final rank is assigned by trust_score
+    # below, once evidence grade and the HVTrust composite are computed.
     rows.sort(key=lambda x: x.get("score", 0) or 0, reverse=True)
-    for i, row in enumerate(rows, 1):
-        row["rank"] = i
 
     eligibility_violations = run_eligibility_checks(rows)
 
@@ -1293,16 +1332,26 @@ def main() -> None:
         # HVTrust composite score
         trust = compute_trust_score(row)
         row["trust_score"] = trust["trust_score"]
+        row["trust_confidence"] = trust["trust_confidence"]
         row["trust_breakdown"] = trust["trust_breakdown"]
 
-    # Compute category ranks (within each category, sorted by score)
+    # Rank by HVTrust (trust-first). Tie-break on momentum score, then stars,
+    # so the leaderboard order and the evidence grade tell the same story.
+    rows.sort(
+        key=lambda x: (x.get("trust_score", 0) or 0, x.get("score", 0) or 0, x.get("stars", 0) or 0),
+        reverse=True,
+    )
+    for i, row in enumerate(rows, 1):
+        row["rank"] = i
+
+    # Compute category ranks (within each category, sorted by trust)
     cat_groups: dict[str, list[dict]] = {}
     for row in rows:
         cat = row.get("category", "")
         if cat:
             cat_groups.setdefault(cat, []).append(row)
     for cat_agents in cat_groups.values():
-        cat_agents.sort(key=lambda x: x["score"], reverse=True)
+        cat_agents.sort(key=lambda x: x.get("trust_score", 0) or 0, reverse=True)
         for j, row in enumerate(cat_agents, 1):
             row["category_rank"] = j
 
@@ -1392,6 +1441,7 @@ def main() -> None:
                 "public_actions": r.get("public_actions"),
                 "evidence_grade": r.get("evidence_grade", "D"),
                 "trust_score": r.get("trust_score"),
+                "trust_confidence": r.get("trust_confidence"),
                 "trust_breakdown": r.get("trust_breakdown", {}),
             }
             for r in rows
@@ -1508,6 +1558,7 @@ def main() -> None:
         lr["evidence_grade"] = "D"
         trust = compute_trust_score(lr)
         lr["trust_score"] = trust["trust_score"]
+        lr["trust_confidence"] = trust["trust_confidence"]
         lr["trust_breakdown"] = trust["trust_breakdown"]
         lr["trust_trend_7d"] = None
     legacy_rows.sort(key=lambda x: x.get("stars", 0), reverse=True)
@@ -1534,7 +1585,7 @@ def main() -> None:
         if cat:
             by_cat.setdefault(cat, []).append(r)
     for cat_rows in by_cat.values():
-        cat_rows.sort(key=lambda x: x["score"], reverse=True)
+        cat_rows.sort(key=lambda x: x.get("trust_score", 0) or 0, reverse=True)
     for row in rows:
         cat = row.get("category", "")
         siblings = [s for s in by_cat.get(cat, []) if s["slug"] != row["slug"]][:5]
