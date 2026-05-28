@@ -3,12 +3,6 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  # Auto-deploy after the leaderboard build commits regenerated output.
-  # Bot commits made with GITHUB_TOKEN do not trigger `push`, so without this
-  # the live site would only update on human pushes / manual dispatch.
-  workflow_run:
-    workflows: ["Update leaderboard"]
-    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -22,8 +16,6 @@ concurrency:
 
 jobs:
   deploy:
-    # Skip when the triggering build failed (it committed nothing to deploy).
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
