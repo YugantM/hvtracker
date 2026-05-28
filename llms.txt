@@ -11,11 +11,11 @@ HVTrust = gate( confidence x [ Safety(30) + Identity(20) + Transparency(20) + Ma
 3. Strands Agents (strands-agents/sdk-python) — HVTrust 87.9/100, Grade C
 4. Vespa (vespa-engine/vespa) — HVTrust 86.0/100, Grade B
 5. Weights & Biases Weave (wandb/weave) — HVTrust 85.0/100, Grade B
-6. Weaviate (weaviate/weaviate) — HVTrust 72.2/100, Grade B
-7. LangGraph (langchain-ai/langgraph) — HVTrust 70.0/100, Grade B
-8. PydanticAI (pydantic/pydantic-ai) — HVTrust 68.7/100, Grade B
-9. OpenAI Agents SDK (openai/openai-agents-python) — HVTrust 68.3/100, Grade B
-10. Haystack (deepset-ai/haystack) — HVTrust 68.1/100, Grade C
+6. LangGraph (langchain-ai/langgraph) — HVTrust 82.0/100, Grade B
+7. PydanticAI (pydantic/pydantic-ai) — HVTrust 80.7/100, Grade B
+8. OpenAI Agents SDK (openai/openai-agents-python) — HVTrust 80.3/100, Grade B
+9. Haystack (deepset-ai/haystack) — HVTrust 80.1/100, Grade C
+10. n8n (n8n-io/n8n) — HVTrust 79.8/100, Grade B
 
 ## Machine-readable data (open, CC BY 4.0)
 - [Full registry JSON](https://hvtracker.net/data/latest.json): all 171 agents with trust scores, grades, and signals
