@@ -170,6 +170,34 @@
       line-height: 1;
     }
     .chip .remove:hover { color: var(--red); }
+    .suggest {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 12px;
+    }
+    .suggest-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-right: 2px;
+    }
+    .suggest-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--text);
+      background: transparent;
+      border: 1px dashed var(--border);
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .suggest-chip:hover { border-style: solid; border-color: var(--accent-dim); background: rgba(255,255,255,0.04); }
+    .suggest-chip .plus { color: var(--accent); font-weight: 700; }
+    .suggest-chip .sg-score { color: var(--muted); font-family: var(--mono); font-size: 11px; }
 
     .suggestions {
       position: absolute;
@@ -567,6 +595,7 @@
         What is compared: HVTrust score, health score, evidence grade, the five trust dimensions, freshness, stars, downloads, commit activity, signed commits, OSSF Scorecard, provenance, and HN mentions.
       </div>
       <div class="chips" id="chips"></div>
+      <div class="suggest" id="suggestRow"></div>
     </section>
 
     <section class="report" id="reportSection">
@@ -1028,6 +1057,24 @@
       panel.classList.add("visible");
     }
 
+    // Suggest same-category agents to add — so arriving with one agent (e.g.
+    // from a profile's "Compare" button) never leaves an empty console.
+    function renderSuggestions() {
+      const row = document.getElementById("suggestRow");
+      if (selected.length === 0 || selected.length >= 3) { row.innerHTML = ""; return; }
+      const cats = new Set(selected.map((a) => a.category).filter(Boolean));
+      const chosen = new Set(selected.map((a) => a.repo));
+      const sibs = allAgents
+        .filter((a) => cats.has(a.category) && !chosen.has(a.repo))
+        .sort((x, y) => Number(y.trust_score || 0) - Number(x.trust_score || 0))
+        .slice(0, 6);
+      row.innerHTML = sibs.length
+        ? `<span class="suggest-label">Similar to compare:</span>` + sibs.map((a) => (
+            `<button type="button" class="suggest-chip" onclick="addAgent('${a.repo}')"><span class="plus">+</span> ${escapeHtml(a.name)} <span class="sg-score">${oneDecimal(a.trust_score)}</span></button>`
+          )).join("")
+        : "";
+    }
+
     function render() {
       const chips = document.getElementById("chips");
       const empty = document.getElementById("emptyState");
@@ -1038,6 +1085,7 @@
 
       if (selected.length === 0) {
         empty.style.display = "";
+        document.getElementById("suggestRow").innerHTML = "";
         document.getElementById("reportSection").classList.remove("visible");
         document.getElementById("overviewChart").classList.remove("visible");
         document.getElementById("dimensionChart").classList.remove("visible");
@@ -1047,6 +1095,7 @@
       }
 
       empty.style.display = "none";
+      renderSuggestions();
       renderReport();
       renderOverviewChart();
       renderDimensionChart();

@@ -286,7 +286,7 @@
         {% if row.license_spdx %}<span class="badge">{{ row.license_spdx }}</span>{% endif %}
       </div>
       <div class="hero-actions">
-        <a class="compare-link" href="/compare/?a={{ row.slug }}">Compare Agent</a>
+        <a class="compare-link" href="/compare/?a={{ row.slug }}">Compare</a>
       </div>
       <div class="seo-summary" style="margin-top:18px;font-size:14px;color:var(--muted);line-height:1.7;max-width:640px;">
         <p>{{ row.name }} is an open-source AI agent in the {{ row.category }} category with {{ row.stars_fmt }} GitHub stars{% if row.description %} — {{ row.description }}{% endif %}.

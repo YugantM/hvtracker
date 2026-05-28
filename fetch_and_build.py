@@ -1487,6 +1487,7 @@ def main() -> None:
                 "signed_commits_ratio": r.get("signed_commits_ratio"),
                 "scorecard_score": r.get("scorecard_score"),
                 "scorecard_checks": r.get("scorecard_checks", {}),
+                "slug": r.get("slug"),
                 "public_actions": r.get("public_actions"),
                 "evidence_grade": r.get("evidence_grade", "D"),
                 "listing_status": r.get("listing_status", "listed"),
