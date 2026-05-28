@@ -35,6 +35,68 @@
     "inLanguage": "en"
   }
   </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "HVTracker",
+    "url": "https://hvtracker.net/",
+    "logo": "https://hvtracker.net/og-v1.png",
+    "description": "Independent trust registry ranking open-source AI agents by evidence-weighted trust."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "name": "HVTracker AI Agent Trust Registry",
+    "description": "Evidence-weighted trust scores (HVTrust) for {{ total }} open-source AI agents, computed from public signals: OSSF Scorecard, build provenance, signed commits, license, maintenance, and adoption.",
+    "url": "https://hvtracker.net/",
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "isAccessibleForFree": true,
+    "creator": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net/" },
+    "distribution": [
+      { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://hvtracker.net/data/latest.json" }
+    ],
+    "keywords": ["AI agents", "trust score", "OSSF Scorecard", "supply chain", "provenance", "open source", "agent safety"]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Top open-source AI agents by trust",
+    "itemListOrder": "https://schema.org/ItemListOrderDescending",
+    "numberOfItems": {{ total }},
+    "itemListElement": [
+      {% for row in rows[:10] %}{ "@type": "ListItem", "position": {{ loop.index }}, "url": "https://hvtracker.net/agents/{{ row.slug }}", "name": {{ row.name | tojson }} }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the most trustworthy open-source AI agent?",
+        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker ranks open-source AI agents by the HVTrust score, an evidence-weighted measure of trust rather than popularity. The current top-ranked agent is {{ rows[0].name }} with an HVTrust score of {{ rows[0].trust_score }}/100. See the full ranking at hvtracker.net." }
+      },
+      {
+        "@type": "Question",
+        "name": "How is the HVTrust score calculated?",
+        "acceptedAnswer": { "@type": "Answer", "text": "HVTrust weights signals by how hard they are to fake: supply-chain safety (OSSF Scorecard, provenance, signed commits) 30, identity 20, transparency 20, maintenance 20, and adoption 10. The result is scaled by an evidence-confidence factor, so agents with little verifiable evidence cannot reach the top tier." }
+      },
+      {
+        "@type": "Question",
+        "name": "What is an AI agent trust registry?",
+        "acceptedAnswer": { "@type": "Answer", "text": "A trust registry independently evaluates and ranks AI agents using public, checkable signals so developers can decide which agents to rely on. HVTracker tracks {{ total }} open-source agents and publishes open, machine-readable trust data." }
+      }
+    ]
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
