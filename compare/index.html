@@ -8,23 +8,23 @@
   <link rel="canonical" href="https://hvtracker.net/compare/">
   <style>
     :root {
-      --bg: #080a10;
-      --bg-2: #0d1018;
-      --surface: rgba(20, 23, 34, 0.72);
-      --surface-2: rgba(31, 35, 50, 0.76);
-      --border: rgba(184, 197, 224, 0.16);
-      --hairline: rgba(184, 197, 224, 0.10);
+      --bg: #0b0d10;
+      --bg-2: #10141a;
+      --surface: rgba(21, 25, 32, 0.78);
+      --surface-2: rgba(27, 32, 41, 0.82);
+      --border: rgba(142, 154, 176, 0.22);
+      --hairline: rgba(168, 179, 194, 0.12);
       --glass-hi: rgba(255, 255, 255, 0.055);
-      --metal: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.018) 34%, rgba(124,106,246,0.055) 72%, rgba(196,168,130,0.06));
-      --text: #e2e8f0;
-      --muted: #9aa3b7;
-      --accent: #7c6af6;
-      --accent-dim: #4a3fa0;
-      --accent-soft: rgba(124, 106, 246, 0.12);
-      --green: #34d399;
-      --blue: #60a5fa;
-      --yellow: #fbbf24;
-      --red: #f87171;
+      --metal: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.018) 34%, rgba(45,212,191,0.045) 72%, rgba(216,166,87,0.055));
+      --text: #eef2f6;
+      --muted: #a8b3c2;
+      --accent: #8fb3ff;
+      --accent-dim: #5677aa;
+      --accent-soft: rgba(143, 179, 255, 0.12);
+      --green: #2dd4bf;
+      --blue: #8fb3ff;
+      --yellow: #d8a657;
+      --red: #e8798b;
       --mono: "SF Mono", Consolas, monospace;
       --sans: "Avenir Next", "Segoe UI", sans-serif;
     }
@@ -36,10 +36,10 @@
       background-color: var(--bg);
       background-image:
         url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
-        radial-gradient(circle at 18% -10%, rgba(124,106,246,0.18), transparent 30%),
-        radial-gradient(circle at 86% 6%, rgba(196,168,130,0.13), transparent 26%),
+        radial-gradient(circle at 18% -10%, rgba(45,212,191,0.13), transparent 30%),
+        radial-gradient(circle at 86% 6%, rgba(216,166,87,0.12), transparent 26%),
         linear-gradient(135deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 11px),
-        linear-gradient(180deg, var(--bg-2), var(--bg) 54%, #05060b);
+        linear-gradient(180deg, var(--bg-2), var(--bg) 54%, #07090c);
       background-repeat: repeat, no-repeat, no-repeat, repeat, no-repeat;
       background-size: 256px 256px, auto, auto, auto, auto;
     }
@@ -55,7 +55,7 @@
       margin-bottom: 18px;
       border: 1px solid var(--border);
       border-radius: 10px;
-      background: var(--metal), rgba(16, 19, 29, 0.68);
+      background: var(--metal), rgba(21, 25, 32, 0.72);
       box-shadow: inset 0 1px 0 var(--glass-hi), 0 18px 54px rgba(0,0,0,0.28);
       backdrop-filter: blur(18px) saturate(120%);
       position: relative;
@@ -98,7 +98,7 @@
     .report,
     .chart-panel,
     .cards-panel {
-      background: linear-gradient(135deg, rgba(255,255,255,0.052), rgba(255,255,255,0.014)), rgba(16, 19, 29, 0.68);
+      background: linear-gradient(135deg, rgba(255,255,255,0.052), rgba(255,255,255,0.014)), rgba(21, 25, 32, 0.72);
       border: 1px solid var(--border);
       border-radius: 10px;
       box-shadow: inset 0 1px 0 var(--glass-hi), 0 24px 70px rgba(0,0,0,0.24);
@@ -838,8 +838,8 @@
 
       selected.forEach((agent) => {
         rows.push(
-          barRow(agent, Number(agent.trust_score || 0), trustMax, "HVTrust", "#00b4a0", oneDecimal(agent.trust_score)),
-          barRow(agent, Number(agent.score || 0), scoreMax, "Health", "#60a5fa", oneDecimal(agent.score))
+          barRow(agent, Number(agent.trust_score || 0), trustMax, "HVTrust", "#2dd4bf", oneDecimal(agent.trust_score)),
+          barRow(agent, Number(agent.score || 0), scoreMax, "Health", "#8fb3ff", oneDecimal(agent.score))
         );
       });
 

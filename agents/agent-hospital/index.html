@@ -57,21 +57,21 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:#080a10; --surface:rgba(20,23,34,0.72); --surface-2:rgba(31,35,50,0.76); --border:rgba(184,197,224,0.16);
-      --hairline:rgba(184,197,224,0.10); --glass:rgba(16,19,29,0.68); --glass-hi:rgba(255,255,255,0.055);
-      --metal:linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.018) 34%, rgba(124,106,246,0.055) 72%, rgba(196,168,130,0.06));
-      --text:#eeeef5; --muted:#9aa3b7;
-      --accent:#7c6af6; --accent-lt:rgba(124,106,246,0.10); --accent-dim:#4a3fa0;
-      --mocha:#c4a882; --mocha-lt:rgba(157,124,90,0.15);
-      --fresh:#34d399; --recent:#a3e635; --aging:#f59e0b; --stale:#6b7280;
-      --score-hi-bg:rgba(124,106,246,0.15); --score-hi-fg:#a5a0ff;
-      --score-mid-bg:rgba(157,124,90,0.15); --score-mid-fg:#c4a882;
-      --score-lo-bg:rgba(100,100,120,0.12); --score-lo-fg:#6b7280;
+      --bg:#0b0d10; --surface:rgba(21,25,32,0.78); --surface-2:rgba(27,32,41,0.82); --border:rgba(142,154,176,0.22);
+      --hairline:rgba(168,179,194,0.12); --glass:rgba(21,25,32,0.72); --glass-hi:rgba(255,255,255,0.055);
+      --metal:linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.018) 34%, rgba(45,212,191,0.045) 72%, rgba(216,166,87,0.055));
+      --text:#eef2f6; --muted:#a8b3c2;
+      --accent:#8fb3ff; --accent-lt:rgba(143,179,255,0.10); --accent-dim:#5677aa;
+      --mocha:#d8a657; --mocha-lt:rgba(216,166,87,0.16);
+      --fresh:#2dd4bf; --recent:#9ae6b4; --aging:#d8a657; --stale:#737f91;
+      --score-hi-bg:rgba(45,212,191,0.16); --score-hi-fg:#5eead4;
+      --score-mid-bg:rgba(216,166,87,0.16); --score-mid-fg:#d8a657;
+      --score-lo-bg:rgba(100,100,120,0.12); --score-lo-fg:#737f91;
       --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
       --font-sans:"Inter",system-ui,-apple-system,sans-serif;
     }
     body { background-color:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:14px; line-height:1.55; min-height:100vh;
-      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"), radial-gradient(circle at 18% -10%, rgba(124,106,246,0.20), transparent 30%), radial-gradient(circle at 86% 6%, rgba(196,168,130,0.13), transparent 26%), linear-gradient(135deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 11px), linear-gradient(180deg, #0d1018 0%, var(--bg) 54%, #05060b 100%);
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"), radial-gradient(circle at 18% -10%, rgba(45,212,191,0.14), transparent 30%), radial-gradient(circle at 86% 6%, rgba(216,166,87,0.12), transparent 26%), linear-gradient(135deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 11px), linear-gradient(180deg, #10141a 0%, var(--bg) 54%, #07090c 100%);
       background-repeat:repeat, no-repeat, no-repeat, repeat, no-repeat; background-size:256px 256px, auto, auto, auto, auto;
     }
     a { color:inherit; text-decoration:none; }
@@ -122,11 +122,11 @@
     }
     .rank-big {
       font-family:var(--font-mono); font-size:54px; font-weight:700; line-height:1;
-      text-shadow:0 0 24px rgba(124,106,246,0.2);
+      text-shadow:0 0 24px rgba(45,212,191,0.16);
       color:var(--accent); letter-spacing:-2px;
     }
     .rank-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-top:6px; }
-    .rank-label a { color:var(--mocha); text-decoration:none; border-bottom:1px solid rgba(196,168,130,0.45); }
+    .rank-label a { color:var(--mocha); text-decoration:none; border-bottom:1px solid rgba(216,166,87,0.48); }
     .rank-label a:hover { color:var(--text); border-color:var(--mocha); }
     .rank-sub { font-family:var(--font-mono); font-size:13px; color:var(--muted); }
     .score-pill {
@@ -210,7 +210,7 @@
     .compare-link {
       display:inline-flex; align-items:center; justify-content:center;
       padding:8px 14px; border:1px solid var(--accent);
-      border-radius:6px; background:rgba(124,106,246,0.16);
+      border-radius:6px; background:rgba(143,179,255,0.16);
       color:var(--text);
       font-family:var(--font-mono); font-size:12px;
       border-color:var(--accent);
@@ -219,7 +219,7 @@
     .compare-link:hover {
       color:var(--text);
       border-color:var(--accent);
-      background:rgba(124,106,246,0.26);
+      background:rgba(143,179,255,0.26);
       text-decoration:none;
     }
 
@@ -278,7 +278,7 @@
       <div class="badges">
         <a href="/categories/agent-frameworks" class="badge cat" style="text-decoration:none">Agent Frameworks</a>
         <span class="badge lang">Python</span>
-        <span class="badge" style="background:#f59e0b;color:#fff;" title="Evidence Grade C: 3 signal types">Grade C</span>
+        <span class="badge" style="background:#d8a657;color:#fff;" title="Evidence Grade C: 3 signal types">Grade C</span>
         <span class="badge" style="">listed</span>
         <span class="badge">MIT</span>
       </div>
@@ -301,7 +301,7 @@
       </div>
       
       <div>
-        <div class="score-pill" style="background:rgba(52,211,153,0.12);color:var(--score-lo-fg);">27.6</div>
+        <div class="score-pill" style="background:rgba(45,212,191,0.14);color:var(--score-lo-fg);">27.6</div>
         <div class="rank-label">HVTrust Score · out of 100</div>
       </div>
       
@@ -321,7 +321,7 @@
     <section class="trend">
       <h2 class="section-title">Rank Trend</h2>
       <div class="sparkline-wrap">
-        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="40" viewBox="0 0 200 40" style="display:block"><path d="M0.0,4.0L100.0,4.0L200.0,4.0" fill="none" stroke="#7c6af6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="40" viewBox="0 0 200 40" style="display:block"><path d="M0.0,4.0L100.0,4.0L200.0,4.0" fill="none" stroke="#8fb3ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <div class="sparkline-labels">
           
           <span>2026-05-25</span>
@@ -402,7 +402,7 @@
       <h2 class="section-title">HVTrust Breakdown <span style="font-weight:400;color:var(--muted);font-size:11px;margin-left:6px">27.6 / 100</span></h2>
       <div class="breakdown-row">
         <span class="breakdown-label">Activity (max 25)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:0.0%;background:#34d399"></div></div>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:0.0%;background:#2dd4bf"></div></div>
         <span class="breakdown-value">0.0</span>
       </div>
       <div class="breakdown-row">
@@ -412,7 +412,7 @@
       </div>
       <div class="breakdown-row">
         <span class="breakdown-label">Transparency (max 20)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:55.5%;background:#f59e0b"></div></div>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:55.5%;background:#d8a657"></div></div>
         <span class="breakdown-value">11.1</span>
       </div>
       <div class="breakdown-row">
