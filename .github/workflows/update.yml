@@ -20,6 +20,7 @@ on:
           - full
           - batch
           - mega
+          - render
 
 permissions:
   contents: write
@@ -59,6 +60,11 @@ jobs:
             fi
             echo "args=--batch $BATCH" >> $GITHUB_OUTPUT
             echo "Running batch $BATCH (hour=$HOUR)"
+          elif [ "${{ inputs.mode }}" = "render" ]; then
+            # Render-only: rebuild all pages from data/render_state.json with
+            # NO API calls. Use for UI/template changes — runs in seconds.
+            echo "args=--render-only" >> $GITHUB_OUTPUT
+            echo "Running RENDER-ONLY (no API calls)"
           elif [ "${{ inputs.mode }}" = "mega" ]; then
             # Mega mode: full rebuild with no batch — refreshes ALL agents
             echo "args=" >> $GITHUB_OUTPUT

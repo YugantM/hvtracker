@@ -1044,7 +1044,12 @@ def main() -> None:
     data_path = os.path.join(script_dir, "data.json")
 
     batch = parse_batch_arg()
-    if batch:
+    render_only = "--render-only" in sys.argv
+    render_state_path = os.path.join(script_dir, "data", "render_state.json")
+    if render_only:
+        print("\n=== RENDER-ONLY MODE: no API calls, rebuilding pages from cache ===\n")
+        batch = None
+    elif batch:
         batch_num, total_batches = batch
         print(f"\n=== BATCH MODE: {batch_num}/{total_batches} ===\n")
 
@@ -1156,122 +1161,130 @@ def main() -> None:
             "listing_status": agent.get("listing_status", "listed"),
         }
 
-    rows = []
-    with ThreadPoolExecutor(max_workers=10) as pool:
-        futures = {pool.submit(fetch_one, a): a for a in agents}
-        for future in as_completed(futures):
-            result = future.result()
-            if result:
-                rows.append(result)
-
-    legacy_rows = []
-    if legacy_agents:
-        with ThreadPoolExecutor(max_workers=5) as pool:
-            futures = {pool.submit(fetch_one, a): a for a in legacy_agents}
+    if render_only:
+        # Load fully-decorated rows from the render cache — no API calls.
+        with open(render_state_path) as _f:
+            _state = json.load(_f)
+        rows = _state["rows"]
+        legacy_rows = _state["legacy_rows"]
+        print(f"RENDER-ONLY: loaded {len(rows)} active + {len(legacy_rows)} legacy rows from render_state.json")
+    else:
+        rows = []
+        with ThreadPoolExecutor(max_workers=10) as pool:
+            futures = {pool.submit(fetch_one, a): a for a in agents}
             for future in as_completed(futures):
                 result = future.result()
                 if result:
-                    result["status"] = "legacy"
-                    legacy_rows.append(result)
+                    rows.append(result)
 
-    hn_terms = {
-        a["repo"].lower(): a["hn_search_term"]
-        for a in agents
-        if a.get("hn_search_term")
-    }
-    # Parallel HN lookups — Algolia allows ~10k req/hr, so this is well within
-    # limits and avoids the sequential 15s-timeout × N stall that dominated
-    # build time. Each thread writes a distinct row, so no locking is needed.
-    for row in rows:
-        row["hn_mentions_30d"] = None
-    hn_targets = [r for r in rows if hn_terms.get(r["repo"].lower())]
+        legacy_rows = []
+        if legacy_agents:
+            with ThreadPoolExecutor(max_workers=5) as pool:
+                futures = {pool.submit(fetch_one, a): a for a in legacy_agents}
+                for future in as_completed(futures):
+                    result = future.result()
+                    if result:
+                        result["status"] = "legacy"
+                        legacy_rows.append(result)
 
-    def _fetch_hn(row: dict) -> None:
-        row["hn_mentions_30d"] = fetch_hn_mentions(hn_terms[row["repo"].lower()])
-
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        list(pool.map(_fetch_hn, hn_targets))
-
-    # Fetch public action counts for agents with fingerprint configs (GitHub Search API).
-    # Rate limit: 30 req/min; each agent uses 1-2 calls + 2s sleep between.
-    fp_map = {a["repo"].lower(): a for a in agents if a.get("fingerprints")}
-    if fp_map:
-        print("\nFetching public action counts (fingerprint-based)...")
+        hn_terms = {
+            a["repo"].lower(): a["hn_search_term"]
+            for a in agents
+            if a.get("hn_search_term")
+        }
+        # Parallel HN lookups — Algolia allows ~10k req/hr, so this is well within
+        # limits and avoids the sequential 15s-timeout × N stall that dominated
+        # build time. Each thread writes a distinct row, so no locking is needed.
         for row in rows:
-            agent_cfg = fp_map.get(row["repo"].lower())
-            if agent_cfg:
-                actions = fetch_agent_actions(agent_cfg)
-                row["public_actions"] = actions
-                print(f"  actions {row['repo']}: {actions}")
-                time.sleep(2.5)
-            else:
+            row["hn_mentions_30d"] = None
+        hn_targets = [r for r in rows if hn_terms.get(r["repo"].lower())]
+
+        def _fetch_hn(row: dict) -> None:
+            row["hn_mentions_30d"] = fetch_hn_mentions(hn_terms[row["repo"].lower()])
+
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            list(pool.map(_fetch_hn, hn_targets))
+
+        # Fetch public action counts for agents with fingerprint configs (GitHub Search API).
+        # Rate limit: 30 req/min; each agent uses 1-2 calls + 2s sleep between.
+        fp_map = {a["repo"].lower(): a for a in agents if a.get("fingerprints")}
+        if fp_map:
+            print("\nFetching public action counts (fingerprint-based)...")
+            for row in rows:
+                agent_cfg = fp_map.get(row["repo"].lower())
+                if agent_cfg:
+                    actions = fetch_agent_actions(agent_cfg)
+                    row["public_actions"] = actions
+                    print(f"  actions {row['repo']}: {actions}")
+                    time.sleep(2.5)
+                else:
+                    row["public_actions"] = None
+        else:
+            for row in rows:
                 row["public_actions"] = None
-    else:
+
+        # Fetch PyPI downloads serially to respect pypistats ~1 req/s rate limit.
+        # (npm was already fetched in parallel above; combine here.)
+        # On 429, fall back to the previous run's cached value so the table never goes blank.
+        print("\nFetching PyPI downloads (serial, with cached fallback on 429)...")
         for row in rows:
-            row["public_actions"] = None
+            pypi_pkg = row.get("pypi_package", "")
+            repo_key = row["repo"].lower()
+            dl_parts = []
+            if row.get("npm_dl") is not None:
+                dl_parts.append(("npm", row["npm_dl"]))
+            if pypi_pkg:
+                pypi_dl = fetch_pypi_downloads(pypi_pkg)
+                if pypi_dl is not None:
+                    dl_parts.append(("pypi", pypi_dl))
+                else:
+                    # 429 or error — use last known good value from previous run
+                    cached = prev_downloads.get(repo_key)
+                    if cached:
+                        cached_count, cached_src = cached
+                        row["weekly_downloads"] = cached_count
+                        row["dl_source"] = cached_src
+                        print(f"  dl {row['repo']:<45} {cached_count:,} ({cached_src}) [cached fallback]")
+                        continue
+            if dl_parts:
+                row["weekly_downloads"] = sum(dl for _, dl in dl_parts)
+                row["dl_source"] = "+".join(src for src, _ in dl_parts)
+                print(f"  dl {row['repo']:<45} {row['weekly_downloads']:,} ({row['dl_source']})")
 
-    # Fetch PyPI downloads serially to respect pypistats ~1 req/s rate limit.
-    # (npm was already fetched in parallel above; combine here.)
-    # On 429, fall back to the previous run's cached value so the table never goes blank.
-    print("\nFetching PyPI downloads (serial, with cached fallback on 429)...")
-    for row in rows:
-        pypi_pkg = row.get("pypi_package", "")
-        repo_key = row["repo"].lower()
-        dl_parts = []
-        if row.get("npm_dl") is not None:
-            dl_parts.append(("npm", row["npm_dl"]))
-        if pypi_pkg:
-            pypi_dl = fetch_pypi_downloads(pypi_pkg)
-            if pypi_dl is not None:
-                dl_parts.append(("pypi", pypi_dl))
+        # Fetch PyPI provenance serially (pypi.org Simple API, ~1 req/s to be safe)
+        print("\nFetching PyPI provenance (serial)...")
+        for row in rows:
+            pypi_pkg = row.get("pypi_package", "")
+            if pypi_pkg:
+                row["pypi_provenance"] = fetch_pypi_provenance(pypi_pkg)
+                time.sleep(0.5)
             else:
-                # 429 or error — use last known good value from previous run
-                cached = prev_downloads.get(repo_key)
-                if cached:
-                    cached_count, cached_src = cached
-                    row["weekly_downloads"] = cached_count
-                    row["dl_source"] = cached_src
-                    print(f"  dl {row['repo']:<45} {cached_count:,} ({cached_src}) [cached fallback]")
-                    continue
-        if dl_parts:
-            row["weekly_downloads"] = sum(dl for _, dl in dl_parts)
-            row["dl_source"] = "+".join(src for src, _ in dl_parts)
-            print(f"  dl {row['repo']:<45} {row['weekly_downloads']:,} ({row['dl_source']})")
+                row["pypi_provenance"] = None
 
-    # Fetch PyPI provenance serially (pypi.org Simple API, ~1 req/s to be safe)
-    print("\nFetching PyPI provenance (serial)...")
-    for row in rows:
-        pypi_pkg = row.get("pypi_package", "")
-        if pypi_pkg:
-            row["pypi_provenance"] = fetch_pypi_provenance(pypi_pkg)
-            time.sleep(0.5)
-        else:
-            row["pypi_provenance"] = None
-
-    # Load OSSF Scorecard from weekly CLI cache (scorecard-cache.json).
-    # Falls back to API if cache misses, then to None.
-    print("\nLoading OSSF Scorecard from cache...")
-    cache_hits = 0
-    api_hits = 0
-    for row in rows:
-        repo_key = row["repo"]
-        cached = scorecard_cache.get(repo_key)
-        if cached:
-            row["scorecard_score"] = cached["score"]
-            row["scorecard_checks"] = cached["checks"]
-            cache_hits += 1
-        else:
-            # Cache miss — try live API as fallback
-            sc = fetch_scorecard(repo_key)
-            if sc:
-                row["scorecard_score"] = sc["score"]
-                row["scorecard_checks"] = sc["checks"]
-                api_hits += 1
+        # Load OSSF Scorecard from weekly CLI cache (scorecard-cache.json).
+        # Falls back to API if cache misses, then to None.
+        print("\nLoading OSSF Scorecard from cache...")
+        cache_hits = 0
+        api_hits = 0
+        for row in rows:
+            repo_key = row["repo"]
+            cached = scorecard_cache.get(repo_key)
+            if cached:
+                row["scorecard_score"] = cached["score"]
+                row["scorecard_checks"] = cached["checks"]
+                cache_hits += 1
             else:
-                row["scorecard_score"] = None
-                row["scorecard_checks"] = {}
-    print(f"  Scorecard: {cache_hits} from cache, {api_hits} from API, "
-          f"{len(rows)-cache_hits-api_hits} unavailable.")
+                # Cache miss — try live API as fallback
+                sc = fetch_scorecard(repo_key)
+                if sc:
+                    row["scorecard_score"] = sc["score"]
+                    row["scorecard_checks"] = sc["checks"]
+                    api_hits += 1
+                else:
+                    row["scorecard_score"] = None
+                    row["scorecard_checks"] = {}
+        print(f"  Scorecard: {cache_hits} from cache, {api_hits} from API, "
+              f"{len(rows)-cache_hits-api_hits} unavailable.")
 
     # In batch mode, merge freshly-fetched rows with existing data.json entries
     if batch:
@@ -1586,6 +1599,13 @@ def main() -> None:
         lr["trust_breakdown"] = trust["trust_breakdown"]
         lr["trust_trend_7d"] = None
     legacy_rows.sort(key=lambda x: x.get("stars", 0), reverse=True)
+
+    # Persist fully-decorated rows so `--render-only` can rebuild all pages
+    # later without any API calls (used for UI/template changes).
+    if not render_only:
+        os.makedirs(os.path.dirname(render_state_path), exist_ok=True)
+        with open(render_state_path, "w", encoding="utf-8") as _f:
+            json.dump({"rows": rows, "legacy_rows": legacy_rows}, _f, ensure_ascii=False)
 
     tmpl = env.get_template("template.html")
     html = tmpl.render(
