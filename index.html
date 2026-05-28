@@ -196,33 +196,42 @@
     }
     .intro-links a { color: var(--accent); }
 
-    /* ── Category tabs ── */
+    /* ── Category tabs (browser-style) ── */
     .cat-tabs {
       display: flex;
-      gap: 6px;
+      gap: 3px;
+      align-items: flex-end;
       flex-wrap: wrap;
-      margin: 16px 0 12px;
+      margin: 18px 0 0;
+      border-bottom: 1px solid var(--border);
     }
     .cat-tab {
       appearance: none;
       cursor: pointer;
-      background: rgba(255,255,255,0.035);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 7px 15px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-bottom: none;
+      border-radius: 9px 9px 0 0;
+      padding: 9px 17px;
+      margin-bottom: -1px;          /* overlap the baseline */
       font-family: var(--font-sans);
       font-size: 12.5px;
       font-weight: 500;
       color: var(--muted);
       white-space: nowrap;
-      transition: color .15s, border-color .15s, background .15s;
+      transition: color .15s, background .15s;
     }
-    .cat-tab:hover { color: var(--text); border-color: var(--accent-dim); }
+    .cat-tab:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+    }
     .cat-tab.active {
-      color: var(--bg);
-      background: var(--accent);
-      border-color: var(--accent);
+      color: var(--text);
       font-weight: 600;
+      background: var(--surface, rgba(255,255,255,0.05));
+      border-color: var(--border);
+      border-bottom: 1px solid var(--bg);  /* cut the baseline → merge with content */
+      box-shadow: 0 -1px 0 var(--glass-hi, rgba(255,255,255,0.06)) inset;
     }
 
     /* ── Filter bar ── */
@@ -873,14 +882,14 @@
         <a href="/methodology">Methodology</a>
       </nav>
       <div class="meta">
-        <span class="live-dot"></span>updated 2026-05-28 21:28 UTC<br>
+        <span class="live-dot"></span>updated 2026-05-28 21:36 UTC<br>
         staggered 4-hour signal refresh
       </div>
     </header>
 
     <section class="intro" aria-labelledby="intro-title">
       <h2 id="intro-title">Open-source AI agent rankings based on trust signals, not hype.</h2>
-      <p>HVTracker tracks 171 open-source AI agents, coding agents, frameworks, browser agents, memory systems, and agent infrastructure. Rankings combine public signals for activity, adoption, transparency, safety, provenance, signed commits, OSSF Scorecard, and evidence quality.</p>
+      <p>Independent trust scores for 171 open-source AI agents — ranked on activity, adoption, transparency, safety, and provenance using public, checkable signals, not vendor claims.</p>
       <div class="intro-links" aria-label="Key HVTracker resources">
         <a href="/methodology">How the ranking works</a>
         <a href="/data.json">Download data.json</a>
@@ -1015,40 +1024,40 @@
       <div class="movers-row">
         
         <a href="/agents/pydanticai" class="mover mover-up">
-          <span class="mover-arrow">▲23</span>
+          <span class="mover-arrow">▲19</span>
           <span class="mover-name">PydanticAI</span>
-          <span class="mover-rank">#2</span>
+          <span class="mover-rank">#6</span>
         </a>
         
         <a href="/agents/vercel-ai-sdk" class="mover mover-up">
-          <span class="mover-arrow">▲15</span>
+          <span class="mover-arrow">▲17</span>
           <span class="mover-name">Vercel AI SDK</span>
-          <span class="mover-rank">#3</span>
+          <span class="mover-rank">#1</span>
         </a>
         
-        <a href="/agents/langgraph" class="mover mover-up">
-          <span class="mover-arrow">▲13</span>
-          <span class="mover-name">LangGraph</span>
-          <span class="mover-rank">#1</span>
+        <a href="/agents/adalflow" class="mover mover-up">
+          <span class="mover-arrow">▲17</span>
+          <span class="mover-name">AdalFlow</span>
+          <span class="mover-rank">#26</span>
         </a>
         
         
         <a href="/agents/continue" class="mover mover-down">
-          <span class="mover-arrow">▼138</span>
+          <span class="mover-arrow">▼136</span>
           <span class="mover-name">Continue</span>
-          <span class="mover-rank">#153</span>
+          <span class="mover-rank">#151</span>
         </a>
         
         <a href="/agents/taskweaver" class="mover mover-down">
-          <span class="mover-arrow">▼110</span>
+          <span class="mover-arrow">▼112</span>
           <span class="mover-name">TaskWeaver</span>
-          <span class="mover-rank">#155</span>
+          <span class="mover-rank">#157</span>
         </a>
         
-        <a href="/agents/ufo" class="mover mover-down">
-          <span class="mover-arrow">▼99</span>
-          <span class="mover-name">UFO</span>
-          <span class="mover-rank">#135</span>
+        <a href="/agents/devon" class="mover mover-down">
+          <span class="mover-arrow">▼102</span>
+          <span class="mover-name">Devon</span>
+          <span class="mover-rank">#165</span>
         </a>
         
       </div>
@@ -1185,7 +1194,7 @@
             data-stars="1094"
             data-last_push="2026-05-28"
             data-weekly_commits="151"
-            data-downloads="227706"
+            data-downloads="232480"
             data-hn_mentions_30d="0"
             data-actions_30d="-1"
             data-scorecard="5.2"
@@ -1616,7 +1625,7 @@
             data-repo="strands-agents/sdk-python"
             data-stars="5962"
             data-last_push="2026-05-28"
-            data-weekly_commits="184"
+            data-weekly_commits="183"
             data-downloads="1982105"
             data-hn_mentions_30d="-1"
             data-actions_30d="-1"
@@ -1650,7 +1659,7 @@
                 <span class="push-text">2026-05-28</span>
               </div>
             </td>
-            <td class="r num">184</td>
+            <td class="r num">183</td>
             <td class="r">
               <span class="trust-pill trust-mid" title="Safety 23.4 · Identity 20.0 · Transparency 15.8 · Maintenance 20.0 · Adoption 8.7 · 60.0% confidence">52.7</span>
               
@@ -2094,7 +2103,7 @@
             data-rank_delta="10"
             data-name="Crawl4AI"
             data-repo="unclecode/crawl4ai"
-            data-stars="66888"
+            data-stars="66890"
             data-last_push="2026-05-25"
             data-weekly_commits="0"
             data-downloads="372687"
@@ -2289,12 +2298,12 @@
             data-stars="4153"
             data-last_push="2026-05-26"
             data-weekly_commits="8"
-            data-downloads="2790"
+            data-downloads="3581"
             data-hn_mentions_30d="0"
             data-actions_30d="-1"
             data-scorecard="3.8"
             data-score="70.3"
-            data-trust_score="43.0"
+            data-trust_score="43.1"
             data-category="Agent Frameworks"
             data-category_rank="9"
             data-evidence_grade="B"
@@ -2324,7 +2333,7 @@
             </td>
             <td class="r num">8<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span></td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Safety 7.6 · Identity 12.0 · Transparency 13.8 · Maintenance 13.8 · Adoption 6.6 · 80.0% confidence">43.0</span>
+              <span class="trust-pill trust-mid" title="Safety 7.6 · Identity 12.0 · Transparency 13.8 · Maintenance 13.8 · Adoption 6.7 · 80.0% confidence">43.1</span>
               
             </td>
           </tr>
@@ -2814,10 +2823,10 @@
             data-rank_delta="31"
             data-name="Cognee"
             data-repo="topoteretes/cognee"
-            data-stars="17573"
+            data-stars="17574"
             data-last_push="2026-05-28"
             data-weekly_commits="455"
-            data-downloads="14772"
+            data-downloads="14361"
             data-hn_mentions_30d="-1"
             data-actions_30d="-1"
             data-scorecard="5.4"
@@ -3390,10 +3399,10 @@
             data-rank_delta="31"
             data-name="Cua"
             data-repo="trycua/cua"
-            data-stars="17261"
+            data-stars="17262"
             data-last_push="2026-05-28"
             data-weekly_commits="220"
-            data-downloads="11783"
+            data-downloads="11713"
             data-hn_mentions_30d="-1"
             data-actions_30d="-1"
             data-scorecard="2.8"
@@ -3729,8 +3738,8 @@
             data-stars="306"
             data-last_push="2026-01-23"
             data-weekly_commits="0"
-            data-downloads="211"
-            data-hn_mentions_30d="6"
+            data-downloads="244"
+            data-hn_mentions_30d="3"
             data-actions_30d="-1"
             data-scorecard="4.2"
             data-score="30.2"
@@ -3764,7 +3773,7 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Safety 10.3 · Identity 12.0 · Transparency 14.2 · Maintenance 3.7 · Adoption 4.5 · 80.0% confidence">35.8</span>
+              <span class="trust-pill trust-mid" title="Safety 10.3 · Identity 12.0 · Transparency 14.2 · Maintenance 3.7 · Adoption 4.6 · 80.0% confidence">35.8</span>
               
             </td>
           </tr>
@@ -4161,12 +4170,12 @@
             data-stars="3348"
             data-last_push="2026-05-25"
             data-weekly_commits="32"
-            data-downloads="16648"
+            data-downloads="20299"
             data-hn_mentions_30d="19"
             data-actions_30d="-1"
             data-scorecard="-1"
             data-score="76.1"
-            data-trust_score="31.7"
+            data-trust_score="31.8"
             data-category="Observability &amp; Evaluation"
             data-category_rank="8"
             data-evidence_grade="C"
@@ -4196,7 +4205,7 @@
             </td>
             <td class="r num">32</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Safety 6.0 · Identity 12.0 · Transparency 10.0 · Maintenance 17.9 · Adoption 7.0 · 60.0% confidence">31.7</span>
+              <span class="trust-pill trust-mid" title="Safety 6.0 · Identity 12.0 · Transparency 10.0 · Maintenance 17.9 · Adoption 7.1 · 60.0% confidence">31.8</span>
               
             </td>
           </tr>
@@ -6033,7 +6042,7 @@
             data-stars="22279"
             data-last_push="2026-01-31"
             data-weekly_commits="0"
-            data-downloads="57"
+            data-downloads="56"
             data-hn_mentions_30d="9"
             data-actions_30d="-1"
             data-scorecard="1.2"
@@ -6222,7 +6231,7 @@
             data-rank_delta="-107"
             data-name="opencode"
             data-repo="sst/opencode"
-            data-stars="166638"
+            data-stars="166639"
             data-last_push="2026-05-28"
             data-weekly_commits="1286"
             data-downloads="0"
