@@ -196,42 +196,36 @@
     }
     .intro-links a { color: var(--accent); }
 
-    /* ── Category tabs (browser-style) ── */
+    /* ── Category tabs (underline / ink-bar) ── */
     .cat-tabs {
       display: flex;
-      gap: 3px;
+      gap: 4px;
       align-items: flex-end;
       flex-wrap: wrap;
-      margin: 18px 0 0;
-      border-bottom: 1px solid var(--border);
+      margin: 22px 0 0;
+      border-bottom: 1px solid var(--hairline);
     }
     .cat-tab {
       appearance: none;
       cursor: pointer;
-      background: transparent;
-      border: 1px solid transparent;
-      border-bottom: none;
-      border-radius: 9px 9px 0 0;
-      padding: 9px 17px;
-      margin-bottom: -1px;          /* overlap the baseline */
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      padding: 10px 16px;
+      margin-bottom: -1px;          /* sit the underline on the baseline */
       font-family: var(--font-sans);
-      font-size: 12.5px;
+      font-size: 13px;
       font-weight: 500;
       color: var(--muted);
       white-space: nowrap;
-      transition: color .15s, background .15s;
+      transition: color .15s, border-color .15s;
     }
-    .cat-tab:hover {
-      color: var(--text);
-      background: rgba(255,255,255,0.04);
-    }
+    .cat-tab:hover { color: var(--text); }
     .cat-tab.active {
-      color: var(--text);
+      color: var(--accent);
+      border-bottom-color: var(--accent);
       font-weight: 600;
-      background: var(--surface, rgba(255,255,255,0.05));
-      border-color: var(--border);
-      border-bottom: 1px solid var(--bg);  /* cut the baseline → merge with content */
-      box-shadow: 0 -1px 0 var(--glass-hi, rgba(255,255,255,0.06)) inset;
     }
 
     /* ── Filter bar ── */
