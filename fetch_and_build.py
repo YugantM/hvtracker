@@ -1489,6 +1489,8 @@ def main() -> None:
                 "scorecard_checks": r.get("scorecard_checks", {}),
                 "public_actions": r.get("public_actions"),
                 "evidence_grade": r.get("evidence_grade", "D"),
+                "listing_status": r.get("listing_status", "listed"),
+                "license_spdx": r.get("license_spdx"),
                 "trust_score": r.get("trust_score"),
                 "trust_confidence": r.get("trust_confidence"),
                 "trust_breakdown": r.get("trust_breakdown", {}),
