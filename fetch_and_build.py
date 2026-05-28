@@ -1179,13 +1179,18 @@ def main() -> None:
         for a in agents
         if a.get("hn_search_term")
     }
+    # Parallel HN lookups — Algolia allows ~10k req/hr, so this is well within
+    # limits and avoids the sequential 15s-timeout × N stall that dominated
+    # build time. Each thread writes a distinct row, so no locking is needed.
     for row in rows:
-        term = hn_terms.get(row["repo"].lower())
-        if term:
-            row["hn_mentions_30d"] = fetch_hn_mentions(term)
-            time.sleep(0.3)
-        else:
-            row["hn_mentions_30d"] = None
+        row["hn_mentions_30d"] = None
+    hn_targets = [r for r in rows if hn_terms.get(r["repo"].lower())]
+
+    def _fetch_hn(row: dict) -> None:
+        row["hn_mentions_30d"] = fetch_hn_mentions(hn_terms[row["repo"].lower()])
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        list(pool.map(_fetch_hn, hn_targets))
 
     # Fetch public action counts for agents with fingerprint configs (GitHub Search API).
     # Rate limit: 30 req/min; each agent uses 1-2 calls + 2s sleep between.
