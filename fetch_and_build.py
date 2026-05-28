@@ -368,17 +368,29 @@ def compute_trust_score(row: dict) -> dict:
 
     raw = safety + identity + transparency + maintenance + adoption  # ≤ 100
 
-    # ── Confidence: independent signal-type coverage (floored) ──
-    coverage = 1  # GitHub repo data always present
-    if row.get("weekly_downloads") is not None:
-        coverage += 1
+    # ── Confidence: present / applicable signal types (floored) ──
+    # Signals that cannot apply to an agent are excluded, not counted as
+    # missing trust — "not applicable" (e.g. package downloads for a project
+    # that ships no package) is not the same as "unverified".
+    applicable = 1   # GitHub repo data — always applicable and present
+    present = 1
+    if row.get("npm_package") or row.get("pypi_package"):
+        applicable += 1
+        if row.get("weekly_downloads") is not None:
+            present += 1
+    # Supply-chain trust (OSSF Scorecard or build provenance) is applicable to
+    # any public repo, so its absence genuinely lowers confidence.
+    applicable += 1
     if sc is not None or row.get("has_provenance"):
-        coverage += 1
-    if row.get("public_actions"):
-        coverage += 1
+        present += 1
+    # Behavioural / discussion signals only count when configured for the agent.
+    if row.get("public_actions") is not None:
+        applicable += 1
+        present += 1
     if row.get("hn_mentions_30d") is not None:
-        coverage += 1
-    confidence = max(0.35, coverage / 5)
+        applicable += 1
+        present += 1
+    confidence = max(0.4, present / applicable)
 
     # ── Penalties: subtractive, cannot be offset by adoption ──
     penalties = 10 if days > 365 else 0

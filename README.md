@@ -42,7 +42,7 @@ HVTrust = gate( confidence × [ Safety(30) + Identity(20) + Transparency(20)
 | **Maintenance** | 20 | Commit freshness and 4-week activity | medium |
 | **Adoption** | 10 | Log-scaled, capped stars and downloads | easy |
 
-**Confidence** = independent signal-type coverage ÷ 5 (floored at 0.35), shown alongside each score: an agent we know little about cannot reach the top tier. See the [methodology](https://hvtracker.net/methodology) for the full model.
+**Confidence** = present ÷ applicable signal types (floored at 0.4), shown alongside each score: an agent we have little verifiable evidence for cannot reach the top tier. Signals that cannot apply to an agent (e.g. package downloads for a project that ships no package) are excluded rather than counted as missing. See the [methodology](https://hvtracker.net/methodology) for the full model.
 
 Each agent also receives an **evidence grade**:
 

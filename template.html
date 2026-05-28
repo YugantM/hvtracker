@@ -611,10 +611,10 @@
     .aging  .push-dot { background: var(--aging); }
     .stale  .push-dot { background: var(--stale); }
 
-    .fresh  .push-text { color: var(--fresh); }
-    .recent .push-text { color: var(--recent); }
-    .aging  .push-text { color: var(--aging); }
-    .stale  .push-text { color: var(--stale); }
+    /* Date text stays a single, consistent color; freshness is conveyed by
+       the colored dot + legend (avoids a jarring wall of colored text when a
+       category is filtered). */
+    .push-text { color: var(--muted); }
 
     /* ── Score pill ── */
     .score-pill {
