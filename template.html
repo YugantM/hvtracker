@@ -196,6 +196,35 @@
     }
     .intro-links a { color: var(--accent); }
 
+    /* ── Category tabs ── */
+    .cat-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 16px 0 12px;
+    }
+    .cat-tab {
+      appearance: none;
+      cursor: pointer;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 15px;
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--muted);
+      white-space: nowrap;
+      transition: color .15s, border-color .15s, background .15s;
+    }
+    .cat-tab:hover { color: var(--text); border-color: var(--accent-dim); }
+    .cat-tab.active {
+      color: var(--bg);
+      background: var(--accent);
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
     /* ── Filter bar ── */
     .filter-bar {
       padding: 4px 0 0;
@@ -859,6 +888,13 @@
       </div>
     </section>
 
+    <div class="cat-tabs" id="catTabs" role="tablist" aria-label="Browse by category">
+      <button class="cat-tab active" data-tab="__all__" role="tab" aria-selected="true">Global</button>
+      {% for cat in categories[:5] %}
+      <button class="cat-tab" data-tab="{{ cat.name }}" role="tab" aria-selected="false">{{ cat.name }}</button>
+      {% endfor %}
+    </div>
+
     <div class="filter-bar" id="filterBar">
       <input type="text" class="search-input" id="searchInput" placeholder="Search agents…  ⌘K" autocomplete="off">
       <div class="cat-dropdown" id="catDropdown">
@@ -1086,6 +1122,29 @@
       const totalCats = catCbs.length;
       let selectedCats = new Set(catCbs.map(cb => cb.value));
 
+      // ── Category tabs (quick presets that drive the same selectedCats state) ──
+      const catTabs = Array.from(document.querySelectorAll(".cat-tab"));
+      function setActiveTab() {
+        // Global tab active when all selected; a category tab active when it's
+        // the sole selection; otherwise (multi-select) no tab is active.
+        const allSelected = selectedCats.size === totalCats;
+        const only = selectedCats.size === 1 ? [...selectedCats][0] : null;
+        catTabs.forEach(t => {
+          const tab = t.dataset.tab;
+          const on = tab === "__all__" ? allSelected : (only === tab);
+          t.classList.toggle("active", on);
+          t.setAttribute("aria-selected", on ? "true" : "false");
+        });
+      }
+      catTabs.forEach(t => {
+        t.addEventListener("click", () => {
+          const tab = t.dataset.tab;
+          selectedCats = tab === "__all__" ? new Set(catCbs.map(cb => cb.value)) : new Set([tab]);
+          syncUI();
+          hvtTrack("category_tab", { tab: tab });
+        });
+      });
+
       function getFilteredRows() {
         return Array.from(tbody.querySelectorAll("tr:not(.hidden)"));
       }
@@ -1209,6 +1268,7 @@
           cb.checked = selectedCats.has(cb.value);
           cb.closest(".cat-option").classList.toggle("checked", cb.checked);
         });
+        setActiveTab();
         // Update toggle label
         if (allSelected) {
           toggle.classList.remove("has-selection");
