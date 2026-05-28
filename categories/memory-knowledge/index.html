@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Best Open-Source Memory &amp; Knowledge — 20 Agents Ranked by Trust Score | HVTracker</title>
-  <meta name="description" content="Compare 20 open-source memory &amp; knowledge ranked by independent trust scores. Open WebUI, Milvus, Weaviate. Updated daily with security, activity, and adoption signals.">
+  <meta name="description" content="Compare 20 open-source memory &amp; knowledge ranked by independent trust scores. Open WebUI, RAGFlow, LibreChat. Updated daily with security, activity, and adoption signals.">
   <link rel="canonical" href="https://hvtracker.net/categories/memory-knowledge">
 
   <meta property="og:type" content="website">
@@ -44,29 +44,29 @@
         {
           "@type": "ListItem",
           "position": 2,
+          "name": "RAGFlow",
+          "url": "https://hvtracker.net/agents/ragflow"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "LibreChat",
+          "url": "https://hvtracker.net/agents/librechat"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 4,
           "name": "Milvus",
           "url": "https://hvtracker.net/agents/milvus"
         },
         
         {
           "@type": "ListItem",
-          "position": 3,
-          "name": "Weaviate",
-          "url": "https://hvtracker.net/agents/weaviate"
-        },
-        
-        {
-          "@type": "ListItem",
-          "position": 4,
-          "name": "Vespa",
-          "url": "https://hvtracker.net/agents/vespa"
-        },
-        
-        {
-          "@type": "ListItem",
           "position": 5,
-          "name": "RAGFlow",
-          "url": "https://hvtracker.net/agents/ragflow"
+          "name": "Mem0",
+          "url": "https://hvtracker.net/agents/mem0"
         },
         
         {
@@ -79,29 +79,29 @@
         {
           "@type": "ListItem",
           "position": 7,
-          "name": "Mem0",
-          "url": "https://hvtracker.net/agents/mem0"
-        },
-        
-        {
-          "@type": "ListItem",
-          "position": 8,
-          "name": "LibreChat",
-          "url": "https://hvtracker.net/agents/librechat"
-        },
-        
-        {
-          "@type": "ListItem",
-          "position": 9,
           "name": "Qdrant",
           "url": "https://hvtracker.net/agents/qdrant"
         },
         
         {
           "@type": "ListItem",
-          "position": 10,
+          "position": 8,
+          "name": "Cognee",
+          "url": "https://hvtracker.net/agents/cognee"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 9,
           "name": "Chroma",
           "url": "https://hvtracker.net/agents/chroma"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 10,
+          "name": "Leon",
+          "url": "https://hvtracker.net/agents/leon"
         }
         
       ]
@@ -109,6 +109,9 @@
   }
   </script>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -122,8 +125,8 @@
       --score-hi-bg:rgba(45,212,191,0.16); --score-hi-fg:#5eead4;
       --score-mid-bg:rgba(216,166,87,0.16); --score-mid-fg:#d8a657;
       --score-lo-bg:rgba(100,100,120,0.12); --score-lo-fg:#737f91;
-      --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
-      --font-sans:"Inter",system-ui,-apple-system,sans-serif;
+      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
     }
     body {
       background-color:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:14px; line-height:1.55; min-height:100vh;
@@ -246,13 +249,13 @@
 
     <section class="hero">
       <h1>Memory &amp; Knowledge</h1>
-      <p class="subtitle">20 open-source agents tracked &middot; Ranked by trust score &middot; Updated 2026-05-27 18:36 UTC</p>
+      <p class="subtitle">20 open-source agents tracked &middot; Ranked by trust score &middot; Updated 2026-05-28 17:40 UTC</p>
 
       <div class="seo-intro">
         <p>HVTracker independently evaluates <strong>20 open-source memory &amp; knowledge</strong> using daily signals from GitHub, package registries, and security databases.
         Each agent is scored on activity, adoption, transparency, safety, and identity.
-        The top-ranked memory &amp; knowledge is <strong>Open WebUI</strong> with a trust score of 73.8/100 (Grade C).
-        Other leading projects include Milvus and Weaviate.
+        The top-ranked memory &amp; knowledge is <strong>Open WebUI</strong> with a trust score of 84.5/100 (Grade B).
+        Other leading projects include RAGFlow and LibreChat.
         </p>
       </div>
     </section>
@@ -263,11 +266,11 @@
         <div class="lbl">Agents</div>
       </div>
       <div class="stat">
-        <div class="num">69</div>
+        <div class="num">70</div>
         <div class="lbl">Avg Trust</div>
       </div>
       <div class="stat">
-        <div class="num">762.9k</div>
+        <div class="num">763.5k</div>
         <div class="lbl">Total Stars</div>
       </div>
       <div class="stat">
@@ -292,16 +295,40 @@
           <td class="rank-cell">1</td>
           <td class="name-cell">
             <a href="/agents/open-webui">Open WebUI</a>
-            <span class="grade grade-C">C</span>
+            <span class="grade grade-B">B</span>
             <span class="desc">User-friendly AI Interface (Supports Ollama, OpenAI API, ...)</span>
           </td>
-          <td class="score-cell score-hi">73.8</td>
-          <td class="stars-cell">138.9k</td>
+          <td class="score-cell score-hi">84.5</td>
+          <td class="stars-cell">139.0k</td>
           <td class="lang-cell">Python</td>
         </tr>
         
         <tr>
           <td class="rank-cell">2</td>
+          <td class="name-cell">
+            <a href="/agents/ragflow">RAGFlow</a>
+            <span class="grade grade-C">C</span>
+            <span class="desc">RAGFlow is a leading open-source Retrieval-Augmented Generation (RAG) engine that fuses cutting-edge RAG with Agent capa</span>
+          </td>
+          <td class="score-cell score-hi">71.6</td>
+          <td class="stars-cell">81.5k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">3</td>
+          <td class="name-cell">
+            <a href="/agents/librechat">LibreChat</a>
+            <span class="grade grade-C">C</span>
+            <span class="desc">Enhanced ChatGPT Clone: Features Agents, MCP, DeepSeek, Anthropic, AWS, OpenAI, Responses API, Azure, Groq, o1, GPT-5, M</span>
+          </td>
+          <td class="score-cell score-hi">70.1</td>
+          <td class="stars-cell">37.6k</td>
+          <td class="lang-cell">TypeScript</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">4</td>
           <td class="name-cell">
             <a href="/agents/milvus">Milvus</a>
             <span class="grade grade-B">B</span>
@@ -313,38 +340,14 @@
         </tr>
         
         <tr>
-          <td class="rank-cell">3</td>
-          <td class="name-cell">
-            <a href="/agents/weaviate">Weaviate</a>
-            <span class="grade grade-B">B</span>
-            <span class="desc">Weaviate is an open-source vector database that stores both objects and vectors, allowing for the combination of vector </span>
-          </td>
-          <td class="score-cell score-hi">79.9</td>
-          <td class="stars-cell">16.2k</td>
-          <td class="lang-cell">Go</td>
-        </tr>
-        
-        <tr>
-          <td class="rank-cell">4</td>
-          <td class="name-cell">
-            <a href="/agents/vespa">Vespa</a>
-            <span class="grade grade-B">B</span>
-            <span class="desc">AI + Data, online. https://vespa.ai</span>
-          </td>
-          <td class="score-cell score-hi">83.1</td>
-          <td class="stars-cell">6.9k</td>
-          <td class="lang-cell">Java</td>
-        </tr>
-        
-        <tr>
           <td class="rank-cell">5</td>
           <td class="name-cell">
-            <a href="/agents/ragflow">RAGFlow</a>
-            <span class="grade grade-C">C</span>
-            <span class="desc">RAGFlow is a leading open-source Retrieval-Augmented Generation (RAG) engine that fuses cutting-edge RAG with Agent capa</span>
+            <a href="/agents/mem0">Mem0</a>
+            <span class="grade grade-B">B</span>
+            <span class="desc">Universal memory layer for AI Agents</span>
           </td>
-          <td class="score-cell score-hi">71.0</td>
-          <td class="stars-cell">81.4k</td>
+          <td class="score-cell score-hi">83.9</td>
+          <td class="stars-cell">57.0k</td>
           <td class="lang-cell">Python</td>
         </tr>
         
@@ -363,30 +366,6 @@
         <tr>
           <td class="rank-cell">7</td>
           <td class="name-cell">
-            <a href="/agents/mem0">Mem0</a>
-            <span class="grade grade-B">B</span>
-            <span class="desc">Universal memory layer for AI Agents</span>
-          </td>
-          <td class="score-cell score-hi">83.6</td>
-          <td class="stars-cell">56.9k</td>
-          <td class="lang-cell">Python</td>
-        </tr>
-        
-        <tr>
-          <td class="rank-cell">8</td>
-          <td class="name-cell">
-            <a href="/agents/librechat">LibreChat</a>
-            <span class="grade grade-C">C</span>
-            <span class="desc">Enhanced ChatGPT Clone: Features Agents, MCP, DeepSeek, Anthropic, AWS, OpenAI, Responses API, Azure, Groq, o1, GPT-5, M</span>
-          </td>
-          <td class="score-cell score-hi">70.2</td>
-          <td class="stars-cell">37.6k</td>
-          <td class="lang-cell">TypeScript</td>
-        </tr>
-        
-        <tr>
-          <td class="rank-cell">9</td>
-          <td class="name-cell">
             <a href="/agents/qdrant">Qdrant</a>
             <span class="grade grade-B">B</span>
             <span class="desc">Qdrant - High-performance, massive-scale Vector Database and Vector Search Engine for the next generation of AI. Also av</span>
@@ -397,55 +376,115 @@
         </tr>
         
         <tr>
-          <td class="rank-cell">10</td>
-          <td class="name-cell">
-            <a href="/agents/chroma">Chroma</a>
-            <span class="grade grade-B">B</span>
-            <span class="desc">Search infrastructure for AI</span>
-          </td>
-          <td class="score-cell score-hi">77.7</td>
-          <td class="stars-cell">28.1k</td>
-          <td class="lang-cell">Rust</td>
-        </tr>
-        
-        <tr>
-          <td class="rank-cell">11</td>
-          <td class="name-cell">
-            <a href="/agents/graphiti">Graphiti</a>
-            <span class="grade grade-C">C</span>
-            <span class="desc">Build Real-Time Knowledge Graphs for AI Agents</span>
-          </td>
-          <td class="score-cell score-hi">72.3</td>
-          <td class="stars-cell">26.7k</td>
-          <td class="lang-cell">Python</td>
-        </tr>
-        
-        <tr>
-          <td class="rank-cell">12</td>
+          <td class="rank-cell">8</td>
           <td class="name-cell">
             <a href="/agents/cognee">Cognee</a>
             <span class="grade grade-C">C</span>
             <span class="desc">Memory control plane for AI Agents in 6 lines of code</span>
           </td>
           <td class="score-cell score-hi">71.4</td>
-          <td class="stars-cell">17.5k</td>
+          <td class="stars-cell">17.6k</td>
           <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">9</td>
+          <td class="name-cell">
+            <a href="/agents/chroma">Chroma</a>
+            <span class="grade grade-B">B</span>
+            <span class="desc">Search infrastructure for AI</span>
+          </td>
+          <td class="score-cell score-hi">77.8</td>
+          <td class="stars-cell">28.1k</td>
+          <td class="lang-cell">Rust</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">10</td>
+          <td class="name-cell">
+            <a href="/agents/leon">Leon</a>
+            <span class="grade grade-D">D</span>
+            <span class="desc">🧠 Leon is your open-source personal assistant.</span>
+          </td>
+          <td class="score-cell score-hi">63.1</td>
+          <td class="stars-cell">17.3k</td>
+          <td class="lang-cell">TypeScript</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">11</td>
+          <td class="name-cell">
+            <a href="/agents/weaviate">Weaviate</a>
+            <span class="grade grade-B">B</span>
+            <span class="desc">Weaviate is an open-source vector database that stores both objects and vectors, allowing for the combination of vector </span>
+          </td>
+          <td class="score-cell score-hi">80.3</td>
+          <td class="stars-cell">16.3k</td>
+          <td class="lang-cell">Go</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">12</td>
+          <td class="name-cell">
+            <a href="/agents/vespa">Vespa</a>
+            <span class="grade grade-B">B</span>
+            <span class="desc">AI + Data, online. https://vespa.ai</span>
+          </td>
+          <td class="score-cell score-hi">83.2</td>
+          <td class="stars-cell">6.9k</td>
+          <td class="lang-cell">Java</td>
         </tr>
         
         <tr>
           <td class="rank-cell">13</td>
           <td class="name-cell">
+            <a href="/agents/lancedb">LanceDB</a>
+            <span class="grade grade-B">B</span>
+            <span class="desc">Developer-friendly OSS embedded retrieval library for multimodal AI. Search More; Manage Less.</span>
+          </td>
+          <td class="score-cell score-hi">83.6</td>
+          <td class="stars-cell">10.4k</td>
+          <td class="lang-cell">HTML</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">14</td>
+          <td class="name-cell">
+            <a href="/agents/txtai">txtai</a>
+            <span class="grade grade-B">B</span>
+            <span class="desc">💡 All-in-one AI framework for semantic search, LLM orchestration and language model workflows</span>
+          </td>
+          <td class="score-cell score-hi">67.6</td>
+          <td class="stars-cell">12.6k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">15</td>
+          <td class="name-cell">
+            <a href="/agents/graphiti">Graphiti</a>
+            <span class="grade grade-C">C</span>
+            <span class="desc">Build Real-Time Knowledge Graphs for AI Agents</span>
+          </td>
+          <td class="score-cell score-hi">72.2</td>
+          <td class="stars-cell">26.7k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">16</td>
+          <td class="name-cell">
             <a href="/agents/pgvector">pgvector</a>
             <span class="grade grade-C">C</span>
             <span class="desc">Open-source vector similarity search for Postgres</span>
           </td>
-          <td class="score-cell score-mid">55.6</td>
+          <td class="score-cell score-mid">55.5</td>
           <td class="stars-cell">21.5k</td>
           <td class="lang-cell">C</td>
         </tr>
         
         <tr>
-          <td class="rank-cell">14</td>
+          <td class="rank-cell">17</td>
           <td class="name-cell">
             <a href="/agents/letta">Letta</a>
             <span class="grade grade-B">B</span>
@@ -457,49 +496,13 @@
         </tr>
         
         <tr>
-          <td class="rank-cell">15</td>
-          <td class="name-cell">
-            <a href="/agents/leon">Leon</a>
-            <span class="grade grade-D">D</span>
-            <span class="desc">🧠 Leon is your open-source personal assistant.</span>
-          </td>
-          <td class="score-cell score-hi">63.2</td>
-          <td class="stars-cell">17.3k</td>
-          <td class="lang-cell">TypeScript</td>
-        </tr>
-        
-        <tr>
-          <td class="rank-cell">16</td>
-          <td class="name-cell">
-            <a href="/agents/lancedb">LanceDB</a>
-            <span class="grade grade-B">B</span>
-            <span class="desc">Developer-friendly OSS embedded retrieval library for multimodal AI. Search More; Manage Less.</span>
-          </td>
-          <td class="score-cell score-hi">78.7</td>
-          <td class="stars-cell">10.4k</td>
-          <td class="lang-cell">HTML</td>
-        </tr>
-        
-        <tr>
-          <td class="rank-cell">17</td>
-          <td class="name-cell">
-            <a href="/agents/txtai">txtai</a>
-            <span class="grade grade-B">B</span>
-            <span class="desc">💡 All-in-one AI framework for semantic search, LLM orchestration and language model workflows</span>
-          </td>
-          <td class="score-cell score-hi">67.7</td>
-          <td class="stars-cell">12.6k</td>
-          <td class="lang-cell">Python</td>
-        </tr>
-        
-        <tr>
           <td class="rank-cell">18</td>
           <td class="name-cell">
             <a href="/agents/khoj">Khoj</a>
             <span class="grade grade-B">B</span>
             <span class="desc">Your AI second brain. Self-hostable. Get answers from the web or your docs. Build custom agents, schedule automations, d</span>
           </td>
-          <td class="score-cell score-mid">59.3</td>
+          <td class="score-cell score-mid">59.5</td>
           <td class="stars-cell">34.7k</td>
           <td class="lang-cell">Python</td>
         </tr>
@@ -511,7 +514,7 @@
             <span class="grade grade-C">C</span>
             <span class="desc">Interact with your documents using the power of GPT, 100% privately, no data leaks</span>
           </td>
-          <td class="score-cell score-mid">46.2</td>
+          <td class="score-cell score-mid">46.1</td>
           <td class="stars-cell">57.2k</td>
           <td class="lang-cell">Python</td>
         </tr>

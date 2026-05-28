@@ -35,6 +35,9 @@
     "inLanguage": "en"
   }
   </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -75,8 +78,8 @@
       --delta-down:  #e8798b;
       /* Row */
       --row-alt:     rgba(255,255,255,0.024);
-      --font-mono: "JetBrains Mono", "Fira Mono", "Cascadia Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
-      --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+      --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+      --font-sans: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
     }
 
     body {
@@ -195,9 +198,7 @@
 
     /* ── Filter bar ── */
     .filter-bar {
-      padding: 12px 0;
-      border-top: 1px solid var(--hairline);
-      border-bottom: 1px solid var(--hairline);
+      padding: 4px 0 0;
       background: transparent;
       position: relative;
       display: flex;
@@ -307,11 +308,10 @@
     .legend {
       display: flex;
       gap: 20px;
-      padding: 10px 0;
+      padding: 12px 0 2px;
       font-size: 12px;
       color: var(--muted);
       border: 0;
-      border-bottom: 1px solid var(--hairline);
       background: transparent;
       position: relative;
       flex-wrap: wrap;
