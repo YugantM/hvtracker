@@ -203,7 +203,15 @@
       align-items: flex-end;
       flex-wrap: wrap;
       margin: 22px 0 0;
-      border-bottom: 1px solid var(--hairline);
+      padding: 0 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    /* Stick the tabs to the leaderboard card: no gap, flat top, shared edge */
+    .cat-tabs + .table-wrap {
+      margin-top: 0;
+      border-top: none;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
     }
     .cat-tab {
       appearance: none;
@@ -891,13 +899,6 @@
       </div>
     </section>
 
-    <div class="cat-tabs" id="catTabs" role="tablist" aria-label="Browse by category">
-      <button class="cat-tab active" data-tab="__all__" role="tab" aria-selected="true">Global</button>
-      {% for cat in categories[:5] %}
-      <button class="cat-tab" data-tab="{{ cat.name }}" role="tab" aria-selected="false">{{ cat.name }}</button>
-      {% endfor %}
-    </div>
-
     <div class="filter-bar" id="filterBar">
       <input type="text" class="search-input" id="searchInput" placeholder="Search agents…  ⌘K" autocomplete="off">
       <div class="cat-dropdown" id="catDropdown">
@@ -947,6 +948,13 @@
       </div>
     </div>
     {% endif %}
+
+    <div class="cat-tabs" id="catTabs" role="tablist" aria-label="Browse by category">
+      <button class="cat-tab active" data-tab="__all__" role="tab" aria-selected="true">Global</button>
+      {% for cat in categories[:5] %}
+      <button class="cat-tab" data-tab="{{ cat.name }}" role="tab" aria-selected="false">{{ cat.name }}</button>
+      {% endfor %}
+    </div>
 
     <div class="table-wrap">
       <table id="leaderboard">
