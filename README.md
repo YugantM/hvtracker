@@ -171,6 +171,7 @@ Replace `<slug>` with your agent's slug (e.g. `langchain`, `aider`). The exact s
 
 ## Specifications
 
+- [Trust Credential v0.1](https://hvtracker.net/spec/trust-credential/v0.1) - machine-readable trust record for agent-to-agent (A2A) verification
 - [Methodology v2.2](https://hvtracker.net/spec/methodology/v2.2) - scoring formula and signal definitions
 - [Eligibility v1.0](https://hvtracker.net/spec/eligibility/v1.0) - listing requirements
 - [Listing v0.1](https://hvtracker.net/spec/listing/v0.1) - listing lifecycle

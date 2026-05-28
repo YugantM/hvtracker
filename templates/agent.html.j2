@@ -575,7 +575,7 @@
     <section class="terminal-note" style="padding:18px 20px;font-size:11px;color:var(--muted);line-height:1.7;">
       <strong style="color:var(--text);font-size:12px;">Data sources</strong><br>
       GitHub REST API (repo, commits, stars, forks, license){% if row.npm_package %} · npm Registry (downloads, provenance){% endif %}{% if row.pypi_package %} · PyPI / pypistats (downloads, provenance){% endif %}{% if row.scorecard_score is not none %} · OSSF Scorecard via deps.dev{% endif %}{% if row.hn_mentions_30d is not none %} · Algolia HN Search API{% endif %}{% if row.public_actions %} · GitHub Search API (fingerprint actions){% endif %}
-      <br>Signals refresh in staggered 4-hour batches. <a href="/methodology" style="color:var(--accent);">Methodology {{ "v2.0" }}</a> · <a href="/data/agents/{{ row.slug }}.json" style="color:var(--accent);">Raw JSON</a>
+      <br>Signals refresh in staggered 4-hour batches. <a href="/methodology" style="color:var(--accent);">Methodology {{ methodology_version }}</a> · <a href="/data/agents/{{ row.slug }}.json" style="color:var(--accent);">Raw JSON</a>
     </section>
 
     <footer>

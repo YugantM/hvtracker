@@ -1123,5 +1123,81 @@ LISTING_V01 = {
 """,
 }
 
+TRUST_CREDENTIAL_V01 = {
+    "title": "HVTracker Trust Credential Specification",
+    "slug": "trust-credential",
+    "version": "v0.1",
+    "status": "Draft",
+    "date": "2026-05-28",
+    "authors": ["HVTracker"],
+    "abstract": (
+        "This document defines the Trust Credential: a machine-readable, "
+        "versioned record by which HVTracker attests the evidence-weighted "
+        "trust of an open-source AI agent. It specifies the credential format, "
+        "the lookup and discovery mechanism, and the verification procedure. "
+        "The credential is designed to let one agent decide whether to trust "
+        "another (agent-to-agent, A2A) before interacting with it."
+    ),
+    "sections": [
+        {"id": "s1", "num": "1.", "title": "Abstract"},
+        {"id": "s2", "num": "2.", "title": "Terminology"},
+        {"id": "s3", "num": "3.", "title": "Discovery"},
+        {"id": "s4", "num": "4.", "title": "Credential Format"},
+        {"id": "s5", "num": "5.", "title": "Verification"},
+        {"id": "s6", "num": "6.", "title": "Revocation and Freshness"},
+        {"id": "s7", "num": "7.", "title": "Signing (Future)"},
+        {"id": "s8", "num": "8.", "title": "Versioning"},
+    ],
+    "body": """
+<h2 id="s1"><span class="sec-num">1.</span> Abstract</h2>
+<p>This document defines the <strong>Trust Credential</strong>: a machine-readable record by which HVTracker attests the evidence-weighted trust of an open-source AI agent. The credential lets a consumer — including another agent (agent-to-agent, A2A) — decide whether to trust an agent before interacting with it.</p>
+<p>The key words <span class="must">MUST</span>, <span class="must">MUST NOT</span>, <span class="should">SHOULD</span>, and <span class="may">MAY</span> are to be interpreted as described in <a href="https://www.rfc-editor.org/rfc/rfc2119" target="_blank" rel="noopener">RFC 2119</a>.</p>
+
+<h2 id="s2"><span class="sec-num">2.</span> Terminology</h2>
+<dl class="terms">
+  <dt>Issuer</dt><dd>The trust authority that produces credentials. For this specification the issuer is <code>hvtracker.net</code>.</dd>
+  <dt>Subject</dt><dd>The AI agent a credential describes, identified by its source repository and HVTracker slug.</dd>
+  <dt>Consumer</dt><dd>Any party — human, tool, or agent — that reads a credential to make a trust decision.</dd>
+</dl>
+
+<h2 id="s3"><span class="sec-num">3.</span> Discovery</h2>
+<p>A consumer <span class="should">SHOULD</span> begin at the authority descriptor <code>https://hvtracker.net/.well-known/hvtracker.json</code>, which declares the issuer, the methodology, and the endpoint templates.</p>
+<p>An agent's credential is retrieved from <code>https://hvtracker.net/data/agents/{slug}.json</code> under the <code>trust_credential</code> key. The full registry is available at <code>https://hvtracker.net/data/latest.json</code>.</p>
+
+<h2 id="s4"><span class="sec-num">4.</span> Credential Format</h2>
+<p>A Trust Credential is a JSON object with the following members:</p>
+<pre>
+{
+  "spec": "https://hvtracker.net/spec/trust-credential/v0.1",
+  "version": "0.1",
+  "issuer": "hvtracker.net",
+  "subject": { "repo": "owner/name", "slug": "name", "agent_url": "https://hvtracker.net/agents/name" },
+  "methodology_version": "v3.0",
+  "issued_at": "2026-05-28 12:00 UTC",
+  "trust_score": 0-100,
+  "confidence": 0.0-1.0,
+  "evidence_grade": "A|B|C|D",
+  "dimensions": { "safety": n, "identity": n, "transparency": n, "maintenance": n, "adoption": n },
+  "listing_status": "listed|legacy|delisted|...",
+  "signature": null
+}
+</pre>
+<p>A consumer <span class="must">MUST</span> treat <code>confidence</code> as a first-class factor: a high <code>trust_score</code> with low <code>confidence</code> reflects thin evidence and <span class="should">SHOULD NOT</span> be relied upon for high-stakes interactions.</p>
+
+<h2 id="s5"><span class="sec-num">5.</span> Verification</h2>
+<p>Until signed credentials are issued (Section 7), a credential is verified by <strong>reproduction</strong>: the consumer re-fetches the public signals named in the methodology and recomputes the score. An implementation conforming to the methodology specification <span class="must">MUST</span> produce a score within 0.1 points of the credential given identical inputs.</p>
+<p>A consumer <span class="should">SHOULD</span> reject a credential whose <code>methodology_version</code> it does not recognize.</p>
+
+<h2 id="s6"><span class="sec-num">6.</span> Revocation and Freshness</h2>
+<p>Credentials are regenerated each build cycle; <code>issued_at</code> records issuance time. A consumer <span class="should">SHOULD</span> treat a credential older than one full refresh cycle (24 hours) as stale. A <code>listing_status</code> of <code>delisted</code> <span class="must">MUST</span> be treated as revocation regardless of score.</p>
+
+<h2 id="s7"><span class="sec-num">7.</span> Signing (Future)</h2>
+<p>The <code>signature</code> member is reserved. A future revision will publish an issuer public key at <code>/.well-known/hvtracker.json</code> and populate <code>signature</code> with a detached signature over the canonicalized credential, enabling offline verification without re-fetching public signals.</p>
+
+<h2 id="s8"><span class="sec-num">8.</span> Versioning</h2>
+<p>This specification uses <code>vMAJOR.MINOR</code> versioning. Published versions remain accessible at their versioned URLs and <span class="must">MUST NOT</span> be modified after publication.</p>
+""",
+}
+
 # All published specs, in display order (newest first)
-ALL_SPECS = [LISTING_V01, BUILD_REPORT_V01, DATA_SCHEMA_V01, ELIGIBILITY_V1, PROVENANCE_V01, METHODOLOGY_V2]
+ALL_SPECS = [TRUST_CREDENTIAL_V01, LISTING_V01, BUILD_REPORT_V01, DATA_SCHEMA_V01, ELIGIBILITY_V1, PROVENANCE_V01, METHODOLOGY_V2]

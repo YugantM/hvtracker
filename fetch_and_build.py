@@ -805,7 +805,26 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
                     "stars": snap_agent.get("stars"),
                 })
         agent_events = all_events.get(repo_key, [])
-        agent_doc = {**meta, **agent, "history": history_points, "events": agent_events}
+        # Machine-readable trust credential — the self-contained, versioned
+        # payload an A2A client consumes to decide whether to trust this agent.
+        # `signature` is reserved for Phase C (Ed25519 signing in CI); until
+        # then the credential is unsigned and verified by re-fetch + recompute.
+        trust_credential = {
+            "spec": "https://hvtracker.net/spec/trust-credential/v0.1",
+            "version": "0.1",
+            "issuer": "hvtracker.net",
+            "subject": {"repo": agent["repo"], "slug": slug, "agent_url": f"https://hvtracker.net/agents/{slug}"},
+            "methodology_version": meta["methodology_version"],
+            "issued_at": meta["generated_at"],
+            "trust_score": agent.get("trust_score"),
+            "confidence": agent.get("trust_confidence"),
+            "evidence_grade": agent.get("evidence_grade"),
+            "dimensions": agent.get("trust_breakdown", {}),
+            "listing_status": agent.get("listing_status"),
+            "signature": None,
+        }
+        agent_doc = {**meta, **agent, "trust_credential": trust_credential,
+                     "history": history_points, "events": agent_events}
         with open(os.path.join(data_dir, "agents", f"{slug}.json"), "w", encoding="utf-8") as f:
             json.dump(agent_doc, f, separators=(",", ":"), ensure_ascii=False)
 
@@ -1610,7 +1629,7 @@ def main() -> None:
         slug_dir = os.path.join(agents_dir, row["slug"])
         os.makedirs(slug_dir, exist_ok=True)
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events))
+            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, methodology_version=METHODOLOGY_VERSION))
 
     for row in legacy_rows:
         repo_key = row["repo"].lower()
@@ -1622,7 +1641,7 @@ def main() -> None:
         slug_dir = os.path.join(agents_dir, row["slug"])
         os.makedirs(slug_dir, exist_ok=True)
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events))
+            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, methodology_version=METHODOLOGY_VERSION))
     print(f"Built {len(rows)} active + {len(legacy_rows)} legacy agent profile pages under agents/.")
 
     # ── Category landing pages — /categories/<slug>/index.html ───────────
