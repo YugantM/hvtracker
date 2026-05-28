@@ -289,7 +289,7 @@
           <li><strong>Maintenance · 20</strong> — recency of the last push and log-scaled recent commit activity (halved when commit data is low-confidence).</li>
           <li><strong>Adoption · 10</strong> — log-scaled, capped stars and package downloads.</li>
         </ul>
-        <p class="note"><strong>Confidence</strong> = independent signal-type coverage ÷ 5 (floored at 0.35) and is shown alongside each score. The earlier four-part health score (stars, freshness, activity, community) is retained only as a tie-breaker and for historical continuity. Cryptographic identity verification will tighten the gate in a future revision.</p>
+        <p class="note"><strong>Confidence</strong> = present ÷ applicable signal types (floored at 0.4) and is shown alongside each score. Signals that cannot apply to an agent (for example, package downloads for a project that ships no package) are excluded rather than counted as missing — "not applicable" is not the same as "unverified". The earlier four-part health score (stars, freshness, activity, community) is retained only as a tie-breaker and for historical continuity. Cryptographic identity verification will tighten the gate in a future revision.</p>
       </section>
 
       <section id="data-sources">
