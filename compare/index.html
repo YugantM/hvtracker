@@ -274,6 +274,14 @@
     }
     .chart-panel.visible { display: block; }
     .chart-body { display: grid; gap: 12px; }
+    /* Radar (spider) chart — overlays all selected agents on the 5 trust
+       dimensions so similarities and differences are visible at a glance. */
+    .radar-wrap { display: flex; justify-content: center; padding: 4px 0 2px; }
+    .radar-svg { width: 100%; max-width: 360px; height: auto; }
+    .radar-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: center; margin: 6px 0 18px; }
+    .radar-leg { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text); }
+    .radar-dot { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+    .dim-grid-inner { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
     .bar-row {
       display: grid;
       grid-template-columns: 170px 1fr 56px;
@@ -620,12 +628,19 @@
 
     const gradeRank = { A: 4, B: 3, C: 2, D: 1 };
     const dimMeta = [
-      { key: "activity", label: "Activity", max: 25, color: "#0d9488" },
-      { key: "adoption", label: "Adoption", max: 20, color: "#2563eb" },
-      { key: "transparency", label: "Transparency", max: 20, color: "#d97706" },
-      { key: "safety", label: "Safety", max: 20, color: "#dc2626" },
-      { key: "identity", label: "Identity", max: 15, color: "#7c3aed" },
+      { key: "safety", label: "Safety", max: 30, color: "#ef4444" },
+      { key: "identity", label: "Identity", max: 20, color: "#8fb3ff" },
+      { key: "transparency", label: "Transparency", max: 20, color: "#d8a657" },
+      { key: "maintenance", label: "Maintenance", max: 20, color: "#2dd4bf" },
+      { key: "adoption", label: "Adoption", max: 10, color: "#3b82f6" },
     ];
+    // Stable per-agent colours so a given agent reads the same across every
+    // chart and the radar legend.
+    const agentPalette = ["#2dd4bf", "#8fb3ff", "#f0883e"];
+    function agentColor(agent) {
+      const i = selected.findIndex((a) => a.repo === agent.repo);
+      return agentPalette[i] || "#8b97a7";
+    }
     const signalMeta = [
       { key: "stars", label: "Stars", formatter: (v) => formatCompact(v) },
       { key: "weekly_downloads", label: "Downloads / week", formatter: (v) => formatCompact(v) },
@@ -811,7 +826,7 @@
         {
           label: "Safety leader",
           value: safetyLeaders.map((entry) => entry.agent.name).join(", "),
-          sub: `${oneDecimal(safetyLeaders[0]?.value)} / 20 safety`,
+          sub: `${oneDecimal(safetyLeaders[0]?.value)} / 30 safety`,
         },
       ].map((card) => (
         `<div class="report-card"><div class="report-label">${card.label}</div><div class="report-value">${escapeHtml(card.value)}</div><div class="report-sub">${escapeHtml(card.sub)}</div></div>`
@@ -832,18 +847,24 @@
         return;
       }
 
-      const trustMax = Math.max(100, ...selected.map((a) => Number(a.trust_score || 0)));
-      const scoreMax = Math.max(100, ...selected.map((a) => Number(a.score || 0)));
-      const rows = [];
-
-      selected.forEach((agent) => {
-        rows.push(
-          barRow(agent, Number(agent.trust_score || 0), trustMax, "HVTrust", "#2dd4bf", oneDecimal(agent.trust_score)),
-          barRow(agent, Number(agent.score || 0), scoreMax, "Health", "#8fb3ff", oneDecimal(agent.score))
-        );
-      });
-
-      body.innerHTML = rows.join("");
+      // Group by metric (agents side-by-side under each), coloured per agent,
+      // so the comparison reads across rather than down a stacked list.
+      const metrics = [
+        { label: "HVTrust score", key: "trust_score" },
+        { label: "Health score", key: "score" },
+      ];
+      body.innerHTML = metrics.map((m) => {
+        const rows = selected.map((agent) => {
+          const value = Number(agent[m.key] || 0);
+          const width = Math.max(4, (value / 100) * 100);
+          return `<div class="bar-row">
+            <div class="bar-label"><strong>${escapeHtml(agent.name)}</strong></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${agentColor(agent)}"></div></div>
+            <div class="bar-value">${oneDecimal(value)}</div>
+          </div>`;
+        }).join("");
+        return `<div class="dim-card"><div class="dim-title"><strong>${m.label}</strong><span>/ 100</span></div>${rows}</div>`;
+      }).join("");
       panel.classList.add("visible");
     }
 
@@ -859,6 +880,41 @@
       </div>`;
     }
 
+    function buildRadar(agents) {
+      const N = dimMeta.length;
+      const size = 340, cx = size / 2, cy = size / 2, R = 118;
+      const angle = (i) => -Math.PI / 2 + i * 2 * Math.PI / N;
+      const pt = (i, norm) => [cx + R * norm * Math.cos(angle(i)), cy + R * norm * Math.sin(angle(i))];
+      let grid = "";
+      [0.25, 0.5, 0.75, 1].forEach((r) => {
+        const poly = dimMeta.map((_, i) => pt(i, r).join(",")).join(" ");
+        grid += `<polygon points="${poly}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>`;
+      });
+      let axes = "";
+      dimMeta.forEach((dim, i) => {
+        const [x, y] = pt(i, 1);
+        axes += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(255,255,255,0.07)"/>`;
+        const [lx, ly] = pt(i, 1.16);
+        const anchor = Math.abs(lx - cx) < 12 ? "middle" : (lx > cx ? "start" : "end");
+        axes += `<text x="${lx}" y="${ly}" fill="#8b97a7" font-size="11" font-weight="500" text-anchor="${anchor}" dominant-baseline="middle">${dim.label}</text>`;
+      });
+      let shapes = "";
+      agents.forEach((agent) => {
+        const c = agentColor(agent);
+        const norms = dimMeta.map((dim) => {
+          const v = Number(agent.trust_breakdown?.[dim.key] || 0);
+          return dim.max > 0 ? Math.min(1, v / dim.max) : 0;
+        });
+        const poly = norms.map((n, i) => pt(i, n).join(",")).join(" ");
+        shapes += `<polygon points="${poly}" fill="${c}26" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>`;
+        norms.forEach((n, i) => {
+          const [x, y] = pt(i, n);
+          shapes += `<circle cx="${x}" cy="${y}" r="2.6" fill="${c}"/>`;
+        });
+      });
+      return `<svg viewBox="0 0 ${size} ${size}" class="radar-svg" role="img" aria-label="Trust dimension comparison radar">${grid}${axes}${shapes}</svg>`;
+    }
+
     function renderDimensionChart() {
       const panel = document.getElementById("dimensionChart");
       const body = document.getElementById("dimensionChartBody");
@@ -867,25 +923,29 @@
         return;
       }
 
-      body.innerHTML = dimMeta.map((dim) => {
+      const legend = selected.map((a) => (
+        `<span class="radar-leg"><span class="radar-dot" style="background:${agentColor(a)}"></span>${escapeHtml(a.name)}</span>`
+      )).join("");
+
+      const bars = dimMeta.map((dim) => {
         const rows = selected.map((agent) => {
           const value = Number(agent.trust_breakdown?.[dim.key] || 0);
           const width = dim.max > 0 ? Math.max(4, (value / dim.max) * 100) : 0;
           return `<div class="bar-row">
-            <div class="bar-label">
-              <strong>${escapeHtml(agent.name)}</strong>
-            </div>
-            <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${dim.color}"></div></div>
+            <div class="bar-label"><strong>${escapeHtml(agent.name)}</strong></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${agentColor(agent)}"></div></div>
             <div class="bar-value">${oneDecimal(value)}</div>
           </div>`;
         }).join("");
-
         return `<div class="dim-card">
-          <div class="dim-title"><strong>${dim.label}</strong><span>${dim.max} point scale</span></div>
+          <div class="dim-title"><strong>${dim.label}</strong><span>/ ${dim.max}</span></div>
           ${rows}
         </div>`;
       }).join("");
 
+      body.innerHTML = `<div class="radar-wrap">${buildRadar(selected)}</div>
+        <div class="radar-legend">${legend}</div>
+        <div class="dim-grid-inner">${bars}</div>`;
       panel.classList.add("visible");
     }
 
@@ -908,7 +968,7 @@
               <strong>${escapeHtml(agent.name)}</strong>
               <span>${escapeHtml(signal.label)}</span>
             </div>
-            <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:#7c8cff"></div></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${agentColor(agent)}"></div></div>
             <div class="bar-value">${escapeHtml(signal.formatter(agent[signal.key]))}</div>
           </div>`;
         }).join("");
