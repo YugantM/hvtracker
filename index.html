@@ -203,7 +203,15 @@
       align-items: flex-end;
       flex-wrap: wrap;
       margin: 22px 0 0;
-      border-bottom: 1px solid var(--hairline);
+      padding: 0 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    /* Stick the tabs to the leaderboard card: no gap, flat top, shared edge */
+    .cat-tabs + .table-wrap {
+      margin-top: 0;
+      border-top: none;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
     }
     .cat-tab {
       appearance: none;
@@ -876,7 +884,7 @@
         <a href="/methodology">Methodology</a>
       </nav>
       <div class="meta">
-        <span class="live-dot"></span>updated 2026-05-28 21:59 UTC<br>
+        <span class="live-dot"></span>updated 2026-05-28 22:06 UTC<br>
         staggered 4-hour signal refresh
       </div>
     </header>
@@ -890,21 +898,6 @@
         <a href="/spec/">Specifications</a>
       </div>
     </section>
-
-    <div class="cat-tabs" id="catTabs" role="tablist" aria-label="Browse by category">
-      <button class="cat-tab active" data-tab="__all__" role="tab" aria-selected="true">Global</button>
-      
-      <button class="cat-tab" data-tab="Coding Agents" role="tab" aria-selected="false">Coding Agents</button>
-      
-      <button class="cat-tab" data-tab="Agent Frameworks" role="tab" aria-selected="false">Agent Frameworks</button>
-      
-      <button class="cat-tab" data-tab="Workflow Platforms" role="tab" aria-selected="false">Workflow Platforms</button>
-      
-      <button class="cat-tab" data-tab="Browser &amp; Computer Use" role="tab" aria-selected="false">Browser &amp; Computer Use</button>
-      
-      <button class="cat-tab" data-tab="Memory &amp; Knowledge" role="tab" aria-selected="false">Memory &amp; Knowledge</button>
-      
-    </div>
 
     <div class="filter-bar" id="filterBar">
       <input type="text" class="search-input" id="searchInput" placeholder="Search agents…  ⌘K" autocomplete="off">
@@ -1058,6 +1051,21 @@
     </div>
     
 
+    <div class="cat-tabs" id="catTabs" role="tablist" aria-label="Browse by category">
+      <button class="cat-tab active" data-tab="__all__" role="tab" aria-selected="true">Global</button>
+      
+      <button class="cat-tab" data-tab="Coding Agents" role="tab" aria-selected="false">Coding Agents</button>
+      
+      <button class="cat-tab" data-tab="Agent Frameworks" role="tab" aria-selected="false">Agent Frameworks</button>
+      
+      <button class="cat-tab" data-tab="Workflow Platforms" role="tab" aria-selected="false">Workflow Platforms</button>
+      
+      <button class="cat-tab" data-tab="Browser &amp; Computer Use" role="tab" aria-selected="false">Browser &amp; Computer Use</button>
+      
+      <button class="cat-tab" data-tab="Memory &amp; Knowledge" role="tab" aria-selected="false">Memory &amp; Knowledge</button>
+      
+    </div>
+
     <div class="table-wrap">
       <table id="leaderboard">
         <colgroup>
@@ -1140,7 +1148,7 @@
             data-stars="6929"
             data-last_push="2026-05-28"
             data-weekly_commits="889"
-            data-downloads="1910675"
+            data-downloads="1942254"
             data-hn_mentions_30d="0"
             data-actions_30d="-1"
             data-scorecard="5.8"
@@ -1188,7 +1196,7 @@
             data-stars="1094"
             data-last_push="2026-05-28"
             data-weekly_commits="151"
-            data-downloads="227706"
+            data-downloads="232480"
             data-hn_mentions_30d="0"
             data-actions_30d="-1"
             data-scorecard="5.2"
@@ -2052,7 +2060,7 @@
             data-stars="4420"
             data-last_push="2026-05-27"
             data-weekly_commits="44"
-            data-downloads="17696"
+            data-downloads="17909"
             data-hn_mentions_30d="0"
             data-actions_30d="-1"
             data-scorecard="3.7"
@@ -2097,7 +2105,7 @@
             data-rank_delta="10"
             data-name="Crawl4AI"
             data-repo="unclecode/crawl4ai"
-            data-stars="66895"
+            data-stars="66896"
             data-last_push="2026-05-25"
             data-weekly_commits="0"
             data-downloads="373718"
@@ -2820,7 +2828,7 @@
             data-stars="17574"
             data-last_push="2026-05-28"
             data-weekly_commits="455"
-            data-downloads="14772"
+            data-downloads="14361"
             data-hn_mentions_30d="-1"
             data-actions_30d="-1"
             data-scorecard="5.4"
@@ -3396,7 +3404,7 @@
             data-stars="17262"
             data-last_push="2026-05-28"
             data-weekly_commits="220"
-            data-downloads="11783"
+            data-downloads="11713"
             data-hn_mentions_30d="-1"
             data-actions_30d="-1"
             data-scorecard="2.8"
@@ -4164,12 +4172,12 @@
             data-stars="3348"
             data-last_push="2026-05-25"
             data-weekly_commits="32"
-            data-downloads="16648"
+            data-downloads="20299"
             data-hn_mentions_30d="19"
             data-actions_30d="-1"
             data-scorecard="-1"
             data-score="76.1"
-            data-trust_score="31.7"
+            data-trust_score="31.8"
             data-category="Observability &amp; Evaluation"
             data-category_rank="8"
             data-evidence_grade="C"
@@ -4199,7 +4207,7 @@
             </td>
             <td class="r num">32</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Safety 6.0 · Identity 12.0 · Transparency 10.0 · Maintenance 17.9 · Adoption 7.0 · 60.0% confidence">31.7</span>
+              <span class="trust-pill trust-mid" title="Safety 6.0 · Identity 12.0 · Transparency 10.0 · Maintenance 17.9 · Adoption 7.1 · 60.0% confidence">31.8</span>
               
             </td>
           </tr>
@@ -5317,7 +5325,7 @@
             data-last_push="2026-05-25"
             data-weekly_commits="1"
             data-downloads="0"
-            data-hn_mentions_30d="653"
+            data-hn_mentions_30d="652"
             data-actions_30d="-1"
             data-scorecard="1.6"
             data-score="55.0"
@@ -5796,12 +5804,12 @@
             data-stars="7710"
             data-last_push="2025-09-18"
             data-weekly_commits="0"
-            data-downloads="177"
+            data-downloads="19"
             data-hn_mentions_30d="-1"
             data-actions_30d="-1"
             data-scorecard="4.2"
             data-score="35.7"
-            data-trust_score="24.1"
+            data-trust_score="23.6"
             data-category="Coding Agents"
             data-category_rank="12"
             data-evidence_grade="C"
@@ -5831,7 +5839,7 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-low" title="Safety 7.7 · Identity 12.0 · Transparency 14.2 · Maintenance 0.0 · Adoption 6.2 · 60.0% confidence">24.1</span>
+              <span class="trust-pill trust-low" title="Safety 7.7 · Identity 12.0 · Transparency 14.2 · Maintenance 0.0 · Adoption 5.5 · 60.0% confidence">23.6</span>
               
             </td>
           </tr>
@@ -6036,7 +6044,7 @@
             data-stars="22279"
             data-last_push="2026-01-31"
             data-weekly_commits="0"
-            data-downloads="57"
+            data-downloads="56"
             data-hn_mentions_30d="9"
             data-actions_30d="-1"
             data-scorecard="1.2"
@@ -6225,9 +6233,9 @@
             data-rank_delta="-107"
             data-name="opencode"
             data-repo="sst/opencode"
-            data-stars="166643"
+            data-stars="166644"
             data-last_push="2026-05-28"
-            data-weekly_commits="1289"
+            data-weekly_commits="1291"
             data-downloads="0"
             data-hn_mentions_30d="51"
             data-actions_30d="-1"
@@ -6261,7 +6269,7 @@
                 <span class="push-text">2026-05-28</span>
               </div>
             </td>
-            <td class="r num">1289</td>
+            <td class="r num">1291</td>
             <td class="r">
               <span class="trust-pill trust-low" title="Safety 4.2 · Identity 12.0 · Transparency 10.0 · Maintenance 20.0 · Adoption 6.3 · 40.0% confidence">21.0</span>
               
