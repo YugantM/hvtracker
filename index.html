@@ -196,42 +196,36 @@
     }
     .intro-links a { color: var(--accent); }
 
-    /* ── Category tabs (browser-style) ── */
+    /* ── Category tabs (underline / ink-bar) ── */
     .cat-tabs {
       display: flex;
-      gap: 3px;
+      gap: 4px;
       align-items: flex-end;
       flex-wrap: wrap;
-      margin: 18px 0 0;
-      border-bottom: 1px solid var(--border);
+      margin: 22px 0 0;
+      border-bottom: 1px solid var(--hairline);
     }
     .cat-tab {
       appearance: none;
       cursor: pointer;
-      background: transparent;
-      border: 1px solid transparent;
-      border-bottom: none;
-      border-radius: 9px 9px 0 0;
-      padding: 9px 17px;
-      margin-bottom: -1px;          /* overlap the baseline */
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      padding: 10px 16px;
+      margin-bottom: -1px;          /* sit the underline on the baseline */
       font-family: var(--font-sans);
-      font-size: 12.5px;
+      font-size: 13px;
       font-weight: 500;
       color: var(--muted);
       white-space: nowrap;
-      transition: color .15s, background .15s;
+      transition: color .15s, border-color .15s;
     }
-    .cat-tab:hover {
-      color: var(--text);
-      background: rgba(255,255,255,0.04);
-    }
+    .cat-tab:hover { color: var(--text); }
     .cat-tab.active {
-      color: var(--text);
+      color: var(--accent);
+      border-bottom-color: var(--accent);
       font-weight: 600;
-      background: var(--surface, rgba(255,255,255,0.05));
-      border-color: var(--border);
-      border-bottom: 1px solid var(--bg);  /* cut the baseline → merge with content */
-      box-shadow: 0 -1px 0 var(--glass-hi, rgba(255,255,255,0.06)) inset;
     }
 
     /* ── Filter bar ── */
@@ -882,7 +876,7 @@
         <a href="/methodology">Methodology</a>
       </nav>
       <div class="meta">
-        <span class="live-dot"></span>updated 2026-05-28 21:36 UTC<br>
+        <span class="live-dot"></span>updated 2026-05-28 21:43 UTC<br>
         staggered 4-hour signal refresh
       </div>
     </header>
@@ -1146,7 +1140,7 @@
             data-stars="6929"
             data-last_push="2026-05-28"
             data-weekly_commits="889"
-            data-downloads="1942254"
+            data-downloads="1910675"
             data-hn_mentions_30d="0"
             data-actions_30d="-1"
             data-scorecard="5.8"
@@ -2058,7 +2052,7 @@
             data-stars="4420"
             data-last_push="2026-05-27"
             data-weekly_commits="44"
-            data-downloads="17696"
+            data-downloads="17909"
             data-hn_mentions_30d="0"
             data-actions_30d="-1"
             data-scorecard="3.7"
@@ -2103,11 +2097,11 @@
             data-rank_delta="10"
             data-name="Crawl4AI"
             data-repo="unclecode/crawl4ai"
-            data-stars="66890"
+            data-stars="66892"
             data-last_push="2026-05-25"
             data-weekly_commits="0"
             data-downloads="372687"
-            data-hn_mentions_30d="9"
+            data-hn_mentions_30d="7"
             data-actions_30d="-1"
             data-scorecard="4.9"
             data-score="71.4"
@@ -3738,7 +3732,7 @@
             data-stars="306"
             data-last_push="2026-01-23"
             data-weekly_commits="0"
-            data-downloads="244"
+            data-downloads="211"
             data-hn_mentions_30d="3"
             data-actions_30d="-1"
             data-scorecard="4.2"
@@ -3773,7 +3767,7 @@
             </td>
             <td class="r num">0</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Safety 10.3 · Identity 12.0 · Transparency 14.2 · Maintenance 3.7 · Adoption 4.6 · 80.0% confidence">35.8</span>
+              <span class="trust-pill trust-mid" title="Safety 10.3 · Identity 12.0 · Transparency 14.2 · Maintenance 3.7 · Adoption 4.5 · 80.0% confidence">35.8</span>
               
             </td>
           </tr>
@@ -4170,12 +4164,12 @@
             data-stars="3348"
             data-last_push="2026-05-25"
             data-weekly_commits="32"
-            data-downloads="20299"
-            data-hn_mentions_30d="19"
+            data-downloads="16648"
+            data-hn_mentions_30d="15"
             data-actions_30d="-1"
             data-scorecard="-1"
             data-score="76.1"
-            data-trust_score="31.8"
+            data-trust_score="31.7"
             data-category="Observability &amp; Evaluation"
             data-category_rank="8"
             data-evidence_grade="C"
@@ -4205,7 +4199,7 @@
             </td>
             <td class="r num">32</td>
             <td class="r">
-              <span class="trust-pill trust-mid" title="Safety 6.0 · Identity 12.0 · Transparency 10.0 · Maintenance 17.9 · Adoption 7.1 · 60.0% confidence">31.8</span>
+              <span class="trust-pill trust-mid" title="Safety 6.0 · Identity 12.0 · Transparency 10.0 · Maintenance 17.9 · Adoption 7.0 · 60.0% confidence">31.7</span>
               
             </td>
           </tr>
@@ -6043,7 +6037,7 @@
             data-last_push="2026-01-31"
             data-weekly_commits="0"
             data-downloads="56"
-            data-hn_mentions_30d="9"
+            data-hn_mentions_30d="2"
             data-actions_30d="-1"
             data-scorecard="1.2"
             data-score="51.0"
@@ -6231,11 +6225,11 @@
             data-rank_delta="-107"
             data-name="opencode"
             data-repo="sst/opencode"
-            data-stars="166639"
+            data-stars="166640"
             data-last_push="2026-05-28"
-            data-weekly_commits="1286"
+            data-weekly_commits="1287"
             data-downloads="0"
-            data-hn_mentions_30d="51"
+            data-hn_mentions_30d="41"
             data-actions_30d="-1"
             data-scorecard="-1"
             data-score="100.0"
@@ -6267,9 +6261,9 @@
                 <span class="push-text">2026-05-28</span>
               </div>
             </td>
-            <td class="r num">1286</td>
+            <td class="r num">1287</td>
             <td class="r">
-              <span class="trust-pill trust-low" title="Safety 4.1 · Identity 12.0 · Transparency 10.0 · Maintenance 20.0 · Adoption 6.3 · 40.0% confidence">21.0</span>
+              <span class="trust-pill trust-low" title="Safety 4.2 · Identity 12.0 · Transparency 10.0 · Maintenance 20.0 · Adoption 6.3 · 40.0% confidence">21.0</span>
               
             </td>
           </tr>
