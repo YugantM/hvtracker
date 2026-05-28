@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-28T15:42:49Z",
-  "data_timestamp": "2026-05-28 15:42 UTC",
+  "generated_at": "2026-05-28T18:43:18Z",
+  "data_timestamp": "2026-05-28 18:43 UTC",
   "schema_version": "v0.1",
   "methodology_version": "v2.0",
   "configured_agents": 29,
@@ -25,6 +25,16 @@
   },
   "warnings": [
     {
+      "repo": "open-webui/open-webui",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "n8n-io/n8n",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
       "repo": "langchain-ai/langchain",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -40,11 +50,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "openclaw/openclaw",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "langflow-ai/langflow",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -55,12 +60,22 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
+      "repo": "milvus-io/milvus",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
       "repo": "elizaOS/eliza",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
     {
       "repo": "activepieces/activepieces",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "mastra-ai/mastra",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -85,17 +100,7 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "paul-gauthier/aider",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "anthropics/claude-code",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "Significant-Gravitas/AutoGPT",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -105,7 +110,17 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
+      "repo": "openai/codex",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
       "repo": "browser-use/browser-use",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "modelcontextprotocol/servers",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -140,6 +155,11 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
+      "repo": "Mintplex-Labs/anything-llm",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
       "repo": "cline/cline",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -155,7 +175,7 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "run-llama/llama_index",
+      "repo": "mem0ai/mem0",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -175,11 +195,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "OpenInterpreter/open-interpreter",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "langchain-ai/langgraph",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -190,17 +205,22 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "OpenBMB/ChatDev",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "CopilotKit/CopilotKit",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
     {
+      "repo": "microsoft/semantic-kernel",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
       "repo": "composiohq/composio",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "openai/openai-agents-python",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -221,16 +241,6 @@
     },
     {
       "repo": "bytedance/UI-TARS-desktop",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "qdrant/qdrant",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "RasaHQ/rasa",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -260,11 +270,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "QwenLM/qwen-code",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "google/A2A",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -275,32 +280,17 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "Skyvern-AI/skyvern",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "promptfoo/promptfoo",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "princeton-nlp/SWE-agent",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "RooVetGit/Roo-Code",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "browserbase/stagehand",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "pydantic/pydantic-ai",
+      "repo": "RooVetGit/Roo-Code",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
+      "repo": "microsoft/autogen",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -320,7 +310,7 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "pgvector/pgvector",
+      "repo": "livekit/agents",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -340,12 +330,12 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "pipecat-ai/pipecat",
+      "repo": "confident-ai/deepeval",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "confident-ai/deepeval",
+      "repo": "microsoft/guidance",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -366,6 +356,11 @@
     },
     {
       "repo": "getmaxun/maxun",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "microsoft/agent-framework",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -395,7 +390,7 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "Pythagora-io/gpt-pilot",
+      "repo": "MervinPraison/PraisonAI",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -420,6 +415,16 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
+      "repo": "microsoft/UFO",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "neuml/txtai",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
       "repo": "leondz/garak",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -431,6 +436,16 @@
     },
     {
       "repo": "flyteorg/flyte",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "microsoft/promptflow",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "modelcontextprotocol/registry",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -450,6 +465,11 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
+      "repo": "NVIDIA/NeMo-Guardrails",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
       "repo": "VRSEN/agency-swarm",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -460,12 +480,17 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "openai/swarm",
+      "repo": "microsoft/OmniParser",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
     {
       "repo": "BrainBlend-AI/atomic-agents",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "meta-llama/PurpleLlama",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -495,6 +520,11 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
+      "repo": "microsoft/TinyTroupe",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
       "repo": "langroid/langroid",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -506,11 +536,6 @@
     },
     {
       "repo": "langwatch/langwatch",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "PrefectHQ/marvin",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -550,11 +575,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "QwenLM/Qwen-Agent",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "wandb/weave",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -566,8 +586,8 @@
     },
     {
       "repo": "microsoft/TaskWeaver",
-      "criterion": "5.1",
-      "detail": "repository is archived"
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
     },
     {
       "repo": "explodinggradients/ragas",
@@ -600,16 +620,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "ServiceNow/BrowserGym",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "QuivrHQ/quivr",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "stanford-oval/storm",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -625,22 +635,17 @@
       "detail": "no meaningful activity in 12 months (last push 2024-08-05)"
     },
     {
+      "repo": "microsoft/JARVIS",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
       "repo": "stitionai/devika",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
     {
       "repo": "ai-christianson/RA.Aid",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "plandex-ai/plandex",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "OpenBMB/XAgent",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -656,8 +661,18 @@
     },
     {
       "repo": "MineDojo/Voyager",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "MineDojo/Voyager",
       "criterion": "4.2.1",
       "detail": "no meaningful activity in 12 months (last push 2024-04-03)"
+    },
+    {
+      "repo": "nickscamara/open-deep-research",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
     },
     {
       "repo": "nickscamara/open-deep-research",
@@ -665,17 +680,7 @@
       "detail": "no meaningful activity in 12 months (last push 2025-05-07)"
     },
     {
-      "repo": "SamuelSchmidgall/AgentLaboratory",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "sweepai/sweep",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "protectai/llm-guard",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -735,9 +740,14 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "protectai/rebuff",
+      "repo": "myshell-ai/AIlice",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "protectai/rebuff",
+      "criterion": "5.1",
+      "detail": "repository is archived"
     },
     {
       "repo": "protectai/rebuff",
@@ -746,6 +756,11 @@
     },
     {
       "repo": "PrefectHQ/ControlFlow",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
+      "repo": "MinorJerry/WebVoyager",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -763,11 +778,6 @@
       "repo": "langchain-ai/langgraph-codeact",
       "criterion": "4.2.1",
       "detail": "no meaningful activity in 12 months (last push 2025-05-16)"
-    },
-    {
-      "repo": "SalesforceAIResearch/AgentLite",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
     },
     {
       "repo": "idosal/AgentLLM",
@@ -810,21 +820,23 @@
       "detail": "no meaningful activity in 12 months (last push 2024-09-26)"
     }
   ],
-  "warning_count": 157,
+  "warning_count": 159,
   "failed_fetches": [],
   "missing_repos_count": 0,
   "package_failures": [
     "sst/opencode",
     "mastra-ai/mastra",
     "Mintplex-Labs/anything-llm",
-    "run-llama/llama_index",
     "leon-ai/leon",
     "microsoft/TaskWeaver",
     "plandex-ai/plandex",
     "myshell-ai/AIlice"
   ],
-  "package_failure_count": 8,
+  "package_failure_count": 7,
   "scorecard_unavailable_count": 23,
-  "fingerprint_agents": [],
-  "fingerprint_agent_count": 0
+  "fingerprint_agents": [
+    "paul-gauthier/aider",
+    "QwenLM/qwen-code"
+  ],
+  "fingerprint_agent_count": 2
 }
