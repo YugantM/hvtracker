@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Best Open-Source Observability &amp; Evaluation — 12 Agents Ranked by Trust Score | HVTracker</title>
-  <meta name="description" content="Compare 12 open-source observability &amp; evaluation ranked by independent trust scores. Agenta, Giskard, Langfuse. Updated daily with security, activity, and adoption signals.">
+  <meta name="description" content="Compare 12 open-source observability &amp; evaluation ranked by independent trust scores. Langfuse, Promptfoo, DeepEval. Updated daily with security, activity, and adoption signals.">
   <link rel="canonical" href="https://hvtracker.net/categories/observability-evaluation">
 
   <meta property="og:type" content="website">
@@ -37,57 +37,57 @@
         {
           "@type": "ListItem",
           "position": 1,
-          "name": "Agenta",
-          "url": "https://hvtracker.net/agents/agenta"
-        },
-        
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Giskard",
-          "url": "https://hvtracker.net/agents/giskard"
-        },
-        
-        {
-          "@type": "ListItem",
-          "position": 3,
           "name": "Langfuse",
           "url": "https://hvtracker.net/agents/langfuse"
         },
         
         {
           "@type": "ListItem",
-          "position": 4,
+          "position": 2,
           "name": "Promptfoo",
           "url": "https://hvtracker.net/agents/promptfoo"
         },
         
         {
           "@type": "ListItem",
-          "position": 5,
+          "position": 3,
           "name": "DeepEval",
           "url": "https://hvtracker.net/agents/deepeval"
         },
         
         {
           "@type": "ListItem",
-          "position": 6,
+          "position": 4,
           "name": "Arize Phoenix",
           "url": "https://hvtracker.net/agents/arize-phoenix"
         },
         
         {
           "@type": "ListItem",
+          "position": 5,
+          "name": "Agenta",
+          "url": "https://hvtracker.net/agents/agenta"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 6,
+          "name": "LangWatch",
+          "url": "https://hvtracker.net/agents/langwatch"
+        },
+        
+        {
+          "@type": "ListItem",
           "position": 7,
-          "name": "Helicone",
-          "url": "https://hvtracker.net/agents/helicone"
+          "name": "Giskard",
+          "url": "https://hvtracker.net/agents/giskard"
         },
         
         {
           "@type": "ListItem",
           "position": 8,
-          "name": "LangWatch",
-          "url": "https://hvtracker.net/agents/langwatch"
+          "name": "Weights &amp; Biases Weave",
+          "url": "https://hvtracker.net/agents/weights-biases-weave"
         },
         
         {
@@ -100,8 +100,8 @@
         {
           "@type": "ListItem",
           "position": 10,
-          "name": "Weights &amp; Biases Weave",
-          "url": "https://hvtracker.net/agents/weights-biases-weave"
+          "name": "Helicone",
+          "url": "https://hvtracker.net/agents/helicone"
         }
         
       ]
@@ -109,40 +109,60 @@
   }
   </script>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:#0c0c15; --surface:#13131f; --surface-2:#1a1a2a; --border:#252538;
-      --text:#eeeef5; --muted:#8a87a8;
-      --accent:#7c6af6; --accent-lt:rgba(124,106,246,0.10); --accent-dim:#4a3fa0;
-      --mocha:#c4a882; --mocha-lt:rgba(157,124,90,0.15);
-      --fresh:#34d399; --aging:#f59e0b; --stale:#6b7280;
-      --score-hi-bg:rgba(124,106,246,0.15); --score-hi-fg:#a5a0ff;
-      --score-mid-bg:rgba(157,124,90,0.15); --score-mid-fg:#c4a882;
-      --score-lo-bg:rgba(100,100,120,0.12); --score-lo-fg:#6b7280;
-      --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
-      --font-sans:"Inter",system-ui,-apple-system,sans-serif;
+      --bg:#0b0d10; --surface:rgba(21,25,32,0.78); --surface-2:rgba(27,32,41,0.82); --border:rgba(142,154,176,0.22);
+      --hairline:rgba(168,179,194,0.12); --glass:rgba(21,25,32,0.72); --glass-hi:rgba(255,255,255,0.055);
+      --metal:linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.018) 34%, rgba(45,212,191,0.045) 72%, rgba(216,166,87,0.055));
+      --text:#eef2f6; --muted:#a8b3c2;
+      --accent:#8fb3ff; --accent-lt:rgba(143,179,255,0.10); --accent-dim:#5677aa;
+      --mocha:#d8a657; --mocha-lt:rgba(216,166,87,0.16);
+      --fresh:#2dd4bf; --aging:#d8a657; --stale:#737f91;
+      --score-hi-bg:rgba(45,212,191,0.16); --score-hi-fg:#5eead4;
+      --score-mid-bg:rgba(216,166,87,0.16); --score-mid-fg:#d8a657;
+      --score-lo-bg:rgba(100,100,120,0.12); --score-lo-fg:#737f91;
+      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
     }
-    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:14px; line-height:1.55; min-height:100vh; }
+    body {
+      background-color:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:14px; line-height:1.55; min-height:100vh;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"), radial-gradient(circle at 18% -10%, rgba(45,212,191,0.14), transparent 30%), radial-gradient(circle at 86% 6%, rgba(216,166,87,0.12), transparent 26%), linear-gradient(135deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 11px), linear-gradient(180deg, #10141a 0%, var(--bg) 54%, #07090c 100%);
+      background-repeat:repeat, no-repeat, no-repeat, repeat, no-repeat; background-size:256px 256px, auto, auto, auto, auto;
+    }
     a { color:inherit; text-decoration:none; }
     a:hover { text-decoration:underline; }
-    .page { max-width:860px; margin:0 auto; padding:0 20px; }
+    .page { max-width:920px; margin:0 auto; padding:24px 20px 0; }
 
     header {
-      padding:28px 0 20px; border-bottom:1px solid var(--border);
+      padding:16px 18px; border:1px solid var(--border); border-radius:10px;
+      background:var(--metal), var(--glass);
+      box-shadow:inset 0 1px 0 var(--glass-hi), 0 18px 54px rgba(0,0,0,0.28);
+      backdrop-filter:blur(18px) saturate(120%);
       display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; position:relative;
-    }
-    header::after {
-      content:""; position:absolute; bottom:-1px; left:0;
-      width:180px; height:1px;
-      background:linear-gradient(to right, var(--accent), transparent);
     }
     .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; }
     .logo span { color:var(--accent); }
-    .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; }
-    .back:hover { color:var(--accent); }
+    .back {
+      font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto;
+      border:1px solid var(--border); border-radius:999px; padding:5px 10px;
+      background:rgba(255,255,255,0.035);
+    }
+    .back:hover { color:var(--text); border-color:var(--accent-dim); text-decoration:none; }
 
-    .hero { padding:32px 0 18px; border-bottom:1px solid var(--border); }
+    .hero,
+    .stats-bar,
+    .cat-nav {
+      border:1px solid var(--border);
+      border-radius:10px;
+      background:linear-gradient(135deg, rgba(255,255,255,0.052), rgba(255,255,255,0.014)), var(--glass);
+      box-shadow:inset 0 1px 0 var(--glass-hi);
+      position:relative;
+    }
+    .hero { padding:24px 20px; margin:14px 0; border-bottom:1px solid var(--border); }
     h1 { font-size:28px; font-weight:700; letter-spacing:-0.5px; margin-bottom:6px; }
     .hero .subtitle { font-size:14px; color:var(--muted); margin-top:4px; }
     .hero .seo-intro {
@@ -151,21 +171,27 @@
     .hero .seo-intro strong { color:var(--text); }
 
     .stats-bar {
-      display:flex; gap:24px; padding:18px 0; border-bottom:1px solid var(--border);
+      display:flex; gap:24px; padding:18px 0; margin:14px 0; border:0; border-top:1px solid var(--hairline); border-bottom:1px solid var(--hairline);
+      background:transparent; box-shadow:none; border-radius:0;
       flex-wrap:wrap;
     }
     .stat { text-align:center; }
     .stat .num { font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--accent); }
     .stat .lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
 
-    table { width:100%; border-collapse:collapse; margin-top:8px; }
+    table {
+      width:100%; border-collapse:separate; border-spacing:0; margin-top:14px;
+      border:1px solid var(--border); border-radius:10px; overflow:hidden;
+      background:linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012)), rgba(12,15,23,0.76);
+      box-shadow:inset 0 1px 0 var(--glass-hi), 0 24px 70px rgba(0,0,0,0.30);
+    }
     th {
       text-align:left; font-family:var(--font-mono); font-size:10px;
       text-transform:uppercase; letter-spacing:1px; color:var(--muted);
-      padding:10px 8px; border-bottom:1px solid var(--border);
+      padding:10px 8px; border-bottom:1px solid var(--hairline); background:rgba(13,16,25,0.94);
     }
-    td { padding:10px 8px; border-bottom:1px solid var(--border); font-size:13px; }
-    tr:hover td { background:var(--surface); }
+    td { padding:10px 8px; border-bottom:1px solid var(--hairline); font-size:13px; }
+    tr:hover td { background:rgba(143,179,255,0.08); }
 
     .rank-cell { font-family:var(--font-mono); font-size:12px; color:var(--muted); width:36px; }
     .name-cell a { font-weight:600; }
@@ -175,9 +201,9 @@
       display:inline-block; font-family:var(--font-mono); font-size:10px; font-weight:700;
       padding:1px 5px; border-radius:2px; margin-left:6px;
     }
-    .grade-A { background:rgba(52,211,153,0.15); color:#34d399; }
-    .grade-B { background:rgba(163,230,53,0.15); color:#a3e635; }
-    .grade-C { background:rgba(245,158,11,0.15); color:#f59e0b; }
+    .grade-A { background:rgba(45,212,191,0.16); color:#2dd4bf; }
+    .grade-B { background:rgba(163,230,53,0.15); color:#9ae6b4; }
+    .grade-C { background:rgba(216,166,87,0.16); color:#d8a657; }
     .grade-D { background:var(--score-lo-bg); color:var(--score-lo-fg); }
 
     .score-cell { font-family:var(--font-mono); font-size:13px; font-weight:600; }
@@ -188,19 +214,19 @@
     .stars-cell { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
     .lang-cell { font-size:11px; color:var(--muted); }
 
-    .cat-nav { padding:24px 0; border-bottom:1px solid var(--border); }
+    .cat-nav { padding:20px 0; margin:14px 0; border:0; border-top:1px solid var(--hairline); background:transparent; box-shadow:none; border-radius:0; }
     .cat-nav h2 { font-size:16px; font-weight:600; margin-bottom:12px; }
     .cat-pills { display:flex; gap:6px; flex-wrap:wrap; }
     .cat-pill {
       font-family:var(--font-mono); font-size:11px; padding:4px 10px;
-      border-radius:3px; background:var(--surface-2); color:var(--muted);
+      border-radius:3px; background:rgba(255,255,255,0.045); color:var(--muted);
       transition:all 0.15s;
     }
     .cat-pill:hover { background:var(--accent-lt); color:var(--accent); text-decoration:none; }
     .cat-pill.active { background:var(--accent-lt); color:var(--accent); }
 
     footer {
-      padding:28px 0; margin-top:20px; border-top:1px solid var(--border);
+      padding:28px 0; margin-top:20px; border-top:0;
       font-size:11px; color:var(--muted); text-align:center;
     }
     footer a:hover { color:var(--accent); }
@@ -223,13 +249,13 @@
 
     <section class="hero">
       <h1>Observability &amp; Evaluation</h1>
-      <p class="subtitle">12 open-source agents tracked &middot; Ranked by trust score &middot; Updated 2026-05-28 18:43 UTC</p>
+      <p class="subtitle">12 open-source agents tracked &middot; Ranked by trust score &middot; Updated 2026-05-28 17:40 UTC</p>
 
       <div class="seo-intro">
         <p>HVTracker independently evaluates <strong>12 open-source observability &amp; evaluation</strong> using daily signals from GitHub, package registries, and security databases.
         Each agent is scored on activity, adoption, transparency, safety, and identity.
-        The top-ranked observability &amp; evaluation is <strong>Agenta</strong> with a trust score of 43.9/100 (Grade C).
-        Other leading projects include Giskard and Langfuse.
+        The top-ranked observability &amp; evaluation is <strong>Langfuse</strong> with a trust score of 83.7/100 (Grade B).
+        Other leading projects include Promptfoo and DeepEval.
         </p>
       </div>
     </section>
@@ -244,7 +270,7 @@
         <div class="lbl">Avg Trust</div>
       </div>
       <div class="stat">
-        <div class="num">118.1k</div>
+        <div class="num">118.2k</div>
         <div class="lbl">Total Stars</div>
       </div>
       <div class="stat">
@@ -268,30 +294,6 @@
         <tr>
           <td class="rank-cell">1</td>
           <td class="name-cell">
-            <a href="/agents/agenta">Agenta</a>
-            <span class="grade grade-C">C</span>
-            <span class="desc">The open-source LLMOps platform: prompt playground, prompt management, LLM evaluation, and LLM observability all in one </span>
-          </td>
-          <td class="score-cell score-mid">43.9</td>
-          <td class="stars-cell">4.2k</td>
-          <td class="lang-cell">TypeScript</td>
-        </tr>
-        
-        <tr>
-          <td class="rank-cell">2</td>
-          <td class="name-cell">
-            <a href="/agents/giskard">Giskard</a>
-            <span class="grade grade-B">B</span>
-            <span class="desc">🐢 Open-Source Evaluation &amp; Testing library for LLM Agents</span>
-          </td>
-          <td class="score-cell score-hi">63.6</td>
-          <td class="stars-cell">5.4k</td>
-          <td class="lang-cell">Python</td>
-        </tr>
-        
-        <tr>
-          <td class="rank-cell">3</td>
-          <td class="name-cell">
             <a href="/agents/langfuse">Langfuse</a>
             <span class="grade grade-B">B</span>
             <span class="desc">🪢 Open source LLM engineering platform: LLM Observability, metrics, evals, prompt management, playground, datasets. Inte</span>
@@ -302,7 +304,7 @@
         </tr>
         
         <tr>
-          <td class="rank-cell">4</td>
+          <td class="rank-cell">2</td>
           <td class="name-cell">
             <a href="/agents/promptfoo">Promptfoo</a>
             <span class="grade grade-B">B</span>
@@ -314,19 +316,19 @@
         </tr>
         
         <tr>
-          <td class="rank-cell">5</td>
+          <td class="rank-cell">3</td>
           <td class="name-cell">
             <a href="/agents/deepeval">DeepEval</a>
             <span class="grade grade-B">B</span>
             <span class="desc">The LLM Evaluation Framework</span>
           </td>
-          <td class="score-cell score-mid">59.5</td>
+          <td class="score-cell score-hi">72.4</td>
           <td class="stars-cell">15.8k</td>
           <td class="lang-cell">Python</td>
         </tr>
         
         <tr>
-          <td class="rank-cell">6</td>
+          <td class="rank-cell">4</td>
           <td class="name-cell">
             <a href="/agents/arize-phoenix">Arize Phoenix</a>
             <span class="grade grade-B">B</span>
@@ -338,43 +340,43 @@
         </tr>
         
         <tr>
-          <td class="rank-cell">7</td>
+          <td class="rank-cell">5</td>
           <td class="name-cell">
-            <a href="/agents/helicone">Helicone</a>
+            <a href="/agents/agenta">Agenta</a>
             <span class="grade grade-C">C</span>
-            <span class="desc">🧊 Open source LLM observability platform. One line of code to monitor, evaluate, and experiment. YC W23 🍓</span>
+            <span class="desc">The open-source LLMOps platform: prompt playground, prompt management, LLM evaluation, and LLM observability all in one </span>
           </td>
-          <td class="score-cell score-mid">48.1</td>
-          <td class="stars-cell">5.7k</td>
+          <td class="score-cell score-mid">58.0</td>
+          <td class="stars-cell">4.2k</td>
           <td class="lang-cell">TypeScript</td>
         </tr>
         
         <tr>
-          <td class="rank-cell">8</td>
+          <td class="rank-cell">6</td>
           <td class="name-cell">
             <a href="/agents/langwatch">LangWatch</a>
             <span class="grade grade-B">B</span>
             <span class="desc">The platform for LLM evaluations and AI agent testing</span>
           </td>
-          <td class="score-cell score-hi">63.0</td>
+          <td class="score-cell score-hi">75.9</td>
           <td class="stars-cell">3.3k</td>
           <td class="lang-cell">TypeScript</td>
         </tr>
         
         <tr>
-          <td class="rank-cell">9</td>
+          <td class="rank-cell">7</td>
           <td class="name-cell">
-            <a href="/agents/trulens">TruLens</a>
-            <span class="grade grade-C">C</span>
-            <span class="desc">Evaluation and Tracking for LLM Experiments and AI Agents</span>
+            <a href="/agents/giskard">Giskard</a>
+            <span class="grade grade-B">B</span>
+            <span class="desc">🐢 Open-Source Evaluation &amp; Testing library for LLM Agents</span>
           </td>
-          <td class="score-cell score-mid">45.7</td>
-          <td class="stars-cell">3.3k</td>
+          <td class="score-cell score-hi">76.6</td>
+          <td class="stars-cell">5.4k</td>
           <td class="lang-cell">Python</td>
         </tr>
         
         <tr>
-          <td class="rank-cell">10</td>
+          <td class="rank-cell">8</td>
           <td class="name-cell">
             <a href="/agents/weights-biases-weave">Weights &amp; Biases Weave</a>
             <span class="grade grade-B">B</span>
@@ -386,13 +388,37 @@
         </tr>
         
         <tr>
+          <td class="rank-cell">9</td>
+          <td class="name-cell">
+            <a href="/agents/trulens">TruLens</a>
+            <span class="grade grade-C">C</span>
+            <span class="desc">Evaluation and Tracking for LLM Experiments and AI Agents</span>
+          </td>
+          <td class="score-cell score-mid">58.5</td>
+          <td class="stars-cell">3.3k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">10</td>
+          <td class="name-cell">
+            <a href="/agents/helicone">Helicone</a>
+            <span class="grade grade-C">C</span>
+            <span class="desc">🧊 Open source LLM observability platform. One line of code to monitor, evaluate, and experiment. YC W23 🍓</span>
+          </td>
+          <td class="score-cell score-hi">61.1</td>
+          <td class="stars-cell">5.7k</td>
+          <td class="lang-cell">TypeScript</td>
+        </tr>
+        
+        <tr>
           <td class="rank-cell">11</td>
           <td class="name-cell">
             <a href="/agents/ragas">Ragas</a>
             <span class="grade grade-B">B</span>
             <span class="desc">Supercharge Your LLM Application Evaluations 🚀</span>
           </td>
-          <td class="score-cell score-mid">46.3</td>
+          <td class="score-cell score-mid">59.3</td>
           <td class="stars-cell">14.1k</td>
           <td class="lang-cell">Python</td>
         </tr>
@@ -404,7 +430,7 @@
             <span class="grade grade-C">C</span>
             <span class="desc">Python SDK for AI agent monitoring, LLM cost tracking, benchmarking, and more. Integrates with most LLMs and agent frame</span>
           </td>
-          <td class="score-cell score-lo">33.8</td>
+          <td class="score-cell score-mid">46.8</td>
           <td class="stars-cell">5.6k</td>
           <td class="lang-cell">Python</td>
         </tr>

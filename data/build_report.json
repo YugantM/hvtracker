@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-28T18:43:18Z",
-  "data_timestamp": "2026-05-28 18:43 UTC",
+  "generated_at": "2026-05-28T17:40:25Z",
+  "data_timestamp": "2026-05-28 17:40 UTC",
   "schema_version": "v0.1",
   "methodology_version": "v2.0",
   "configured_agents": 29,
@@ -825,14 +825,15 @@
   "missing_repos_count": 0,
   "package_failures": [
     "sst/opencode",
-    "mastra-ai/mastra",
     "Mintplex-Labs/anything-llm",
+    "mastra-ai/mastra",
     "leon-ai/leon",
     "microsoft/TaskWeaver",
     "plandex-ai/plandex",
-    "myshell-ai/AIlice"
+    "myshell-ai/AIlice",
+    "swarmzero/swarmzero"
   ],
-  "package_failure_count": 7,
+  "package_failure_count": 8,
   "scorecard_unavailable_count": 23,
   "fingerprint_agents": [
     "paul-gauthier/aider",

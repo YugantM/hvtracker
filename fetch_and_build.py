@@ -385,11 +385,8 @@ def score_components(stars: int, days_since: int, recent_commits: int, forks: in
     }
 
 
-def compute_score(repo: dict, weeks: list) -> float:
-    pushed_at = datetime.fromisoformat(repo["pushed_at"].replace("Z", "+00:00"))
-    days_since = (datetime.now(timezone.utc) - pushed_at).days
-    recent_commits = sum(w["total"] for w in weeks[-4:]) if weeks else 0
-    c = score_components(repo["stargazers_count"], days_since, recent_commits, repo["forks_count"])
+def health_score(stars: int, days_since: int, recent_commits: int, forks: int) -> float:
+    c = score_components(stars, days_since, recent_commits, forks)
     return round(c["stars"] + c["freshness"] + c["activity"] + c["community"], 1)
 
 
@@ -1046,7 +1043,6 @@ def main() -> None:
             return None
 
         weeks = get_commit_activity(repo_id)
-        score = compute_score(repo, weeks)
         d = days_ago(repo["pushed_at"])
         # Use Stats API 4-week sum for the display column.
         # Fall back to Commits API when Stats returned nothing, or when the repo
@@ -1055,6 +1051,12 @@ def main() -> None:
         if commits_4wk is None or (commits_4wk == 0 and (not weeks or d <= 7)):
             commits_4wk = fetch_recent_commits(repo_id)
         recent_commits = commits_4wk
+        score = health_score(
+            repo["stargazers_count"],
+            d,
+            recent_commits or 0,
+            repo["forks_count"],
+        )
         # Flag cells where Stats API may still be stale (recent push, very low count).
         commits_low_confidence = bool(d <= 7 and (recent_commits or 0) < 10)
 
