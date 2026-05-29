@@ -1,29 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#0c0c15"/>
-  <rect x="0" y="0" width="1200" height="630" fill="url(#bg)"/>
-  <rect x="96" y="96" width="1008" height="438" rx="24" fill="#13131f" stroke="#252538" stroke-width="2"/>
-  <rect x="96" y="96" width="1008" height="8" rx="4" fill="#7c6af6"/>
-
-  <text x="144" y="210" font-family="JetBrains Mono, Fira Mono, ui-monospace, monospace" font-size="72" font-weight="700" fill="#eeeef5">HV<tspan fill="#7c6af6">Tracker</tspan></text>
-  <text x="148" y="272" font-family="Inter, system-ui, sans-serif" font-size="30" font-weight="600" fill="#c4a882">AI Agent Trust Registry</text>
-  <text x="148" y="330" font-family="Inter, system-ui, sans-serif" font-size="26" fill="#eeeef5">Evidence-weighted rankings for open-source AI agents</text>
-
-  <g font-family="JetBrains Mono, Fira Mono, ui-monospace, monospace" font-size="23" fill="#8a87a8">
-    <text x="148" y="412">171 agents</text>
-    <text x="345" y="412">14 categories</text>
-    <text x="580" y="412">trust, safety, activity, adoption</text>
-  </g>
-
-  <g font-family="Inter, system-ui, sans-serif" font-size="18" fill="#8a87a8">
-    <text x="148" y="470">Public signals from GitHub, package registries, OSSF Scorecard, provenance, HN, and history.</text>
-    <text x="148" y="504">v1 launch - hvtracker.net</text>
-  </g>
-
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#0c0c15"/>
-      <stop offset="0.62" stop-color="#10101c"/>
-      <stop offset="1" stop-color="#17142a"/>
+      <stop offset="0" stop-color="#10141a"/>
+      <stop offset="0.54" stop-color="#0b0d10"/>
+      <stop offset="1" stop-color="#07090c"/>
     </linearGradient>
+    <linearGradient id="card" x1="96" y1="76" x2="1104" y2="554" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#202733"/>
+      <stop offset="0.48" stop-color="#141922"/>
+      <stop offset="1" stop-color="#11161d"/>
+    </linearGradient>
+    <linearGradient id="rule" x1="144" y1="496" x2="944" y2="496" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8fb3ff"/>
+      <stop offset="0.52" stop-color="#2dd4bf"/>
+      <stop offset="1" stop-color="#d8a657"/>
+    </linearGradient>
+    <filter id="shadow" x="60" y="40" width="1080" height="560" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#000000" flood-opacity="0.34"/>
+    </filter>
   </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="166" cy="38" r="240" fill="#2dd4bf" opacity="0.10"/>
+  <circle cx="1024" cy="70" r="250" fill="#d8a657" opacity="0.10"/>
+
+  <g filter="url(#shadow)">
+    <rect x="96" y="76" width="1008" height="478" rx="26" fill="url(#card)" stroke="#334155" stroke-width="2"/>
+    <rect x="97" y="77" width="1006" height="476" rx="25" fill="none" stroke="#ffffff" stroke-opacity="0.08"/>
+  </g>
+
+  <text x="144" y="172" font-family="IBM Plex Mono, JetBrains Mono, SFMono-Regular, Menlo, monospace" font-size="64" font-weight="700" fill="#eef2f6">HV<tspan fill="#8fb3ff">Tracker</tspan></text>
+  <text x="144" y="226" font-family="Hanken Grotesk, Inter, system-ui, sans-serif" font-size="31" font-weight="700" fill="#d8a657">Open-Source AI Agent Trust Registry</text>
+
+  <text x="144" y="306" font-family="Hanken Grotesk, Inter, system-ui, sans-serif" font-size="40" font-weight="700" fill="#eef2f6">Rank agents by evidence,</text>
+  <text x="144" y="354" font-family="Hanken Grotesk, Inter, system-ui, sans-serif" font-size="40" font-weight="700" fill="#eef2f6">not GitHub hype.</text>
+
+  <g font-family="IBM Plex Mono, JetBrains Mono, SFMono-Regular, Menlo, monospace" font-size="22" fill="#a8b3c2">
+    <text x="144" y="430">172 agents</text>
+    <text x="330" y="430">14 categories</text>
+    <text x="552" y="430">HVTrust score</text>
+    <text x="782" y="430">open data API</text>
+  </g>
+
+  <rect x="144" y="492" width="812" height="5" rx="2.5" fill="url(#rule)"/>
+  <text x="144" y="528" font-family="Hanken Grotesk, Inter, system-ui, sans-serif" font-size="20" fill="#a8b3c2">Safety · provenance · signed commits · OSSF Scorecard · maintenance · adoption</text>
+
+  <g transform="translate(914 132)">
+    <rect x="0" y="0" width="142" height="142" rx="22" fill="#0b0d10" stroke="#334155" stroke-width="2"/>
+    <path d="M42 78l20 20 44-58" fill="none" stroke="#2dd4bf" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="71" y="122" text-anchor="middle" font-family="IBM Plex Mono, JetBrains Mono, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="700" fill="#8fb3ff">TRUST</text>
+  </g>
 </svg>

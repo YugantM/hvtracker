@@ -1,57 +1,81 @@
 # HVTracker
 
-**AI Agent Trust Registry**
+**Open-source AI Agent Trust Registry**
 
-**Live:** [hvtracker.net](https://hvtracker.net)  
-**Public data API:** [hvtracker.net/data/latest.json](https://hvtracker.net/data/latest.json)
+[hvtracker.net](https://hvtracker.net) ranks open-source AI agents by evidence-weighted trust signals, not GitHub hype.
 
-HVTracker ranks open-source AI agent projects by evidence-weighted trust, not only stars. The v1 launch tracks **171 agents** across **14 categories**, with public signals for activity, adoption, transparency, safety, identity, provenance, and rank movement.
+HVTracker tracks **172 active agents** across **14 categories** and publishes public, machine-readable trust data for each project: activity, adoption, transparency, supply-chain safety, identity, provenance, evidence grade, and rank movement.
 
-The goal is simple: help builders, researchers, and security-minded teams answer, "Which AI agent projects look active, adopted, transparent, and verifiable right now?"
+The core question is simple:
+
+> Which open-source AI agent projects look active, adopted, transparent, and verifiable right now?
 
 ---
 
-## V1 Snapshot
+## What You Can Do
 
-- **171** active open-source AI agent projects
+- Browse the live trust registry: [hvtracker.net](https://hvtracker.net)
+- Compare agents side by side: [hvtracker.net/compare](https://hvtracker.net/compare/)
+- Read category comparison guides: [hvtracker.net/blog](https://hvtracker.net/blog/)
+- Use the public API: [hvtracker.net/data/latest.json](https://hvtracker.net/data/latest.json)
+- Embed live trust badges in project READMEs
+
+---
+
+## Current Snapshot
+
+- **172** active open-source AI agent projects
 - **14** curated categories
 - **6** staggered refresh batches per day
+- **24h** full refresh cycle
 - **90-day** per-agent history where available
-- Public JSON endpoints for the leaderboard, per-agent records, build reports, and selected signal files
+- **184** JSON feed items across agents and comparison guides
+- Static GitHub Pages site: no backend, no database, no React
 
-Signals refresh every 4 hours in batches. A full refresh cycle completes in 24 hours.
+Newly submitted agents are listed quickly using a pending-only refresh path, then normal cron jobs keep signals fresh.
 
 ---
 
-## What Makes It Different
+## Why HVTracker Exists
 
-Most agent lists are manually curated directories or popularity rankings. HVTracker combines curation with independently checkable public signals:
+Most AI agent directories are either manual lists or popularity rankings. Stars can tell you what is visible. They do not tell you whether a project has maintainers, a license, package provenance, signed commits, OSSF Scorecard data, or recent activity.
 
-The leaderboard ranks by the **HVTrust score**, not by popularity. HVTrust is gated and confidence-scaled — dimensions are weighted by how hard each signal is to fake, missing evidence lowers the score, staleness is penalised, and unverified or deprecated listings are capped below the verified tier:
+HVTracker combines curation with independently checkable public evidence. The default rank is **HVTrust**, a 0-100 score designed to reward verifiable trust signals and penalize thin evidence.
 
 ```text
-HVTrust = gate( confidence × [ Safety(30) + Identity(20) + Transparency(20)
-                               + Maintenance(20) + Adoption(10) ] − penalties )
+HVTrust = gate(
+  confidence x [ Safety(30) + Identity(20) + Transparency(20)
+                 + Maintenance(20) + Adoption(10) ]
+  - penalties
+)
 ```
 
-| Dimension | Max | What it measures | Forgeability |
-|---|---:|---|---|
-| **Safety / Integrity** | 30 | OSSF Scorecard, provenance, signed commits | very hard |
-| **Identity / Provenance** | 20 | Verified listing status and build provenance | hard |
-| **Transparency** | 20 | License and OSSF transparency checks | medium |
-| **Maintenance** | 20 | Commit freshness and 4-week activity | medium |
-| **Adoption** | 10 | Log-scaled, capped stars and downloads | easy |
+| Dimension | Max | What it measures |
+|---|---:|---|
+| Safety / Integrity | 30 | OSSF Scorecard, package provenance, signed commits |
+| Identity / Provenance | 20 | Verified listing status and build provenance |
+| Transparency | 20 | License and OSSF transparency checks |
+| Maintenance | 20 | Freshness and recent commit activity |
+| Adoption | 10 | Log-scaled, capped stars and package downloads |
 
-**Confidence** = present ÷ applicable signal types (floored at 0.4), shown alongside each score: an agent we have little verifiable evidence for cannot reach the top tier. Signals that cannot apply to an agent (e.g. package downloads for a project that ships no package) are excluded rather than counted as missing. See the [methodology](https://hvtracker.net/methodology) for the full model.
+Confidence is based on present vs applicable signal types. Thin evidence limits how high an agent can rank, even if it is popular.
 
-Each agent also receives an **evidence grade**:
+Read the full methodology: [hvtracker.net/methodology](https://hvtracker.net/methodology)
+
+---
+
+## Evidence Grades
+
+Each agent also receives an evidence grade so readers can separate score from evidence depth.
 
 | Grade | Meaning |
 |---|---|
-| A | Multiple independent signal types are available |
-| B | Strong public evidence, with some signal gaps |
+| A | Broad independent signal coverage |
+| B | Strong public evidence with some gaps |
 | C | Basic public evidence |
-| D | Mostly GitHub-only evidence |
+| D | Mostly GitHub-only or thin evidence |
+
+HVTracker is not a security certification. Missing provenance, Scorecard, or signature data can mean a signal is unavailable, not that a project is unsafe.
 
 ---
 
@@ -59,7 +83,7 @@ Each agent also receives an **evidence grade**:
 
 | Category | Count |
 |---|---:|
-| Agent Frameworks | 57 |
+| Agent Frameworks | 58 |
 | Coding Agents | 26 |
 | Memory & Knowledge | 20 |
 | Browser & Computer Use | 15 |
@@ -70,26 +94,57 @@ Each agent also receives an **evidence grade**:
 | LLM Gateways & Infra | 4 |
 | Protocols & Tool Integration | 4 |
 | Multi-Agent Systems | 3 |
+| Robotics & Embodied | 1 |
 | Voice & Conversational | 1 |
 | Sandboxes & Runtimes | 1 |
-| Robotics & Embodied | 1 |
 
 ---
 
-## Public Signals
+## Public Data API
 
-| Signal | Source |
+The public dataset is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). CORS is open for public endpoints.
+
+| Endpoint | Description |
 |---|---|
-| Stars, forks, language, license, last push | GitHub REST API |
-| 4-week commit activity | GitHub Stats API and recent commits fallback |
-| Weekly downloads | npm Registry and PyPI/pypistats |
-| OSSF Scorecard | deps.dev API and weekly CLI scan |
-| Package provenance | npm and PyPI attestation endpoints |
-| Signed commit ratio | GitHub Commits API |
-| Hacker News mentions (30d) | Algolia HN Search API |
-| Public action fingerprints | GitHub Search API |
+| [`/data/latest.json`](https://hvtracker.net/data/latest.json) | Current public trust registry snapshot |
+| [`/data/agents/{slug}.json`](https://hvtracker.net/data/agents/dify.json) | Per-agent record with history, events, and trust credential |
+| [`/data/build_report.json`](https://hvtracker.net/data/build_report.json) | Build integrity report |
+| [`/data/signals/scorecard.json`](https://hvtracker.net/data/signals/scorecard.json) | OSSF Scorecard signal cache |
+| [`/data/signals/provenance.json`](https://hvtracker.net/data/signals/provenance.json) | Package provenance signal cache |
+| [`/feed.json`](https://hvtracker.net/feed.json) | JSON Feed with agents and comparison guides |
+| [`/llms.txt`](https://hvtracker.net/llms.txt) | LLM-readable project summary and key links |
 
-HVTracker is not a security certification. Missing provenance, Scorecard, or signature data can mean the signal is unavailable, not that a project is unsafe.
+---
+
+## Trust Badges
+
+Listed projects can embed live HVTrust and evidence-grade badges.
+
+```md
+[![HVTrust](https://hvtracker.net/badge/<slug>.svg)](https://hvtracker.net/agents/<slug>/)
+[![Evidence Grade](https://hvtracker.net/badge/<slug>-grade.svg)](https://hvtracker.net/agents/<slug>/)
+```
+
+Example:
+
+```md
+[![HVTrust](https://hvtracker.net/badge/dify.svg)](https://hvtracker.net/agents/dify/)
+[![Evidence Grade](https://hvtracker.net/badge/dify-grade.svg)](https://hvtracker.net/agents/dify/)
+```
+
+The exact snippet is shown on every agent profile page.
+
+---
+
+## SEO And Comparison Pages
+
+HVTracker publishes crawlable, data-backed comparison pages:
+
+- Category pages: `/categories/<category>/`
+- Agent comparison pages: `/compare/<agent-a>-vs-<agent-b>/`
+- Blog comparison guides: `/blog/<category>-top-agents/`
+
+These pages are generated from the current registry data, included in `sitemap.xml`, and linked from `feed.json` and `llms.txt`.
 
 ---
 
@@ -105,9 +160,21 @@ cache.json                                 data/agents/<slug>.json
 
 1. `fetch_and_build.py` reads curated agents from `agents.json`.
 2. Public APIs are fetched in parallel where safe and serially where rate limits require it.
-3. Scores, evidence grades, trust breakdowns, rank deltas, and per-agent histories are computed.
-4. Static pages, JSON endpoints, feed files, specs, sitemap, and build reports are generated.
+3. HVTrust scores, evidence grades, rank deltas, trust breakdowns, and events are computed.
+4. Static pages, JSON endpoints, badges, specs, feed files, sitemap, and build reports are generated.
 5. GitHub Pages serves the static site.
+
+### Build Modes
+
+```bash
+python fetch_and_build.py              # full refresh
+python fetch_and_build.py --batch 1/6  # one staggered batch
+python fetch_and_build.py --pending-only
+python fetch_and_build.py --render-only
+```
+
+- `--pending-only` refreshes newly listed agents without running a full batch.
+- `--render-only` rebuilds pages from cached render state without API calls.
 
 ---
 
@@ -119,8 +186,7 @@ cd hvtracker
 pip install -r requirements.txt
 
 export GITHUB_TOKEN=$(gh auth token)  # or a personal access token
-python fetch_and_build.py             # full build
-python fetch_and_build.py --batch 1/6 # one refresh batch
+python fetch_and_build.py --render-only
 
 python3 -m http.server 4173
 ```
@@ -129,9 +195,11 @@ Open [http://127.0.0.1:4173](http://127.0.0.1:4173).
 
 ---
 
-## Submitting Or Correcting An Agent
+## Submit Or Correct An Agent
 
-Use the [agent listing issue template](https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml). A listed project should be:
+Use the [agent listing issue template](https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml).
+
+A listed project should be:
 
 - A public, non-archived GitHub repository
 - Related to AI agents or agent infrastructure
@@ -142,49 +210,15 @@ Include the canonical repository, preferred display name, category suggestion, p
 
 ---
 
-## Public Data API
-
-The v1 public dataset is available under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). CORS is open for public endpoints.
-
-| Endpoint | Description |
-|---|---|
-| [`/data/latest.json`](https://hvtracker.net/data/latest.json) | Current public leaderboard snapshot |
-| [`/data/agents/{slug}.json`](https://hvtracker.net/data/agents/dify.json) | Per-agent public detail with history and events |
-| [`/data/build_report.json`](https://hvtracker.net/data/build_report.json) | Build integrity report |
-| [`/data/signals/scorecard.json`](https://hvtracker.net/data/signals/scorecard.json) | OSSF Scorecard signal cache |
-| [`/data/signals/provenance.json`](https://hvtracker.net/data/signals/provenance.json) | Package provenance signal cache |
-
----
-
-## Trust Badges
-
-Listed projects can display their live HVTrust score and evidence grade. Badges regenerate every build, so they always reflect current data.
-
-| Badge | Markdown |
-|---|---|
-| HVTrust score | `[![HVTrust](https://hvtracker.net/badge/<slug>.svg)](https://hvtracker.net/agents/<slug>/)` |
-| Evidence grade | `[![HVTrust Grade](https://hvtracker.net/badge/<slug>-grade.svg)](https://hvtracker.net/agents/<slug>/)` |
-
-Replace `<slug>` with your agent's slug (e.g. `langchain`, `aider`). The exact snippet for each agent is shown on its profile page.
-
----
-
 ## Specifications
 
-- [Trust Credential v0.1](https://hvtracker.net/spec/trust-credential/v0.1) - machine-readable trust record for agent-to-agent (A2A) verification
-- [Methodology v2.2](https://hvtracker.net/spec/methodology/v2.2) - scoring formula and signal definitions
-- [Eligibility v1.0](https://hvtracker.net/spec/eligibility/v1.0) - listing requirements
-- [Listing v0.1](https://hvtracker.net/spec/listing/v0.1) - listing lifecycle
-- [Data Schema v2.0](https://hvtracker.net/spec/data-schema/v2.0) - public API schema
-- [Provenance v0.1](https://hvtracker.net/spec/provenance/v0.1) - provenance detection
-- [Build Report v0.1](https://hvtracker.net/spec/build-report/v0.1) - build transparency
-
----
-
-## Launch And Business Notes
-
-- [V1 launch checklist and zero-budget marketing plan](docs/launch-v1.md)
-- [Open-core and company-readiness notes](docs/open-core.md)
+- [Trust Credential v0.1](https://hvtracker.net/spec/trust-credential/v0.1)
+- [Methodology v2.0](https://hvtracker.net/spec/methodology/v2.0)
+- [Eligibility v1.0](https://hvtracker.net/spec/eligibility/v1.0)
+- [Listing v0.1](https://hvtracker.net/spec/listing/v0.1)
+- [Data Schema v0.1](https://hvtracker.net/spec/data-schema/v0.1)
+- [Provenance v0.1](https://hvtracker.net/spec/provenance/v0.1)
+- [Build Report v0.1](https://hvtracker.net/spec/build-report/v0.1)
 
 ---
 
@@ -193,20 +227,21 @@ Replace `<slug>` with your agent's slug (e.g. `langchain`, `aider`). The exact s
 ```text
 hvtracker/
 ├── fetch_and_build.py        # Core build, scoring, and rendering
-├── template.html             # Leaderboard template
-├── templates/agent.html.j2   # Per-agent profile template
-├── templates/methodology.html.j2
+├── template.html             # Main registry template
+├── templates/                # Agent, category, blog, compare, and spec templates
 ├── agents.json               # Curated agent registry
-├── specs.py                  # Specification page generator
+├── specs.py                  # Specification content
 ├── scan_scorecards.py        # Weekly OSSF Scorecard scan
 ├── discover_agents.py        # Weekly discovery scan
 ├── docs/                     # Launch, research, and operating docs
 ├── data/                     # Generated public data endpoints
-└── agents/                   # Generated per-agent pages
+├── agents/                   # Generated per-agent pages
+├── badge/                    # Generated SVG badges
+└── blog/                     # Generated and static articles
 ```
 
 ---
 
 ## License
 
-The v1 public data is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Review [docs/open-core.md](docs/open-core.md) before changing the public/private data boundary for a future company-backed edition.
+The public data is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Review [docs/open-core.md](docs/open-core.md) before changing the public/private data boundary for a future company-backed edition.
