@@ -28,8 +28,21 @@
       link_url: url.href,
       link_text: link.textContent.trim().slice(0, 80)
     };
+    var isBadgesPath = url.pathname === "/badges/" || url.pathname === "/badges";
 
-    if (url.pathname.startsWith("/agents/")) {
+    // Leaving the /badges/ page via an in-site, same-tab link (badge adoption funnel).
+    // Fired alongside the destination event below so we capture both the exit and where it went.
+    if (document.body.dataset.pageType === "badges" && !link.target &&
+        !isBadgesPath && url.hostname === window.location.hostname) {
+      window.hvtTrack("badges_exit", Object.assign({}, params, { exit_to: url.pathname }));
+    }
+
+    if (link.closest(".pr-offer")) {
+      window.hvtTrack("badge_pr_click", params);
+    } else if (isBadgesPath) {
+      // Landing on /badges/: distinguish the per-agent "Badge guide for maintainers" link.
+      window.hvtTrack(link.closest("#embed-badge") ? "badge_guide_click" : "badges_click", params);
+    } else if (url.pathname.startsWith("/agents/")) {
       var parts = url.pathname.split("/").filter(Boolean);
       window.hvtTrack("agent_click", Object.assign(params, {
         clicked_agent_slug: parts[1] || "",

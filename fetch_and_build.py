@@ -2100,6 +2100,7 @@ def main() -> None:
     sitemap_urls = [
         ("https://hvtracker.net/", "1.0", "daily"),
         ("https://hvtracker.net/methodology", "0.5", "monthly"),
+        ("https://hvtracker.net/badges/", "0.6", "weekly"),
         ("https://hvtracker.net/spec/", "0.4", "monthly"),
     ]
     for spec in _ALL_SPECS:
@@ -2278,6 +2279,19 @@ HVTrust = gate( confidence x [ Safety(30) + Identity(20) + Transparency(20) + Ma
         with open(path, "w", encoding="utf-8") as f:
             f.write(methodology_html)
     print(f"Built methodology.html ({METHODOLOGY_VERSION}, updated {methodology_date}).")
+
+    # Build /badges/ — Badge for Maintainers page
+    badges_html = env.get_template("badges.html.j2").render(
+        top_repos=rows[:12],
+        sample=rows[0],
+        total=len(rows),
+        updated=methodology_date,
+    )
+    badges_dir = os.path.join(script_dir, "badges")
+    os.makedirs(badges_dir, exist_ok=True)
+    with open(os.path.join(badges_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(badges_html)
+    print("Built badges/index.html (Badge for Maintainers).")
 
     # Build /spec/ pages
     from specs import ALL_SPECS
