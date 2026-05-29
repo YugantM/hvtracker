@@ -6,16 +6,16 @@
 HVTrust = gate( confidence x [ Safety(30) + Identity(20) + Transparency(20) + Maintenance(20) + Adoption(10) ] - penalties ). Confidence = present/applicable signal types. Higher trust means more verifiable, not more popular. Methodology: https://hvtracker.net/methodology
 
 ## Top 10 agents by HVTrust
-1. Vercel AI SDK (vercel/ai) — HVTrust 90.5/100, Grade B
+1. Vercel AI SDK (vercel/ai) — HVTrust 90.4/100, Grade B
 2. Haystack (deepset-ai/haystack) — HVTrust 90.1/100, Grade C
-3. Trigger.dev (triggerdotdev/trigger.dev) — HVTrust 89.6/100, Grade C
+3. Trigger.dev (triggerdotdev/trigger.dev) — HVTrust 89.5/100, Grade C
 4. Cline (cline/cline) — HVTrust 88.4/100, Grade B
-5. Strands Agents (strands-agents/sdk-python) — HVTrust 87.9/100, Grade C
+5. Strands Agents (strands-agents/sdk-python) — HVTrust 87.8/100, Grade C
 6. Stagehand (browserbase/stagehand) — HVTrust 86.2/100, Grade B
-7. Vespa (vespa-engine/vespa) — HVTrust 86.0/100, Grade B
+7. Vespa (vespa-engine/vespa) — HVTrust 85.9/100, Grade B
 8. Botpress (botpress/botpress) — HVTrust 85.6/100, Grade B
-9. Weights & Biases Weave (wandb/weave) — HVTrust 85.0/100, Grade B
-10. LangGraph (langchain-ai/langgraph) — HVTrust 82.0/100, Grade B
+9. Weights & Biases Weave (wandb/weave) — HVTrust 84.9/100, Grade B
+10. LangGraph (langchain-ai/langgraph) — HVTrust 81.9/100, Grade B
 
 ## Machine-readable data (open, CC BY 4.0)
 - [Full registry JSON](https://hvtracker.net/data/latest.json): all 171 agents with trust scores, grades, and signals
