@@ -267,6 +267,28 @@
       font-family:var(--font-mono); font-size:12px;
     }
 
+    .maintainer-cta {
+      padding:18px 20px; margin:14px 0;
+      border:1px solid var(--mocha); border-radius:10px;
+      background:linear-gradient(135deg, rgba(216,166,87,0.12), rgba(216,166,87,0.03)), var(--glass);
+      box-shadow:inset 0 1px 0 var(--glass-hi);
+    }
+    .maintainer-cta .section-title { margin-bottom:8px; }
+    .maintainer-cta p {
+      font-size:13.5px; color:var(--muted); line-height:1.6; max-width:560px; margin-bottom:14px;
+    }
+    .maintainer-cta p strong { color:var(--text); }
+    .maintainer-actions { display:flex; gap:10px; flex-wrap:wrap; font-family:var(--font-mono); font-size:12px; }
+    .cta-correction {
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:9px 16px; border:1px solid var(--mocha); border-radius:6px;
+      background:var(--mocha-lt); color:var(--mocha); font-weight:700;
+    }
+    .cta-correction:hover {
+      background:rgba(216,166,87,0.28); color:var(--text);
+      border-color:var(--mocha); text-decoration:none;
+    }
+
     .siblings { padding:22px 0; margin:0; border-top:1px solid var(--hairline); }
     .siblings ul { list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px 18px; }
     .siblings li a {
@@ -646,6 +668,15 @@
       
     </section>
 
+    <section class="maintainer-cta">
+      <h2 class="section-title">Maintain Milvus?</h2>
+      <p>HVTrust scores Milvus from <strong>public signals only</strong> — we never contact maintainers first. If a signal is wrong, stale, or missing (provenance you publish, a Scorecard you run, signed releases), tell us and we'll review it. Corrections are public and tracked on GitHub.</p>
+      <div class="maintainer-actions">
+        <a class="cta-correction" href="https://github.com/YugantM/hvtracker/issues/new?title=%5BCorrection%5D+Milvus&amp;body=Profile%3A+https%3A%2F%2Fhvtracker.net%2Fagents%2Fmilvus%2F%0ARepository%3A+milvus-io%2Fmilvus%0A%0AWhat+should+be+corrected%3F%0A%0AEvidence+or+links%3A%0A" target="_blank" rel="noopener noreferrer">Submit a correction →</a>
+        <a class="secondary-link" href="#embed-badge">Add the trust badge</a>
+      </div>
+    </section>
+
     
 
     
@@ -789,7 +820,7 @@
     </section>
 
     <footer>
-      <span>Updated 2026-05-29 20:04 UTC</span>
+      <span>Updated 2026-05-29 20:12 UTC</span>
       <span class="footer-sep">·</span>
       <a href="/methodology">methodology</a>
       <span class="footer-sep">·</span>
