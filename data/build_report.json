@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-29T01:55:39Z",
-  "data_timestamp": "2026-05-29 01:55 UTC",
+  "generated_at": "2026-05-29T07:50:39Z",
+  "data_timestamp": "2026-05-29 07:50 UTC",
   "schema_version": "v0.1",
   "methodology_version": "v3.0",
-  "configured_agents": 36,
+  "configured_agents": 29,
   "active_agents": 171,
-  "legacy_agents": 7,
-  "total_generated": 178,
+  "legacy_agents": 0,
+  "total_generated": 171,
   "categories": {
     "Coding Agents": 26,
     "Agent Frameworks": 57,
@@ -55,11 +55,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "google-gemini/gemini-cli",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "openai/codex",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -71,31 +66,6 @@
     },
     {
       "repo": "infiniflow/ragflow",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "firecrawl/firecrawl",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "daytonaio/daytona",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "cline/cline",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "CrewAIInc/crewAI",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "danny-avila/LibreChat",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -115,16 +85,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "CopilotKit/CopilotKit",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "composiohq/composio",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "openai/openai-agents-python",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -140,17 +100,7 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "elizaOS/eliza",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "langfuse/langfuse",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "FlowiseAI/Flowise",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -161,11 +111,6 @@
     },
     {
       "repo": "Mintplex-Labs/anything-llm",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "deepset-ai/haystack",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -200,11 +145,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "chroma-core/chroma",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "livekit/agents",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -216,11 +156,6 @@
     },
     {
       "repo": "leon-ai/leon",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "confident-ai/deepeval",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -255,11 +190,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "getmaxun/maxun",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "modelcontextprotocol/servers",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -270,27 +200,12 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "firebase/genkit",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "flyteorg/flyte",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "NVIDIA/NeMo-Guardrails",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
     {
       "repo": "gptme/gptme",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "e2b-dev/e2b",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -320,17 +235,7 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "Giskard-AI/giskard-oss",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "google/adk-go",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "github/copilot-cli",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -356,11 +261,6 @@
     },
     {
       "repo": "OpenInterpreter/open-interpreter",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "getzep/graphiti",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -410,16 +310,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "continuedev/continue",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "dagworks-inc/burr",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "letta-ai/letta",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -450,11 +340,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "coze-dev/coze-studio",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "microsoft/OmniParser",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -480,27 +365,12 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "FoundationAgents/OpenManus",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "browserbase/open-operator",
-      "criterion": "5.1",
-      "detail": "repository is archived"
-    },
-    {
       "repo": "browserbase/open-operator",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
     {
       "repo": "homanp/superagent",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "geekan/MetaGPT",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -515,17 +385,7 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "explodinggradients/ragas",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "yoheinakajima/babyagi",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "EmergenceAI/agent-e",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -606,21 +466,11 @@
     },
     {
       "repo": "entropy-research/Devon",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "entropy-research/Devon",
       "criterion": "4.2.1",
       "detail": "no meaningful activity in 12 months (last push 2025-05-26)"
     },
     {
       "repo": "crewAIInc/crewAI-tools",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "AbanteAI/archive-old-cli-mentat",
       "criterion": "5.1",
       "detail": "repository is archived"
     },
@@ -705,7 +555,7 @@
       "detail": "no meaningful activity in 12 months (last push 2024-09-26)"
     }
   ],
-  "warning_count": 136,
+  "warning_count": 106,
   "failed_fetches": [],
   "missing_repos_count": 0,
   "package_failures": [
@@ -720,8 +570,7 @@
   "package_failure_count": 7,
   "scorecard_unavailable_count": 23,
   "fingerprint_agents": [
-    "All-Hands-AI/OpenHands",
-    "anthropics/claude-code"
+    "google-gemini/gemini-cli"
   ],
-  "fingerprint_agent_count": 2
+  "fingerprint_agent_count": 1
 }
