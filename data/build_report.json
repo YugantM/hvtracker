@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-29T18:42:47Z",
-  "data_timestamp": "2026-05-29 18:42 UTC",
+  "generated_at": "2026-05-29T21:53:48Z",
+  "data_timestamp": "2026-05-29 21:53 UTC",
   "schema_version": "v0.1",
   "methodology_version": "v3.0",
-  "configured_agents": 29,
+  "configured_agents": 27,
   "active_agents": 172,
   "legacy_agents": 0,
   "total_generated": 172,
@@ -28,16 +28,6 @@
       "repo": "anthropics/claude-code",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "Skyvern-AI/skyvern",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "RooVetGit/Roo-Code",
-      "criterion": "5.1",
-      "detail": "repository is archived"
     },
     {
       "repo": "browserbase/open-operator",
@@ -96,18 +86,8 @@
     },
     {
       "repo": "protectai/rebuff",
-      "criterion": "5.1",
-      "detail": "repository is archived"
-    },
-    {
-      "repo": "protectai/rebuff",
       "criterion": "4.2.1",
       "detail": "no meaningful activity in 12 months (last push 2024-08-07)"
-    },
-    {
-      "repo": "PrefectHQ/ControlFlow",
-      "criterion": "5.1",
-      "detail": "repository is archived"
     },
     {
       "repo": "MinorJerry/WebVoyager",
@@ -135,23 +115,19 @@
       "detail": "no meaningful activity in 12 months (last push 2024-09-26)"
     }
   ],
-  "warning_count": 22,
+  "warning_count": 18,
   "failed_fetches": [],
   "missing_repos_count": 0,
   "package_failures": [
     "mastra-ai/mastra",
     "Mintplex-Labs/anything-llm",
     "leon-ai/leon",
-    "sst/opencode",
     "myshell-ai/AIlice",
     "plandex-ai/plandex",
     "microsoft/TaskWeaver"
   ],
-  "package_failure_count": 7,
+  "package_failure_count": 6,
   "scorecard_unavailable_count": 24,
-  "fingerprint_agents": [
-    "paul-gauthier/aider",
-    "QwenLM/qwen-code"
-  ],
-  "fingerprint_agent_count": 2
+  "fingerprint_agents": [],
+  "fingerprint_agent_count": 0
 }
