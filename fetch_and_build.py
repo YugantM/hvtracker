@@ -714,6 +714,8 @@ def run_eligibility_checks(rows: list[dict]) -> list[dict]:
     """
     violations = []
     for r in rows:
+        if r.get("pending_signals"):
+            continue
         repo = r["repo"]
         if r.get("archived"):
             violations.append({"repo": repo, "criterion": "5.1", "detail": "repository is archived"})
@@ -1050,6 +1052,80 @@ def merge_batch_into_data(data_path: str, fresh_rows: list[dict]) -> list[dict]:
     return kept  # caller will add fresh rows after scoring
 
 
+def load_existing_data_repos(data_path: str) -> set[str]:
+    """Return repos already present in generated data.json with real signals."""
+    try:
+        with open(data_path) as f:
+            existing = json.load(f)
+        return {
+            a["repo"].lower()
+            for a in existing.get("agents", [])
+            if a.get("repo") and not a.get("pending_signals")
+        }
+    except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
+        return set()
+
+
+def provisional_agent_row(agent: dict) -> dict:
+    """Create a cached render row for a newly-listed agent awaiting signals."""
+    repo_id = agent["repo"]
+    name = agent.get("name", repo_id.split("/")[-1])
+    return {
+        "name": name,
+        "category": agent.get("category", ""),
+        "repo": repo_id,
+        "url": f"https://github.com/{repo_id}",
+        "stars": 0,
+        "stars_fmt": "0",
+        "forks": 0,
+        "forks_fmt": "0",
+        "last_push": "pending",
+        "days_ago": 999,
+        "freshness_class": freshness_class(999),
+        "weekly_commits": 0,
+        "commits_low_confidence": False,
+        "score": 0.0,
+        "score_class": score_class(0),
+        "description": agent.get("description", "Pending first signal refresh"),
+        "language": "",
+        "open_issues": 0,
+        "archived": False,
+        "license_spdx": None,
+        "npm_package": agent.get("npm_package", ""),
+        "pypi_package": agent.get("pypi_package", ""),
+        "npm_dl": None,
+        "npm_provenance": None,
+        "pypi_provenance": None,
+        "signed_commits_ratio": None,
+        "weekly_downloads": None,
+        "dl_source": "",
+        "downloads_fmt": "—",
+        "hn_mentions_30d": None,
+        "public_actions": None,
+        "scorecard_score": None,
+        "scorecard_checks": {},
+        "scorecard_fmt": None,
+        "has_provenance": False,
+        "provenance_sources": [],
+        "listing_status": agent.get("listing_status", "listed"),
+        "pending_signals": True,
+    }
+
+
+def add_provisional_missing_agents(rows: list[dict], agents: list[dict]) -> int:
+    """Append provisional rows for active agents missing from cached output."""
+    existing = {r["repo"].lower() for r in rows if r.get("repo")}
+    added = 0
+    for agent in agents:
+        repo_key = agent["repo"].lower()
+        if repo_key in existing:
+            continue
+        rows.append(provisional_agent_row(agent))
+        existing.add(repo_key)
+        added += 1
+    return added
+
+
 def main() -> None:
     script_dir = os.path.dirname(os.path.abspath(__file__))
     agents_path = os.path.join(script_dir, "agents.json")
@@ -1087,8 +1163,23 @@ def main() -> None:
     # In batch mode, only fetch a slice of active agents
     all_agents = agents  # keep full list for context
     if batch:
-        agents = select_batch(agents, batch_num, total_batches)
-        print(f"Batch {batch_num}/{total_batches}: fetching {len(agents)} of {len(all_agents)} active agents")
+        batch_agents = select_batch(all_agents, batch_num, total_batches)
+        existing_data_repos = load_existing_data_repos(data_path)
+        missing_agents = [
+            a for a in all_agents
+            if a["repo"].lower() not in existing_data_repos
+        ]
+        batch_repos = {a["repo"].lower() for a in batch_agents}
+        extra_agents = [
+            a for a in missing_agents
+            if a["repo"].lower() not in batch_repos
+        ]
+        agents = batch_agents + extra_agents
+        print(
+            f"Batch {batch_num}/{total_batches}: fetching {len(batch_agents)} scheduled"
+            f" + {len(extra_agents)} newly-added missing agents"
+            f" ({len(agents)} of {len(all_agents)} active agents)"
+        )
         # Legacy agents: only fetch in batch 1 (they rarely change)
         if batch_num != 1:
             legacy_agents = []
@@ -1179,7 +1270,10 @@ def main() -> None:
             _state = json.load(_f)
         rows = _state["rows"]
         legacy_rows = _state["legacy_rows"]
+        provisional_count = add_provisional_missing_agents(rows, all_agents)
         print(f"RENDER-ONLY: loaded {len(rows)} active + {len(legacy_rows)} legacy rows from render_state.json")
+        if provisional_count:
+            print(f"RENDER-ONLY: added {provisional_count} provisional agent listing(s) pending signal refresh")
     else:
         rows = []
         with ThreadPoolExecutor(max_workers=10) as pool:
@@ -1322,6 +1416,9 @@ def main() -> None:
         fresh_keys = {r["repo"].lower() for r in rows}
         merged = rows + [a for a in old_agents if a["repo"].lower() not in fresh_keys]
         rows = merged
+        provisional_count = add_provisional_missing_agents(rows, all_agents)
+        if provisional_count:
+            print(f"Batch merge: added {provisional_count} provisional agent listing(s) pending signal refresh")
         print(f"\nMerged batch: {len(rows)} total agents ({len(rows) - len(old_agents)} refreshed, {len(old_agents)} carried forward)")
 
     # Provisional momentum ordering; final rank is assigned by trust_score
@@ -1523,6 +1620,7 @@ def main() -> None:
                 "trust_score": r.get("trust_score"),
                 "trust_confidence": r.get("trust_confidence"),
                 "trust_breakdown": r.get("trust_breakdown", {}),
+                "pending_signals": r.get("pending_signals", False),
             }
             for r in rows
         ],

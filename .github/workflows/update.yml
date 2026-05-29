@@ -1,6 +1,10 @@
 name: Update leaderboard
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - agents.json
   schedule:
     # Staggered batches — each batch refreshes ~29 agents, full cycle in 24h
     - cron: "0 0 * * *"   # Batch 1/6 at 00:00 UTC
@@ -65,6 +69,11 @@ jobs:
             # NO API calls. Use for UI/template changes — runs in seconds.
             echo "args=--render-only" >> $GITHUB_OUTPUT
             echo "Running RENDER-ONLY (no API calls)"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            # agents.json changed: list new agents immediately from cache, then
+            # let the normal staggered cron enrich signals in the next batch.
+            echo "args=--render-only" >> $GITHUB_OUTPUT
+            echo "Running RENDER-ONLY for agents.json change (no API calls)"
           elif [ "${{ inputs.mode }}" = "mega" ]; then
             # Mega mode: full rebuild with no batch — refreshes ALL agents
             echo "args=" >> $GITHUB_OUTPUT

@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-05-29T16:28:39Z",
-  "data_timestamp": "2026-05-29 16:28 UTC",
+  "generated_at": "2026-05-29T16:48:46Z",
+  "data_timestamp": "2026-05-29 16:48 UTC",
   "schema_version": "v0.1",
   "methodology_version": "v3.0",
-  "configured_agents": 29,
-  "active_agents": 171,
+  "configured_agents": 179,
+  "active_agents": 172,
   "legacy_agents": 0,
-  "total_generated": 171,
+  "total_generated": 172,
   "categories": {
     "Coding Agents": 26,
-    "Agent Frameworks": 57,
+    "Agent Frameworks": 58,
     "Workflow Platforms": 13,
     "Browser & Computer Use": 15,
     "Memory & Knowledge": 20,
@@ -136,8 +136,16 @@
     }
   ],
   "warning_count": 22,
-  "failed_fetches": [],
-  "missing_repos_count": 0,
+  "failed_fetches": [
+    "OpenBMB/AgentVerse",
+    "TransformerOptimus/SuperAGI",
+    "aymenfurter/microagents",
+    "biobootloader/wolverine",
+    "kuafuai/DevOpsGPT",
+    "lavague-ai/LaVague",
+    "smol-ai/developer"
+  ],
+  "missing_repos_count": 7,
   "package_failures": [
     "mastra-ai/mastra",
     "Mintplex-Labs/anything-llm",
@@ -145,13 +153,17 @@
     "sst/opencode",
     "myshell-ai/AIlice",
     "plandex-ai/plandex",
-    "microsoft/TaskWeaver"
+    "microsoft/TaskWeaver",
+    "AIOSAI/AIPass"
   ],
-  "package_failure_count": 7,
-  "scorecard_unavailable_count": 23,
+  "package_failure_count": 8,
+  "scorecard_unavailable_count": 24,
   "fingerprint_agents": [
+    "anthropics/claude-code",
+    "All-Hands-AI/OpenHands",
     "paul-gauthier/aider",
+    "google-gemini/gemini-cli",
     "QwenLM/qwen-code"
   ],
-  "fingerprint_agent_count": 2
+  "fingerprint_agent_count": 5
 }
