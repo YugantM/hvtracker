@@ -225,6 +225,47 @@
       background:rgba(143,179,255,0.26);
       text-decoration:none;
     }
+    .secondary-link {
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:8px 14px; border:1px solid var(--border);
+      border-radius:6px; background:rgba(255,255,255,0.035);
+      color:var(--muted);
+      font-family:var(--font-mono); font-size:12px;
+    }
+    .secondary-link:hover {
+      color:var(--text);
+      border-color:var(--accent-dim);
+      text-decoration:none;
+      background:rgba(143,179,255,0.10);
+    }
+    .review-card {
+      padding:18px 20px; margin:14px 0;
+      border:1px solid var(--border); border-radius:10px;
+      background:linear-gradient(135deg, rgba(45,212,191,0.07), rgba(143,179,255,0.045) 44%, rgba(216,166,87,0.04)), var(--glass);
+      box-shadow:inset 0 1px 0 var(--glass-hi);
+    }
+    .review-grid {
+      display:grid; grid-template-columns:1.2fr 1fr 1fr;
+      gap:12px;
+    }
+    .review-item {
+      border:1px solid var(--hairline);
+      border-radius:8px;
+      padding:12px;
+      background:rgba(255,255,255,0.032);
+    }
+    .review-item.primary { grid-row:span 2; }
+    .review-item.wide { grid-column:span 2; }
+    .review-kicker {
+      font-family:var(--font-mono); font-size:10px; color:var(--muted);
+      text-transform:uppercase; letter-spacing:0.07em; margin-bottom:7px;
+    }
+    .review-value { font-size:15px; color:var(--text); line-height:1.45; }
+    .review-metric { font-family:var(--font-mono); font-size:18px; font-weight:700; color:var(--accent); margin-top:4px; }
+    .review-actions {
+      margin-top:14px; display:flex; flex-wrap:wrap; gap:10px;
+      font-family:var(--font-mono); font-size:12px;
+    }
 
     .siblings { padding:22px 0; margin:0; border-top:1px solid var(--hairline); }
     .siblings ul { list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px 18px; }
@@ -251,6 +292,9 @@
     .terminal-note { margin:0; border-top:1px solid var(--hairline); }
     @media (max-width:720px) {
       .rank-block { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+      .review-grid { grid-template-columns:1fr; }
+      .review-item.primary { grid-row:auto; }
+      .review-item.wide { grid-column:auto; }
     }
   </style>
 
@@ -298,6 +342,8 @@
       </div>
       <div class="hero-actions">
         <a class="compare-link" href="/compare/?a={{ row.slug }}">Compare</a>
+        <a class="secondary-link" href="#embed-badge">Embed badge</a>
+        <a class="secondary-link" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Suggest correction</a>
       </div>
       <div class="seo-summary" style="margin-top:18px;font-size:14px;color:var(--muted);line-height:1.7;max-width:640px;">
         <p>{{ row.name }} is an open-source AI agent in the {{ row.category }} category with {{ row.stars_fmt }} GitHub stars{% if row.description %} — {{ row.description }}{% endif %}.
@@ -305,6 +351,44 @@
         {% if row.scorecard_score %}It scores {{ row.scorecard_score }}/10 on the OpenSSF Scorecard for supply-chain security.{% endif %}
         {% if row.has_provenance %}Package provenance is verified.{% endif %}
         Signals are refreshed daily from GitHub, package registries, and security databases.</p>
+      </div>
+    </section>
+
+    <section class="review-card">
+      <h2 class="section-title">Quick Trust Read</h2>
+      <div class="review-grid">
+        <div class="review-item primary">
+          <div class="review-kicker">Verdict</div>
+          <div class="review-value">{{ row.review_insights.verdict }}</div>
+          <div class="review-metric">{{ row.trust_score }}/100 · Grade {{ row.evidence_grade }}</div>
+        </div>
+{% if row.review_insights.strongest %}
+        <div class="review-item">
+          <div class="review-kicker">Strongest Signal</div>
+          <div class="review-value">{{ row.review_insights.strongest.label }}</div>
+          <div class="review-metric">{{ row.review_insights.strongest.value }}/{{ row.review_insights.strongest.max }}</div>
+        </div>
+{% endif %}
+{% if row.review_insights.weakest %}
+        <div class="review-item">
+          <div class="review-kicker">Weakest Signal</div>
+          <div class="review-value">{{ row.review_insights.weakest.label }}</div>
+          <div class="review-metric">{{ row.review_insights.weakest.value }}/{{ row.review_insights.weakest.max }}</div>
+        </div>
+{% endif %}
+        <div class="review-item wide">
+          <div class="review-kicker">What Would Improve It</div>
+          <div class="review-value">{{ row.review_insights.improvement }}</div>
+        </div>
+      </div>
+      <div class="review-actions">
+{% if comparisons %}
+        <a class="compare-link" href="{{ comparisons[0].url }}">Compare with {{ comparisons[0].name }}</a>
+{% else %}
+        <a class="compare-link" href="/compare/?a={{ row.slug }}">Compare with another agent</a>
+{% endif %}
+        {% if row.category %}<a class="secondary-link" href="/categories/{{ row.category_slug }}">View {{ row.category }}</a>{% endif %}
+        <a class="secondary-link" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Report missing data</a>
       </div>
     </section>
 
@@ -552,7 +636,7 @@
       {% if row.npm_package %}<a href="https://www.npmjs.com/package/{{ row.npm_package }}" target="_blank" rel="noopener noreferrer">npm: {{ row.npm_package }}</a>{% endif %}
     </section>
 
-    <section class="provenance" style="margin-top:0;">
+    <section class="provenance" id="embed-badge" style="margin-top:0;">
       <h2 class="section-title">Embed Badge</h2>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
         <img src="/badge/{{ row.slug }}.svg" alt="HVTrust {{ row.trust_score }}" height="20">

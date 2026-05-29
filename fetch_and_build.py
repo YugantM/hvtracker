@@ -481,6 +481,76 @@ def score_class(s: float) -> str:
     return "score-low"
 
 
+TRUST_DIMENSIONS = {
+    "safety": ("Safety / Integrity", 30),
+    "identity": ("Identity / Provenance", 20),
+    "transparency": ("Transparency", 20),
+    "maintenance": ("Maintenance", 20),
+    "adoption": ("Adoption", 10),
+}
+
+
+def agent_review_insights(row: dict) -> dict:
+    """Summarize the trust score in plain language for agent profile pages."""
+    score = row.get("trust_score") or 0
+    grade = row.get("evidence_grade") or "D"
+    confidence = row.get("trust_confidence") or 0
+    breakdown = row.get("trust_breakdown") or {}
+
+    if score >= 75 and grade in ("A", "B"):
+        verdict = "Strong public trust posture, backed by multiple independent signals."
+    elif score >= 55:
+        verdict = "Promising trust profile, but some evidence still deserves review."
+    else:
+        verdict = "Thin or incomplete trust evidence. Review carefully before production use."
+
+    dimensions = []
+    for key, (label, max_score) in TRUST_DIMENSIONS.items():
+        value = breakdown.get(key, 0) or 0
+        dimensions.append({
+            "key": key,
+            "label": label,
+            "value": value,
+            "max": max_score,
+            "pct": value / max_score if max_score else 0,
+        })
+    strongest = max(dimensions, key=lambda d: d["pct"]) if dimensions else None
+    weakest = min(dimensions, key=lambda d: d["pct"]) if dimensions else None
+
+    if row.get("scorecard_score") is None:
+        improvement = "Add or improve OSSF Scorecard coverage so safety checks are easier to verify."
+    elif not row.get("has_provenance"):
+        improvement = "Publish package provenance or release attestations for stronger supply-chain evidence."
+    elif row.get("signed_commits_ratio") is None or row.get("signed_commits_ratio", 0) < 0.5:
+        improvement = "Increase the share of verified signed commits for clearer maintainer identity."
+    elif confidence < 0.8:
+        improvement = "Expose more independent signals, such as package metadata, provenance, or public usage evidence."
+    elif weakest:
+        improvement = f"Improve {weakest['label'].lower()} to lift the weakest part of the trust profile."
+    else:
+        improvement = "Keep trust signals fresh and verifiable as the project changes."
+
+    return {
+        "verdict": verdict,
+        "strongest": strongest,
+        "weakest": weakest,
+        "improvement": improvement,
+    }
+
+
+def agent_correction_url(row: dict) -> str:
+    correction_body = (
+        f"Profile: https://hvtracker.net/agents/{row['slug']}/\n"
+        f"Repository: {row.get('repo', '')}\n\n"
+        "What should be corrected?\n\n"
+        "Evidence or links:\n"
+    )
+    return "https://github.com/YugantM/hvtracker/issues/new?" + urlencode({
+        "title": f"[Correction] {row['name']}",
+        "body": correction_body,
+    })
+
+
 def _load_prior_snapshot(history_dir: str) -> dict | None:
     """Return the most recent history snapshot older than today, or None."""
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -1798,6 +1868,8 @@ def main() -> None:
     # Add category_slug so agent pages can link to category pages
     for row in rows + legacy_rows:
         row["category_slug"] = slugify(row.get("category", "")) if row.get("category") else ""
+        row["review_insights"] = agent_review_insights(row)
+        row["correction_url"] = agent_correction_url(row)
     for row in rows:
         repo_key = row["repo"].lower()
         points = sparkline_data.get(repo_key, [])
