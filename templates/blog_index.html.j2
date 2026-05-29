@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — AI Agent Trust Insights | HVTracker</title>
+  <meta name="description" content="Research, comparisons, and SEO-friendly guides on AI agent safety, trust, adoption, and open-source agent selection.">
+  <link rel="canonical" href="https://hvtracker.net/blog/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Blog — AI Agent Trust Insights | HVTracker">
+  <meta property="og:description" content="Research and comparisons on AI agent safety, trust, and adoption.">
+  <meta property="og:url" content="https://hvtracker.net/blog/">
+  <meta property="og:image" content="https://hvtracker.net/og-v1.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Blog — AI Agent Trust Insights | HVTracker">
+  <meta name="twitter:description" content="Research and comparisons on AI agent safety, trust, and adoption.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v1.png">
+
+  <script type="application/ld+json">{{ blog_schema_json | safe }}</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#0b0d10; --surface:rgba(21,25,32,0.78); --border:rgba(142,154,176,0.22);
+      --hairline:rgba(168,179,194,0.12); --glass-hi:rgba(255,255,255,0.055);
+      --text:#eef2f6; --muted:#a8b3c2; --accent:#8fb3ff; --accent-lt:rgba(143,179,255,0.10);
+      --mocha:#d8a657; --fresh:#2dd4bf;
+      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    }
+    body {
+      background-color:var(--bg); color:var(--text); font-family:var(--font-sans);
+      font-size:15px; line-height:1.6; min-height:100vh;
+      background-image:radial-gradient(circle at 18% -10%, rgba(45,212,191,0.12), transparent 30%), radial-gradient(circle at 86% 6%, rgba(216,166,87,0.10), transparent 26%), linear-gradient(180deg, #10141a 0%, var(--bg) 54%, #07090c 100%);
+    }
+    a { color:inherit; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:920px; margin:0 auto; padding:24px 20px 0; }
+    header {
+      padding:16px 18px; border:1px solid var(--border); border-radius:10px;
+      background:linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.018)), var(--surface);
+      box-shadow:inset 0 1px 0 var(--glass-hi), 0 18px 54px rgba(0,0,0,0.28);
+      display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+    }
+    .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; }
+    .logo span { color:var(--accent); }
+    .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; border:1px solid var(--border); border-radius:999px; padding:5px 10px; background:rgba(255,255,255,0.035); }
+    .back:hover { color:var(--text); border-color:var(--accent); text-decoration:none; }
+    .hero { padding:34px 0 22px; border-bottom:1px solid var(--hairline); }
+    h1 { font-size:30px; line-height:1.16; font-weight:700; letter-spacing:-0.02em; margin-bottom:8px; }
+    .subtitle { color:var(--muted); max-width:680px; }
+    .section-title { font-family:var(--font-mono); color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:26px 0 12px; }
+    .post-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px; padding-bottom:18px; }
+    .post-card {
+      border:1px solid var(--border); border-radius:10px; padding:18px; min-height:100%;
+      background:linear-gradient(135deg, rgba(255,255,255,0.052), rgba(255,255,255,0.014)), var(--surface);
+      box-shadow:inset 0 1px 0 var(--glass-hi);
+    }
+    .post-card:hover { border-color:rgba(143,179,255,0.42); }
+    .post-card h2 { font-size:18px; line-height:1.25; margin-bottom:8px; letter-spacing:-0.01em; }
+    .post-card h2 a:hover { color:var(--accent); text-decoration:none; }
+    .post-meta { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-bottom:10px; }
+    .post-excerpt { color:var(--muted); font-size:14px; }
+    .read-more { display:inline-block; margin-top:14px; color:var(--accent); font-size:13px; font-weight:600; }
+    .featured { grid-column:1 / -1; display:grid; grid-template-columns:1.2fr .8fr; gap:18px; align-items:center; }
+    .metric-strip { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+    .metric { border:1px solid var(--hairline); border-radius:8px; padding:10px; background:rgba(0,0,0,0.14); }
+    .metric strong { display:block; font-family:var(--font-mono); color:var(--fresh); font-size:18px; }
+    .metric span { color:var(--muted); font-size:11px; }
+    footer { padding:28px 0; border-top:1px solid var(--hairline); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--accent); }
+    @media (max-width:760px) {
+      .post-grid { grid-template-columns:1fr; }
+      .featured { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <a href="/" class="back">&larr; Trust Registry</a>
+    </header>
+
+    <section class="hero">
+      <h1>AI Agent Trust Insights</h1>
+      <p class="subtitle">Data-backed guides and comparisons for choosing open-source AI agents, coding agents, frameworks, guardrails, memory systems, and agent infrastructure.</p>
+    </section>
+
+    <div class="section-title">Research</div>
+    <div class="post-grid">
+      <article class="post-card featured">
+        <div>
+          <h2><a href="/blog/how-to-evaluate-ai-agent-safety">How to Evaluate AI Agent Safety: 5 Signals That Actually Matter</a></h2>
+          <div class="post-meta">May 27, 2026 &middot; 6 min read</div>
+          <p class="post-excerpt">GitHub stars measure popularity, not trustworthiness. Here are the evidence-based signals that actually help evaluate whether an open-source AI agent is safe to adopt.</p>
+          <a href="/blog/how-to-evaluate-ai-agent-safety" class="read-more">Read article &rarr;</a>
+        </div>
+        <div class="metric-strip">
+          <div class="metric"><strong>{{ total }}</strong><span>agents tracked</span></div>
+          <div class="metric"><strong>{{ categories|length }}</strong><span>categories</span></div>
+          <div class="metric"><strong>{{ top_agent.trust_score }}</strong><span>top HVTrust</span></div>
+        </div>
+      </article>
+    </div>
+
+    <div class="section-title">Top Category Comparisons</div>
+    <div class="post-grid">
+      {% for article in articles %}
+      <article class="post-card">
+        <h2><a href="/blog/{{ article.slug }}/">{{ article.title }}</a></h2>
+        <div class="post-meta">{{ article.date }} &middot; {{ article.read_time }} min read &middot; {{ article.category }}</div>
+        <p class="post-excerpt">{{ article.excerpt }}</p>
+        <a href="/blog/{{ article.slug }}/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      {% endfor %}
+    </div>
+
+    <footer>
+      <a href="/">HVTracker</a> &middot; AI Agent Trust Registry &middot;
+      <a href="/methodology">Methodology</a> &middot;
+      <a href="/compare/">Compare</a> &middot;
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>
