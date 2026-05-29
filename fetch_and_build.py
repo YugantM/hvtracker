@@ -1335,9 +1335,18 @@ def main() -> None:
         dl = row.get("weekly_downloads")
         row["downloads_fmt"] = f"{dl:,}" if dl is not None else "—"
         row["slug"] = slugify(row["name"])
-        # Ensure template-only fields exist (needed for carried-forward batch rows)
-        if "freshness_class" not in row:
-            row["freshness_class"] = freshness_class(row.get("days_ago") or 999)
+        # Always recompute freshness from the absolute last_push date so the
+        # color coding (and the maintenance dimension) stay correct even when
+        # rendering from a cached snapshot — cached days_ago would drift stale.
+        lp = row.get("last_push")
+        if lp:
+            try:
+                pushed = datetime.strptime(str(lp)[:10], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                row["days_ago"] = max(0, (datetime.now(timezone.utc) - pushed).days)
+            except Exception:
+                pass
+        _da = row.get("days_ago")
+        row["freshness_class"] = freshness_class(_da if _da is not None else 999)
         if "score_class" not in row:
             row["score_class"] = score_class(row.get("score") or 0)
         row["score_breakdown"] = score_components(
