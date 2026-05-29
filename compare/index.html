@@ -941,7 +941,9 @@
           shapes += `<circle cx="${x}" cy="${y}" r="2.6" fill="${c}"/>`;
         });
       });
-      return `<svg viewBox="0 0 ${size} ${size}" class="radar-svg" role="img" aria-label="Trust dimension comparison radar">${grid}${axes}${shapes}</svg>`;
+      // Pad the viewBox so axis labels (e.g. "Adoption" on the left) never
+      // clip past the SVG edge.
+      return `<svg viewBox="-58 -16 ${size + 116} ${size + 34}" class="radar-svg" role="img" aria-label="Trust dimension comparison radar">${grid}${axes}${shapes}</svg>`;
     }
 
     function renderDimensionChart() {
@@ -956,25 +958,8 @@
         `<span class="radar-leg"><span class="radar-dot" style="background:${agentColor(a)}"></span>${escapeHtml(a.name)}</span>`
       )).join("");
 
-      const bars = dimMeta.map((dim) => {
-        const rows = selected.map((agent) => {
-          const value = Number(agent.trust_breakdown?.[dim.key] || 0);
-          const width = dim.max > 0 ? Math.max(4, (value / dim.max) * 100) : 0;
-          return `<div class="bar-row">
-            <div class="bar-label"><strong>${escapeHtml(agent.name)}</strong></div>
-            <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${agentColor(agent)}"></div></div>
-            <div class="bar-value">${oneDecimal(value)}</div>
-          </div>`;
-        }).join("");
-        return `<div class="dim-card">
-          <div class="dim-title"><strong>${dim.label}</strong><span>/ ${dim.max}</span></div>
-          ${rows}
-        </div>`;
-      }).join("");
-
       body.innerHTML = `<div class="radar-wrap">${buildRadar(selected)}</div>
-        <div class="radar-legend">${legend}</div>
-        <div class="dim-grid-inner">${bars}</div>`;
+        <div class="radar-legend">${legend}</div>`;
       panel.classList.add("visible");
     }
 
