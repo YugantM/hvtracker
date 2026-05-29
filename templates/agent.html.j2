@@ -263,6 +263,17 @@
     gtag('config', 'G-TZ8921LR0K');
   </script>
   <script defer src="/analytics.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "{{ row.category }}", "item": "https://hvtracker.net/categories/{{ row.category_slug }}/" },
+      { "@type": "ListItem", "position": 3, "name": "{{ row.name }}", "item": "https://hvtracker.net/agents/{{ row.slug }}/" }
+    ]
+  }
+  </script>
 </head>
 <body data-page-type="agent_profile" data-agent-slug="{{ row.slug }}" data-agent-name="{{ row.name }}" data-category="{{ row.category }}" data-global-rank="{{ row.rank }}" data-trust-score="{{ row.trust_score }}">
   <div class="page">
@@ -565,6 +576,22 @@
             <span class="sib-rank">#{{ s.rank }}</span>
             <span class="sib-name">{{ s.name }}</span>
             <span class="sib-score">{{ s.score }}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    {% if comparisons %}
+    <section class="siblings">
+      <h2 class="section-title">{{ row.name }} head-to-head</h2>
+      <ul>
+        {% for c in comparisons %}
+        <li>
+          <a href="{{ c.url }}">
+            <span class="sib-name">{{ row.name }} vs {{ c.name }}</span>
+            <span class="sib-score">compare →</span>
           </a>
         </li>
         {% endfor %}

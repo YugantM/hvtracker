@@ -1458,6 +1458,25 @@ def main() -> None:
         if cat not in category_order and cat:
             categories.append({"name": cat, "slug": slugify(cat), "count": len(cat_groups[cat])})
 
+    # Precompute head-to-head comparison pairs (top 3 per category) so agent
+    # and category pages can link to them — internal linking turns the
+    # /compare/ pages from orphans into ranking pages.
+    import itertools
+    compare_pairs = []          # (a_row, b_row, cat_slug) — used to render pages
+    compare_by_slug = {}        # agent slug -> [{name, url}] for agent pages
+    compare_by_cat = {}         # cat slug   -> [{a, b, url}] for category pages
+    for _cm in categories:
+        _top = sorted(
+            [r for r in rows if r.get("category") == _cm["name"]],
+            key=lambda x: x.get("category_rank") or 9999,
+        )[:3]
+        for _a, _b in itertools.combinations(_top, 2):
+            _url = f"/compare/{_a['slug']}-vs-{_b['slug']}/"
+            compare_pairs.append((_a, _b, _cm["slug"]))
+            compare_by_slug.setdefault(_a["slug"], []).append({"name": _b["name"], "url": _url})
+            compare_by_slug.setdefault(_b["slug"], []).append({"name": _a["name"], "url": _url})
+            compare_by_cat.setdefault(_cm["slug"], []).append({"a": _a["name"], "b": _b["name"], "url": _url})
+
     # Write data.json (machine-readable leaderboard)
     data_output = {
         "updated": now_str,
@@ -1678,7 +1697,7 @@ def main() -> None:
         slug_dir = os.path.join(agents_dir, row["slug"])
         os.makedirs(slug_dir, exist_ok=True)
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, methodology_version=METHODOLOGY_VERSION))
+            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, methodology_version=METHODOLOGY_VERSION, comparisons=compare_by_slug.get(row['slug'], [])))
 
     for row in legacy_rows:
         repo_key = row["repo"].lower()
@@ -1690,7 +1709,7 @@ def main() -> None:
         slug_dir = os.path.join(agents_dir, row["slug"])
         os.makedirs(slug_dir, exist_ok=True)
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, methodology_version=METHODOLOGY_VERSION))
+            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, methodology_version=METHODOLOGY_VERSION, comparisons=compare_by_slug.get(row['slug'], [])))
     print(f"Built {len(rows)} active + {len(legacy_rows)} legacy agent profile pages under agents/.")
 
     # ── Category landing pages — /categories/<slug>/index.html ───────────
@@ -1724,30 +1743,28 @@ def main() -> None:
                 total_stars=fmt_num(total_stars_raw),
                 grade_a_count=grade_a,
                 top3_names=", ".join(top3),
+                comparisons=compare_by_cat.get(cat_slug, []),
             ))
     print(f"Built {len(all_cat_meta)} category pages under categories/.")
 
-    # Comparison pages — /compare/<a>-vs-<b>/ for the top agents within each
-    # category. Targets high-intent "X vs Y" searches and gives LLMs citable
-    # head-to-head trust data. Scoped to top 3 per category (no thin N^2 blowup).
-    import itertools
+    # Comparison pages — /compare/<a>-vs-<b>/ from the precomputed pairs
+    # (top 3 per category). High-intent "X vs Y" search + LLM-citable.
     cmp_tmpl = env.get_template("compare.html.j2")
     compare_dir = os.path.join(script_dir, "compare")
     os.makedirs(compare_dir, exist_ok=True)
-    compare_pairs = []
-    for cat_info in all_cat_meta:
-        cat_top = sorted(
-            [r for r in rows if r.get("category") == cat_info["name"]],
-            key=lambda x: x.get("category_rank") or 9999,
-        )[:3]
-        for a, b in itertools.combinations(cat_top, 2):
-            winner, loser = (a, b) if (a.get("trust_score") or 0) >= (b.get("trust_score") or 0) else (b, a)
-            pair_dir = os.path.join(compare_dir, f"{a['slug']}-vs-{b['slug']}")
-            os.makedirs(pair_dir, exist_ok=True)
-            with open(os.path.join(pair_dir, "index.html"), "w", encoding="utf-8") as f:
-                f.write(cmp_tmpl.render(a=a, b=b, winner=winner, loser=loser,
-                                        category_slug=cat_info["slug"], updated=now_str))
-            compare_pairs.append((a["slug"], b["slug"]))
+    # Remove stale comparison dirs (top-3 membership shifts as ranks change) so
+    # we don't serve orphaned pages. Leaves the /compare/ interactive tool.
+    import shutil
+    for _d in os.listdir(compare_dir):
+        if "-vs-" in _d and os.path.isdir(os.path.join(compare_dir, _d)):
+            shutil.rmtree(os.path.join(compare_dir, _d), ignore_errors=True)
+    for a, b, cat_slug in compare_pairs:
+        winner, loser = (a, b) if (a.get("trust_score") or 0) >= (b.get("trust_score") or 0) else (b, a)
+        pair_dir = os.path.join(compare_dir, f"{a['slug']}-vs-{b['slug']}")
+        os.makedirs(pair_dir, exist_ok=True)
+        with open(os.path.join(pair_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(cmp_tmpl.render(a=a, b=b, winner=winner, loser=loser,
+                                    category_slug=cat_slug, updated=now_str))
     print(f"Built {len(compare_pairs)} comparison pages under compare/.")
 
     # sitemap.xml — /, /methodology, all /agents/<slug>
@@ -1772,8 +1789,8 @@ def main() -> None:
         sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}", "0.8", "daily"))
     for row in legacy_rows:
         sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}", "0.4", "monthly"))
-    for sa, sb in compare_pairs:
-        sitemap_urls.append((f"https://hvtracker.net/compare/{sa}-vs-{sb}/", "0.7", "weekly"))
+    for _a, _b, _cs in compare_pairs:
+        sitemap_urls.append((f"https://hvtracker.net/compare/{_a['slug']}-vs-{_b['slug']}/", "0.7", "weekly"))
     sitemap_urls += [
         ("https://hvtracker.net/compare/", "0.7", "daily"),
         ("https://hvtracker.net/changelog/", "0.6", "weekly"),
@@ -1793,6 +1810,28 @@ def main() -> None:
     with open(os.path.join(script_dir, "sitemap.xml"), "w", encoding="utf-8") as f:
         f.write("\n".join(sitemap_lines) + "\n")
     print(f"Wrote sitemap.xml with {len(sitemap_urls)} URLs.")
+
+    # IndexNow — notify Bing/Yandex/Seznam (and IndexNow-consuming AI search)
+    # that content changed, for near-instant (re)indexing. Best-effort; never
+    # fails the build. Skipped on render-only (cosmetic) rebuilds.
+    if not render_only:
+        try:
+            import urllib.request
+            key = "a3f8c1e94b7d42a6b9e05f3c8d1a7e26"
+            payload = json.dumps({
+                "host": "hvtracker.net",
+                "key": key,
+                "keyLocation": f"https://hvtracker.net/{key}.txt",
+                "urlList": [u for (u, _p, _f) in sitemap_urls],
+            }).encode()
+            req = urllib.request.Request(
+                "https://api.indexnow.org/indexnow",
+                data=payload, headers={"Content-Type": "application/json"},
+            )
+            urllib.request.urlopen(req, timeout=12)
+            print(f"Pinged IndexNow with {len(sitemap_urls)} URLs.")
+        except Exception as e:
+            print(f"IndexNow ping skipped: {e}")
 
     # llms.txt — concise, citable summary for LLM crawlers (llmstxt.org).
     # Kept fresh with the current top-ranked agents and data endpoints so

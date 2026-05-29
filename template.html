@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="HVTracker is an open-source AI agent leaderboard and trust registry ranking agents by activity, adoption, transparency, safety, provenance, OSSF Scorecard, signed commits, and evidence.">
-  <title>HVTracker — Open-Source AI Agent Trust Registry</title>
+  <title>HVTracker — AI Agent Trust Registry & Open-Source Agent Leaderboard</title>
   <link rel="canonical" href="https://hvtracker.net/">
   <link rel="alternate" type="application/feed+json" title="HVTracker — JSON Feed" href="/feed.json">
   <meta property="og:type" content="website">
@@ -32,7 +32,12 @@
     "alternateName": "HVTracker AI Agent Trust Registry",
     "url": "https://hvtracker.net/",
     "description": "HVTracker is an open-source AI agent leaderboard and trust registry ranking agents by activity, adoption, transparency, safety, provenance, OSSF Scorecard, signed commits, and evidence.",
-    "inLanguage": "en"
+    "inLanguage": "en",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": { "@type": "EntryPoint", "urlTemplate": "https://hvtracker.net/?q={search_term_string}" },
+      "query-input": "required name=search_term_string"
+    }
   }
   </script>
   <script type="application/ld+json">
@@ -1290,6 +1295,10 @@
       const searchInput = document.getElementById("searchInput");
       let searchTerm = "";
       let searchTimer = null;
+
+      // Honour ?q= so the schema.org SearchAction (sitelinks search box) works.
+      const _q = new URLSearchParams(location.search).get("q");
+      if (_q) { searchInput.value = _q; searchTerm = _q.trim().toLowerCase(); }
 
       function applyFilters() {
         currentPage = 0;

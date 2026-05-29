@@ -176,6 +176,16 @@
       .name-cell .desc { max-width:200px; }
     }
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "{{ category }}", "item": "https://hvtracker.net/categories/{{ slug }}/" }
+    ]
+  }
+  </script>
 </head>
 <body>
   <div class="page">
@@ -242,6 +252,17 @@
         {% endfor %}
       </tbody>
     </table>
+
+    {% if comparisons %}
+    <nav class="cat-nav">
+      <h2>Popular {{ category }} comparisons</h2>
+      <div class="cat-pills">
+        {% for c in comparisons %}
+        <a href="{{ c.url }}" class="cat-pill">{{ c.a }} vs {{ c.b }}</a>
+        {% endfor %}
+      </div>
+    </nav>
+    {% endif %}
 
     <nav class="cat-nav">
       <h2>All Categories</h2>
