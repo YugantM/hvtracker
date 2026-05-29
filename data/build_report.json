@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-28T22:59:22Z",
-  "data_timestamp": "2026-05-28 22:59 UTC",
+  "generated_at": "2026-05-29T01:55:39Z",
+  "data_timestamp": "2026-05-29 01:55 UTC",
   "schema_version": "v0.1",
   "methodology_version": "v3.0",
-  "configured_agents": 178,
+  "configured_agents": 36,
   "active_agents": 171,
-  "legacy_agents": 0,
-  "total_generated": 171,
+  "legacy_agents": 7,
+  "total_generated": 178,
   "categories": {
     "Coding Agents": 26,
     "Agent Frameworks": 57,
@@ -70,11 +70,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "browser-use/browser-use",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "infiniflow/ragflow",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -85,27 +80,12 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "All-Hands-AI/OpenHands",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "bytedance/deer-flow",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "daytonaio/daytona",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
     {
       "repo": "cline/cline",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "BerriAI/litellm",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -121,16 +101,6 @@
     },
     {
       "repo": "anthropics/claude-code",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "block/goose",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "agno-agi/agno",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -181,11 +151,6 @@
     },
     {
       "repo": "FlowiseAI/Flowise",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "activepieces/activepieces",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -265,11 +230,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "Canner/WrenAI",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "microsoft/agent-framework",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -280,27 +240,12 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "botpress/botpress",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "langchain-ai/open-swe",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "browserbase/stagehand",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "MervinPraison/PraisonAI",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "Arize-AI/phoenix",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -311,16 +256,6 @@
     },
     {
       "repo": "getmaxun/maxun",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "agentscope-ai/agentscope",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "assafelovic/gpt-researcher",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -340,17 +275,7 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "camel-ai/camel",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "flyteorg/flyte",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "Agenta-AI/agenta",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -391,11 +316,6 @@
     },
     {
       "repo": "RooVetGit/Roo-Code",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "alibaba/spring-ai-alibaba",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -455,11 +375,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "BrainBlend-AI/atomic-agents",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "microsoft/guidance",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -475,17 +390,7 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "browser-use/web-ui",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "microsoft/promptflow",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "bytedance/UI-TARS-desktop",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -581,6 +486,11 @@
     },
     {
       "repo": "browserbase/open-operator",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
+      "repo": "browserbase/open-operator",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
     },
@@ -620,16 +530,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "agentops-ai/agentops",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "bytedance/UI-TARS",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "QuivrHQ/quivr",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -655,11 +555,6 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
-      "repo": "ai-christianson/RA.Aid",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "plandex-ai/plandex",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
@@ -673,11 +568,6 @@
       "repo": "OpenBMB/XAgent",
       "criterion": "4.2.1",
       "detail": "no meaningful activity in 12 months (last push 2024-08-12)"
-    },
-    {
-      "repo": "ag2ai/fastagency",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
     },
     {
       "repo": "MineDojo/Voyager",
@@ -731,18 +621,13 @@
     },
     {
       "repo": "AbanteAI/archive-old-cli-mentat",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
+      "criterion": "5.1",
+      "detail": "repository is archived"
     },
     {
       "repo": "AbanteAI/archive-old-cli-mentat",
       "criterion": "4.2.1",
       "detail": "no meaningful activity in 12 months (last push 2025-01-07)"
-    },
-    {
-      "repo": "agiresearch/OpenAGI",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
     },
     {
       "repo": "agiresearch/OpenAGI",
@@ -810,16 +695,6 @@
       "detail": "no meaningful activity in 12 months (last push 2023-07-31)"
     },
     {
-      "repo": "aitomatic/openssa",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
-      "repo": "albertvillanova/tinyagents",
-      "criterion": "4.1.1",
-      "detail": "no declared license (GitHub license field is null)"
-    },
-    {
       "repo": "albertvillanova/tinyagents",
       "criterion": "4.2.1",
       "detail": "no meaningful activity in 12 months (last push 2025-05-19)"
@@ -830,17 +705,9 @@
       "detail": "no meaningful activity in 12 months (last push 2024-09-26)"
     }
   ],
-  "warning_count": 161,
-  "failed_fetches": [
-    "OpenBMB/AgentVerse",
-    "TransformerOptimus/SuperAGI",
-    "aymenfurter/microagents",
-    "biobootloader/wolverine",
-    "kuafuai/DevOpsGPT",
-    "lavague-ai/LaVague",
-    "smol-ai/developer"
-  ],
-  "missing_repos_count": 7,
+  "warning_count": 136,
+  "failed_fetches": [],
+  "missing_repos_count": 0,
   "package_failures": [
     "mastra-ai/mastra",
     "Mintplex-Labs/anything-llm",
@@ -853,11 +720,8 @@
   "package_failure_count": 7,
   "scorecard_unavailable_count": 23,
   "fingerprint_agents": [
-    "anthropics/claude-code",
     "All-Hands-AI/OpenHands",
-    "paul-gauthier/aider",
-    "google-gemini/gemini-cli",
-    "QwenLM/qwen-code"
+    "anthropics/claude-code"
   ],
-  "fingerprint_agent_count": 5
+  "fingerprint_agent_count": 2
 }
