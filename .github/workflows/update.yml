@@ -25,6 +25,7 @@ on:
           - batch
           - mega
           - render
+          - pending
 
 permissions:
   contents: write
@@ -69,11 +70,16 @@ jobs:
             # NO API calls. Use for UI/template changes — runs in seconds.
             echo "args=--render-only" >> $GITHUB_OUTPUT
             echo "Running RENDER-ONLY (no API calls)"
+          elif [ "${{ inputs.mode }}" = "pending" ]; then
+            # Pending-only: fetch only newly-listed agents that still have
+            # provisional rows, then merge them into the cached leaderboard.
+            echo "args=--pending-only" >> $GITHUB_OUTPUT
+            echo "Running PENDING-ONLY refresh"
           elif [ "${{ github.event_name }}" = "push" ]; then
-            # agents.json changed: list new agents immediately from cache, then
-            # let the normal staggered cron enrich signals in the next batch.
-            echo "args=--render-only" >> $GITHUB_OUTPUT
-            echo "Running RENDER-ONLY for agents.json change (no API calls)"
+            # agents.json changed: fetch only newly-listed/pending agents.
+            # If a fetch fails, the build still falls back to a provisional row.
+            echo "args=--pending-only" >> $GITHUB_OUTPUT
+            echo "Running PENDING-ONLY refresh for agents.json change"
           elif [ "${{ inputs.mode }}" = "mega" ]; then
             # Mega mode: full rebuild with no batch — refreshes ALL agents
             echo "args=" >> $GITHUB_OUTPUT

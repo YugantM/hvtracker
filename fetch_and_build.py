@@ -1133,10 +1133,14 @@ def main() -> None:
 
     batch = parse_batch_arg()
     render_only = "--render-only" in sys.argv
+    pending_only = "--pending-only" in sys.argv
     render_state_path = os.path.join(script_dir, "data", "render_state.json")
     if render_only:
         print("\n=== RENDER-ONLY MODE: no API calls, rebuilding pages from cache ===\n")
         batch = None
+        pending_only = False
+    elif pending_only:
+        print("\n=== PENDING-ONLY MODE: refreshing newly-listed agents ===\n")
     elif batch:
         batch_num, total_batches = batch
         print(f"\n=== BATCH MODE: {batch_num}/{total_batches} ===\n")
@@ -1162,7 +1166,15 @@ def main() -> None:
 
     # In batch mode, only fetch a slice of active agents
     all_agents = agents  # keep full list for context
-    if batch:
+    if pending_only:
+        existing_data_repos = load_existing_data_repos(data_path)
+        agents = [
+            a for a in all_agents
+            if a["repo"].lower() not in existing_data_repos
+        ]
+        legacy_agents = []
+        print(f"Pending-only: fetching {len(agents)} newly-listed agent(s)")
+    elif batch:
         batch_agents = select_batch(all_agents, batch_num, total_batches)
         existing_data_repos = load_existing_data_repos(data_path)
         missing_agents = [
@@ -1392,8 +1404,8 @@ def main() -> None:
         print(f"  Scorecard: {cache_hits} from cache, {api_hits} from API, "
               f"{len(rows)-cache_hits-api_hits} unavailable.")
 
-    # In batch mode, merge freshly-fetched rows with existing data.json entries
-    if batch:
+    # In incremental modes, merge freshly-fetched rows with existing data.json entries
+    if batch or pending_only:
         old_agents = merge_batch_into_data(data_path, rows)
         # old_agents have pre-computed fields from prior runs; rows are fresh
         # Re-compute display fields on fresh rows to match old format
@@ -1419,7 +1431,7 @@ def main() -> None:
         provisional_count = add_provisional_missing_agents(rows, all_agents)
         if provisional_count:
             print(f"Batch merge: added {provisional_count} provisional agent listing(s) pending signal refresh")
-        print(f"\nMerged batch: {len(rows)} total agents ({len(rows) - len(old_agents)} refreshed, {len(old_agents)} carried forward)")
+        print(f"\nMerged incremental refresh: {len(rows)} total agents ({len(rows) - len(old_agents)} refreshed, {len(old_agents)} carried forward)")
 
     # Provisional momentum ordering; final rank is assigned by trust_score
     # below, once evidence grade and the HVTrust composite are computed.
