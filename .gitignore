@@ -59,8 +59,12 @@ linkedin_carousel.js
 /feed.json
 /llms.txt
 /data.json
-/data/
-/output/
+# Keep render_state.json (seed for render-only tests/CI) but ignore other data/* artifacts
+/data/*
+!/data/render_state.json
+# Keep daily history snapshots (rank-delta baseline + test fixture) but no other output/*
+/output/*
+!/output/history/
 /agents/
 /badge/
 /badges/
