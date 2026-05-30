@@ -20,10 +20,9 @@ ARGS=()
 case "$MODE" in
   batch)
     HOUR=$(date -u +%-H)
-    BATCH_NUM=$(( (HOUR / 4) + 1 ))
-    [ "$BATCH_NUM" -gt 6 ] && BATCH_NUM=6
+    BATCH_NUM=$(( ((HOUR / 2) % 6) + 1 ))
     ARGS=(--batch "$BATCH_NUM/6")
-    echo "=== Refreshing batch $BATCH_NUM/6 (hour=$HOUR UTC) ==="
+    echo "=== Refreshing batch $BATCH_NUM/6 (2-hour slot, hour=$HOUR UTC) ==="
     ;;
   full)
     echo "=== Running full refresh ==="
