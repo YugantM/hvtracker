@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Submit an agent — HVTracker</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 560px; margin: 3rem auto; padding: 0 1rem; color: #111; }
+    h1 { font-size: 1.4rem; }
+    label { display: block; margin: 1rem 0 .25rem; font-weight: 600; }
+    input, textarea { width: 100%; padding: .6rem; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
+    button { margin-top: 1.5rem; padding: .7rem 1.4rem; background: #111; color: #fff; border: 0; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+    p.hint { color: #666; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <h1>Submit an agent for listing</h1>
+  <p class="hint">Submissions enter a moderation queue and appear after review.</p>
+  <form method="post" action="/submit">
+    <label for="repo">GitHub repo (owner/name)</label>
+    <input id="repo" name="repo" placeholder="owner/name" required>
+    <label for="name">Display name</label>
+    <input id="name" name="name" placeholder="My Agent" required>
+    <label for="category">Category (optional)</label>
+    <input id="category" name="category" placeholder="Coding Agents">
+    <label for="contact">Contact email (optional)</label>
+    <input id="contact" name="contact" type="email" placeholder="you@example.com">
+    <button type="submit">Submit for review</button>
+  </form>
+</body>
+</html>

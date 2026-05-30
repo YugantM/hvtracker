@@ -11,9 +11,14 @@
   <meta property="og:title" content="{{ row.name }} — Trust Score {{ row.trust_score }}/100 | HVTracker">
   <meta property="og:description" content="Grade {{ row.evidence_grade }} · HVTrust {{ row.trust_score }}/100 · {{ row.stars_fmt }} stars · {{ row.category }}. Independent trust signals for AI agents.">
   <meta property="og:url" content="https://hvtracker.net/agents/{{ row.slug }}">
-  <meta property="og:image" content="https://hvtracker.net/badge/{{ row.slug }}.svg">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://hvtracker.net/badge/{{ row.slug }}.svg">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="{{ row.name }} on HVTracker">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:image:alt" content="{{ row.name }} on HVTracker">
 
   <script type="application/ld+json">
   {

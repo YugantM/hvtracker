@@ -5,6 +5,7 @@ import json
 import math
 import os
 import re
+import shutil
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -14,6 +15,10 @@ from urllib.parse import quote, urlencode
 import requests
 from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader
+
+import cache
+import db
+import storage
 
 load_dotenv()
 
@@ -30,6 +35,7 @@ METHODOLOGY_VERSION = "v3.0"
 DATA_SCHEMA_VERSION = "v0.1"
 
 
+@cache.cached("repo", ttl=5400)
 def get_repo(owner_repo: str) -> dict:
     url = f"{GITHUB_API}/repos/{owner_repo}"
     r = requests.get(url, headers=HEADERS, timeout=15)
@@ -37,6 +43,7 @@ def get_repo(owner_repo: str) -> dict:
     return r.json()
 
 
+@cache.cached("commit_activity", ttl=5400)
 def get_commit_activity(owner_repo: str) -> list:
     """Return list of weekly commit-count dicts for the last 52 weeks."""
     url = f"{GITHUB_API}/repos/{owner_repo}/stats/commit_activity"
@@ -103,6 +110,7 @@ def fetch_recent_commits(owner_repo: str, days: int = 30) -> int | None:
         return None
 
 
+@cache.cached("npm_dl", ttl=21600, skip_none=True)
 def fetch_npm_downloads(package_name: str) -> int | None:
     """Fetch last-week download count from npm. Returns None on any error."""
     encoded = quote(package_name, safe='')
@@ -209,6 +217,7 @@ def fetch_hn_mentions(search_term: str, days: int = 30) -> int:
         return 0
 
 
+@cache.cached("pypi_dl", ttl=21600, skip_none=True)
 def fetch_pypi_downloads(package_name: str) -> int | None:
     """Fetch last-week download count from PyPI via pypistats. Returns None on any error."""
     url = f"https://pypistats.org/api/packages/{package_name}/recent"
@@ -228,6 +237,7 @@ def fetch_pypi_downloads(package_name: str) -> int | None:
     return None
 
 
+@cache.cached("crate_dl", ttl=21600, skip_none=True)
 def fetch_crate_downloads(crate_name: str) -> int | None:
     """Fetch recent downloads for a crates.io package (last 90 days, divided by ~13 for weekly approx)."""
     url = f"https://crates.io/api/v1/crates/{quote(crate_name, safe='')}"
@@ -243,6 +253,7 @@ def fetch_crate_downloads(crate_name: str) -> int | None:
         return None
 
 
+@cache.cached("npm_prov", ttl=86400, skip_none=True)
 def fetch_npm_provenance(package_name: str) -> bool | None:
     """Check if the latest version of an npm package has provenance attestations."""
     encoded = quote(package_name, safe='@/')
@@ -256,6 +267,7 @@ def fetch_npm_provenance(package_name: str) -> bool | None:
         return None
 
 
+@cache.cached("pypi_prov", ttl=86400, skip_none=True)
 def fetch_pypi_provenance(package_name: str) -> bool | None:
     """Check if a PyPI package's latest release has PEP 740 provenance attestations."""
     url = f"https://pypi.org/simple/{package_name}/"
@@ -273,6 +285,7 @@ def fetch_pypi_provenance(package_name: str) -> bool | None:
         return None
 
 
+@cache.cached("scorecard", ttl=86400)
 def fetch_scorecard(owner_repo: str) -> dict | None:
     """Fetch OSSF Scorecard — tries deps.dev first, falls back to securityscorecards.dev."""
     # Primary: deps.dev
@@ -303,6 +316,7 @@ def fetch_scorecard(owner_repo: str) -> dict | None:
     return None
 
 
+@cache.cached("signed_ratio", ttl=86400)
 def fetch_signed_commit_ratio(owner_repo: str, sample: int = 100) -> float | None:
     """Sample recent commits and return fraction with verified signatures (0.0–1.0)."""
     url = f"{GITHUB_API}/repos/{owner_repo}/commits"
@@ -1309,8 +1323,20 @@ def add_provisional_missing_agents(rows: list[dict], agents: list[dict]) -> int:
 
 
 def main() -> None:
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    agents_path = os.path.join(script_dir, "agents.json")
+    # base_dir = code/asset root (templates, scorecard cache).
+    # script_dir = output root (volume in production via OUTPUT_DIR; falls back
+    # to base_dir locally/CI). All generated artifacts are written under here.
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    script_dir = os.environ.get("OUTPUT_DIR", base_dir)
+    os.makedirs(script_dir, exist_ok=True)
+    # When writing to a separate output root (the volume), copy the static
+    # assets the site references but that aren't generated (OG images, etc.).
+    if script_dir != base_dir:
+        for asset in (".nojekyll", "robots.txt", "_headers", "analytics.js",
+                      "og.png", "og.svg", "og-v1.png", "linkedin_carousel.js"):
+            src = os.path.join(base_dir, asset)
+            if os.path.isfile(src):
+                shutil.copy2(src, os.path.join(script_dir, asset))
     data_path = os.path.join(script_dir, "data.json")
 
     batch = parse_batch_arg()
@@ -1327,10 +1353,9 @@ def main() -> None:
         batch_num, total_batches = batch
         print(f"\n=== BATCH MODE: {batch_num}/{total_batches} ===\n")
 
-    scorecard_cache = load_scorecard_cache(script_dir)
+    scorecard_cache = load_scorecard_cache(base_dir)
 
-    with open(agents_path) as f:
-        agents = json.load(f)
+    agents = db.load_agents()
 
     # De-duplicate by repo path (agents.json may have accidental dupes)
     seen: set[str] = set()
@@ -1838,6 +1863,8 @@ def main() -> None:
     with open(history_path, "w", encoding="utf-8") as f:
         json.dump(data_output, f, indent=2, ensure_ascii=False)
     print(f"Wrote history snapshot {history_path}.")
+    if storage.put_file(f"history/{today_utc}.json", history_path, "application/json"):
+        print(f"Archived history snapshot to bucket: history/{today_utc}.json")
 
     agent_events = generate_data_endpoints(script_dir, data_output, rows, history_dir, now_str)
 
@@ -1900,12 +1927,12 @@ def main() -> None:
         json.dump(build_report, f, indent=2, ensure_ascii=False)
     print(f"Wrote data/build_report.json (active={len(rows)}, legacy={len(legacy_rows)}, warnings={len(eligibility_violations)}, failed={len(failed_repos)}).")
 
-    # ── SVG Badges (/badge/<slug>.svg) ───────────────────────────────────────
-    generate_badges(script_dir, rows)
+    # SVG badges are now served dynamically by the web service (/badge/...svg)
+    # from data.json, so static badge files are no longer generated here.
 
-    templates_dir = os.path.join(script_dir, "templates")
+    templates_dir = os.path.join(base_dir, "templates")
     env = Environment(
-        loader=FileSystemLoader([templates_dir, script_dir]),
+        loader=FileSystemLoader([templates_dir, base_dir]),
         autoescape=True,
     )
 
@@ -2056,7 +2083,6 @@ def main() -> None:
     os.makedirs(compare_dir, exist_ok=True)
     # Remove stale comparison dirs (top-3 membership shifts as ranks change) so
     # we don't serve orphaned pages. Leaves the /compare/ interactive tool.
-    import shutil
     for _d in os.listdir(compare_dir):
         if "-vs-" in _d and os.path.isdir(os.path.join(compare_dir, _d)):
             shutil.rmtree(os.path.join(compare_dir, _d), ignore_errors=True)
@@ -2470,6 +2496,40 @@ HVTrust = gate( confidence x [ Safety(30) + Identity(20) + Transparency(20) + Ma
     with open(os.path.join(spec_base, "index.html"), "w", encoding="utf-8") as f:
         f.write(index_html)
     print(f"Built spec index with {len(ALL_SPECS)} spec(s).")
+
+
+def run_refresh(mode: str = "auto") -> None:
+    """Programmatic entrypoint for the web service scheduler.
+
+    Translates a mode into the CLI flags main() expects, then runs a build.
+      auto   — full build if no data.json yet on the volume, else a batch slice
+      full   — full refresh of all agents
+      render — rebuild pages from cached render_state (no API calls)
+      pending— refresh only newly-listed agents
+    """
+    out_dir = os.environ.get("OUTPUT_DIR", os.path.dirname(os.path.abspath(__file__)))
+    argv = ["fetch_and_build.py"]
+    if mode == "auto":
+        if os.path.isfile(os.path.join(out_dir, "data.json")):
+            hour = datetime.now(timezone.utc).hour
+            batch_num = ((hour // 2) % 6) + 1
+            argv += ["--batch", f"{batch_num}/6"]
+        # else: no data yet → full build (no flags)
+    elif mode == "render":
+        argv.append("--render-only")
+    elif mode == "pending":
+        argv.append("--pending-only")
+    elif mode == "full":
+        pass
+    else:
+        raise ValueError(f"unknown mode: {mode}")
+
+    prev_argv = sys.argv
+    sys.argv = argv
+    try:
+        main()
+    finally:
+        sys.argv = prev_argv
 
 
 if __name__ == "__main__":

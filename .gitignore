@@ -49,3 +49,26 @@ next-env.d.ts
 hvtracker_linkedin.pptx
 hvtracker_linkedin_carousel.pdf
 linkedin_carousel.js
+
+# Generated site + state — produced at runtime into the Railway volume.
+/index.html
+/methodology.html
+/sitemap.xml
+/feed.json
+/llms.txt
+/data.json
+# Keep render_state.json (seed for render-only tests/CI) but ignore other data/* artifacts
+/data/*
+!/data/render_state.json
+# Keep daily history snapshots (rank-delta baseline + test fixture) but no other output/*
+/output/*
+!/output/history/
+/agents/
+/badge/
+/badges/
+/categories/
+/compare/*
+!/compare/index.html
+/blog/
+/spec/
+/roadmap/

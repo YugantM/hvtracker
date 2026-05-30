@@ -1,26 +1,23 @@
 FROM python:3.12-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY fetch_and_build.py specs.py agents.json scorecard-cache.json template.html ./
+# Application code
+COPY app.py fetch_and_build.py specs.py db.py cache.py storage.py schema.sql ./
+# Generator inputs: curated seed, scorecard cache, and templates/assets
+COPY agents.json scorecard-cache.json template.html ./
 COPY templates/ templates/
-COPY .nojekyll CNAME robots.txt _headers analytics.js og.png og.svg og-v1.png ./
-COPY output/ output/
-COPY data/ data/
-COPY badge/ badge/
-COPY blog/ blog/
-COPY categories/ categories/
-COPY compare/ compare/
-COPY spec/ spec/
-COPY roadmap/ roadmap/
-COPY badges/ badges/
-COPY docs/ docs/
+COPY compare/index.html compare/index.html
+COPY .nojekyll robots.txt _headers analytics.js og.png og.svg og-v1.png og-v2.png ./
+# Seed history snapshots — copied into the volume on first startup if missing.
+# Needed so rank-deltas, sparklines, and movers have prior days to compare against.
+COPY output/history/ /app/seed/history/
 
-COPY cron_runner.sh .
-RUN chmod +x cron_runner.sh
+ENV OUTPUT_DIR=/data/site
+EXPOSE 8080
 
-CMD ["./cron_runner.sh"]
+# Generated site + state live on the volume mounted at /data, never in git.
+CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8080}"]
