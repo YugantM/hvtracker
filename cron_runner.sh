@@ -6,7 +6,9 @@ set -euo pipefail
 
 echo "=== HVTracker cron run: $(date -u '+%Y-%m-%d %H:%M UTC') ==="
 
-# Clone fresh copy (shallow, fast)
+# Clone fresh copy (shallow, fast). Railway reuses the cron container's
+# filesystem between runs, so clear any leftover checkout first.
+rm -rf /tmp/hvtracker
 git clone --depth 1 "https://x-access-token:${GITHUB_TOKEN}@github.com/YugantM/hvtracker.git" /tmp/hvtracker
 cd /tmp/hvtracker
 
