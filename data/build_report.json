@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-30T16:06:21Z",
-  "data_timestamp": "2026-05-30 16:06 UTC",
+  "generated_at": "2026-05-30T18:06:31Z",
+  "data_timestamp": "2026-05-30 18:06 UTC",
   "schema_version": "v0.1",
   "methodology_version": "v3.0",
   "configured_agents": 29,
@@ -33,6 +33,11 @@
       "repo": "browserbase/open-operator",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "microsoft/TaskWeaver",
+      "criterion": "5.1",
+      "detail": "repository is archived"
     },
     {
       "repo": "yoheinakajima/babyagi",
@@ -96,11 +101,6 @@
     },
     {
       "repo": "langchain-ai/langgraph-codeact",
-      "criterion": "5.1",
-      "detail": "repository is archived"
-    },
-    {
-      "repo": "langchain-ai/langgraph-codeact",
       "criterion": "4.2.1",
       "detail": "no meaningful activity in 12 months (last push 2025-05-16)"
     },
@@ -133,8 +133,6 @@
   ],
   "package_failure_count": 6,
   "scorecard_unavailable_count": 23,
-  "fingerprint_agents": [
-    "google-gemini/gemini-cli"
-  ],
-  "fingerprint_agent_count": 1
+  "fingerprint_agents": [],
+  "fingerprint_agent_count": 0
 }
