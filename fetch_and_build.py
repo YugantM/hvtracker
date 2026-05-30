@@ -110,6 +110,7 @@ def fetch_recent_commits(owner_repo: str, days: int = 30) -> int | None:
         return None
 
 
+@cache.cached("npm_dl", ttl=21600, skip_none=True)
 def fetch_npm_downloads(package_name: str) -> int | None:
     """Fetch last-week download count from npm. Returns None on any error."""
     encoded = quote(package_name, safe='')
@@ -216,6 +217,7 @@ def fetch_hn_mentions(search_term: str, days: int = 30) -> int:
         return 0
 
 
+@cache.cached("pypi_dl", ttl=21600, skip_none=True)
 def fetch_pypi_downloads(package_name: str) -> int | None:
     """Fetch last-week download count from PyPI via pypistats. Returns None on any error."""
     url = f"https://pypistats.org/api/packages/{package_name}/recent"
@@ -235,6 +237,7 @@ def fetch_pypi_downloads(package_name: str) -> int | None:
     return None
 
 
+@cache.cached("crate_dl", ttl=21600, skip_none=True)
 def fetch_crate_downloads(crate_name: str) -> int | None:
     """Fetch recent downloads for a crates.io package (last 90 days, divided by ~13 for weekly approx)."""
     url = f"https://crates.io/api/v1/crates/{quote(crate_name, safe='')}"
@@ -250,6 +253,7 @@ def fetch_crate_downloads(crate_name: str) -> int | None:
         return None
 
 
+@cache.cached("npm_prov", ttl=86400, skip_none=True)
 def fetch_npm_provenance(package_name: str) -> bool | None:
     """Check if the latest version of an npm package has provenance attestations."""
     encoded = quote(package_name, safe='@/')
@@ -263,6 +267,7 @@ def fetch_npm_provenance(package_name: str) -> bool | None:
         return None
 
 
+@cache.cached("pypi_prov", ttl=86400, skip_none=True)
 def fetch_pypi_provenance(package_name: str) -> bool | None:
     """Check if a PyPI package's latest release has PEP 740 provenance attestations."""
     url = f"https://pypi.org/simple/{package_name}/"

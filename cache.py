@@ -25,11 +25,15 @@ def _redis():
     return _client
 
 
-def cached(prefix: str, ttl: int = 3600):
+def cached(prefix: str, ttl: int = 3600, skip_none: bool = False):
     """Cache a function's return value in Redis keyed by its arguments.
 
     Only the first positional arg (plus any extra args) is used for the key,
     which fits the fetch_* helpers (keyed by owner/repo or package name).
+
+    skip_none: when True, a None result is not cached — used for fetches where
+    None means "rate-limited / unavailable" so a transient failure doesn't get
+    cached as if it were the real value.
     """
     def decorator(fn):
         @functools.wraps(fn)
@@ -45,6 +49,8 @@ def cached(prefix: str, ttl: int = 3600):
             except Exception:
                 return fn(*args, **kwargs)
             value = fn(*args, **kwargs)
+            if skip_none and value is None:
+                return value
             try:
                 r.setex(key, ttl, json.dumps(value))
             except Exception:
