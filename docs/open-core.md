@@ -8,6 +8,16 @@ This is product strategy, not legal advice. Before fundraising, selling paid pla
 
 Keep the public project valuable enough to earn trust, citations, and community corrections. Keep expensive, operational, private, or workflow-specific capabilities in a hosted commercial layer.
 
+## Current Repository Boundary
+
+As of the Railway migration:
+
+- **Repository code:** MIT-licensed in this repo.
+- **Public registry data:** CC BY 4.0.
+- **Hosted service:** can remain proprietary in its operations, enrichment, alerting, and private workflows even if the public registry stays open and inspectable.
+
+That means you do not need to close the whole repository to build a company. The better move is to keep the trust-critical surface public and keep the operational/commercial layer private.
+
 ## Public Core
 
 Keep these public:

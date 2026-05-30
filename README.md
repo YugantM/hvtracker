@@ -136,6 +136,19 @@ The exact snippet is shown on every agent profile page.
 
 ---
 
+## Open-Core Boundary
+
+HVTracker uses an open-core model.
+
+- Public: methodology, specs, curated registry entries, current trust scores, public profiles, correction flow, and the public data API.
+- Private later: hosted alerts, watchlists, extended history, team workflows, and higher-volume API access.
+
+The code in this repository remains under the repo's existing MIT license. Public registry data remains licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The brand, hosted service, private enrichment, and future enterprise workflows are not implicitly included in that public-data license.
+
+Read [docs/open-core.md](docs/open-core.md) before widening the public API or changing what gets stored internally.
+
+---
+
 ## SEO And Comparison Pages
 
 HVTracker publishes crawlable, data-backed comparison pages:
