@@ -26,11 +26,11 @@ The core question is simple:
 
 - **172** active open-source AI agent projects
 - **14** curated categories
-- **6** staggered refresh batches per day
-- **24h** full refresh cycle
+- **12** staggered refresh batches per day
+- **12h** full refresh cycle
 - **90-day** per-agent history where available
 - **184** JSON feed items across agents and comparison guides
-- Static GitHub Pages site: no backend, no database, no React
+- Railway-hosted site with a small FastAPI edge and generated public pages/data
 
 Newly submitted agents are listed quickly using a pending-only refresh path, then normal cron jobs keep signals fresh.
 
@@ -162,7 +162,7 @@ cache.json                                 data/agents/<slug>.json
 2. Public APIs are fetched in parallel where safe and serially where rate limits require it.
 3. HVTrust scores, evidence grades, rank deltas, trust breakdowns, and events are computed.
 4. Static pages, JSON endpoints, badges, specs, feed files, sitemap, and build reports are generated.
-5. GitHub Pages serves the static site.
+5. Railway serves the generated site from a persistent volume and refreshes it on a 2-hour cadence.
 
 ### Build Modes
 
@@ -192,6 +192,12 @@ python3 -m http.server 4173
 ```
 
 Open [http://127.0.0.1:4173](http://127.0.0.1:4173).
+
+Production runs on Railway with:
+
+- FastAPI for health, API, forms, and dynamic badge routes
+- Generated site output stored on a persistent volume
+- A 2-hour scheduler that refreshes one leaderboard batch per run
 
 ---
 

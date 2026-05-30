@@ -21,6 +21,7 @@ OUTPUT_DIR = os.environ.get("OUTPUT_DIR", BASE_DIR)
 os.makedirs(OUTPUT_DIR, exist_ok=True)  # volume subdir may not exist on first boot
 DATA_PATH = os.path.join(OUTPUT_DIR, "data.json")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+COMPARE_TOOL_PATH = os.path.join(BASE_DIR, "compare", "index.html")
 
 app = FastAPI(title="HVTracker", docs_url="/api/docs", openapi_url="/api/openapi.json")
 
@@ -46,6 +47,14 @@ def find_agent(repo: str) -> dict | None:
     repo = repo.lower()
     for a in load_data().get("agents", []):
         if a["repo"].lower() == repo:
+            return a
+    return None
+
+
+def find_agent_by_slug(slug: str) -> dict | None:
+    slug = slug.lower()
+    for a in load_data().get("agents", []):
+        if (a.get("slug") or "").lower() == slug:
             return a
     return None
 
@@ -95,6 +104,15 @@ def api_feed():
         return JSONResponse(json.load(f))
 
 
+@app.api_route("/compare", methods=["GET", "HEAD"], response_class=HTMLResponse)
+@app.api_route("/compare/", methods=["GET", "HEAD"], response_class=HTMLResponse)
+def compare_tool():
+    if not os.path.isfile(COMPARE_TOOL_PATH):
+        return HTMLResponse("<p>Compare tool is not available yet.</p>", status_code=503)
+    with open(COMPARE_TOOL_PATH, encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+
 # ---- Dynamic SVG badges --------------------------------------------------
 
 def _badge_svg(label: str, value: str, color: str) -> str:
@@ -137,6 +155,19 @@ def badge(owner: str, repo: str, kind: str):
     if not agent:
         headers["Cache-Control"] = "public, max-age=60"
     return Response(svg, media_type="image/svg+xml", headers=headers)
+
+
+@app.get("/badge/{slug}.svg")
+def badge_by_slug(slug: str):
+    kind = "trust"
+    if slug.endswith("-grade"):
+        slug = slug[:-6]
+        kind = "grade"
+    agent = find_agent_by_slug(slug)
+    if not agent:
+        return JSONResponse({"error": "not found"}, status_code=404)
+    owner, repo = agent["repo"].split("/", 1)
+    return badge(owner, repo, kind)
 
 
 # ---- Submission / correction intake --------------------------------------

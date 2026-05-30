@@ -51,8 +51,6 @@ hvtracker_linkedin_carousel.pdf
 linkedin_carousel.js
 
 # Generated site + state — produced at runtime into the Railway volume.
-# Tracked copies remain until the DNS cutover (GitHub Pages rollback); after
-# cutover these are removed from tracking with `git rm --cached`.
 /index.html
 /methodology.html
 /sitemap.xml
@@ -69,7 +67,8 @@ linkedin_carousel.js
 /badge/
 /badges/
 /categories/
-/compare/
+/compare/*
+!/compare/index.html
 /blog/
 /spec/
 /roadmap/
