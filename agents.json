@@ -497,14 +497,16 @@
       "search_endpoint": "pulls"
     },
     "listing_status": "listed",
-    "tracking_mode": "direct"
+    "tracking_mode": "direct",
+    "npm_package": "@google/gemini-cli"
   },
   {
     "repo": "openai/codex",
     "name": "Codex",
     "category": "Coding Agents",
     "listing_status": "listed",
-    "tracking_mode": "direct"
+    "tracking_mode": "direct",
+    "npm_package": "@openai/codex"
   },
   {
     "repo": "QwenLM/qwen-code",
@@ -934,7 +936,8 @@
     "category": "Coding Agents",
     "hn_search_term": "block goose",
     "listing_status": "listed",
-    "tracking_mode": "direct"
+    "tracking_mode": "direct",
+    "crate_package": "goose"
   },
   {
     "repo": "AbanteAI/archive-old-cli-mentat",
@@ -992,7 +995,8 @@
     "category": "Browser & Computer Use",
     "hn_search_term": "openclaw",
     "listing_status": "listed",
-    "tracking_mode": "direct"
+    "tracking_mode": "direct",
+    "pypi_package": "openclaw"
   },
   {
     "repo": "xlang-ai/OpenCUA",

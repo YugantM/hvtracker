@@ -228,6 +228,21 @@ def fetch_pypi_downloads(package_name: str) -> int | None:
     return None
 
 
+def fetch_crate_downloads(crate_name: str) -> int | None:
+    """Fetch recent downloads for a crates.io package (last 90 days, divided by ~13 for weekly approx)."""
+    url = f"https://crates.io/api/v1/crates/{quote(crate_name, safe='')}"
+    try:
+        r = requests.get(url, headers={"User-Agent": "HVTracker/1.0 (https://hvtracker.net)"}, timeout=10)
+        if r.status_code == 200:
+            data = r.json().get("crate", {})
+            recent = data.get("recent_downloads")  # last 90 days
+            if recent is not None:
+                return max(1, recent // 13)  # approximate weekly
+        return None
+    except Exception:
+        return None
+
+
 def fetch_npm_provenance(package_name: str) -> bool | None:
     """Check if the latest version of an npm package has provenance attestations."""
     encoded = quote(package_name, safe='@/')
@@ -771,8 +786,10 @@ def rank_delta_display(delta: int | None, is_new: bool) -> str:
     """Return display string for rank delta."""
     if is_new:
         return "NEW"
-    if delta is None or delta == 0:
+    if delta is None:
         return "—"
+    if delta == 0:
+        return "="
     if delta > 0:
         return f"▲{delta}"
     return f"▼{abs(delta)}"
@@ -782,7 +799,9 @@ def rank_delta_class(delta: int | None, is_new: bool) -> str:
     """Return CSS class for rank delta."""
     if is_new:
         return "delta-new"
-    if delta is None or delta == 0:
+    if delta is None:
+        return "delta-same"
+    if delta == 0:
         return "delta-same"
     if delta > 0:
         return "delta-up"
@@ -1401,9 +1420,11 @@ def main() -> None:
         # Flag cells where Stats API may still be stale (recent push, very low count).
         commits_low_confidence = bool(d <= 7 and (recent_commits or 0) < 10)
 
-        # Fetch npm downloads + provenance in parallel (npm API has no strict rate limit)
+        # Fetch npm/crate downloads + provenance in parallel
         pypi_pkg = agent.get("pypi_package", "")
+        crate_pkg = agent.get("crate_package", "")
         npm_dl = fetch_npm_downloads(npm_pkg) if npm_pkg else None
+        crate_dl = fetch_crate_downloads(crate_pkg) if crate_pkg else None
         npm_prov = fetch_npm_provenance(npm_pkg) if npm_pkg else None
         signed_ratio = fetch_signed_commit_ratio(repo_id)
         print(f"OK  {repo_id:<45} score={score:5.1f}")
@@ -1431,7 +1452,9 @@ def main() -> None:
             "license_spdx": (repo.get("license") or {}).get("spdx_id") or None,
             "npm_package": npm_pkg if npm_pkg else "",
             "pypi_package": pypi_pkg if pypi_pkg else "",
+            "crate_package": crate_pkg if crate_pkg else "",
             "npm_dl": npm_dl,
+            "crate_dl": crate_dl,
             "npm_provenance": npm_prov,
             "signed_commits_ratio": signed_ratio,
             "weekly_downloads": None,  # filled in serial pass below
@@ -1514,6 +1537,8 @@ def main() -> None:
             dl_parts = []
             if row.get("npm_dl") is not None:
                 dl_parts.append(("npm", row["npm_dl"]))
+            if row.get("crate_dl") is not None:
+                dl_parts.append(("crates.io", row["crate_dl"]))
             if pypi_pkg:
                 pypi_dl = fetch_pypi_downloads(pypi_pkg)
                 if pypi_dl is not None:
@@ -1777,6 +1802,7 @@ def main() -> None:
                 "category": r.get("category", ""),
                 "category_rank": r.get("category_rank"),
                 "npm_package": r.get("npm_package", ""),
+                "crate_package": r.get("crate_package", ""),
                 "pypi_package": r.get("pypi_package", ""),
                 "weekly_downloads": r.get("weekly_downloads"),
                 "dl_source": r.get("dl_source", ""),
