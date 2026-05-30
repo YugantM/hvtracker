@@ -2207,6 +2207,9 @@ def main() -> None:
         sitemap_urls.append((f"https://hvtracker.net/categories/{cat_m['slug']}", "0.7", "daily"))
     sitemap_urls.append(("https://hvtracker.net/blog/", "0.6", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety", "0.8", "monthly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/most-starred-ai-agents-no-provenance", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/coding-agents-trust-rankings", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/ai-agent-frameworks-ranked-by-trust", "0.9", "weekly"))
     for article in blog_articles:
         sitemap_urls.append((f"https://hvtracker.net/blog/{article['slug']}", "0.8", "weekly"))
     for row in rows:
@@ -2314,7 +2317,31 @@ HVTrust = gate( confidence x [ Safety(30) + Identity(20) + Transparency(20) + Ma
             "content_text": "A practical guide to evaluating open-source AI agent safety using OSSF Scorecard, package provenance, signed commits, activity patterns, and transparency indicators.",
             "date_modified": now_iso,
             "tags": ["AI agent safety", "Trust signals"],
-        }
+        },
+        {
+            "id": "https://hvtracker.net/blog/most-starred-ai-agents-no-provenance",
+            "url": "https://hvtracker.net/blog/most-starred-ai-agents-no-provenance",
+            "title": "The Most Popular AI Agents Ship Without Provenance — Here's the List",
+            "content_text": "375k stars, 184k stars, 167k stars — and zero package provenance. We checked the top 10 most-starred AI agents.",
+            "date_modified": now_iso,
+            "tags": ["Provenance", "Supply chain trust"],
+        },
+        {
+            "id": "https://hvtracker.net/blog/coding-agents-trust-rankings",
+            "url": "https://hvtracker.net/blog/coding-agents-trust-rankings",
+            "title": "Coding Agents Ranked by Trust, Not Stars — The Results Are Embarrassing",
+            "content_text": "We ranked 26 coding agents by supply-chain trust. opencode (167k stars) lands at #127. Only one coding agent cracks the top 10.",
+            "date_modified": now_iso,
+            "tags": ["Coding agents", "Trust rankings"],
+        },
+        {
+            "id": "https://hvtracker.net/blog/ai-agent-frameworks-ranked-by-trust",
+            "url": "https://hvtracker.net/blog/ai-agent-frameworks-ranked-by-trust",
+            "title": "LangChain vs LangGraph vs CrewAI vs AutoGPT — Ranked by Trust, Not Hype",
+            "content_text": "LangGraph #1, AutoGPT #39, LlamaIndex #126. We ranked the top AI frameworks by supply-chain trust instead of stars.",
+            "date_modified": now_iso,
+            "tags": ["Agent frameworks", "Trust rankings"],
+        },
     ] + [
         {
             "id": f"https://hvtracker.net/blog/{a['slug']}",
