@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Compile all Python sources (syntax check)
+        run: python -m compileall -q .
+
+      - name: Run unit and data-integrity tests
+        run: python -m pytest
+
+      - name: Lint shell scripts
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          shellcheck cron_runner.sh
+
+  build-smoke:
+    # Verify the site actually renders from cached state (no network/API calls).
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Render-only build
+        run: python fetch_and_build.py --render-only
+
+      - name: Assert key artifacts were produced
+        run: |
+          test -s index.html
+          test -s data.json
+          python -c "import json; json.load(open('data.json'))"
