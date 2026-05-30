@@ -5,25 +5,15 @@ on:
     branches: [main]
     paths:
       - agents.json
-  schedule:
-    # Staggered batches — each batch refreshes ~29 agents, full cycle in 24h
-    - cron: "0 0 * * *"   # Batch 1/6 at 00:00 UTC
-    - cron: "0 4 * * *"   # Batch 2/6 at 04:00 UTC
-    - cron: "0 8 * * *"   # Batch 3/6 at 08:00 UTC
-    - cron: "0 12 * * *"  # Batch 4/6 at 12:00 UTC
-    - cron: "0 16 * * *"  # Batch 5/6 at 16:00 UTC
-    - cron: "0 20 * * *"  # Batch 6/6 at 20:00 UTC
   workflow_dispatch:
     inputs:
       mode:
         description: "Run mode"
         required: false
-        default: "full"
+        default: "pending"
         type: choice
         options:
           - full
-          - batch
-          - mega
           - render
           - pending
 
@@ -50,73 +40,42 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Determine batch number
-        id: batch
+      - name: Determine run mode
+        id: mode
         run: |
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            # Use hour ranges to tolerate GitHub's cron delays (up to ~4h late)
-            HOUR=$(date -u +%-H)
-            if   [ $HOUR -ge 0  ] && [ $HOUR -lt 4  ]; then BATCH="1/6"
-            elif [ $HOUR -ge 4  ] && [ $HOUR -lt 8  ]; then BATCH="2/6"
-            elif [ $HOUR -ge 8  ] && [ $HOUR -lt 12 ]; then BATCH="3/6"
-            elif [ $HOUR -ge 12 ] && [ $HOUR -lt 16 ]; then BATCH="4/6"
-            elif [ $HOUR -ge 16 ] && [ $HOUR -lt 20 ]; then BATCH="5/6"
-            else BATCH="6/6"
-            fi
-            echo "args=--batch $BATCH" >> $GITHUB_OUTPUT
-            echo "Running batch $BATCH (hour=$HOUR)"
-          elif [ "${{ inputs.mode }}" = "render" ]; then
-            # Render-only: rebuild all pages from data/render_state.json with
-            # NO API calls. Use for UI/template changes — runs in seconds.
+          if [ "${{ inputs.mode }}" = "render" ]; then
             echo "args=--render-only" >> $GITHUB_OUTPUT
             echo "Running RENDER-ONLY (no API calls)"
-          elif [ "${{ inputs.mode }}" = "pending" ]; then
-            # Pending-only: fetch only newly-listed agents that still have
-            # provisional rows, then merge them into the cached leaderboard.
-            echo "args=--pending-only" >> $GITHUB_OUTPUT
-            echo "Running PENDING-ONLY refresh"
-          elif [ "${{ github.event_name }}" = "push" ]; then
-            # agents.json changed: fetch only newly-listed/pending agents.
-            # If a fetch fails, the build still falls back to a provisional row.
-            echo "args=--pending-only" >> $GITHUB_OUTPUT
-            echo "Running PENDING-ONLY refresh for agents.json change"
-          elif [ "${{ inputs.mode }}" = "mega" ]; then
-            # Mega mode: full rebuild with no batch — refreshes ALL agents
-            echo "args=" >> $GITHUB_OUTPUT
-            echo "Running MEGA full rebuild (all agents)"
-          elif [ "${{ inputs.mode }}" = "batch" ]; then
-            # Manual batch trigger — pick batch based on current hour
-            HOUR=$(date -u +%-H)
-            BATCH_NUM=$(( (HOUR / 4) + 1 ))
-            [ $BATCH_NUM -gt 6 ] && BATCH_NUM=6
-            echo "args=--batch $BATCH_NUM/6" >> $GITHUB_OUTPUT
-            echo "Running manual batch $BATCH_NUM/6"
-          else
+          elif [ "${{ inputs.mode }}" = "full" ]; then
             echo "args=" >> $GITHUB_OUTPUT
             echo "Running full rebuild"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            echo "args=--pending-only" >> $GITHUB_OUTPUT
+            echo "Running PENDING-ONLY refresh for agents.json change"
+          else
+            echo "args=--pending-only" >> $GITHUB_OUTPUT
+            echo "Running PENDING-ONLY refresh"
           fi
 
-      - name: Fetch data and build index.html
+      - name: Fetch data and build
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        run: python fetch_and_build.py ${{ steps.batch.outputs.args }}
+        run: python fetch_and_build.py ${{ steps.mode.outputs.args }}
 
       - name: Commit and push if changed
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html data.json methodology.html output/history/ output/methodology.html agents/ sitemap.xml feed.json data/ spec/ badge/ categories/ blog/ compare/ llms.txt robots.txt
+          git add index.html data.json methodology.html output/history/ output/methodology.html agents/ sitemap.xml feed.json data/ spec/ badge/ categories/ blog/ compare/ llms.txt robots.txt roadmap/ badges/
           if git diff --cached --quiet; then
             echo "No changes — skipping commit."
           else
-            git commit -m "chore: regenerate leaderboard $(date -u '+%Y-%m-%d %H:%M') ${{ steps.batch.outputs.args }}"
-            # Retry push up to 3 times — pull with ours strategy to avoid
-            # merge conflicts on auto-generated files
+            git commit -m "chore: regenerate leaderboard $(date -u '+%Y-%m-%d %H:%M') ${{ steps.mode.outputs.args }}"
             for i in 1 2 3; do
               git push && break
               echo "Push failed (attempt $i/3), pulling with auto-resolve..."
               git fetch origin main
               git reset --soft origin/main
-              git commit -m "chore: regenerate leaderboard $(date -u '+%Y-%m-%d %H:%M') ${{ steps.batch.outputs.args }}"
+              git commit -m "chore: regenerate leaderboard $(date -u '+%Y-%m-%d %H:%M') ${{ steps.mode.outputs.args }}"
             done
           fi
