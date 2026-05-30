@@ -256,6 +256,8 @@
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
         <span class="active">Methodology</span>
+        <a href="/badges/">Badges</a>
+        <a href="/roadmap/">Roadmap</a>
         <a href="/spec/">Specifications</a>
       </nav>
     </header>
@@ -344,7 +346,7 @@
 
       <section id="updates">
         <h2>How Often Data Updates</h2>
-        <p>The GitHub Actions workflow refreshes six staggered batches every 4 hours. A full refresh cycle completes in 24 hours. Each successful run regenerates the leaderboard, agent pages, public JSON endpoints, <code>feed.json</code>, <code>sitemap.xml</code>, and a dated history snapshot.</p>
+        <p>The GitHub Actions workflow runs six staggered batches per day, one every 4 hours. Each batch refreshes roughly one-sixth of the tracked agents, so any given agent's signals update approximately once per day. Each successful run regenerates the leaderboard, agent pages, public JSON endpoints, <code>feed.json</code>, <code>sitemap.xml</code>, and a dated history snapshot.</p>
       </section>
 
       <section id="limitations">
