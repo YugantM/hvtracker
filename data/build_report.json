@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-29T21:53:48Z",
-  "data_timestamp": "2026-05-29 21:53 UTC",
+  "generated_at": "2026-05-30T01:51:22Z",
+  "data_timestamp": "2026-05-30 01:51 UTC",
   "schema_version": "v0.1",
   "methodology_version": "v3.0",
-  "configured_agents": 27,
+  "configured_agents": 36,
   "active_agents": 172,
-  "legacy_agents": 0,
-  "total_generated": 172,
+  "legacy_agents": 7,
+  "total_generated": 179,
   "categories": {
     "Coding Agents": 26,
     "Agent Frameworks": 58,
@@ -28,6 +28,11 @@
       "repo": "anthropics/claude-code",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "browserbase/open-operator",
+      "criterion": "5.1",
+      "detail": "repository is archived"
     },
     {
       "repo": "browserbase/open-operator",
@@ -68,6 +73,11 @@
       "repo": "entropy-research/Devon",
       "criterion": "4.2.1",
       "detail": "no meaningful activity in 12 months (last push 2025-05-26)"
+    },
+    {
+      "repo": "AbanteAI/archive-old-cli-mentat",
+      "criterion": "5.1",
+      "detail": "repository is archived"
     },
     {
       "repo": "AbanteAI/archive-old-cli-mentat",
@@ -115,7 +125,7 @@
       "detail": "no meaningful activity in 12 months (last push 2024-09-26)"
     }
   ],
-  "warning_count": 18,
+  "warning_count": 20,
   "failed_fetches": [],
   "missing_repos_count": 0,
   "package_failures": [
@@ -128,6 +138,9 @@
   ],
   "package_failure_count": 6,
   "scorecard_unavailable_count": 24,
-  "fingerprint_agents": [],
-  "fingerprint_agent_count": 0
+  "fingerprint_agents": [
+    "All-Hands-AI/OpenHands",
+    "anthropics/claude-code"
+  ],
+  "fingerprint_agent_count": 2
 }

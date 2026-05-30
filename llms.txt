@@ -7,15 +7,15 @@ HVTrust = gate( confidence x [ Safety(30) + Identity(20) + Transparency(20) + Ma
 
 ## Top 10 agents by HVTrust
 1. LangGraph (langchain-ai/langgraph) — HVTrust 91.9/100, Grade B
-2. PydanticAI (pydantic/pydantic-ai) — HVTrust 90.7/100, Grade B
-3. Vercel AI SDK (vercel/ai) — HVTrust 90.5/100, Grade B
+2. PydanticAI (pydantic/pydantic-ai) — HVTrust 90.6/100, Grade B
+3. Vercel AI SDK (vercel/ai) — HVTrust 90.4/100, Grade B
 4. OpenAI Agents SDK (openai/openai-agents-python) — HVTrust 90.2/100, Grade B
-5. Haystack (deepset-ai/haystack) — HVTrust 90.1/100, Grade C
-6. n8n (n8n-io/n8n) — HVTrust 89.8/100, Grade B
-7. LiveKit Agents (livekit/agents) — HVTrust 89.8/100, Grade C
-8. Trigger.dev (triggerdotdev/trigger.dev) — HVTrust 89.7/100, Grade C
+5. Haystack (deepset-ai/haystack) — HVTrust 90.0/100, Grade C
+6. n8n (n8n-io/n8n) — HVTrust 89.7/100, Grade B
+7. LiveKit Agents (livekit/agents) — HVTrust 89.7/100, Grade C
+8. Trigger.dev (triggerdotdev/trigger.dev) — HVTrust 89.6/100, Grade C
 9. LeRobot (huggingface/lerobot) — HVTrust 88.9/100, Grade B
-10. Cline (cline/cline) — HVTrust 88.4/100, Grade B
+10. Cline (cline/cline) — HVTrust 88.3/100, Grade B
 
 ## Machine-readable data (open, CC BY 4.0)
 - [Full registry JSON](https://hvtracker.net/data/latest.json): all 172 agents with trust scores, grades, and signals
@@ -38,7 +38,7 @@ HVTrust = gate( confidence x [ Safety(30) + Identity(20) + Transparency(20) + Ma
 - [Best Open-Source Agent Frameworks: LangGraph vs PydanticAI](https://hvtracker.net/blog/agent-frameworks-top-agents): LangGraph vs PydanticAI by HVTrust
 - [Best Open-Source Workflow Platforms: Haystack vs n8n](https://hvtracker.net/blog/workflow-platforms-top-agents): Haystack vs n8n by HVTrust
 - [Best Open-Source Browser & Computer Use: Stagehand vs Skyvern](https://hvtracker.net/blog/browser-computer-use-top-agents): Stagehand vs Skyvern by HVTrust
-- [Best Open-Source Memory & Knowledge: LanceDB vs Vespa](https://hvtracker.net/blog/memory-knowledge-top-agents): LanceDB vs Vespa by HVTrust
+- [Best Open-Source Memory & Knowledge: LanceDB vs Open WebUI](https://hvtracker.net/blog/memory-knowledge-top-agents): LanceDB vs Open WebUI by HVTrust
 - [Best Open-Source Research & Data: DeerFlow vs Firecrawl](https://hvtracker.net/blog/research-data-top-agents): DeerFlow vs Firecrawl by HVTrust
 - [Best Open-Source Observability & Evaluation: Weights & Biases Weave vs Langfuse](https://hvtracker.net/blog/observability-evaluation-top-agents): Weights & Biases Weave vs Langfuse by HVTrust
 - [Best Open-Source Security & Guardrails: NeMo Guardrails vs Garak](https://hvtracker.net/blog/security-guardrails-top-agents): NeMo Guardrails vs Garak by HVTrust

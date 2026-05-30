@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wolverine Review — Trust Score 0.0/100, Is It Safe? | HVTracker</title>
-  <meta name="description" content="Is Wolverine safe? Independent trust score 0.0/100 (Grade D). Ranked # of 171 open-source AI agents. 5.1k GitHub stars, Coding Agents. Security, transparency & adoption signals reviewed.">
+  <meta name="description" content="Is Wolverine safe? Independent trust score 0.0/100 (Grade D). Ranked # of 172 open-source AI agents. 5.1k GitHub stars, Coding Agents. Security, transparency & adoption signals reviewed.">
   <link rel="canonical" href="https://hvtracker.net/agents/wolverine">
 
   <meta property="og:type" content="website">
@@ -225,6 +225,69 @@
       background:rgba(143,179,255,0.26);
       text-decoration:none;
     }
+    .secondary-link {
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:8px 14px; border:1px solid var(--border);
+      border-radius:6px; background:rgba(255,255,255,0.035);
+      color:var(--muted);
+      font-family:var(--font-mono); font-size:12px;
+    }
+    .secondary-link:hover {
+      color:var(--text);
+      border-color:var(--accent-dim);
+      text-decoration:none;
+      background:rgba(143,179,255,0.10);
+    }
+    .review-card {
+      padding:18px 20px; margin:14px 0;
+      border:1px solid var(--border); border-radius:10px;
+      background:linear-gradient(135deg, rgba(45,212,191,0.07), rgba(143,179,255,0.045) 44%, rgba(216,166,87,0.04)), var(--glass);
+      box-shadow:inset 0 1px 0 var(--glass-hi);
+    }
+    .review-grid {
+      display:grid; grid-template-columns:1.2fr 1fr 1fr;
+      gap:12px;
+    }
+    .review-item {
+      border:1px solid var(--hairline);
+      border-radius:8px;
+      padding:12px;
+      background:rgba(255,255,255,0.032);
+    }
+    .review-item.primary { grid-row:span 2; }
+    .review-item.wide { grid-column:span 2; }
+    .review-kicker {
+      font-family:var(--font-mono); font-size:10px; color:var(--muted);
+      text-transform:uppercase; letter-spacing:0.07em; margin-bottom:7px;
+    }
+    .review-value { font-size:15px; color:var(--text); line-height:1.45; }
+    .review-metric { font-family:var(--font-mono); font-size:18px; font-weight:700; color:var(--accent); margin-top:4px; }
+    .review-actions {
+      margin-top:14px; display:flex; flex-wrap:wrap; gap:10px;
+      font-family:var(--font-mono); font-size:12px;
+    }
+
+    .maintainer-cta {
+      padding:18px 20px; margin:14px 0;
+      border:1px solid var(--mocha); border-radius:10px;
+      background:linear-gradient(135deg, rgba(216,166,87,0.12), rgba(216,166,87,0.03)), var(--glass);
+      box-shadow:inset 0 1px 0 var(--glass-hi);
+    }
+    .maintainer-cta .section-title { margin-bottom:8px; }
+    .maintainer-cta p {
+      font-size:13.5px; color:var(--muted); line-height:1.6; max-width:560px; margin-bottom:14px;
+    }
+    .maintainer-cta p strong { color:var(--text); }
+    .maintainer-actions { display:flex; gap:10px; flex-wrap:wrap; font-family:var(--font-mono); font-size:12px; }
+    .cta-correction {
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:9px 16px; border:1px solid var(--mocha); border-radius:6px;
+      background:var(--mocha-lt); color:var(--mocha); font-weight:700;
+    }
+    .cta-correction:hover {
+      background:rgba(216,166,87,0.28); color:var(--text);
+      border-color:var(--mocha); text-decoration:none;
+    }
 
     .siblings { padding:22px 0; margin:0; border-top:1px solid var(--hairline); }
     .siblings ul { list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px 18px; }
@@ -251,6 +314,9 @@
     .terminal-note { margin:0; border-top:1px solid var(--hairline); }
     @media (max-width:720px) {
       .rank-block { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+      .review-grid { grid-template-columns:1fr; }
+      .review-item.primary { grid-row:auto; }
+      .review-item.wide { grid-column:auto; }
     }
   </style>
 
@@ -263,6 +329,17 @@
     gtag('config', 'G-TZ8921LR0K');
   </script>
   <script defer src="/analytics.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Coding Agents", "item": "https://hvtracker.net/categories/coding-agents/" },
+      { "@type": "ListItem", "position": 3, "name": "Wolverine", "item": "https://hvtracker.net/agents/wolverine/" }
+    ]
+  }
+  </script>
 </head>
 <body data-page-type="agent_profile" data-agent-slug="wolverine" data-agent-name="Wolverine" data-category="Coding Agents" data-global-rank="" data-trust-score="0.0">
   <div class="page">
@@ -287,13 +364,51 @@
       </div>
       <div class="hero-actions">
         <a class="compare-link" href="/compare/?a=wolverine">Compare</a>
+        <a class="secondary-link" href="#embed-badge">Embed badge</a>
+        <a class="secondary-link" href="https://github.com/YugantM/hvtracker/issues/new?title=%5BCorrection%5D+Wolverine&amp;body=Profile%3A+https%3A%2F%2Fhvtracker.net%2Fagents%2Fwolverine%2F%0ARepository%3A+biobootloader%2Fwolverine%0A%0AWhat+should+be+corrected%3F%0A%0AEvidence+or+links%3A%0A" target="_blank" rel="noopener noreferrer">Suggest correction</a>
       </div>
       <div class="seo-summary" style="margin-top:18px;font-size:14px;color:var(--muted);line-height:1.7;max-width:640px;">
         <p>Wolverine is an open-source AI agent in the Coding Agents category with 5.1k GitHub stars.
-        HVTracker independently evaluates Wolverine with a <strong style="color:var(--text)">Trust Score of 0.0/100</strong> (Grade D), ranking it <strong style="color:var(--text)"># of 171</strong> tracked AI agents.
+        HVTracker independently evaluates Wolverine with a <strong style="color:var(--text)">Trust Score of 0.0/100</strong> (Grade D), ranking it <strong style="color:var(--text)"># of 172</strong> tracked AI agents.
         
         
         Signals are refreshed daily from GitHub, package registries, and security databases.</p>
+      </div>
+    </section>
+
+    <section class="review-card">
+      <h2 class="section-title">Quick Trust Read</h2>
+      <div class="review-grid">
+        <div class="review-item primary">
+          <div class="review-kicker">Verdict</div>
+          <div class="review-value">Thin or incomplete trust evidence. Review carefully before production use.</div>
+          <div class="review-metric">0.0/100 · Grade D</div>
+        </div>
+
+        <div class="review-item">
+          <div class="review-kicker">Strongest Signal</div>
+          <div class="review-value">Transparency</div>
+          <div class="review-metric">10.0/20</div>
+        </div>
+
+
+        <div class="review-item">
+          <div class="review-kicker">Weakest Signal</div>
+          <div class="review-value">Identity / Provenance</div>
+          <div class="review-metric">0/20</div>
+        </div>
+
+        <div class="review-item wide">
+          <div class="review-kicker">What Would Improve It</div>
+          <div class="review-value">Add or improve OSSF Scorecard coverage so safety checks are easier to verify.</div>
+        </div>
+      </div>
+      <div class="review-actions">
+
+        <a class="compare-link" href="/compare/?a=wolverine">Compare with another agent</a>
+
+        <a class="secondary-link" href="/categories/coding-agents">View Coding Agents</a>
+        <a class="secondary-link" href="https://github.com/YugantM/hvtracker/issues/new?title=%5BCorrection%5D+Wolverine&amp;body=Profile%3A+https%3A%2F%2Fhvtracker.net%2Fagents%2Fwolverine%2F%0ARepository%3A+biobootloader%2Fwolverine%0A%0AWhat+should+be+corrected%3F%0A%0AEvidence+or+links%3A%0A" target="_blank" rel="noopener noreferrer">Report missing data</a>
       </div>
     </section>
 
@@ -310,7 +425,7 @@
       
       <div>
         <div class="rank-big">#</div>
-        <div class="rank-label">Global Rank · of 171</div>
+        <div class="rank-label">Global Rank · of 172</div>
       </div>
       
     </section>
@@ -344,7 +459,7 @@
         <div class="stale">
           <div class="stat-label">Last Push</div>
           <div class="stat-value"><span class="fresh-dot"></span>2024-03-08</div>
-          <div class="stat-sub">811 days ago</div>
+          <div class="stat-sub">812 days ago</div>
         </div>
         <div>
           <div class="stat-label">Commits (4 wk)</div>
@@ -454,6 +569,15 @@
       
     </section>
 
+    <section class="maintainer-cta">
+      <h2 class="section-title">Maintain Wolverine?</h2>
+      <p>HVTrust scores Wolverine from <strong>public signals only</strong> — we never contact maintainers first. If a signal is wrong, stale, or missing (provenance you publish, a Scorecard you run, signed releases), tell us and we'll review it. Corrections are public and tracked on GitHub.</p>
+      <div class="maintainer-actions">
+        <a class="cta-correction" href="https://github.com/YugantM/hvtracker/issues/new?title=%5BCorrection%5D+Wolverine&amp;body=Profile%3A+https%3A%2F%2Fhvtracker.net%2Fagents%2Fwolverine%2F%0ARepository%3A+biobootloader%2Fwolverine%0A%0AWhat+should+be+corrected%3F%0A%0AEvidence+or+links%3A%0A" target="_blank" rel="noopener noreferrer">Submit a correction →</a>
+        <a class="secondary-link" href="#embed-badge">Add the trust badge</a>
+      </div>
+    </section>
+
     
 
     
@@ -489,8 +613,8 @@
       
     </section>
 
-    <section class="provenance" style="margin-top:0;">
-      <h2 class="section-title">Embed Badge</h2>
+    <section class="provenance" id="embed-badge" style="margin-top:0;">
+      <h2 class="section-title">Embed Badge <a href="/badges/" style="font-weight:400;color:var(--accent);font-size:11px;margin-left:8px;">Badge guide for maintainers →</a></h2>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
         <img src="/badge/wolverine.svg" alt="HVTrust 0.0" height="20">
         <img src="/badge/wolverine-grade.svg" alt="Grade D" height="20">
@@ -505,6 +629,8 @@
 
     
 
+    
+
     <section class="terminal-note" style="padding:18px 20px;font-size:11px;color:var(--muted);line-height:1.7;">
       <strong style="color:var(--text);font-size:12px;">Data sources</strong><br>
       GitHub REST API (repo, commits, stars, forks, license) · OSSF Scorecard via deps.dev · Algolia HN Search API
@@ -512,7 +638,7 @@
     </section>
 
     <footer>
-      <span>Updated 2026-05-29 01:55 UTC</span>
+      <span>Updated 2026-05-30 01:51 UTC</span>
       <span class="footer-sep">·</span>
       <a href="/methodology">methodology</a>
       <span class="footer-sep">·</span>
