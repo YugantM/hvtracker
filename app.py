@@ -9,9 +9,11 @@ from __future__ import annotations
 import json
 import os
 import threading
+import hashlib
+import time
 
 from fastapi import FastAPI, Form, Request
-from fastapi.responses import HTMLResponse, JSONResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 import db
@@ -22,6 +24,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)  # volume subdir may not exist on first b
 DATA_PATH = os.path.join(OUTPUT_DIR, "data.json")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 COMPARE_TOOL_PATH = os.path.join(BASE_DIR, "compare", "index.html")
+RENDER_FINGERPRINT_PATH = os.path.join(OUTPUT_DIR, ".render_fingerprint")
 
 app = FastAPI(title="HVTracker", docs_url="/api/docs", openapi_url="/api/openapi.json")
 
@@ -37,9 +40,18 @@ def load_data() -> dict:
     except OSError:
         return {"agents": [], "total": 0, "updated": None}
     if _cache["mtime"] != mtime:
-        with open(DATA_PATH, encoding="utf-8") as f:
-            _cache["data"] = json.load(f)
-        _cache["mtime"] = mtime
+        for _ in range(3):
+            try:
+                with open(DATA_PATH, encoding="utf-8") as f:
+                    _cache["data"] = json.load(f)
+                _cache["mtime"] = mtime
+                break
+            except json.JSONDecodeError:
+                if _cache["data"] is not None:
+                    return _cache["data"]
+                time.sleep(0.05)
+        else:
+            return {"agents": [], "total": 0, "updated": None}
     return _cache["data"]
 
 
@@ -111,6 +123,11 @@ def compare_tool():
         return HTMLResponse("<p>Compare tool is not available yet.</p>", status_code=503)
     with open(COMPARE_TOOL_PATH, encoding="utf-8") as f:
         return HTMLResponse(f.read())
+
+
+@app.get("/og-v2.png")
+def og_v2():
+    return FileResponse(os.path.join(BASE_DIR, "og-v2.png"), media_type="image/png")
 
 
 # ---- Dynamic SVG badges --------------------------------------------------
@@ -216,6 +233,44 @@ def _refresh(mode: str) -> None:
         print(f"[scheduler] refresh ({mode}) failed: {e}")
 
 
+def _compute_render_fingerprint() -> str:
+    digest = hashlib.sha256()
+    tracked_paths = [
+        os.path.join(BASE_DIR, "template.html"),
+        os.path.join(BASE_DIR, "compare", "index.html"),
+        os.path.join(BASE_DIR, "og-v2.png"),
+    ]
+    templates_dir = os.path.join(BASE_DIR, "templates")
+    for name in sorted(os.listdir(templates_dir)):
+        if name.endswith((".html", ".j2")):
+            tracked_paths.append(os.path.join(templates_dir, name))
+    for path in tracked_paths:
+        with open(path, "rb") as f:
+            digest.update(path.removeprefix(BASE_DIR).encode("utf-8"))
+            digest.update(b"\0")
+            digest.update(f.read())
+            digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def _read_render_fingerprint() -> str | None:
+    try:
+        with open(RENDER_FINGERPRINT_PATH, encoding="utf-8") as f:
+            return f.read().strip() or None
+    except OSError:
+        return None
+
+
+def _write_render_fingerprint(fingerprint: str) -> None:
+    with open(RENDER_FINGERPRINT_PATH, "w", encoding="utf-8") as f:
+        f.write(fingerprint)
+
+
+def _refresh_and_record(mode: str, fingerprint: str) -> None:
+    _refresh(mode)
+    _write_render_fingerprint(fingerprint)
+
+
 def _seed_history_into_volume() -> int:
     """Copy daily history snapshots baked into the image into the volume if
     they're missing. Without prior days the leaderboard has no rank deltas,
@@ -244,6 +299,8 @@ def _seed_history_into_volume() -> int:
 @app.on_event("startup")
 def startup():
     seeded = _seed_history_into_volume()
+    fingerprint = _compute_render_fingerprint()
+    stored_fingerprint = _read_render_fingerprint()
     db.init_schema()
     # Seed the agents table from agents.json the first time the DB is empty.
     if db.enabled() and db.count_agents() == 0:
@@ -254,14 +311,18 @@ def startup():
     # If the volume has no site yet, build one in the background so the service
     # comes up immediately and the site appears shortly after.
     if not os.path.isfile(DATA_PATH):
-        threading.Thread(target=_refresh, args=("full",), daemon=True).start()
+        threading.Thread(target=_refresh_and_record, args=("full", fingerprint), daemon=True).start()
         print("[startup] no data.json on volume — kicked off initial full build")
-    elif seeded > 0:
+    elif seeded > 0 or stored_fingerprint != fingerprint:
         # We just dropped prior-day snapshots into a volume that already had a
-        # site rendered without them — re-render so rank deltas, sparklines,
-        # and movers reflect the now-present history.
-        threading.Thread(target=_refresh, args=("render",), daemon=True).start()
-        print("[startup] history seeded into existing volume — kicked off render-only rebuild")
+        # site rendered without them — or templates/assets changed in the image.
+        # Re-render so rank deltas, sparklines, movers, and share metadata stay
+        # in sync with the current deploy.
+        threading.Thread(target=_refresh_and_record, args=("render", fingerprint), daemon=True).start()
+        if seeded > 0:
+            print("[startup] history seeded into existing volume — kicked off render-only rebuild")
+        else:
+            print("[startup] template/assets fingerprint changed — kicked off render-only rebuild")
 
     if os.environ.get("DISABLE_SCHEDULER") != "1":
         from apscheduler.schedulers.background import BackgroundScheduler
