@@ -20,6 +20,13 @@ The core question is simple:
 - Use the public API: [hvtracker.net/data/latest.json](https://hvtracker.net/data/latest.json)
 - Embed live trust badges in project READMEs
 
+## Repository Docs
+
+- [docs/README.md](docs/README.md) - repo docs index
+- [docs/open-core.md](docs/open-core.md) - public/private product boundary
+- [docs/AI_HANDOVER.md](docs/AI_HANDOVER.md) - implementation handover for coding agents
+- [docs/launch-v1.md](docs/launch-v1.md) - launch and distribution notes
+
 ---
 
 ## Current Snapshot
