@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HVTracker's public roadmap. We're extending trust signals beyond supply chain into runtime trust — what an agent actually does when it runs.">
+  <title>Roadmap — Runtime Trust for AI Agents | HVTracker</title>
+  <link rel="canonical" href="https://hvtracker.net/roadmap/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Roadmap — Runtime Trust for AI Agents | HVTracker">
+  <meta property="og:description" content="What we're building next: runtime trust signals — MCP support, tool surface, external dependencies, provenance drift.">
+  <meta property="og:url" content="https://hvtracker.net/roadmap/">
+  <meta property="og:image" content="https://hvtracker.net/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Roadmap — Runtime Trust for AI Agents | HVTracker">
+  <meta name="twitter:description" content="What we're building next: runtime trust signals — MCP support, tool surface, external dependencies, provenance drift.">
+  <meta name="twitter:image" content="https://hvtracker.net/og.png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0b0d10;
+      --surface:   #151920;
+      --surface-2: #1b2029;
+      --border:    #303846;
+      --text:      #eef2f6;
+      --muted:     #8a87a8;
+      --accent:    #8fb3ff;
+      --accent-lt: rgba(143,179,255,0.10);
+      --mocha:     #d8a657;
+      --mocha-lt:  rgba(216,166,87,0.14);
+      --fresh:     #2dd4bf;
+      --font-mono: "JetBrains Mono", "Fira Mono", "Cascadia Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
+      --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+    }
+
+    body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 15px; line-height: 1.65; min-height: 100vh; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .page { max-width: 1100px; margin: 0 auto; padding: 0 20px 48px; }
+
+    header { padding: 36px 0 24px; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap; }
+    .logo { font-family: var(--font-mono); font-size: 24px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .tagline { font-size: 13px; color: var(--muted); }
+    .site-nav { margin-left: auto; font-family: var(--font-mono); font-size: 12px; display: flex; gap: 8px; align-items: baseline; }
+    .site-nav a { color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 5px 10px; background: rgba(255,255,255,0.03); }
+    .site-nav a:hover { color: var(--text); border-color: var(--accent); text-decoration: none; }
+    .site-nav .active { color: var(--text); border-color: var(--accent); font-weight: 600; }
+
+    .content { max-width: 760px; margin: 0 auto; padding: 40px 0 0; }
+
+    .doc-title { font-family: var(--font-mono); font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; line-height: 1.2; }
+    .doc-lede { font-size: 16px; color: var(--text); margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+
+    section { margin-bottom: 40px; }
+    h2 { font-family: var(--font-mono); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 16px; }
+    p { margin-bottom: 14px; }
+
+    .stage { padding: 18px 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); margin-bottom: 14px; }
+    .stage-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+    .stage-tag { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 8px; border-radius: 4px; font-weight: 700; }
+    .stage-tag.shipped { background: rgba(45,212,191,0.15); color: var(--fresh); }
+    .stage-tag.building { background: rgba(216,166,87,0.18); color: var(--mocha); }
+    .stage-tag.next { background: var(--accent-lt); color: var(--accent); }
+    .stage-tag.later { background: rgba(168,179,194,0.10); color: var(--muted); }
+    .stage-title { font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--text); }
+    .stage p { margin-bottom: 8px; font-size: 14px; }
+    .stage ul { padding-left: 1.25em; margin: 8px 0 4px; }
+    .stage li { margin-bottom: 4px; font-size: 13.5px; color: var(--muted); }
+    .stage li strong { color: var(--text); }
+
+    footer { max-width: 760px; margin: 48px auto 0; padding-top: 24px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted); line-height: 1.7; }
+    footer .footer-links { font-family: var(--font-mono); font-size: 12px; display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 20px; }
+    footer .disclaimer { font-size: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+    @media (max-width: 640px) {
+      header { flex-direction: column; gap: 8px; }
+      .site-nav { margin-left: 0; }
+      .doc-title { font-size: 24px; }
+    }
+  </style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="roadmap">
+  <div class="page">
+
+    <header>
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <span class="tagline">Trust signals for open-source AI agents</span>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/badges/">Badges</a>
+        <span class="active">Roadmap</span>
+      </nav>
+    </header>
+
+    <article class="content">
+      <h1 class="doc-title">Roadmap</h1>
+      <p class="doc-lede">Today HVTrust scores <strong>supply-chain trust</strong> — how a project is built, signed, and released. Next, we're extending it to <strong>runtime trust</strong> — what an agent actually does when you run it.</p>
+
+      <section>
+        <h2>Now Shipped</h2>
+
+        <div class="stage">
+          <div class="stage-header">
+            <span class="stage-tag shipped">Live</span>
+            <span class="stage-title">Supply-chain trust v3</span>
+          </div>
+          <p>HVTrust ranks 172 open-source AI agents on five weighted dimensions: Safety/Integrity (30), Identity/Provenance (20), Transparency (20), Maintenance (20), Adoption (10).</p>
+          <ul>
+            <li><strong>OSSF Scorecard</strong> via deps.dev + fallback</li>
+            <li><strong>npm + PyPI provenance</strong> attestation checks</li>
+            <li><strong>Signed commit ratio</strong> from GitHub verification</li>
+            <li><strong>Confidence-weighted</strong> evidence grades A–D</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Building Now</h2>
+
+        <div class="stage">
+          <div class="stage-header">
+            <span class="stage-tag building">In progress</span>
+            <span class="stage-title">Runtime trust — discovery</span>
+          </div>
+          <p>For each tracked agent, we're collecting <strong>static runtime characteristics</strong> from public sources (repo manifests, READMEs, registry metadata). Starting with non-invasive fields anyone can verify themselves:</p>
+          <ul>
+            <li><strong>MCP support</strong> — does the agent declare or implement Model Context Protocol?</li>
+            <li><strong>Tool / plugin surface</strong> — built-in tools, integrations, plugin ecosystem</li>
+            <li><strong>External service dependencies</strong> — required APIs, model providers, data services</li>
+            <li><strong>Package provenance drift</strong> — does the latest published package still match its source repo?</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Up Next</h2>
+
+        <div class="stage">
+          <div class="stage-header">
+            <span class="stage-tag next">Q3</span>
+            <span class="stage-title">Runtime trust — scored signals</span>
+          </div>
+          <p>Once discovery stabilises, runtime signals get scored and folded into HVTrust as a new dimension — separate from supply-chain hygiene so readers can see them independently.</p>
+          <ul>
+            <li>Per-agent <strong>capability surface</strong> page (what it can reach)</li>
+            <li>Trend tracking for runtime drift over time</li>
+            <li>Public spec at <code>/spec/runtime-trust</code></li>
+          </ul>
+        </div>
+
+        <div class="stage">
+          <div class="stage-header">
+            <span class="stage-tag next">Q3</span>
+            <span class="stage-title">Maintainer self-service</span>
+          </div>
+          <p>Today corrections flow through GitHub issues. Next we want maintainers to:</p>
+          <ul>
+            <li>Claim their listing</li>
+            <li>Declare runtime fields (with evidence) before we infer them</li>
+            <li>Get notified when their score changes</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Later</h2>
+
+        <div class="stage">
+          <div class="stage-header">
+            <span class="stage-tag later">Later</span>
+            <span class="stage-title">Cryptographic identity gate</span>
+          </div>
+          <p>Tighten the gate at the top of the leaderboard: require Sigstore-style identity binding for projects to reach the verified tier.</p>
+        </div>
+
+        <div class="stage">
+          <div class="stage-header">
+            <span class="stage-tag later">Later</span>
+            <span class="stage-title">Continuous behavioural signals</span>
+          </div>
+          <p>Lightweight, opt-in runtime telemetry that detects when an agent's actual behaviour drifts from its declared capabilities — without sending user data anywhere.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>How to influence the roadmap</h2>
+        <p>This roadmap is intentionally short. Priorities are driven by what maintainers and users ask for. To suggest a signal, flag a gap, or push back on the order, <a href="https://github.com/YugantM/hvtracker/issues/new?title=Roadmap+feedback%3A+" target="_blank" rel="noopener">open an issue</a>.</p>
+      </section>
+    </article>
+
+    <footer>
+      <div class="footer-links">
+        <a href="/">← Leaderboard</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/badges/">Badges</a>
+        <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">Source code</a>
+      </div>
+      <p class="disclaimer">HVTracker is not affiliated with any of the projects listed. Roadmap items are intentions, not commitments — priorities shift as we learn what matters most to maintainers and users.</p>
+    </footer>
+
+  </div>
+</body>
+</html>

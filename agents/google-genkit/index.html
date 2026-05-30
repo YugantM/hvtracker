@@ -267,6 +267,81 @@
       font-family:var(--font-mono); font-size:12px;
     }
 
+    .how-to-read {
+      margin:10px 0 0; padding:10px 14px; font-size:12px;
+      border:1px dashed var(--hairline); border-radius:6px;
+      background:rgba(255,255,255,0.025); color:var(--muted); line-height:1.6;
+    }
+    .how-to-read strong { color:var(--text); font-weight:600; }
+    .how-to-read a { color:var(--accent); border-bottom:1px dotted var(--accent-dim); }
+    .how-to-read a:hover { text-decoration:none; border-bottom-color:var(--accent); }
+
+    .freshness-banner {
+      margin:14px 0 0; padding:10px 14px; font-family:var(--font-mono); font-size:11.5px;
+      border:1px solid var(--hairline); border-radius:6px; color:var(--muted);
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .freshness-banner.is-stale { border-color:rgba(216,166,87,0.55); background:rgba(216,166,87,0.06); color:var(--text); }
+    .freshness-banner .dot { width:8px; height:8px; border-radius:50%; background:var(--fresh); }
+    .freshness-banner.is-stale .dot { background:var(--aging); }
+    .freshness-banner .meta { color:var(--muted); }
+
+    .safety-qa { padding:22px 0; margin:0; border-top:1px solid var(--hairline); }
+    .safety-qa .qa-summary {
+      padding:12px 14px; margin-bottom:18px;
+      border-left:3px solid var(--accent); background:var(--accent-lt);
+      border-radius:0 6px 6px 0; font-size:14px; line-height:1.6; color:var(--text);
+    }
+    .safety-qa details {
+      padding:10px 0; border-bottom:1px solid var(--hairline);
+    }
+    .safety-qa details:last-of-type { border-bottom:none; }
+    .safety-qa summary {
+      cursor:pointer; font-size:14px; font-weight:600; color:var(--text);
+      padding:6px 0; list-style:none;
+    }
+    .safety-qa summary::-webkit-details-marker { display:none; }
+    .safety-qa summary::before { content:"+ "; color:var(--accent); font-family:var(--font-mono); font-weight:700; }
+    .safety-qa details[open] summary::before { content:"− "; }
+    .safety-qa .qa-answer { padding:6px 0 4px 14px; font-size:13.5px; color:var(--muted); line-height:1.7; }
+    .safety-qa .qa-disclaimer {
+      margin-top:14px; padding:10px 12px; font-size:11px; color:var(--muted);
+      border:1px solid var(--hairline); border-radius:6px;
+      background:rgba(255,255,255,0.025);
+    }
+
+    .compare-strip { padding:22px 0; margin:0; border-top:1px solid var(--hairline); }
+    .compare-strip .cmp-row { display:flex; gap:10px; flex-wrap:wrap; }
+    .compare-strip .cmp-link {
+      flex:1 1 220px; padding:12px 14px;
+      border:1px solid var(--accent); border-radius:8px;
+      background:rgba(143,179,255,0.10);
+      font-family:var(--font-mono); font-size:13px;
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+    }
+    .compare-strip .cmp-link:hover {
+      text-decoration:none; background:rgba(143,179,255,0.20);
+      border-color:var(--accent); color:var(--text);
+    }
+    .compare-strip .cmp-name { color:var(--text); font-weight:600; }
+    .compare-strip .cmp-arrow { color:var(--accent); font-weight:700; }
+
+    .runtime-soon { padding:22px 0; margin:0; border-top:1px solid var(--hairline); }
+    .runtime-soon .rt-card {
+      padding:14px 16px; border:1px dashed var(--accent-dim); border-radius:8px;
+      background:rgba(143,179,255,0.04); color:var(--muted); font-size:13.5px; line-height:1.6;
+    }
+    .runtime-soon .rt-card strong { color:var(--text); font-weight:600; }
+    .runtime-soon .rt-fields {
+      margin-top:10px; display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:8px 14px;
+      font-family:var(--font-mono); font-size:11.5px;
+    }
+    .runtime-soon .rt-fields li {
+      list-style:none; padding:6px 10px; border:1px solid var(--hairline);
+      border-radius:4px; color:var(--muted); background:rgba(255,255,255,0.02);
+    }
+    .runtime-soon .rt-fields li::before { content:"◯ "; color:var(--accent-dim); }
+
     .maintainer-cta {
       padding:18px 20px; margin:14px 0;
       border:1px solid var(--mocha); border-radius:10px;
@@ -435,6 +510,19 @@
       
     </section>
 
+    <p class="how-to-read">
+      <strong>How to read this:</strong> HVTrust (0–100) weighs harder-to-fake supply-chain signals (provenance, OSSF Scorecard, signed commits) more than popularity. <strong>Grade C</strong> reflects evidence coverage: A = 5+ signal types, B = 4, C = 3, D = 1–2. Adoption alone cannot buy a top score. <a href="/methodology">Full methodology →</a>
+    </p>
+
+    
+    <div class="freshness-banner">
+      <span class="dot"></span>
+      <strong>Signals refreshed</strong>
+      <span class="meta">2026-05-30 07:41 UTC</span>
+      <span class="meta">·</span>
+      <span class="meta">Repo last pushed yesterday</span>
+    </div>
+
     
     <section class="trend">
       <h2 class="section-title">Rank Trend</h2>
@@ -574,6 +662,53 @@
       
     </section>
 
+    
+    <section class="safety-qa">
+      <h2 class="section-title">Is Google Genkit safe?</h2>
+      <div class="qa-summary">Public trust evidence for Google Genkit is thin: several supply-chain signals are missing or weak. This does not mean the project is unsafe — it means an outside observer cannot easily verify the usual integrity checks. Treat with extra scrutiny.</div>
+
+      <details>
+        <summary>Does Google Genkit publish package provenance?</summary>
+        <div class="qa-answer">No published build provenance is currently detected for Google Genkit. This is common for open-source projects but means consumers cannot independently verify that the package on the registry matches the GitHub source.</div>
+      </details>
+      <details>
+        <summary>Does Google Genkit have an OpenSSF Scorecard?</summary>
+        <div class="qa-answer">No OpenSSF Scorecard data is currently published for Google Genkit. Maintainers can enable the Scorecard GitHub Action to get a public score; without it, automated supply-chain hygiene is harder for outsiders to verify.</div>
+      </details>
+      <details>
+        <summary>Is Google Genkit actively maintained?</summary>
+        <div class="qa-answer">Actively maintained. The repository was pushed to within the last 1 day(s).</div>
+      </details>
+      <details>
+        <summary>What license does Google Genkit use?</summary>
+        <div class="qa-answer">Google Genkit ships under Apache-2.0. A declared, OSI-approved license is one of the transparency signals HVTrust scores.</div>
+      </details>
+      
+      <details>
+        <summary>Are Google Genkit's commits signed?</summary>
+        <div class="qa-answer">92% of the last 100 commits to Google Genkit are verified-signed (GPG, SSH, S/MIME, or GitHub's signing flow). Signed commits help confirm that code was authored by who the commit claims.</div>
+      </details>
+      
+
+      <p class="qa-disclaimer"><strong>Not a safety endorsement.</strong> HVTracker describes what public signals show, not whether a project is safe for your use case. Run your own security review before adopting in production.</p>
+    </section>
+    
+
+    
+
+    <section class="runtime-soon">
+      <h2 class="section-title">Runtime trust — coming soon</h2>
+      <div class="rt-card">
+        <p>HVTrust currently scores supply-chain signals. We're adding <strong>runtime trust</strong> next: what an agent actually does when it runs — what it can reach, which tools it carries, what external services it depends on. Track progress on the <a href="/roadmap/" style="color:var(--accent);">roadmap →</a></p>
+        <ul class="rt-fields">
+          <li>MCP support</li>
+          <li>Tool / plugin surface</li>
+          <li>External service deps</li>
+          <li>Package provenance drift</li>
+        </ul>
+      </div>
+    </section>
+
     <section class="maintainer-cta">
       <h2 class="section-title">Maintain Google Genkit?</h2>
       <p>HVTrust scores Google Genkit from <strong>public signals only</strong> — we never contact maintainers first. If a signal is wrong, stale, or missing (provenance you publish, a Scorecard you run, signed releases), tell us and we'll review it. Corrections are public and tracked on GitHub.</p>
@@ -699,7 +834,7 @@
     </section>
 
     <footer>
-      <span>Updated 2026-05-30 06:43 UTC</span>
+      <span>Updated 2026-05-30 07:41 UTC</span>
       <span class="footer-sep">·</span>
       <a href="/methodology">methodology</a>
       <span class="footer-sep">·</span>

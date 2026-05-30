@@ -538,6 +538,99 @@ def agent_review_insights(row: dict) -> dict:
     }
 
 
+def agent_safety_qa(row: dict) -> dict:
+    """Generate 'Is X safe?' SEO Q&A content from public signals only.
+
+    Carefully hedged — we describe what the *signals* show, never claim a
+    project is or isn't safe. The goal is SEO-friendly factual content
+    that matches what people actually search.
+    """
+    name = row.get("name", "this agent")
+    score = row.get("trust_score") or 0
+    grade = row.get("evidence_grade") or "D"
+    has_prov = row.get("has_provenance")
+    sc_score = row.get("scorecard_score")
+    signed = row.get("signed_commits_ratio")
+    days_ago = row.get("days_ago")
+    license_spdx = row.get("license_spdx")
+
+    # Safety summary — describes signals, doesn't make safety claims
+    if score >= 75 and grade in ("A", "B"):
+        safety_summary = (
+            f"Public supply-chain signals for {name} are strong: it has "
+            f"multiple independent trust indicators in place. This does not "
+            f"replace your own security review, but {name} carries less "
+            f"obvious unverified-evidence risk than projects with thin signals."
+        )
+    elif score >= 55:
+        safety_summary = (
+            f"{name} has a mixed signal profile. Some trust indicators are "
+            f"present, others are missing. Whether it is safe for your use "
+            f"case depends on which gaps matter to you — review the breakdown "
+            f"below before adopting in production."
+        )
+    else:
+        safety_summary = (
+            f"Public trust evidence for {name} is thin: several supply-chain "
+            f"signals are missing or weak. This does not mean the project is "
+            f"unsafe — it means an outside observer cannot easily verify the "
+            f"usual integrity checks. Treat with extra scrutiny."
+        )
+
+    # Provenance Q
+    if has_prov:
+        prov_a = (
+            f"Yes. {name}'s package releases carry build provenance attestations, "
+            f"which cryptographically link the published package back to its "
+            f"source repository and CI workflow."
+        )
+    else:
+        prov_a = (
+            f"No published build provenance is currently detected for {name}. "
+            f"This is common for open-source projects but means consumers cannot "
+            f"independently verify that the package on the registry matches the "
+            f"GitHub source."
+        )
+
+    # OSSF Scorecard Q
+    if sc_score is not None:
+        sc_a = (
+            f"{name} has an OpenSSF Scorecard score of {sc_score}/10. The "
+            f"Scorecard checks for branch protection, signed releases, dependency "
+            f"updates, fuzzing, code review, and other supply-chain hygiene items. "
+            f"See the full check breakdown on this page."
+        )
+    else:
+        sc_a = (
+            f"No OpenSSF Scorecard data is currently published for {name}. "
+            f"Maintainers can enable the Scorecard GitHub Action to get a public "
+            f"score; without it, automated supply-chain hygiene is harder for "
+            f"outsiders to verify."
+        )
+
+    # Maintenance Q
+    if days_ago is not None:
+        if days_ago <= 7:
+            maint_a = f"Actively maintained. The repository was pushed to within the last {max(days_ago,1)} day(s)."
+        elif days_ago <= 30:
+            maint_a = f"Maintained. Last push was {days_ago} days ago."
+        elif days_ago <= 180:
+            maint_a = f"Slowing down. Last push was {days_ago} days ago — keep an eye on whether activity resumes."
+        else:
+            maint_a = f"Stale. The repository has not been pushed to in {days_ago} days. Consider whether the project is still being maintained."
+    else:
+        maint_a = "Recent activity could not be determined."
+
+    return {
+        "safety_summary": safety_summary,
+        "provenance_answer": prov_a,
+        "scorecard_answer": sc_a,
+        "maintenance_answer": maint_a,
+        "license": license_spdx or "no SPDX license detected",
+        "signed_pct": int((signed or 0) * 100) if signed is not None else None,
+    }
+
+
 def agent_correction_url(row: dict) -> str:
     correction_body = (
         f"Profile: https://hvtracker.net/agents/{row['slug']}/\n"
@@ -1869,6 +1962,7 @@ def main() -> None:
     for row in rows + legacy_rows:
         row["category_slug"] = slugify(row.get("category", "")) if row.get("category") else ""
         row["review_insights"] = agent_review_insights(row)
+        row["safety_qa"] = agent_safety_qa(row)
         row["correction_url"] = agent_correction_url(row)
     for row in rows:
         repo_key = row["repo"].lower()
@@ -2101,6 +2195,7 @@ def main() -> None:
         ("https://hvtracker.net/", "1.0", "daily"),
         ("https://hvtracker.net/methodology", "0.5", "monthly"),
         ("https://hvtracker.net/badges/", "0.6", "weekly"),
+        ("https://hvtracker.net/roadmap/", "0.5", "weekly"),
         ("https://hvtracker.net/spec/", "0.4", "monthly"),
     ]
     for spec in _ALL_SPECS:
@@ -2292,6 +2387,14 @@ HVTrust = gate( confidence x [ Safety(30) + Identity(20) + Transparency(20) + Ma
     with open(os.path.join(badges_dir, "index.html"), "w", encoding="utf-8") as f:
         f.write(badges_html)
     print("Built badges/index.html (Badge for Maintainers).")
+
+    # Build /roadmap/ — public roadmap (P2 Runtime Trust direction)
+    roadmap_html = env.get_template("roadmap.html.j2").render()
+    roadmap_dir = os.path.join(script_dir, "roadmap")
+    os.makedirs(roadmap_dir, exist_ok=True)
+    with open(os.path.join(roadmap_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(roadmap_html)
+    print("Built roadmap/index.html (public roadmap).")
 
     # Build /spec/ pages
     from specs import ALL_SPECS

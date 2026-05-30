@@ -29,6 +29,10 @@
       link_text: link.textContent.trim().slice(0, 80)
     };
     var isBadgesPath = url.pathname === "/badges/" || url.pathname === "/badges";
+    var isComparePath = url.pathname.startsWith("/compare/");
+    var isRoadmapPath = url.pathname === "/roadmap/" || url.pathname === "/roadmap";
+    // Correction URLs are GitHub issue templates with our [Correction] title prefix.
+    var isCorrectionLink = url.hostname === "github.com" && href.indexOf("%5BCorrection%5D") !== -1;
 
     // Leaving the /badges/ page via an in-site, same-tab link (badge adoption funnel).
     // Fired alongside the destination event below so we capture both the exit and where it went.
@@ -39,6 +43,22 @@
 
     if (link.closest(".pr-offer")) {
       window.hvtTrack("badge_pr_click", params);
+    } else if (isCorrectionLink) {
+      // Distinct from generic github_issue_click — correction is a conversion event.
+      window.hvtTrack("correction_click", Object.assign({}, params, {
+        from_area: link.closest(".maintainer-cta") ? "maintainer_cta" :
+                   link.closest(".review-actions") ? "review_card" :
+                   link.closest(".hero-actions") ? "hero" : "other"
+      }));
+    } else if (isComparePath) {
+      window.hvtTrack("compare_click", Object.assign({}, params, {
+        from_area: link.closest(".compare-strip") ? "compare_strip" :
+                   link.closest(".review-actions") ? "review_card" :
+                   link.closest(".hero-actions") ? "hero" :
+                   link.closest(".siblings") ? "head_to_head" : "other"
+      }));
+    } else if (isRoadmapPath) {
+      window.hvtTrack("roadmap_click", params);
     } else if (isBadgesPath) {
       // Landing on /badges/: distinguish the per-agent "Badge guide for maintainers" link.
       window.hvtTrack(link.closest("#embed-badge") ? "badge_guide_click" : "badges_click", params);
