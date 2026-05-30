@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-30T08:12:12Z",
-  "data_timestamp": "2026-05-30 08:12 UTC",
+  "generated_at": "2026-05-30T09:30:18Z",
+  "data_timestamp": "2026-05-30 09:30 UTC",
   "schema_version": "v0.1",
   "methodology_version": "v3.0",
-  "configured_agents": 0,
+  "configured_agents": 179,
   "active_agents": 172,
-  "legacy_agents": 0,
-  "total_generated": 172,
+  "legacy_agents": 7,
+  "total_generated": 179,
   "categories": {
     "Coding Agents": 26,
     "Agent Frameworks": 58,
@@ -30,9 +30,24 @@
       "detail": "no declared license (GitHub license field is null)"
     },
     {
+      "repo": "RooVetGit/Roo-Code",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
+      "repo": "browserbase/open-operator",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
       "repo": "browserbase/open-operator",
       "criterion": "4.1.1",
       "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "microsoft/TaskWeaver",
+      "criterion": "5.1",
+      "detail": "repository is archived"
     },
     {
       "repo": "yoheinakajima/babyagi",
@@ -70,6 +85,16 @@
       "detail": "no meaningful activity in 12 months (last push 2025-05-26)"
     },
     {
+      "repo": "crewAIInc/crewAI-tools",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
+      "repo": "AbanteAI/archive-old-cli-mentat",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
       "repo": "AbanteAI/archive-old-cli-mentat",
       "criterion": "4.2.1",
       "detail": "no meaningful activity in 12 months (last push 2025-01-07)"
@@ -86,13 +111,28 @@
     },
     {
       "repo": "protectai/rebuff",
+      "criterion": "5.1",
+      "detail": "repository is archived"
+    },
+    {
+      "repo": "protectai/rebuff",
       "criterion": "4.2.1",
       "detail": "no meaningful activity in 12 months (last push 2024-08-07)"
+    },
+    {
+      "repo": "PrefectHQ/ControlFlow",
+      "criterion": "5.1",
+      "detail": "repository is archived"
     },
     {
       "repo": "MinorJerry/WebVoyager",
       "criterion": "4.2.1",
       "detail": "no meaningful activity in 12 months (last push 2024-03-04)"
+    },
+    {
+      "repo": "langchain-ai/langgraph-codeact",
+      "criterion": "5.1",
+      "detail": "repository is archived"
     },
     {
       "repo": "langchain-ai/langgraph-codeact",
@@ -115,7 +155,7 @@
       "detail": "no meaningful activity in 12 months (last push 2024-09-26)"
     }
   ],
-  "warning_count": 18,
+  "warning_count": 26,
   "failed_fetches": [],
   "missing_repos_count": 0,
   "package_failures": [
@@ -127,7 +167,13 @@
     "microsoft/TaskWeaver"
   ],
   "package_failure_count": 6,
-  "scorecard_unavailable_count": 24,
-  "fingerprint_agents": [],
-  "fingerprint_agent_count": 0
+  "scorecard_unavailable_count": 23,
+  "fingerprint_agents": [
+    "anthropics/claude-code",
+    "All-Hands-AI/OpenHands",
+    "paul-gauthier/aider",
+    "google-gemini/gemini-cli",
+    "QwenLM/qwen-code"
+  ],
+  "fingerprint_agent_count": 5
 }
