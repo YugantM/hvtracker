@@ -185,8 +185,34 @@ def _refresh(mode: str) -> None:
         print(f"[scheduler] refresh ({mode}) failed: {e}")
 
 
+def _seed_history_into_volume() -> int:
+    """Copy daily history snapshots baked into the image into the volume if
+    they're missing. Without prior days the leaderboard has no rank deltas,
+    sparklines, or movers. Existing files on the volume are never overwritten,
+    so today's freshly-written snapshot is preserved. Returns the number of
+    files copied."""
+    import shutil
+    seed = os.path.join(BASE_DIR, "seed", "history")
+    if not os.path.isdir(seed):
+        return 0
+    dest = os.path.join(OUTPUT_DIR, "output", "history")
+    os.makedirs(dest, exist_ok=True)
+    copied = 0
+    for fn in sorted(os.listdir(seed)):
+        if not fn.endswith(".json"):
+            continue
+        dst = os.path.join(dest, fn)
+        if not os.path.exists(dst):
+            shutil.copy2(os.path.join(seed, fn), dst)
+            copied += 1
+    if copied:
+        print(f"[startup] seeded {copied} history snapshot(s) into volume")
+    return copied
+
+
 @app.on_event("startup")
 def startup():
+    seeded = _seed_history_into_volume()
     db.init_schema()
     # Seed the agents table from agents.json the first time the DB is empty.
     if db.enabled() and db.count_agents() == 0:
@@ -199,6 +225,12 @@ def startup():
     if not os.path.isfile(DATA_PATH):
         threading.Thread(target=_refresh, args=("full",), daemon=True).start()
         print("[startup] no data.json on volume — kicked off initial full build")
+    elif seeded > 0:
+        # We just dropped prior-day snapshots into a volume that already had a
+        # site rendered without them — re-render so rank deltas, sparklines,
+        # and movers reflect the now-present history.
+        threading.Thread(target=_refresh, args=("render",), daemon=True).start()
+        print("[startup] history seeded into existing volume — kicked off render-only rebuild")
 
     if os.environ.get("DISABLE_SCHEDULER") != "1":
         from apscheduler.schedulers.background import BackgroundScheduler

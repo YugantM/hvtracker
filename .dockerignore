@@ -20,7 +20,8 @@ feed.json
 llms.txt
 data.json
 data/
-output/
+output/*
+!output/history/
 agents/
 badge/
 badges/
