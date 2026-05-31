@@ -300,15 +300,17 @@ _SOURCE_AVAILABLE_MARKERS = (
     "functional source license", "fsl-",
     "commons clause",
     "commercial license must be obtained",
-    "additional conditions",
+    "sustainable use license", "fair-code", "fair source",
 )
 _PROPRIETARY_MARKERS = (
-    "all rights reserved", "commercial terms of service", "proprietary license",
+    "commercial terms of service", "proprietary license",
     "not open source", "no license is granted",
 )
+# "all rights reserved" removed — too many false positives (BSD-3 variants use it
+# then grant permissive rights).  Genuine proprietary tools use overrides instead.
 
 
-@cache.cached("license_type", ttl=604800)
+@cache.cached("license_type_v2", ttl=604800)
 def classify_license(repo_id: str, spdx_id: str | None) -> str:
     """Classify a repo's license as open/source-available/proprietary/unlicensed.
 
@@ -318,12 +320,14 @@ def classify_license(repo_id: str, spdx_id: str | None) -> str:
     if spdx_id and spdx_id != "NOASSERTION":
         return "open"
     # GitHub couldn't detect — fetch the actual license file
+    found_file = False
     for filename in ("LICENSE", "LICENSE.md", "LICENSE.txt", "LICENCE", "COPYING"):
         url = f"https://raw.githubusercontent.com/{repo_id}/HEAD/{filename}"
         try:
             r = requests.get(url, timeout=8)
             if r.status_code != 200:
                 continue
+            found_file = True
             text = r.text[:4000].lower()
             if any(m in text for m in _SOURCE_AVAILABLE_MARKERS):
                 return "source-available"
@@ -333,15 +337,26 @@ def classify_license(repo_id: str, spdx_id: str | None) -> str:
             return "open"
         except Exception:
             continue
-    return "unlicensed"
+    # Only label "unlicensed" if no LICENSE file was found at all
+    return "unlicensed" if not found_file else "open"
 
 
 def normalize_license_type(row: dict) -> str:
-    """Keep cached rows consistent with the detected GitHub SPDX license."""
+    """Keep cached rows consistent with the detected GitHub SPDX license.
+
+    Respects license_override (from agents.json) as authoritative.
+    Always reclassifies non-overridden agents to pick up marker improvements.
+    """
+    if row.get("license_override"):
+        return row["license_override"]
     spdx_id = row.get("license_spdx")
     if spdx_id and spdx_id != "NOASSERTION":
         return "open"
-    return row.get("license_type") or classify_license(row.get("repo", ""), spdx_id)
+    # Always reclassify — the cache key bump (license_type_v2) ensures fresh
+    # results on full runs.  On render-only runs classify_license will use
+    # the Redis cache (which may be empty → returns unlicensed), but that's
+    # acceptable since overrides cover the known-wrong cases.
+    return classify_license(row.get("repo", ""), spdx_id)
 
 
 @cache.cached("npm_prov", ttl=86400, skip_none=True)
@@ -1376,7 +1391,8 @@ def provisional_agent_row(agent: dict) -> dict:
         "open_issues": 0,
         "archived": False,
         "license_spdx": None,
-        "license_type": "unlicensed",
+        "license_type": agent.get("license_override") or "unlicensed",
+        "license_override": agent.get("license_override") or "",
         "npm_package": agent.get("npm_package", ""),
         "pypi_package": agent.get("pypi_package", ""),
         "npm_dl": None,
@@ -1574,7 +1590,8 @@ def main() -> None:
             "open_issues": repo.get("open_issues_count", 0),
             "archived": repo.get("archived", False),
             "license_spdx": (repo.get("license") or {}).get("spdx_id") or None,
-            "license_type": classify_license(repo_id, (repo.get("license") or {}).get("spdx_id")),
+            "license_type": agent.get("license_override") or classify_license(repo_id, (repo.get("license") or {}).get("spdx_id")),
+            "license_override": agent.get("license_override") or "",
             "npm_package": npm_pkg if npm_pkg else "",
             "pypi_package": pypi_pkg if pypi_pkg else "",
             "crate_package": crate_pkg if crate_pkg else "",
@@ -1758,11 +1775,17 @@ def main() -> None:
 
     eligibility_violations = run_eligibility_checks(rows)
 
+    # Build a lookup for license_override from agents.json config
+    _override_map = {a["repo"].lower(): a.get("license_override", "") for a in all_agents if a.get("license_override")}
+
     # Add formatted download counts and slug/breakdown for template rendering
     for row in rows:
         dl = row.get("weekly_downloads")
         row["downloads_fmt"] = f"{dl:,}" if dl is not None else "—"
         row["slug"] = slugify(row["name"])
+        # Inject override from agents.json if not already on the row (render_state cache)
+        if not row.get("license_override"):
+            row["license_override"] = _override_map.get(row.get("repo", "").lower(), "")
         row["license_type"] = normalize_license_type(row)
         # Always recompute freshness from the absolute last_push date so the
         # color coding (and the maintenance dimension) stay correct even when
@@ -1955,6 +1978,7 @@ def main() -> None:
                 "listing_status": r.get("listing_status", "listed"),
                 "license_spdx": r.get("license_spdx"),
                 "license_type": r.get("license_type", "unlicensed"),
+                "license_override": r.get("license_override", ""),
                 "trust_score": r.get("trust_score"),
                 "trust_confidence": r.get("trust_confidence"),
                 "trust_breakdown": r.get("trust_breakdown", {}),
@@ -2053,6 +2077,8 @@ def main() -> None:
     # Sort legacy rows by stars descending for display; populate fields needed by templates
     for lr in legacy_rows:
         lr["slug"] = slugify(lr["name"])
+        if not lr.get("license_override"):
+            lr["license_override"] = _override_map.get(lr.get("repo", "").lower(), "")
         lr["license_type"] = normalize_license_type(lr)
         dl = lr.get("weekly_downloads")
         lr["downloads_fmt"] = f"{dl:,}" if dl is not None else "—"

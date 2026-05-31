@@ -11,7 +11,8 @@
       "search_endpoint": "pulls"
     },
     "listing_status": "listed",
-    "tracking_mode": "direct"
+    "tracking_mode": "direct",
+    "license_override": "proprietary"
   },
   {
     "repo": "All-Hands-AI/OpenHands",
@@ -436,7 +437,8 @@
     "hn_search_term": "dify",
     "listing_status": "listed",
     "tracking_mode": "direct",
-    "docker_image": "langgenius/dify-api"
+    "docker_image": "langgenius/dify-api",
+    "license_override": "source-available"
   },
   {
     "repo": "Pythagora-io/gpt-pilot",
@@ -480,7 +482,8 @@
     "category": "Coding Agents",
     "pypi_package": "sweepai",
     "listing_status": "listed",
-    "tracking_mode": "direct"
+    "tracking_mode": "direct",
+    "license_override": "source-available"
   },
   {
     "repo": "vercel/ai",
@@ -529,7 +532,8 @@
     "name": "GitHub Copilot CLI",
     "category": "Coding Agents",
     "listing_status": "listed",
-    "tracking_mode": "direct"
+    "tracking_mode": "direct",
+    "license_override": "proprietary"
   },
   {
     "repo": "plandex-ai/plandex",
@@ -1053,7 +1057,8 @@
     "npm_package": "n8n",
     "listing_status": "listed",
     "tracking_mode": "direct",
-    "docker_image": "n8nio/n8n"
+    "docker_image": "n8nio/n8n",
+    "license_override": "source-available"
   },
   {
     "repo": "botpress/botpress",
@@ -1124,7 +1129,8 @@
     "hn_search_term": "open-webui",
     "pypi_package": "open-webui",
     "listing_status": "listed",
-    "tracking_mode": "direct"
+    "tracking_mode": "direct",
+    "license_override": "open"
   },
   {
     "repo": "danny-avila/LibreChat",
