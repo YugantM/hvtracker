@@ -1337,6 +1337,11 @@ def main() -> None:
             src = os.path.join(base_dir, asset)
             if os.path.isfile(src):
                 shutil.copy2(src, os.path.join(script_dir, asset))
+        # Copy tracked static directories that the volume needs to serve
+        for static_dir in ("changelog", ".well-known"):
+            src = os.path.join(base_dir, static_dir)
+            if os.path.isdir(src):
+                shutil.copytree(src, os.path.join(script_dir, static_dir), dirs_exist_ok=True)
     data_path = os.path.join(script_dir, "data.json")
 
     batch = parse_batch_arg()
@@ -2460,14 +2465,12 @@ HVTrust = gate( confidence x [ Safety(30) + Identity(20) + Transparency(20) + Ma
     )
     output_dir = os.path.join(script_dir, "output")
     os.makedirs(output_dir, exist_ok=True)
-    methodology_paths = [
-        os.path.join(output_dir, "methodology.html"),
-        os.path.join(script_dir, "methodology.html"),
-    ]
-    for path in methodology_paths:
-        with open(path, "w", encoding="utf-8") as f:
+    for parent in (output_dir, script_dir):
+        meth_dir = os.path.join(parent, "methodology")
+        os.makedirs(meth_dir, exist_ok=True)
+        with open(os.path.join(meth_dir, "index.html"), "w", encoding="utf-8") as f:
             f.write(methodology_html)
-    print(f"Built methodology.html ({METHODOLOGY_VERSION}, updated {methodology_date}).")
+    print(f"Built methodology/index.html ({METHODOLOGY_VERSION}, updated {methodology_date}).")
 
     # Build /badges/ — Badge for Maintainers page
     badges_html = env.get_template("badges.html.j2").render(
