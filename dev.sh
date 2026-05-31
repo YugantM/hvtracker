@@ -49,7 +49,7 @@ export OUTPUT_DIR="$PWD"
 # ── Optional template rebuild ────────────────────────────────────────────────
 if [[ "${1:-}" == "--rebuild" ]]; then
   echo "→ Rebuilding templates from cached render_state (no API calls)…"
-  python fetch_and_build.py --render-only
+  python3 fetch_and_build.py --render-only
   echo ""
 fi
 

@@ -162,19 +162,76 @@
     .aging  .fresh-dot { background:var(--aging); }  .aging  .stat-value { color:var(--aging); }
     .stale  .fresh-dot { background:var(--stale); }  .stale  .stat-value { color:var(--stale); }
 
-    .breakdown { padding:22px 0; margin:0; border-top:1px solid var(--hairline); }
+    .analysis { padding:24px 0; margin:0; border-top:1px solid var(--hairline); }
     .section-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:14px; }
-    .breakdown-row {
-      display:grid; grid-template-columns:140px 1fr 60px;
-      gap:14px; align-items:center; padding:8px 0;
-      font-family:var(--font-mono); font-size:12px;
+    .analysis-panel { display:grid; gap:14px; }
+    .analysis-card {
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(143,179,255,0.10), transparent 30%),
+        linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.014)),
+        rgba(255,255,255,0.028);
+      box-shadow:inset 0 1px 0 var(--glass-hi);
+      padding:16px;
     }
-    .breakdown-label { color:var(--muted); }
-    .breakdown-bar {
-      height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden;
+    .analysis-card-head {
+      display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+      margin-bottom:12px;
     }
-    .breakdown-fill { height:100%; background:var(--accent); border-radius:3px; }
-    .breakdown-value { text-align:right; color:var(--text); }
+    .analysis-card-title {
+      font-size:13px; font-weight:700; color:var(--text);
+    }
+    .analysis-score {
+      font-family:var(--font-mono); font-size:11px; color:var(--muted);
+      padding:4px 8px; border:1px solid var(--hairline); border-radius:999px;
+      background:rgba(255,255,255,0.035); white-space:nowrap;
+    }
+    .metric-section + .metric-section {
+      margin-top:18px;
+      padding-top:16px;
+      border-top:1px solid var(--hairline);
+    }
+    .metric-section-title {
+      display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+      margin-bottom:10px;
+    }
+    .metric-section-title h3 { font-size:13px; color:var(--text); }
+    .metric-section-title span {
+      font-family:var(--font-mono); font-size:11px; color:var(--muted);
+      white-space:nowrap;
+    }
+    .metric-list { display:grid; gap:9px; }
+    .metric-row {
+      display:grid; grid-template-columns:168px minmax(180px, 1fr) 92px;
+      gap:14px; align-items:center;
+      min-height:34px;
+      font-family:var(--font-mono);
+    }
+    .metric-name {
+      color:var(--muted); font-size:11px; line-height:1.35;
+      min-width:0;
+    }
+    .metric-name strong {
+      display:block; color:var(--text); font-size:12px;
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .metric-sub { color:var(--stale); font-size:10px; }
+    .metric-track {
+      position:relative; height:8px; border-radius:999px; overflow:hidden;
+      background:rgba(255,255,255,0.075);
+      box-shadow:inset 0 1px 2px rgba(0,0,0,0.30);
+    }
+    .metric-fill {
+      height:100%; width:var(--fill);
+      border-radius:999px;
+      background:var(--bar, var(--accent));
+    }
+    .metric-value {
+      color:var(--text); text-align:right; font-size:12px; font-weight:700;
+      white-space:nowrap;
+    }
+    .metric-value span { color:var(--muted); font-weight:500; }
 
     .trend { padding:18px 0; margin:0; border-top:1px solid var(--hairline); }
     .sparkline-wrap { margin-top:10px; }
@@ -397,6 +454,10 @@
       .review-grid { grid-template-columns:1fr; }
       .review-item.primary { grid-row:auto; }
       .review-item.wide { grid-column:auto; }
+      .analysis-card-head { align-items:flex-start; flex-direction:column; gap:8px; }
+      .metric-section-title { align-items:flex-start; flex-direction:column; gap:4px; }
+      .metric-row { grid-template-columns:1fr; gap:6px; padding:8px 0; }
+      .metric-value { text-align:left; }
     }
   </style>
 
@@ -587,57 +648,73 @@
       </div>
     </section>
 
-    <section class="breakdown">
-      <h2 class="section-title">Score Breakdown</h2>
-      <div class="breakdown-row">
-        <span class="breakdown-label">Stars (max 30)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ row.score_breakdown.stars_pct }}%"></div></div>
-        <span class="breakdown-value">{{ row.score_breakdown.stars }}</span>
-      </div>
-      <div class="breakdown-row">
-        <span class="breakdown-label">Freshness (max 25)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ row.score_breakdown.freshness_pct }}%"></div></div>
-        <span class="breakdown-value">{{ row.score_breakdown.freshness }}</span>
-      </div>
-      <div class="breakdown-row">
-        <span class="breakdown-label">Activity (max 25)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ row.score_breakdown.activity_pct }}%"></div></div>
-        <span class="breakdown-value">{{ row.score_breakdown.activity }}</span>
-      </div>
-      <div class="breakdown-row">
-        <span class="breakdown-label">Community (max 20)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ row.score_breakdown.community_pct }}%"></div></div>
-        <span class="breakdown-value">{{ row.score_breakdown.community }}</span>
-      </div>
-    </section>
-
     {% if row.trust_breakdown is defined %}
-    <section class="breakdown">
-      <h2 class="section-title">HVTrust Breakdown <span style="font-weight:400;color:var(--muted);font-size:11px;margin-left:6px">{{ row.trust_score }} / 100{% if row.trust_confidence is defined and row.trust_confidence %} · {{ (row.trust_confidence * 100) | round }}% confidence{% endif %}</span></h2>
-      <div class="breakdown-row">
-        <span class="breakdown-label">Safety / Integrity (max 30)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.safety / 30 * 100) | round(1) }}%;background:#ef4444"></div></div>
-        <span class="breakdown-value">{{ row.trust_breakdown.safety }}</span>
-      </div>
-      <div class="breakdown-row">
-        <span class="breakdown-label">Identity / Provenance (max 20)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.identity / 20 * 100) | round(1) }}%;background:var(--accent)"></div></div>
-        <span class="breakdown-value">{{ row.trust_breakdown.identity }}</span>
-      </div>
-      <div class="breakdown-row">
-        <span class="breakdown-label">Transparency (max 20)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.transparency / 20 * 100) | round(1) }}%;background:#d8a657"></div></div>
-        <span class="breakdown-value">{{ row.trust_breakdown.transparency }}</span>
-      </div>
-      <div class="breakdown-row">
-        <span class="breakdown-label">Maintenance (max 20)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.maintenance / 20 * 100) | round(1) }}%;background:#2dd4bf"></div></div>
-        <span class="breakdown-value">{{ row.trust_breakdown.maintenance }}</span>
-      </div>
-      <div class="breakdown-row">
-        <span class="breakdown-label">Adoption (max 10)</span>
-        <div class="breakdown-bar"><div class="breakdown-fill" style="width:{{ (row.trust_breakdown.adoption / 10 * 100) | round(1) }}%;background:#3b82f6"></div></div>
-        <span class="breakdown-value">{{ row.trust_breakdown.adoption }}</span>
+    <section class="analysis">
+      <h2 class="section-title">Analysis</h2>
+      <div class="analysis-panel">
+        <div class="analysis-card">
+          <div class="metric-section">
+            <div class="metric-section-title">
+              <h3>HVTrust Dimensions</h3>
+              <span>{{ row.trust_score }} / 100{% if row.trust_confidence is defined and row.trust_confidence %} · {{ (row.trust_confidence * 100) | round }}% confidence{% endif %}</span>
+            </div>
+            <div class="metric-list" aria-label="HVTrust dimensions for {{ row.name }}">
+              <div class="metric-row">
+                <div class="metric-name"><strong>Safety / Integrity</strong><span class="metric-sub">OSSF, provenance, signatures</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.safety / 25 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">{{ row.trust_breakdown.safety }} <span>/ 25</span></div>
+              </div>
+              <div class="metric-row">
+                <div class="metric-name"><strong>Identity / Provenance</strong><span class="metric-sub">Listing and build link</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.identity / 18 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">{{ row.trust_breakdown.identity }} <span>/ 18</span></div>
+              </div>
+              <div class="metric-row">
+                <div class="metric-name"><strong>Transparency</strong><span class="metric-sub">License and public checks</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.transparency / 17 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">{{ row.trust_breakdown.transparency }} <span>/ 17</span></div>
+              </div>
+              <div class="metric-row">
+                <div class="metric-name"><strong>Maintenance</strong><span class="metric-sub">Freshness and commits</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.maintenance / 20 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">{{ row.trust_breakdown.maintenance }} <span>/ 20</span></div>
+              </div>
+              <div class="metric-row">
+                <div class="metric-name"><strong>Adoption</strong><span class="metric-sub">Stars and downloads</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.adoption / 20 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">{{ row.trust_breakdown.adoption }} <span>/ 20</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="metric-section">
+            <div class="metric-section-title">
+              <h3>Activity Inputs</h3>
+              <span>{{ row.score }} / 100</span>
+            </div>
+            <div class="metric-list" aria-label="Activity inputs for {{ row.name }}">
+              <div class="metric-row">
+                <div class="metric-name"><strong>Stars</strong><span class="metric-sub">Repository reach</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:{{ row.score_breakdown.stars_pct }}%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">{{ row.score_breakdown.stars }} <span>/ 30</span></div>
+              </div>
+              <div class="metric-row">
+                <div class="metric-name"><strong>Freshness</strong><span class="metric-sub">Last push recency</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:{{ row.score_breakdown.freshness_pct }}%;--bar:var(--fresh);"></div></div>
+                <div class="metric-value">{{ row.score_breakdown.freshness }} <span>/ 25</span></div>
+              </div>
+              <div class="metric-row">
+                <div class="metric-name"><strong>Activity</strong><span class="metric-sub">Recent commits</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:{{ row.score_breakdown.activity_pct }}%;--bar:#9ae6b4;"></div></div>
+                <div class="metric-value">{{ row.score_breakdown.activity }} <span>/ 25</span></div>
+              </div>
+              <div class="metric-row">
+                <div class="metric-name"><strong>Community</strong><span class="metric-sub">Fork signal</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:{{ row.score_breakdown.community_pct }}%;--bar:var(--mocha);"></div></div>
+                <div class="metric-value">{{ row.score_breakdown.community }} <span>/ 20</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
     {% endif %}

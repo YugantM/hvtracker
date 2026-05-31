@@ -336,6 +336,14 @@ def classify_license(repo_id: str, spdx_id: str | None) -> str:
     return "unlicensed"
 
 
+def normalize_license_type(row: dict) -> str:
+    """Keep cached rows consistent with the detected GitHub SPDX license."""
+    spdx_id = row.get("license_spdx")
+    if spdx_id and spdx_id != "NOASSERTION":
+        return "open"
+    return row.get("license_type") or classify_license(row.get("repo", ""), spdx_id)
+
+
 @cache.cached("npm_prov", ttl=86400, skip_none=True)
 def fetch_npm_provenance(package_name: str) -> bool | None:
     """Check if the latest version of an npm package has provenance attestations."""
@@ -592,11 +600,11 @@ def score_class(s: float) -> str:
 
 
 TRUST_DIMENSIONS = {
-    "safety": ("Safety / Integrity", 30),
-    "identity": ("Identity / Provenance", 20),
-    "transparency": ("Transparency", 20),
+    "safety": ("Safety / Integrity", 25),
+    "identity": ("Identity / Provenance", 18),
+    "transparency": ("Transparency", 17),
     "maintenance": ("Maintenance", 20),
-    "adoption": ("Adoption", 10),
+    "adoption": ("Adoption", 20),
 }
 
 
@@ -1755,6 +1763,7 @@ def main() -> None:
         dl = row.get("weekly_downloads")
         row["downloads_fmt"] = f"{dl:,}" if dl is not None else "—"
         row["slug"] = slugify(row["name"])
+        row["license_type"] = normalize_license_type(row)
         # Always recompute freshness from the absolute last_push date so the
         # color coding (and the maintenance dimension) stay correct even when
         # rendering from a cached snapshot — cached days_ago would drift stale.
@@ -2044,6 +2053,7 @@ def main() -> None:
     # Sort legacy rows by stars descending for display; populate fields needed by templates
     for lr in legacy_rows:
         lr["slug"] = slugify(lr["name"])
+        lr["license_type"] = normalize_license_type(lr)
         dl = lr.get("weekly_downloads")
         lr["downloads_fmt"] = f"{dl:,}" if dl is not None else "—"
         lr["score_breakdown"] = score_components(
@@ -2451,7 +2461,7 @@ def main() -> None:
 > HVTracker is an independent trust registry that ranks {len(rows)} open-source AI agents by evidence-weighted trust (the HVTrust score), not popularity. Trust is computed from public, checkable signals: supply-chain integrity (OSSF Scorecard, build provenance, signed commits), identity/provenance, transparency (license, docs), maintenance, and adoption — scaled by an evidence-confidence factor. All data is open and machine-readable.
 
 ## How HVTrust works
-HVTrust = gate( confidence x [ Safety(30) + Identity(20) + Transparency(20) + Maintenance(20) + Adoption(10) ] - penalties ). Confidence = present/applicable signal types. Higher trust means more verifiable, not more popular. Methodology: https://hvtracker.net/methodology
+HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Maintenance(20) + Adoption(20) ] - penalties ). Confidence = present/applicable signal types. Higher trust means more verifiable, not more popular. Methodology: https://hvtracker.net/methodology
 
 ## Top {len(top10)} agents by HVTrust
 {top_lines}

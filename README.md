@@ -12,6 +12,12 @@ The core question is simple:
 
 ---
 
+## Version 2
+
+HVTracker v2 ships the refreshed public site, premium agent profile analysis UI, corrected HVTrust v3.1 weighting, normalized license detection for cached repositories, and updated social link preview card.
+
+---
+
 ## What You Can Do
 
 - Browse the live trust registry: [hvtracker.net](https://hvtracker.net)
@@ -51,19 +57,19 @@ HVTracker combines curation with independently checkable public evidence. The de
 
 ```text
 HVTrust = gate(
-  confidence x [ Safety(30) + Identity(20) + Transparency(20)
-                 + Maintenance(20) + Adoption(10) ]
+  confidence x [ Safety(25) + Identity(18) + Transparency(17)
+                 + Maintenance(20) + Adoption(20) ]
   - penalties
 )
 ```
 
 | Dimension | Max | What it measures |
 |---|---:|---|
-| Safety / Integrity | 30 | OSSF Scorecard, package provenance, signed commits |
-| Identity / Provenance | 20 | Verified listing status and build provenance |
-| Transparency | 20 | License and OSSF transparency checks |
+| Safety / Integrity | 25 | OSSF Scorecard, package provenance, signed commits |
+| Identity / Provenance | 18 | Verified listing status and build provenance |
+| Transparency | 17 | License and OSSF transparency checks |
 | Maintenance | 20 | Freshness and recent commit activity |
-| Adoption | 10 | Log-scaled, capped stars and package downloads |
+| Adoption | 20 | Log-scaled, capped stars and package downloads |
 
 Confidence is based on present vs applicable signal types. Thin evidence limits how high an agent can rank, even if it is popular.
 
