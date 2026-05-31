@@ -1439,7 +1439,7 @@ def main() -> None:
     # assets the site references but that aren't generated (OG images, etc.).
     if script_dir != base_dir:
         for asset in (".nojekyll", "robots.txt", "_headers", "analytics.js",
-                      "og-v2.png", "linkedin_carousel.js"):
+                      "og-v2.png", "og-provenance.png", "linkedin_carousel.js"):
             src = os.path.join(base_dir, asset)
             if os.path.isfile(src):
                 shutil.copy2(src, os.path.join(script_dir, asset))
