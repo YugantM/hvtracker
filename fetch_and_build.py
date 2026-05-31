@@ -2107,11 +2107,17 @@ def main() -> None:
     # Copy hand-written blog articles from blog_static/ (tracked in git)
     blog_static_dir = os.path.join(base_dir, "blog_static")
     if os.path.isdir(blog_static_dir):
+        copied = 0
         for article_dir in os.listdir(blog_static_dir):
             src = os.path.join(blog_static_dir, article_dir)
             dst = os.path.join(blog_dir, article_dir)
             if os.path.isdir(src):
                 shutil.copytree(src, dst, dirs_exist_ok=True)
+                copied += 1
+        if copied:
+            print(f"Copied {copied} hand-written blog articles from blog_static/.")
+    else:
+        print(f"[warn] blog_static/ not found at {blog_static_dir}")
 
     article_tmpl = env.get_template("blog_category_comparison.html.j2")
     blog_articles = []
