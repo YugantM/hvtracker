@@ -2104,6 +2104,15 @@ def main() -> None:
         if _d.endswith("-top-agents") and os.path.isdir(os.path.join(blog_dir, _d)):
             shutil.rmtree(os.path.join(blog_dir, _d), ignore_errors=True)
 
+    # Copy hand-written blog articles from blog_static/ (tracked in git)
+    blog_static_dir = os.path.join(base_dir, "blog_static")
+    if os.path.isdir(blog_static_dir):
+        for article_dir in os.listdir(blog_static_dir):
+            src = os.path.join(blog_static_dir, article_dir)
+            dst = os.path.join(blog_dir, article_dir)
+            if os.path.isdir(src):
+                shutil.copytree(src, dst, dirs_exist_ok=True)
+
     article_tmpl = env.get_template("blog_category_comparison.html.j2")
     blog_articles = []
     article_date = datetime.now(timezone.utc).strftime("%B %-d, %Y")
