@@ -2416,6 +2416,7 @@ def main() -> None:
     sitemap_urls.append(("https://hvtracker.net/blog/most-starred-ai-agents-no-provenance", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/coding-agents-trust-rankings", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/ai-agent-frameworks-ranked-by-trust", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/github-stars-dont-predict-ai-agent-trust", "0.9", "weekly"))
     for article in blog_articles:
         sitemap_urls.append((f"https://hvtracker.net/blog/{article['slug']}", "0.8", "weekly"))
     for row in rows:
@@ -2547,6 +2548,14 @@ HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Ma
             "content_text": "LangGraph #1, AutoGPT #39, LlamaIndex #126. We ranked the top AI frameworks by supply-chain trust instead of stars.",
             "date_modified": now_iso,
             "tags": ["Agent frameworks", "Trust rankings"],
+        },
+        {
+            "id": "https://hvtracker.net/blog/github-stars-dont-predict-ai-agent-trust",
+            "url": "https://hvtracker.net/blog/github-stars-dont-predict-ai-agent-trust",
+            "title": "GitHub Stars Don't Predict AI Agent Trust — I Scored 192 to Prove It",
+            "content_text": "24 of the 30 most-starred AI agents ship with no build provenance. The full list, the six exceptions, and why stars are the wrong metric.",
+            "date_modified": now_iso,
+            "tags": ["Provenance", "Trust rankings"],
         },
     ] + [
         {
