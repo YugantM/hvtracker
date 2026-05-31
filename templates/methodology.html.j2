@@ -276,22 +276,25 @@
         <h2>Health Score And Trust Score</h2>
         <p><strong>The leaderboard ranks by the HVTrust score, not by popularity.</strong> HVTrust is a 0–100 composite designed so that the rank and the evidence grade tell the same story. It is built on four principles:</p>
         <ul class="weights">
-          <li><strong>Trust is not popularity.</strong> Adoption (stars and downloads) is log-scaled, capped, and carries the lowest weight, so a widely used project cannot buy its way to the top.</li>
-          <li><strong>Harder-to-fake signals weigh more.</strong> Supply-chain integrity sits at the top; stars sit at the bottom.</li>
+          <li><strong>Trust is not just popularity — but adoption matters.</strong> Widely used software receives more scrutiny, bug reports, and security review. Adoption is log-scaled and capped, but carries meaningful weight (20%).</li>
+          <li><strong>Harder-to-fake signals weigh more.</strong> Supply-chain integrity (provenance, signed commits, OSSF Scorecard) carries the highest weight.</li>
           <li><strong>Missing evidence lowers trust.</strong> The raw score is multiplied by a confidence factor based on how many independent signal types are available. An agent we know little about cannot reach the top tier.</li>
           <li><strong>Known-bad states are penalised and gated.</strong> Staleness subtracts points that adoption cannot offset; deprecated or unverified listings are capped below the verified tier.</li>
+          <li><strong>Proprietary tools are scored honestly.</strong> A lower score for a proprietary tool reflects fewer <em>public</em> supply-chain artifacts, not a security finding. The leaderboard includes a license filter to compare like with like.</li>
         </ul>
         <div class="formula-block">
-          HVTrust = gate( confidence × [ Safety(30) + Identity(20) + Transparency(20) + Maintenance(20) + Adoption(10) ] − penalties )
+          HVTrust = gate( confidence × [ Safety(25) + Identity(18) + Transparency(17) + Maintenance(20) + Adoption(20) ] − penalties )
         </div>
         <ul class="weights">
-          <li><strong>Safety / Integrity · 30</strong> — OSSF Scorecard, build provenance, and signed-commit ratio. The hardest signals to fake.</li>
-          <li><strong>Identity / Provenance · 20</strong> — verified listing status and build provenance binding the package to its source.</li>
-          <li><strong>Transparency · 20</strong> — a declared license and OSSF transparency checks.</li>
+          <li><strong>Safety / Integrity · 25</strong> — OSSF Scorecard, build provenance, and signed-commit ratio. The hardest signals to fake.</li>
+          <li><strong>Identity / Provenance · 18</strong> — verified listing status and build provenance binding the package to its source.</li>
+          <li><strong>Transparency · 17</strong> — a declared license and OSSF transparency checks.</li>
           <li><strong>Maintenance · 20</strong> — recency of the last push and log-scaled recent commit activity (halved when commit data is low-confidence).</li>
-          <li><strong>Adoption · 10</strong> — log-scaled, capped stars and package downloads.</li>
+          <li><strong>Adoption · 20</strong> — log-scaled, capped stars and package downloads (npm, PyPI, crates.io, Docker Hub, VS Code Marketplace).</li>
         </ul>
-        <p class="note"><strong>Confidence</strong> = present ÷ applicable signal types (floored at 0.4) and is shown alongside each score. Signals that cannot apply to an agent (for example, package downloads for a project that ships no package) are excluded rather than counted as missing — "not applicable" is not the same as "unverified". The earlier four-part health score (stars, freshness, activity, community) is retained only as a tie-breaker and for historical continuity. Cryptographic identity verification will tighten the gate in a future revision.</p>
+        <p class="note"><strong>Confidence</strong> = present ÷ applicable signal types (floored at 0.4) and is shown alongside each score. Signals that cannot apply to an agent (for example, package downloads for a project that ships no package) are excluded rather than counted as missing — "not applicable" is not the same as "unverified".</p>
+        <p class="note"><strong>Evidence Grade</strong> is derived from the trust score band: A ≥ 80, B ≥ 65, C ≥ 50, D &lt; 50. It summarizes the overall trust level at a glance.</p>
+        <p class="note"><strong>License Type</strong> classifies each project as Open, Source-available, Proprietary, or Unlicensed. Proprietary and source-available tools are scored on the same scale but are flagged so users can filter and compare like with like.</p>
       </section>
 
       <section id="data-sources">

@@ -438,9 +438,10 @@
       <div class="badges">
         {% if row.category %}<a href="/categories/{{ row.category_slug }}" class="badge cat" style="text-decoration:none">{{ row.category }}</a>{% endif %}
         {% if row.language %}<span class="badge lang">{{ row.language }}</span>{% endif %}
-        {% if row.evidence_grade %}<span class="badge" style="background:{% if row.evidence_grade == 'A' %}#22c55e{% elif row.evidence_grade == 'B' %}#3b82f6{% elif row.evidence_grade == 'C' %}#d8a657{% else %}#666{% endif %};color:#fff;" title="Evidence Grade {{ row.evidence_grade }}: {% if row.evidence_grade == 'A' %}5+ signal types{% elif row.evidence_grade == 'B' %}4 signal types{% elif row.evidence_grade == 'C' %}3 signal types{% else %}1-2 signal types{% endif %}">Grade {{ row.evidence_grade }}</span>{% endif %}
+        {% if row.evidence_grade %}<span class="badge" style="background:{% if row.evidence_grade == 'A' %}#22c55e{% elif row.evidence_grade == 'B' %}#3b82f6{% elif row.evidence_grade == 'C' %}#d8a657{% else %}#666{% endif %};color:#fff;" title="Grade {{ row.evidence_grade }}: trust score {% if row.evidence_grade == 'A' %}≥ 80{% elif row.evidence_grade == 'B' %}≥ 65{% elif row.evidence_grade == 'C' %}≥ 50{% else %}&lt; 50{% endif %}">Grade {{ row.evidence_grade }}</span>{% endif %}
         {% if row.listing_status %}<span class="badge" style="{% if row.listing_status == 'legacy' %}background:rgba(107,114,128,0.15);color:var(--stale);{% endif %}">{{ row.listing_status }}</span>{% endif %}
         {% if row.license_spdx %}<span class="badge">{{ row.license_spdx }}</span>{% endif %}
+        {% if row.license_type and row.license_type != 'open' %}<span class="badge" style="background:{% if row.license_type == 'proprietary' %}rgba(232,121,139,0.25);color:#e8798b{% elif row.license_type == 'source-available' %}rgba(216,166,87,0.25);color:#d8a657{% else %}rgba(142,154,176,0.25);color:#a8b3c2{% endif %}">{{ row.license_type | capitalize }}</span>{% endif %}
       </div>
       <div class="hero-actions">
         <a class="compare-link" href="/compare/?a={{ row.slug }}">Compare</a>
@@ -518,7 +519,7 @@
     </section>
 
     <p class="how-to-read">
-      <strong>How to read this:</strong> HVTrust (0–100) weighs harder-to-fake supply-chain signals (provenance, OSSF Scorecard, signed commits) more than popularity. <strong>Grade {{ row.evidence_grade }}</strong> reflects evidence coverage: A = 5+ signal types, B = 4, C = 3, D = 1–2. Adoption alone cannot buy a top score. <a href="/methodology">Full methodology →</a>
+      <strong>How to read this:</strong> HVTrust (0–100) weighs supply-chain signals (provenance, OSSF Scorecard, signed commits, open license) alongside real-world adoption. <strong>Grade {{ row.evidence_grade }}</strong> reflects the trust score band: A ≥ 80, B ≥ 65, C ≥ 50, D &lt; 50. <a href="/methodology">Full methodology →</a>
     </p>
 
     {% set is_stale = row.days_ago is not none and row.days_ago > 180 %}
@@ -690,6 +691,11 @@
     {% if row.safety_qa %}
     <section class="safety-qa">
       <h2 class="section-title">Is {{ row.name }} safe?</h2>
+      {% if row.license_type in ('proprietary', 'source-available') %}
+      <div class="qa-summary" style="background:rgba(216,166,87,0.08);border:1px solid rgba(216,166,87,0.2);border-radius:6px;padding:10px 14px;margin-bottom:12px;font-size:13px;">
+        <strong>{{ row.license_type | capitalize }} software.</strong> A lower HVTrust score reflects fewer <em>public</em> supply-chain artifacts (open license, build provenance, signed commits) — not a security finding. {{ row.name }} may have internal security practices not visible through public signals.
+      </div>
+      {% endif %}
       <div class="qa-summary">{{ row.safety_qa.safety_summary }}</div>
 
       <details>

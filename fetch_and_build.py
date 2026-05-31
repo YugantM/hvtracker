@@ -31,7 +31,7 @@ HEADERS = {
 if TOKEN:
     HEADERS["Authorization"] = f"Bearer {TOKEN}"
 
-METHODOLOGY_VERSION = "v3.0"
+METHODOLOGY_VERSION = "v3.1"
 DATA_SCHEMA_VERSION = "v0.1"
 
 
@@ -253,6 +253,89 @@ def fetch_crate_downloads(crate_name: str) -> int | None:
         return None
 
 
+@cache.cached("docker_pulls", ttl=86400, skip_none=True)
+def fetch_docker_pulls(image: str) -> int | None:
+    """Fetch cumulative pull count from Docker Hub.
+
+    Returns the lifetime pull count (not weekly). The adoption formula uses
+    log scale so cumulative is acceptable — it measures distribution reach.
+    """
+    url = f"https://hub.docker.com/v2/repositories/{quote(image, safe='/')}/"
+    try:
+        r = requests.get(url, timeout=10)
+        if r.status_code == 200:
+            return r.json().get("pull_count")
+        return None
+    except Exception:
+        return None
+
+
+@cache.cached("vscode_installs", ttl=86400, skip_none=True)
+def fetch_vscode_installs(extension_id: str) -> int | None:
+    """Fetch install count from VS Code Marketplace."""
+    url = "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery"
+    payload = {
+        "filters": [{"criteria": [{"filterType": 7, "value": extension_id}]}],
+        "flags": 0x100,  # IncludeStatistics
+    }
+    try:
+        r = requests.post(url, json=payload, timeout=10,
+                          headers={"Accept": "application/json;api-version=6.0-preview.1"})
+        if r.status_code != 200:
+            return None
+        exts = r.json().get("results", [{}])[0].get("extensions", [])
+        if not exts:
+            return None
+        for stat in exts[0].get("statistics", []):
+            if stat.get("statisticName") == "install":
+                return int(stat.get("value", 0))
+        return None
+    except Exception:
+        return None
+
+
+_SOURCE_AVAILABLE_MARKERS = (
+    "business source license", "bsl-", "busl-",
+    "elastic license", "sspl", "server side public license",
+    "functional source license", "fsl-",
+    "commons clause",
+    "commercial license must be obtained",
+    "additional conditions",
+)
+_PROPRIETARY_MARKERS = (
+    "all rights reserved", "commercial terms of service", "proprietary license",
+    "not open source", "no license is granted",
+)
+
+
+@cache.cached("license_type", ttl=604800)
+def classify_license(repo_id: str, spdx_id: str | None) -> str:
+    """Classify a repo's license as open/source-available/proprietary/unlicensed.
+
+    Uses the GitHub SPDX id when available; falls back to reading the LICENSE
+    file content for repos where GitHub returns null (proprietary / custom).
+    """
+    if spdx_id and spdx_id != "NOASSERTION":
+        return "open"
+    # GitHub couldn't detect — fetch the actual license file
+    for filename in ("LICENSE", "LICENSE.md", "LICENSE.txt", "LICENCE", "COPYING"):
+        url = f"https://raw.githubusercontent.com/{repo_id}/HEAD/{filename}"
+        try:
+            r = requests.get(url, timeout=8)
+            if r.status_code != 200:
+                continue
+            text = r.text[:4000].lower()
+            if any(m in text for m in _SOURCE_AVAILABLE_MARKERS):
+                return "source-available"
+            if any(m in text for m in _PROPRIETARY_MARKERS):
+                return "proprietary"
+            # Has a license file but we can't classify it — assume open
+            return "open"
+        except Exception:
+            continue
+    return "unlicensed"
+
+
 @cache.cached("npm_prov", ttl=86400, skip_none=True)
 def fetch_npm_provenance(package_name: str) -> bool | None:
     """Check if the latest version of an npm package has provenance attestations."""
@@ -342,18 +425,16 @@ def compute_trust_score(row: dict) -> dict:
 
     Model:  trust = clamp( gate( confidence × Σ(wᵢ · dimᵢ) − penalties ) )
 
-    Trust is not popularity. Dimensions are weighted by how hard the signal
-    is to fake (Safety/Integrity highest, Adoption lowest), adoption is
-    logarithmic and capped so stars can't dominate, missing evidence lowers
-    the score via a confidence multiplier rather than being treated as
-    neutral, and known-bad states subtract penalties that popularity cannot
-    offset.
+    Trust is not popularity, but real-world adoption is a meaningful trust
+    signal — widely-used software gets more scrutiny, bug reports, and
+    security review. Dimensions are weighted by a mix of verifiability and
+    real-world impact.
 
-      Safety/Integrity (30): OSSF Scorecard + provenance + signed commits
-      Identity/Provenance (20): verified listing + build provenance
-      Transparency (20): license + OSSF transparency checks
+      Safety/Integrity (25): OSSF Scorecard + provenance + signed commits
+      Identity/Provenance (18): verified listing + build provenance
+      Transparency (17): license + OSSF transparency checks
       Maintenance (20): freshness + (confidence-adjusted) commit activity
-      Adoption (10): log(stars + downloads), capped
+      Adoption (20): log(stars + downloads), capped
 
       confidence: independent signal-type coverage / 5 (floored 0.35) —
         thin evidence mathematically cannot reach the top tier.
@@ -367,17 +448,17 @@ def compute_trust_score(row: dict) -> dict:
     sr = row.get("signed_commits_ratio")
     sig01 = sr if sr is not None else 0.0
 
-    # ── Safety / Integrity (30) — hardest to fake ──
-    safety = round((0.5 * sc01 + 0.3 * prov + 0.2 * sig01) * 30, 1)
+    # ── Safety / Integrity (25) — hardest to fake ──
+    safety = round((0.5 * sc01 + 0.3 * prov + 0.2 * sig01) * 25, 1)
 
-    # ── Identity / Provenance (20) ──
+    # ── Identity / Provenance (18) ──
     ls = row.get("listing_status", "")
     listed01 = 1.0 if ls == "listed" else 0.0
-    identity = round((0.6 * listed01 + 0.4 * prov) * 20, 1)
+    identity = round((0.6 * listed01 + 0.4 * prov) * 18, 1)
 
-    # ── Transparency (20) ──
+    # ── Transparency (17) ──
     license01 = 1.0 if row.get("license_spdx") else 0.0
-    transparency = round((0.5 * license01 + 0.5 * sc01) * 20, 1)
+    transparency = round((0.5 * license01 + 0.5 * sc01) * 17, 1)
 
     # ── Maintenance (20) ──
     days = row.get("days_ago", 999)
@@ -388,12 +469,12 @@ def compute_trust_score(row: dict) -> dict:
         activity01 *= 0.5
     maintenance = round((0.6 * freshness01 + 0.4 * min(1.0, activity01)) * 20, 1)
 
-    # ── Adoption (10) — logarithmic, capped, low weight ──
+    # ── Adoption (20) — logarithmic, capped ──
     stars = row.get("stars", 0) or 0
     dl = row.get("weekly_downloads") or 0
     stars01 = math.log1p(stars) / math.log1p(100_000)
     dl01 = (math.log1p(dl) / math.log1p(1_000_000)) if dl > 0 else 0.0
-    adoption = round(min(1.0, 0.6 * stars01 + 0.4 * dl01) * 10, 1)
+    adoption = round(min(1.0, 0.6 * stars01 + 0.4 * dl01) * 20, 1)
 
     raw = safety + identity + transparency + maintenance + adoption  # ≤ 100
 
@@ -1287,6 +1368,7 @@ def provisional_agent_row(agent: dict) -> dict:
         "open_issues": 0,
         "archived": False,
         "license_spdx": None,
+        "license_type": "unlicensed",
         "npm_package": agent.get("npm_package", ""),
         "pypi_package": agent.get("pypi_package", ""),
         "npm_dl": None,
@@ -1457,6 +1539,10 @@ def main() -> None:
         crate_dl = fetch_crate_downloads(crate_pkg) if crate_pkg else None
         npm_prov = fetch_npm_provenance(npm_pkg) if npm_pkg else None
         signed_ratio = fetch_signed_commit_ratio(repo_id)
+        docker_img = agent.get("docker_image", "")
+        docker_pulls = fetch_docker_pulls(docker_img) if docker_img else None
+        vscode_ext = agent.get("vscode_extension", "")
+        vscode_installs = fetch_vscode_installs(vscode_ext) if vscode_ext else None
         print(f"OK  {repo_id:<45} score={score:5.1f}")
 
         return {
@@ -1480,11 +1566,14 @@ def main() -> None:
             "open_issues": repo.get("open_issues_count", 0),
             "archived": repo.get("archived", False),
             "license_spdx": (repo.get("license") or {}).get("spdx_id") or None,
+            "license_type": classify_license(repo_id, (repo.get("license") or {}).get("spdx_id")),
             "npm_package": npm_pkg if npm_pkg else "",
             "pypi_package": pypi_pkg if pypi_pkg else "",
             "crate_package": crate_pkg if crate_pkg else "",
             "npm_dl": npm_dl,
             "crate_dl": crate_dl,
+            "docker_pulls": docker_pulls,
+            "vscode_installs": vscode_installs,
             "npm_provenance": npm_prov,
             "signed_commits_ratio": signed_ratio,
             "weekly_downloads": None,  # filled in serial pass below
@@ -1569,6 +1658,10 @@ def main() -> None:
                 dl_parts.append(("npm", row["npm_dl"]))
             if row.get("crate_dl") is not None:
                 dl_parts.append(("crates.io", row["crate_dl"]))
+            if row.get("docker_pulls") is not None:
+                dl_parts.append(("docker", row["docker_pulls"]))
+            if row.get("vscode_installs") is not None:
+                dl_parts.append(("vscode", row["vscode_installs"]))
             if pypi_pkg:
                 pypi_dl = fetch_pypi_downloads(pypi_pkg)
                 if pypi_dl is not None:
@@ -1705,20 +1798,24 @@ def main() -> None:
             signal_types += 1
         if row.get("hn_mentions_30d") is not None:
             signal_types += 1
-        if signal_types >= 5:
-            row["evidence_grade"] = "A"
-        elif signal_types >= 4:
-            row["evidence_grade"] = "B"
-        elif signal_types >= 3:
-            row["evidence_grade"] = "C"
-        else:
-            row["evidence_grade"] = "D"
+        row["signal_coverage"] = round(signal_types / 5, 2)
 
         # HVTrust composite score
         trust = compute_trust_score(row)
         row["trust_score"] = trust["trust_score"]
         row["trust_confidence"] = trust["trust_confidence"]
         row["trust_breakdown"] = trust["trust_breakdown"]
+
+        # Evidence grade — based on trust score band so grade agrees with rank
+        ts = row["trust_score"]
+        if ts >= 80:
+            row["evidence_grade"] = "A"
+        elif ts >= 65:
+            row["evidence_grade"] = "B"
+        elif ts >= 50:
+            row["evidence_grade"] = "C"
+        else:
+            row["evidence_grade"] = "D"
 
     # Rank by HVTrust (trust-first). Tie-break on momentum score, then stars,
     # so the leaderboard order and the evidence grade tell the same story.
@@ -1848,6 +1945,7 @@ def main() -> None:
                 "evidence_grade": r.get("evidence_grade", "D"),
                 "listing_status": r.get("listing_status", "listed"),
                 "license_spdx": r.get("license_spdx"),
+                "license_type": r.get("license_type", "unlicensed"),
                 "trust_score": r.get("trust_score"),
                 "trust_confidence": r.get("trust_confidence"),
                 "trust_breakdown": r.get("trust_breakdown", {}),

@@ -630,6 +630,20 @@
       margin-left: 4px;
     }
 
+    .license-chip {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 3px;
+      margin-top: 3px;
+      margin-left: 4px;
+    }
+    .license-proprietary { background: rgba(232,121,139,0.15); color: var(--red, #e8798b); }
+    .license-source-available { background: rgba(216,166,87,0.15); color: var(--yellow, #d8a657); }
+    .license-unlicensed { background: rgba(142,154,176,0.15); color: var(--muted); }
+
     .agent-tags {
       display: flex;
       gap: 4px;
@@ -984,6 +998,26 @@
           {% endfor %}
         </div>
       </div>
+      <div class="cat-dropdown" id="licDropdown">
+        <span class="cat-toggle" id="licToggle">License <span class="arrow">▾</span></span>
+        <div class="cat-panel" id="licPanel">
+          <label class="cat-option all-opt">
+            <input type="radio" name="lic" value="all" checked> All
+          </label>
+          <label class="cat-option">
+            <input type="radio" name="lic" value="open"> Open source
+          </label>
+          <label class="cat-option">
+            <input type="radio" name="lic" value="source-available"> Source-available
+          </label>
+          <label class="cat-option">
+            <input type="radio" name="lic" value="proprietary"> Proprietary
+          </label>
+          <label class="cat-option">
+            <input type="radio" name="lic" value="unlicensed"> Unlicensed
+          </label>
+        </div>
+      </div>
       <span class="cat-clear" id="catClear">✕ Clear filters</span>
     </div>
 
@@ -1067,6 +1101,7 @@
             data-category="{{ row.category }}"
             data-category_rank="{{ row.category_rank }}"
             data-evidence_grade="{{ row.evidence_grade }}"
+            data-license_type="{{ row.license_type or 'unlicensed' }}"
           >
             <td class="rank r">
               <span class="rank-num">{{ row.rank }}</span>
@@ -1079,6 +1114,7 @@
               <div class="agent-tags">
                 {% if row.language %}<span class="lang">{{ row.language }}</span>{% endif %}
                 {% if row.category %}<span class="cat-badge">{{ row.category }}</span>{% endif %}
+                {% if row.license_type and row.license_type != 'open' %}<span class="license-chip license-{{ row.license_type }}">{{ row.license_type | capitalize }}</span>{% endif %}
               </div>
             </td>
             <td class="c">
@@ -1200,6 +1236,20 @@
       const clearBtn = document.getElementById("catClear");
       const totalCats = catCbs.length;
       let selectedCats = new Set(catCbs.map(cb => cb.value));
+      let selectedLicense = "all";
+
+      // ── License filter ──
+      const licToggle = document.getElementById("licToggle");
+      const licDropdown = document.getElementById("licDropdown");
+      const licRadios = Array.from(document.querySelectorAll('input[name="lic"]'));
+      licToggle.addEventListener("click", (e) => { e.stopPropagation(); licDropdown.classList.toggle("open"); });
+      document.addEventListener("click", (e) => { if (!licDropdown.contains(e.target)) licDropdown.classList.remove("open"); });
+      licRadios.forEach(r => r.addEventListener("change", () => {
+        selectedLicense = r.value;
+        licDropdown.classList.remove("open");
+        applyFilters();
+        hvtTrack("license_filter", { license: selectedLicense });
+      }));
 
       // ── Category tabs (quick presets that drive the same selectedCats state) ──
       const catTabs = Array.from(document.querySelectorAll(".cat-tab"));
@@ -1308,9 +1358,11 @@
           const name = (row.dataset.name || "").toLowerCase();
           const repo = (row.dataset.repo || "").toLowerCase();
           const cat = row.dataset.category || "";
+          const lic = row.dataset.license_type || "unlicensed";
           const matchesSearch = !searchTerm || name.includes(searchTerm) || repo.includes(searchTerm) || cat.toLowerCase().includes(searchTerm);
           const matchesCat = allSelected || selectedCats.has(cat);
-          if (matchesSearch && matchesCat) {
+          const matchesLic = selectedLicense === "all" || lic === selectedLicense;
+          if (matchesSearch && matchesCat && matchesLic) {
             row.classList.remove("hidden");
           } else {
             row.classList.add("hidden");
