@@ -997,7 +997,7 @@ def compute_newly_added(rows: list[dict], history: list[dict], limit: int = 6) -
     added = []
     for row in rows:
         repo_key = row.get("repo", "").lower()
-        if first_seen.get(repo_key) != history[-2].get("_date", ""):
+        if first_seen.get(repo_key) != latest_date:
             continue
         added.append({
             "name": row["name"],
