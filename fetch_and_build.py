@@ -1651,7 +1651,7 @@ def main() -> None:
     # When writing to a separate output root (the volume), copy the static
     # assets the site references but that aren't generated (OG images, etc.).
     if script_dir != base_dir:
-        for asset in (".nojekyll", "robots.txt", "_headers", "analytics.js",
+        for asset in (".nojekyll", "robots.txt", "analytics.js",
                       "og-v2.png", "og-provenance.png", "linkedin_carousel.js"):
             src = os.path.join(base_dir, asset)
             if os.path.isfile(src):
@@ -1906,6 +1906,19 @@ def main() -> None:
             _state = json.load(_f)
         rows = _state["rows"]
         legacy_rows = _state["legacy_rows"]
+        # Re-apply legacy classification from agents.json so that flipping
+        # an agent's status to "legacy" propagates without a full refetch.
+        _legacy_repos = {a["repo"].lower() for a in legacy_agents}
+        moved = [r for r in rows if r["repo"].lower() in _legacy_repos]
+        if moved:
+            for r in moved:
+                r["status"] = "legacy"
+                r["listing_status"] = "legacy"
+            rows = [r for r in rows if r["repo"].lower() not in _legacy_repos]
+            # Avoid duplicates if already in legacy_rows
+            existing_legacy = {r["repo"].lower() for r in legacy_rows}
+            legacy_rows = legacy_rows + [r for r in moved if r["repo"].lower() not in existing_legacy]
+            print(f"RENDER-ONLY: reclassified {len(moved)} row(s) as legacy from agents.json")
         provisional_count = add_provisional_missing_agents(rows, all_agents)
         print(f"RENDER-ONLY: loaded {len(rows)} active + {len(legacy_rows)} legacy rows from render_state.json")
         if provisional_count:

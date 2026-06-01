@@ -54,7 +54,7 @@ jobs:
           cache: "pip"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements-dev.txt
 
       - name: Render-only build
         run: python fetch_and_build.py --render-only
@@ -64,3 +64,6 @@ jobs:
           test -s index.html
           test -s data.json
           python -c "import json; json.load(open('data.json'))"
+
+      - name: Validate rendered HTML (sample pages)
+        run: python tests/validate_html.py

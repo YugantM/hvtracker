@@ -29,6 +29,34 @@ RENDER_FINGERPRINT_PATH = os.path.join(OUTPUT_DIR, ".render_fingerprint")
 
 app = FastAPI(title="HVTracker", docs_url="/api/docs", openapi_url="/api/openapi.json")
 
+
+# ---- cache headers -------------------------------------------------------
+#
+# StaticFiles ships responses with no Cache-Control, so Cloudflare returns
+# `cf-cache-status: DYNAMIC` and every visit hits Railway directly.  Add
+# sensible defaults: HTML pages get 5 min browser / 15 min CDN cache (with
+# stale-while-revalidate so re-fetches feel instant), JSON data endpoints
+# get longer s-maxage since they're consumed by API users.  Routes that
+# already set Cache-Control (e.g. badge SVGs at app.py:172) win — we only
+# fill in the gaps.
+_HTML_CACHE = "public, max-age=300, s-maxage=900, stale-while-revalidate=86400"
+_JSON_CACHE = "public, max-age=600, s-maxage=1800, stale-while-revalidate=86400"
+
+
+@app.middleware("http")
+async def _cache_headers(request, call_next):
+    response = await call_next(request)
+    if response.status_code != 200 or "cache-control" in {k.lower() for k in response.headers}:
+        return response
+    path = request.url.path
+    if path.startswith("/data/") and path.endswith(".json"):
+        response.headers["Cache-Control"] = _JSON_CACHE
+    elif path.endswith("/") or path.endswith(".html"):
+        response.headers["Cache-Control"] = _HTML_CACHE
+    elif path in ("",) or path == "/":
+        response.headers["Cache-Control"] = _HTML_CACHE
+    return response
+
 # ---- data.json access (mtime-cached) -------------------------------------
 
 _cache: dict = {"mtime": None, "data": None}
