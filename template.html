@@ -426,6 +426,76 @@
       border-bottom-color: var(--accent);
       font-weight: 600;
     }
+    .cat-tab.special {
+      border: 1px solid rgba(216,166,87,0.28);
+      border-bottom-width: 1px;
+      border-radius: 999px;
+      background: rgba(216,166,87,0.08);
+      color: var(--yellow);
+      margin: 0 8px 6px 0;
+      padding: 8px 14px;
+    }
+    .cat-tab.special:hover {
+      color: var(--text);
+      border-color: rgba(216,166,87,0.42);
+      background: rgba(216,166,87,0.12);
+    }
+    .cat-tab.special.active {
+      color: #f4d59a;
+      border-color: rgba(216,166,87,0.58);
+      border-bottom-color: rgba(216,166,87,0.58);
+      box-shadow: inset 0 -1px 0 rgba(216,166,87,0.55);
+    }
+    .cat-tab-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 6px;
+      margin-left: 7px;
+      border-radius: 999px;
+      background: rgba(216,166,87,0.16);
+      color: inherit;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      line-height: 1;
+    }
+    .cat-tab.special {
+      border: 1px solid rgba(216,166,87,0.28);
+      border-bottom-width: 1px;
+      border-radius: 999px;
+      background: rgba(216,166,87,0.08);
+      color: var(--yellow);
+      margin: 0 8px 6px 0;
+      padding: 8px 14px;
+    }
+    .cat-tab.special:hover {
+      color: var(--text);
+      border-color: rgba(216,166,87,0.42);
+      background: rgba(216,166,87,0.12);
+    }
+    .cat-tab.special.active {
+      color: #f4d59a;
+      border-color: rgba(216,166,87,0.58);
+      border-bottom-color: rgba(216,166,87,0.58);
+      box-shadow: inset 0 -1px 0 rgba(216,166,87,0.55);
+    }
+    .cat-tab-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 6px;
+      margin-left: 7px;
+      border-radius: 999px;
+      background: rgba(216,166,87,0.16);
+      color: inherit;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      line-height: 1;
+    }
 
     /* ── Filter bar ── */
     .filter-bar {
@@ -1065,91 +1135,6 @@
     .mover-down .mover-arrow { color: var(--delta-down); }
     .mover-name { color: var(--text); }
     .mover-rank { color: var(--muted); font-size: 10px; }
-    .fresh-strip {
-      padding: 12px 0 16px;
-      border-bottom: 1px solid var(--hairline);
-      display: grid;
-      gap: 10px;
-    }
-    .fresh-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .fresh-title {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-    .fresh-copy {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-      max-width: 760px;
-    }
-    .fresh-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .fresh-card {
-      flex: 1 1 160px;
-      min-width: 0;
-      display: grid;
-      gap: 4px;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: rgba(255,255,255,0.04);
-      transition: border-color 0.15s, transform 0.15s ease;
-    }
-    .fresh-card:hover {
-      border-color: var(--accent-dim);
-      transform: translateY(-1px);
-      text-decoration: none;
-    }
-    .fresh-meta {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-size: 10px;
-      font-family: var(--font-mono);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .fresh-name {
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 600;
-      line-height: 1.35;
-    }
-    .fresh-sub {
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.45;
-    }
-    .fresh-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 7px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(45,212,191,0.10);
-      color: var(--green);
-      font-size: 10px;
-      font-family: var(--font-mono);
-    }
-    .fresh-badge.pending {
-      background: rgba(216,166,87,0.12);
-      color: var(--yellow);
-    }
-
     /* ── Score formula note ── */
     .formula {
       font-size: 11.5px;
@@ -1443,39 +1428,14 @@
     </div>
     {% endif %}
 
-    {% if newly_added %}
-    <div class="fresh-strip" aria-label="Newly added agents">
-      <div class="fresh-head">
-        <span class="fresh-title">Newly added agents</span>
-        <span class="fresh-copy">Recent additions to the registry. Some new listings may show pending signals until their first full refresh completes.</span>
-      </div>
-      <div class="fresh-row">
-        {% for agent in newly_added %}
-        <a href="/agents/{{ agent.slug }}" class="fresh-card">
-          <div class="fresh-meta">
-            <span>{{ agent.date }}</span>
-            <span>#{{ agent.rank }}</span>
-            <span>{{ agent.category }}</span>
-          </div>
-          <span class="fresh-name">{{ agent.name }}</span>
-          <div class="fresh-sub">
-            {% if agent.pending_signals %}
-            <span class="fresh-badge pending">Pending refresh</span>
-            {% else %}
-            <span class="fresh-badge">Grade {{ agent.evidence_grade }}</span>
-            {% endif %}
-          </div>
-        </a>
-        {% endfor %}
-      </div>
-    </div>
-    {% endif %}
-
     <div class="cat-tabs" id="catTabs" role="tablist" aria-label="Browse by category">
       <button class="cat-tab active" data-tab="__all__" role="tab" aria-selected="true">Global</button>
       {% for cat in categories[:5] %}
       <button class="cat-tab" data-tab="{{ cat.name }}" role="tab" aria-selected="false">{{ cat.name }}</button>
       {% endfor %}
+      {% if newly_added %}
+      <button class="cat-tab special" data-tab="__new__" role="tab" aria-selected="false">Newly added <span class="cat-tab-badge">{{ newly_added|length }}</span></button>
+      {% endif %}
     </div>
 
     <div class="table-wrap">
@@ -1522,6 +1482,7 @@
             data-category_rank="{{ row.category_rank }}"
             data-evidence_grade="{{ row.evidence_grade }}"
             data-license_type="{{ row.license_type or 'unlicensed' }}"
+            data-newly-added="{% if newly_added and row.repo in newly_added|map(attribute='repo')|list %}1{% else %}0{% endif %}"
           >
             <td class="rank r">
               <span class="rank-num">{{ row.rank }}</span>
@@ -1661,6 +1622,7 @@
       const totalCats = catCbs.length;
       let selectedCats = new Set(catCbs.map(cb => cb.value));
       let selectedLicense = "all";
+      let selectedSpecialTab = "__all__";
 
       // ── License filter ──
       const licToggle = document.getElementById("licToggle");
@@ -1680,6 +1642,14 @@
       function setActiveTab() {
         // Global tab active when all selected; a category tab active when it's
         // the sole selection; otherwise (multi-select) no tab is active.
+        if (selectedSpecialTab === "__new__") {
+          catTabs.forEach(t => {
+            const on = t.dataset.tab === "__new__";
+            t.classList.toggle("active", on);
+            t.setAttribute("aria-selected", on ? "true" : "false");
+          });
+          return;
+        }
         const allSelected = selectedCats.size === totalCats;
         const only = selectedCats.size === 1 ? [...selectedCats][0] : null;
         catTabs.forEach(t => {
@@ -1692,7 +1662,10 @@
       catTabs.forEach(t => {
         t.addEventListener("click", () => {
           const tab = t.dataset.tab;
-          selectedCats = tab === "__all__" ? new Set(catCbs.map(cb => cb.value)) : new Set([tab]);
+          selectedSpecialTab = tab === "__new__" ? "__new__" : "__all__";
+          selectedCats = tab === "__all__" || tab === "__new__"
+            ? new Set(catCbs.map(cb => cb.value))
+            : new Set([tab]);
           syncUI();
           hvtTrack("category_tab", { tab: tab });
         });
@@ -1786,7 +1759,8 @@
           const matchesSearch = !searchTerm || name.includes(searchTerm) || repo.includes(searchTerm) || cat.toLowerCase().includes(searchTerm);
           const matchesCat = allSelected || selectedCats.has(cat);
           const matchesLic = selectedLicense === "all" || lic === selectedLicense;
-          if (matchesSearch && matchesCat && matchesLic) {
+          const matchesNew = selectedSpecialTab !== "__new__" || row.dataset.newlyAdded === "1";
+          if (matchesSearch && matchesCat && matchesLic && matchesNew) {
             row.classList.remove("hidden");
           } else {
             row.classList.add("hidden");
@@ -1880,7 +1854,11 @@
         });
         setActiveTab();
         // Update toggle label
-        if (allSelected) {
+        if (selectedSpecialTab === "__new__") {
+          toggle.classList.add("has-selection");
+          toggle.innerHTML = 'All categories <span class="arrow">▾</span>';
+          clearBtn.classList.add("visible");
+        } else if (allSelected) {
           toggle.classList.remove("has-selection");
           toggle.innerHTML = 'Categories <span class="arrow">▾</span>';
           clearBtn.classList.remove("visible");
@@ -1904,6 +1882,7 @@
       }
 
       catAllCb.addEventListener("change", () => {
+        selectedSpecialTab = "__all__";
         selectedCats = catAllCb.checked
           ? new Set(catCbs.map(cb => cb.value))
           : new Set();
@@ -1912,6 +1891,7 @@
 
       catCbs.forEach(cb => {
         cb.addEventListener("change", () => {
+          selectedSpecialTab = "__all__";
           if (cb.checked) {
             selectedCats.add(cb.value);
           } else {
@@ -1922,6 +1902,7 @@
       });
 
       clearBtn.addEventListener("click", () => {
+        selectedSpecialTab = "__all__";
         selectedCats = new Set(catCbs.map(cb => cb.value));
         syncUI();
       });

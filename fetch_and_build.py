@@ -640,6 +640,30 @@ def slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
+def assign_unique_slugs(rows: list[dict]) -> None:
+    """Assign stable unique slugs in-place, preserving the plain name slug when possible."""
+    base_counts: dict[str, int] = {}
+    assigned_bases: set[str] = set()
+    for row in rows:
+        base = slugify(row["name"])
+        row["_base_slug"] = base
+        base_counts[base] = base_counts.get(base, 0) + 1
+
+    seen: dict[str, int] = {}
+    for row in rows:
+        base = row.pop("_base_slug")
+        if base_counts.get(base, 0) == 1 or base not in assigned_bases:
+            row["slug"] = base
+            assigned_bases.add(base)
+            continue
+        owner = row.get("repo", "").split("/", 1)[0]
+        candidate = slugify(f"{owner} {row['name']}") or base
+        if candidate == base:
+            seen[base] = seen.get(base, 0) + 1
+            candidate = f"{base}-{seen[base]}"
+        row["slug"] = candidate
+
+
 def fmt_num(n: int) -> str:
     if n >= 1_000_000:
         return f"{n / 1_000_000:.1f}M"
@@ -931,7 +955,7 @@ def load_history(history_dir: str) -> list[dict]:
     return snapshots
 
 
-def compute_movers(history: list[dict], window: int = 7) -> dict:
+def compute_movers(history: list[dict], slug_map: dict[str, str] | None = None, window: int = 7) -> dict:
     """Compare latest snapshot vs `window` days ago. Returns {up: [...], down: [...]}."""
     if len(history) < 2:
         return {"up": [], "down": []}
@@ -947,7 +971,7 @@ def compute_movers(history: list[dict], window: int = 7) -> dict:
             continue
         delta = old - a["rank"]  # positive = improved
         if delta != 0:
-            movers.append({"name": a["name"], "slug": re.sub(r"[^a-z0-9]+", "-", a["name"].lower()).strip("-"),
+            movers.append({"name": a["name"], "slug": (slug_map or {}).get(repo, slugify(a["name"])),
                            "rank": a["rank"], "delta": delta, "score": a["score"]})
     movers.sort(key=lambda m: m["delta"], reverse=True)
     up = [m for m in movers if m["delta"] > 0][:3]
@@ -957,23 +981,28 @@ def compute_movers(history: list[dict], window: int = 7) -> dict:
 
 
 def compute_newly_added(rows: list[dict], history: list[dict], limit: int = 6) -> list[dict]:
-    """Return newest-looking agents for the homepage widget.
-
-    Prefer rows that are still pending their first full signal refresh because
-    those are the clearest recent additions in the current dataset shape.
-    """
-    if not rows:
+    """Return agents first seen in the most recent prior snapshot window."""
+    if not rows or len(history) < 2:
         return []
-    latest_date = history[-1].get("_date", "") if history else ""
 
-    pending_rows = [row for row in rows if row.get("pending_signals")]
-    source_rows = pending_rows if pending_rows else rows
+    latest_date = history[-1].get("_date", "")
+    first_seen: dict[str, str] = {}
+    for snap in history:
+        snap_date = snap.get("_date", "")
+        for agent in snap.get("agents", []):
+            repo_key = agent.get("repo", "").lower()
+            if repo_key and repo_key not in first_seen:
+                first_seen[repo_key] = snap_date
 
     added = []
-    for row in source_rows:
+    for row in rows:
+        repo_key = row.get("repo", "").lower()
+        if first_seen.get(repo_key) != history[-2].get("_date", ""):
+            continue
         added.append({
             "name": row["name"],
             "slug": row["slug"],
+            "repo": row["repo"],
             "rank": row["rank"],
             "category": row.get("category") or "Uncategorized",
             "date": latest_date,
@@ -1653,14 +1682,23 @@ def main() -> None:
 
     agents = db.load_agents()
 
-    # De-duplicate by repo path (agents.json may have accidental dupes)
-    seen: set[str] = set()
+    # De-duplicate by repo path and by canonical name (agents.json may have
+    # accidental dupes, e.g. forks/copycats reusing an existing agent's name).
+    seen_repos: set[str] = set()
+    seen_names: set[str] = set()
     deduped = []
     for a in agents:
-        key = a["repo"].lower()
-        if key not in seen:
-            seen.add(key)
-            deduped.append(a)
+        repo_key = a["repo"].lower()
+        name_key = a.get("name", "").strip().lower()
+        if repo_key in seen_repos:
+            continue
+        if name_key and name_key in seen_names:
+            print(f"  ! Skipping duplicate-name agent: {a['repo']} (name '{a['name']}' already tracked)")
+            continue
+        seen_repos.add(repo_key)
+        if name_key:
+            seen_names.add(name_key)
+        deduped.append(a)
     agents = deduped
 
     # Split active vs legacy agents — legacy entries are fetched but rendered separately
@@ -1990,7 +2028,6 @@ def main() -> None:
         for row in rows:
             dl = row.get("weekly_downloads")
             row["downloads_fmt"] = f"{dl:,}" if dl is not None else "—"
-            row["slug"] = slugify(row["name"])
             prov_signals = []
             if row.get("npm_provenance"):
                 prov_signals.append("npm")
@@ -2029,7 +2066,6 @@ def main() -> None:
     for row in rows:
         dl = row.get("weekly_downloads")
         row["downloads_fmt"] = f"{dl:,}" if dl is not None else "—"
-        row["slug"] = slugify(row["name"])
         # Inject override from agents.json if not already on the row (render_state cache)
         if not row.get("license_override"):
             row["license_override"] = _override_map.get(row.get("repo", "").lower(), "")
@@ -2160,6 +2196,8 @@ def main() -> None:
     for cat in sorted(cat_groups.keys()):
         if cat not in category_order and cat:
             categories.append({"name": cat, "slug": slugify(cat), "count": len(cat_groups[cat])})
+
+    assign_unique_slugs(rows + legacy_rows)
 
     # Precompute head-to-head comparison pairs (top 3 per category) so agent
     # and category pages can link to them — internal linking turns the
@@ -2319,12 +2357,11 @@ def main() -> None:
         autoescape=True,
     )
 
-    movers = compute_movers(history)
+    movers = compute_movers(history, {r["repo"].lower(): r["slug"] for r in rows})
     newly_added = compute_newly_added(rows, history)
 
     # Sort legacy rows by stars descending for display; populate fields needed by templates
     for lr in legacy_rows:
-        lr["slug"] = slugify(lr["name"])
         if not lr.get("license_override"):
             lr["license_override"] = _override_map.get(lr.get("repo", "").lower(), "")
         lr["license_type"] = normalize_license_type(lr)
@@ -2356,12 +2393,11 @@ def main() -> None:
         lr["trust_trend_7d"] = None
     legacy_rows.sort(key=lambda x: x.get("stars", 0), reverse=True)
 
-    # Persist fully-decorated rows so `--render-only` can rebuild all pages
-    # later without any API calls (used for UI/template changes).
-    if not render_only:
-        os.makedirs(os.path.dirname(render_state_path), exist_ok=True)
-        with open(render_state_path, "w", encoding="utf-8") as _f:
-            json.dump({"rows": rows, "legacy_rows": legacy_rows}, _f, ensure_ascii=False)
+    # Persist fully-decorated rows so `--render-only` rebuilds keep the local
+    # cache aligned with the generated site, including slug corrections.
+    os.makedirs(os.path.dirname(render_state_path), exist_ok=True)
+    with open(render_state_path, "w", encoding="utf-8") as _f:
+        json.dump({"rows": rows, "legacy_rows": legacy_rows}, _f, ensure_ascii=False)
 
     tmpl = env.get_template("template.html")
     html = tmpl.render(

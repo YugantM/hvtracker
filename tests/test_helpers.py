@@ -23,6 +23,18 @@ def test_slugify(name, expected):
     assert fb.slugify(name) == expected
 
 
+def test_assign_unique_slugs_keeps_primary_and_disambiguates_duplicates():
+    rows = [
+        {"name": "Goose", "repo": "block/goose"},
+        {"name": "Goose", "repo": "aaif-goose/goose"},
+        {"name": "Codex", "repo": "openai/codex"},
+    ]
+    fb.assign_unique_slugs(rows)
+    assert rows[0]["slug"] == "goose"
+    assert rows[1]["slug"] == "aaif-goose-goose"
+    assert rows[2]["slug"] == "codex"
+
+
 @pytest.mark.parametrize("n,expected", [
     (0, "0"),
     (999, "999"),
@@ -165,6 +177,32 @@ def test_select_batch_is_deterministic():
     first = fb.select_batch(agents, 1, 3)
     second = fb.select_batch(agents, 1, 3)
     assert first == second
+
+
+def test_compute_newly_added_uses_first_seen_history_not_previous_rank():
+    history = [
+        {"_date": "2026-05-30", "agents": [
+            {"repo": "block/goose"},
+            {"repo": "openai/codex"},
+        ]},
+        {"_date": "2026-05-31", "agents": [
+            {"repo": "block/goose"},
+            {"repo": "aaif-goose/goose"},
+            {"repo": "openai/codex"},
+        ]},
+        {"_date": "2026-06-01", "agents": [
+            {"repo": "block/goose"},
+            {"repo": "aaif-goose/goose"},
+            {"repo": "openai/codex"},
+        ]},
+    ]
+    rows = [
+        {"name": "Goose", "repo": "block/goose", "slug": "goose", "rank": 40, "category": "Coding Agents", "evidence_grade": "B"},
+        {"name": "Goose", "repo": "aaif-goose/goose", "slug": "aaif-goose-goose", "rank": 70, "category": "Agent Frameworks", "evidence_grade": "C"},
+        {"name": "Codex", "repo": "openai/codex", "slug": "codex", "rank": 2, "category": "Coding Agents", "evidence_grade": "A"},
+    ]
+    added = fb.compute_newly_added(rows, history, limit=6)
+    assert [item["repo"] for item in added] == ["aaif-goose/goose"]
 
 
 def test_load_cached_commit_counts_prefers_data_json_then_history(tmp_path, monkeypatch):
