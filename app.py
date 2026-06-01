@@ -629,9 +629,14 @@ def _compute_render_fingerprint() -> str:
         os.path.join(BASE_DIR, "template.html"),
         os.path.join(BASE_DIR, "compare", "index.html"),
         os.path.join(BASE_DIR, "og-v2.png"),
-        os.path.join(BASE_DIR, "data", "render_state.json"),
         os.path.join(BASE_DIR, "agents.json"),
     ]
+    # render_state.json lives on the volume in production (excluded from Docker
+    # image by .dockerignore).  Include it when present so adding an agent
+    # triggers a re-render; skip gracefully when the file doesn't exist yet.
+    _rs_path = os.path.join(BASE_DIR, "data", "render_state.json")
+    if os.path.isfile(_rs_path):
+        tracked_paths.append(_rs_path)
     templates_dir = os.path.join(BASE_DIR, "templates")
     for name in sorted(os.listdir(templates_dir)):
         if name.endswith((".html", ".j2")):
