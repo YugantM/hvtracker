@@ -956,24 +956,31 @@ def compute_movers(history: list[dict], window: int = 7) -> dict:
     return {"up": up, "down": down}
 
 
-def compute_newly_added(rows: list[dict], limit: int = 6) -> list[dict]:
-    """Return recently listed agents based on injected recent_events."""
+def compute_newly_added(rows: list[dict], history: list[dict], limit: int = 6) -> list[dict]:
+    """Return newest-looking agents for the homepage widget.
+
+    Prefer rows that are still pending their first full signal refresh because
+    those are the clearest recent additions in the current dataset shape.
+    """
+    if not rows:
+        return []
+    latest_date = history[-1].get("_date", "") if history else ""
+
+    pending_rows = [row for row in rows if row.get("pending_signals")]
+    source_rows = pending_rows if pending_rows else rows
+
     added = []
-    for row in rows:
-        events = row.get("recent_events") or []
-        listed_event = next((evt for evt in events if evt.get("type") == "listed"), None)
-        if not listed_event:
-            continue
+    for row in source_rows:
         added.append({
             "name": row["name"],
             "slug": row["slug"],
             "rank": row["rank"],
             "category": row.get("category") or "Uncategorized",
-            "date": listed_event.get("date", ""),
+            "date": latest_date,
             "pending_signals": bool(row.get("pending_signals")),
             "evidence_grade": row.get("evidence_grade", "D"),
         })
-    added.sort(key=lambda item: (item["date"], -item["rank"]), reverse=True)
+    added.sort(key=lambda item: item["rank"])
     return added[:limit]
 
 
@@ -2313,7 +2320,7 @@ def main() -> None:
     )
 
     movers = compute_movers(history)
-    newly_added = compute_newly_added(rows)
+    newly_added = compute_newly_added(rows, history)
 
     # Sort legacy rows by stars descending for display; populate fields needed by templates
     for lr in legacy_rows:
