@@ -743,12 +743,33 @@ def startup():
     # and corrections go to separate tables), so this is safe to run
     # unconditionally — it keeps category/legacy/license-override edits
     # in sync without waiting for a manual reseed.
+    #
+    # We also track a hash of the agents.json content (stored on the volume)
+    # to detect when the *content* actually changed across deploys. The
+    # fingerprint above hashes templates + agents.json bytes together; the
+    # render-only rebuild reads agents from the DB. If only agents.json
+    # changed (e.g. an agent's category was edited), template fingerprints
+    # match, but the render is still stale unless we explicitly trigger one.
+    agents_changed = False
     if db.enabled():
-        with open(os.path.join(BASE_DIR, "agents.json")) as f:
-            agents_seed = json.load(f)
-        for a in agents_seed:
-            db.upsert_agent(a)
-        print(f"[startup] synced {len(agents_seed)} entries from agents.json into DB")
+        with open(os.path.join(BASE_DIR, "agents.json"), "rb") as f:
+            agents_bytes = f.read()
+        agents_hash = hashlib.sha256(agents_bytes).hexdigest()
+        agents_seed = json.loads(agents_bytes)
+        agents_hash_path = os.path.join(OUTPUT_DIR, ".agents_hash")
+        try:
+            prev_hash = open(agents_hash_path).read().strip()
+        except OSError:
+            prev_hash = ""
+        if prev_hash != agents_hash:
+            for a in agents_seed:
+                db.upsert_agent(a)
+            with open(agents_hash_path, "w") as f:
+                f.write(agents_hash)
+            agents_changed = True
+            print(f"[startup] agents.json changed → synced {len(agents_seed)} entries into DB")
+        else:
+            print(f"[startup] agents.json unchanged ({len(agents_seed)} entries) — DB sync skipped")
     # If the volume has no site yet, build one in the background so the service
     # comes up immediately and the site appears shortly after.
     if not os.path.isfile(DATA_PATH):
@@ -757,16 +778,19 @@ def startup():
     elif _has_missing_commit_rows():
         threading.Thread(target=_refresh_and_record, args=("repair-commits", fingerprint), daemon=True).start()
         print("[startup] detected rows with missing commit counts — kicked off targeted repair refresh")
-    elif seeded > 0 or stored_fingerprint != fingerprint:
-        # We just dropped prior-day snapshots into a volume that already had a
-        # site rendered without them — or templates/assets changed in the image.
-        # Re-render so rank deltas, sparklines, movers, and share metadata stay
-        # in sync with the current deploy.
+    elif seeded > 0 or stored_fingerprint != fingerprint or agents_changed:
+        # Re-render when:
+        #   - we just dropped prior-day snapshots into a volume that already
+        #     had a site rendered without them, or
+        #   - templates/assets changed in the image, or
+        #   - agents.json content changed since last deploy (DB resync above)
         threading.Thread(target=_refresh_and_record, args=("render", fingerprint), daemon=True).start()
         if seeded > 0:
             print("[startup] history seeded into existing volume — kicked off render-only rebuild")
-        else:
+        elif stored_fingerprint != fingerprint:
             print("[startup] template/assets fingerprint changed — kicked off render-only rebuild")
+        else:
+            print("[startup] agents.json changed — kicked off render-only rebuild")
 
     if os.environ.get("DISABLE_SCHEDULER") != "1":
         from apscheduler.schedulers.background import BackgroundScheduler
