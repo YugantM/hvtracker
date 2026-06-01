@@ -737,12 +737,18 @@ def startup():
     fingerprint = _compute_render_fingerprint()
     stored_fingerprint = _read_render_fingerprint()
     db.init_schema()
-    # Seed the agents table from agents.json the first time the DB is empty.
-    if db.enabled() and db.count_agents() == 0:
+    # Sync agents table from agents.json on every startup.  agents.json is
+    # the source of truth; the table is rebuilt from it.  upsert_agent is
+    # idempotent and only `agents.json` writes to this table (submissions
+    # and corrections go to separate tables), so this is safe to run
+    # unconditionally — it keeps category/legacy/license-override edits
+    # in sync without waiting for a manual reseed.
+    if db.enabled():
         with open(os.path.join(BASE_DIR, "agents.json")) as f:
-            for a in json.load(f):
-                db.upsert_agent(a)
-        print(f"[startup] seeded agents table from agents.json")
+            agents_seed = json.load(f)
+        for a in agents_seed:
+            db.upsert_agent(a)
+        print(f"[startup] synced {len(agents_seed)} entries from agents.json into DB")
     # If the volume has no site yet, build one in the background so the service
     # comes up immediately and the site appears shortly after.
     if not os.path.isfile(DATA_PATH):
