@@ -37,5 +37,16 @@ CREATE TABLE IF NOT EXISTS corrections (
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS interest_signups (
+    id          BIGSERIAL PRIMARY KEY,
+    kind        TEXT NOT NULL,                  -- alerts | track-agent | sponsor | api-access
+    email       TEXT NOT NULL,
+    repo        TEXT,
+    payload     JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE INDEX IF NOT EXISTS submissions_status_idx ON submissions (status);
 CREATE INDEX IF NOT EXISTS corrections_status_idx ON corrections (status);
+CREATE INDEX IF NOT EXISTS interest_signups_kind_idx ON interest_signups (kind);
+CREATE INDEX IF NOT EXISTS interest_signups_repo_idx ON interest_signups (repo);

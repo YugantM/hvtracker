@@ -80,8 +80,27 @@ def test_static_site_served(client):
     assert client.get("/api/feed").status_code == 200
 
 
+def test_growth_pages_render(client):
+    assert client.get("/alerts").status_code == 200
+    assert client.get("/sponsor").status_code == 200
+    assert client.get("/data-api").status_code == 200
+    assert client.get("/track/codex").status_code == 200
+    assert client.get("/track/not-a-real-agent").status_code == 404
+
+
 def test_submit_validation_rejects_bad_repo(client):
     # No DB configured, so a valid repo would raise; we only assert the
     # owner/name validation guard fires before any DB call.
     r = client.post("/submit", data={"repo": "not-a-repo", "name": "X"})
     assert r.status_code == 400
+
+
+def test_growth_post_routes_fail_gracefully_without_db(client):
+    for path, payload in (
+        ("/alerts", {"email": "test@example.com"}),
+        ("/sponsor", {"name": "Y", "company": "HV", "email": "test@example.com", "message": "Hi"}),
+        ("/data-api", {"email": "test@example.com", "message": "Need access"}),
+        ("/track/codex", {"email": "test@example.com"}),
+    ):
+        r = client.post(path, data=payload)
+        assert r.status_code == 503

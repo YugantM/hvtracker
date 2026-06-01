@@ -123,6 +123,20 @@ def add_correction(repo: str, payload: dict, contact: str | None) -> int:
         return new_id
 
 
+def add_interest_signup(kind: str, email: str, repo: str | None, payload: dict) -> int:
+    if not enabled():
+        raise RuntimeError("add_interest_signup requires DATABASE_URL")
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO interest_signups (kind, email, repo, payload) "
+            "VALUES (%s, %s, %s, %s) RETURNING id",
+            (kind, email, repo, json.dumps(payload)),
+        )
+        new_id = cur.fetchone()[0]
+        conn.commit()
+        return new_id
+
+
 def list_queue(table: str, status: str = "pending") -> list[dict]:
     if table not in ("submissions", "corrections"):
         raise ValueError(table)

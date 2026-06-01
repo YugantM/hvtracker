@@ -300,6 +300,11 @@
       text-decoration:none;
       background:rgba(143,179,255,0.10);
     }
+    .watch-button.is-saved {
+      color:var(--text);
+      border-color:rgba(45,212,191,0.45);
+      background:rgba(45,212,191,0.14);
+    }
     .review-card {
       padding:18px 20px; margin:14px 0;
       border:1px solid var(--border); border-radius:10px;
@@ -506,7 +511,9 @@
       </div>
       <div class="hero-actions">
         <a class="compare-link" href="/compare/?a={{ row.slug }}">Compare</a>
-        <a class="secondary-link" href="#embed-badge">Embed badge</a>
+        <button class="secondary-link watch-button" id="watchToggle" type="button" data-watch-slug="{{ row.slug }}" data-watch-name="{{ row.name }}" data-watch-repo="{{ row.repo }}">Save to watchlist</button>
+        <a class="secondary-link" id="watchlistCompareLink" href="/compare/">Compare saved agents</a>
+        <a class="secondary-link" href="/track/{{ row.slug }}">Track this agent</a>
         <a class="secondary-link" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Suggest correction</a>
       </div>
       <div class="seo-summary" style="margin-top:18px;font-size:14px;color:var(--muted);line-height:1.7;max-width:640px;">
@@ -551,6 +558,7 @@
 {% else %}
         <a class="compare-link" href="/compare/?a={{ row.slug }}">Compare with another agent</a>
 {% endif %}
+        <a class="secondary-link" href="/track/{{ row.slug }}">Track {{ row.name }}</a>
         {% if row.category %}<a class="secondary-link" href="/categories/{{ row.category_slug }}">View {{ row.category }}</a>{% endif %}
         <a class="secondary-link" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Report missing data</a>
       </div>
@@ -625,7 +633,7 @@
         </div>
         <div>
           <div class="stat-label">Commits (4 wk)</div>
-          <div class="stat-value">{% if row.weekly_commits is not none %}{{ row.weekly_commits }}{% else %}—{% endif %}{% if row.commits_low_confidence %}<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:13px;margin-left:3px;cursor:help;">?</span>{% endif %}</div>
+          <div class="stat-value">{% if row.weekly_commits is not none %}{{ row.weekly_commits }}{% else %}—{% endif %}{% if row.commits_low_confidence %}<span title="Recent push detected; GitHub's commit stats cache may be stale, so this 4-week count could be temporarily under-reported." style="color:var(--aging);font-size:13px;margin-left:3px;cursor:help;">?</span>{% endif %}</div>
         </div>
         <div>
           <div class="stat-label">Downloads (7d)</div>
@@ -964,5 +972,55 @@
     </footer>
 
   </div>
+  <script>
+    (function () {
+      const WATCHLIST_KEY = "hvtracker_watchlist_v1";
+      const btn = document.getElementById("watchToggle");
+      const compareLink = document.getElementById("watchlistCompareLink");
+      if (!btn || !compareLink) return;
+
+      function loadWatchlist() {
+        try {
+          const raw = localStorage.getItem(WATCHLIST_KEY);
+          const items = raw ? JSON.parse(raw) : [];
+          return Array.isArray(items) ? items : [];
+        } catch (_) {
+          return [];
+        }
+      }
+
+      function saveWatchlist(items) {
+        localStorage.setItem(WATCHLIST_KEY, JSON.stringify(items.slice(0, 12)));
+      }
+
+      function render() {
+        const items = loadWatchlist();
+        const saved = items.some((item) => item.slug === btn.dataset.watchSlug);
+        btn.classList.toggle("is-saved", saved);
+        btn.textContent = saved ? "Saved to watchlist" : "Save to watchlist";
+        compareLink.href = items.length ? "/compare/?watchlist=1" : "/compare/";
+        compareLink.textContent = items.length ? `Compare saved agents (${items.length})` : "Compare saved agents";
+      }
+
+      btn.addEventListener("click", () => {
+        const items = loadWatchlist();
+        const slug = btn.dataset.watchSlug;
+        const existing = items.find((item) => item.slug === slug);
+        const next = existing
+          ? items.filter((item) => item.slug !== slug)
+          : items.concat([{ slug, name: btn.dataset.watchName, repo: btn.dataset.watchRepo }]).slice(0, 12);
+        saveWatchlist(next);
+        render();
+        if (typeof hvtTrack === "function") {
+          hvtTrack(existing ? "watchlist_remove" : "watchlist_add", {
+            slug,
+            watchlist_size: next.length
+          });
+        }
+      });
+
+      render();
+    })();
+  </script>
 </body>
 </html>

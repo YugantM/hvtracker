@@ -33,6 +33,10 @@ case "$MODE" in
     ARGS=(--pending-only)
     echo "=== Refreshing pending agents only ==="
     ;;
+  repair-commits)
+    ARGS=(--repair-commits)
+    echo "=== Repairing rows with missing commit counts ==="
+    ;;
   render)
     ARGS=(--render-only)
     echo "=== Rendering from cached state only ==="

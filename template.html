@@ -322,6 +322,70 @@
       padding-bottom: 2px;
     }
     .intro-links a:hover { color: var(--text); text-decoration: none; border-color: var(--accent); }
+    .growth-strip {
+      margin: 0 0 16px;
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background:
+        linear-gradient(135deg, rgba(45,212,191,0.06), rgba(143,179,255,0.045) 42%, rgba(216,166,87,0.04)),
+        rgba(13, 17, 24, 0.84);
+      box-shadow: var(--panel-shadow);
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .growth-copy { max-width: 620px; }
+    .growth-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--mocha);
+      margin-bottom: 6px;
+    }
+    .growth-copy strong {
+      display: block;
+      font-size: 18px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .growth-copy p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .growth-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .growth-actions a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-decoration: none;
+    }
+    .growth-actions a.primary {
+      border-color: var(--accent);
+      background: rgba(143,179,255,0.14);
+      color: var(--text);
+      font-weight: 700;
+    }
+    .growth-actions a:hover {
+      color: var(--text);
+      border-color: var(--accent-dim);
+      background: rgba(143,179,255,0.12);
+    }
 
     /* ── Category tabs (underline / ink-bar) ── */
     .cat-tabs {
@@ -643,6 +707,11 @@
 
     /* ── Agent name cell ── */
     .agent-cell { min-width: 0; overflow: hidden; }
+    .agent-head {
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
     .agent-name {
       font-weight: 600;
       font-size: 13px;
@@ -715,6 +784,133 @@
       flex-wrap: wrap;
       align-items: center;
       margin-top: 2px;
+    }
+    .watch-toggle {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:24px;
+      height:24px;
+      padding:0;
+      border-radius:7px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,0.04);
+      color:var(--muted);
+      font-family:var(--font-mono);
+      font-size:0;
+      cursor:pointer;
+      transition:border-color .15s, background .15s, color .15s;
+      flex-shrink:0;
+    }
+    .watch-toggle::before {
+      content:"⇄";
+      font-size:11px;
+      line-height:1;
+    }
+    .watch-toggle:hover {
+      color:var(--text);
+      border-color:var(--accent-dim);
+      background:rgba(143,179,255,0.10);
+    }
+    .watch-toggle.is-saved {
+      color:var(--text);
+      border-color:rgba(45,212,191,0.45);
+      background:rgba(45,212,191,0.14);
+    }
+    .watch-toggle.is-saved::before {
+      content:"✓";
+      font-size:12px;
+    }
+    .watch-panel {
+      margin: 0 0 16px;
+      padding: 16px 18px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(13, 17, 24, 0.78);
+      box-shadow: var(--panel-shadow);
+      display:grid;
+      gap:12px;
+    }
+    .watch-panel-head {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .watch-panel-copy strong {
+      display:block;
+      color:var(--text);
+      margin-bottom:4px;
+      font-size:16px;
+    }
+    .watch-panel-copy p {
+      color:var(--muted);
+      font-size:13px;
+      max-width:620px;
+    }
+    .watch-panel-actions {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .watch-link {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:36px;
+      padding:8px 13px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,0.04);
+      color:var(--muted);
+      font-family:var(--font-mono);
+      font-size:11px;
+      text-decoration:none;
+    }
+    .watch-link.primary {
+      border-color:var(--accent);
+      background:rgba(143,179,255,0.14);
+      color:var(--text);
+      font-weight:700;
+    }
+    .watch-link:hover {
+      color:var(--text);
+      border-color:var(--accent-dim);
+      background:rgba(143,179,255,0.10);
+      text-decoration:none;
+    }
+    .watch-list {
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      min-height:28px;
+    }
+    .watch-pill {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,0.04);
+      color:var(--text);
+      font-family:var(--font-mono);
+      font-size:11px;
+    }
+    .watch-pill button {
+      border:none;
+      background:none;
+      color:var(--muted);
+      cursor:pointer;
+      font:inherit;
+      padding:0;
+    }
+    .watch-pill button:hover { color:var(--delta-down); }
+    .watch-empty {
+      color:var(--muted);
+      font-size:12px;
+      font-family:var(--font-mono);
     }
     .evidence-badge {
       display: inline-block;
@@ -1029,7 +1225,9 @@
       <nav class="site-nav" aria-label="Site">
         <a href="/methodology">Methodology</a>
         <a href="/compare/">Compare</a>
-        <a href="/badges/">Badge</a>
+        <a href="/alerts">Alerts</a>
+        <a href="/data-api">Data API</a>
+        <a href="/sponsor">Sponsor</a>
       </nav>
       <div class="meta">
         <span class="live-dot"></span>updated {{ updated }}
@@ -1056,7 +1254,38 @@
       <div class="intro-links" aria-label="Key HVTracker resources">
         <a href="/methodology">How the ranking works</a>
         <a href="/data.json">Download data.json</a>
+        <a href="/alerts">Join alerts waitlist</a>
+        <a href="/data-api">Request API access</a>
         <a href="/spec/">Specifications</a>
+      </div>
+    </section>
+
+    <section class="growth-strip" aria-label="Operator actions">
+      <div class="growth-copy">
+        <div class="growth-eyebrow">Early access</div>
+        <strong>Want rank-change alerts, data access, or a sponsorship slot?</strong>
+        <p>HVTracker is still early. These links double as product validation, so the fastest way to shape the roadmap is to tell me what you actually want to use.</p>
+      </div>
+      <div class="growth-actions">
+        <a class="primary" href="/alerts">Get alerts</a>
+        <a href="/data-api">Data API</a>
+        <a href="/sponsor">Sponsor HVTracker</a>
+      </div>
+    </section>
+
+    <section class="watch-panel" aria-label="Free watchlist">
+      <div class="watch-panel-head">
+        <div class="watch-panel-copy">
+          <strong>Save agents to a free watchlist.</strong>
+          <p>No login needed. Save interesting projects in this browser, then open the compare view with your saved list preloaded.</p>
+        </div>
+        <div class="watch-panel-actions">
+          <a class="watch-link primary" id="watchlistCompareLink" href="/compare/">Compare saved agents</a>
+          <a class="watch-link" id="watchlistClearLink" href="#">Clear watchlist</a>
+        </div>
+      </div>
+      <div class="watch-list" id="watchlistPreview">
+        <span class="watch-empty">Your watchlist is empty. Use the + buttons in the table to save agents.</span>
       </div>
     </section>
 
@@ -1187,7 +1416,10 @@
             </td>
             <td class="delta {{ row.rank_delta_class }}">{{ row.rank_delta_display }}</td>
             <td class="agent-cell">
-              <a class="agent-name" href="/agents/{{ row.slug }}">{{ row.name }}</a>
+              <div class="agent-head">
+                <a class="agent-name" href="/agents/{{ row.slug }}">{{ row.name }}</a>
+                <button class="watch-toggle" type="button" data-watch-slug="{{ row.slug }}" data-watch-name="{{ row.name }}" data-watch-repo="{{ row.repo }}" aria-label="Save {{ row.name }} to watchlist"></button>
+              </div>
               <a class="agent-repo" href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>
               {% if row.description %}<span class="agent-desc" title="{{ row.description }}">{{ row.description }}</span>{% endif %}
               <div class="agent-tags">
@@ -1206,7 +1438,7 @@
                 <span class="push-text">{{ row.last_push }}</span>
               </div>
             </td>
-            <td class="r num">{{ row.weekly_commits }}{% if row.commits_low_confidence %}<span title="commit count may be stale (GitHub Stats API cache)" style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span>{% endif %}</td>
+            <td class="r num">{% if row.weekly_commits is not none %}{{ row.weekly_commits }}{% else %}&mdash;{% endif %}{% if row.commits_low_confidence %}<span title="Recent push detected; GitHub's commit stats cache may be stale, so this 4-week count could be temporarily under-reported." style="color:var(--aging);font-size:10px;margin-left:2px;cursor:help;">?</span>{% endif %}</td>
             <td class="r">
               <span class="trust-pill {% if row.trust_score >= 55 %}trust-high{% elif row.trust_score >= 30 %}trust-mid{% else %}trust-low{% endif %}" title="Safety {{ row.trust_breakdown.safety }} · Identity {{ row.trust_breakdown.identity }} · Transparency {{ row.trust_breakdown.transparency }} · Maintenance {{ row.trust_breakdown.maintenance }} · Adoption {{ row.trust_breakdown.adoption }}{% if row.trust_confidence %} · {{ (row.trust_confidence * 100) | round }}% confidence{% endif %}">{{ row.trust_score }}</span>
               {% if row.trust_trend_7d is not none and row.trust_trend_7d != 0 %}
@@ -1294,6 +1526,7 @@
   <script>
     // ── Category filtering, sorting & pagination ──
     (function () {
+      const WATCHLIST_KEY = "hvtracker_watchlist_v1";
       const PAGE_SIZE = 15;
       let currentPage = 0;
 
@@ -1451,6 +1684,57 @@
         sortRows();
       }
 
+      function loadWatchlist() {
+        try {
+          const raw = localStorage.getItem(WATCHLIST_KEY);
+          const items = raw ? JSON.parse(raw) : [];
+          return Array.isArray(items) ? items : [];
+        } catch (_) {
+          return [];
+        }
+      }
+
+      function saveWatchlist(items) {
+        localStorage.setItem(WATCHLIST_KEY, JSON.stringify(items.slice(0, 12)));
+      }
+
+      function updateWatchButtons() {
+        const items = loadWatchlist();
+        document.querySelectorAll(".watch-toggle").forEach((btn) => {
+          const saved = items.some((item) => item.slug === btn.dataset.watchSlug);
+          btn.classList.toggle("is-saved", saved);
+          btn.setAttribute("aria-label", saved
+            ? `Remove ${btn.dataset.watchName} from watchlist`
+            : `Save ${btn.dataset.watchName} to watchlist`);
+        });
+      }
+
+      function renderWatchlistPreview() {
+        const items = loadWatchlist();
+        const preview = document.getElementById("watchlistPreview");
+        const compareLink = document.getElementById("watchlistCompareLink");
+        const clearLink = document.getElementById("watchlistClearLink");
+        clearLink.style.visibility = items.length ? "visible" : "hidden";
+        compareLink.href = items.length ? "/compare/?watchlist=1" : "/compare/";
+        compareLink.textContent = items.length ? `Compare saved agents (${items.length})` : "Compare saved agents";
+        if (!items.length) {
+          preview.innerHTML = '<span class="watch-empty">Your watchlist is empty. Use the + buttons in the table to save agents.</span>';
+          updateWatchButtons();
+          return;
+        }
+        preview.innerHTML = items.map((item) => (
+          `<span class="watch-pill">${item.name}<button type="button" data-remove-slug="${item.slug}" aria-label="Remove ${item.name}">×</button></span>`
+        )).join("");
+        preview.querySelectorAll("[data-remove-slug]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const next = loadWatchlist().filter((item) => item.slug !== btn.dataset.removeSlug);
+            saveWatchlist(next);
+            renderWatchlistPreview();
+          });
+        });
+        updateWatchButtons();
+      }
+
       searchInput.addEventListener("input", () => {
         searchTerm = searchInput.value.trim().toLowerCase();
         applyFilters();
@@ -1530,6 +1814,30 @@
         syncUI();
       });
 
+      document.querySelectorAll(".watch-toggle").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const items = loadWatchlist();
+          const slug = btn.dataset.watchSlug;
+          const existing = items.find((item) => item.slug === slug);
+          const next = existing
+            ? items.filter((item) => item.slug !== slug)
+            : items.concat([{ slug, name: btn.dataset.watchName, repo: btn.dataset.watchRepo }]).slice(0, 12);
+          saveWatchlist(next);
+          renderWatchlistPreview();
+          hvtTrack(existing ? "watchlist_remove" : "watchlist_add", {
+            slug,
+            watchlist_size: next.length
+          });
+        });
+      });
+
+      document.getElementById("watchlistClearLink").addEventListener("click", (e) => {
+        e.preventDefault();
+        saveWatchlist([]);
+        renderWatchlistPreview();
+        hvtTrack("watchlist_clear", {});
+      });
+
       // ── Pagination ──
       prevBtn.addEventListener("click", () => {
         if (currentPage > 0) {
@@ -1570,6 +1878,7 @@
       });
 
       // Initial render
+      renderWatchlistPreview();
       renderPage();
 
       // ⌘K / Ctrl+K → focus search

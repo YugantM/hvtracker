@@ -35,11 +35,81 @@ METHODOLOGY_VERSION = "v3.1"
 DATA_SCHEMA_VERSION = "v0.1"
 
 
+def _github_retry_delay(resp: requests.Response | None, attempt: int) -> float:
+    """Best-effort backoff for transient GitHub API failures."""
+    if resp is not None:
+        retry_after = resp.headers.get("Retry-After")
+        if retry_after:
+            try:
+                return max(1.0, min(float(retry_after), 30.0))
+            except ValueError:
+                pass
+        if resp.headers.get("X-RateLimit-Remaining") == "0":
+            reset = resp.headers.get("X-RateLimit-Reset")
+            if reset:
+                try:
+                    wait = float(reset) - time.time() + 1.0
+                    return max(1.0, min(wait, 30.0))
+                except ValueError:
+                    pass
+    return min(2.0 * (attempt + 1), 10.0)
+
+
+def _github_get(
+    url: str,
+    *,
+    params: dict | None = None,
+    timeout: int = 30,
+    attempts: int = 4,
+    allow_202: bool = False,
+) -> requests.Response:
+    """GET a GitHub API endpoint with bounded retries for transient failures."""
+    last_resp: requests.Response | None = None
+    last_exc: Exception | None = None
+
+    for attempt in range(attempts):
+        try:
+            resp = requests.get(url, headers=HEADERS, params=params, timeout=timeout)
+            last_resp = resp
+            if resp.status_code == 200:
+                return resp
+            if allow_202 and resp.status_code == 202 and attempt < attempts - 1:
+                time.sleep(5 * (attempt + 1))
+                continue
+            if resp.status_code in {403, 429, 500, 502, 503, 504} and attempt < attempts - 1:
+                delay = _github_retry_delay(resp, attempt)
+                print(
+                    f"GitHub retry {attempt + 1}/{attempts} for {url} "
+                    f"(status {resp.status_code}, waiting {delay:.1f}s)",
+                    file=sys.stderr,
+                )
+                time.sleep(delay)
+                continue
+            resp.raise_for_status()
+        except requests.RequestException as exc:
+            last_exc = exc
+            if attempt < attempts - 1:
+                delay = _github_retry_delay(last_resp, attempt)
+                print(
+                    f"GitHub request error {attempt + 1}/{attempts} for {url}: {exc} "
+                    f"(waiting {delay:.1f}s)",
+                    file=sys.stderr,
+                )
+                time.sleep(delay)
+                continue
+            raise
+
+    if last_resp is not None:
+        last_resp.raise_for_status()
+    if last_exc is not None:
+        raise last_exc
+    raise RuntimeError(f"GitHub request failed without response: {url}")
+
+
 @cache.cached("repo", ttl=5400)
 def get_repo(owner_repo: str) -> dict:
     url = f"{GITHUB_API}/repos/{owner_repo}"
-    r = requests.get(url, headers=HEADERS, timeout=15)
-    r.raise_for_status()
+    r = _github_get(url, timeout=15)
     return r.json()
 
 
@@ -47,17 +117,11 @@ def get_repo(owner_repo: str) -> dict:
 def get_commit_activity(owner_repo: str) -> list:
     """Return list of weekly commit-count dicts for the last 52 weeks."""
     url = f"{GITHUB_API}/repos/{owner_repo}/stats/commit_activity"
-    for attempt in range(3):
-        r = requests.get(url, headers=HEADERS, timeout=30)
-        if r.status_code == 200:
-            return r.json() or []
-        if r.status_code == 202:
-            # GitHub is computing stats asynchronously; wait and retry
-            time.sleep(5 * (attempt + 1))
-            continue
-        # Any other failure: skip gracefully
+    try:
+        r = _github_get(url, timeout=30, attempts=4, allow_202=True)
+        return r.json() or []
+    except Exception:
         return []
-    return []
 
 
 def _parse_link_last_page(link_header: str) -> tuple[int | None, str | None]:
@@ -81,8 +145,7 @@ def fetch_recent_commits(owner_repo: str, days: int = 30) -> int | None:
     params = {"since": since_iso, "per_page": 100}
 
     try:
-        r = requests.get(url, headers=HEADERS, params=params, timeout=30)
-        r.raise_for_status()
+        r = _github_get(url, params=params, timeout=30, attempts=4)
         commits = r.json()
         if not isinstance(commits, list):
             return None
@@ -95,8 +158,7 @@ def fetch_recent_commits(owner_repo: str, days: int = 30) -> int | None:
             if last_page is None or last_page <= 1:
                 count = len(commits)
             elif last_url:
-                r_last = requests.get(last_url, headers=HEADERS, timeout=30)
-                r_last.raise_for_status()
+                r_last = _github_get(last_url, timeout=30, attempts=4)
                 last_commits = r_last.json()
                 if not isinstance(last_commits, list):
                     return None
@@ -822,6 +884,38 @@ def load_previous_downloads(history_dir: str) -> dict[str, tuple[int, str]]:
         return {}
 
 
+def load_cached_commit_counts(data_path: str, history_dir: str) -> dict[str, int]:
+    """Load last-known-good commit counts from data.json, then prior history.
+
+    This prevents transient GitHub stats/commits API failures from blanking the
+    commit column for repos that had a valid count on a previous run.
+    """
+    result: dict[str, int] = {}
+
+    try:
+        with open(data_path, encoding="utf-8") as f:
+            current = json.load(f)
+        for a in current.get("agents", []):
+            commits = a.get("weekly_commits")
+            if commits is not None and a.get("repo"):
+                result[a["repo"].lower()] = commits
+    except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
+        pass
+
+    prev = _load_prior_snapshot(history_dir)
+    if not prev:
+        return result
+    try:
+        for a in prev.get("agents", []):
+            repo = a.get("repo")
+            commits = a.get("weekly_commits")
+            if repo and commits is not None and repo.lower() not in result:
+                result[repo.lower()] = commits
+    except (KeyError, TypeError):
+        pass
+    return result
+
+
 def load_history(history_dir: str) -> list[dict]:
     """Load all history snapshots sorted chronologically. Returns list of dicts."""
     snapshots = []
@@ -1366,6 +1460,34 @@ def load_existing_data_repos(data_path: str) -> set[str]:
         return set()
 
 
+def load_repos_with_missing_commits(data_path: str) -> set[str]:
+    """Return repos whose generated row has a missing 4-week commit count."""
+    try:
+        with open(data_path, encoding="utf-8") as f:
+            existing = json.load(f)
+        return {
+            a["repo"].lower()
+            for a in existing.get("agents", [])
+            if a.get("repo") and a.get("weekly_commits") is None
+        }
+    except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
+        return set()
+
+
+def load_existing_agents_map(data_path: str) -> dict[str, dict]:
+    """Return the current generated agents keyed by repo."""
+    try:
+        with open(data_path, encoding="utf-8") as f:
+            existing = json.load(f)
+        return {
+            a["repo"].lower(): a
+            for a in existing.get("agents", [])
+            if a.get("repo")
+        }
+    except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
+        return {}
+
+
 def provisional_agent_row(agent: dict) -> dict:
     """Create a cached render row for a newly-listed agent awaiting signals."""
     repo_id = agent["repo"]
@@ -1428,6 +1550,35 @@ def add_provisional_missing_agents(rows: list[dict], agents: list[dict]) -> int:
     return added
 
 
+def repair_missing_commit_counts(rows: list[dict], cached_commit_counts: dict[str, int]) -> int:
+    """Retry commit-count collection for rows that still have no 4-week count."""
+    repaired = 0
+    for row in rows:
+        if row.get("weekly_commits") is not None or not row.get("repo"):
+            continue
+        repo_id = row["repo"]
+        last_push = row.get("last_push")
+        try:
+            pushed = datetime.strptime(str(last_push)[:10], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            d = max(0, (datetime.now(timezone.utc) - pushed).days)
+        except Exception:
+            d = row.get("days_ago", 999)
+
+        weeks = get_commit_activity(repo_id)
+        commits_4wk = sum(w["total"] for w in weeks[-4:]) if weeks else None
+        if commits_4wk is None or (commits_4wk == 0 and (not weeks or d <= 7)):
+            commits_4wk = fetch_recent_commits(repo_id)
+        if commits_4wk is None:
+            commits_4wk = cached_commit_counts.get(repo_id.lower())
+
+        if commits_4wk is not None:
+            row["weekly_commits"] = commits_4wk
+            row["commits_low_confidence"] = bool(d <= 7 and commits_4wk < 10)
+            repaired += 1
+            print(f"  repaired commits {repo_id:<45} {commits_4wk}")
+    return repaired
+
+
 def main() -> None:
     # base_dir = code/asset root (templates, scorecard cache).
     # script_dir = output root (volume in production via OUTPUT_DIR; falls back
@@ -1453,9 +1604,15 @@ def main() -> None:
     batch = parse_batch_arg()
     render_only = "--render-only" in sys.argv
     pending_only = "--pending-only" in sys.argv
+    repair_commits = "--repair-commits" in sys.argv
     render_state_path = os.path.join(script_dir, "data", "render_state.json")
     if render_only:
         print("\n=== RENDER-ONLY MODE: no API calls, rebuilding pages from cache ===\n")
+        batch = None
+        pending_only = False
+        repair_commits = False
+    elif repair_commits:
+        print("\n=== REPAIR-COMMITS MODE: refreshing rows with missing 4-week commit counts ===\n")
         batch = None
         pending_only = False
     elif pending_only:
@@ -1492,6 +1649,14 @@ def main() -> None:
         ]
         legacy_agents = []
         print(f"Pending-only: fetching {len(agents)} newly-listed agent(s)")
+    elif repair_commits:
+        broken_commit_repos = load_repos_with_missing_commits(data_path)
+        agents = [
+            a for a in all_agents
+            if a["repo"].lower() in broken_commit_repos
+        ]
+        legacy_agents = []
+        print(f"Repair-commits: refreshing {len(agents)} agent(s) with missing commit counts")
     elif batch:
         batch_agents = select_batch(all_agents, batch_num, total_batches)
         existing_data_repos = load_existing_data_repos(data_path)
@@ -1521,6 +1686,8 @@ def main() -> None:
     os.makedirs(history_dir, exist_ok=True)
     prev_ranks = load_previous_ranks(history_dir)
     prev_downloads = load_previous_downloads(history_dir)
+    cached_commit_counts = load_cached_commit_counts(data_path, history_dir)
+    existing_agents_map = load_existing_agents_map(data_path)
     history = load_history(history_dir)
     sparkline_data = compute_sparklines(history)
 
@@ -1529,6 +1696,44 @@ def main() -> None:
         name = agent.get("name", repo_id.split("/")[1])
         category = agent.get("category", "")
         npm_pkg = agent.get("npm_package", "")
+        existing_row = existing_agents_map.get(repo_id.lower())
+
+        if repair_commits:
+            if not existing_row:
+                return None
+            weeks = get_commit_activity(repo_id)
+            last_push = existing_row.get("last_push")
+            if last_push:
+                try:
+                    pushed = datetime.strptime(str(last_push)[:10], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                    d = max(0, (datetime.now(timezone.utc) - pushed).days)
+                except Exception:
+                    d = existing_row.get("days_ago", 999)
+            else:
+                d = existing_row.get("days_ago", 999)
+            commits_4wk = sum(w["total"] for w in weeks[-4:]) if weeks else None
+            if commits_4wk is None or (commits_4wk == 0 and (not weeks or d <= 7)):
+                commits_4wk = fetch_recent_commits(repo_id)
+            recent_commits = commits_4wk
+            used_cached_commit_count = False
+            if recent_commits is None:
+                cached_commits = cached_commit_counts.get(repo_id.lower())
+                if cached_commits is not None:
+                    recent_commits = cached_commits
+                    used_cached_commit_count = True
+
+            repaired = dict(existing_row)
+            repaired["weekly_commits"] = recent_commits
+            repaired["commits_low_confidence"] = bool(
+                recent_commits is None or used_cached_commit_count
+            )
+            print(
+                f"OK  {repo_id:<45} repair-commits="
+                f"{recent_commits if recent_commits is not None else 'missing'}"
+                f"{' [cached commits]' if used_cached_commit_count else ''}"
+            )
+            return repaired
+
         try:
             repo = get_repo(repo_id)
         except requests.HTTPError as e:
@@ -1547,6 +1752,12 @@ def main() -> None:
         if commits_4wk is None or (commits_4wk == 0 and (not weeks or d <= 7)):
             commits_4wk = fetch_recent_commits(repo_id)
         recent_commits = commits_4wk
+        used_cached_commit_count = False
+        if recent_commits is None:
+            cached_commits = cached_commit_counts.get(repo_id.lower())
+            if cached_commits is not None:
+                recent_commits = cached_commits
+                used_cached_commit_count = True
         score = health_score(
             repo["stargazers_count"],
             d,
@@ -1554,7 +1765,9 @@ def main() -> None:
             repo["forks_count"],
         )
         # Flag cells where Stats API may still be stale (recent push, very low count).
-        commits_low_confidence = bool(d <= 7 and (recent_commits or 0) < 10)
+        commits_low_confidence = bool(
+            used_cached_commit_count or (d <= 7 and (recent_commits or 0) < 10)
+        )
 
         # Fetch npm/crate downloads + provenance in parallel
         pypi_pkg = agent.get("pypi_package", "")
@@ -1567,7 +1780,8 @@ def main() -> None:
         docker_pulls = fetch_docker_pulls(docker_img) if docker_img else None
         vscode_ext = agent.get("vscode_extension", "")
         vscode_installs = fetch_vscode_installs(vscode_ext) if vscode_ext else None
-        print(f"OK  {repo_id:<45} score={score:5.1f}")
+        fallback_note = " [cached commits]" if used_cached_commit_count else ""
+        print(f"OK  {repo_id:<45} score={score:5.1f}{fallback_note}")
 
         return {
             "name": name,
@@ -1741,7 +1955,7 @@ def main() -> None:
               f"{len(rows)-cache_hits-api_hits} unavailable.")
 
     # In incremental modes, merge freshly-fetched rows with existing data.json entries
-    if batch or pending_only:
+    if batch or pending_only or repair_commits:
         old_agents = merge_batch_into_data(data_path, rows)
         # old_agents have pre-computed fields from prior runs; rows are fresh
         # Re-compute display fields on fresh rows to match old format
@@ -1768,6 +1982,11 @@ def main() -> None:
         if provisional_count:
             print(f"Batch merge: added {provisional_count} provisional agent listing(s) pending signal refresh")
         print(f"\nMerged incremental refresh: {len(rows)} total agents ({len(rows) - len(old_agents)} refreshed, {len(old_agents)} carried forward)")
+
+    if not render_only and not repair_commits:
+        repaired_count = repair_missing_commit_counts(rows, cached_commit_counts)
+        if repaired_count:
+            print(f"\nRepaired {repaired_count} missing commit count(s) before final render.")
 
     # Provisional momentum ordering; final rank is assigned by trust_score
     # below, once evidence grade and the HVTrust composite are computed.
@@ -2417,6 +2636,7 @@ def main() -> None:
     sitemap_urls.append(("https://hvtracker.net/blog/coding-agents-trust-rankings", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/ai-agent-frameworks-ranked-by-trust", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/github-stars-dont-predict-ai-agent-trust", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/codex-vs-claude-code", "0.9", "weekly"))
     for article in blog_articles:
         sitemap_urls.append((f"https://hvtracker.net/blog/{article['slug']}", "0.8", "weekly"))
     for row in rows:
@@ -2557,6 +2777,14 @@ HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Ma
             "date_modified": now_iso,
             "tags": ["Provenance", "Trust rankings"],
         },
+        {
+            "id": "https://hvtracker.net/blog/codex-vs-claude-code",
+            "url": "https://hvtracker.net/blog/codex-vs-claude-code",
+            "title": "Codex vs Claude Code: Which Coding Agent Is Easier to Trust?",
+            "content_text": "Claude Code has more stars, but Codex ranks far higher on HVTracker. The gap is about provenance, signed commits, and public verifiability.",
+            "date_modified": now_iso,
+            "tags": ["Coding agents", "Comparison"],
+        },
     ] + [
         {
             "id": f"https://hvtracker.net/blog/{a['slug']}",
@@ -2667,6 +2895,7 @@ def run_refresh(mode: str = "auto") -> None:
       full   — full refresh of all agents
       render — rebuild pages from cached render_state (no API calls)
       pending— refresh only newly-listed agents
+      repair-commits — refresh only rows whose commit count is currently missing
     """
     out_dir = os.environ.get("OUTPUT_DIR", os.path.dirname(os.path.abspath(__file__)))
     argv = ["fetch_and_build.py"]
@@ -2680,6 +2909,8 @@ def run_refresh(mode: str = "auto") -> None:
         argv.append("--render-only")
     elif mode == "pending":
         argv.append("--pending-only")
+    elif mode == "repair-commits":
+        argv.append("--repair-commits")
     elif mode == "full":
         pass
     else:

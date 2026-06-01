@@ -96,8 +96,8 @@
 
     .search-panel,
     .report,
-    .chart-panel,
-    .cards-panel {
+    .matrix-panel,
+    .notes-panel {
       background: linear-gradient(135deg, rgba(255,255,255,0.052), rgba(255,255,255,0.014)), rgba(21, 25, 32, 0.72);
       border: 1px solid var(--border);
       border-radius: 10px;
@@ -198,6 +198,78 @@
     .suggest-chip:hover { border-style: solid; border-color: var(--accent-dim); background: rgba(255,255,255,0.04); }
     .suggest-chip .plus { color: var(--accent); font-weight: 700; }
     .suggest-chip .sg-score { color: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .watchlist-strip {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--hairline);
+      display:grid;
+      gap:10px;
+    }
+    .watchlist-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .watchlist-head strong {
+      font-size:13px;
+      color:var(--text);
+    }
+    .watchlist-head span {
+      color:var(--muted);
+      font-size:12px;
+    }
+    .watchlist-actions {
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .watchlist-actions button {
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,0.035);
+      color:var(--muted);
+      font-size:11px;
+      font-family:var(--mono);
+      cursor:pointer;
+    }
+    .watchlist-actions button:hover {
+      color:var(--text);
+      border-color:var(--accent-dim);
+    }
+    .watchlist-saved {
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .saved-chip {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 11px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,0.04);
+      color:var(--text);
+      font-size:12px;
+      font-family:var(--mono);
+    }
+    .saved-chip button {
+      border:none;
+      background:none;
+      color:var(--muted);
+      cursor:pointer;
+      font:inherit;
+      padding:0;
+    }
+    .saved-chip button:hover { color: var(--red); }
+    .saved-empty {
+      color:var(--muted);
+      font-size:12px;
+      font-family:var(--mono);
+    }
 
     .suggestions {
       position: absolute;
@@ -229,12 +301,67 @@
       margin-top: 3px;
     }
 
+    .visual-panel,
     .report {
       padding: 18px;
       margin-bottom: 18px;
       display: none;
     }
+    .visual-panel.visible,
     .report.visible { display: block; }
+    .visual-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .visual-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      background: rgba(255,255,255,0.03);
+      display: grid;
+      gap: 10px;
+    }
+    .visual-card h3 {
+      font-size: 14px;
+      line-height: 1.25;
+    }
+    .visual-card p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .radar-wrap {
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height: 220px;
+    }
+    .radar-svg {
+      width: 100%;
+      max-width: 240px;
+      height: auto;
+      overflow: visible;
+    }
+    .radar-legend {
+      display:flex;
+      gap:8px 12px;
+      flex-wrap:wrap;
+    }
+    .radar-leg {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:11px;
+      color:var(--text);
+      font-family:var(--mono);
+    }
+    .radar-dot {
+      width:10px;
+      height:10px;
+      border-radius:3px;
+      flex-shrink:0;
+    }
     .section-head {
       display: flex;
       gap: 12px;
@@ -290,159 +417,6 @@
       font-size: 13px;
       line-height: 1.7;
     }
-
-    .chart-stack {
-      display: grid;
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-    .chart-panel {
-      padding: 18px;
-      display: none;
-    }
-    .chart-panel.visible { display: block; }
-    .chart-body { display: grid; gap: 12px; }
-    /* Radar (spider) chart — overlays all selected agents on the 5 trust
-       dimensions so similarities and differences are visible at a glance. */
-    .radar-wrap { display: flex; justify-content: center; padding: 4px 0 2px; }
-    .radar-svg { width: 100%; max-width: 360px; height: auto; }
-    .radar-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: center; margin: 6px 0 18px; }
-    .radar-leg { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text); }
-    .radar-dot { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
-    .dim-grid-inner { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-    .bar-row {
-      display: grid;
-      grid-template-columns: 170px 1fr 56px;
-      gap: 12px;
-      align-items: center;
-    }
-    .bar-label {
-      min-width: 0;
-    }
-    .bar-label strong {
-      display: block;
-      font-size: 13px;
-      color: var(--text);
-    }
-    .bar-label span {
-      display: block;
-      font-size: 11px;
-      color: var(--muted);
-      font-family: var(--mono);
-      margin-top: 2px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .bar-track {
-      height: 12px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 999px;
-      overflow: hidden;
-      position: relative;
-    }
-    .bar-fill {
-      height: 100%;
-      border-radius: 999px;
-    }
-    .bar-value {
-      text-align: right;
-      font-size: 12px;
-      font-family: var(--mono);
-      color: var(--text);
-    }
-    .dim-grid {
-      display: grid;
-      gap: 14px;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .dim-card {
-      background: rgba(255,255,255,0.040);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
-    }
-    .dim-title {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
-      align-items: baseline;
-    }
-    .dim-title strong { font-size: 13px; }
-    .dim-title span {
-      color: var(--muted);
-      font-size: 11px;
-      font-family: var(--mono);
-    }
-    .dim-card .bar-row {
-      grid-template-columns: 110px 1fr 52px;
-      margin-bottom: 8px;
-    }
-    .dim-card .bar-row:last-child { margin-bottom: 0; }
-
-    .cards-panel {
-      padding: 18px;
-      display: none;
-    }
-    .cards-panel.visible { display: block; }
-    .cards-grid {
-      display: grid;
-      gap: 16px;
-    }
-    .cards-grid.grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .cards-grid.grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .card {
-      background: rgba(255,255,255,0.040);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 18px;
-    }
-    .card-name {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 3px;
-    }
-    .card-name a:hover { color: var(--accent); }
-    .card-repo {
-      font-size: 11px;
-      color: var(--muted);
-      font-family: var(--mono);
-      margin-bottom: 14px;
-    }
-    .card-blurb {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.6;
-      min-height: 56px;
-      margin-bottom: 14px;
-    }
-    .score-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-    }
-    .big-score {
-      font-size: 34px;
-      font-weight: 700;
-      font-family: var(--mono);
-      line-height: 1;
-    }
-    .big-score.high { color: var(--green); }
-    .big-score.mid { color: var(--blue); }
-    .big-score.low { color: var(--red); }
-    .score-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .score-caption {
-      color: var(--muted);
-      font-size: 11px;
-      font-family: var(--mono);
-    }
     .grade-badge {
       display: inline-flex;
       width: fit-content;
@@ -456,58 +430,243 @@
     .grade-B { background: rgba(96, 165, 250, 0.15); color: var(--blue); }
     .grade-C { background: rgba(251, 191, 36, 0.15); color: var(--yellow); }
     .grade-D { background: rgba(248, 113, 113, 0.15); color: var(--red); }
-    .mini-grid {
-      display: grid;
+    .matrix-panel,
+    .notes-panel {
+      padding: 18px;
+      margin-bottom: 18px;
+      display: none;
+    }
+    .matrix-panel.visible,
+    .notes-panel.visible { display: block; }
+    .matrix-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--hairline);
+      border-radius: 12px;
+      background: rgba(7, 10, 16, 0.34);
+    }
+    .matrix-table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+    }
+    .matrix-table th,
+    .matrix-table td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--hairline);
+      vertical-align: middle;
+    }
+    .matrix-table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: rgba(13, 17, 24, 0.96);
+      color: var(--muted);
+      font-size: 11px;
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .matrix-table thead th:first-child,
+    .matrix-table tbody th {
+      text-align: left;
+    }
+    .matrix-table tbody th {
+      width: 240px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      background: rgba(255,255,255,0.02);
+    }
+    .matrix-table td {
+      text-align: center;
+      font-size: 12px;
+      font-family: var(--mono);
+      color: var(--text);
+    }
+    .matrix-section th {
+      background: rgba(143,179,255,0.08) !important;
+      color: var(--accent) !important;
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+    .matrix-table tr:last-child th,
+    .matrix-table tr:last-child td {
+      border-bottom: none;
+    }
+    .agent-col-head strong {
+      display:block;
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      text-transform: none;
+      letter-spacing: normal;
+      margin-bottom: 3px;
+    }
+    .agent-col-head span {
+      color: var(--muted);
+      font-size: 10px;
+      font-family: var(--mono);
+    }
+    .metric-help {
+      display:block;
+      color: var(--muted);
+      font-weight: 400;
+      font-size: 10px;
+      font-family: var(--mono);
+      margin-top: 3px;
+    }
+    .cell-win {
+      color: var(--green) !important;
+      font-weight: 700;
+    }
+    .cell-tie {
+      color: var(--yellow) !important;
+      font-weight: 700;
+    }
+    .cell-muted { color: var(--muted) !important; }
+    .cell-badge {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-size: 11px;
+      font-family: var(--mono);
+      min-width: 56px;
+    }
+    .cell-badge.good {
+      border-color: rgba(45,212,191,0.4);
+      background: rgba(45,212,191,0.12);
+      color: var(--green);
+    }
+    .cell-badge.bad {
+      border-color: rgba(232,121,139,0.35);
+      background: rgba(232,121,139,0.12);
+      color: var(--red);
+    }
+    .decision-grid {
+      display:grid;
+      gap:12px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .decision-card {
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:14px;
+      background: rgba(255,255,255,0.03);
+    }
+    .decision-label {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .decision-value {
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .decision-sub {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .notes-grid {
+      display:grid;
+      gap:12px;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px 12px;
-      margin-bottom: 14px;
     }
-    .mini-stat {
-      background: rgba(10, 15, 30, 0.55);
-      border: 1px solid rgba(35, 49, 74, 0.8);
-      border-radius: 8px;
-      padding: 10px;
+    .note-card {
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:14px;
+      background: rgba(255,255,255,0.03);
     }
-    .mini-stat-label {
+    .note-card h3 {
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .note-card p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .cards-panel {
+      padding: 18px;
+      margin-bottom: 18px;
+      display: none;
+    }
+    .cards-panel.visible { display: block; }
+    .cards-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .agent-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      background: rgba(255,255,255,0.03);
+      display: grid;
+      gap: 10px;
+    }
+    .agent-card-head {
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .agent-card-name {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .agent-card-name a:hover { color: var(--accent); }
+    .agent-card-repo {
+      color: var(--muted);
+      font-size: 10px;
+      font-family: var(--mono);
+      margin-top: 3px;
+    }
+    .agent-card-desc {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .agent-card-stats {
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap:8px;
+    }
+    .agent-stat {
+      border:1px solid var(--hairline);
+      border-radius:8px;
+      padding:8px 9px;
+      background: rgba(7, 10, 16, 0.28);
+    }
+    .agent-stat-label {
       color: var(--muted);
       font-size: 10px;
       font-family: var(--mono);
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       margin-bottom: 4px;
     }
-    .mini-stat-value {
-      font-size: 14px;
-      font-family: var(--mono);
+    .agent-stat-value {
       color: var(--text);
-    }
-    .dims { margin-top: 10px; }
-    .dim-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-      padding: 6px 0;
-      border-bottom: 1px solid var(--hairline);
       font-size: 12px;
-    }
-    .dim-row:last-child { border-bottom: none; }
-    .dim-label { color: var(--muted); }
-    .dim-val {
-      min-width: 44px;
-      text-align: right;
       font-family: var(--mono);
-    }
-    .dim-bar {
-      flex: 1;
-      height: 6px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .dim-bar-fill {
-      height: 100%;
-      border-radius: 999px;
     }
 
     .empty-state {
@@ -540,11 +699,11 @@
 
     @media (max-width: 900px) {
       .report-grid,
-      .dim-grid {
+      .visual-grid,
+      .decision-grid,
+      .notes-grid,
+      .cards-grid {
         grid-template-columns: 1fr 1fr;
-      }
-      .bar-row {
-        grid-template-columns: 130px 1fr 52px;
       }
     }
     @media (max-width: 720px) {
@@ -553,19 +712,13 @@
         margin-left: 0;
       }
       .report-grid,
-      .dim-grid,
-      .cards-grid.grid-2,
-      .cards-grid.grid-3 {
+      .visual-grid,
+      .decision-grid,
+      .notes-grid,
+      .cards-grid {
         grid-template-columns: 1fr;
       }
-      .bar-row,
-      .dim-card .bar-row {
-        grid-template-columns: 1fr;
-        gap: 6px;
-      }
-      .bar-value {
-        text-align: left;
-      }
+      .matrix-table { min-width: 640px; }
     }
   </style>
 </head>
@@ -592,53 +745,64 @@
         <button type="button" onclick="clearAll()">Clear all</button>
       </div>
       <div class="search-hint">
-        What is compared: HVTrust score, health score, evidence grade, the five trust dimensions, freshness, stars, downloads, commit activity, signed commits, OSSF Scorecard, provenance, and HN mentions.
+        What is compared: HVTrust score, health score, evidence grade, the five trust dimensions, freshness, stars, weekly downloads, 4-week commits, signed commits, OSSF Scorecard, and build provenance.
       </div>
       <div class="chips" id="chips"></div>
       <div class="suggest" id="suggestRow"></div>
+      <div class="watchlist-strip">
+        <div class="watchlist-head">
+          <div>
+            <strong>Saved watchlist</strong>
+            <span>Keep up to 12 agents saved in this browser and preload up to 3 into compare.</span>
+          </div>
+          <div class="watchlist-actions">
+            <button type="button" id="loadWatchlistBtn">Load saved into compare</button>
+            <button type="button" id="clearWatchlistBtn">Clear saved list</button>
+          </div>
+        </div>
+        <div class="watchlist-saved" id="watchlistSaved"></div>
+      </div>
     </section>
 
     <section class="report" id="reportSection">
       <div class="section-head">
-        <h2>At a glance</h2>
+        <h2>Decision summary</h2>
         <p id="reportIntro"></p>
       </div>
       <div class="report-grid" id="reportGrid"></div>
       <div class="report-notes" id="reportNotes"></div>
     </section>
 
-    <div class="chart-stack">
-      <section class="chart-panel" id="overviewChart">
-        <div class="section-head">
-          <h2>Score overview</h2>
-          <p>Trust and health scores are shown together so you can see whether a project leads on operational trust, general momentum, or both.</p>
-        </div>
-        <div class="chart-body" id="overviewChartBody"></div>
-      </section>
+    <section class="visual-panel" id="visualPanel">
+      <div class="section-head">
+        <h2>Quick visual scan</h2>
+        <p>Three compact overlays: trust shape, ecosystem traction, and verification posture. Use this for fast pattern recognition before reading the detailed rows.</p>
+      </div>
+      <div class="visual-grid" id="visualGrid"></div>
+    </section>
 
-      <section class="chart-panel" id="dimensionChart">
-        <div class="section-head">
-          <h2>Trust dimension breakdown</h2>
-          <p>Each row compares one of the five trust dimensions with its own scale, making the spread between agents much easier to read.</p>
-        </div>
-        <div class="dim-grid" id="dimensionChartBody"></div>
-      </section>
+    <section class="matrix-panel" id="matrixPanel">
+      <div class="section-head">
+        <h2>Comparison matrix</h2>
+        <p>Compact side-by-side scoring. Green cells indicate the current leader for that metric. For ranks and freshness, lower is better.</p>
+      </div>
+      <div class="matrix-wrap" id="matrixWrap"></div>
+    </section>
 
-      <section class="chart-panel" id="signalChart">
-        <div class="section-head">
-          <h2>Public signal comparison</h2>
-          <p>These bars compare the observable operating signals that feed reputation and trust: stars, downloads, commits, HN mentions, and signed commit coverage.</p>
-        </div>
-        <div class="chart-body" id="signalChartBody"></div>
-      </section>
-    </div>
+    <section class="notes-panel" id="notesPanel">
+      <div class="section-head">
+        <h2>How to read the gap</h2>
+        <p>Short guidance for what actually matters when the numbers diverge.</p>
+      </div>
+      <div class="notes-grid" id="notesGrid"></div>
+    </section>
 
     <section class="cards-panel" id="cardsPanel">
       <div class="section-head">
-        <h2>Profile cards</h2>
-        <p>Raw details remain visible below in case you want the full side-by-side readout after scanning the summary and charts.</p>
+        <h2>Agent snapshots</h2>
+        <p>Quick profile cards for context, links, and a few top-level signals without leaving compare.</p>
       </div>
-      <div class="cards-grid" id="compareGrid"></div>
+      <div class="cards-grid" id="cardsGrid"></div>
     </section>
 
     <div class="empty-state" id="emptyState">
@@ -652,31 +816,38 @@
   </div>
 
   <script>
+    const WATCHLIST_KEY = "hvtracker_watchlist_v1";
     let allAgents = [];
     let selected = [];
 
     const gradeRank = { A: 4, B: 3, C: 2, D: 1 };
+    const agentPalette = ["#2dd4bf", "#8fb3ff", "#f59e0b"];
     const dimMeta = [
-      { key: "safety", label: "Safety", max: 30, color: "#ef4444" },
-      { key: "identity", label: "Identity", max: 20, color: "#8fb3ff" },
-      { key: "transparency", label: "Transparency", max: 20, color: "#d8a657" },
-      { key: "maintenance", label: "Maintenance", max: 20, color: "#2dd4bf" },
-      { key: "adoption", label: "Adoption", max: 10, color: "#3b82f6" },
+      { key: "safety", label: "Safety", max: 25 },
+      { key: "identity", label: "Identity", max: 18 },
+      { key: "transparency", label: "Transparency", max: 17 },
+      { key: "maintenance", label: "Maintenance", max: 20 },
+      { key: "adoption", label: "Adoption", max: 20 },
     ];
-    // Stable per-agent colours so a given agent reads the same across every
-    // chart and the radar legend.
-    const agentPalette = ["#2dd4bf", "#8fb3ff", "#f0883e"];
+
     function agentColor(agent) {
-      const i = selected.findIndex((a) => a.repo === agent.repo);
-      return agentPalette[i] || "#8b97a7";
+      const index = selected.findIndex((entry) => entry.repo === agent.repo);
+      return agentPalette[index] || "#8b97a7";
     }
-    const signalMeta = [
-      { key: "stars", label: "Stars", formatter: (v) => formatCompact(v) },
-      { key: "weekly_downloads", label: "Downloads / week", formatter: (v) => formatCompact(v) },
-      { key: "weekly_commits", label: "Commits / 4 weeks", formatter: (v) => formatCompact(v) },
-      { key: "hn_mentions_30d", label: "HN mentions / 30d", formatter: (v) => formatCompact(v) },
-      { key: "signed_commits_ratio", label: "Signed commits", formatter: (v) => percent(v) },
-    ];
+
+    function loadWatchlist() {
+      try {
+        const raw = localStorage.getItem(WATCHLIST_KEY);
+        const items = raw ? JSON.parse(raw) : [];
+        return Array.isArray(items) ? items : [];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function saveWatchlist(items) {
+      localStorage.setItem(WATCHLIST_KEY, JSON.stringify(items.slice(0, 12)));
+    }
 
     fetch("/data/latest.json")
       .then((r) => r.json())
@@ -687,11 +858,18 @@
         }));
 
         const params = new URLSearchParams(location.search);
-        const names = (params.get("a") || "").split(",").filter(Boolean);
+        const names = [
+          ...(params.get("a") || "").split(",").filter(Boolean),
+          params.get("b"),
+          params.get("c"),
+        ].filter(Boolean);
         names.forEach((name) => {
           const agent = allAgents.find((a) => a.slug === name || a.name.toLowerCase() === name.toLowerCase());
           if (agent && selected.length < 3) selected.push(agent);
         });
+        if (!selected.length && params.get("watchlist") === "1") {
+          loadSavedIntoCompare();
+        }
         render();
       })
       .catch(() => {
@@ -751,6 +929,37 @@
       render();
     }
 
+    function removeSaved(slug) {
+      saveWatchlist(loadWatchlist().filter((item) => item.slug !== slug));
+      renderSavedWatchlist();
+    }
+
+    function renderSavedWatchlist() {
+      const saved = loadWatchlist();
+      const box = document.getElementById("watchlistSaved");
+      if (!saved.length) {
+        box.innerHTML = '<span class="saved-empty">No saved agents yet. Save them from the leaderboard or an agent profile.</span>';
+        return;
+      }
+      box.innerHTML = saved.map((item) => (
+        `<span class="saved-chip">${escapeHtml(item.name)}<button type="button" onclick="removeSaved('${item.slug}')">×</button></span>`
+      )).join("");
+    }
+
+    function loadSavedIntoCompare() {
+      const saved = loadWatchlist();
+      const picks = [];
+      saved.forEach((item) => {
+        const agent = allAgents.find((a) => a.slug === item.slug || a.repo === item.repo);
+        if (agent && !picks.find((entry) => entry.repo === agent.repo) && picks.length < 3) {
+          picks.push(agent);
+        }
+      });
+      selected = picks;
+      updateURL();
+      render();
+    }
+
     function updateURL() {
       const slugs = selected.map((a) => a.slug).join(",");
       history.replaceState(null, "", slugs ? `?a=${slugs}` : location.pathname);
@@ -800,6 +1009,20 @@
       return gradeRank[value] || 0;
     }
 
+    function bestNumeric(entries, higherBetter = true) {
+      const valid = entries.filter((entry) => entry.value != null && Number.isFinite(entry.value));
+      if (!valid.length) return new Set();
+      const target = higherBetter
+        ? Math.max(...valid.map((entry) => entry.value))
+        : Math.min(...valid.map((entry) => entry.value));
+      return new Set(valid.filter((entry) => entry.value === target).map((entry) => entry.agent.repo));
+    }
+
+    function bestBoolean(entries) {
+      const yes = entries.filter((entry) => !!entry.value);
+      return new Set(yes.map((entry) => entry.agent.repo));
+    }
+
     function bestAgentsBy(getter) {
       const values = selected.map((agent) => ({ agent, value: getter(agent) }));
       const valid = values.filter((entry) => entry.value != null && Number.isFinite(entry.value));
@@ -817,6 +1040,125 @@
       return spreads[0];
     }
 
+    function scaleRecent(days) {
+      if (days == null || !Number.isFinite(Number(days))) return 0;
+      const value = Number(days);
+      if (value <= 3) return 1;
+      if (value >= 180) return 0;
+      return Math.max(0, 1 - (value / 180));
+    }
+
+    function relativeNormalizer(values) {
+      const valid = values.filter((value) => value != null && Number.isFinite(Number(value))).map(Number);
+      if (!valid.length) return () => 0;
+      const max = Math.max(...valid);
+      if (max <= 0) return () => 0;
+      return (value) => value == null || !Number.isFinite(Number(value)) ? 0 : Math.max(0, Math.min(1, Number(value) / max));
+    }
+
+    function polarPoint(cx, cy, radius, index, total) {
+      const angle = (-Math.PI / 2) + ((Math.PI * 2 * index) / total);
+      return [cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius];
+    }
+
+    function buildRadarCard(title, description, axes) {
+      const size = 240;
+      const cx = size / 2;
+      const cy = size / 2;
+      const radius = 82;
+      const rings = [0.25, 0.5, 0.75, 1];
+      const total = axes.length;
+      const grid = rings.map((ring) => {
+        const points = axes.map((_, index) => polarPoint(cx, cy, radius * ring, index, total).join(",")).join(" ");
+        return `<polygon points="${points}" fill="none" stroke="rgba(168,179,194,0.16)" stroke-width="1" />`;
+      }).join("");
+      const spokes = axes.map((_, index) => {
+        const [x, y] = polarPoint(cx, cy, radius, index, total);
+        return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(168,179,194,0.18)" stroke-width="1" />`;
+      }).join("");
+      const labels = axes.map((axis, index) => {
+        const [x, y] = polarPoint(cx, cy, radius + 22, index, total);
+        return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" fill="#a8b3c2" font-size="10" font-family="SF Mono, Consolas, monospace">${escapeHtml(axis.label)}</text>`;
+      }).join("");
+      const series = selected.map((agent) => {
+        const points = axes.map((axis, index) => {
+          const value = Math.max(0, Math.min(1, Number(axis.getter(agent) || 0)));
+          return polarPoint(cx, cy, radius * value, index, total).join(",");
+        }).join(" ");
+        const color = agentColor(agent);
+        return `
+          <polygon points="${points}" fill="${color}" fill-opacity="0.10" stroke="${color}" stroke-width="2"></polygon>
+          ${axes.map((axis, index) => {
+            const value = Math.max(0, Math.min(1, Number(axis.getter(agent) || 0)));
+            const [x, y] = polarPoint(cx, cy, radius * value, index, total);
+            return `<circle cx="${x}" cy="${y}" r="3" fill="${color}" />`;
+          }).join("")}
+        `;
+      }).join("");
+      const legend = selected.map((agent) => `
+        <span class="radar-leg"><span class="radar-dot" style="background:${agentColor(agent)}"></span>${escapeHtml(agent.name)}</span>
+      `).join("");
+      return `
+        <article class="visual-card">
+          <div>
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(description)}</p>
+          </div>
+          <div class="radar-wrap">
+            <svg class="radar-svg" viewBox="0 0 ${size} ${size}" role="img" aria-label="${escapeHtml(title)} radar comparison">
+              ${grid}
+              ${spokes}
+              ${series}
+              ${labels}
+            </svg>
+          </div>
+          <div class="radar-legend">${legend}</div>
+        </article>
+      `;
+    }
+
+    function renderVisuals() {
+      const panel = document.getElementById("visualPanel");
+      const grid = document.getElementById("visualGrid");
+      if (selected.length < 2) {
+        panel.classList.remove("visible");
+        return;
+      }
+
+      const starsNorm = relativeNormalizer(selected.map((agent) => agent.stars));
+      const downloadsNorm = relativeNormalizer(selected.map((agent) => agent.weekly_downloads));
+      const commitsNorm = relativeNormalizer(selected.map((agent) => agent.weekly_commits));
+      const trustNorm = relativeNormalizer(selected.map((agent) => agent.trust_score));
+      const scoreNorm = relativeNormalizer(selected.map((agent) => agent.score));
+
+      const charts = [
+        buildRadarCard("Trust shape", "How each agent distributes strength across the five trust dimensions.", [
+          { label: "Safety", getter: (agent) => Number(agent.trust_breakdown?.safety || 0) / 25 },
+          { label: "Identity", getter: (agent) => Number(agent.trust_breakdown?.identity || 0) / 18 },
+          { label: "Transparency", getter: (agent) => Number(agent.trust_breakdown?.transparency || 0) / 17 },
+          { label: "Maintenance", getter: (agent) => Number(agent.trust_breakdown?.maintenance || 0) / 20 },
+          { label: "Adoption", getter: (agent) => Number(agent.trust_breakdown?.adoption || 0) / 20 },
+        ]),
+        buildRadarCard("Ecosystem traction", "Relative momentum inside this set: adoption, activity, commits, stars, and downloads.", [
+          { label: "Trust", getter: (agent) => trustNorm(agent.trust_score) },
+          { label: "Health", getter: (agent) => scoreNorm(agent.score) },
+          { label: "Stars", getter: (agent) => starsNorm(agent.stars) },
+          { label: "Downloads", getter: (agent) => downloadsNorm(agent.weekly_downloads) },
+          { label: "Commits", getter: (agent) => commitsNorm(agent.weekly_commits) },
+        ]),
+        buildRadarCard("Verification posture", "Signals that matter most when you need public proof instead of popularity.", [
+          { label: "Provenance", getter: (agent) => agent.has_provenance ? 1 : 0 },
+          { label: "Grade", getter: (agent) => rankGrade(agent.evidence_grade) / 4 },
+          { label: "Signed", getter: (agent) => Number(agent.signed_commits_ratio || 0) },
+          { label: "Score", getter: (agent) => agent.scorecard_score == null ? 0 : Number(agent.scorecard_score) / 10 },
+          { label: "Freshness", getter: (agent) => scaleRecent(agent.days_ago) },
+        ]),
+      ];
+
+      grid.innerHTML = charts.join("");
+      panel.classList.add("visible");
+    }
+
     function renderReport() {
       const report = document.getElementById("reportSection");
       const reportGrid = document.getElementById("reportGrid");
@@ -832,10 +1174,11 @@
       const healthLeaders = bestAgentsBy((a) => Number(a.score));
       const evidenceLeaders = bestAgentsBy((a) => rankGrade(a.evidence_grade));
       const safetyLeaders = bestAgentsBy((a) => Number(a.trust_breakdown?.safety));
+      const provenanceLeaders = selected.filter((a) => a.has_provenance);
       const trustSpread = Math.max(...selected.map((a) => Number(a.trust_score || 0))) - Math.min(...selected.map((a) => Number(a.trust_score || 0)));
       const biggestSpread = largestDimensionSpread();
 
-      reportIntro.textContent = `${selected.length} agents selected. This report calls out the leaders, the widest trust gaps, and the signals where the separation is most meaningful.`;
+      reportIntro.textContent = `${selected.length} agents selected. Start with who leads on trust, then scan the matrix for where that lead comes from.`;
       reportGrid.innerHTML = [
         {
           label: "Trust leader",
@@ -857,188 +1200,186 @@
           value: safetyLeaders.map((entry) => entry.agent.name).join(", "),
           sub: `${oneDecimal(safetyLeaders[0]?.value)} / 30 safety`,
         },
+        {
+          label: "Provenance advantage",
+          value: provenanceLeaders.length ? provenanceLeaders.map((agent) => agent.name).join(", ") : "No one",
+          sub: provenanceLeaders.length ? "Verified package provenance" : "No verified provenance in this set",
+        },
       ].map((card) => (
         `<div class="report-card"><div class="report-label">${card.label}</div><div class="report-value">${escapeHtml(card.value)}</div><div class="report-sub">${escapeHtml(card.sub)}</div></div>`
       )).join("");
 
       reportNotes.textContent = biggestSpread.spread > 0
-        ? `Biggest separation shows up in ${biggestSpread.label.toLowerCase()} with a ${oneDecimal(biggestSpread.spread)} point spread. Overall trust spread across this set is ${oneDecimal(trustSpread)} points, so that dimension is doing most of the work in differentiating the agents.`
-        : `These agents are tightly clustered on the five trust dimensions. The useful differences are more likely to come from evidence grade, freshness, and public operating signals than from the trust breakdown alone.`;
+        ? `The biggest gap is in ${biggestSpread.label.toLowerCase()}, with a ${oneDecimal(biggestSpread.spread)} point spread. Overall trust spread across this set is ${oneDecimal(trustSpread)} points.`
+        : `These agents are tightly clustered on the trust dimensions, so the better decision signal is likely evidence grade, provenance, freshness, or workflow fit.`;
 
       report.classList.add("visible");
     }
+    function formatGrade(grade) {
+      return `<span class="grade-badge grade-${escapeHtml(grade || "D")}">Grade ${escapeHtml(grade || "D")}</span>`;
+    }
 
-    function renderOverviewChart() {
-      const panel = document.getElementById("overviewChart");
-      const body = document.getElementById("overviewChartBody");
+    function renderCell(value, options = {}) {
+      if (options.badge === "good") return `<span class="cell-badge good">${escapeHtml(value)}</span>`;
+      if (options.badge === "bad") return `<span class="cell-badge bad">${escapeHtml(value)}</span>`;
+      if (options.badge === "neutral") return `<span class="cell-badge">${escapeHtml(value)}</span>`;
+      if (options.grade) return formatGrade(value);
+      return escapeHtml(value);
+    }
+
+    function matrixRow(label, help, getter, formatter, higherBetter = true, options = {}) {
+      const entries = selected.map((agent) => ({ agent, value: getter(agent) }));
+      let winners;
+      if (options.booleanMetric) winners = bestBoolean(entries);
+      else if (options.customWinner) winners = options.customWinner(entries);
+      else winners = bestNumeric(entries, higherBetter);
+      const tie = winners.size > 1;
+      return `<tr>
+        <th>${escapeHtml(label)}${help ? `<span class="metric-help">${escapeHtml(help)}</span>` : ""}</th>
+        ${entries.map((entry) => {
+          const won = winners.has(entry.agent.repo);
+          const classes = [won ? (tie ? "cell-tie" : "cell-win") : "", entry.value == null ? "cell-muted" : ""].filter(Boolean).join(" ");
+          return `<td class="${classes}">${renderCell(formatter(entry.value, entry.agent), options)}</td>`;
+        }).join("")}
+      </tr>`;
+    }
+
+    function matrixSection(title) {
+      return `<tr class="matrix-section"><th colspan="${selected.length + 1}">${escapeHtml(title)}</th></tr>`;
+    }
+
+    function renderMatrix() {
+      const panel = document.getElementById("matrixPanel");
+      const wrap = document.getElementById("matrixWrap");
       if (selected.length === 0) {
         panel.classList.remove("visible");
         return;
       }
 
-      // Group by metric (agents side-by-side under each), coloured per agent,
-      // so the comparison reads across rather than down a stacked list.
-      const metrics = [
-        { label: "HVTrust score", key: "trust_score" },
-        { label: "Health score", key: "score" },
+      const rows = [
+        matrixSection("Overall"),
+        matrixRow("HVTrust score", "Higher is better", (a) => Number(a.trust_score), (v) => oneDecimal(v)),
+        matrixRow("Activity score", "Higher is better", (a) => Number(a.score), (v) => oneDecimal(v)),
+        matrixRow("Global rank", "Lower is better", (a) => Number(a.rank), (v) => `#${v}`, false),
+        matrixRow("Evidence grade", "More public evidence wins", (a) => rankGrade(a.evidence_grade), (_v, a) => a.evidence_grade, true, {
+          grade: true,
+          customWinner: (entries) => {
+            const best = Math.max(...entries.map((e) => e.value));
+            return new Set(entries.filter((e) => e.value === best).map((e) => e.agent.repo));
+          }
+        }),
+
+        matrixSection("Trust breakdown"),
+        ...dimMeta.map((dim) =>
+          matrixRow(`${dim.label}`, `out of ${dim.max}`, (a) => Number(a.trust_breakdown?.[dim.key] || 0), (v) => `${oneDecimal(v)} / ${dim.max}`)
+        ),
+
+        matrixSection("Operational signals"),
+        matrixRow("Build provenance", "Verifiable package attestation", (a) => !!a.has_provenance, (v) => v ? "Verified" : "None", true, {
+          booleanMetric: true,
+          badge: null,
+          customWinner: bestBoolean
+        }),
+        matrixRow("Signed commits", "Higher is better", (a) => Number(a.signed_commits_ratio || 0), (v) => percent(v)),
+        matrixRow("OSSF Scorecard", "Higher is better", (a) => a.scorecard_score == null ? null : Number(a.scorecard_score), (v) => v == null ? "—" : `${oneDecimal(v)} / 10`),
+        matrixRow("4-week commits", "Higher is better", (a) => a.weekly_commits == null ? null : Number(a.weekly_commits), (v) => v == null ? "—" : formatPlain(v)),
+        matrixRow("Weekly downloads", "Higher is better", (a) => a.weekly_downloads == null ? null : Number(a.weekly_downloads), (v) => v == null ? "—" : formatCompact(v)),
+        matrixRow("Stars", "Higher is better", (a) => Number(a.stars || 0), (v) => formatCompact(v)),
+        matrixRow("Last push", "More recent is better", (a) => a.days_ago == null ? null : Number(a.days_ago), (_v, a) => a.last_push || "—", false),
       ];
-      body.innerHTML = metrics.map((m) => {
-        const rows = selected.map((agent) => {
-          const value = Number(agent[m.key] || 0);
-          const width = Math.max(4, (value / 100) * 100);
-          return `<div class="bar-row">
-            <div class="bar-label"><strong>${escapeHtml(agent.name)}</strong></div>
-            <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${agentColor(agent)}"></div></div>
-            <div class="bar-value">${oneDecimal(value)}</div>
-          </div>`;
-        }).join("");
-        return `<div class="dim-card"><div class="dim-title"><strong>${m.label}</strong><span>/ 100</span></div>${rows}</div>`;
-      }).join("");
+
+      wrap.innerHTML = `<table class="matrix-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            ${selected.map((agent) => `<th><div class="agent-col-head"><strong><a href="/agents/${agent.slug}">${escapeHtml(agent.name)}</a></strong><span>${escapeHtml(agent.repo)}</span></div></th>`).join("")}
+          </tr>
+        </thead>
+        <tbody>${rows.join("")}</tbody>
+      </table>`;
       panel.classList.add("visible");
     }
 
-    function barRow(agent, value, max, label, color, displayValue) {
-      const width = max > 0 ? Math.max(4, (value / max) * 100) : 0;
-      return `<div class="bar-row">
-        <div class="bar-label">
-          <strong>${escapeHtml(agent.name)}</strong>
-          <span>${escapeHtml(label)}</span>
-        </div>
-        <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${color}"></div></div>
-        <div class="bar-value">${escapeHtml(displayValue)}</div>
-      </div>`;
-    }
-
-    function buildRadar(agents) {
-      const N = dimMeta.length;
-      const size = 340, cx = size / 2, cy = size / 2, R = 118;
-      const angle = (i) => -Math.PI / 2 + i * 2 * Math.PI / N;
-      const pt = (i, norm) => [cx + R * norm * Math.cos(angle(i)), cy + R * norm * Math.sin(angle(i))];
-      let grid = "";
-      [0.25, 0.5, 0.75, 1].forEach((r) => {
-        const poly = dimMeta.map((_, i) => pt(i, r).join(",")).join(" ");
-        grid += `<polygon points="${poly}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>`;
-      });
-      let axes = "";
-      dimMeta.forEach((dim, i) => {
-        const [x, y] = pt(i, 1);
-        axes += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(255,255,255,0.07)"/>`;
-        const [lx, ly] = pt(i, 1.16);
-        const anchor = Math.abs(lx - cx) < 12 ? "middle" : (lx > cx ? "start" : "end");
-        axes += `<text x="${lx}" y="${ly}" fill="#8b97a7" font-size="11" font-weight="500" text-anchor="${anchor}" dominant-baseline="middle">${dim.label}</text>`;
-      });
-      let shapes = "";
-      agents.forEach((agent) => {
-        const c = agentColor(agent);
-        const norms = dimMeta.map((dim) => {
-          const v = Number(agent.trust_breakdown?.[dim.key] || 0);
-          return dim.max > 0 ? Math.min(1, v / dim.max) : 0;
-        });
-        const poly = norms.map((n, i) => pt(i, n).join(",")).join(" ");
-        shapes += `<polygon points="${poly}" fill="${c}26" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>`;
-        norms.forEach((n, i) => {
-          const [x, y] = pt(i, n);
-          shapes += `<circle cx="${x}" cy="${y}" r="2.6" fill="${c}"/>`;
-        });
-      });
-      // Pad the viewBox so axis labels (e.g. "Adoption" on the left) never
-      // clip past the SVG edge.
-      return `<svg viewBox="-58 -16 ${size + 116} ${size + 34}" class="radar-svg" role="img" aria-label="Trust dimension comparison radar">${grid}${axes}${shapes}</svg>`;
-    }
-
-    function renderDimensionChart() {
-      const panel = document.getElementById("dimensionChart");
-      const body = document.getElementById("dimensionChartBody");
-      if (selected.length === 0) {
+    function renderNotes() {
+      const panel = document.getElementById("notesPanel");
+      const grid = document.getElementById("notesGrid");
+      if (selected.length < 2) {
         panel.classList.remove("visible");
         return;
       }
+      const trustLeader = bestAgentsBy((a) => Number(a.trust_score))[0]?.agent;
+      const provenanceLeaders = selected.filter((a) => a.has_provenance);
+      const weakestTransparency = selected.slice().sort((a, b) => Number(a.trust_breakdown?.transparency || 0) - Number(b.trust_breakdown?.transparency || 0))[0];
+      const mostPopular = bestAgentsBy((a) => Number(a.stars || 0))[0]?.agent;
 
-      const legend = selected.map((a) => (
-        `<span class="radar-leg"><span class="radar-dot" style="background:${agentColor(a)}"></span>${escapeHtml(a.name)}</span>`
+      grid.innerHTML = [
+        {
+          title: "Who looks safest to trust first?",
+          body: trustLeader
+            ? `${trustLeader.name} currently leads the set on HVTrust. That usually means it combines stronger provenance, better commit verification, and fewer obvious evidence gaps.`
+            : "Pick at least two agents to see a recommendation."
+        },
+        {
+          title: "Where is the clearest operational gap?",
+          body: provenanceLeaders.length
+            ? `${provenanceLeaders.map((a) => a.name).join(", ")} publish verified provenance, which is still one of the cleanest differentiators for terminal and code-executing agents.`
+            : "None of the selected agents publish verified provenance, so the better discriminator is likely signed commits and evidence grade."
+        },
+        {
+          title: "Where should you be skeptical?",
+          body: weakestTransparency
+            ? `${weakestTransparency.name} is the weakest on transparency in this set, which usually points to thinner public proof around packaging, docs, or release posture.`
+            : "Transparency gaps tend to matter most when you are deciding whether to install and automate against a tool."
+        },
+        {
+          title: "Popularity vs trust",
+          body: mostPopular && trustLeader && mostPopular.repo !== trustLeader.repo
+            ? `${mostPopular.name} wins on stars, but ${trustLeader.name} wins on trust. That is the exact gap HVTracker is designed to expose.`
+            : "In this set, popularity and trust are moving in the same direction, so the decision may come down more to workflow fit than evidence gaps."
+        }
+      ].map((card) => (
+        `<div class="note-card"><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.body)}</p></div>`
       )).join("");
-
-      body.innerHTML = `<div class="radar-wrap">${buildRadar(selected)}</div>
-        <div class="radar-legend">${legend}</div>`;
-      panel.classList.add("visible");
-    }
-
-    function renderSignalChart() {
-      const panel = document.getElementById("signalChart");
-      const body = document.getElementById("signalChartBody");
-      if (selected.length === 0) {
-        panel.classList.remove("visible");
-        return;
-      }
-
-      const parts = signalMeta.map((signal) => {
-        const values = selected.map((agent) => Number(agent[signal.key] || 0));
-        const max = Math.max(...values, 0);
-        const rows = selected.map((agent) => {
-          const value = Number(agent[signal.key] || 0);
-          const width = max > 0 ? Math.max(value > 0 ? 4 : 0, (value / max) * 100) : 0;
-          return `<div class="bar-row">
-            <div class="bar-label">
-              <strong>${escapeHtml(agent.name)}</strong>
-              <span>${escapeHtml(signal.label)}</span>
-            </div>
-            <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${agentColor(agent)}"></div></div>
-            <div class="bar-value">${escapeHtml(signal.formatter(agent[signal.key]))}</div>
-          </div>`;
-        }).join("");
-
-        return rows;
-      });
-
-      body.innerHTML = parts.join("");
       panel.classList.add("visible");
     }
 
     function renderCards() {
       const panel = document.getElementById("cardsPanel");
-      const grid = document.getElementById("compareGrid");
+      const grid = document.getElementById("cardsGrid");
       if (selected.length === 0) {
         panel.classList.remove("visible");
         return;
       }
-
-      grid.className = `cards-grid ${selected.length === 3 ? "grid-3" : "grid-2"}`;
-      grid.innerHTML = selected.map((agent) => {
-        const trust = Number(agent.trust_score || 0);
-        const grade = agent.evidence_grade || "D";
-        const dims = dimMeta.map((dim) => {
-          const value = Number(agent.trust_breakdown?.[dim.key] || 0);
-          const width = dim.max > 0 ? Math.max(4, (value / dim.max) * 100) : 0;
-          return `<div class="dim-row">
-            <span class="dim-label">${dim.label}</span>
-            <div class="dim-bar"><div class="dim-bar-fill" style="width:${width}%;background:${dim.color}"></div></div>
-            <span class="dim-val">${oneDecimal(value)}</span>
-          </div>`;
-        }).join("");
-
-        return `<div class="card">
-          <div class="card-name"><a href="/agents/${agent.slug}">${escapeHtml(agent.name)}</a></div>
-          <div class="card-repo">${escapeHtml(agent.repo)}</div>
-          <div class="card-blurb">${escapeHtml(agent.description || "No description available.")}</div>
-          <div class="score-row">
-            <span class="big-score ${scoreClass(trust)}">${oneDecimal(trust)}</span>
-            <div class="score-meta">
-              <span class="grade-badge grade-${grade}">Grade ${grade}</span>
-              <span class="score-caption">Health ${oneDecimal(agent.score)} · Rank #${agent.rank}</span>
+      grid.innerHTML = selected.map((agent) => `
+        <article class="agent-card">
+          <div class="agent-card-head">
+            <div>
+              <div class="agent-card-name"><a href="/agents/${agent.slug}">${escapeHtml(agent.name)}</a></div>
+              <div class="agent-card-repo">${escapeHtml(agent.repo)}</div>
+            </div>
+            ${formatGrade(agent.evidence_grade)}
+          </div>
+          <div class="agent-card-desc">${escapeHtml(agent.description || "No description available.")}</div>
+          <div class="agent-card-stats">
+            <div class="agent-stat">
+              <div class="agent-stat-label">HVTrust</div>
+              <div class="agent-stat-value">${oneDecimal(agent.trust_score)}</div>
+            </div>
+            <div class="agent-stat">
+              <div class="agent-stat-label">Rank</div>
+              <div class="agent-stat-value">#${escapeHtml(agent.rank)}</div>
+            </div>
+            <div class="agent-stat">
+              <div class="agent-stat-label">Stars</div>
+              <div class="agent-stat-value">${escapeHtml(formatCompact(agent.stars || 0))}</div>
+            </div>
+            <div class="agent-stat">
+              <div class="agent-stat-label">4w commits</div>
+              <div class="agent-stat-value">${agent.weekly_commits == null ? "—" : escapeHtml(formatPlain(agent.weekly_commits))}</div>
             </div>
           </div>
-          <div class="mini-grid">
-            <div class="mini-stat"><div class="mini-stat-label">Stars</div><div class="mini-stat-value">${escapeHtml(agent.stars_fmt || formatCompact(agent.stars))}</div></div>
-            <div class="mini-stat"><div class="mini-stat-label">Downloads / week</div><div class="mini-stat-value">${escapeHtml(agent.weekly_downloads != null ? formatPlain(agent.weekly_downloads) : "—")}</div></div>
-            <div class="mini-stat"><div class="mini-stat-label">Commits / 4 weeks</div><div class="mini-stat-value">${escapeHtml(agent.weekly_commits != null ? formatPlain(agent.weekly_commits) : "—")}</div></div>
-            <div class="mini-stat"><div class="mini-stat-label">Last push</div><div class="mini-stat-value">${escapeHtml(agent.last_push || "—")}</div></div>
-            <div class="mini-stat"><div class="mini-stat-label">Signed commits</div><div class="mini-stat-value">${escapeHtml(percent(agent.signed_commits_ratio))}</div></div>
-            <div class="mini-stat"><div class="mini-stat-label">OSSF Scorecard</div><div class="mini-stat-value">${escapeHtml(agent.scorecard_score != null ? `${agent.scorecard_score.toFixed(1)}/10` : "—")}</div></div>
-          </div>
-          <div class="dims">${dims}</div>
-        </div>`;
-      }).join("");
-
+        </article>
+      `).join("");
       panel.classList.add("visible");
     }
 
@@ -1071,22 +1412,30 @@
       if (selected.length === 0) {
         empty.style.display = "";
         document.getElementById("suggestRow").innerHTML = "";
+        document.getElementById("visualPanel").classList.remove("visible");
         document.getElementById("reportSection").classList.remove("visible");
-        document.getElementById("overviewChart").classList.remove("visible");
-        document.getElementById("dimensionChart").classList.remove("visible");
-        document.getElementById("signalChart").classList.remove("visible");
+        document.getElementById("matrixPanel").classList.remove("visible");
+        document.getElementById("notesPanel").classList.remove("visible");
         document.getElementById("cardsPanel").classList.remove("visible");
         return;
       }
 
       empty.style.display = "none";
       renderSuggestions();
+      renderVisuals();
       renderReport();
-      renderOverviewChart();
-      renderDimensionChart();
-      renderSignalChart();
+      renderMatrix();
+      renderNotes();
       renderCards();
+      renderSavedWatchlist();
     }
+
+    window.removeSaved = removeSaved;
+    document.getElementById("loadWatchlistBtn").addEventListener("click", loadSavedIntoCompare);
+    document.getElementById("clearWatchlistBtn").addEventListener("click", () => {
+      saveWatchlist([]);
+      renderSavedWatchlist();
+    });
   </script>
 </body>
 </html>

@@ -5,6 +5,7 @@ These are deterministic and make no network calls.
 import sys
 
 import pytest
+import requests
 
 import fetch_and_build as fb
 
@@ -164,3 +165,133 @@ def test_select_batch_is_deterministic():
     first = fb.select_batch(agents, 1, 3)
     second = fb.select_batch(agents, 1, 3)
     assert first == second
+
+
+def test_load_cached_commit_counts_prefers_data_json_then_history(tmp_path, monkeypatch):
+    data_path = tmp_path / "data.json"
+    history_dir = tmp_path / "output" / "history"
+    history_dir.mkdir(parents=True)
+
+    data_path.write_text(
+        """
+        {
+          "agents": [
+            {"repo": "anthropics/claude-code", "weekly_commits": 41},
+            {"repo": "foo/bar", "weekly_commits": null}
+          ]
+        }
+        """.strip(),
+        encoding="utf-8",
+    )
+    (history_dir / "2026-05-30.json").write_text(
+        """
+        {
+          "agents": [
+            {"repo": "anthropics/claude-code", "weekly_commits": 12},
+            {"repo": "foo/bar", "weekly_commits": 7}
+          ]
+        }
+        """.strip(),
+        encoding="utf-8",
+    )
+
+    class _FakeDateTime:
+        @staticmethod
+        def now(_tz=None):
+            from datetime import datetime, timezone
+            return datetime(2026, 5, 31, tzinfo=timezone.utc)
+
+    monkeypatch.setattr(fb, "datetime", _FakeDateTime)
+    cached = fb.load_cached_commit_counts(str(data_path), str(history_dir))
+    assert cached["anthropics/claude-code"] == 41
+    assert cached["foo/bar"] == 7
+
+
+class _FakeResp:
+    def __init__(self, status_code=200, headers=None, json_data=None):
+        self.status_code = status_code
+        self.headers = headers or {}
+        self._json_data = json_data
+
+    def json(self):
+        return self._json_data
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise requests.HTTPError(f"{self.status_code} error")
+
+
+def test_github_get_retries_after_429(monkeypatch):
+    calls = {"n": 0}
+    sleeps = []
+
+    def fake_get(*_args, **_kwargs):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return _FakeResp(status_code=429, headers={"Retry-After": "1"})
+        return _FakeResp(status_code=200, json_data={"ok": True})
+
+    monkeypatch.setattr(fb.requests, "get", fake_get)
+    monkeypatch.setattr(fb.time, "sleep", lambda s: sleeps.append(s))
+
+    resp = fb._github_get("https://api.github.com/repos/openai/codex")
+    assert resp.json() == {"ok": True}
+    assert calls["n"] == 2
+    assert sleeps == [1.0]
+
+
+def test_github_get_retries_202_then_succeeds(monkeypatch):
+    calls = {"n": 0}
+    sleeps = []
+
+    def fake_get(*_args, **_kwargs):
+        calls["n"] += 1
+        if calls["n"] < 3:
+            return _FakeResp(status_code=202)
+        return _FakeResp(status_code=200, json_data=[{"total": 3}])
+
+    monkeypatch.setattr(fb.requests, "get", fake_get)
+    monkeypatch.setattr(fb.time, "sleep", lambda s: sleeps.append(s))
+
+    resp = fb._github_get(
+        "https://api.github.com/repos/openai/codex/stats/commit_activity",
+        allow_202=True,
+    )
+    assert resp.json() == [{"total": 3}]
+    assert calls["n"] == 3
+    assert sleeps == [5, 10]
+
+
+def test_repair_missing_commit_counts_uses_live_then_cached(monkeypatch):
+    rows = [
+        {
+            "repo": "anthropics/claude-code",
+            "weekly_commits": None,
+            "last_push": "2026-05-31",
+            "days_ago": 0,
+            "commits_low_confidence": False,
+        },
+        {
+            "repo": "openai/codex",
+            "weekly_commits": None,
+            "last_push": "2026-05-30",
+            "days_ago": 1,
+            "commits_low_confidence": False,
+        },
+    ]
+
+    monkeypatch.setattr(
+        fb,
+        "get_commit_activity",
+        lambda repo: [] if repo == "anthropics/claude-code" else [{"total": 0}] * 52,
+    )
+    monkeypatch.setattr(
+        fb,
+        "fetch_recent_commits",
+        lambda repo: 40 if repo == "anthropics/claude-code" else None,
+    )
+
+    repaired = fb.repair_missing_commit_counts(rows, {"openai/codex": 936})
+    assert repaired == 2
+    assert rows[0]["weekly_commits"] == 40
+    assert rows[1]["weekly_commits"] == 936
