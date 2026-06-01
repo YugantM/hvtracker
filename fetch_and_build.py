@@ -981,11 +981,16 @@ def compute_movers(history: list[dict], slug_map: dict[str, str] | None = None, 
 
 
 def compute_newly_added(rows: list[dict], history: list[dict], limit: int = 6) -> list[dict]:
-    """Return agents first seen in the most recent prior snapshot window."""
+    """Return agents first seen in the latest or immediately prior snapshot.
+
+    This keeps truly new agents visible right away while also preserving the
+    short carry-over window expected by the homepage and tests.
+    """
     if not rows or len(history) < 2:
         return []
 
     latest_date = history[-1].get("_date", "")
+    previous_date = history[-2].get("_date", "")
     first_seen: dict[str, str] = {}
     for snap in history:
         snap_date = snap.get("_date", "")
@@ -997,7 +1002,7 @@ def compute_newly_added(rows: list[dict], history: list[dict], limit: int = 6) -
     added = []
     for row in rows:
         repo_key = row.get("repo", "").lower()
-        if first_seen.get(repo_key) != latest_date:
+        if first_seen.get(repo_key) not in {latest_date, previous_date}:
             continue
         added.append({
             "name": row["name"],
