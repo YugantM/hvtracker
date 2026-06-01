@@ -1,7 +1,7 @@
 {
-  "updated": "2026-06-01 17:37 UTC",
+  "updated": "2026-06-01 17:43 UTC",
   "methodology_version": "v3.1",
-  "total": 192,
+  "total": 193,
   "agents": [
     {
       "name": "LangGraph",
@@ -13027,6 +13027,57 @@
         "adoption": 9.5
       },
       "pending_signals": false
+    },
+    {
+      "name": "Lingxi",
+      "repo": "lingxi-agent/Lingxi",
+      "url": "https://github.com/lingxi-agent/Lingxi",
+      "rank": 193,
+      "previous_rank": null,
+      "rank_delta": null,
+      "stars": 0,
+      "stars_fmt": "0",
+      "forks": 0,
+      "forks_fmt": "0",
+      "last_push": "pending",
+      "days_ago": 999,
+      "weekly_commits": 0,
+      "commits_low_confidence": false,
+      "score": 0.0,
+      "description": "Pending first signal refresh",
+      "language": "",
+      "open_issues": 0,
+      "category": "Agent Frameworks",
+      "category_rank": 69,
+      "npm_package": "",
+      "crate_package": "",
+      "pypi_package": "",
+      "weekly_downloads": null,
+      "dl_source": "",
+      "hn_mentions_30d": null,
+      "has_provenance": false,
+      "npm_provenance": null,
+      "pypi_provenance": null,
+      "signed_commits_ratio": null,
+      "scorecard_score": null,
+      "scorecard_checks": {},
+      "slug": "lingxi",
+      "public_actions": null,
+      "evidence_grade": "D",
+      "listing_status": "listed",
+      "license_spdx": null,
+      "license_type": "open",
+      "license_override": "",
+      "trust_score": 0.0,
+      "trust_confidence": 0.5,
+      "trust_breakdown": {
+        "safety": 0.0,
+        "identity": 10.8,
+        "transparency": 0.0,
+        "maintenance": 0.0,
+        "adoption": 0.0
+      },
+      "pending_signals": true
     }
   ]
 }

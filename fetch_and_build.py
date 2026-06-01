@@ -1663,24 +1663,15 @@ def main() -> None:
     pending_only = "--pending-only" in sys.argv
     repair_commits = "--repair-commits" in sys.argv
     render_state_path = os.path.join(script_dir, "data", "render_state.json")
-    # When outputting to a volume, prefer the image-baked render_state.json if
-    # it differs from the volume copy — this ensures newly-listed agents added
-    # via git push appear on the next deploy even in render-only mode.
-    # We compare content hashes (not mtime) because Docker builds don't
-    # preserve filesystem timestamps.
+    # When outputting to a volume, seed render_state.json from the image only
+    # if the volume copy is missing. Never overwrite an existing volume cache:
+    # the volume may be newer than the image after scheduled refreshes.
     if script_dir != base_dir:
         image_rs = os.path.join(base_dir, "data", "render_state.json")
-        if os.path.isfile(image_rs):
+        if os.path.isfile(image_rs) and not os.path.isfile(render_state_path):
             os.makedirs(os.path.dirname(render_state_path), exist_ok=True)
-            import hashlib as _hl
-            def _fhash(p):
-                try:
-                    return _hl.sha256(open(p, "rb").read()).hexdigest()
-                except OSError:
-                    return ""
-            if _fhash(image_rs) != _fhash(render_state_path):
-                shutil.copy2(image_rs, render_state_path)
-                print(f"Synced render_state.json from image → volume")
+            shutil.copy2(image_rs, render_state_path)
+            print("Seeded render_state.json from image → volume")
     if render_only:
         print("\n=== RENDER-ONLY MODE: no API calls, rebuilding pages from cache ===\n")
         batch = None
@@ -2077,8 +2068,10 @@ def main() -> None:
 
     eligibility_violations = run_eligibility_checks(rows)
 
-    # Build a lookup for license_override from agents.json config
+    # Build lookups for overrides from agents.json config
     _override_map = {a["repo"].lower(): a.get("license_override", "") for a in all_agents if a.get("license_override")}
+    _category_map = {a["repo"].lower(): a.get("category", "") for a in all_agents if a.get("category")}
+    _lang_override_map = {a["repo"].lower(): a.get("language_override", "") for a in all_agents if a.get("language_override")}
 
     # Add formatted download counts and slug/breakdown for template rendering
     for row in rows:
@@ -2087,6 +2080,15 @@ def main() -> None:
         # Inject override from agents.json if not already on the row (render_state cache)
         if not row.get("license_override"):
             row["license_override"] = _override_map.get(row.get("repo", "").lower(), "")
+        # Keep taxonomy and language aligned with agents.json even in render-only
+        # mode where rows are sourced from cached render_state.
+        repo_key = row.get("repo", "").lower()
+        category_override = _category_map.get(repo_key)
+        if category_override:
+            row["category"] = category_override
+        language_override = _lang_override_map.get(repo_key)
+        if language_override:
+            row["language"] = language_override
         row["license_type"] = normalize_license_type(row)
         # Always recompute freshness from the absolute last_push date so the
         # color coding (and the maintenance dimension) stay correct even when
