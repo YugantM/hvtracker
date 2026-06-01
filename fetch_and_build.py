@@ -2483,6 +2483,22 @@ def main() -> None:
             f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, methodology_version=METHODOLOGY_VERSION, comparisons=compare_by_slug.get(row['slug'], [])))
     print(f"Built {len(rows)} active + {len(legacy_rows)} legacy agent profile pages under agents/.")
 
+    # Generate per-agent OG cards (1200×630 PNG)
+    try:
+        from generate_og_card import generate as generate_og
+        og_count = 0
+        for row in rows + legacy_rows:
+            slug_dir = os.path.join(agents_dir, row["slug"])
+            og_path = os.path.join(slug_dir, "og.png")
+            try:
+                generate_og(row, og_path)
+                og_count += 1
+            except Exception as e:
+                print(f"  WARN: OG card failed for {row['slug']}: {e}")
+        print(f"Generated {og_count} agent OG cards.")
+    except ImportError:
+        print("WARN: generate_og_card not available — skipping OG cards.")
+
     # ── Category landing pages — /categories/<slug>/index.html ───────────
     cat_tmpl = env.get_template("category.html.j2")
     categories_dir = os.path.join(script_dir, "categories")
