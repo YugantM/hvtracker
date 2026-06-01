@@ -9,7 +9,19 @@ Update as you ship.  Move done items to "## Done" with a date + commit.
 
 ## 🔴 High priority
 
-_(empty — see "Done" for what just shipped)_
+- **Cloudflare Cache Rule for HTML/JSON.**  Cache-Control headers are now
+  set correctly on the origin (HTML: `s-maxage=900`, JSON: `s-maxage=1800`)
+  but Cloudflare still returns `cf-cache-status: DYNAMIC` because by
+  default it only caches static file extensions.  Add one Cache Rule in
+  the Cloudflare dashboard:
+
+  - **Match:** URL path starts with `/agents/`, `/categories/`, `/data/`,
+    `/blog/`, `/compare/` OR exactly equals `/`
+  - **Action:** Cache eligibility = Eligible for cache, Edge TTL =
+    Respect origin headers
+
+  Until this is configured, only the browser caches HTML; Railway still
+  serves every visit.  5-minute dashboard task.
 
 ## 🟡 Medium priority
 
