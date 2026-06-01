@@ -19,7 +19,8 @@ sitemap.xml
 feed.json
 llms.txt
 data.json
-data/
+data/*
+!data/render_state.json
 output/*
 !output/history/
 agents/
