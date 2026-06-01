@@ -1663,6 +1663,17 @@ def main() -> None:
     pending_only = "--pending-only" in sys.argv
     repair_commits = "--repair-commits" in sys.argv
     render_state_path = os.path.join(script_dir, "data", "render_state.json")
+    # When outputting to a volume, prefer the image-baked render_state.json if
+    # it is newer than the volume copy — this ensures newly-listed agents added
+    # via git push appear on the next deploy even in render-only mode.
+    if script_dir != base_dir:
+        image_rs = os.path.join(base_dir, "data", "render_state.json")
+        if os.path.isfile(image_rs):
+            os.makedirs(os.path.dirname(render_state_path), exist_ok=True)
+            vol_mtime = os.path.getmtime(render_state_path) if os.path.isfile(render_state_path) else 0
+            if os.path.getmtime(image_rs) > vol_mtime:
+                shutil.copy2(image_rs, render_state_path)
+                print(f"Synced render_state.json from image → volume")
     if render_only:
         print("\n=== RENDER-ONLY MODE: no API calls, rebuilding pages from cache ===\n")
         batch = None
