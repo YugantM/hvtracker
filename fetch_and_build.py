@@ -1664,14 +1664,21 @@ def main() -> None:
     repair_commits = "--repair-commits" in sys.argv
     render_state_path = os.path.join(script_dir, "data", "render_state.json")
     # When outputting to a volume, prefer the image-baked render_state.json if
-    # it is newer than the volume copy — this ensures newly-listed agents added
+    # it differs from the volume copy — this ensures newly-listed agents added
     # via git push appear on the next deploy even in render-only mode.
+    # We compare content hashes (not mtime) because Docker builds don't
+    # preserve filesystem timestamps.
     if script_dir != base_dir:
         image_rs = os.path.join(base_dir, "data", "render_state.json")
         if os.path.isfile(image_rs):
             os.makedirs(os.path.dirname(render_state_path), exist_ok=True)
-            vol_mtime = os.path.getmtime(render_state_path) if os.path.isfile(render_state_path) else 0
-            if os.path.getmtime(image_rs) > vol_mtime:
+            import hashlib as _hl
+            def _fhash(p):
+                try:
+                    return _hl.sha256(open(p, "rb").read()).hexdigest()
+                except OSError:
+                    return ""
+            if _fhash(image_rs) != _fhash(render_state_path):
                 shutil.copy2(image_rs, render_state_path)
                 print(f"Synced render_state.json from image → volume")
     if render_only:

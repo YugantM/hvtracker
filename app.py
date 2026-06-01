@@ -629,6 +629,8 @@ def _compute_render_fingerprint() -> str:
         os.path.join(BASE_DIR, "template.html"),
         os.path.join(BASE_DIR, "compare", "index.html"),
         os.path.join(BASE_DIR, "og-v2.png"),
+        os.path.join(BASE_DIR, "data", "render_state.json"),
+        os.path.join(BASE_DIR, "agents.json"),
     ]
     templates_dir = os.path.join(BASE_DIR, "templates")
     for name in sorted(os.listdir(templates_dir)):
