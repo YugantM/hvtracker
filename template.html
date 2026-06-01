@@ -1065,6 +1065,90 @@
     .mover-down .mover-arrow { color: var(--delta-down); }
     .mover-name { color: var(--text); }
     .mover-rank { color: var(--muted); font-size: 10px; }
+    .fresh-strip {
+      padding: 12px 0 16px;
+      border-bottom: 1px solid var(--hairline);
+      display: grid;
+      gap: 10px;
+    }
+    .fresh-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .fresh-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .fresh-copy {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      max-width: 760px;
+    }
+    .fresh-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .fresh-card {
+      flex: 1 1 160px;
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      transition: border-color 0.15s, transform 0.15s ease;
+    }
+    .fresh-card:hover {
+      border-color: var(--accent-dim);
+      transform: translateY(-1px);
+      text-decoration: none;
+    }
+    .fresh-meta {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 10px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .fresh-name {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+    .fresh-sub {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    .fresh-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(45,212,191,0.10);
+      color: var(--green);
+      font-size: 10px;
+      font-family: var(--font-mono);
+    }
+    .fresh-badge.pending {
+      background: rgba(216,166,87,0.12);
+      color: var(--yellow);
+    }
 
     /* ── Score formula note ── */
     .formula {
@@ -1353,6 +1437,34 @@
           <span class="mover-arrow">▼{{ m.delta|abs }}</span>
           <span class="mover-name">{{ m.name }}</span>
           <span class="mover-rank">#{{ m.rank }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if newly_added %}
+    <div class="fresh-strip" aria-label="Newly added agents">
+      <div class="fresh-head">
+        <span class="fresh-title">Newly added agents</span>
+        <span class="fresh-copy">Recent additions to the registry. Some new listings may show pending signals until their first full refresh completes.</span>
+      </div>
+      <div class="fresh-row">
+        {% for agent in newly_added %}
+        <a href="/agents/{{ agent.slug }}" class="fresh-card">
+          <div class="fresh-meta">
+            <span>{{ agent.date }}</span>
+            <span>#{{ agent.rank }}</span>
+            <span>{{ agent.category }}</span>
+          </div>
+          <span class="fresh-name">{{ agent.name }}</span>
+          <div class="fresh-sub">
+            {% if agent.pending_signals %}
+            <span class="fresh-badge pending">Pending refresh</span>
+            {% else %}
+            <span class="fresh-badge">Grade {{ agent.evidence_grade }}</span>
+            {% endif %}
+          </div>
         </a>
         {% endfor %}
       </div>

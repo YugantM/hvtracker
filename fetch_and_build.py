@@ -956,6 +956,27 @@ def compute_movers(history: list[dict], window: int = 7) -> dict:
     return {"up": up, "down": down}
 
 
+def compute_newly_added(rows: list[dict], limit: int = 6) -> list[dict]:
+    """Return recently listed agents based on injected recent_events."""
+    added = []
+    for row in rows:
+        events = row.get("recent_events") or []
+        listed_event = next((evt for evt in events if evt.get("type") == "listed"), None)
+        if not listed_event:
+            continue
+        added.append({
+            "name": row["name"],
+            "slug": row["slug"],
+            "rank": row["rank"],
+            "category": row.get("category") or "Uncategorized",
+            "date": listed_event.get("date", ""),
+            "pending_signals": bool(row.get("pending_signals")),
+            "evidence_grade": row.get("evidence_grade", "D"),
+        })
+    added.sort(key=lambda item: (item["date"], -item["rank"]), reverse=True)
+    return added[:limit]
+
+
 def compute_sparklines(history: list[dict]) -> dict[str, list[dict]]:
     """Build per-agent rank history for sparkline rendering.
     Returns {repo_lower: [{date, rank, score}, ...]}."""
@@ -2292,6 +2313,7 @@ def main() -> None:
     )
 
     movers = compute_movers(history)
+    newly_added = compute_newly_added(rows)
 
     # Sort legacy rows by stars descending for display; populate fields needed by templates
     for lr in legacy_rows:
@@ -2342,6 +2364,7 @@ def main() -> None:
         total=len(rows),
         categories=categories,
         movers=movers,
+        newly_added=newly_added,
         history_days=len(history),
     )
     out_path = os.path.join(script_dir, "index.html")
