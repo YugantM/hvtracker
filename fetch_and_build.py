@@ -3541,6 +3541,7 @@ def main() -> None:
     sitemap_urls.append(("https://hvtracker.net/blog/ai-agent-frameworks-ranked-by-trust", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/github-stars-dont-predict-ai-agent-trust", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/codex-vs-claude-code", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/you-are-not-installing-what-you-think", "0.9", "weekly"))
     for article in blog_articles:
         sitemap_urls.append((f"https://hvtracker.net/blog/{article['slug']}", "0.8", "weekly"))
     for row in rows:
