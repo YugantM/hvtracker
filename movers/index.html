@@ -46,10 +46,20 @@
     footer a{color:var(--accent)}
     @media(max-width:760px){.summary-row,.chart-band,.mover-grid{grid-template-columns:1fr}h1{font-size:26px}nav{margin-left:0}}
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Movers" }
+    ]
+  }
+  </script>
   <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
   <script>
     (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
-    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
   </script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
   <script>
@@ -75,7 +85,7 @@
     <section class="hero">
       <h1>AI Agent Rank Movers</h1>
       <p>Daily movement from the current 11-day history window. Gains and drops are based on HVTracker rank changes, so this page stays fresh as the cron refresh updates snapshots.</p>
-      <div class="meta">Updated 2026-06-02 14:04 UTC</div>
+      <div class="meta">Updated 2026-06-02 16:53 UTC</div>
     </section>
 
     <section class="summary-row" aria-label="Movement summary">

@@ -58,6 +58,35 @@
     }
   }
   </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "{{ row.category }}", "item": "https://hvtracker.net/categories/{{ row.category | lower | replace(' ', '-') | replace('/', '-') | replace('&', '') }}" },
+      { "@type": "ListItem", "position": 3, "name": "{{ row.name }}" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is {{ row.name }} safe to use?",
+        "acceptedAnswer": { "@type": "Answer", "text": "{{ row.name }} has an HVTrust score of {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}), ranked #{{ row.rank }} of {{ total }} AI agents. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals." }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the trust score for {{ row.name }}?",
+        "acceptedAnswer": { "@type": "Answer", "text": "{{ row.name }} scores {{ row.trust_score }}/100 on HVTracker's evidence-weighted HVTrust scale. It has {{ row.stars_fmt }} GitHub stars and is categorized under {{ row.category }}." }
+      }
+    ]
+  }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

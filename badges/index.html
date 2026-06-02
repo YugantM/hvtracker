@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Add the HVTrust badge to your README. Show a transparent, independent trust score built from live public signals — no self-reporting, no vendor claims. Free for open-source AI agent maintainers.">
+  <title>Badge for Maintainers — Add Your HVTrust Score | HVTracker</title>
+  <link rel="canonical" href="https://hvtracker.net/badges/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Badge for Maintainers — Add Your HVTrust Score | HVTracker">
+  <meta property="og:description" content="Show a transparent, independent trust score on your README — built from live public signals, not self-reporting.">
+  <meta property="og:url" content="https://hvtracker.net/badges/">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Badge for Maintainers — Add Your HVTrust Score | HVTracker">
+  <meta name="twitter:description" content="Show a transparent, independent trust score on your README — built from live public signals, not self-reporting.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Badges" }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0b0d10;
+      --surface:   #151920;
+      --surface-2: #1b2029;
+      --border:    #303846;
+      --text:      #eef2f6;
+      --muted:     #8a87a8;
+      --accent:    #8fb3ff;
+      --accent-lt: rgba(143,179,255,0.10);
+      --mocha:     #d8a657;
+      --mocha-lt:  rgba(216,166,87,0.14);
+      --font-mono: "JetBrains Mono", "Fira Mono", "Cascadia Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
+      --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .page { max-width: 1100px; margin: 0 auto; padding: 0 20px 48px; }
+
+    header {
+      padding: 36px 0 24px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .logo {
+      font-family: var(--font-mono);
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+    .logo span { color: var(--accent); }
+    .tagline { font-size: 13px; color: var(--muted); }
+
+    .site-nav {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+    }
+    .site-nav a {
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: rgba(255,255,255,0.03);
+    }
+    .site-nav a:hover { color: var(--text); border-color: var(--accent); text-decoration: none; }
+    .site-nav .active { color: var(--text); border-color: var(--accent); font-weight: 600; }
+
+    .content { max-width: 760px; margin: 0 auto; padding: 40px 0 0; }
+
+    .doc-title {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .doc-lede { font-size: 16px; color: var(--text); margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+
+    section { margin-bottom: 40px; }
+    h2 {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    p { margin-bottom: 14px; }
+    p:last-child { margin-bottom: 0; }
+
+    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .why-card {
+      border: 1px solid var(--border); border-radius: 8px;
+      background: var(--surface-2); padding: 16px;
+    }
+    .why-card .why-title { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .why-card p { font-size: 13.5px; color: var(--muted); margin: 0; }
+
+    .badge-preview { display: flex; gap: 10px; align-items: center; margin: 4px 0 18px; flex-wrap: wrap; }
+
+    .snippet-label { font-family: var(--font-mono); font-size: 12px; color: var(--text); margin: 14px 0 6px; }
+    .snippet {
+      font-family: var(--font-mono); font-size: 12px;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px;
+      padding: 12px 14px; color: var(--muted); word-break: break-all; line-height: 1.6;
+    }
+
+    .pr-offer {
+      border: 1px solid var(--mocha); border-radius: 8px;
+      background: var(--mocha-lt); padding: 16px 18px; margin-bottom: 20px;
+    }
+    .pr-offer .why-title { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--mocha); margin-bottom: 6px; }
+    .pr-offer p { font-size: 14px; color: var(--text); margin-bottom: 12px; }
+    .pr-offer a.cta {
+      display: inline-flex; align-items: center; font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+      padding: 8px 14px; border: 1px solid var(--mocha); border-radius: 6px; color: var(--mocha);
+      background: rgba(216,166,87,0.10);
+    }
+    .pr-offer a.cta:hover { background: rgba(216,166,87,0.26); color: var(--text); text-decoration: none; }
+
+    table.top-repos { width: 100%; border-collapse: collapse; font-size: 14px; }
+    table.top-repos th, table.top-repos td { text-align: left; padding: 10px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    table.top-repos th { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; }
+    table.top-repos td.rank { font-family: var(--font-mono); color: var(--muted); white-space: nowrap; }
+    table.top-repos td.name a { font-weight: 600; color: var(--text); }
+    table.top-repos td.name a:hover { color: var(--accent); }
+    table.top-repos td.snippet-cell code {
+      font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px;
+      padding: 2px 6px; display: inline-block; word-break: break-all;
+    }
+
+    .note {
+      font-size: 14px; color: var(--muted); margin-top: 16px;
+      padding: 12px 14px; background: var(--accent-lt); border-radius: 4px; border-left: 3px solid var(--accent);
+    }
+
+    footer {
+      max-width: 760px; margin: 48px auto 0; padding-top: 24px; border-top: 1px solid var(--border);
+      font-size: 13px; color: var(--muted); line-height: 1.7;
+    }
+    footer .footer-links { font-family: var(--font-mono); font-size: 12px; display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 20px; }
+    footer .disclaimer { font-size: 12px; color: var(--muted); margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+    @media (max-width: 640px) {
+      header { flex-direction: column; gap: 8px; }
+      .site-nav { margin-left: 0; }
+      .doc-title { font-size: 24px; }
+      .why-grid { grid-template-columns: 1fr; }
+      table.top-repos td.snippet-cell { display: none; }
+      table.top-repos th.snippet-col { display: none; }
+    }
+  </style>
+  <!-- Google tag (gtag.js) -->
+  <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="badges">
+  <div class="page">
+
+    <header>
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <span class="tagline">Trust signals for open-source AI agents</span>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/methodology">Methodology</a>
+        <span class="active">Badges</span>
+        <a href="/roadmap/">Roadmap</a>
+        <a href="/spec/">Specifications</a>
+      </nav>
+    </header>
+
+    <article class="content">
+      <h1 class="doc-title">Badge for Maintainers</h1>
+      <p class="doc-lede">Add the HVTrust badge to your README to show an independent, continuously updated trust score for your project — built from public signals, not self-reporting.</p>
+
+      <section id="why">
+        <h2>Why add the badge</h2>
+        <div class="why-grid">
+          <div class="why-card">
+            <div class="why-title">Transparent trust score</div>
+            <p>A single 0–100 HVTrust score and evidence grade readers can check at a glance — with the full breakdown one click away.</p>
+          </div>
+          <div class="why-card">
+            <div class="why-title">Live public signals</div>
+            <p>The badge reflects current data — OSSF Scorecard, provenance, signed commits, maintenance — refreshed daily. It updates itself as your project improves.</p>
+          </div>
+          <div class="why-card">
+            <div class="why-title">Independent methodology</div>
+            <p>Scored by a third party using a <a href="/methodology">published, versioned methodology</a>. No vendor claims, no pay-to-rank, no submission required.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="get-badge">
+        <h2>Get your badge</h2>
+        <p>Every tracked project has two badges at <code>/badge/&lt;slug&gt;.svg</code> (trust score) and <code>/badge/&lt;slug&gt;-grade.svg</code> (evidence grade). Find your project on the <a href="/">leaderboard</a>, open its page, and copy the snippet from the <em>Embed Badge</em> section — or use the pattern below, replacing <code>your-slug</code> with your project's slug.</p>
+
+        <div class="badge-preview">
+          <img src="/badge/langgraph.svg" alt="HVTrust score badge example" height="20">
+          <img src="/badge/langgraph-grade.svg" alt="Evidence grade badge example" height="20">
+        </div>
+
+        <div class="snippet-label">Markdown</div>
+        <div class="snippet">[![HVTrust](https://hvtracker.net/badge/your-slug.svg)](https://hvtracker.net/agents/your-slug)</div>
+
+        <div class="snippet-label">HTML</div>
+        <div class="snippet">&lt;a href="https://hvtracker.net/agents/your-slug"&gt;&lt;img src="https://hvtracker.net/badge/your-slug.svg" alt="HVTrust"&gt;&lt;/a&gt;</div>
+
+        <p class="note">Badges are plain SVGs served from this site, so they always show your project's current score and grade — there is nothing to update once the badge is in place.</p>
+      </section>
+
+      <section id="top-repos">
+        <h2>Top tracked projects</h2>
+
+        <div class="pr-offer">
+          <div class="why-title">Maintainer of one of these? We'll open the PR for you.</div>
+          <p>We're happy to send a tiny README pull request adding the badge so you don't have to do the work. Just let us know and we'll open it against your repository.</p>
+          <a class="cta" href="https://github.com/YugantM/hvtracker/issues/new?title=Badge+PR+request&amp;body=Repository%3A+%0A%0AI%27m+a+maintainer+and+would+like+a+README+badge+PR.%0A" target="_blank" rel="noopener">Request a badge PR →</a>
+        </div>
+
+        <table class="top-repos">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Project</th>
+              <th>HVTrust</th>
+              <th class="snippet-col">Ready-to-paste Markdown</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+            <tr>
+              <td class="rank">#1</td>
+              <td class="name"><a href="/agents/langgraph">LangGraph</a></td>
+              <td><img src="/badge/langgraph.svg" alt="HVTrust 93.2" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/langgraph.svg)](https://hvtracker.net/agents/langgraph)</code></td>
+            </tr>
+            
+            <tr>
+              <td class="rank">#2</td>
+              <td class="name"><a href="/agents/codex">Codex</a></td>
+              <td><img src="/badge/codex.svg" alt="HVTrust 92.7" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/codex.svg)](https://hvtracker.net/agents/codex)</code></td>
+            </tr>
+            
+            <tr>
+              <td class="rank">#3</td>
+              <td class="name"><a href="/agents/vercel-ai-sdk">Vercel AI SDK</a></td>
+              <td><img src="/badge/vercel-ai-sdk.svg" alt="HVTrust 92.0" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/vercel-ai-sdk.svg)](https://hvtracker.net/agents/vercel-ai-sdk)</code></td>
+            </tr>
+            
+            <tr>
+              <td class="rank">#4</td>
+              <td class="name"><a href="/agents/pydanticai">PydanticAI</a></td>
+              <td><img src="/badge/pydanticai.svg" alt="HVTrust 91.8" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/pydanticai.svg)](https://hvtracker.net/agents/pydanticai)</code></td>
+            </tr>
+            
+            <tr>
+              <td class="rank">#5</td>
+              <td class="name"><a href="/agents/n8n">n8n</a></td>
+              <td><img src="/badge/n8n.svg" alt="HVTrust 91.7" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/n8n.svg)](https://hvtracker.net/agents/n8n)</code></td>
+            </tr>
+            
+            <tr>
+              <td class="rank">#6</td>
+              <td class="name"><a href="/agents/openai-agents-sdk">OpenAI Agents SDK</a></td>
+              <td><img src="/badge/openai-agents-sdk.svg" alt="HVTrust 91.6" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/openai-agents-sdk.svg)](https://hvtracker.net/agents/openai-agents-sdk)</code></td>
+            </tr>
+            
+            <tr>
+              <td class="rank">#7</td>
+              <td class="name"><a href="/agents/cline">Cline</a></td>
+              <td><img src="/badge/cline.svg" alt="HVTrust 91.4" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/cline.svg)](https://hvtracker.net/agents/cline)</code></td>
+            </tr>
+            
+            <tr>
+              <td class="rank">#8</td>
+              <td class="name"><a href="/agents/haystack">Haystack</a></td>
+              <td><img src="/badge/haystack.svg" alt="HVTrust 90.3" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/haystack.svg)](https://hvtracker.net/agents/haystack)</code></td>
+            </tr>
+            
+            <tr>
+              <td class="rank">#9</td>
+              <td class="name"><a href="/agents/livekit-agents">LiveKit Agents</a></td>
+              <td><img src="/badge/livekit-agents.svg" alt="HVTrust 89.9" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/livekit-agents.svg)](https://hvtracker.net/agents/livekit-agents)</code></td>
+            </tr>
+            
+            <tr>
+              <td class="rank">#10</td>
+              <td class="name"><a href="/agents/trigger-dev">Trigger.dev</a></td>
+              <td><img src="/badge/trigger-dev.svg" alt="HVTrust 89.9" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/trigger-dev.svg)](https://hvtracker.net/agents/trigger-dev)</code></td>
+            </tr>
+            
+            <tr>
+              <td class="rank">#11</td>
+              <td class="name"><a href="/agents/lerobot">LeRobot</a></td>
+              <td><img src="/badge/lerobot.svg" alt="HVTrust 88.8" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/lerobot.svg)](https://hvtracker.net/agents/lerobot)</code></td>
+            </tr>
+            
+            <tr>
+              <td class="rank">#12</td>
+              <td class="name"><a href="/agents/strands-agents">Strands Agents</a></td>
+              <td><img src="/badge/strands-agents.svg" alt="HVTrust 88.8" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/strands-agents.svg)](https://hvtracker.net/agents/strands-agents)</code></td>
+            </tr>
+            
+          </tbody>
+        </table>
+        <p class="note">Don't see your project? It may rank outside the top 12 — every one of the 178 tracked projects has its own badge on its <a href="/">leaderboard</a> page.</p>
+      </section>
+    </article>
+
+    <footer>
+      <div class="footer-links">
+        <a href="/">← Leaderboard</a>
+        <a href="/methodology">Methodology</a>
+        <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">Source code</a>
+        <a href="https://github.com/YugantM/hvtracker/issues" target="_blank" rel="noopener">Open an issue</a>
+      </div>
+      <p class="disclaimer">HVTracker is not affiliated with any of the projects listed. Scores are computed from public APIs using a <a href="/methodology">published methodology</a>.</p>
+    </footer>
+
+  </div>
+</body>
+</html>

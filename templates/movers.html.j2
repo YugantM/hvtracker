@@ -46,6 +46,16 @@
     footer a{color:var(--accent)}
     @media(max-width:760px){.summary-row,.chart-band,.mover-grid{grid-template-columns:1fr}h1{font-size:26px}nav{margin-left:0}}
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Movers" }
+    ]
+  }
+  </script>
   <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
   <script>
     (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}

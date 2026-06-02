@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiveKit Agents vs E2B: Trust Score & Security Comparison | HVTracker</title>
+  <meta name="description" content="LiveKit Agents vs E2B compared on independent trust signals: HVTrust score (89.9 vs 72.2), evidence grade, supply-chain safety, maintenance, and adoption. LiveKit Agents ranks higher.">
+  <link rel="canonical" href="https://hvtracker.net/compare/livekit-agents-vs-e2b/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="LiveKit Agents vs E2B — Trust Score Comparison">
+  <meta property="og:description" content="Independent trust comparison: HVTrust 89.9 vs 72.2. Supply-chain safety, maintenance, adoption.">
+  <meta property="og:url" content="https://hvtracker.net/compare/livekit-agents-vs-e2b/">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is LiveKit Agents or E2B more trustworthy?",
+        "acceptedAnswer": { "@type": "Answer", "text": "On HVTracker's evidence-weighted HVTrust score, LiveKit Agents ranks higher (89.9 vs 72.2/100). Trust reflects verifiable supply-chain, transparency, maintenance, and adoption signals — not popularity." }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between LiveKit Agents and E2B?",
+        "acceptedAnswer": { "@type": "Answer", "text": "LiveKit Agents (livekit/agents) has an HVTrust score of 89.9 (Grade A) with 10.8k GitHub stars; E2B (e2b-dev/e2b) scores 72.2 (Grade B) with 12.4k stars. Both are LLM Gateways &amp; Infra." }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Compare", "item": "https://hvtracker.net/compare/" },
+      { "@type": "ListItem", "position": 3, "name": "LiveKit Agents vs E2B" }
+    ]
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0b0d10;--surface:rgba(21,25,32,.78);--surface-2:rgba(27,32,41,.82);--border:rgba(255,255,255,.09);--hairline:rgba(168,179,194,.12);--text:#e8ecf2;--muted:#8b97a7;--accent:#8fb3ff;--accent-dim:#5677aa;--green:#3dd68c;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;--font-mono:"IBM Plex Mono","SF Mono",Menlo,monospace}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+    .page{max-width:880px;margin:0 auto;padding:32px 20px 64px}
+    .crumbs{font-size:12px;color:var(--muted);margin-bottom:18px}
+    h1{font-size:30px;line-height:1.2;font-weight:700;letter-spacing:-.01em;margin-bottom:10px}
+    h1 .vs{color:var(--muted);font-weight:500}
+    .lede{color:var(--muted);font-size:15px;margin-bottom:24px}
+    .verdict{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:14px 18px;margin-bottom:28px;font-size:14px}
+    .verdict strong{color:var(--text)}
+    table{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:28px}
+    th,td{padding:11px 12px;border-bottom:1px solid var(--hairline);text-align:left}
+    thead th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+    tbody th{font-weight:500;color:var(--muted);width:38%}
+    td{font-family:var(--font-mono);font-size:13px}
+    td.win{color:var(--green);font-weight:600}
+    .name-col{font-family:var(--font-sans);font-weight:700;font-size:15px}
+    .name-col a{color:var(--text)}
+    .grade{display:inline-block;font-family:var(--font-mono);font-weight:700;font-size:11px;padding:2px 7px;border-radius:4px;color:#fff}
+    .ga{background:#22c55e}.gb{background:#3b82f6}.gc{background:#d8a657}.gd{background:#666}
+    .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+    .cta a{border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--text);background:var(--surface)}
+    .cta a:hover{border-color:var(--accent-dim);text-decoration:none}
+    footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--hairline);font-size:12px;color:var(--muted)}
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "LLM Gateways &amp; Infra", "item": "https://hvtracker.net/categories/llm-gateways-infra/" },
+      { "@type": "ListItem", "position": 3, "name": "LiveKit Agents vs E2B", "item": "https://hvtracker.net/compare/livekit-agents-vs-e2b/" }
+    ]
+  }
+  </script>
+  <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="compare_page" data-category="LLM Gateways &amp; Infra">
+  <div class="page">
+    <div class="crumbs"><a href="/">HVTracker</a> › <a href="/categories/llm-gateways-infra/">LLM Gateways &amp; Infra</a> › LiveKit Agents vs E2B</div>
+    <h1>LiveKit Agents <span class="vs">vs</span> E2B</h1>
+    <p class="lede">An independent, evidence-weighted trust comparison of two llm gateways &amp; infra — ranked on verifiable signals, not popularity.</p>
+
+    <div class="verdict">
+      <strong>LiveKit Agents ranks higher</strong> with an HVTrust score of <strong>89.9</strong> vs 72.2/100
+      (Grade A vs B).
+      HVTrust reflects supply-chain safety, transparency, maintenance, and adoption — weighted by how much verifiable evidence exists.
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Signal</th><th class="name-col"><a href="/agents/livekit-agents/">LiveKit Agents</a></th><th class="name-col"><a href="/agents/e2b/">E2B</a></th></tr>
+      </thead>
+      <tbody>
+        <tr><th>HVTrust score</th><td class="win">89.9</td><td class="">72.2</td></tr>
+        <tr><th>Evidence grade</th><td><span class="grade ga">A</span></td><td><span class="grade gb">B</span></td></tr>
+        <tr><th>Safety / Integrity (25)</th><td class="win">20.5</td><td class="">11.3</td></tr>
+        <tr><th>Identity / Provenance (18)</th><td class="win">18.0</td><td class="">10.8</td></tr>
+        <tr><th>Transparency (17)</th><td class="win">13.9</td><td class="">13.7</td></tr>
+        <tr><th>Maintenance (20)</th><td class="win">19.9</td><td class="">18.6</td></tr>
+        <tr><th>Adoption (20)</th><td class="">17.6</td><td class="win">17.8</td></tr>
+        <tr><th>GitHub stars</th><td class="">10.8k</td><td class="win">12.4k</td></tr>
+        <tr><th>Weekly downloads</th><td>925,849</td><td>961,468</td></tr>
+        <tr><th>Last push</th><td>2026-06-01</td><td>2026-06-02</td></tr>
+        <tr><th>Language</th><td>Python</td><td>Python</td></tr>
+        <tr><th>OSSF Scorecard</th><td>6.4</td><td>6.1</td></tr>
+      </tbody>
+    </table>
+
+    <div class="cta">
+      <a href="/agents/livekit-agents/">Full LiveKit Agents report →</a>
+      <a href="/agents/e2b/">Full E2B report →</a>
+      <a href="/categories/llm-gateways-infra/">All LLM Gateways &amp; Infra →</a>
+    </div>
+
+    <footer>
+      Methodology: <a href="/methodology">how HVTrust is computed</a>. Data updated 2026-06-02 16:53 UTC. HVTracker is independent and not affiliated with these projects.
+    </footer>
+  </div>
+</body>
+</html>

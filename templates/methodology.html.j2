@@ -15,6 +15,44 @@
   <meta name="twitter:title" content="Methodology — How HVTracker Ranks Open-Source AI Agents">
   <meta name="twitter:description" content="Learn how HVTracker ranks open-source AI agents using public signals for activity, adoption, transparency, safety, identity, provenance, and evidence quality.">
   <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How does HVTracker rank AI agents?",
+        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker ranks AI agents using an evidence-weighted HVTrust score computed from public, verifiable signals: supply-chain integrity (OSSF Scorecard, build provenance, signed commits), transparency (license, documentation), maintenance activity, and community adoption. The score is scaled by an evidence-confidence factor so agents with more checkable signals rank higher." }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the HVTrust score?",
+        "acceptedAnswer": { "@type": "Answer", "text": "HVTrust is a 0-100 composite trust score that measures how verifiably trustworthy an open-source AI agent is. Unlike popularity metrics like GitHub stars, HVTrust is based on concrete security and quality signals: OSSF Scorecard results, build provenance attestation, commit signing, license permissiveness, maintenance freshness, and adoption breadth." }
+      },
+      {
+        "@type": "Question",
+        "name": "What signals does HVTracker use?",
+        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker evaluates seven signal categories: Activity (commit recency, release frequency), Adoption (GitHub stars, forks, dependents), Transparency (license, README quality), Safety (OSSF Scorecard score), Identity (signed commits, verified publishers), Provenance (SLSA build attestation), and Evidence Quality (how many signals are actually checkable for a given agent)." }
+      },
+      {
+        "@type": "Question",
+        "name": "How often is HVTracker data updated?",
+        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker data is refreshed daily via an automated pipeline that fetches the latest signals from GitHub, OSSF Scorecard, and other public sources. The leaderboard, agent profiles, and all comparison pages update with each refresh cycle." }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Methodology" }
+    ]
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
