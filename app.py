@@ -296,6 +296,18 @@ def _marketing_page(title: str, eyebrow: str, heading: str, body_html: str) -> s
     .back:hover {{ color:var(--accent); }}
     .ok {{ color:var(--fresh); font-weight:700; }}
   </style>
+  <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
+  <script>
+    (function(){{try{{if(localStorage.getItem("hvt_notrack")==="1"){{window["ga-disable-G-TZ8921LR0K"]=true;return}}}}catch(_){{}}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){{window["ga-disable-G-TZ8921LR0K"]=true}}}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){{dataLayer.push(arguments);}}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
 </head>
 <body>
   <div class="page">
