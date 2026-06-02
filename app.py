@@ -671,6 +671,12 @@ def _compute_render_fingerprint() -> str:
     for name in sorted(os.listdir(templates_dir)):
         if name.endswith((".html", ".j2")):
             tracked_paths.append(os.path.join(templates_dir, name))
+    blog_static_dir = os.path.join(BASE_DIR, "blog_static")
+    if os.path.isdir(blog_static_dir):
+        for name in sorted(os.listdir(blog_static_dir)):
+            idx = os.path.join(blog_static_dir, name, "index.html")
+            if os.path.isfile(idx):
+                tracked_paths.append(idx)
     for path in tracked_paths:
         with open(path, "rb") as f:
             digest.update(path.removeprefix(BASE_DIR).encode("utf-8"))
