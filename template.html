@@ -1564,40 +1564,6 @@
       </div>
     </div>
 
-    {% if legacy_rows %}
-    <div class="container" style="margin-top:3rem">
-      <h2 style="font-size:1rem;font-weight:600;color:var(--text-muted,#888);letter-spacing:.05em;text-transform:uppercase;margin-bottom:.75rem">
-        Legacy Agents
-        <span style="font-weight:400;font-size:.85em;margin-left:.5rem">— inactive ≥365 days, preserved for historical reference</span>
-      </h2>
-      <table style="width:100%;border-collapse:collapse;font-size:.85rem">
-        <thead>
-          <tr style="color:var(--text-muted,#888);border-bottom:1px solid var(--border,#e5e7eb)">
-            <th style="text-align:left;padding:.4rem .75rem">Agent</th>
-            <th style="text-align:left;padding:.4rem .75rem">Category</th>
-            <th style="text-align:right;padding:.4rem .75rem">Stars</th>
-            <th style="text-align:right;padding:.4rem .75rem">Last push</th>
-            <th style="text-align:right;padding:.4rem .75rem">Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for lr in legacy_rows %}
-          <tr style="border-bottom:1px solid var(--border,#e5e7eb);opacity:.65">
-            <td style="padding:.4rem .75rem">
-              <a href="/agents/{{ lr.slug }}" style="color:inherit;text-decoration:none;font-weight:500">{{ lr.name }}</a>
-              <a href="https://github.com/{{ lr.repo }}" target="_blank" rel="noopener" style="color:var(--text-muted,#888);font-size:.75em;margin-left:.4rem">↗</a>
-            </td>
-            <td style="padding:.4rem .75rem;color:var(--text-muted,#888)">{{ lr.category }}</td>
-            <td style="padding:.4rem .75rem;text-align:right">{{ lr.stars_fmt }}</td>
-            <td style="padding:.4rem .75rem;text-align:right;color:var(--text-muted,#888)">{{ lr.last_push[:10] if lr.last_push else '—' }}</td>
-            <td style="padding:.4rem .75rem;text-align:right">{{ lr.score }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    {% endif %}
-
     <nav class="category-panel">
       <div style="font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Browse by Category</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
