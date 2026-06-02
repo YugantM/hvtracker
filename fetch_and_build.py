@@ -2959,6 +2959,7 @@ def main() -> None:
         "Robotics & Embodied",
         "LLM Gateways & Infra",
         "Multi-Agent Systems",
+        "UI & App Builders",
     ]
     categories = []
     for cat in category_order:

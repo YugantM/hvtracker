@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn how HVTracker ranks open-source AI agents using public signals for activity, adoption, transparency, safety, identity, provenance, and evidence quality.">
+  <title>Methodology — How HVTracker Ranks Open-Source AI Agents</title>
+  <link rel="canonical" href="https://hvtracker.net/methodology">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Methodology — How HVTracker Ranks Open-Source AI Agents">
+  <meta property="og:description" content="Learn how HVTracker ranks open-source AI agents using public signals for activity, adoption, transparency, safety, identity, provenance, and evidence quality.">
+  <meta property="og:url" content="https://hvtracker.net/methodology">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Methodology — How HVTracker Ranks Open-Source AI Agents">
+  <meta name="twitter:description" content="Learn how HVTracker ranks open-source AI agents using public signals for activity, adoption, transparency, safety, identity, provenance, and evidence quality.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0b0d10;
+      --surface:   #151920;
+      --surface-2: #1b2029;
+      --border:    #303846;
+      --text:      #eef2f6;
+      --muted:     #8a87a8;
+      --accent:    #8fb3ff;
+      --accent-lt: rgba(143,179,255,0.10);
+      --font-mono: "JetBrains Mono", "Fira Mono", "Cascadia Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
+      --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .page { max-width: 1100px; margin: 0 auto; padding: 0 20px 48px; }
+
+    header {
+      padding: 36px 0 24px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .logo {
+      font-family: var(--font-mono);
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+    .logo span { color: var(--accent); }
+
+    .tagline { font-size: 13px; color: var(--muted); }
+
+    .site-nav {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+    }
+    .site-nav a {
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: rgba(255,255,255,0.03);
+    }
+    .site-nav a:hover {
+      color: var(--text);
+      border-color: var(--accent);
+      text-decoration: none;
+    }
+    .site-nav .active {
+      color: var(--text);
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .content {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 40px 0 0;
+    }
+
+    .doc-title {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .doc-meta {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    section { margin-bottom: 40px; }
+
+    h2 {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    p { margin-bottom: 14px; }
+    p:last-child { margin-bottom: 0; }
+
+    .sources { list-style: none; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-2); }
+    .sources li {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sources li:last-child { border-bottom: none; }
+    .sources dt {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .sources dd { margin: 0; color: var(--text); font-size: 14px; }
+    .sources .limitation {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .formula-block {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 18px 20px;
+      margin: 16px 0;
+      line-height: 1.7;
+    }
+
+    .weights { list-style: none; margin: 16px 0; }
+    .weights li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .weights li:last-child { border-bottom: none; }
+    .weights strong {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--accent);
+      display: inline-block;
+      min-width: 88px;
+    }
+
+    ul.bullets {
+      padding-left: 1.25em;
+      margin: 0;
+    }
+    ul.bullets li { margin-bottom: 10px; }
+    ul.bullets li:last-child { margin-bottom: 0; }
+
+    .changelog { list-style: none; }
+    .changelog li {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .changelog li:last-child { border-bottom: none; }
+    .changelog .ver {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .note {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 16px;
+      padding: 12px 14px;
+      background: var(--accent-lt);
+      border-radius: 4px;
+      border-left: 3px solid var(--accent);
+    }
+
+    footer {
+      max-width: 700px;
+      margin: 48px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    footer p { margin-bottom: 12px; }
+    footer .footer-links {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      margin-bottom: 20px;
+    }
+    footer .disclaimer {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 640px) {
+      header { flex-direction: column; gap: 8px; }
+      .site-nav { margin-left: 0; }
+      .doc-title { font-size: 24px; }
+    }
+  </style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="methodology">
+  <div class="page">
+
+    <header>
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <span class="tagline">Trust signals for open-source AI agents</span>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <span class="active">Methodology</span>
+        <a href="/badges/">Badges</a>
+        <a href="/roadmap/">Roadmap</a>
+        <a href="/spec/">Specifications</a>
+      </nav>
+    </header>
+
+    <article class="content">
+      <h1 class="doc-title">Methodology</h1>
+      <p class="doc-meta">v3.0 · Last updated 2026-05-31</p>
+
+      <section id="what-it-measures">
+        <h2>What HVTracker Measures</h2>
+        <p>HVTracker measures open-source AI agent projects using public, independently checkable signals. The goal is to show project health, maintenance momentum, community adoption, and basic supply-chain trust without relying on vendor claims or self-reported submissions.</p>
+        <p>The leaderboard currently tracks GitHub activity, package downloads, Hacker News discussion, category ranking, rank movement, and trust/provenance signals where they are available in public APIs.</p>
+      </section>
+
+      <section id="scoring">
+        <h2>Health Score And Trust Score</h2>
+        <p><strong>The leaderboard ranks by the HVTrust score, not by popularity.</strong> HVTrust is a 0–100 composite designed so that the rank and the evidence grade tell the same story. It is built on four principles:</p>
+        <ul class="weights">
+          <li><strong>Trust is not popularity.</strong> Adoption (stars and downloads) is log-scaled, capped, and carries the lowest weight, so a widely used project cannot buy its way to the top.</li>
+          <li><strong>Harder-to-fake signals weigh more.</strong> Supply-chain integrity sits at the top; stars sit at the bottom.</li>
+          <li><strong>Missing evidence lowers trust.</strong> The raw score is multiplied by a confidence factor based on how many independent signal types are available. An agent we know little about cannot reach the top tier.</li>
+          <li><strong>Known-bad states are penalised and gated.</strong> Staleness subtracts points that adoption cannot offset; deprecated or unverified listings are capped below the verified tier.</li>
+        </ul>
+        <div class="formula-block">
+          HVTrust = gate( confidence × [ Safety(30) + Identity(20) + Transparency(20) + Maintenance(20) + Adoption(10) ] − penalties )
+        </div>
+        <ul class="weights">
+          <li><strong>Safety / Integrity · 30</strong> — OSSF Scorecard, build provenance, and signed-commit ratio. The hardest signals to fake.</li>
+          <li><strong>Identity / Provenance · 20</strong> — verified listing status and build provenance binding the package to its source.</li>
+          <li><strong>Transparency · 20</strong> — a declared license and OSSF transparency checks.</li>
+          <li><strong>Maintenance · 20</strong> — recency of the last push and log-scaled recent commit activity (halved when commit data is low-confidence).</li>
+          <li><strong>Adoption · 10</strong> — log-scaled, capped stars and package downloads.</li>
+        </ul>
+        <p class="note"><strong>Confidence</strong> = present ÷ applicable signal types (floored at 0.4) and is shown alongside each score. Signals that cannot apply to an agent (for example, package downloads for a project that ships no package) are excluded rather than counted as missing — "not applicable" is not the same as "unverified". The earlier four-part health score (stars, freshness, activity, community) is retained only as a tie-breaker and for historical continuity. Cryptographic identity verification will tighten the gate in a future revision.</p>
+      </section>
+
+      <section id="data-sources">
+        <h2>Displayed Signals</h2>
+        <dl class="sources">
+          <div>
+            <dt>GitHub repository data</dt>
+            <dd>Stars, forks, last push date, recent commits, language, description, and open issue count come from the GitHub REST API.</dd>
+            <dd class="limitation">GitHub's commit activity endpoint can return stale or delayed results. When possible, HVTracker falls back to recent commit counts and flags low-confidence commit cells with a question mark.</dd>
+          </div>
+          <div>
+            <dt>Package downloads</dt>
+            <dd>Weekly downloads are fetched from npm and PyPI for projects that have package names configured in <code>agents.json</code>. If a project has both package ecosystems configured, the values are summed and labeled by source.</dd>
+            <dd class="limitation">Downloads are install events, not unique users. They can include CI, mirrors, bots, and automated environments.</dd>
+          </div>
+          <div>
+            <dt>Hacker News mentions</dt>
+            <dd>HN mentions count matching stories from the last 30 days using the Algolia Hacker News API and curated search terms.</dd>
+            <dd class="limitation">Generic project names can create false positives or false negatives, so not every project has an HN query configured.</dd>
+          </div>
+          <div>
+            <dt>Rank movement</dt>
+            <dd>Rank deltas compare the current run with the most recent prior daily snapshot in <code>output/history</code>. Historical snapshots also power the biggest-movers strip and per-agent rank sparklines.</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section id="provenance">
+        <h2>Trust And Provenance Signals</h2>
+        <p>HVTracker surfaces supply-chain signals separately from the health score. These indicators help readers judge release hygiene and verifiability, but they do not currently affect rank.</p>
+
+        <dl class="sources">
+          <div>
+            <dt>npm provenance</dt>
+            <dd>For npm packages, HVTracker checks whether the latest published version exposes provenance attestations in the npm registry's <code>dist.attestations</code> field.</dd>
+          </div>
+          <div>
+            <dt>PyPI provenance</dt>
+            <dd>For PyPI packages, HVTracker checks whether latest-release files expose PEP 740 provenance metadata through PyPI's Simple API JSON response.</dd>
+          </div>
+          <div>
+            <dt>OSSF Scorecard</dt>
+            <dd>Where available through deps.dev, HVTracker displays the OpenSSF Scorecard overall score and individual checks. Scorecard coverage is not guaranteed for every repository.</dd>
+          </div>
+          <div>
+            <dt>Signed commit ratio</dt>
+            <dd>HVTracker samples recent commits and reports the percentage that GitHub marks as verified through GPG, SSH, S/MIME, or GitHub's own signing flow.</dd>
+            <dd class="limitation">A verified signature confirms that GitHub considers the commit signed; it does not prove code quality, maintainer intent, or release safety.</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section id="updates">
+        <h2>How Often Data Updates</h2>
+        <p>The GitHub Actions workflow runs six staggered batches per day, one every 4 hours. Each batch refreshes roughly one-sixth of the tracked agents, so any given agent's signals update approximately once per day. Each successful run regenerates the leaderboard, agent pages, public JSON endpoints, <code>feed.json</code>, <code>sitemap.xml</code>, and a dated history snapshot.</p>
+      </section>
+
+      <section id="limitations">
+        <h2>Known Limitations</h2>
+        <ul class="bullets">
+          <li><strong>Stars are imperfect.</strong> Stars can reflect popularity, hype, age, or marketing, not necessarily production quality.</li>
+          <li><strong>Commit counts are noisy.</strong> A high commit count can mean active development, churn, imports, generated files, or repository maintenance work.</li>
+          <li><strong>Downloads are not users.</strong> Package download numbers can include automation and duplicate installs.</li>
+          <li><strong>HN mentions are approximate.</strong> Curated search terms reduce noise but cannot perfectly capture discussion.</li>
+          <li><strong>Trust signals are partial.</strong> Missing provenance or Scorecard data can mean the signal is unavailable, not necessarily that a project is unsafe.</li>
+          <li><strong>No qualitative review yet.</strong> HVTracker does not currently score documentation quality, API stability, model/provider compatibility, benchmark performance, or real-world adoption.</li>
+          <li><strong>No formal SLSA level.</strong> HVTracker displays observable provenance and Scorecard signals but does not claim an authoritative SLSA build level.</li>
+        </ul>
+      </section>
+
+      <section id="corrections">
+        <h2>Corrections And Project Submissions</h2>
+        <p>To suggest a correction, submit a missing package name, propose a category change, or request a new project, open a <a href="https://github.com/YugantM/hvtracker/issues" target="_blank" rel="noopener">GitHub issue</a> or <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">pull request</a>. Include the project repository, the preferred display name, the category you believe fits best, and any npm or PyPI package names that should be tracked.</p>
+        <p>New projects should be open-source AI agent projects or closely related infrastructure. Categories are curated manually to keep the leaderboard useful and comparable.</p>
+      </section>
+
+      <section id="versioning">
+        <h2>Versioning</h2>
+        <p>Methodology changes are versioned explicitly. Every revision is recorded in the changelog below. Raw data snapshots are preserved on each build so past leaderboard states remain auditable — see the <a href="https://github.com/YugantM/hvtracker/tree/main/output/history">historical snapshots</a> in the repository.</p>
+      </section>
+
+      <section id="changelog">
+        <h2>Changelog</h2>
+        <ul class="changelog">
+          <li><span class="ver">v3.0</span> (current) — The leaderboard now ranks by HVTrust instead of the popularity-based health score. HVTrust is gated and confidence-scaled: dimensions are weighted by how hard each signal is to fake (Safety 30, Identity 20, Transparency 20, Maintenance 20, Adoption 10), missing evidence lowers the score via a confidence multiplier, staleness incurs a penalty, and deprecated or unverified listings are capped below the verified tier.</li>
+          <li><span class="ver">v2.0</span> — Added supply chain trust signals: npm provenance, PyPI attestations (PEP 740), OSSF Scorecard (via deps.dev), signed commit ratio. These are displayed independently, not folded into the composite score.</li>
+          <li><span class="ver">v1.1</span> — Added npm, PyPI, and Hacker News data sources. Daily historical snapshots now archived.</li>
+          <li><span class="ver">v1.0</span> (May 2026) — Initial methodology. GitHub-only signals: stars, freshness, activity, community (forks).</li>
+        </ul>
+      </section>
+    </article>
+
+    <footer>
+      <div class="footer-links">
+        <a href="/">← Leaderboard</a>
+        <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">Source code</a>
+        <a href="https://github.com/YugantM/hvtracker/issues" target="_blank" rel="noopener">Open an issue</a>
+      </div>
+      <p>Questions or critiques? <a href="https://github.com/YugantM/hvtracker/issues" target="_blank" rel="noopener">Open an issue</a> on GitHub.</p>
+      <p class="disclaimer">HVTracker is not affiliated with any of the projects listed. Data is collected from public APIs.</p>
+    </footer>
+
+  </div>
+</body>
+</html>

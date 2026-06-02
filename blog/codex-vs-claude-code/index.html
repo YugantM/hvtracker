@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codex vs Claude Code: Which Coding Agent Is Easier to Trust? | HVTracker</title>
+  <meta name="description" content="Codex vs Claude Code compared on trust, provenance, signed commits, maintenance, and adoption. Codex ranks #2 on HVTracker; Claude Code ranks #82.">
+  <link rel="canonical" href="https://hvtracker.net/blog/codex-vs-claude-code">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Codex vs Claude Code: Which Coding Agent Is Easier to Trust?">
+  <meta property="og:description" content="Codex ranks #2 on HVTracker. Claude Code ranks #82. The gap is not about hype — it's about what the public can verify.">
+  <meta property="og:url" content="https://hvtracker.net/blog/codex-vs-claude-code">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Codex vs Claude Code: Which Coding Agent Is Easier to Trust?">
+  <meta name="twitter:description" content="Codex vs Claude Code on provenance, signed commits, maintenance, and trust signals.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Codex vs Claude Code: Which Coding Agent Is Easier to Trust?",
+    "description": "A head-to-head trust comparison of Codex and Claude Code using HVTracker's public scoring model.",
+    "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "publisher": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "datePublished": "2026-06-01",
+    "dateModified": "2026-06-01",
+    "mainEntityOfPage": "https://hvtracker.net/blog/codex-vs-claude-code"
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#0b0d10; --surface:#151920; --surface-2:#1b2029; --border:#303846;
+      --text:#eef2f6; --muted:#8a87a8;
+      --accent:#8fb3ff; --accent-lt:rgba(143,179,255,0.10);
+      --mocha:#d8a657; --mocha-lt:rgba(216,166,87,0.16);
+      --fresh:#2dd4bf; --red:#ef4444;
+      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:16px; line-height:1.7; min-height:100vh; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:720px; margin:0 auto; padding:0 20px; }
+    header { padding:28px 0 20px; border-bottom:1px solid var(--border); display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+    .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; color:var(--text); }
+    .logo span { color:var(--accent); }
+    .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; border:1px solid var(--border); border-radius:999px; padding:5px 10px; background:rgba(255,255,255,0.03); }
+    .back:hover { color:var(--text); border-color:var(--accent); text-decoration:none; }
+    article { padding:36px 0 48px; }
+    h1 { font-size:31px; font-weight:700; letter-spacing:-0.5px; line-height:1.2; margin-bottom:12px; }
+    .meta { font-size:13px; color:var(--muted); margin-bottom:32px; font-family:var(--font-mono); }
+    h2 { font-size:22px; font-weight:700; margin-top:36px; margin-bottom:12px; letter-spacing:-0.3px; }
+    p { margin-bottom:16px; }
+    .lede { font-size:18px; color:var(--text); }
+    .callout { background:var(--accent-lt); border-left:3px solid var(--accent); padding:16px 20px; margin:24px 0; border-radius:0 6px 6px 0; font-size:14px; }
+    .callout strong { color:var(--accent); }
+    table { width:100%; border-collapse:collapse; margin:24px 0; font-size:14px; }
+    th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
+    td.name a { font-weight:600; color:var(--text); }
+    td.name a:hover { color:var(--accent); }
+    td.good { color:var(--fresh); font-weight:600; }
+    td.bad { color:var(--red); font-weight:600; }
+    td.mono { font-family:var(--font-mono); }
+    .cta-box { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:24px; margin:36px 0; text-align:center; }
+    .cta-box h3 { color:var(--text); margin-top:0; font-size:18px; margin-bottom:8px; }
+    .cta-box p { font-size:14px; color:var(--muted); margin-bottom:16px; }
+    .cta-btn { display:inline-block; background:var(--accent); color:#fff; padding:10px 24px; border-radius:5px; font-weight:600; font-size:14px; text-decoration:none; }
+    .cta-btn:hover { opacity:0.9; text-decoration:none; }
+    footer { padding:28px 0; border-top:1px solid var(--border); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--accent); }
+    @media (max-width:600px) { h1 { font-size:24px; } table { font-size:12px; } th,td { padding:8px 6px; } }
+  </style>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TZ8921LR0K');</script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="blog">
+  <div class="page">
+    <header>
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <a href="/blog/" class="back">&larr; Blog</a>
+    </header>
+
+    <article>
+      <h1>Codex vs Claude Code: Which Coding Agent Is Easier to Trust?</h1>
+      <div class="meta">June 1, 2026 &middot; 5 min read &middot; Coding Agent Comparison</div>
+
+      <p class="lede">If you only look at attention, Claude Code wins. It has more GitHub stars and a bigger public halo. If you look at what the public can actually verify, Codex wins by a mile.</p>
+
+      <p>On HVTracker today, <a href="/agents/codex">Codex</a> ranks <strong>#2</strong> with an HVTrust score of <strong>92.7/100</strong>. <a href="/agents/claude-code">Claude Code</a> ranks <strong>#82</strong> at <strong>61.9/100</strong>.</p>
+
+      <p>That gap is not a product-quality verdict. It is a <strong>verifiability verdict</strong>.</p>
+
+      <h2>The headline numbers</h2>
+
+      <table>
+        <thead>
+          <tr><th>Agent</th><th>Stars</th><th>HVTrust Rank</th><th>Trust Score</th><th>Grade</th><th>4-week commits</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name"><a href="/agents/codex">Codex</a></td>
+            <td class="mono">87.3k</td>
+            <td class="mono good">#2</td>
+            <td class="mono">92.7</td>
+            <td class="mono good">A</td>
+            <td class="mono">901</td>
+          </tr>
+          <tr>
+            <td class="name"><a href="/agents/claude-code">Claude Code</a></td>
+            <td class="mono">129.2k</td>
+            <td class="mono bad">#82</td>
+            <td class="mono">61.9</td>
+            <td class="mono">C</td>
+            <td class="mono">40</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Claude Code is more popular by stars. Codex is far easier to evaluate through public trust signals.</p>
+
+      <h2>Why the trust gap is so large</h2>
+
+      <table>
+        <thead>
+          <tr><th>Signal</th><th>Codex</th><th>Claude Code</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Build provenance</td><td class="good">Verified</td><td class="bad">None</td></tr>
+          <tr><td>Signed commits</td><td class="good">100%</td><td class="bad">18%</td></tr>
+          <tr><td>OSSF Scorecard</td><td class="mono">6.6 / 10</td><td class="mono">5.6 / 10</td></tr>
+          <tr><td>Safety / Integrity</td><td class="mono">20.7 / 25</td><td class="mono">7.9 / 25</td></tr>
+          <tr><td>Identity / Provenance</td><td class="mono">18.0 / 18</td><td class="mono">10.8 / 18</td></tr>
+          <tr><td>Transparency</td><td class="mono">14.1 / 17</td><td class="mono">4.8 / 17</td></tr>
+          <tr><td>Maintenance</td><td class="mono">19.9 / 20</td><td class="mono">18.4 / 20</td></tr>
+          <tr><td>Adoption</td><td class="mono">20.0 / 20</td><td class="mono">20.0 / 20</td></tr>
+        </tbody>
+      </table>
+
+      <p>The trust gap is doing most of its work in three places:</p>
+
+      <p><strong>1. Provenance.</strong> Codex publishes package provenance. Claude Code does not. That alone is a major difference for a terminal agent.</p>
+
+      <p><strong>2. Commit verification.</strong> Codex sits at 100% signed commits in the sampled window. Claude Code is at 18%.</p>
+
+      <p><strong>3. Transparency.</strong> Codex exposes far more publicly verifiable evidence, so it gets credit on the dimensions where public proof matters.</p>
+
+      <div class="callout">
+        <strong>The important distinction:</strong> this is not saying Codex is “better at coding” than Claude Code. It is saying Codex is easier to trust from the outside because more of its operational posture is publicly inspectable.
+      </div>
+
+      <h2>Where Claude Code still looks strong</h2>
+
+      <p>Claude Code is not a weak project. It still scores well on maintenance and adoption, and its star count shows extremely strong user interest. If your question is “which one has more visible demand?”, Claude Code clearly does.</p>
+
+      <p>But if your question is “which one gives me more public evidence before I give it repo access?”, the answer is Codex.</p>
+
+      <h2>What this means for buyers and teams</h2>
+
+      <p>If you are choosing a coding agent for real engineering use, stars are a starting point, not a decision rule.</p>
+
+      <p>For a tool that can read code, run commands, and operate inside a terminal workflow, the more useful question is:</p>
+
+      <p><strong>What can I verify before I trust it?</strong></p>
+
+      <p>That is why Codex ranks near the very top of HVTracker while Claude Code lands much lower despite a larger public following.</p>
+
+      <div class="cta-box">
+        <h3>Open the live comparison</h3>
+        <p>See the side-by-side profile and compare the trust signals directly.</p>
+        <a class="cta-btn" href="/compare/?a=codex,claude-code">Compare Codex vs Claude Code</a>
+      </div>
+
+      <p style="font-size:13px;color:var(--muted);">Data from HVTracker signals as of June 1, 2026. Public signals refresh roughly every 2 hours. <a href="/methodology">Full methodology</a>.</p>
+    </article>
+
+    <footer>
+      <a href="/">HVTracker</a> &middot; <a href="/methodology">Methodology</a> &middot; <a href="/blog/">Blog</a>
+    </footer>
+  </div>
+</body>
+</html>

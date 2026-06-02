@@ -4,7 +4,7 @@
 Core hook (data-backed, defensible): *popularity ≠ trustworthiness.*
 
 Key stats (live, 2026-05-31):
-- 192 AI agents scored.
+- hundreds of AI agents scored.
 - **24 of the 30 most-starred agents have no build provenance.**
 - Claude Code: #82 (128k stars). Codex: #2 (87k stars). Stars don't predict trust.
 - Grade distribution: A=23, B=51, C=38, D=80.
@@ -14,13 +14,13 @@ Key stats (live, 2026-05-31):
 
 ## 1. Show HN
 
-**Title:** `Show HN: I scored 192 AI agents by supply-chain trust (most popular ≠ safest)`
+**Title:** `Show HN: I scored hundreds of AI agents by supply-chain trust (most popular ≠ safest)`
 
 **URL:** `https://hvtracker.net`
 
 **First comment (post immediately after submitting):**
 
-> I kept seeing "best AI agent" lists ranked purely by GitHub stars, so I built a registry that scores 192 agents on verifiable supply-chain signals instead: OSSF Scorecard, build provenance, signed commits, license type, maintenance, and adoption — each weighted by how hard it is to fake, then scaled by an evidence-confidence factor so tools with little verifiable evidence can't reach the top tier.
+> I kept seeing "best AI agent" lists ranked purely by GitHub stars, so I built a registry that scores hundreds of agents on verifiable supply-chain signals instead: OSSF Scorecard, build provenance, signed commits, license type, maintenance, and adoption — each weighted by how hard it is to fake, then scaled by an evidence-confidence factor so tools with little verifiable evidence can't reach the top tier.
 >
 > The uncomfortable finding: 24 of the 30 most-starred agents publish no build provenance at all. Claude Code (128k stars) lands at #82 — not because it's bad software, but because it's proprietary with no public Scorecard or provenance, so there's little to verify. Codex (87k stars) sits at #2 because nearly everything is verifiable.
 >
@@ -36,7 +36,7 @@ Key stats (live, 2026-05-31):
 >
 > That felt incomplete for tools that can read your code, run commands, and land inside CI.
 >
-> So I built HVTracker v2: a public trust registry that scores 192 AI agents on signals you can actually verify, including OSSF Scorecard, build provenance, signed commits, license type, maintenance, and adoption.
+> So I built HVTracker v2: a public trust registry that scores hundreds of AI agents on signals you can actually verify, including OSSF Scorecard, build provenance, signed commits, license type, maintenance, and adoption.
 >
 > The headline surprised even me: **24 of the 30 most-starred AI agents publish no build provenance at all.**
 >
@@ -60,7 +60,7 @@ Key stats (live, 2026-05-31):
 ## 3. X / Twitter thread
 
 **1/**
-I scored 192 AI agents by supply-chain trust, not GitHub stars.
+I scored hundreds of AI agents by supply-chain trust, not GitHub stars.
 
 The result is uncomfortable: the most popular tools are often the least verifiable.
 
@@ -100,15 +100,15 @@ Tell me which signal I'm weighting wrong. 👇
 ## 4. Reddit
 
 ### r/LocalLLaMA  /  r/MachineLearning
-**Title:** `I ranked 192 AI agents by supply-chain trust instead of GitHub stars — 24 of the 30 most popular have no build provenance`
+**Title:** `I ranked hundreds of AI agents by supply-chain trust instead of GitHub stars — 24 of the 30 most popular have no build provenance`
 
 **Body:**
-> Most "best AI agent" lists rank by stars. I wanted to know which ones are actually *verifiable*, so I built a registry that scores 192 agents on OSSF Scorecard, build provenance, signed commits, license type, maintenance, and adoption — weighted by how hard each signal is to fake.
+> Most "best AI agent" lists rank by stars. I wanted to know which ones are actually *verifiable*, so I built a registry that scores hundreds of agents on OSSF Scorecard, build provenance, signed commits, license type, maintenance, and adoption — weighted by how hard each signal is to fake.
 >
 > Findings that surprised me:
 > - 24 of the 30 most-starred agents publish no build provenance.
 > - Claude Code (128k stars) ranks #82; Codex (87k) ranks #2 — driven by what's publicly verifiable, not quality.
-> - 80 of 192 are Grade D, mostly for missing verifiable signals.
+> - the majority are Grade D, mostly for missing verifiable signals.
 >
 > Full dataset is CC BY 4.0 and the methodology is public. Happy to be told my weighting is wrong — that's half the reason I'm posting. Link in comments to avoid the spam filter.
 
@@ -117,7 +117,7 @@ Tell me which signal I'm weighting wrong. 👇
 ### r/devops  /  r/programming
 **Title:** `A trust registry for AI agents — OSSF Scorecard, provenance, and signed commits instead of stars`
 
-**Body:** Same as above, but lead with the supply-chain angle: *"If you're putting AI agents in your CI or dev environment, stars tell you nothing about whether the artifact matches the source. I scored 192 of them on provenance, Scorecard, and signing."*
+**Body:** Same as above, but lead with the supply-chain angle: *"If you're putting AI agents in your CI or dev environment, stars tell you nothing about whether the artifact matches the source. I scored hundreds of them on provenance, Scorecard, and signing."*
 
 ---
 
@@ -133,4 +133,4 @@ Tell me which signal I'm weighting wrong. 👇
 
 **Subject:** `Data: 24 of 30 most-popular AI agents have no build provenance`
 
-> Hi [name] — I run HVTracker, an open trust registry for AI agents. I just scored 192 of them on supply-chain signals (Scorecard, provenance, signing) rather than stars. The headline: 24 of the 30 most-starred agents publish no provenance, and Claude Code ranks #82 despite 128k stars. Full dataset is CC BY 4.0 and free to cite/chart. Thought it might fit [newsletter] — happy to send the raw numbers or a chart. — [you]
+> Hi [name] — I run HVTracker, an open trust registry for AI agents. I just scored hundreds of them on supply-chain signals (Scorecard, provenance, signing) rather than stars. The headline: 24 of the 30 most-starred agents publish no provenance, and Claude Code ranks #82 despite 128k stars. Full dataset is CC BY 4.0 and free to cite/chart. Thought it might fit [newsletter] — happy to send the raw numbers or a chart. — [you]

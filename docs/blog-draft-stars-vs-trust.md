@@ -5,7 +5,7 @@
 
 ---
 
-## GitHub stars don't predict AI agent trust. I scored 192 of them to prove it.
+## GitHub stars don't predict AI agent trust. I scored them to prove it.
 
 **Subhead:** 24 of the 30 most-starred AI agents ship with no build provenance. Here's the full list — and the six that get it right.
 
@@ -13,7 +13,7 @@
 
 Every "best AI agent" list ranks the same way: by GitHub stars. Stars are easy to count and easy to game. They measure attention, not trustworthiness — and for software you're about to give access to your terminal, your CI, and your codebase, attention is the wrong metric.
 
-So I built HVTracker to score AI agents on signals you can actually verify: OSSF Scorecard, build provenance, signed commits, license type, maintenance, and adoption — each weighted by how hard it is to fake. 192 of the most notable agents, refreshed every two hours. (It's a curated registry of the agents people actually use — not an index of every repo on GitHub.)
+So I built HVTracker to score AI agents on signals you can actually verify: OSSF Scorecard, build provenance, signed commits, license type, maintenance, and adoption — each weighted by how hard it is to fake. the most notable agents, refreshed every two hours. (It's a curated registry of the agents people actually use — not an index of every repo on GitHub.)
 
 Then I checked the 30 most-starred agents for the one signal that should be table stakes: **build provenance** — cryptographic proof that the package you install was built from the source you can read.
 

@@ -4,7 +4,7 @@
 
 [hvtracker.net](https://hvtracker.net) ranks open-source AI agents by evidence-weighted trust signals, not GitHub hype.
 
-HVTracker tracks **172 active agents** across **14 categories** and publishes public, machine-readable trust data for each project: activity, adoption, transparency, supply-chain safety, identity, provenance, evidence grade, and rank movement.
+HVTracker is an ever-growing leaderboard that tracks open-source AI agents across multiple categories and publishes public, machine-readable trust data for each project: activity, adoption, transparency, supply-chain safety, identity, provenance, evidence grade, and rank movement.
 
 The core question is simple:
 
@@ -37,8 +37,8 @@ HVTracker v2 ships the refreshed public site, premium agent profile analysis UI,
 
 ## Current Snapshot
 
-- **172** active open-source AI agent projects
-- **14** curated categories
+- Active open-source AI agent projects (see [live count](https://hvtracker.net))
+- Curated categories spanning coding agents, frameworks, infra, security, and more
 - **12** staggered refresh batches per day
 - **12h** full refresh cycle
 - **90-day** per-agent history where available
