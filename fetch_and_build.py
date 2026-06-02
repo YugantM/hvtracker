@@ -1122,6 +1122,199 @@ def render_distribution_svg(groups: list[dict], width: int = 680, height: int = 
     )
 
 
+def _clamp(value: float, low: float = 0.0, high: float = 100.0) -> float:
+    return max(low, min(high, value))
+
+
+def evidence_axis_score(row: dict) -> float:
+    """Convert public evidence signals into a 0-100 axis for benchmark charts."""
+    grade_base = {"A": 68, "B": 54, "C": 38, "D": 22}.get(row.get("evidence_grade", "D"), 22)
+    scorecard = row.get("scorecard_score")
+    signed = row.get("signed_commits_ratio")
+    bonus = 0.0
+    if row.get("has_provenance"):
+        bonus += 10
+    if scorecard is not None:
+        bonus += min(float(scorecard), 10.0) * 1.1
+    if signed is not None:
+        bonus += min(float(signed), 1.0) * 8
+    return round(_clamp(grade_base + bonus), 1)
+
+
+def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
+                                label_key: str = "name", width: int = 720,
+                                height: int = 430, x_label: str = "Evidence",
+                                y_label: str = "HVTrust",
+                                title: str = "Benchmark Quadrant",
+                                x_min: float | None = None,
+                                x_max: float | None = None,
+                                y_min: float = 0,
+                                y_max: float = 100,
+                                mid_x: float | None = None,
+                                mid_y: float = 55,
+                                max_items: int = 18,
+                                positive_x: bool = True,
+                                quadrant_labels: tuple[str, str, str, str] | None = None) -> str:
+    """Render an LLM-benchmark-style quadrant scatter plot."""
+    chart_items = [item for item in items[:max_items] if item.get(x_key) is not None and item.get(y_key) is not None]
+    if not chart_items:
+        return ""
+
+    x_values = [float(item.get(x_key) or 0) for item in chart_items]
+    if x_min is None:
+        x_min = 0 if positive_x else min(x_values)
+    if x_max is None:
+        x_max = max(100 if positive_x else max(x_values), 1)
+    if x_min == x_max:
+        x_min -= 1
+        x_max += 1
+    if mid_x is None:
+        mid_x = (x_min + x_max) / 2
+
+    left, right, top, bottom = 74, 28, 34, 68
+    plot_w = width - left - right
+    plot_h = height - top - bottom
+
+    def sx(value: float) -> float:
+        return left + (value - x_min) / (x_max - x_min) * plot_w
+
+    def sy(value: float) -> float:
+        return top + (1 - (value - y_min) / max(y_max - y_min, 1)) * plot_h
+
+    zero_x = sx(mid_x)
+    zero_y = sy(mid_y)
+    grade_colors = {"A": "#2dd4bf", "B": "#8fb3ff", "C": "#d8a657", "D": "#e8798b"}
+    dots = []
+    labels = []
+    for index, item in enumerate(chart_items):
+        x = sx(float(item.get(x_key) or 0))
+        y = sy(float(item.get(y_key) or 0))
+        grade = item.get("evidence_grade", "")
+        color = item.get("color") or grade_colors.get(grade, "#8fb3ff")
+        radius = 5.5 + min(math.log1p(item.get("stars") or 0) / math.log1p(100_000), 1.0) * 7
+        name = escape(str(item.get(label_key, ""))[:22])
+        opacity = 0.96 if index < 10 else 0.62
+        dots.append(
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{radius:.1f}" fill="{color}" opacity="{opacity}" '
+            f'stroke="rgba(255,255,255,.78)" stroke-width="1.1"/>'
+        )
+        if index < 10:
+            anchor = "start" if x < left + plot_w * 0.76 else "end"
+            dx = 9 if anchor == "start" else -9
+            labels.append(
+                f'<text x="{x + dx:.1f}" y="{y - radius - 4:.1f}" text-anchor="{anchor}" '
+                f'fill="#eef2f6" font-size="10.5" font-family="IBM Plex Mono, monospace">{name}</text>'
+            )
+
+    grid = []
+    for pct in (0, 25, 50, 75, 100):
+        y = sy(y_min + (y_max - y_min) * pct / 100)
+        grid.append(f'<line x1="{left}" y1="{y:.1f}" x2="{width - right}" y2="{y:.1f}" stroke="rgba(255,255,255,.075)"/>')
+        grid.append(f'<text x="{left - 12}" y="{y + 4:.1f}" text-anchor="end" fill="#7f8a99" font-size="10" font-family="IBM Plex Mono, monospace">{pct}</text>')
+    for pct in (0, 25, 50, 75, 100):
+        value = x_min + (x_max - x_min) * pct / 100
+        x = sx(value)
+        grid.append(f'<line x1="{x:.1f}" y1="{top}" x2="{x:.1f}" y2="{top + plot_h}" stroke="rgba(255,255,255,.055)"/>')
+
+    q1, q2, q3, q4 = quadrant_labels or (
+        "strong benchmark fit", "trusted, needs proof", "evidence ahead of trust", "watchlist"
+    )
+    q_labels = (
+        '<text x="{right_x}" y="{top_y}" text-anchor="end" fill="#2dd4bf" font-size="11" font-family="IBM Plex Mono, monospace">{q1}</text>'
+        '<text x="{left_x}" y="{top_y}" fill="#8fb3ff" font-size="11" font-family="IBM Plex Mono, monospace">{q2}</text>'
+        '<text x="{right_x}" y="{bottom_y}" text-anchor="end" fill="#d8a657" font-size="11" font-family="IBM Plex Mono, monospace">{q3}</text>'
+        '<text x="{left_x}" y="{bottom_y}" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">{q4}</text>'
+    ).format(
+        right_x=width - right - 12,
+        left_x=left + 12,
+        top_y=top + 19,
+        bottom_y=top + plot_h - 12,
+        q1=escape(q1),
+        q2=escape(q2),
+        q3=escape(q3),
+        q4=escape(q4),
+    )
+
+    return (
+        f'<svg class="insight-chart quadrant-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img" aria-label="{escape(title)}">'
+        '<defs>'
+        '<radialGradient id="scatterGlow" cx="50%" cy="45%" r="70%"><stop offset="0" stop-color="rgba(143,179,255,.22)"/><stop offset="1" stop-color="rgba(143,179,255,0)"/></radialGradient>'
+        '<filter id="dotGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+        '</defs>'
+        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)"/>'
+        f'<rect x="{left}" y="{top}" width="{plot_w}" height="{plot_h}" rx="12" fill="url(#scatterGlow)" stroke="rgba(255,255,255,.11)"/>'
+        + "".join(grid) +
+        f'<line x1="{zero_x:.1f}" y1="{top}" x2="{zero_x:.1f}" y2="{top + plot_h}" stroke="rgba(238,242,246,.24)" stroke-dasharray="5 6"/>'
+        f'<line x1="{left}" y1="{zero_y:.1f}" x2="{width - right}" y2="{zero_y:.1f}" stroke="rgba(238,242,246,.24)" stroke-dasharray="5 6"/>'
+        + q_labels +
+        f'<g filter="url(#dotGlow)">{"".join(dots)}</g>{"".join(labels)}'
+        f'<text x="{left + plot_w / 2:.1f}" y="{height - 24}" text-anchor="middle" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">{escape(x_label)}</text>'
+        f'<text transform="translate(20 {top + plot_h / 2:.1f}) rotate(-90)" text-anchor="middle" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">{escape(y_label)}</text>'
+        '</svg>'
+    )
+
+
+def render_radar_svg(metrics: list[dict], width: int = 430, height: int = 430,
+                     title: str = "Signal radar") -> str:
+    """Render a polished radar chart from [{label, value, max, color?}]."""
+    axes = [m for m in metrics if (m.get("max") or 0) > 0]
+    if len(axes) < 3:
+        return ""
+    cx, cy = width / 2, height / 2 + 10
+    radius = min(width, height) * 0.34
+    levels = []
+    for level in (0.25, 0.5, 0.75, 1.0):
+        pts = []
+        for index in range(len(axes)):
+            angle = -math.pi / 2 + index * 2 * math.pi / len(axes)
+            pts.append(f'{cx + math.cos(angle) * radius * level:.1f},{cy + math.sin(angle) * radius * level:.1f}')
+        levels.append(f'<polygon points="{" ".join(pts)}" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="1"/>')
+
+    area_pts = []
+    spokes = []
+    labels = []
+    for index, metric in enumerate(axes):
+        angle = -math.pi / 2 + index * 2 * math.pi / len(axes)
+        pct = _clamp(float(metric.get("value") or 0) / float(metric.get("max") or 1), 0, 1)
+        area_pts.append(f'{cx + math.cos(angle) * radius * pct:.1f},{cy + math.sin(angle) * radius * pct:.1f}')
+        spokes.append(f'<line x1="{cx:.1f}" y1="{cy:.1f}" x2="{cx + math.cos(angle) * radius:.1f}" y2="{cy + math.sin(angle) * radius:.1f}" stroke="rgba(255,255,255,.12)"/>')
+        lx = cx + math.cos(angle) * (radius + 42)
+        ly = cy + math.sin(angle) * (radius + 32)
+        anchor = "middle"
+        if math.cos(angle) > 0.35:
+            anchor = "start"
+        elif math.cos(angle) < -0.35:
+            anchor = "end"
+        label = escape(str(metric.get("label", ""))[:18])
+        value = round(pct * 100)
+        labels.append(
+            f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" fill="#eef2f6" font-size="11" font-family="Hanken Grotesk, sans-serif">{label}</text>'
+            f'<text x="{lx:.1f}" y="{ly + 14:.1f}" text-anchor="{anchor}" fill="#8fb3ff" font-size="10" font-family="IBM Plex Mono, monospace">{value}%</text>'
+        )
+
+    return (
+        f'<svg class="insight-chart radar-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img" aria-label="{escape(title)}">'
+        '<defs>'
+        '<linearGradient id="radarFill" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset=".62" stop-color="#8fb3ff"/><stop offset="1" stop-color="#d8a657"/></linearGradient>'
+        '<filter id="radarGlow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+        '</defs>'
+        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)"/>'
+        + "".join(levels) + "".join(spokes) +
+        f'<polygon points="{" ".join(area_pts)}" fill="url(#radarFill)" opacity=".28" stroke="url(#radarFill)" stroke-width="2.2" filter="url(#radarGlow)"/>'
+        f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="3" fill="#eef2f6" opacity=".75"/>'
+        + "".join(labels) +
+        '</svg>'
+    )
+
+
+def average_trust_radar(agents: list[dict]) -> list[dict]:
+    metrics = []
+    for key, (label, max_score) in TRUST_DIMENSIONS.items():
+        avg = sum((agent.get("trust_breakdown") or {}).get(key, 0) or 0 for agent in agents) / max(len(agents), 1)
+        metrics.append({"label": label.split(" / ")[0], "value": avg, "max": max_score})
+    return metrics
+
+
 def compute_movers_page_data(rows: list[dict], history: list[dict], window: int = 7) -> dict:
     """Return richer mover rows and charts for the generated movers page."""
     if len(history) < 2:
@@ -1147,6 +1340,7 @@ def compute_movers_page_data(rows: list[dict], history: list[dict], window: int 
             "trust_score": row.get("trust_score") or 0,
             "evidence_grade": row.get("evidence_grade", "D"),
             "score": row.get("score") or 0,
+            "stars": row.get("stars") or 0,
         })
     up = sorted([m for m in movers if m["delta"] > 0], key=lambda m: m["delta"], reverse=True)[:12]
     down = sorted([m for m in movers if m["delta"] < 0], key=lambda m: m["delta"])[:12]
@@ -1157,11 +1351,37 @@ def compute_movers_page_data(rows: list[dict], history: list[dict], window: int 
         {"label": label, "value": value}
         for label, value in sorted(category_counts.items(), key=lambda item: item[1], reverse=True)[:8]
     ]
+    scatter_items = []
+    for mover in (up + down):
+        scatter_items.append({
+            **mover,
+            "rank_delta": mover["delta"],
+            "color": "#2dd4bf" if mover["delta"] > 0 else "#e8798b",
+        })
+    max_delta = max([abs(item["rank_delta"]) for item in scatter_items] or [1])
+    max_category = max([item["value"] for item in category_items] or [1])
     return {
         "up": up,
         "down": down,
-        "chart_svg": render_bar_chart_svg(up + down, "name", "delta", accent="#2dd4bf", max_items=12, grad_id="moverSwingGrad"),
-        "category_svg": render_bar_chart_svg(category_items, "label", "value", accent="#8fb3ff", max_items=8, grad_id="moverCategoryGrad"),
+        "chart_svg": render_quadrant_scatter_svg(
+            scatter_items,
+            "rank_delta",
+            "trust_score",
+            x_label="Rank movement over window",
+            y_label="HVTrust",
+            title="Rank movement quadrant",
+            x_min=-max_delta,
+            x_max=max_delta,
+            mid_x=0,
+            mid_y=55,
+            positive_x=False,
+            max_items=18,
+            quadrant_labels=("rising leaders", "falling but trusted", "rising watchlist", "falling watchlist"),
+        ),
+        "category_svg": render_radar_svg(
+            [{"label": item["label"], "value": item["value"], "max": max_category} for item in category_items[:6]],
+            title="Category movement radar",
+        ),
     }
 
 
@@ -1200,7 +1420,6 @@ def build_use_case_pages(rows: list[dict]) -> list[dict]:
         },
     ]
     pages = []
-    grade_colors = {"A": "#2dd4bf", "B": "#8fb3ff", "C": "#d8a657", "D": "#e8798b"}
     for definition in definitions:
         agents = sorted(
             [r for r in rows if definition["filter"](r)],
@@ -1208,19 +1427,27 @@ def build_use_case_pages(rows: list[dict]) -> list[dict]:
         )[:16]
         if not agents:
             continue
-        grade_groups = [
-            {"label": grade, "value": sum(1 for r in agents if r.get("evidence_grade") == grade), "color": color}
-            for grade, color in grade_colors.items()
-        ]
-        chart_items = [
-            {"name": r["name"], "trust_score": r.get("trust_score") or 0}
-            for r in agents[:10]
-        ]
+        chart_items = []
+        for r in agents:
+            chart_items.append({
+                "name": r["name"],
+                "stars": r.get("stars") or 0,
+                "evidence_grade": r.get("evidence_grade", "D"),
+                "evidence_axis": evidence_axis_score(r),
+                "trust_score": r.get("trust_score") or 0,
+            })
         pages.append({
             **definition,
             "agents": agents,
-            "chart_svg": render_bar_chart_svg(chart_items, "name", "trust_score", accent="#2dd4bf", max_items=10, grad_id=f"useCase{definition['slug'].replace('-', '')}Grad"),
-            "distribution_svg": render_distribution_svg(grade_groups),
+            "chart_svg": render_quadrant_scatter_svg(
+                chart_items,
+                "evidence_axis",
+                "trust_score",
+                x_label="Public evidence strength",
+                y_label="HVTrust",
+                title=f"{definition['title']} evidence quadrant",
+            ),
+            "distribution_svg": render_radar_svg(average_trust_radar(agents), title=f"{definition['title']} signal radar"),
             "avg_trust": round(sum(r.get("trust_score") or 0 for r in agents) / len(agents)),
             "provenance_count": sum(1 for r in agents if r.get("has_provenance")),
             "fresh_count": sum(1 for r in agents if (r.get("days_ago") or 9999) <= 14),
@@ -2821,16 +3048,21 @@ def main() -> None:
                 "description": "Fresh, data-backed slices of the HVTracker registry for common evaluation jobs.",
                 "slug": "",
                 "agents": rows[:12],
-                "chart_svg": render_bar_chart_svg(
-                    [{"name": r["name"], "trust_score": r.get("trust_score") or 0} for r in rows[:10]],
-                    "name", "trust_score", max_items=10,
+                "chart_svg": render_quadrant_scatter_svg(
+                    [{
+                        "name": r["name"],
+                        "stars": r.get("stars") or 0,
+                        "evidence_grade": r.get("evidence_grade", "D"),
+                        "evidence_axis": evidence_axis_score(r),
+                        "trust_score": r.get("trust_score") or 0,
+                    } for r in rows[:16]],
+                    "evidence_axis",
+                    "trust_score",
+                    x_label="Public evidence strength",
+                    y_label="HVTrust",
+                    title="Use-case discovery evidence quadrant",
                 ),
-                "distribution_svg": render_distribution_svg([
-                    {"label": "A", "value": sum(1 for r in rows if r.get("evidence_grade") == "A"), "color": "#2dd4bf"},
-                    {"label": "B", "value": sum(1 for r in rows if r.get("evidence_grade") == "B"), "color": "#8fb3ff"},
-                    {"label": "C", "value": sum(1 for r in rows if r.get("evidence_grade") == "C"), "color": "#d8a657"},
-                    {"label": "D", "value": sum(1 for r in rows if r.get("evidence_grade") == "D"), "color": "#e8798b"},
-                ]),
+                "distribution_svg": render_radar_svg(average_trust_radar(rows), title="Registry signal radar"),
                 "avg_trust": round(sum(r.get("trust_score") or 0 for r in rows) / max(len(rows), 1)),
                 "provenance_count": sum(1 for r in rows if r.get("has_provenance")),
                 "fresh_count": sum(1 for r in rows if (r.get("days_ago") or 9999) <= 14),
