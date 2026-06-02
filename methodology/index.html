@@ -267,6 +267,11 @@
     }
   </style>
   <!-- Google tag (gtag.js) -->
+  <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -293,7 +298,7 @@
 
     <article class="content">
       <h1 class="doc-title">Methodology</h1>
-      <p class="doc-meta">v3.1 · Last updated 2026-06-01</p>
+      <p class="doc-meta">v3.1 · Last updated 2026-06-02</p>
 
       <section id="what-it-measures">
         <h2>What HVTracker Measures</h2>
