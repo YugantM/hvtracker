@@ -1,4 +1,12 @@
 (function () {
+  // Skip analytics for developers and bots.
+  // Set once in your browser console: localStorage.setItem('hvt_notrack', '1')
+  try {
+    if (localStorage.getItem("hvt_notrack") === "1") return;
+  } catch (_) {}
+  var ua = navigator.userAgent || "";
+  if (/HeadlessChrome|Puppeteer|Playwright|bot|crawl|spider|curl|wget|python-requests/i.test(ua)) return;
+
   var ATTRIBUTION_KEY = "hvtracker_attribution_v1";
   var LAST_COMPARE_KEY = "hvtracker_last_compare_v1";
 

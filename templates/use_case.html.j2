@@ -39,6 +39,11 @@
     footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--hairline);font:11px var(--font-mono);color:var(--muted);text-align:center}footer a{color:var(--accent)}
     @media(max-width:760px){.metric-row,.chart-band{grid-template-columns:1fr}h1{font-size:26px}nav{margin-left:0}table{font-size:13px}th:nth-child(4),td:nth-child(4){display:none}}
   </style>
+  <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
