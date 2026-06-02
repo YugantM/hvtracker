@@ -133,9 +133,15 @@ def test_startup_keeps_scheduler_alive(monkeypatch):
         def shutdown(self, wait=False):
             self.shutdown_called = True
 
-    fake_module = types.ModuleType("apscheduler.schedulers.background")
-    fake_module.BackgroundScheduler = FakeScheduler
-    monkeypatch.setitem(sys.modules, "apscheduler.schedulers.background", fake_module)
+    fake_bg = types.ModuleType("apscheduler.schedulers.background")
+    fake_bg.BackgroundScheduler = FakeScheduler
+    fake_sched = types.ModuleType("apscheduler.schedulers")
+    fake_sched.background = fake_bg
+    fake_ap = types.ModuleType("apscheduler")
+    fake_ap.schedulers = fake_sched
+    monkeypatch.setitem(sys.modules, "apscheduler", fake_ap)
+    monkeypatch.setitem(sys.modules, "apscheduler.schedulers", fake_sched)
+    monkeypatch.setitem(sys.modules, "apscheduler.schedulers.background", fake_bg)
     monkeypatch.delenv("DISABLE_SCHEDULER", raising=False)
 
     monkeypatch.setattr(app, "_seed_history_into_volume", lambda: 0)
