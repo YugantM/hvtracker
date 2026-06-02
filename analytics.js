@@ -1,15 +1,106 @@
 (function () {
+  var ATTRIBUTION_KEY = "hvtracker_attribution_v1";
+  var LAST_COMPARE_KEY = "hvtracker_last_compare_v1";
+
+  function safeStorage(kind) {
+    try {
+      return kind === "local" ? window.localStorage : window.sessionStorage;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function readJson(storage, key) {
+    if (!storage) return null;
+    try {
+      var raw = storage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function writeJson(storage, key, value) {
+    if (!storage) return;
+    try {
+      storage.setItem(key, JSON.stringify(value));
+    } catch (_) {}
+  }
+
+  function inferPageType(pathname) {
+    if (pathname === "/" || pathname === "") return "leaderboard";
+    if (pathname.indexOf("/agents/") === 0) return "agent_profile";
+    if (pathname.indexOf("/categories/") === 0) return "category_page";
+    if (pathname.indexOf("/blog/") === 0) {
+      return pathname === "/blog/" || pathname === "/blog" ? "blog_index" : "blog_article";
+    }
+    if (pathname.indexOf("/compare/") === 0 || pathname === "/compare") return "compare_page";
+    if (pathname.indexOf("/methodology") === 0) return "methodology";
+    if (pathname.indexOf("/spec/") === 0 || pathname === "/spec") return "spec_page";
+    if (pathname.indexOf("/badges/") === 0 || pathname === "/badges") return "badges";
+    if (pathname.indexOf("/roadmap/") === 0 || pathname === "/roadmap") return "roadmap";
+    return "unknown";
+  }
+
+  function trimValue(value, maxLen) {
+    return value ? String(value).slice(0, maxLen) : "";
+  }
+
+  function captureAttribution() {
+    var sessionStore = safeStorage("session");
+    var localStore = safeStorage("local");
+    var params = new URLSearchParams(window.location.search);
+    var hasUtm = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"].some(function (key) {
+      return params.get(key);
+    });
+    var referrer = document.referrer || "";
+    var referrerUrl = null;
+    var externalReferrer = "";
+    try {
+      referrerUrl = referrer ? new URL(referrer) : null;
+      if (referrerUrl && referrerUrl.hostname !== window.location.hostname) {
+        externalReferrer = referrerUrl.hostname;
+      }
+    } catch (_) {}
+
+    var existing = readJson(sessionStore, ATTRIBUTION_KEY) || readJson(localStore, ATTRIBUTION_KEY) || {};
+    var next = existing;
+
+    if (hasUtm || externalReferrer || !existing.source) {
+      next = {
+        source: trimValue(params.get("utm_source"), 100) || externalReferrer || existing.source || "(direct)",
+        medium: trimValue(params.get("utm_medium"), 100) || (externalReferrer ? "referral" : existing.medium || "(none)"),
+        campaign: trimValue(params.get("utm_campaign"), 120) || existing.campaign || "",
+        term: trimValue(params.get("utm_term"), 120) || existing.term || "",
+        content: trimValue(params.get("utm_content"), 120) || existing.content || "",
+        referrer_host: trimValue(externalReferrer, 120) || existing.referrer_host || "",
+        landing_path: existing.landing_path || window.location.pathname,
+        landing_page: existing.landing_page || window.location.pathname + window.location.search
+      };
+      writeJson(sessionStore, ATTRIBUTION_KEY, next);
+      writeJson(localStore, ATTRIBUTION_KEY, next);
+    }
+
+    return next;
+  }
+
   function baseParams() {
     var body = document.body || {};
     var data = body.dataset || {};
+    var attribution = captureAttribution();
     var params = {
-      page_type: data.pageType || "unknown"
+      page_type: data.pageType || inferPageType(window.location.pathname),
+      page_path: window.location.pathname
     };
     if (data.agentSlug) params.agent_slug = data.agentSlug;
     if (data.agentName) params.agent_name = data.agentName;
     if (data.category) params.category = data.category;
     if (data.globalRank) params.global_rank = Number(data.globalRank);
     if (data.trustScore) params.trust_score = Number(data.trustScore);
+    if (attribution.source) params.session_source = attribution.source;
+    if (attribution.medium) params.session_medium = attribution.medium;
+    if (attribution.campaign) params.session_campaign = attribution.campaign;
+    if (attribution.referrer_host) params.referrer_host = attribution.referrer_host;
     return params;
   }
 
@@ -17,6 +108,14 @@
     if (typeof window.gtag !== "function") return;
     window.gtag("event", eventName, Object.assign(baseParams(), params || {}));
   };
+
+  captureAttribution();
+  if (typeof window.gtag === "function") {
+    window.hvtTrack("hvt_pageview", {
+      page_location: window.location.href,
+      page_title: document.title
+    });
+  }
 
   document.addEventListener("click", function (event) {
     var link = event.target.closest("a");
@@ -86,4 +185,25 @@
       window.hvtTrack("outbound_click", Object.assign(params, { outbound_domain: url.hostname }));
     }
   });
+
+  if (window.location.pathname.indexOf("/compare") === 0) {
+    var compareState = window.location.search;
+    var sessionStore = safeStorage("session");
+    var previousState = sessionStore ? sessionStore.getItem(LAST_COMPARE_KEY) : null;
+    if (compareState && compareState !== previousState) {
+      var selections = new URLSearchParams(window.location.search).get("a") || "";
+      var slugs = selections ? selections.split(",").filter(Boolean) : [];
+      if (slugs.length >= 2) {
+        window.hvtTrack("compare_view", {
+          compared_agents: slugs.join(","),
+          compared_count: slugs.length
+        });
+      }
+    }
+    if (sessionStore) {
+      try {
+        sessionStore.setItem(LAST_COMPARE_KEY, compareState);
+      } catch (_) {}
+    }
+  }
 })();

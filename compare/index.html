@@ -6,6 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Compare trust scores, evidence grades, and operating signals side-by-side for open-source AI agents.">
   <link rel="canonical" href="https://hvtracker.net/compare/">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
   <style>
     :root {
       --bg: #0b0d10;
@@ -722,7 +730,7 @@
     }
   </style>
 </head>
-<body>
+<body data-page-type="compare_page">
   <div class="container">
     <header>
       <h1><a href="/">HVTracker</a> Compare</h1>
@@ -915,18 +923,37 @@
       suggestions.classList.remove("visible");
       updateURL();
       render();
+      if (typeof window.hvtTrack === "function") {
+        window.hvtTrack("compare_agent_add", {
+          agent_slug: agent.slug,
+          agent_name: agent.name,
+          compared_count: selected.length
+        });
+      }
     }
 
     function removeAgent(repo) {
+      const removed = selected.find((a) => a.repo === repo);
       selected = selected.filter((a) => a.repo !== repo);
       updateURL();
       render();
+      if (removed && typeof window.hvtTrack === "function") {
+        window.hvtTrack("compare_agent_remove", {
+          agent_slug: removed.slug,
+          agent_name: removed.name,
+          compared_count: selected.length
+        });
+      }
     }
 
     function clearAll() {
+      const hadAgents = selected.length;
       selected = [];
       updateURL();
       render();
+      if (hadAgents && typeof window.hvtTrack === "function") {
+        window.hvtTrack("compare_clear", { compared_count: 0 });
+      }
     }
 
     function removeSaved(slug) {
@@ -958,6 +985,12 @@
       selected = picks;
       updateURL();
       render();
+      if (typeof window.hvtTrack === "function") {
+        window.hvtTrack("compare_watchlist_load", {
+          compared_count: selected.length,
+          watchlist_size: saved.length
+        });
+      }
     }
 
     function updateURL() {
@@ -1428,6 +1461,18 @@
       renderNotes();
       renderCards();
       renderSavedWatchlist();
+      if (selected.length >= 2 && typeof window.hvtTrack === "function") {
+        const compareKey = selected.map((agent) => agent.slug).join(",");
+        if (render.lastCompareKey !== compareKey) {
+          render.lastCompareKey = compareKey;
+          window.hvtTrack("compare_results_view", {
+            compared_agents: compareKey,
+            compared_count: selected.length
+          });
+        }
+      } else {
+        render.lastCompareKey = "";
+      }
     }
 
     window.removeSaved = removeSaved;
