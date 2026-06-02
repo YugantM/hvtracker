@@ -1171,7 +1171,7 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
     if mid_x is None:
         mid_x = (x_min + x_max) / 2
 
-    left, right, top, bottom = 74, 28, 34, 68
+    left, right, top, bottom = 74, 28, 34, 92
     plot_w = width - left - right
     plot_h = height - top - bottom
 
@@ -1185,25 +1185,43 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
     zero_y = sy(mid_y)
     grade_colors = {"A": "#2dd4bf", "B": "#8fb3ff", "C": "#d8a657", "D": "#e8798b"}
     dots = []
-    labels = []
+    marker_labels = []
+    legend_items = []
+    placed_points = []
     for index, item in enumerate(chart_items):
         x = sx(float(item.get(x_key) or 0))
         y = sy(float(item.get(y_key) or 0))
         grade = item.get("evidence_grade", "")
         color = item.get("color") or grade_colors.get(grade, "#8fb3ff")
         radius = 5.5 + min(math.log1p(item.get("stars") or 0) / math.log1p(100_000), 1.0) * 7
+        for attempt in range(6):
+            if not any(math.hypot(x - px, y - py) < (radius + pr) * 0.72 for px, py, pr in placed_points):
+                break
+            angle = index * 2.399 + attempt * 1.17
+            distance = 5 + attempt * 3
+            x = _clamp(x + math.cos(angle) * distance, left + radius, width - right - radius)
+            y = _clamp(y + math.sin(angle) * distance, top + radius, top + plot_h - radius)
+        placed_points.append((x, y, radius))
         name = escape(str(item.get(label_key, ""))[:22])
         opacity = 0.96 if index < 10 else 0.62
         dots.append(
             f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{radius:.1f}" fill="{color}" opacity="{opacity}" '
             f'stroke="rgba(255,255,255,.78)" stroke-width="1.1"/>'
         )
-        if index < 10:
-            anchor = "start" if x < left + plot_w * 0.76 else "end"
-            dx = 9 if anchor == "start" else -9
-            labels.append(
-                f'<text x="{x + dx:.1f}" y="{y - radius - 4:.1f}" text-anchor="{anchor}" '
-                f'fill="#eef2f6" font-size="10.5" font-family="IBM Plex Mono, monospace">{name}</text>'
+        if index < 8:
+            marker_labels.append(
+                f'<text x="{x:.1f}" y="{y + 3.5:.1f}" text-anchor="middle" fill="#071014" '
+                f'font-size="9.5" font-weight="700" font-family="IBM Plex Mono, monospace">{index + 1}</text>'
+            )
+            col = index // 4
+            row = index % 4
+            lx = left + col * 300
+            ly = height - 88 + row * 14
+            legend_items.append(
+                f'<text x="{lx:.1f}" y="{ly:.1f}" fill="{color}" font-size="10" font-weight="700" '
+                f'font-family="IBM Plex Mono, monospace">{index + 1}</text>'
+                f'<text x="{lx + 16:.1f}" y="{ly:.1f}" fill="#eef2f6" font-size="10" '
+                f'font-family="IBM Plex Mono, monospace">{name}</text>'
             )
 
     grid = []
@@ -1220,7 +1238,7 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
         "strong benchmark fit", "trusted, needs proof", "evidence ahead of trust", "watchlist"
     )
     q_labels = (
-        '<text x="{right_x}" y="{top_y}" text-anchor="end" fill="#2dd4bf" font-size="11" font-family="IBM Plex Mono, monospace">{q1}</text>'
+        '<text x="{right_x}" y="{q1_y}" text-anchor="end" fill="#2dd4bf" font-size="11" font-family="IBM Plex Mono, monospace">{q1}</text>'
         '<text x="{left_x}" y="{top_y}" fill="#8fb3ff" font-size="11" font-family="IBM Plex Mono, monospace">{q2}</text>'
         '<text x="{right_x}" y="{bottom_y}" text-anchor="end" fill="#d8a657" font-size="11" font-family="IBM Plex Mono, monospace">{q3}</text>'
         '<text x="{left_x}" y="{bottom_y}" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">{q4}</text>'
@@ -1228,6 +1246,7 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
         right_x=width - right - 12,
         left_x=left + 12,
         top_y=top + 19,
+        q1_y=round(max(top + 19, zero_y - 12), 1),
         bottom_y=top + plot_h - 12,
         q1=escape(q1),
         q2=escape(q2),
@@ -1247,7 +1266,9 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
         f'<line x1="{zero_x:.1f}" y1="{top}" x2="{zero_x:.1f}" y2="{top + plot_h}" stroke="rgba(238,242,246,.24)" stroke-dasharray="5 6"/>'
         f'<line x1="{left}" y1="{zero_y:.1f}" x2="{width - right}" y2="{zero_y:.1f}" stroke="rgba(238,242,246,.24)" stroke-dasharray="5 6"/>'
         + q_labels +
-        f'<g filter="url(#dotGlow)">{"".join(dots)}</g>{"".join(labels)}'
+        f'<g filter="url(#dotGlow)">{"".join(dots)}</g>{"".join(marker_labels)}'
+        f'<rect x="{left}" y="{height - 101}" width="{plot_w}" height="65" rx="10" fill="rgba(7,10,14,.42)" stroke="rgba(255,255,255,.08)"/>'
+        + "".join(legend_items) +
         f'<text x="{left + plot_w / 2:.1f}" y="{height - 24}" text-anchor="middle" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">{escape(x_label)}</text>'
         f'<text transform="translate(20 {top + plot_h / 2:.1f}) rotate(-90)" text-anchor="middle" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">{escape(y_label)}</text>'
         '</svg>'
