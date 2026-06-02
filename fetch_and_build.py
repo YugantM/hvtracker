@@ -3609,7 +3609,7 @@ def main() -> None:
         f"{i}. {r['name']} ({r['repo']}) — HVTrust {r.get('trust_score')}/100, Grade {r.get('evidence_grade','D')}"
         for i, r in enumerate(top10, 1)
     )
-    llms_txt = f"""# HVTracker — AI Agent Trust Registry
+    llms_txt = f"""# HVTracker — AI Trust Registry
 
 > HVTracker is an independent trust registry that ranks {len(rows)} open-source AI agents by evidence-weighted trust (the HVTrust score), not popularity. Trust is computed from public, checkable signals: supply-chain integrity (OSSF Scorecard, build provenance, signed commits), identity/provenance, transparency (license, docs), maintenance, and adoption — scaled by an evidence-confidence factor. All data is open and machine-readable.
 
@@ -3724,7 +3724,7 @@ HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Ma
     ]
     feed = {
         "version": "https://jsonfeed.org/version/1.1",
-        "title": "HVTracker — AI Agent Trust Registry",
+        "title": "HVTracker — AI Trust Registry",
         "description": "AI agent trust registry — daily signals for trust, activity, safety, and adoption.",
         "home_page_url": "https://hvtracker.net/",
         "feed_url": "https://hvtracker.net/feed.json",

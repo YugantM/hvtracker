@@ -1,6 +1,6 @@
 # HVTracker
 
-**Open-source AI Agent Trust Registry**
+**AI Trust Registry for Open-Source Agents**
 
 [hvtracker.net](https://hvtracker.net) ranks open-source AI agents by evidence-weighted trust signals, not GitHub hype.
 
