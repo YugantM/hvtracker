@@ -1292,6 +1292,8 @@
       <h1 class="logo">HV<span>Tracker</span></h1>
       <span class="tagline">AI Agent Trust Registry</span>
       <nav class="site-nav" aria-label="Site">
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
         <a href="/compare/">Compare</a>
         <a href="/alerts">Alerts</a>
@@ -1321,6 +1323,8 @@
         </div>
       </div>
       <div class="intro-links" aria-label="Key HVTracker resources">
+        <a href="/movers/">Rank movers</a>
+        <a href="/use-cases/">Use-case lists</a>
         <a href="/methodology">How the ranking works</a>
         <a href="/data.json">Download data.json</a>
         <a href="/alerts">Join alerts waitlist</a>
@@ -1392,6 +1396,26 @@
           </label>
           <label class="cat-option">
             <input type="radio" name="lic" value="unlicensed"> Unlicensed
+          </label>
+        </div>
+      </div>
+      <div class="cat-dropdown" id="trustDropdown">
+        <span class="cat-toggle" id="trustToggle">Trust signals <span class="arrow">▾</span></span>
+        <div class="cat-panel" id="trustPanel">
+          <label class="cat-option">
+            <input type="checkbox" class="trust-cb" value="provenance"> Provenance
+          </label>
+          <label class="cat-option">
+            <input type="checkbox" class="trust-cb" value="signed"> Signed commits
+          </label>
+          <label class="cat-option">
+            <input type="checkbox" class="trust-cb" value="scorecard"> Scorecard >= 7
+          </label>
+          <label class="cat-option">
+            <input type="checkbox" class="trust-cb" value="fresh"> Active <= 14d
+          </label>
+          <label class="cat-option">
+            <input type="checkbox" class="trust-cb" value="grade-ab"> Grade A/B
           </label>
         </div>
       </div>
@@ -1476,6 +1500,9 @@
             data-hn_mentions_30d="{{ row.hn_mentions_30d if row.hn_mentions_30d is not none else -1 }}"
             data-actions_30d="{{ row.public_actions.actions_30d if row.public_actions else -1 }}"
             data-scorecard="{{ row.scorecard_score if row.scorecard_score is not none else -1 }}"
+            data-has_provenance="{% if row.has_provenance %}1{% else %}0{% endif %}"
+            data-signed_commits_ratio="{{ row.signed_commits_ratio if row.signed_commits_ratio is not none else 0 }}"
+            data-days_ago="{{ row.days_ago if row.days_ago is not none else 9999 }}"
             data-score="{{ row.score }}"
             data-trust_score="{{ row.trust_score }}"
             data-category="{{ row.category }}"
@@ -1622,6 +1649,7 @@
       const totalCats = catCbs.length;
       let selectedCats = new Set(catCbs.map(cb => cb.value));
       let selectedLicense = "all";
+      let selectedTrust = new Set();
       let selectedSpecialTab = "__all__";
 
       // ── License filter ──
@@ -1634,7 +1662,25 @@
         selectedLicense = r.value;
         licDropdown.classList.remove("open");
         applyFilters();
+        updateFilterUrl();
         hvtTrack("license_filter", { license: selectedLicense });
+      }));
+
+      // ── Trust signal filter ──
+      const trustToggle = document.getElementById("trustToggle");
+      const trustDropdown = document.getElementById("trustDropdown");
+      const trustCbs = Array.from(document.querySelectorAll(".trust-cb"));
+      trustToggle.addEventListener("click", (e) => { e.stopPropagation(); trustDropdown.classList.toggle("open"); });
+      document.addEventListener("click", (e) => { if (!trustDropdown.contains(e.target)) trustDropdown.classList.remove("open"); });
+      trustCbs.forEach(cb => cb.addEventListener("change", () => {
+        if (cb.checked) selectedTrust.add(cb.value); else selectedTrust.delete(cb.value);
+        syncTrustUI();
+        applyFilters();
+        updateFilterUrl();
+        hvtTrack("trust_filter", {
+          filters: [...selectedTrust].join(","),
+          result_count: getFilteredRows().length
+        });
       }));
 
       // ── Category tabs (quick presets that drive the same selectedCats state) ──
@@ -1667,6 +1713,7 @@
             ? new Set(catCbs.map(cb => cb.value))
             : new Set([tab]);
           syncUI();
+          updateFilterUrl();
           hvtTrack("category_tab", { tab: tab });
         });
       });
@@ -1745,8 +1792,82 @@
       let searchTimer = null;
 
       // Honour ?q= so the schema.org SearchAction (sitelinks search box) works.
-      const _q = new URLSearchParams(location.search).get("q");
+      const urlParams = new URLSearchParams(location.search);
+      const _q = urlParams.get("q");
       if (_q) { searchInput.value = _q; searchTerm = _q.trim().toLowerCase(); }
+      const _cat = urlParams.get("cat");
+      if (_cat) {
+        const requested = _cat.split(",").map(v => v.trim()).filter(Boolean);
+        const available = new Set(catCbs.map(cb => cb.value));
+        const valid = requested.filter(v => available.has(v));
+        if (valid.length) selectedCats = new Set(valid);
+      }
+      const _lic = urlParams.get("lic");
+      if (_lic && Array.from(licRadios).some(r => r.value === _lic)) {
+        selectedLicense = _lic;
+        licRadios.forEach(r => { r.checked = r.value === selectedLicense; });
+      }
+      const _trust = urlParams.get("trust");
+      if (_trust) {
+        const availableTrust = new Set(trustCbs.map(cb => cb.value));
+        selectedTrust = new Set(_trust.split(",").filter(v => availableTrust.has(v)));
+      }
+      if (urlParams.get("tab") === "new") {
+        selectedSpecialTab = "__new__";
+        selectedCats = new Set(catCbs.map(cb => cb.value));
+      }
+
+      function updateFilterUrl() {
+        const params = new URLSearchParams();
+        if (searchTerm) params.set("q", searchTerm);
+        if (selectedCats.size > 0 && selectedCats.size < totalCats) params.set("cat", [...selectedCats].join(","));
+        if (selectedLicense !== "all") params.set("lic", selectedLicense);
+        if (selectedTrust.size) params.set("trust", [...selectedTrust].join(","));
+        if (selectedSpecialTab === "__new__") params.set("tab", "new");
+        const next = params.toString() ? "?" + params.toString() : location.pathname;
+        history.replaceState(null, "", next);
+      }
+
+      function syncTrustUI() {
+        if (selectedLicense !== "all") {
+          licToggle.classList.add("has-selection");
+          licToggle.innerHTML = selectedLicense + ' <span class="arrow">▾</span>';
+          clearBtn.classList.add("visible");
+        } else {
+          licToggle.classList.remove("has-selection");
+          licToggle.innerHTML = 'License <span class="arrow">▾</span>';
+        }
+        trustCbs.forEach(cb => {
+          cb.checked = selectedTrust.has(cb.value);
+          cb.closest(".cat-option").classList.toggle("checked", cb.checked);
+        });
+        if (selectedTrust.size) {
+          trustToggle.classList.add("has-selection");
+          trustToggle.innerHTML = selectedTrust.size === 1
+            ? [...selectedTrust][0] + ' <span class="arrow">▾</span>'
+            : selectedTrust.size + ' signals <span class="arrow">▾</span>';
+          clearBtn.classList.add("visible");
+        } else {
+          trustToggle.classList.remove("has-selection");
+          trustToggle.innerHTML = 'Trust signals <span class="arrow">▾</span>';
+        }
+      }
+
+      function matchesTrustFilters(row) {
+        if (!selectedTrust.size) return true;
+        const signedRatio = parseFloat(row.dataset.signed_commits_ratio || "0");
+        const scorecard = parseFloat(row.dataset.scorecard || "-1");
+        const daysAgo = parseFloat(row.dataset.days_ago || "9999");
+        const grade = row.dataset.evidence_grade || "";
+        const checks = {
+          provenance: row.dataset.has_provenance === "1",
+          signed: signedRatio >= 0.5,
+          scorecard: scorecard >= 7,
+          fresh: daysAgo <= 14,
+          "grade-ab": grade === "A" || grade === "B"
+        };
+        return [...selectedTrust].every(filter => checks[filter]);
+      }
 
       function applyFilters() {
         currentPage = 0;
@@ -1759,8 +1880,9 @@
           const matchesSearch = !searchTerm || name.includes(searchTerm) || repo.includes(searchTerm) || cat.toLowerCase().includes(searchTerm);
           const matchesCat = allSelected || selectedCats.has(cat);
           const matchesLic = selectedLicense === "all" || lic === selectedLicense;
+          const matchesTrust = matchesTrustFilters(row);
           const matchesNew = selectedSpecialTab !== "__new__" || row.dataset.newlyAdded === "1";
-          if (matchesSearch && matchesCat && matchesLic && matchesNew) {
+          if (matchesSearch && matchesCat && matchesLic && matchesTrust && matchesNew) {
             row.classList.remove("hidden");
           } else {
             row.classList.add("hidden");
@@ -1824,6 +1946,7 @@
       searchInput.addEventListener("input", () => {
         searchTerm = searchInput.value.trim().toLowerCase();
         applyFilters();
+        updateFilterUrl();
         clearTimeout(searchTimer);
         if (searchTerm.length >= 2) {
           searchTimer = setTimeout(() => {
@@ -1845,7 +1968,7 @@
       });
 
       // ── Category checkbox logic ──
-      function syncUI() {
+      function syncUI(trackEvent = true) {
         const allSelected = selectedCats.size === totalCats;
         catAllCb.checked = allSelected;
         catCbs.forEach(cb => {
@@ -1873,12 +1996,15 @@
           clearBtn.classList.add("visible");
         }
         applyFilters();
-        hvtTrack("category_filter", {
-          selected_count: selectedCats.size,
-          selected_category: selectedCats.size === 1 ? [...selectedCats][0] : "",
-          all_selected: selectedCats.size === totalCats,
-          result_count: getFilteredRows().length
-        });
+        syncTrustUI();
+        if (trackEvent) {
+          hvtTrack("category_filter", {
+            selected_count: selectedCats.size,
+            selected_category: selectedCats.size === 1 ? [...selectedCats][0] : "",
+            all_selected: selectedCats.size === totalCats,
+            result_count: getFilteredRows().length
+          });
+        }
       }
 
       catAllCb.addEventListener("change", () => {
@@ -1887,6 +2013,7 @@
           ? new Set(catCbs.map(cb => cb.value))
           : new Set();
         syncUI();
+        updateFilterUrl();
       });
 
       catCbs.forEach(cb => {
@@ -1898,13 +2025,19 @@
             selectedCats.delete(cb.value);
           }
           syncUI();
+          updateFilterUrl();
         });
       });
 
       clearBtn.addEventListener("click", () => {
         selectedSpecialTab = "__all__";
         selectedCats = new Set(catCbs.map(cb => cb.value));
+        selectedLicense = "all";
+        selectedTrust = new Set();
+        licRadios.forEach(r => { r.checked = r.value === "all"; });
         syncUI();
+        syncTrustUI();
+        updateFilterUrl();
       });
 
       document.querySelectorAll(".watch-toggle").forEach((btn) => {
@@ -1971,6 +2104,8 @@
       });
 
       // Initial render
+      syncTrustUI();
+      syncUI(false);
       renderWatchlistPreview();
       renderPage();
 

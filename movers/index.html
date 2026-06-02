@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agent Rank Movers — Fresh Trust Changes | HVTracker</title>
+  <meta name="description" content="Daily AI agent rank movers from HVTracker: biggest trust rank gains, drops, and category movement across the current history window.">
+  <link rel="canonical" href="https://hvtracker.net/movers/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AI Agent Rank Movers | HVTracker">
+  <meta property="og:description" content="Fresh trust-rank gains and drops across open-source AI agents.">
+  <meta property="og:url" content="https://hvtracker.net/movers/">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI Agent Rank Movers | HVTracker">
+  <meta name="twitter:description" content="Fresh trust-rank gains and drops across open-source AI agents.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0b0d10;--surface:rgba(21,25,32,.78);--surface-2:rgba(27,32,41,.82);--border:rgba(142,154,176,.22);--hairline:rgba(168,179,194,.12);--text:#eef2f6;--muted:#a8b3c2;--accent:#8fb3ff;--fresh:#2dd4bf;--mocha:#d8a657;--red:#e8798b;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}
+    body{min-height:100vh;background:var(--bg);color:var(--text);font:15px/1.62 var(--font-sans);background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E"),radial-gradient(circle at 16% -10%,rgba(45,212,191,.14),transparent 30%),radial-gradient(circle at 86% 4%,rgba(216,166,87,.12),transparent 28%),linear-gradient(180deg,#10141a 0%,#0b0d10 54%,#07090c 100%)}
+    a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}
+    .page{max-width:1080px;margin:0 auto;padding:28px 20px 44px}
+    header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding:16px 18px;border:1px solid var(--border);border-radius:10px;background:linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 18px 54px rgba(0,0,0,.28)}
+    .logo{font-family:var(--font-mono);font-weight:700;font-size:18px}.logo span{color:var(--accent)}
+    nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;font:11px var(--font-mono)}nav a{color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:5px 10px;background:rgba(255,255,255,.035)}
+    .hero{padding:32px 0 18px;border-bottom:1px solid var(--hairline)}
+    h1{font-size:34px;line-height:1.14;letter-spacing:0;margin-bottom:8px}.hero p{color:var(--muted);max-width:760px}
+    .meta{font:11px var(--font-mono);color:var(--muted);margin-top:14px}
+    .chart-band{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,.8fr);gap:18px;margin:22px 0}
+    .chart-panel{border-top:1px solid var(--hairline);padding-top:16px;min-width:0}.chart-panel h2{font-size:14px;margin-bottom:10px}.insight-chart{width:100%;height:auto;display:block;overflow:visible}
+    .mover-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:20px}
+    .mover-list{border-top:1px solid var(--hairline);padding-top:14px}
+    .mover-list h2{font-size:15px;margin-bottom:10px}
+    .mover-item{display:grid;grid-template-columns:54px minmax(0,1fr) 54px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--hairline)}
+    .delta{font:700 13px var(--font-mono)}.up .delta{color:var(--fresh)}.down .delta{color:var(--red)}
+    .name{font-weight:700}.sub{display:block;color:var(--muted);font:11px var(--font-mono);margin-top:2px}.rank{font:12px var(--font-mono);color:var(--muted);text-align:right}
+    footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--hairline);font:11px var(--font-mono);color:var(--muted);text-align:center}
+    footer a{color:var(--accent)}
+    @media(max-width:760px){.chart-band,.mover-grid{grid-template-columns:1fr}h1{font-size:26px}nav{margin-left:0}}
+  </style>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="movers">
+  <div class="page">
+    <header>
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/compare/">Compare</a>
+        <a href="/methodology">Methodology</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>AI Agent Rank Movers</h1>
+      <p>Daily movement from the current 11-day history window. Gains and drops are based on HVTracker rank changes, so this page stays fresh as the cron refresh updates snapshots.</p>
+      <div class="meta">Updated 2026-06-02 10:27 UTC</div>
+    </section>
+
+    <section class="chart-band" aria-label="Rank movement charts">
+      <div class="chart-panel">
+        <h2>Largest Rank Swings</h2>
+        <svg class="insight-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 436" role="img"><defs><linearGradient id="moverSwingGrad" x1="0" x2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#d8a657"/></linearGradient></defs><text x="0" y="36" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Weights &amp; Biases Weave</text><rect x="190" y="22" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="22" width="402.0" height="18" rx="4" fill="url(#moverSwingGrad)"/><text x="616" y="36" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">108</text><text x="0" y="70" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Strands Agents</text><rect x="190" y="56" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="56" width="338.7" height="18" rx="4" fill="url(#moverSwingGrad)"/><text x="616" y="70" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">91</text><text x="0" y="104" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">LanceDB</text><rect x="190" y="90" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="90" width="282.9" height="18" rx="4" fill="url(#moverSwingGrad)"/><text x="616" y="104" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">76</text><text x="0" y="138" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Trigger.dev</text><rect x="190" y="124" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="124" width="260.6" height="18" rx="4" fill="url(#moverSwingGrad)"/><text x="616" y="138" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">70</text><text x="0" y="172" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">NeMo Guardrails</text><rect x="190" y="158" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="158" width="256.8" height="18" rx="4" fill="url(#moverSwingGrad)"/><text x="616" y="172" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">69</text><text x="0" y="206" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">PydanticAI</text><rect x="190" y="192" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="192" width="234.5" height="18" rx="4" fill="url(#moverSwingGrad)"/><text x="616" y="206" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">63</text><text x="0" y="240" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">LiveKit Agents</text><rect x="190" y="226" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="226" width="234.5" height="18" rx="4" fill="url(#moverSwingGrad)"/><text x="616" y="240" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">63</text><text x="0" y="274" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">LangWatch</text><rect x="190" y="260" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="260" width="227.1" height="18" rx="4" fill="url(#moverSwingGrad)"/><text x="616" y="274" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">61</text><text x="0" y="308" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Arize Phoenix</text><rect x="190" y="294" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="294" width="223.3" height="18" rx="4" fill="url(#moverSwingGrad)"/><text x="616" y="308" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">60</text><text x="0" y="342" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Pipecat</text><rect x="190" y="328" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="328" width="204.7" height="18" rx="4" fill="url(#moverSwingGrad)"/><text x="616" y="342" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">55</text><text x="0" y="376" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">GPTMe</text><rect x="190" y="362" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="362" width="193.6" height="18" rx="4" fill="url(#moverSwingGrad)"/><text x="616" y="376" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">52</text><text x="0" y="410" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Griptape</text><rect x="190" y="396" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="396" width="193.6" height="18" rx="4" fill="url(#moverSwingGrad)"/><text x="616" y="410" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">52</text></svg>
+      </div>
+      <div class="chart-panel">
+        <h2>Movement by Category</h2>
+        <svg class="insight-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 300" role="img"><defs><linearGradient id="moverCategoryGrad" x1="0" x2="1"><stop offset="0" stop-color="#8fb3ff"/><stop offset="1" stop-color="#d8a657"/></linearGradient></defs><text x="0" y="36" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Agent Frameworks</text><rect x="190" y="22" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="22" width="402.0" height="18" rx="4" fill="url(#moverCategoryGrad)"/><text x="616" y="36" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">49</text><text x="0" y="70" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Coding Agents</text><rect x="190" y="56" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="56" width="188.7" height="18" rx="4" fill="url(#moverCategoryGrad)"/><text x="616" y="70" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">23</text><text x="0" y="104" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Memory &amp; Knowledge</text><rect x="190" y="90" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="90" width="164.1" height="18" rx="4" fill="url(#moverCategoryGrad)"/><text x="616" y="104" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">20</text><text x="0" y="138" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Browser &amp; Computer Use</text><rect x="190" y="124" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="124" width="114.9" height="18" rx="4" fill="url(#moverCategoryGrad)"/><text x="616" y="138" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">14</text><text x="0" y="172" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Observability &amp; Evaluation</text><rect x="190" y="158" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="158" width="98.4" height="18" rx="4" fill="url(#moverCategoryGrad)"/><text x="616" y="172" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">12</text><text x="0" y="206" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Workflow Platforms</text><rect x="190" y="192" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="192" width="90.2" height="18" rx="4" fill="url(#moverCategoryGrad)"/><text x="616" y="206" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">11</text><text x="0" y="240" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Research &amp; Data</text><rect x="190" y="226" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="226" width="57.4" height="18" rx="4" fill="url(#moverCategoryGrad)"/><text x="616" y="240" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">7</text><text x="0" y="274" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Security &amp; Guardrails</text><rect x="190" y="260" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="260" width="41.0" height="18" rx="4" fill="url(#moverCategoryGrad)"/><text x="616" y="274" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">5</text></svg>
+      </div>
+    </section>
+
+    <section class="mover-grid">
+      <div class="mover-list">
+        <h2>Biggest Gains</h2>
+        
+        <a class="mover-item up" href="/agents/weights-biases-weave/">
+          <span class="delta">+108</span>
+          <span><span class="name">Weights &amp; Biases Weave</span><span class="sub">Observability &amp; Evaluation · Grade A · HVTrust 84.0</span></span>
+          <span class="rank">#22</span>
+        </a>
+        
+        <a class="mover-item up" href="/agents/strands-agents/">
+          <span class="delta">+91</span>
+          <span><span class="name">Strands Agents</span><span class="sub">Agent Frameworks · Grade A · HVTrust 88.8</span></span>
+          <span class="rank">#12</span>
+        </a>
+        
+        <a class="mover-item up" href="/agents/lancedb/">
+          <span class="delta">+76</span>
+          <span><span class="name">LanceDB</span><span class="sub">Memory &amp; Knowledge · Grade A · HVTrust 87.9</span></span>
+          <span class="rank">#15</span>
+        </a>
+        
+        <a class="mover-item up" href="/agents/trigger-dev/">
+          <span class="delta">+70</span>
+          <span><span class="name">Trigger.dev</span><span class="sub">Workflow Platforms · Grade A · HVTrust 89.9</span></span>
+          <span class="rank">#9</span>
+        </a>
+        
+        <a class="mover-item up" href="/agents/nemo-guardrails/">
+          <span class="delta">+69</span>
+          <span><span class="name">NeMo Guardrails</span><span class="sub">Security &amp; Guardrails · Grade B · HVTrust 73.2</span></span>
+          <span class="rank">#38</span>
+        </a>
+        
+        <a class="mover-item up" href="/agents/pydanticai/">
+          <span class="delta">+63</span>
+          <span><span class="name">PydanticAI</span><span class="sub">Agent Frameworks · Grade A · HVTrust 91.8</span></span>
+          <span class="rank">#4</span>
+        </a>
+        
+        <a class="mover-item up" href="/agents/livekit-agents/">
+          <span class="delta">+63</span>
+          <span><span class="name">LiveKit Agents</span><span class="sub">LLM Gateways &amp; Infra · Grade A · HVTrust 89.9</span></span>
+          <span class="rank">#8</span>
+        </a>
+        
+        <a class="mover-item up" href="/agents/langwatch/">
+          <span class="delta">+61</span>
+          <span><span class="name">LangWatch</span><span class="sub">Observability &amp; Evaluation · Grade B · HVTrust 69.7</span></span>
+          <span class="rank">#58</span>
+        </a>
+        
+        <a class="mover-item up" href="/agents/arize-phoenix/">
+          <span class="delta">+60</span>
+          <span><span class="name">Arize Phoenix</span><span class="sub">Observability &amp; Evaluation · Grade B · HVTrust 75.9</span></span>
+          <span class="rank">#32</span>
+        </a>
+        
+        <a class="mover-item up" href="/agents/pipecat/">
+          <span class="delta">+55</span>
+          <span><span class="name">Pipecat</span><span class="sub">Voice &amp; Conversational · Grade A · HVTrust 85.4</span></span>
+          <span class="rank">#21</span>
+        </a>
+        
+        <a class="mover-item up" href="/agents/gptme/">
+          <span class="delta">+52</span>
+          <span><span class="name">GPTMe</span><span class="sub">Coding Agents · Grade B · HVTrust 68.2</span></span>
+          <span class="rank">#63</span>
+        </a>
+        
+        <a class="mover-item up" href="/agents/griptape/">
+          <span class="delta">+52</span>
+          <span><span class="name">Griptape</span><span class="sub">Agent Frameworks · Grade B · HVTrust 66.7</span></span>
+          <span class="rank">#72</span>
+        </a>
+        
+      </div>
+      <div class="mover-list">
+        <h2>Biggest Drops</h2>
+        
+        <a class="mover-item down" href="/agents/eliza/">
+          <span class="delta">-153</span>
+          <span><span class="name">Eliza</span><span class="sub">Agent Frameworks · Grade D · HVTrust 37.3</span></span>
+          <span class="rank">#163</span>
+        </a>
+        
+        <a class="mover-item down" href="/agents/activepieces/">
+          <span class="delta">-141</span>
+          <span><span class="name">Activepieces</span><span class="sub">Workflow Platforms · Grade D · HVTrust 41.7</span></span>
+          <span class="rank">#152</span>
+        </a>
+        
+        <a class="mover-item down" href="/agents/agenta/">
+          <span class="delta">-139</span>
+          <span><span class="name">Agenta</span><span class="sub">Observability &amp; Evaluation · Grade D · HVTrust 41.1</span></span>
+          <span class="rank">#154</span>
+        </a>
+        
+        <a class="mover-item down" href="/agents/opencode/">
+          <span class="delta">-138</span>
+          <span><span class="name">opencode</span><span class="sub">Coding Agents · Grade D · HVTrust 46.3</span></span>
+          <span class="rank">#139</span>
+        </a>
+        
+        <a class="mover-item down" href="/agents/continue/">
+          <span class="delta">-130</span>
+          <span><span class="name">Continue</span><span class="sub">Coding Agents · Grade D · HVTrust 32.5</span></span>
+          <span class="rank">#171</span>
+        </a>
+        
+        <a class="mover-item down" href="/agents/mastra/">
+          <span class="delta">-119</span>
+          <span><span class="name">Mastra</span><span class="sub">Agent Frameworks · Grade D · HVTrust 48.9</span></span>
+          <span class="rank">#131</span>
+        </a>
+        
+        <a class="mover-item down" href="/agents/daytona/">
+          <span class="delta">-113</span>
+          <span><span class="name">Daytona</span><span class="sub">Sandboxes &amp; Runtimes · Grade D · HVTrust 45.9</span></span>
+          <span class="rank">#142</span>
+        </a>
+        
+        <a class="mover-item down" href="/agents/anythingllm/">
+          <span class="delta">-105</span>
+          <span><span class="name">AnythingLLM</span><span class="sub">Memory &amp; Knowledge · Grade D · HVTrust 47.1</span></span>
+          <span class="rank">#136</span>
+        </a>
+        
+        <a class="mover-item down" href="/agents/llamaindex/">
+          <span class="delta">-99</span>
+          <span><span class="name">LlamaIndex</span><span class="sub">Agent Frameworks · Grade D · HVTrust 47.3</span></span>
+          <span class="rank">#134</span>
+        </a>
+        
+        <a class="mover-item down" href="/agents/smolagents/">
+          <span class="delta">-99</span>
+          <span><span class="name">smolagents</span><span class="sub">Agent Frameworks · Grade D · HVTrust 41.8</span></span>
+          <span class="rank">#151</span>
+        </a>
+        
+        <a class="mover-item down" href="/agents/aider/">
+          <span class="delta">-88</span>
+          <span><span class="name">Aider</span><span class="sub">Coding Agents · Grade C · HVTrust 60.6</span></span>
+          <span class="rank">#105</span>
+        </a>
+        
+        <a class="mover-item down" href="/agents/ten-framework/">
+          <span class="delta">-88</span>
+          <span><span class="name">TEN Framework</span><span class="sub">LLM Gateways &amp; Infra · Grade D · HVTrust 25.1</span></span>
+          <span class="rank">#174</span>
+        </a>
+        
+      </div>
+    </section>
+
+    <footer>
+      <a href="/">HVTracker</a> &middot; <a href="/data/latest.json">Data API</a> &middot; <a href="/feed.json">Feed</a>
+    </footer>
+  </div>
+</body>
+</html>

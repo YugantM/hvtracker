@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page.title }} | HVTracker</title>
+  <meta name="description" content="{{ page.description }}">
+  <link rel="canonical" href="https://hvtracker.net/use-cases/{% if page.slug %}{{ page.slug }}/{% endif %}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ page.title }} | HVTracker">
+  <meta property="og:description" content="{{ page.description }}">
+  <meta property="og:url" content="https://hvtracker.net/use-cases/{% if page.slug %}{{ page.slug }}/{% endif %}">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ page.title }} | HVTracker">
+  <meta name="twitter:description" content="{{ page.description }}">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0b0d10;--surface:rgba(21,25,32,.78);--border:rgba(142,154,176,.22);--hairline:rgba(168,179,194,.12);--text:#eef2f6;--muted:#a8b3c2;--accent:#8fb3ff;--fresh:#2dd4bf;--mocha:#d8a657;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}
+    body{min-height:100vh;background:var(--bg);color:var(--text);font:15px/1.62 var(--font-sans);background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E"),radial-gradient(circle at 14% -8%,rgba(45,212,191,.14),transparent 30%),radial-gradient(circle at 86% 6%,rgba(143,179,255,.12),transparent 26%),linear-gradient(180deg,#10141a 0%,#0b0d10 54%,#07090c 100%)}
+    a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}
+    .page{max-width:1080px;margin:0 auto;padding:28px 20px 46px}
+    header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding:16px 18px;border:1px solid var(--border);border-radius:10px;background:linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 18px 54px rgba(0,0,0,.28)}
+    .logo{font-family:var(--font-mono);font-weight:700;font-size:18px}.logo span{color:var(--accent)}
+    nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;font:11px var(--font-mono)}nav a{color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:5px 10px;background:rgba(255,255,255,.035)}
+    .hero{padding:32px 0 18px;border-bottom:1px solid var(--hairline)}
+    h1{font-size:34px;line-height:1.14;letter-spacing:0;margin-bottom:8px}.hero p{color:var(--muted);max-width:760px}
+    .metric-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}
+    .metric{border-top:1px solid var(--hairline);padding-top:12px}.metric strong{display:block;font:700 24px var(--font-mono);color:var(--fresh)}.metric span{color:var(--muted);font-size:12px}
+    .chart-band{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.85fr);gap:18px;margin:22px 0}
+    .chart-panel{border-top:1px solid var(--hairline);padding-top:16px;min-width:0}.chart-panel h2{font-size:14px;margin-bottom:10px}.insight-chart{width:100%;height:auto;display:block;overflow:visible}
+    .chart-legend{display:flex;gap:10px;flex-wrap:wrap;font:11px IBM Plex Mono,monospace;color:#a8b3c2}.chart-legend span{display:inline-flex;align-items:center;gap:5px}.chart-legend i{display:inline-block;width:9px;height:9px;border-radius:3px}.chart-legend strong{color:#eef2f6;font-weight:600}
+    .slice-nav{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 4px}.slice-nav a{font:11px var(--font-mono);color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:6px 10px;background:rgba(255,255,255,.035)}.slice-nav a.active{color:var(--text);border-color:rgba(45,212,191,.5)}
+    table{width:100%;border-collapse:collapse;margin-top:20px;font-size:14px}th,td{padding:11px 10px;border-bottom:1px solid var(--hairline);text-align:left}th{font:11px var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}td.num{text-align:right;font-family:var(--font-mono)}.agent{font-weight:700}.repo{display:block;color:var(--muted);font:11px var(--font-mono);margin-top:2px}.grade{display:inline-flex;min-width:24px;justify-content:center;border-radius:5px;padding:2px 7px;font:700 11px var(--font-mono);background:rgba(143,179,255,.16);color:var(--accent)}
+    footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--hairline);font:11px var(--font-mono);color:var(--muted);text-align:center}footer a{color:var(--accent)}
+    @media(max-width:760px){.chart-band,.metric-row{grid-template-columns:1fr}h1{font-size:26px}nav{margin-left:0}table{font-size:13px}th:nth-child(4),td:nth-child(4){display:none}}
+  </style>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="{% if is_index %}use_cases_index{% else %}use_case{% endif %}">
+  <div class="page">
+    <header>
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/compare/">Compare</a>
+        <a href="/methodology">Methodology</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>{{ page.title }}</h1>
+      <p>{{ page.description }} Updated from the same generated registry data as the leaderboard, so the list changes with every cron refresh.</p>
+      <div class="slice-nav" aria-label="Use-case slices">
+        <a href="/use-cases/" class="{% if is_index %}active{% endif %}">All slices</a>
+        {% for p in pages %}
+        <a href="/use-cases/{{ p.slug }}/" class="{% if p.slug == page.slug %}active{% endif %}">{{ p.title }}</a>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="metric-row" aria-label="Slice summary">
+      <div class="metric"><strong>{{ page.agents|length }}</strong><span>Agents in slice</span></div>
+      <div class="metric"><strong>{{ page.avg_trust }}</strong><span>Average HVTrust</span></div>
+      <div class="metric"><strong>{{ page.provenance_count }}</strong><span>With provenance signals</span></div>
+    </section>
+
+    <section class="chart-band" aria-label="Use-case charts">
+      <div class="chart-panel">
+        <h2>Top HVTrust Scores</h2>
+        {{ page.chart_svg | safe }}
+      </div>
+      <div class="chart-panel">
+        <h2>Evidence Grade Mix</h2>
+        {{ page.distribution_svg | safe }}
+      </div>
+    </section>
+
+    <table>
+      <thead>
+        <tr><th>Agent</th><th>Category</th><th>Grade</th><th class="num">Rank</th><th class="num">HVTrust</th><th class="num">Fresh</th></tr>
+      </thead>
+      <tbody>
+        {% for agent in page.agents %}
+        <tr>
+          <td><a class="agent" href="/agents/{{ agent.slug }}/">{{ agent.name }}</a><span class="repo">{{ agent.repo }}</span></td>
+          <td>{{ agent.category }}</td>
+          <td><span class="grade">{{ agent.evidence_grade }}</span></td>
+          <td class="num">#{{ agent.rank }}</td>
+          <td class="num">{{ agent.trust_score }}</td>
+          <td class="num">{% if agent.days_ago == 0 %}today{% elif agent.days_ago == 1 %}1d{% else %}{{ agent.days_ago }}d{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <footer>
+      Updated {{ updated }} &middot; <a href="/data/latest.json">Data API</a> &middot; <a href="/feed.json">Feed</a>
+    </footer>
+  </div>
+</body>
+</html>

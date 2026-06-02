@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agents With Strong Provenance Signals | HVTracker</title>
+  <meta name="description" content="Projects with package provenance, stronger signed-commit posture, or high Scorecard evidence.">
+  <link rel="canonical" href="https://hvtracker.net/use-cases/provenance-ready/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Agents With Strong Provenance Signals | HVTracker">
+  <meta property="og:description" content="Projects with package provenance, stronger signed-commit posture, or high Scorecard evidence.">
+  <meta property="og:url" content="https://hvtracker.net/use-cases/provenance-ready/">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Agents With Strong Provenance Signals | HVTracker">
+  <meta name="twitter:description" content="Projects with package provenance, stronger signed-commit posture, or high Scorecard evidence.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0b0d10;--surface:rgba(21,25,32,.78);--border:rgba(142,154,176,.22);--hairline:rgba(168,179,194,.12);--text:#eef2f6;--muted:#a8b3c2;--accent:#8fb3ff;--fresh:#2dd4bf;--mocha:#d8a657;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}
+    body{min-height:100vh;background:var(--bg);color:var(--text);font:15px/1.62 var(--font-sans);background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E"),radial-gradient(circle at 14% -8%,rgba(45,212,191,.14),transparent 30%),radial-gradient(circle at 86% 6%,rgba(143,179,255,.12),transparent 26%),linear-gradient(180deg,#10141a 0%,#0b0d10 54%,#07090c 100%)}
+    a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}
+    .page{max-width:1080px;margin:0 auto;padding:28px 20px 46px}
+    header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding:16px 18px;border:1px solid var(--border);border-radius:10px;background:linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 18px 54px rgba(0,0,0,.28)}
+    .logo{font-family:var(--font-mono);font-weight:700;font-size:18px}.logo span{color:var(--accent)}
+    nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;font:11px var(--font-mono)}nav a{color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:5px 10px;background:rgba(255,255,255,.035)}
+    .hero{padding:32px 0 18px;border-bottom:1px solid var(--hairline)}
+    h1{font-size:34px;line-height:1.14;letter-spacing:0;margin-bottom:8px}.hero p{color:var(--muted);max-width:760px}
+    .metric-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}
+    .metric{border-top:1px solid var(--hairline);padding-top:12px}.metric strong{display:block;font:700 24px var(--font-mono);color:var(--fresh)}.metric span{color:var(--muted);font-size:12px}
+    .chart-band{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.85fr);gap:18px;margin:22px 0}
+    .chart-panel{border-top:1px solid var(--hairline);padding-top:16px;min-width:0}.chart-panel h2{font-size:14px;margin-bottom:10px}.insight-chart{width:100%;height:auto;display:block;overflow:visible}
+    .chart-legend{display:flex;gap:10px;flex-wrap:wrap;font:11px IBM Plex Mono,monospace;color:#a8b3c2}.chart-legend span{display:inline-flex;align-items:center;gap:5px}.chart-legend i{display:inline-block;width:9px;height:9px;border-radius:3px}.chart-legend strong{color:#eef2f6;font-weight:600}
+    .slice-nav{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 4px}.slice-nav a{font:11px var(--font-mono);color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:6px 10px;background:rgba(255,255,255,.035)}.slice-nav a.active{color:var(--text);border-color:rgba(45,212,191,.5)}
+    table{width:100%;border-collapse:collapse;margin-top:20px;font-size:14px}th,td{padding:11px 10px;border-bottom:1px solid var(--hairline);text-align:left}th{font:11px var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}td.num{text-align:right;font-family:var(--font-mono)}.agent{font-weight:700}.repo{display:block;color:var(--muted);font:11px var(--font-mono);margin-top:2px}.grade{display:inline-flex;min-width:24px;justify-content:center;border-radius:5px;padding:2px 7px;font:700 11px var(--font-mono);background:rgba(143,179,255,.16);color:var(--accent)}
+    footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--hairline);font:11px var(--font-mono);color:var(--muted);text-align:center}footer a{color:var(--accent)}
+    @media(max-width:760px){.chart-band,.metric-row{grid-template-columns:1fr}h1{font-size:26px}nav{margin-left:0}table{font-size:13px}th:nth-child(4),td:nth-child(4){display:none}}
+  </style>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="use_case">
+  <div class="page">
+    <header>
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/compare/">Compare</a>
+        <a href="/methodology">Methodology</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Agents With Strong Provenance Signals</h1>
+      <p>Projects with package provenance, stronger signed-commit posture, or high Scorecard evidence. Updated from the same generated registry data as the leaderboard, so the list changes with every cron refresh.</p>
+      <div class="slice-nav" aria-label="Use-case slices">
+        <a href="/use-cases/" class="">All slices</a>
+        
+        <a href="/use-cases/coding-agents/" class="">Best Coding Agents by Trust</a>
+        
+        <a href="/use-cases/provenance-ready/" class="active">Agents With Strong Provenance Signals</a>
+        
+        <a href="/use-cases/self-hosted-open-source/" class="">Best Open-Source Agents to Self-Host</a>
+        
+        <a href="/use-cases/recently-active/" class="">Recently Active AI Agent Projects</a>
+        
+        <a href="/use-cases/high-evidence/" class="">Highest Evidence AI Agents</a>
+        
+      </div>
+    </section>
+
+    <section class="metric-row" aria-label="Slice summary">
+      <div class="metric"><strong>16</strong><span>Agents in slice</span></div>
+      <div class="metric"><strong>90</strong><span>Average HVTrust</span></div>
+      <div class="metric"><strong>16</strong><span>With provenance signals</span></div>
+    </section>
+
+    <section class="chart-band" aria-label="Use-case charts">
+      <div class="chart-panel">
+        <h2>Top HVTrust Scores</h2>
+        <svg class="insight-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 368" role="img"><defs><linearGradient id="useCaseprovenancereadyGrad" x1="0" x2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#d8a657"/></linearGradient></defs><text x="0" y="36" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">LangGraph</text><rect x="190" y="22" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="22" width="402.0" height="18" rx="4" fill="url(#useCaseprovenancereadyGrad)"/><text x="616" y="36" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">93</text><text x="0" y="70" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Codex</text><rect x="190" y="56" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="56" width="399.8" height="18" rx="4" fill="url(#useCaseprovenancereadyGrad)"/><text x="616" y="70" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">93</text><text x="0" y="104" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Vercel AI SDK</text><rect x="190" y="90" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="90" width="396.8" height="18" rx="4" fill="url(#useCaseprovenancereadyGrad)"/><text x="616" y="104" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">92</text><text x="0" y="138" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">PydanticAI</text><rect x="190" y="124" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="124" width="396.0" height="18" rx="4" fill="url(#useCaseprovenancereadyGrad)"/><text x="616" y="138" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">92</text><text x="0" y="172" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">n8n</text><rect x="190" y="158" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="158" width="395.5" height="18" rx="4" fill="url(#useCaseprovenancereadyGrad)"/><text x="616" y="172" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">92</text><text x="0" y="206" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">OpenAI Agents SDK</text><rect x="190" y="192" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="192" width="395.1" height="18" rx="4" fill="url(#useCaseprovenancereadyGrad)"/><text x="616" y="206" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">92</text><text x="0" y="240" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Haystack</text><rect x="190" y="226" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="226" width="389.1" height="18" rx="4" fill="url(#useCaseprovenancereadyGrad)"/><text x="616" y="240" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">90</text><text x="0" y="274" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">LiveKit Agents</text><rect x="190" y="260" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="260" width="387.8" height="18" rx="4" fill="url(#useCaseprovenancereadyGrad)"/><text x="616" y="274" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">90</text><text x="0" y="308" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Trigger.dev</text><rect x="190" y="294" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="294" width="387.8" height="18" rx="4" fill="url(#useCaseprovenancereadyGrad)"/><text x="616" y="308" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">90</text><text x="0" y="342" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">Cline</text><rect x="190" y="328" width="402" height="18" rx="4" fill="rgba(255,255,255,0.055)"/><rect x="190" y="328" width="384.7" height="18" rx="4" fill="url(#useCaseprovenancereadyGrad)"/><text x="616" y="342" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">89</text></svg>
+      </div>
+      <div class="chart-panel">
+        <h2>Evidence Grade Mix</h2>
+        <svg class="insight-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 118" role="img"><rect x="0" y="22" width="680" height="28" rx="5" fill="rgba(255,255,255,0.055)"/><rect x="0.0" y="22" width="680.0" height="28" rx="5" fill="#2dd4bf" opacity="0.88"/><foreignObject x="0" y="64" width="680" height="46"><div xmlns="http://www.w3.org/1999/xhtml" class="chart-legend"><span><i style="background:#2dd4bf"></i>A <strong>16</strong></span></div></foreignObject></svg>
+      </div>
+    </section>
+
+    <table>
+      <thead>
+        <tr><th>Agent</th><th>Category</th><th>Grade</th><th class="num">Rank</th><th class="num">HVTrust</th><th class="num">Fresh</th></tr>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td><a class="agent" href="/agents/langgraph/">LangGraph</a><span class="repo">langchain-ai/langgraph</span></td>
+          <td>Agent Frameworks</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#1</td>
+          <td class="num">93.2</td>
+          <td class="num">1d</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/codex/">Codex</a><span class="repo">openai/codex</span></td>
+          <td>Coding Agents</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#2</td>
+          <td class="num">92.7</td>
+          <td class="num">1d</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/vercel-ai-sdk/">Vercel AI SDK</a><span class="repo">vercel/ai</span></td>
+          <td>Agent Frameworks</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#3</td>
+          <td class="num">92.0</td>
+          <td class="num">today</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/pydanticai/">PydanticAI</a><span class="repo">pydantic/pydantic-ai</span></td>
+          <td>Agent Frameworks</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#4</td>
+          <td class="num">91.8</td>
+          <td class="num">1d</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/n8n/">n8n</a><span class="repo">n8n-io/n8n</span></td>
+          <td>Workflow Platforms</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#5</td>
+          <td class="num">91.7</td>
+          <td class="num">1d</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/openai-agents-sdk/">OpenAI Agents SDK</a><span class="repo">openai/openai-agents-python</span></td>
+          <td>Agent Frameworks</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#6</td>
+          <td class="num">91.6</td>
+          <td class="num">2d</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/haystack/">Haystack</a><span class="repo">deepset-ai/haystack</span></td>
+          <td>Agent Frameworks</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#7</td>
+          <td class="num">90.2</td>
+          <td class="num">1d</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/livekit-agents/">LiveKit Agents</a><span class="repo">livekit/agents</span></td>
+          <td>LLM Gateways &amp; Infra</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#8</td>
+          <td class="num">89.9</td>
+          <td class="num">1d</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/trigger-dev/">Trigger.dev</a><span class="repo">triggerdotdev/trigger.dev</span></td>
+          <td>Workflow Platforms</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#9</td>
+          <td class="num">89.9</td>
+          <td class="num">today</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/cline/">Cline</a><span class="repo">cline/cline</span></td>
+          <td>Coding Agents</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#10</td>
+          <td class="num">89.2</td>
+          <td class="num">1d</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/lerobot/">LeRobot</a><span class="repo">huggingface/lerobot</span></td>
+          <td>Robotics &amp; Embodied</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#11</td>
+          <td class="num">88.8</td>
+          <td class="num">1d</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/strands-agents/">Strands Agents</a><span class="repo">strands-agents/sdk-python</span></td>
+          <td>Agent Frameworks</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#12</td>
+          <td class="num">88.8</td>
+          <td class="num">today</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/skyvern/">Skyvern</a><span class="repo">Skyvern-AI/skyvern</span></td>
+          <td>Browser &amp; Computer Use</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#13</td>
+          <td class="num">88.4</td>
+          <td class="num">today</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/a2a-agent2agent-protocol/">A2A / Agent2Agent Protocol</a><span class="repo">google/A2A</span></td>
+          <td>Protocols &amp; Tool Integration</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#14</td>
+          <td class="num">88.2</td>
+          <td class="num">4d</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/lancedb/">LanceDB</a><span class="repo">lancedb/lancedb</span></td>
+          <td>Memory &amp; Knowledge</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#15</td>
+          <td class="num">87.9</td>
+          <td class="num">1d</td>
+        </tr>
+        
+        <tr>
+          <td><a class="agent" href="/agents/vespa/">Vespa</a><span class="repo">vespa-engine/vespa</span></td>
+          <td>Memory &amp; Knowledge</td>
+          <td><span class="grade">A</span></td>
+          <td class="num">#16</td>
+          <td class="num">87.6</td>
+          <td class="num">today</td>
+        </tr>
+        
+      </tbody>
+    </table>
+
+    <footer>
+      Updated 2026-06-02 10:27 UTC &middot; <a href="/data/latest.json">Data API</a> &middot; <a href="/feed.json">Feed</a>
+    </footer>
+  </div>
+</body>
+</html>

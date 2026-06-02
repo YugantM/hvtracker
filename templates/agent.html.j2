@@ -240,6 +240,14 @@
       font-family:var(--font-mono); font-size:10px; color:var(--muted);
       margin-top:4px;
     }
+    .insight-chart { width:100%; height:auto; display:block; overflow:visible; margin:8px 0 14px; }
+    .chart-legend {
+      display:flex; gap:10px; flex-wrap:wrap;
+      font:11px var(--font-mono); color:var(--muted);
+    }
+    .chart-legend span { display:inline-flex; align-items:center; gap:5px; }
+    .chart-legend i { display:inline-block; width:9px; height:9px; border-radius:3px; }
+    .chart-legend strong { color:var(--text); font-weight:600; }
 
     .provenance { padding:22px 0; margin:0; border-top:1px solid var(--hairline); }
     .prov-grid {
@@ -889,6 +897,9 @@
     {% if events %}
     <section class="provenance">
       <h2 class="section-title">Reputation Timeline</h2>
+      {% if row.event_chart_svg %}
+      {{ row.event_chart_svg | safe }}
+      {% endif %}
       <div style="display:flex;flex-direction:column;gap:0;">
         {% for e in events|reverse %}
         <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;{% if not loop.last %}border-bottom:1px solid var(--border);{% endif %}">

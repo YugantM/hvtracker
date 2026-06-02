@@ -10,6 +10,7 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
+from html import escape
 from urllib.parse import quote, urlencode
 
 import requests
@@ -1056,6 +1057,212 @@ def render_sparkline_svg(points: list[dict], width: int = 200, height: int = 40)
     )
 
 
+def render_bar_chart_svg(items: list[dict], label_key: str, value_key: str,
+                         width: int = 680, row_height: int = 34,
+                         accent: str = "#2dd4bf", max_items: int = 10,
+                         grad_id: str = "barGrad") -> str:
+    """Render a compact horizontal SVG chart for generated discovery pages."""
+    chart_items = [item for item in items[:max_items] if item.get(value_key) is not None]
+    if not chart_items:
+        return ""
+    label_w = 190
+    value_w = 64
+    gap = 12
+    inner_w = width - label_w - value_w - gap * 2
+    height = max(68, 28 + row_height * len(chart_items))
+    values = [abs(float(item.get(value_key) or 0)) for item in chart_items]
+    max_value = max(max(values), 1)
+    rows = []
+    for index, item in enumerate(chart_items):
+        raw_value = float(item.get(value_key) or 0)
+        value = abs(raw_value)
+        y = 22 + index * row_height
+        bar_w = max(4, round(value / max_value * inner_w, 1))
+        label = escape(str(item.get(label_key, ""))[:32])
+        display = f"{raw_value:+.0f}" if raw_value < 0 else f"{raw_value:.0f}"
+        rows.append(
+            f'<text x="0" y="{y + 14}" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">{label}</text>'
+            f'<rect x="{label_w}" y="{y}" width="{inner_w}" height="18" rx="4" fill="rgba(255,255,255,0.055)"/>'
+            f'<rect x="{label_w}" y="{y}" width="{bar_w}" height="18" rx="4" fill="url(#{grad_id})"/>'
+            f'<text x="{width - value_w}" y="{y + 14}" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">{escape(display)}</text>'
+        )
+    return (
+        f'<svg class="insight-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img">'
+        f'<defs><linearGradient id="{grad_id}" x1="0" x2="1"><stop offset="0" stop-color="{accent}"/><stop offset="1" stop-color="#d8a657"/></linearGradient></defs>'
+        + "".join(rows) +
+        '</svg>'
+    )
+
+
+def render_distribution_svg(groups: list[dict], width: int = 680, height: int = 118) -> str:
+    """Render a segmented distribution chart from [{label, value, color}]."""
+    total = sum(max(0, int(g.get("value") or 0)) for g in groups)
+    if total <= 0:
+        return ""
+    x = 0.0
+    segments = []
+    labels = []
+    for group in groups:
+        value = max(0, int(group.get("value") or 0))
+        if value <= 0:
+            continue
+        w = round(value / total * width, 1)
+        color = group.get("color") or "#8fb3ff"
+        label = escape(str(group.get("label", "")))
+        segments.append(f'<rect x="{x}" y="22" width="{w}" height="28" rx="5" fill="{color}" opacity="0.88"/>')
+        labels.append(
+            f'<span><i style="background:{color}"></i>{label} <strong>{value}</strong></span>'
+        )
+        x += w
+    legend = f'<foreignObject x="0" y="64" width="{width}" height="46"><div xmlns="http://www.w3.org/1999/xhtml" class="chart-legend">{"".join(labels)}</div></foreignObject>'
+    return (
+        f'<svg class="insight-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img">'
+        f'<rect x="0" y="22" width="{width}" height="28" rx="5" fill="rgba(255,255,255,0.055)"/>'
+        + "".join(segments) + legend + '</svg>'
+    )
+
+
+def compute_movers_page_data(rows: list[dict], history: list[dict], window: int = 7) -> dict:
+    """Return richer mover rows and charts for the generated movers page."""
+    if len(history) < 2:
+        return {"up": [], "down": [], "chart_svg": "", "category_svg": ""}
+    baseline = history[0] if len(history) <= window else history[-min(window, len(history))]
+    old_by_repo = {a.get("repo", "").lower(): a for a in baseline.get("agents", [])}
+    movers = []
+    for row in rows:
+        repo = row.get("repo", "").lower()
+        old = old_by_repo.get(repo)
+        if not old:
+            continue
+        delta = (old.get("rank") or row.get("rank") or 0) - (row.get("rank") or 0)
+        if delta == 0:
+            continue
+        movers.append({
+            "name": row["name"],
+            "slug": row["slug"],
+            "repo": row["repo"],
+            "category": row.get("category") or "Uncategorized",
+            "rank": row.get("rank"),
+            "delta": delta,
+            "trust_score": row.get("trust_score") or 0,
+            "evidence_grade": row.get("evidence_grade", "D"),
+            "score": row.get("score") or 0,
+        })
+    up = sorted([m for m in movers if m["delta"] > 0], key=lambda m: m["delta"], reverse=True)[:12]
+    down = sorted([m for m in movers if m["delta"] < 0], key=lambda m: m["delta"])[:12]
+    category_counts: dict[str, int] = {}
+    for mover in movers:
+        category_counts[mover["category"]] = category_counts.get(mover["category"], 0) + 1
+    category_items = [
+        {"label": label, "value": value}
+        for label, value in sorted(category_counts.items(), key=lambda item: item[1], reverse=True)[:8]
+    ]
+    return {
+        "up": up,
+        "down": down,
+        "chart_svg": render_bar_chart_svg(up + down, "name", "delta", accent="#2dd4bf", max_items=12, grad_id="moverSwingGrad"),
+        "category_svg": render_bar_chart_svg(category_items, "label", "value", accent="#8fb3ff", max_items=8, grad_id="moverCategoryGrad"),
+    }
+
+
+def build_use_case_pages(rows: list[dict]) -> list[dict]:
+    """Generate curated, data-backed discovery slices from the current rows."""
+    definitions = [
+        {
+            "slug": "coding-agents",
+            "title": "Best Coding Agents by Trust",
+            "description": "Coding agents ranked by HVTrust, evidence grade, provenance, signed commits, and current maintenance.",
+            "filter": lambda r: r.get("category") == "Coding Agents",
+        },
+        {
+            "slug": "provenance-ready",
+            "title": "Agents With Strong Provenance Signals",
+            "description": "Projects with package provenance, stronger signed-commit posture, or high Scorecard evidence.",
+            "filter": lambda r: bool(r.get("has_provenance")) or (r.get("signed_commits_ratio") or 0) >= 0.5 or (r.get("scorecard_score") or 0) >= 7,
+        },
+        {
+            "slug": "self-hosted-open-source",
+            "title": "Best Open-Source Agents to Self-Host",
+            "description": "Open-license projects with active maintenance and enough evidence for a first-pass technical review.",
+            "filter": lambda r: r.get("license_type") == "open" and (r.get("days_ago") or 9999) <= 45,
+        },
+        {
+            "slug": "recently-active",
+            "title": "Recently Active AI Agent Projects",
+            "description": "Agents with fresh repository activity and visible development momentum.",
+            "filter": lambda r: (r.get("days_ago") or 9999) <= 14 and (r.get("weekly_commits") or 0) >= 1,
+        },
+        {
+            "slug": "high-evidence",
+            "title": "Highest Evidence AI Agents",
+            "description": "Agents with the strongest public evidence depth, weighted toward A/B grades and high HVTrust.",
+            "filter": lambda r: r.get("evidence_grade") in {"A", "B"} and (r.get("trust_score") or 0) >= 55,
+        },
+    ]
+    pages = []
+    grade_colors = {"A": "#2dd4bf", "B": "#8fb3ff", "C": "#d8a657", "D": "#e8798b"}
+    for definition in definitions:
+        agents = sorted(
+            [r for r in rows if definition["filter"](r)],
+            key=lambda r: (-(r.get("trust_score") or 0), r.get("rank") or 9999),
+        )[:16]
+        if not agents:
+            continue
+        grade_groups = [
+            {"label": grade, "value": sum(1 for r in agents if r.get("evidence_grade") == grade), "color": color}
+            for grade, color in grade_colors.items()
+        ]
+        chart_items = [
+            {"name": r["name"], "trust_score": r.get("trust_score") or 0}
+            for r in agents[:10]
+        ]
+        pages.append({
+            **definition,
+            "agents": agents,
+            "chart_svg": render_bar_chart_svg(chart_items, "name", "trust_score", accent="#2dd4bf", max_items=10, grad_id=f"useCase{definition['slug'].replace('-', '')}Grad"),
+            "distribution_svg": render_distribution_svg(grade_groups),
+            "avg_trust": round(sum(r.get("trust_score") or 0 for r in agents) / len(agents)),
+            "provenance_count": sum(1 for r in agents if r.get("has_provenance")),
+            "fresh_count": sum(1 for r in agents if (r.get("days_ago") or 9999) <= 14),
+        })
+    return pages
+
+
+def render_event_timeline_svg(events: list[dict]) -> str:
+    """Render a compact distribution of recent reputation events."""
+    if not events:
+        return ""
+    labels = {
+        "listed": "Listed",
+        "score_changed": "Score",
+        "rank_changed": "Rank",
+        "stale_warning": "Stale",
+        "freshness_restored": "Fresh",
+        "scorecard_added": "Scorecard",
+        "provenance_added": "Provenance",
+        "delisted": "Delisted",
+    }
+    colors = {
+        "listed": "#2dd4bf",
+        "score_changed": "#8fb3ff",
+        "rank_changed": "#d8a657",
+        "stale_warning": "#e8798b",
+        "freshness_restored": "#2dd4bf",
+        "scorecard_added": "#8fb3ff",
+        "provenance_added": "#2dd4bf",
+        "delisted": "#e8798b",
+    }
+    counts: dict[str, int] = {}
+    for event in events:
+        event_type = event.get("type", "other")
+        counts[event_type] = counts.get(event_type, 0) + 1
+    groups = [
+        {"label": labels.get(event_type, event_type.replace("_", " ").title()), "value": value, "color": colors.get(event_type, "#a8b3c2")}
+        for event_type, value in sorted(counts.items(), key=lambda item: item[1], reverse=True)
+    ]
+    return render_distribution_svg(groups, width=680, height=104)
+
+
 def rank_delta_display(delta: int | None, is_new: bool) -> str:
     """Return display string for rank delta."""
     if is_new:
@@ -1612,6 +1819,33 @@ def add_provisional_missing_agents(rows: list[dict], agents: list[dict]) -> int:
     return added
 
 
+def apply_legacy_classification(
+    rows: list[dict], legacy_rows: list[dict], legacy_agents: list[dict]
+) -> int:
+    """Move any rows whose agents.json status is 'legacy' from `rows` to `legacy_rows`.
+
+    Runs after every build mode so that flipping `status: legacy` in agents.json
+    propagates without waiting for batch-1 (which is the only batch that
+    re-fetches legacy agents) or a full refetch. Returns the number of rows
+    reclassified this call.
+    """
+    legacy_repos = {a["repo"].lower() for a in legacy_agents}
+    if not legacy_repos:
+        return 0
+    existing_legacy = {r["repo"].lower() for r in legacy_rows}
+    moved = []
+    for r in list(rows):
+        if r["repo"].lower() in legacy_repos:
+            r["status"] = "legacy"
+            r["listing_status"] = "legacy"
+            moved.append(r)
+            rows.remove(r)
+    for r in moved:
+        if r["repo"].lower() not in existing_legacy:
+            legacy_rows.append(r)
+    return len(moved)
+
+
 def repair_missing_commit_counts(rows: list[dict], cached_commit_counts: dict[str, int]) -> int:
     """Retry commit-count collection for rows that still have no 4-week count."""
     repaired = 0
@@ -1906,19 +2140,9 @@ def main() -> None:
             _state = json.load(_f)
         rows = _state["rows"]
         legacy_rows = _state["legacy_rows"]
-        # Re-apply legacy classification from agents.json so that flipping
-        # an agent's status to "legacy" propagates without a full refetch.
-        _legacy_repos = {a["repo"].lower() for a in legacy_agents}
-        moved = [r for r in rows if r["repo"].lower() in _legacy_repos]
+        moved = apply_legacy_classification(rows, legacy_rows, legacy_agents)
         if moved:
-            for r in moved:
-                r["status"] = "legacy"
-                r["listing_status"] = "legacy"
-            rows = [r for r in rows if r["repo"].lower() not in _legacy_repos]
-            # Avoid duplicates if already in legacy_rows
-            existing_legacy = {r["repo"].lower() for r in legacy_rows}
-            legacy_rows = legacy_rows + [r for r in moved if r["repo"].lower() not in existing_legacy]
-            print(f"RENDER-ONLY: reclassified {len(moved)} row(s) as legacy from agents.json")
+            print(f"RENDER-ONLY: reclassified {moved} row(s) as legacy from agents.json")
         provisional_count = add_provisional_missing_agents(rows, all_agents)
         print(f"RENDER-ONLY: loaded {len(rows)} active + {len(legacy_rows)} legacy rows from render_state.json")
         if provisional_count:
@@ -2073,6 +2297,21 @@ def main() -> None:
         provisional_count = add_provisional_missing_agents(rows, all_agents)
         if provisional_count:
             print(f"Batch merge: added {provisional_count} provisional agent listing(s) pending signal refresh")
+        # If batch mode skipped legacy fetches (batch_num != 1), carry forward
+        # legacy_rows from the prior render so we don't lose them.
+        if batch and not legacy_rows and os.path.isfile(render_state_path):
+            try:
+                with open(render_state_path) as _f:
+                    legacy_rows = json.load(_f).get("legacy_rows", []) or []
+                if legacy_rows:
+                    print(f"Batch merge: carried forward {len(legacy_rows)} legacy row(s) from prior render")
+            except (OSError, json.JSONDecodeError):
+                pass
+        # Re-apply agents.json legacy classification so status flips in the
+        # config propagate even when batch mode didn't refetch them.
+        reclassified = apply_legacy_classification(rows, legacy_rows, legacy_agents)
+        if reclassified:
+            print(f"Batch merge: reclassified {reclassified} row(s) as legacy from agents.json")
         print(f"\nMerged incremental refresh: {len(rows)} total agents ({len(rows) - len(old_agents)} refreshed, {len(old_agents)} carried forward)")
 
     if not render_only and not repair_commits:
@@ -2396,7 +2635,9 @@ def main() -> None:
     )
 
     movers = compute_movers(history, {r["repo"].lower(): r["slug"] for r in rows})
+    movers_page = compute_movers_page_data(rows, history)
     newly_added = compute_newly_added(rows, history)
+    use_case_pages = build_use_case_pages(rows)
 
     # Sort legacy rows by stars descending for display; populate fields needed by templates
     for lr in legacy_rows:
@@ -2446,6 +2687,7 @@ def main() -> None:
         categories=categories,
         movers=movers,
         newly_added=newly_added,
+        use_case_pages=use_case_pages,
         history_days=len(history),
     )
     out_path = os.path.join(script_dir, "index.html")
@@ -2485,6 +2727,7 @@ def main() -> None:
         row["sparkline_svg"] = render_sparkline_svg(points)
         row["rank_history"] = points
         events = agent_events.get(repo_key, [])
+        row["event_chart_svg"] = render_event_timeline_svg(events)
         slug_dir = os.path.join(agents_dir, row["slug"])
         os.makedirs(slug_dir, exist_ok=True)
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
@@ -2497,6 +2740,7 @@ def main() -> None:
         row["rank_history"] = points
         row["siblings"] = []
         events = agent_events.get(repo_key, [])
+        row["event_chart_svg"] = render_event_timeline_svg(events)
         slug_dir = os.path.join(agents_dir, row["slug"])
         os.makedirs(slug_dir, exist_ok=True)
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
@@ -2553,6 +2797,54 @@ def main() -> None:
                 comparisons=compare_by_cat.get(cat_slug, []),
             ))
     print(f"Built {len(all_cat_meta)} category pages under categories/.")
+
+    # Movers page — /movers/ is refreshed from history snapshots on every build.
+    movers_tmpl = env.get_template("movers.html.j2")
+    movers_dir = os.path.join(script_dir, "movers")
+    os.makedirs(movers_dir, exist_ok=True)
+    with open(os.path.join(movers_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(movers_tmpl.render(
+            movers=movers_page,
+            updated=now_str,
+            history_days=len(history),
+        ))
+    print("Built movers page under movers/.")
+
+    # Use-case landing pages — /use-cases/ and /use-cases/<slug>/.
+    use_case_tmpl = env.get_template("use_case.html.j2")
+    use_cases_dir = os.path.join(script_dir, "use-cases")
+    os.makedirs(use_cases_dir, exist_ok=True)
+    with open(os.path.join(use_cases_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(use_case_tmpl.render(
+            page={
+                "title": "AI Agent Discovery by Use Case",
+                "description": "Fresh, data-backed slices of the HVTracker registry for common evaluation jobs.",
+                "slug": "",
+                "agents": rows[:12],
+                "chart_svg": render_bar_chart_svg(
+                    [{"name": r["name"], "trust_score": r.get("trust_score") or 0} for r in rows[:10]],
+                    "name", "trust_score", max_items=10,
+                ),
+                "distribution_svg": render_distribution_svg([
+                    {"label": "A", "value": sum(1 for r in rows if r.get("evidence_grade") == "A"), "color": "#2dd4bf"},
+                    {"label": "B", "value": sum(1 for r in rows if r.get("evidence_grade") == "B"), "color": "#8fb3ff"},
+                    {"label": "C", "value": sum(1 for r in rows if r.get("evidence_grade") == "C"), "color": "#d8a657"},
+                    {"label": "D", "value": sum(1 for r in rows if r.get("evidence_grade") == "D"), "color": "#e8798b"},
+                ]),
+                "avg_trust": round(sum(r.get("trust_score") or 0 for r in rows) / max(len(rows), 1)),
+                "provenance_count": sum(1 for r in rows if r.get("has_provenance")),
+                "fresh_count": sum(1 for r in rows if (r.get("days_ago") or 9999) <= 14),
+            },
+            pages=use_case_pages,
+            updated=now_str,
+            is_index=True,
+        ))
+    for page in use_case_pages:
+        page_dir = os.path.join(use_cases_dir, page["slug"])
+        os.makedirs(page_dir, exist_ok=True)
+        with open(os.path.join(page_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(use_case_tmpl.render(page=page, pages=use_case_pages, updated=now_str, is_index=False))
+    print(f"Built {len(use_case_pages)} use-case pages under use-cases/.")
 
     # Comparison pages — /compare/<a>-vs-<b>/ from the precomputed pairs
     # (top 3 per category). High-intent "X vs Y" search + LLM-citable.
@@ -2739,6 +3031,8 @@ def main() -> None:
     sitemap_urls = [
         ("https://hvtracker.net/", "1.0", "daily"),
         ("https://hvtracker.net/methodology", "0.5", "monthly"),
+        ("https://hvtracker.net/movers/", "0.8", "daily"),
+        ("https://hvtracker.net/use-cases/", "0.8", "daily"),
         ("https://hvtracker.net/badges/", "0.6", "weekly"),
         ("https://hvtracker.net/roadmap/", "0.5", "weekly"),
         ("https://hvtracker.net/spec/", "0.4", "monthly"),
@@ -2750,6 +3044,8 @@ def main() -> None:
         ))
     for cat_m in all_cat_meta:
         sitemap_urls.append((f"https://hvtracker.net/categories/{cat_m['slug']}", "0.7", "daily"))
+    for page in use_case_pages:
+        sitemap_urls.append((f"https://hvtracker.net/use-cases/{page['slug']}/", "0.8", "daily"))
     sitemap_urls.append(("https://hvtracker.net/blog/", "0.6", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety", "0.8", "monthly"))
     sitemap_urls.append(("https://hvtracker.net/blog/most-starred-ai-agents-no-provenance", "0.9", "weekly"))
