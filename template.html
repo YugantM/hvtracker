@@ -1438,7 +1438,7 @@
 
     {% if movers and (movers.up or movers.down) %}
     <div class="movers">
-      <span class="movers-title">Biggest movers ({{ history_days }}-day window)</span>
+      <span class="movers-title">Biggest movers (daily snapshot, {{ history_days }}-day window)</span>
       <div class="movers-row">
         {% for m in movers.up %}
         <a href="/agents/{{ m.slug }}" class="mover mover-up">

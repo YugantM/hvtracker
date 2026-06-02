@@ -956,13 +956,34 @@ def load_history(history_dir: str) -> list[dict]:
     return snapshots
 
 
+def select_completed_history_window(history: list[dict], window: int = 7) -> tuple[dict | None, dict | None]:
+    """Return the latest completed daily snapshot and its baseline snapshot.
+
+    If today's snapshot exists, it is treated as still in progress because the
+    refresh pipeline updates it throughout the day. Movers should remain stable
+    until the next completed daily snapshot is available.
+    """
+    if len(history) < 2:
+        return None, None
+
+    today_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    completed = history
+    if history[-1].get("_date") == today_utc and len(history) >= 2:
+        completed = history[:-1]
+    if len(completed) < 2:
+        return None, None
+
+    latest = completed[-1]
+    baseline_idx = 0 if len(completed) <= window else len(completed) - window
+    baseline = completed[baseline_idx]
+    return latest, baseline
+
+
 def compute_movers(history: list[dict], slug_map: dict[str, str] | None = None, window: int = 7) -> dict:
     """Compare latest snapshot vs `window` days ago. Returns {up: [...], down: [...]}."""
-    if len(history) < 2:
+    latest, baseline = select_completed_history_window(history, window)
+    if not latest or not baseline:
         return {"up": [], "down": []}
-    latest = history[-1]
-    # Find snapshot closest to `window` days back
-    baseline = history[0] if len(history) <= window else history[-min(window, len(history))]
     old_ranks = {a["repo"].lower(): a["rank"] for a in baseline.get("agents", [])}
     movers = []
     for a in latest.get("agents", []):
@@ -981,11 +1002,11 @@ def compute_movers(history: list[dict], slug_map: dict[str, str] | None = None, 
     return {"up": up, "down": down}
 
 
-def compute_newly_added(rows: list[dict], history: list[dict], limit: int = 6) -> list[dict]:
+def compute_newly_added(rows: list[dict], history: list[dict], limit: int | None = None) -> list[dict]:
     """Return agents first seen in the latest or immediately prior snapshot.
 
     This keeps truly new agents visible right away while also preserving the
-    short carry-over window expected by the homepage and tests.
+    short carry-over window driven by the last two snapshots.
     """
     if not rows or len(history) < 2:
         return []
@@ -1016,7 +1037,7 @@ def compute_newly_added(rows: list[dict], history: list[dict], limit: int = 6) -
             "evidence_grade": row.get("evidence_grade", "D"),
         })
     added.sort(key=lambda item: item["rank"])
-    return added[:limit]
+    return added if limit is None else added[:limit]
 
 
 def compute_sparklines(history: list[dict]) -> dict[str, list[dict]]:
@@ -1621,13 +1642,23 @@ def render_stacked_radar_svg(agents: list[dict], mode: str = "trust",
 
 def compute_movers_page_data(rows: list[dict], history: list[dict], window: int = 7) -> dict:
     """Return richer mover rows and charts for the generated movers page."""
-    if len(history) < 2:
-        return {"up": [], "down": [], "top_category": None, "radar_up_svg": "", "radar_down_svg": ""}
-    baseline = history[0] if len(history) <= window else history[-min(window, len(history))]
+    latest, baseline = select_completed_history_window(history, window)
+    if not latest or not baseline:
+        return {
+            "up": [],
+            "down": [],
+            "top_category": None,
+            "radar_up_svg": "",
+            "radar_down_svg": "",
+            "latest_date": None,
+            "baseline_date": None,
+        }
+
+    latest_rows = latest.get("agents", [])
+    latest_by_repo = {a.get("repo", "").lower(): a for a in latest_rows}
     old_by_repo = {a.get("repo", "").lower(): a for a in baseline.get("agents", [])}
     movers = []
-    for row in rows:
-        repo = row.get("repo", "").lower()
+    for repo, row in latest_by_repo.items():
         old = old_by_repo.get(repo)
         if not old:
             continue
@@ -1654,12 +1685,14 @@ def compute_movers_page_data(rows: list[dict], history: list[dict], window: int 
     top_category = max(category_counts, key=category_counts.get, default=None) if category_counts else None
     up_repos = {m["repo"].lower() for m in up}
     down_repos = {m["repo"].lower() for m in down}
-    up_rows = [r for r in rows if r.get("repo", "").lower() in up_repos] or rows[:8]
-    down_rows = [r for r in rows if r.get("repo", "").lower() in down_repos] or rows[:8]
+    up_rows = [r for r in latest_rows if r.get("repo", "").lower() in up_repos] or latest_rows[:8]
+    down_rows = [r for r in latest_rows if r.get("repo", "").lower() in down_repos] or latest_rows[:8]
     return {
         "up": up,
         "down": down,
         "top_category": top_category,
+        "latest_date": latest.get("_date"),
+        "baseline_date": baseline.get("_date"),
         "radar_up_svg": render_stacked_radar_svg(
             up_rows, mode="trust", title="Rising agents — trust profile", color="#2dd4bf",
         ),

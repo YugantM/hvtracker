@@ -84,7 +84,7 @@
 
     <section class="hero">
       <h1>AI Agent Rank Movers</h1>
-      <p>Daily movement from the current {{ history_days }}-day history window. Gains and drops are based on HVTracker rank changes, so this page stays fresh as the cron refresh updates snapshots.</p>
+      <p>Daily movement from the current {{ history_days }}-day history window. Gains and drops are pinned to the most recent completed daily snapshot, so the page stays stable throughout the day instead of shifting on every partial refresh.</p>
       <div class="meta">Updated {{ updated }}</div>
     </section>
 
@@ -93,6 +93,9 @@
       <div class="summary down"><strong>{{ movers.down|length }}</strong><span>Agents falling</span></div>
       <div class="summary"><strong>{{ movers.top_category or '—' }}</strong><span>Most active category</span></div>
     </section>
+    {% if movers.latest_date %}
+    <div class="meta" style="margin-bottom:18px;">Snapshot {{ movers.latest_date }}{% if movers.baseline_date %} vs {{ movers.baseline_date }}{% endif %}</div>
+    {% endif %}
 
     <section class="chart-band" aria-label="Trust profile comparison">
       <div class="chart-panel">
