@@ -654,6 +654,7 @@ def _refresh(mode: str) -> None:
 def _compute_render_fingerprint() -> str:
     digest = hashlib.sha256()
     tracked_paths = [
+        os.path.join(BASE_DIR, "fetch_and_build.py"),
         os.path.join(BASE_DIR, "template.html"),
         os.path.join(BASE_DIR, "compare", "index.html"),
         os.path.join(BASE_DIR, "og-v2.png"),
