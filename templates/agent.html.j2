@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ row.name }} Review — Trust Score & Safety Profile | HVTracker</title>
-  <meta name="description" content="Is {{ row.name }} safe? Independent trust score {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}). Ranked #{{ row.rank }} of {{ total }} open-source AI agents. {{ row.stars_fmt }} GitHub stars, {{ row.category }}. Security, transparency & adoption signals reviewed.">
+  <meta name="description" content="Is {{ row.name }} trustworthy? Independent trust score {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}). Ranked #{{ row.rank }} of {{ total }} open-source AI projects. {{ row.stars_fmt }} GitHub stars, {{ row.category }}. Safety, transparency, maintenance, and provenance signals reviewed.">
   <link rel="canonical" href="https://hvtracker.net/agents/{{ row.slug }}">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="{{ row.name }} — Trust Score {{ row.trust_score }}/100 | HVTracker">
-  <meta property="og:description" content="Grade {{ row.evidence_grade }} · HVTrust {{ row.trust_score }}/100 · {{ row.stars_fmt }} stars · {{ row.category }}. Independent trust signals for AI agents.">
+  <meta property="og:description" content="Grade {{ row.evidence_grade }} · HVTrust {{ row.trust_score }}/100 · {{ row.stars_fmt }} stars · {{ row.category }}. Independent trust signals for open-source AI projects.">
   <meta property="og:url" content="https://hvtracker.net/agents/{{ row.slug }}">
   <meta property="og:image" content="https://hvtracker.net/agents/{{ row.slug }}/og.png">
   <meta property="og:image:type" content="image/png">
@@ -77,7 +77,7 @@
       {
         "@type": "Question",
         "name": "Is {{ row.name }} safe to use?",
-        "acceptedAnswer": { "@type": "Answer", "text": "{{ row.name }} has an HVTrust score of {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}), ranked #{{ row.rank }} of {{ total }} AI agents. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals." }
+        "acceptedAnswer": { "@type": "Answer", "text": "{{ row.name }} has an HVTrust score of {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}), ranked #{{ row.rank }} of {{ total }} open-source AI projects. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals." }
       },
       {
         "@type": "Question",
@@ -559,8 +559,8 @@
         <a class="secondary-link" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Suggest correction</a>
       </div>
       <div class="seo-summary" style="margin-top:18px;font-size:14px;color:var(--muted);line-height:1.7;max-width:640px;">
-        <p>{{ row.name }} is an open-source AI agent in the {{ row.category }} category with {{ row.stars_fmt }} GitHub stars{% if row.description %} — {{ row.description }}{% endif %}.
-        HVTracker independently evaluates {{ row.name }} with a <strong style="color:var(--text)">Trust Score of {{ row.trust_score }}/100</strong> (Grade {{ row.evidence_grade }}), ranking it <strong style="color:var(--text)">#{{ row.rank }} of {{ total }}</strong> tracked AI agents.
+        <p>{{ row.name }} is an open-source AI project in the {{ row.category }} category with {{ row.stars_fmt }} GitHub stars{% if row.description %} — {{ row.description }}{% endif %}.
+        HVTracker independently evaluates {{ row.name }} with a <strong style="color:var(--text)">Trust Score of {{ row.trust_score }}/100</strong> (Grade {{ row.evidence_grade }}), ranking it <strong style="color:var(--text)">#{{ row.rank }} of {{ total }}</strong> tracked AI projects.
         {% if row.scorecard_score %}It scores {{ row.scorecard_score }}/10 on the OpenSSF Scorecard for supply-chain security.{% endif %}
         {% if row.has_provenance %}Package provenance is verified.{% endif %}
         Signals are refreshed daily from GitHub, package registries, and security databases.</p>

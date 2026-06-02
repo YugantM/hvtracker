@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Compare trust and safety scores for {{ total }} AI agents and coding assistants. Evidence-weighted rankings across safety, provenance, transparency, maintenance, and adoption.">
-  <title>AI Agent Trust Scores &amp; Safety Rankings | HVTracker</title>
+  <meta name="description" content="AI Trust Registry for open-source AI projects. Independent trust scores across activity, adoption, transparency, safety, and provenance using public, checkable signals.">
+  <title>AI Trust Registry For Open-Source AI Projects | HVTracker</title>
   <!-- Google Search Console: paste the token from search.google.com/search-console into content, then uncomment this line. -->
   <!-- <meta name="google-site-verification" content="REPLACE_WITH_GSC_TOKEN"> -->
   <!-- Bing Webmaster Tools (also indexes for DuckDuckGo): paste token from bing.com/webmasters, then uncomment. -->
@@ -12,22 +12,22 @@
   <link rel="canonical" href="https://hvtracker.net/">
   <link rel="alternate" type="application/feed+json" title="HVTracker — JSON Feed" href="/feed.json">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="AI Agent Trust Scores &amp; Safety Rankings — {{ total }} Tools | HVTracker">
-  <meta property="og:description" content="Evidence-weighted trust scores for {{ total }} AI agents. Compare safety, provenance, transparency, maintenance, adoption, OSSF Scorecard, and signed commits.">
+  <meta property="og:title" content="AI Trust Registry — {{ total }} Open-Source AI Projects | HVTracker">
+  <meta property="og:description" content="Independent trust scores for {{ total }} open-source AI projects using public, checkable signals across safety, provenance, transparency, maintenance, and adoption.">
   <meta property="og:url" content="https://hvtracker.net/">
   <meta property="og:image" content="https://hvtracker.net/og-provenance.png">
   <meta property="og:image:secure_url" content="https://hvtracker.net/og-provenance.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="24 of the 30 most-starred AI agents ship no build provenance — HVTracker">
+  <meta property="og:image:alt" content="AI Trust Registry for open-source AI projects — HVTracker">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:domain" content="hvtracker.net">
   <meta name="twitter:url" content="https://hvtracker.net/">
-  <meta name="twitter:title" content="AI Agent Trust Scores &amp; Safety Rankings — {{ total }} Tools | HVTracker">
-  <meta name="twitter:description" content="Evidence-weighted trust scores for {{ total }} AI agents. Compare safety, provenance, transparency, maintenance, adoption, OSSF Scorecard, and signed commits.">
+  <meta name="twitter:title" content="AI Trust Registry — {{ total }} Open-Source AI Projects | HVTracker">
+  <meta name="twitter:description" content="Independent trust scores for {{ total }} open-source AI projects using public, checkable signals across safety, provenance, transparency, maintenance, and adoption.">
   <meta name="twitter:image" content="https://hvtracker.net/og-provenance.png">
-  <meta name="twitter:image:alt" content="24 of the 30 most-starred AI agents ship no build provenance — HVTracker">
+  <meta name="twitter:image:alt" content="AI Trust Registry for open-source AI projects — HVTracker">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -35,7 +35,7 @@
     "name": "HVTracker",
     "alternateName": "HVTracker AI Trust Registry",
     "url": "https://hvtracker.net/",
-    "description": "HVTracker is an open-source AI agent trust registry ranking agents by evidence-weighted HVTrust signals: safety, provenance, transparency, maintenance, and adoption.",
+    "description": "HVTracker is an AI Trust Registry for open-source AI projects, using evidence-weighted signals across safety, provenance, transparency, maintenance, and adoption.",
     "inLanguage": "en",
     "potentialAction": {
       "@type": "SearchAction",
@@ -51,7 +51,7 @@
     "name": "HVTracker",
     "url": "https://hvtracker.net/",
     "logo": "https://hvtracker.net/og-v2.png",
-    "description": "Independent trust registry ranking open-source AI agents by evidence-weighted trust.",
+    "description": "Independent AI trust registry for open-source AI projects.",
     "sameAs": [
       "https://github.com/YugantM/hvtracker"
     ]
@@ -62,7 +62,7 @@
     "@context": "https://schema.org",
     "@type": "Dataset",
     "name": "HVTracker AI Trust Registry",
-    "description": "Evidence-weighted trust scores (HVTrust) for {{ total }} open-source AI agents, computed from public signals: OSSF Scorecard, build provenance, signed commits, license, maintenance, and adoption.",
+    "description": "Evidence-weighted trust scores (HVTrust) for {{ total }} open-source AI projects, computed from public signals: OSSF Scorecard, build provenance, signed commits, license, maintenance, and adoption.",
     "url": "https://hvtracker.net/",
     "license": "https://creativecommons.org/licenses/by/4.0/",
     "isAccessibleForFree": true,
@@ -70,14 +70,14 @@
     "distribution": [
       { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://hvtracker.net/data/latest.json" }
     ],
-    "keywords": ["AI agents", "trust score", "OSSF Scorecard", "supply chain", "provenance", "open source", "agent safety"]
+    "keywords": ["AI trust registry", "AI projects", "trust score", "OSSF Scorecard", "supply chain", "provenance", "open source"]
   }
   </script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": "Top open-source AI agents by trust",
+    "name": "Top open-source AI projects by trust",
     "itemListOrder": "https://schema.org/ItemListOrderDescending",
     "numberOfItems": {{ total }},
     "itemListElement": [
@@ -94,7 +94,7 @@
       {
         "@type": "Question",
         "name": "What is the most trustworthy open-source AI agent?",
-        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker ranks open-source AI agents by the HVTrust score, an evidence-weighted measure of trust rather than popularity. The current top-ranked agent is {{ rows[0].name }} with an HVTrust score of {{ rows[0].trust_score }}/100. See the full ranking at hvtracker.net." }
+        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker ranks open-source AI projects by the HVTrust score, an evidence-weighted measure of trust rather than popularity. The current top-ranked project is {{ rows[0].name }} with an HVTrust score of {{ rows[0].trust_score }}/100. See the full registry at hvtracker.net." }
       },
       {
         "@type": "Question",
@@ -103,8 +103,8 @@
       },
       {
         "@type": "Question",
-        "name": "What is an AI agent trust registry?",
-        "acceptedAnswer": { "@type": "Answer", "text": "A trust registry independently evaluates and ranks AI agents using public, checkable signals so developers can decide which agents to rely on. HVTracker tracks {{ total }} open-source agents and publishes open, machine-readable trust data." }
+        "name": "What is an AI trust registry?",
+        "acceptedAnswer": { "@type": "Answer", "text": "A trust registry independently evaluates AI projects using public, checkable signals so developers can decide which systems to rely on. HVTracker tracks {{ total }} open-source AI projects and publishes open, machine-readable trust data." }
       }
     ]
   }
@@ -1312,8 +1312,8 @@
     </header>
 
     <section class="intro" aria-labelledby="intro-title">
-      <h2 id="intro-title">Open-source AI agent rankings based on trust signals, not hype.</h2>
-      <p>Independent trust scores for {{ total }} open-source AI agents — ranked on activity, adoption, transparency, safety, and provenance using public, checkable signals, not vendor claims.</p>
+      <h2 id="intro-title">AI Trust Registry for open-source AI projects.</h2>
+      <p>Independent trust scores for {{ total }} open-source AI projects, based on public, checkable signals across activity, adoption, transparency, safety, and provenance — not hype or vendor claims.</p>
       <div class="hero-metrics" aria-label="Registry snapshot">
         <div class="hero-metric">
           <strong>{{ total }}</strong>
