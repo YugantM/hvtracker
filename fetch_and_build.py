@@ -1523,29 +1523,29 @@ def render_stacked_radar_svg(agents: list[dict], mode: str = "trust",
         return ""
 
     cx, cy = width / 2, height / 2 + 10
-    radius = min(width, height) * 0.34
+    radius = min(width, height) * 0.30
 
     angles = [-math.pi / 2 + i * 2 * math.pi / n_axes for i in range(n_axes)]
 
-    # Grid levels
+    # Grid levels — fine hairlines
     levels = []
     for level in (0.25, 0.5, 0.75, 1.0):
         pts = " ".join(
             f'{cx + math.cos(a) * radius * level:.1f},{cy + math.sin(a) * radius * level:.1f}'
             for a in angles
         )
-        levels.append(f'<polygon points="{pts}" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="1"/>')
+        levels.append(f'<polygon points="{pts}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="0.5"/>')
 
-    # Spokes
+    # Spokes — fine hairlines
     spokes = []
     for a in angles:
         spokes.append(
             f'<line x1="{cx:.1f}" y1="{cy:.1f}" '
             f'x2="{cx + math.cos(a) * radius:.1f}" y2="{cy + math.sin(a) * radius:.1f}" '
-            f'stroke="rgba(255,255,255,.12)"/>'
+            f'stroke="rgba(255,255,255,.08)" stroke-width="0.5"/>'
         )
 
-    # Individual agent polygons (stacked)
+    # Individual agent polygons (stacked, low opacity)
     polys = []
     avg_pcts = [0.0] * n_axes
     for agent in agents:
@@ -1563,11 +1563,11 @@ def render_stacked_radar_svg(agents: list[dict], mode: str = "trust",
             for i in range(n_axes)
         )
         polys.append(
-            f'<polygon points="{pts}" fill="{color}" opacity="0.1" '
-            f'stroke="{color}" stroke-width="0.8" stroke-opacity="0.18"/>'
+            f'<polygon points="{pts}" fill="{color}" opacity="0.06" '
+            f'stroke="{color}" stroke-width="0.5" stroke-opacity="0.12"/>'
         )
 
-    # Average polygon on top (brighter)
+    # Average polygon on top
     n_agents = max(len(agents), 1)
     avg_pcts = [p / n_agents for p in avg_pcts]
     avg_pts = " ".join(
@@ -1576,36 +1576,44 @@ def render_stacked_radar_svg(agents: list[dict], mode: str = "trust",
         for i in range(n_axes)
     )
 
-    # Axis labels with average %
+    # Axis labels — pushed out further, no overlap
     labels = []
     for i, (label, _) in enumerate(axis_defs):
         a = angles[i]
-        lx = cx + math.cos(a) * (radius + 42)
-        ly = cy + math.sin(a) * (radius + 32)
+        label_r = radius + 50
+        lx = cx + math.cos(a) * label_r
+        ly = cy + math.sin(a) * (label_r - 8)
         anchor = "middle"
-        if math.cos(a) > 0.35:
+        if math.cos(a) > 0.3:
             anchor = "start"
-        elif math.cos(a) < -0.35:
+            lx = cx + math.cos(a) * (radius + 18)
+        elif math.cos(a) < -0.3:
             anchor = "end"
+            lx = cx + math.cos(a) * (radius + 18)
+        if math.sin(a) < -0.8:
+            ly = cy + math.sin(a) * (radius + 28)
+        elif math.sin(a) > 0.8:
+            ly = cy + math.sin(a) * (radius + 28)
+        short_label = escape(str(label)[:14])
         value = round(avg_pcts[i] * 100)
         labels.append(
             f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" fill="#eef2f6" '
-            f'font-size="11" font-family="Hanken Grotesk, sans-serif">{escape(label)}</text>'
-            f'<text x="{lx:.1f}" y="{ly + 14:.1f}" text-anchor="{anchor}" fill="#8fb3ff" '
-            f'font-size="10" font-family="IBM Plex Mono, monospace">{value}%</text>'
+            f'font-size="10" font-family="Hanken Grotesk, sans-serif">{short_label}</text>'
+            f'<text x="{lx:.1f}" y="{ly + 12:.1f}" text-anchor="{anchor}" fill="#8fb3ff" '
+            f'font-size="9" font-family="IBM Plex Mono, monospace">{value}%</text>'
         )
 
     return (
         f'<svg class="insight-chart radar-chart" xmlns="http://www.w3.org/2000/svg" '
         f'viewBox="0 0 {width} {height}" role="img" aria-label="{escape(title)}">'
-        f'<defs><filter id="sGlow"><feGaussianBlur stdDeviation="4" result="b"/>'
+        f'<defs><filter id="sGlow"><feGaussianBlur stdDeviation="3" result="b"/>'
         f'<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'
         f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)"/>'
         + "".join(levels) + "".join(spokes)
         + "".join(polys)
-        + f'<polygon points="{avg_pts}" fill="{color}" opacity="0.18" '
-        f'stroke="{color}" stroke-width="2" stroke-opacity="0.7" filter="url(#sGlow)"/>'
-        f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="3" fill="#eef2f6" opacity=".75"/>'
+        + f'<polygon points="{avg_pts}" fill="{color}" opacity="0.12" '
+        f'stroke="{color}" stroke-width="1.2" stroke-opacity="0.55" filter="url(#sGlow)"/>'
+        f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="2" fill="#eef2f6" opacity=".6"/>'
         + "".join(labels) +
         '</svg>'
     )
