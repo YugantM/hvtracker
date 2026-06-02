@@ -30,7 +30,10 @@
     .hero{padding:32px 0 18px;border-bottom:1px solid var(--hairline)}
     h1{font-size:34px;line-height:1.14;letter-spacing:0;margin-bottom:8px}.hero p{color:var(--muted);max-width:760px}
     .meta{font:11px var(--font-mono);color:var(--muted);margin-top:14px}
-    .chart-band{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,.8fr);gap:18px;margin:22px 0}
+    .summary-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:22px 0}
+    .summary{border-top:1px solid var(--hairline);padding-top:12px}.summary strong{display:block;font:700 24px var(--font-mono);color:var(--fresh)}.summary span{color:var(--muted);font-size:12px}
+    .summary.down strong{color:var(--red)}
+    .chart-band{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:22px 0}
     .chart-panel{border-top:1px solid var(--hairline);padding-top:16px;min-width:0}.chart-panel h2{font-size:14px;margin-bottom:10px}.insight-chart{width:100%;height:auto;display:block;overflow:visible}
     .mover-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:20px}
     .mover-list{border-top:1px solid var(--hairline);padding-top:14px}
@@ -40,7 +43,7 @@
     .name{font-weight:700}.sub{display:block;color:var(--muted);font:11px var(--font-mono);margin-top:2px}.rank{font:12px var(--font-mono);color:var(--muted);text-align:right}
     footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--hairline);font:11px var(--font-mono);color:var(--muted);text-align:center}
     footer a{color:var(--accent)}
-    @media(max-width:760px){.chart-band,.mover-grid{grid-template-columns:1fr}h1{font-size:26px}nav{margin-left:0}}
+    @media(max-width:760px){.summary-row,.chart-band,.mover-grid{grid-template-columns:1fr}h1{font-size:26px}nav{margin-left:0}}
   </style>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
   <script>
@@ -69,14 +72,20 @@
       <div class="meta">Updated {{ updated }}</div>
     </section>
 
-    <section class="chart-band" aria-label="Rank movement charts">
+    <section class="summary-row" aria-label="Movement summary">
+      <div class="summary"><strong>{{ movers.up|length }}</strong><span>Agents rising</span></div>
+      <div class="summary down"><strong>{{ movers.down|length }}</strong><span>Agents falling</span></div>
+      <div class="summary"><strong>{{ movers.top_category or '—' }}</strong><span>Most active category</span></div>
+    </section>
+
+    <section class="chart-band" aria-label="Trust profile comparison">
       <div class="chart-panel">
-        <h2>Rank Movement Quadrant</h2>
-        {{ movers.chart_svg | safe }}
+        <h2>Rising Agents — Trust Profile</h2>
+        {{ movers.radar_up_svg | safe }}
       </div>
       <div class="chart-panel">
-        <h2>Category Movement Radar</h2>
-        {{ movers.category_svg | safe }}
+        <h2>Falling Agents — Trust Profile</h2>
+        {{ movers.radar_down_svg | safe }}
       </div>
     </section>
 

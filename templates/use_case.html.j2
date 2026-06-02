@@ -31,13 +31,12 @@
     h1{font-size:34px;line-height:1.14;letter-spacing:0;margin-bottom:8px}.hero p{color:var(--muted);max-width:760px}
     .metric-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}
     .metric{border-top:1px solid var(--hairline);padding-top:12px}.metric strong{display:block;font:700 24px var(--font-mono);color:var(--fresh)}.metric span{color:var(--muted);font-size:12px}
-    .chart-band{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.85fr);gap:18px;margin:22px 0}
+    .chart-band{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:22px 0}
     .chart-panel{border-top:1px solid var(--hairline);padding-top:16px;min-width:0}.chart-panel h2{font-size:14px;margin-bottom:10px}.insight-chart{width:100%;height:auto;display:block;overflow:visible}
-    .chart-legend{display:flex;gap:10px;flex-wrap:wrap;font:11px IBM Plex Mono,monospace;color:#a8b3c2}.chart-legend span{display:inline-flex;align-items:center;gap:5px}.chart-legend i{display:inline-block;width:9px;height:9px;border-radius:3px}.chart-legend strong{color:#eef2f6;font-weight:600}
     .slice-nav{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 4px}.slice-nav a{font:11px var(--font-mono);color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:6px 10px;background:rgba(255,255,255,.035)}.slice-nav a.active{color:var(--text);border-color:rgba(45,212,191,.5)}
     table{width:100%;border-collapse:collapse;margin-top:20px;font-size:14px}th,td{padding:11px 10px;border-bottom:1px solid var(--hairline);text-align:left}th{font:11px var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}td.num{text-align:right;font-family:var(--font-mono)}.agent{font-weight:700}.repo{display:block;color:var(--muted);font:11px var(--font-mono);margin-top:2px}.grade{display:inline-flex;min-width:24px;justify-content:center;border-radius:5px;padding:2px 7px;font:700 11px var(--font-mono);background:rgba(143,179,255,.16);color:var(--accent)}
     footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--hairline);font:11px var(--font-mono);color:var(--muted);text-align:center}footer a{color:var(--accent)}
-    @media(max-width:760px){.chart-band,.metric-row{grid-template-columns:1fr}h1{font-size:26px}nav{margin-left:0}table{font-size:13px}th:nth-child(4),td:nth-child(4){display:none}}
+    @media(max-width:760px){.metric-row,.chart-band{grid-template-columns:1fr}h1{font-size:26px}nav{margin-left:0}table{font-size:13px}th:nth-child(4),td:nth-child(4){display:none}}
   </style>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
   <script>
@@ -74,17 +73,17 @@
     <section class="metric-row" aria-label="Slice summary">
       <div class="metric"><strong>{{ page.agents|length }}</strong><span>Agents in slice</span></div>
       <div class="metric"><strong>{{ page.avg_trust }}</strong><span>Average HVTrust</span></div>
-      <div class="metric"><strong>{{ page.provenance_count }}</strong><span>With provenance signals</span></div>
+      <div class="metric"><strong>{{ page.fresh_count }}</strong><span>Updated in last 14 days</span></div>
     </section>
 
-    <section class="chart-band" aria-label="Use-case charts">
+    <section class="chart-band" aria-label="Slice charts">
       <div class="chart-panel">
-        <h2>Trust vs Evidence Quadrant</h2>
-        {{ page.chart_svg | safe }}
+        <h2>Trust Shape</h2>
+        {{ page.radar_trust_svg | safe }}
       </div>
       <div class="chart-panel">
-        <h2>Signal Shape Radar</h2>
-        {{ page.distribution_svg | safe }}
+        <h2>Activity Signals</h2>
+        {{ page.radar_activity_svg | safe }}
       </div>
     </section>
 

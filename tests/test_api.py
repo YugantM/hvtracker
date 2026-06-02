@@ -8,6 +8,8 @@ import importlib
 import os
 import shutil
 import tempfile
+import types
+import sys
 
 import pytest
 
@@ -104,3 +106,57 @@ def test_growth_post_routes_fail_gracefully_without_db(client):
     ):
         r = client.post(path, data=payload)
         assert r.status_code == 503
+
+
+def test_startup_keeps_scheduler_alive(monkeypatch):
+    import app
+    importlib.reload(app)
+
+    class FakeScheduler:
+        def __init__(self, timezone):
+            self.timezone = timezone
+            self.jobs = []
+            self.started = False
+            self.shutdown_called = False
+
+        def add_job(self, func, trigger, hour, id):
+            self.jobs.append({
+                "func": func,
+                "trigger": trigger,
+                "hour": hour,
+                "id": id,
+            })
+
+        def start(self):
+            self.started = True
+
+        def shutdown(self, wait=False):
+            self.shutdown_called = True
+
+    fake_module = types.ModuleType("apscheduler.schedulers.background")
+    fake_module.BackgroundScheduler = FakeScheduler
+    monkeypatch.setitem(sys.modules, "apscheduler.schedulers.background", fake_module)
+    monkeypatch.delenv("DISABLE_SCHEDULER", raising=False)
+
+    monkeypatch.setattr(app, "_seed_history_into_volume", lambda: 0)
+    monkeypatch.setattr(app, "_compute_render_fingerprint", lambda: "fp")
+    monkeypatch.setattr(app, "_read_render_fingerprint", lambda: "fp")
+    monkeypatch.setattr(app.db, "init_schema", lambda: None)
+    monkeypatch.setattr(app.db, "enabled", lambda: False)
+    monkeypatch.setattr(app, "_has_missing_commit_rows", lambda: False)
+    monkeypatch.setattr(app.os.path, "isfile", lambda path: True)
+
+    app._scheduler = None
+    app.startup()
+
+    assert app._scheduler is not None
+    assert app._scheduler.started is True
+    assert len(app._scheduler.jobs) == 1
+    job = app._scheduler.jobs[0]
+    assert callable(job["func"])
+    assert job["trigger"] == "cron"
+    assert job["hour"] == "*/2"
+    assert job["id"] == "refresh"
+
+    app.shutdown()
+    assert app._scheduler is None
