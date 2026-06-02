@@ -28,6 +28,7 @@ COMPARE_TOOL_PATH = os.path.join(BASE_DIR, "compare", "index.html")
 RENDER_FINGERPRINT_PATH = os.path.join(OUTPUT_DIR, ".render_fingerprint")
 
 app = FastAPI(title="HVTracker", docs_url="/api/docs", openapi_url="/api/openapi.json")
+_scheduler = None
 
 
 # ---- cache headers -------------------------------------------------------
@@ -734,6 +735,7 @@ def _has_missing_commit_rows() -> bool:
 
 @app.on_event("startup")
 def startup():
+    global _scheduler
     seeded = _seed_history_into_volume()
     fingerprint = _compute_render_fingerprint()
     stored_fingerprint = _read_render_fingerprint()
@@ -795,10 +797,19 @@ def startup():
 
     if os.environ.get("DISABLE_SCHEDULER") != "1":
         from apscheduler.schedulers.background import BackgroundScheduler
-        sched = BackgroundScheduler(timezone="UTC")
-        sched.add_job(lambda: _refresh("auto"), "cron", hour="*/2", id="refresh")
-        sched.start()
+        if _scheduler is None:
+            _scheduler = BackgroundScheduler(timezone="UTC")
+            _scheduler.add_job(lambda: _refresh("auto"), "cron", hour="*/2", id="refresh")
+            _scheduler.start()
         print("[startup] scheduler started (refresh every 2h)")
+
+
+@app.on_event("shutdown")
+def shutdown():
+    global _scheduler
+    if _scheduler is not None:
+        _scheduler.shutdown(wait=False)
+        _scheduler = None
 
 
 # Static site LAST so /api, /badge, /submit, /correct take precedence.
