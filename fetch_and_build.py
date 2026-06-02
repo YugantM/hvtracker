@@ -1280,7 +1280,7 @@ def render_radial_bar_svg(agents: list[dict], width: int = 720, height: int = 43
         f'viewBox="0 0 {width} {height}" role="img" aria-label="{escape(title)}">'
         f'<defs><filter id="arcGlow"><feGaussianBlur stdDeviation="2" result="b"/>'
         f'<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'
-        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)"/>'
+        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)" stroke="rgba(255,255,255,.10)" stroke-width="1"/>'
         f'<g filter="url(#arcGlow)">{"".join(arcs)}</g>'
         + "".join(labels) + "".join(grade_legend) +
         '</svg>'
@@ -1406,7 +1406,7 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
         '<radialGradient id="scatterGlow" cx="50%" cy="45%" r="70%"><stop offset="0" stop-color="rgba(143,179,255,.22)"/><stop offset="1" stop-color="rgba(143,179,255,0)"/></radialGradient>'
         '<filter id="dotGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
         '</defs>'
-        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)"/>'
+        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)" stroke="rgba(255,255,255,.10)" stroke-width="1"/>'
         f'<rect x="{left}" y="{top}" width="{plot_w}" height="{plot_h}" rx="12" fill="url(#scatterGlow)" stroke="rgba(255,255,255,.11)"/>'
         + "".join(grid) +
         f'<line x1="{zero_x:.1f}" y1="{top}" x2="{zero_x:.1f}" y2="{top + plot_h}" stroke="rgba(238,242,246,.24)" stroke-dasharray="5 6"/>'
@@ -1465,7 +1465,7 @@ def render_radar_svg(metrics: list[dict], width: int = 430, height: int = 430,
         '<linearGradient id="radarFill" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset=".62" stop-color="#8fb3ff"/><stop offset="1" stop-color="#d8a657"/></linearGradient>'
         '<filter id="radarGlow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
         '</defs>'
-        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)"/>'
+        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)" stroke="rgba(255,255,255,.10)" stroke-width="1"/>'
         + "".join(levels) + "".join(spokes) +
         f'<polygon points="{" ".join(area_pts)}" fill="url(#radarFill)" opacity=".28" stroke="url(#radarFill)" stroke-width="2.2" filter="url(#radarGlow)"/>'
         f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="3" fill="#eef2f6" opacity=".75"/>'
@@ -1608,7 +1608,7 @@ def render_stacked_radar_svg(agents: list[dict], mode: str = "trust",
         f'viewBox="0 0 {width} {height}" role="img" aria-label="{escape(title)}">'
         f'<defs><filter id="sGlow"><feGaussianBlur stdDeviation="3" result="b"/>'
         f'<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'
-        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)"/>'
+        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)" stroke="rgba(255,255,255,.10)" stroke-width="1"/>'
         + "".join(levels) + "".join(spokes)
         + "".join(polys)
         + f'<polygon points="{avg_pts}" fill="{color}" opacity="0.12" '
