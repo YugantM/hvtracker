@@ -29,63 +29,73 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0b0d10;
-      --surface:   #151920;
-      --surface-2: #1b2029;
-      --border:    #303846;
-      --text:      #eef2f6;
-      --muted:     #8a87a8;
-      --accent:    #8fb3ff;
-      --accent-lt: rgba(143,179,255,0.10);
-      --mocha:     #d8a657;
-      --mocha-lt:  rgba(216,166,87,0.14);
-      --fresh:     #2dd4bf;
+      --paper: #f4f1eb;
+      --paper-2: #ece4d6;
+      --ink: #1f1b17;
+      --muted: #6f665d;
+      --line: #d5cbbc;
+      --line-strong: #b9aa96;
+      --blue-strong: #7f9cbd;
+      --blue-soft: rgba(167, 191, 217, 0.18);
+      --lobster: #c67c6d;
+      --lobster-soft: rgba(198, 124, 109, 0.14);
+      --moss: #6f876e;
+      --moss-soft: rgba(111, 135, 110, 0.14);
       --font-mono: "JetBrains Mono", "Fira Mono", "Cascadia Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
       --font-sans: "Inter", system-ui, -apple-system, sans-serif;
     }
 
-    body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 15px; line-height: 1.65; min-height: 100vh; }
-    a { color: var(--accent); text-decoration: none; }
+    body { background: var(--paper); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color: var(--ink); font-family: var(--font-sans); font-size: 15px; line-height: 1.7; min-height: 100vh; }
+    a { color: var(--ink); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    .page { max-width: 1100px; margin: 0 auto; padding: 0 20px 48px; }
+    .page { background: var(--paper); min-height: 100vh; max-width: 1100px; margin: 0 auto; padding: 24px 20px 48px; }
 
-    header { padding: 36px 0 24px; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap; }
-    .logo { font-family: var(--font-mono); font-size: 24px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
-    .logo span { color: var(--accent); }
-    .tagline { font-size: 13px; color: var(--muted); }
-    .site-nav { margin-left: auto; font-family: var(--font-mono); font-size: 12px; display: flex; gap: 8px; align-items: baseline; }
-    .site-nav a { color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 5px 10px; background: rgba(255,255,255,0.03); }
-    .site-nav a:hover { color: var(--text); border-color: var(--accent); text-decoration: none; }
-    .site-nav .active { color: var(--text); border-color: var(--accent); font-weight: 600; }
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+    }
+    .site-header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+    }
+    .logo { font-family: var(--font-mono); font-size:20px; font-weight: 700; letter-spacing:0; color: var(--ink); }
+    .logo span { color: var(--lobster); }
+    .tagline { font-size: 12px; color: var(--muted); }
+    .site-nav { margin-left: auto; font-family: var(--font-mono); font-size:11px; display: flex; gap:6px; align-items: baseline; flex-wrap: wrap; }
+    .site-nav a { color: var(--muted); padding: 5px 10px; border: 1px solid transparent; }
+    .site-nav a:hover { color: var(--ink); border-color: var(--line); background: var(--paper-2); text-decoration: none; }
 
-    .content { max-width: 760px; margin: 0 auto; padding: 40px 0 0; }
+    .content { max-width: 780px; margin: 0 auto; padding: 28px 0 0; }
 
-    .doc-title { font-family: var(--font-mono); font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; line-height: 1.2; }
-    .doc-lede { font-size: 16px; color: var(--text); margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+    .doc-title { font-size: 30px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 10px; line-height: 1.14; }
+    .doc-lede { font-size: 16px; color: var(--ink); margin-bottom: 38px; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
 
     section { margin-bottom: 40px; }
-    h2 { font-family: var(--font-mono); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 16px; }
+    h2 { font-family: var(--font-mono); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--lobster); margin-bottom: 14px; }
     p { margin-bottom: 14px; }
 
-    .stage { padding: 18px 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); margin-bottom: 14px; }
+    .stage { padding: 18px 20px; border-top: 2px solid var(--line-strong); background: var(--paper-2); margin-bottom: 14px; }
     .stage-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
-    .stage-tag { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 8px; border-radius: 4px; font-weight: 700; }
-    .stage-tag.shipped { background: rgba(45,212,191,0.15); color: var(--fresh); }
-    .stage-tag.building { background: rgba(216,166,87,0.18); color: var(--mocha); }
-    .stage-tag.next { background: var(--accent-lt); color: var(--accent); }
-    .stage-tag.later { background: rgba(168,179,194,0.10); color: var(--muted); }
-    .stage-title { font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--text); }
+    .stage-tag { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 8px; border-radius: 999px; font-weight: 700; }
+    .stage-tag.shipped { background: var(--moss-soft); color: var(--moss); }
+    .stage-tag.building { background: var(--lobster-soft); color: var(--lobster); }
+    .stage-tag.next { background: var(--blue-soft); color: var(--lobster); }
+    .stage-tag.later { background: rgba(111, 102, 93, 0.10); color: var(--muted); }
+    .stage-title { font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--ink); }
     .stage p { margin-bottom: 8px; font-size: 14px; }
-    .stage ul { padding-left: 1.25em; margin: 8px 0 4px; }
+    .stage ul { padding-left: 1.2em; margin: 8px 0 4px; }
     .stage li { margin-bottom: 4px; font-size: 13.5px; color: var(--muted); }
-    .stage li strong { color: var(--text); }
+    .stage li strong { color: var(--ink); }
 
-    footer { max-width: 760px; margin: 48px auto 0; padding-top: 24px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted); line-height: 1.7; }
+    footer { max-width: 780px; margin: 48px auto 0; padding-top: 20px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); line-height: 1.7; }
     footer .footer-links { font-family: var(--font-mono); font-size: 12px; display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 20px; }
-    footer .disclaimer { font-size: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+    footer .footer-links a { color: var(--ink); }
+    footer .footer-links a:hover { color: var(--lobster); text-decoration: none; }
+    footer .disclaimer { font-size: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
 
     @media (max-width: 640px) {
-      header { flex-direction: column; gap: 8px; }
+      .site-header-inner { gap: 8px; }
       .site-nav { margin-left: 0; }
       .doc-title { font-size: 24px; }
     }
@@ -106,18 +116,22 @@
   <script defer src="/analytics.js"></script>
 </head>
 <body data-page-type="roadmap">
-  <div class="page">
-
-    <header>
+  <header class="site-header">
+    <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
-      <span class="tagline">AI Trust Registry</span>
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
-        <a href="/badges/">Badges</a>
-        <span class="active">Roadmap</span>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
       </nav>
-    </header>
+    </div>
+  </header>
+  <div class="page">
 
     <article class="content">
       <h1 class="doc-title">Roadmap</h1>
@@ -216,13 +230,23 @@
     </article>
 
     <footer>
-      <div class="footer-links">
-        <a href="/">← Leaderboard</a>
-        <a href="/methodology">Methodology</a>
-        <a href="/badges/">Badges</a>
-        <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">Source code</a>
-      </div>
-      <p class="disclaimer">HVTracker is not affiliated with any of the projects listed. Roadmap items are intentions, not commitments — priorities shift as we learn what matters most to maintainers and users.</p>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
 
   </div>

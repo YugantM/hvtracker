@@ -539,7 +539,7 @@ def compute_trust_score(row: dict) -> dict:
 
     # ── Identity / Provenance (18) ──
     ls = row.get("listing_status", "")
-    listed01 = 1.0 if ls == "listed" else 0.0
+    listed01 = 1.0 if ls in ("listed", "warning") else 0.0
     identity = round((0.6 * listed01 + 0.4 * prov) * 18, 1)
 
     # ── Transparency (17) ──
@@ -756,6 +756,87 @@ def agent_review_insights(row: dict) -> dict:
         "weakest": weakest,
         "improvement": improvement,
     }
+
+
+def agent_remediation_steps(row: dict) -> list[dict]:
+    """Return concrete, evidence-backed trust improvements for maintainers."""
+    steps = []
+    license_type = row.get("license_type") or "unlicensed"
+    if license_type in {"unlicensed", "proprietary"}:
+        steps.append({
+            "label": "Declare an open license",
+            "detail": "Publish a clear OSI-approved license so usage and maintenance terms are independently verifiable.",
+        })
+    if row.get("scorecard_score") is None:
+        steps.append({
+            "label": "Add Scorecard coverage",
+            "detail": "Expose the repository to OpenSSF Scorecard checks so supply-chain posture is easier to verify.",
+        })
+    elif (row.get("scorecard_score") or 0) < 7:
+        steps.append({
+            "label": "Raise Scorecard signals",
+            "detail": f"Current OSSF Scorecard is {row.get('scorecard_score'):.1f}/10. Tighten the weakest checks to improve public safety evidence.",
+        })
+    if not row.get("has_provenance"):
+        steps.append({
+            "label": "Publish provenance",
+            "detail": "Add package provenance or release attestations so users can verify where shipped artifacts came from.",
+        })
+    signed_ratio = row.get("signed_commits_ratio")
+    if signed_ratio is None or signed_ratio < 0.5:
+        steps.append({
+            "label": "Increase signed commits",
+            "detail": "Raise the share of verified-signed commits to make maintainer identity and release history easier to trust.",
+        })
+    days_ago = row.get("days_ago")
+    if days_ago is not None and days_ago > 30:
+        steps.append({
+            "label": "Refresh maintenance signals",
+            "detail": f"The repo was last pushed {days_ago} days ago. Fresh activity helps separate stable projects from stale ones.",
+        })
+    if not steps:
+        steps.append({
+            "label": "Keep signals current",
+            "detail": "Trust posture is already in a healthy range. The main job is to keep provenance, maintenance, and public evidence fresh.",
+        })
+    return steps[:4]
+
+
+def decorate_registry_states(rows: list[dict], legacy_rows: list[dict], violations: list[dict]) -> None:
+    """Attach display state and warning context to rendered rows."""
+    violations_by_repo: dict[str, list[dict]] = {}
+    for violation in violations:
+        violations_by_repo.setdefault(violation["repo"].lower(), []).append(violation)
+
+    for row in rows + legacy_rows:
+        listing_status = row.get("listing_status", "listed")
+        row_violations = violations_by_repo.get(row["repo"].lower(), [])
+        has_warning = bool(row_violations) and listing_status in ("listed", "warning")
+        if has_warning:
+            row["listing_status"] = "warning"
+            listing_status = "warning"
+        elif listing_status == "warning" and not row_violations:
+            row["listing_status"] = "listed"
+            listing_status = "listed"
+        tone = {
+            "listed": "positive",
+            "warning": "negative",
+            "legacy": "muted",
+            "rejected": "negative",
+            "delisted": "negative",
+        }.get(listing_status, "neutral")
+        label = {
+            "listed": "Listed",
+            "warning": "Needs review",
+            "legacy": "Legacy",
+            "rejected": "Rejected",
+            "delisted": "Delisted",
+        }.get(listing_status, str(listing_status).replace("_", " ").title())
+        row["warning_reasons"] = row_violations
+        row["has_warning"] = has_warning
+        row["display_listing_status"] = listing_status
+        row["display_status_label"] = label
+        row["display_status_tone"] = tone
 
 
 def agent_safety_qa(row: dict) -> dict:
@@ -979,12 +1060,28 @@ def select_completed_history_window(history: list[dict], window: int = 7) -> tup
     return latest, baseline
 
 
-def compute_movers(history: list[dict], slug_map: dict[str, str] | None = None, window: int = 7) -> dict:
-    """Compare latest snapshot vs `window` days ago. Returns {up: [...], down: [...]}."""
-    latest, baseline = select_completed_history_window(history, window)
+def select_daily_pair(history: list[dict]) -> tuple[dict | None, dict | None]:
+    """Return the two most recent completed daily snapshots (today excluded)."""
+    if len(history) < 2:
+        return None, None
+
+    today_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    completed = history
+    if history[-1].get("_date") == today_utc and len(history) >= 2:
+        completed = history[:-1]
+    if len(completed) < 2:
+        return None, None
+
+    return completed[-1], completed[-2]
+
+
+def compute_movers(history: list[dict], slug_map: dict[str, str] | None = None, rows: list[dict] | None = None) -> dict:
+    """Compare the two most recent completed daily snapshots. Returns {up: [...], down: [...]}."""
+    latest, baseline = select_daily_pair(history)
     if not latest or not baseline:
         return {"up": [], "down": []}
     old_ranks = {a["repo"].lower(): a["rank"] for a in baseline.get("agents", [])}
+    rows_by_repo = {r.get("repo", "").lower(): r for r in (rows or [])}
     movers = []
     for a in latest.get("agents", []):
         repo = a["repo"].lower()
@@ -993,8 +1090,12 @@ def compute_movers(history: list[dict], slug_map: dict[str, str] | None = None, 
             continue
         delta = old - a["rank"]  # positive = improved
         if delta != 0:
+            current = rows_by_repo.get(repo, {})
             movers.append({"name": a["name"], "slug": (slug_map or {}).get(repo, slugify(a["name"])),
-                           "rank": a["rank"], "delta": delta, "score": a["score"]})
+                           "rank": a["rank"], "delta": delta, "score": a["score"],
+                           "category": current.get("category", ""),
+                           "evidence_grade": current.get("evidence_grade", ""),
+                           "language": current.get("language", "")})
     movers.sort(key=lambda m: m["delta"], reverse=True)
     up = [m for m in movers if m["delta"] > 0][:3]
     down = [m for m in movers if m["delta"] < 0][-3:]
@@ -1080,7 +1181,7 @@ def render_sparkline_svg(points: list[dict], width: int = 200, height: int = 40)
 
 def render_bar_chart_svg(items: list[dict], label_key: str, value_key: str,
                          width: int = 680, row_height: int = 34,
-                         accent: str = "#2dd4bf", max_items: int = 10,
+                         accent: str = "#2f6846", max_items: int = 10,
                          grad_id: str = "barGrad") -> str:
     """Render a compact horizontal SVG chart for generated discovery pages."""
     chart_items = [item for item in items[:max_items] if item.get(value_key) is not None]
@@ -1102,14 +1203,14 @@ def render_bar_chart_svg(items: list[dict], label_key: str, value_key: str,
         label = escape(str(item.get(label_key, ""))[:32])
         display = f"{raw_value:+.0f}" if raw_value < 0 else f"{raw_value:.0f}"
         rows.append(
-            f'<text x="0" y="{y + 14}" fill="#eef2f6" font-size="12" font-family="Hanken Grotesk, sans-serif">{label}</text>'
-            f'<rect x="{label_w}" y="{y}" width="{inner_w}" height="18" rx="4" fill="rgba(255,255,255,0.055)"/>'
+            f'<text x="0" y="{y + 14}" fill="#1a1a1a" font-size="12" font-family="Hanken Grotesk, sans-serif">{label}</text>'
+            f'<rect x="{label_w}" y="{y}" width="{inner_w}" height="18" rx="4" fill="rgba(0,0,0,0.04)"/>'
             f'<rect x="{label_w}" y="{y}" width="{bar_w}" height="18" rx="4" fill="url(#{grad_id})"/>'
-            f'<text x="{width - value_w}" y="{y + 14}" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">{escape(display)}</text>'
+            f'<text x="{width - value_w}" y="{y + 14}" fill="#6b6560" font-size="11" font-family="IBM Plex Mono, monospace">{escape(display)}</text>'
         )
     return (
         f'<svg class="insight-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img">'
-        f'<defs><linearGradient id="{grad_id}" x1="0" x2="1"><stop offset="0" stop-color="{accent}"/><stop offset="1" stop-color="#d8a657"/></linearGradient></defs>'
+        f'<defs><linearGradient id="{grad_id}" x1="0" x2="1"><stop offset="0" stop-color="{accent}"/><stop offset="1" stop-color="#8b6914"/></linearGradient></defs>'
         + "".join(rows) +
         '</svg>'
     )
@@ -1128,7 +1229,7 @@ def render_distribution_svg(groups: list[dict], width: int = 680, height: int = 
         if value <= 0:
             continue
         w = round(value / total * width, 1)
-        color = group.get("color") or "#8fb3ff"
+        color = group.get("color") or "#2c5282"
         label = escape(str(group.get("label", "")))
         segments.append(f'<rect x="{x}" y="22" width="{w}" height="28" rx="5" fill="{color}" opacity="0.88"/>')
         labels.append(
@@ -1138,7 +1239,7 @@ def render_distribution_svg(groups: list[dict], width: int = 680, height: int = 
     legend = f'<foreignObject x="0" y="64" width="{width}" height="46"><div xmlns="http://www.w3.org/1999/xhtml" class="chart-legend">{"".join(labels)}</div></foreignObject>'
     return (
         f'<svg class="insight-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img">'
-        f'<rect x="0" y="22" width="{width}" height="28" rx="5" fill="rgba(255,255,255,0.055)"/>'
+        f'<rect x="0" y="22" width="{width}" height="28" rx="5" fill="rgba(0,0,0,0.04)"/>'
         + "".join(segments) + legend + '</svg>'
     )
 
@@ -1183,14 +1284,14 @@ def render_diverging_bar_svg(items: list[dict], label_key: str, value_key: str,
         y = 22 + index * row_height
         bar_w = abs(raw) / abs_max * (bar_area / 2)
         label = escape(str(item.get(label_key, ""))[:24])
-        color = "#2dd4bf" if raw > 0 else "#e8798b"
+        color = "#2f6846" if raw > 0 else "#9b3c3c"
         display = f"{raw:+.0f}"
         if raw >= 0:
             bx = center_x
         else:
             bx = center_x - bar_w
         rows.append(
-            f'<text x="{label_w - 8:.0f}" y="{y + 13}" text-anchor="end" fill="#eef2f6" font-size="11.5" '
+            f'<text x="{label_w - 8:.0f}" y="{y + 13}" text-anchor="end" fill="#1a1a1a" font-size="11.5" '
             f'font-family="Hanken Grotesk, sans-serif">{label}</text>'
             f'<rect x="{bx:.1f}" y="{y}" width="{bar_w:.1f}" height="18" rx="4" fill="{color}" opacity="0.82"/>'
             f'<text x="{width - value_w + 4:.0f}" y="{y + 13}" fill="{color}" font-size="11" '
@@ -1200,7 +1301,7 @@ def render_diverging_bar_svg(items: list[dict], label_key: str, value_key: str,
     return (
         f'<svg class="insight-chart diverging-chart" xmlns="http://www.w3.org/2000/svg" '
         f'viewBox="0 0 {width} {height}" role="img" aria-label="{escape(title)}">'
-        f'<rect x="0" y="0" width="{width}" height="{height}" rx="12" fill="rgba(255,255,255,.018)"/>'
+        f'<rect x="0" y="0" width="{width}" height="{height}" rx="12" fill="rgba(0,0,0,.02)"/>'
         f'<line x1="{center_x:.1f}" y1="14" x2="{center_x:.1f}" y2="{height - 8}" '
         f'stroke="rgba(238,242,246,.2)" stroke-dasharray="4 5"/>'
         + "".join(rows) +
@@ -1215,7 +1316,7 @@ def render_radial_bar_svg(agents: list[dict], width: int = 720, height: int = 43
     chart_items = [a for a in agents[:max_items] if a.get("trust_score")]
     if not chart_items:
         return ""
-    grade_colors = {"A": "#2dd4bf", "B": "#8fb3ff", "C": "#d8a657", "D": "#e8798b"}
+    grade_colors = {"A": "#2f6846", "B": "#2c5282", "C": "#8b6914", "D": "#9b3c3c"}
     n = len(chart_items)
 
     chart_r_area = min(width * 0.48, height * 0.48)
@@ -1232,7 +1333,7 @@ def render_radial_bar_svg(agents: list[dict], width: int = 720, height: int = 43
     for index, agent in enumerate(chart_items):
         score = float(agent.get("trust_score") or 0)
         grade = agent.get("evidence_grade", "D")
-        color = grade_colors.get(grade, "#8fb3ff")
+        color = grade_colors.get(grade, "#2c5282")
         r = inner_r + index * (ring_w + ring_gap) + ring_w / 2
         sweep = score / 100 * 270
         name = escape(str(agent.get("name", ""))[:22])
@@ -1244,7 +1345,7 @@ def render_radial_bar_svg(agents: list[dict], width: int = 720, height: int = 43
         bg_y2 = cy + r * math.sin(math.radians(bg_end))
         arcs.append(
             f'<path d="M {bg_x1:.1f} {bg_y1:.1f} A {r:.1f} {r:.1f} 0 1 1 {bg_x2:.1f} {bg_y2:.1f}" '
-            f'fill="none" stroke="rgba(255,255,255,.06)" stroke-width="{ring_w:.1f}" stroke-linecap="round"/>'
+            f'fill="none" stroke="rgba(0,0,0,.06)" stroke-width="{ring_w:.1f}" stroke-linecap="round"/>'
         )
 
         end_angle = start_angle + sweep
@@ -1275,24 +1376,24 @@ def render_radial_bar_svg(agents: list[dict], width: int = 720, height: int = 43
     legend_top = max(20, (height - n * row_h) / 2)
     for index, agent in enumerate(chart_items):
         grade = agent.get("evidence_grade", "D")
-        color = grade_colors.get(grade, "#8fb3ff")
+        color = grade_colors.get(grade, "#2c5282")
         name = escape(str(agent.get("name", ""))[:22])
         ly = legend_top + index * row_h
         labels.append(
             f'<text x="{legend_x}" y="{ly + 12}" fill="{color}" font-size="10" font-weight="700" '
             f'font-family="IBM Plex Mono, monospace">{index + 1}</text>'
-            f'<text x="{legend_x + 20}" y="{ly + 12}" fill="#eef2f6" font-size="11" '
+            f'<text x="{legend_x + 20}" y="{ly + 12}" fill="#1a1a1a" font-size="11" '
             f'font-family="Hanken Grotesk, sans-serif" opacity="{0.95 if index < 8 else 0.6}">{name}</text>'
         )
 
     # Grade legend at bottom-left
     grade_y = height - 18
     grade_legend = []
-    for i, (grade, color) in enumerate([("A", "#2dd4bf"), ("B", "#8fb3ff"), ("C", "#d8a657"), ("D", "#e8798b")]):
+    for i, (grade, color) in enumerate([("A", "#2f6846"), ("B", "#2c5282"), ("C", "#8b6914"), ("D", "#9b3c3c")]):
         gx = legend_x + i * 52
         grade_legend.append(
             f'<circle cx="{gx}" cy="{grade_y}" r="3.5" fill="{color}" opacity="0.8"/>'
-            f'<text x="{gx + 7}" y="{grade_y + 3.5}" fill="#a8b3c2" font-size="9" '
+            f'<text x="{gx + 7}" y="{grade_y + 3.5}" fill="#6b6560" font-size="9" '
             f'font-family="IBM Plex Mono, monospace">{grade}</text>'
         )
 
@@ -1301,7 +1402,7 @@ def render_radial_bar_svg(agents: list[dict], width: int = 720, height: int = 43
         f'viewBox="0 0 {width} {height}" role="img" aria-label="{escape(title)}">'
         f'<defs><filter id="arcGlow"><feGaussianBlur stdDeviation="2" result="b"/>'
         f'<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'
-        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)" stroke="rgba(255,255,255,.10)" stroke-width="1"/>'
+        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(0,0,0,.02)" stroke="rgba(0,0,0,.10)" stroke-width="1"/>'
         f'<g filter="url(#arcGlow)">{"".join(arcs)}</g>'
         + "".join(labels) + "".join(grade_legend) +
         '</svg>'
@@ -1350,7 +1451,7 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
 
     zero_x = sx(mid_x)
     zero_y = sy(mid_y)
-    grade_colors = {"A": "#2dd4bf", "B": "#8fb3ff", "C": "#d8a657", "D": "#e8798b"}
+    grade_colors = {"A": "#2f6846", "B": "#2c5282", "C": "#8b6914", "D": "#9b3c3c"}
     dots = []
     marker_labels = []
     legend_items = []
@@ -1359,7 +1460,7 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
         x = sx(float(item.get(x_key) or 0))
         y = sy(float(item.get(y_key) or 0))
         grade = item.get("evidence_grade", "")
-        color = item.get("color") or grade_colors.get(grade, "#8fb3ff")
+        color = item.get("color") or grade_colors.get(grade, "#2c5282")
         radius = 5.5 + min(math.log1p(item.get("stars") or 0) / math.log1p(100_000), 1.0) * 7
         for attempt in range(6):
             if not any(math.hypot(x - px, y - py) < (radius + pr) * 0.72 for px, py, pr in placed_points):
@@ -1373,7 +1474,7 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
         opacity = 0.96 if index < 10 else 0.62
         dots.append(
             f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{radius:.1f}" fill="{color}" opacity="{opacity}" '
-            f'stroke="rgba(255,255,255,.78)" stroke-width="1.1"/>'
+            f'stroke="rgba(0,0,0,.6)" stroke-width="1.1"/>'
         )
         if index < 8:
             marker_labels.append(
@@ -1387,28 +1488,28 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
             legend_items.append(
                 f'<text x="{lx:.1f}" y="{ly:.1f}" fill="{color}" font-size="10" font-weight="700" '
                 f'font-family="IBM Plex Mono, monospace">{index + 1}</text>'
-                f'<text x="{lx + 16:.1f}" y="{ly:.1f}" fill="#eef2f6" font-size="10" '
+                f'<text x="{lx + 16:.1f}" y="{ly:.1f}" fill="#1a1a1a" font-size="10" '
                 f'font-family="IBM Plex Mono, monospace">{name}</text>'
             )
 
     grid = []
     for pct in (0, 25, 50, 75, 100):
         y = sy(y_min + (y_max - y_min) * pct / 100)
-        grid.append(f'<line x1="{left}" y1="{y:.1f}" x2="{width - right}" y2="{y:.1f}" stroke="rgba(255,255,255,.075)"/>')
+        grid.append(f'<line x1="{left}" y1="{y:.1f}" x2="{width - right}" y2="{y:.1f}" stroke="rgba(0,0,0,.06)"/>')
         grid.append(f'<text x="{left - 12}" y="{y + 4:.1f}" text-anchor="end" fill="#7f8a99" font-size="10" font-family="IBM Plex Mono, monospace">{pct}</text>')
     for pct in (0, 25, 50, 75, 100):
         value = x_min + (x_max - x_min) * pct / 100
         x = sx(value)
-        grid.append(f'<line x1="{x:.1f}" y1="{top}" x2="{x:.1f}" y2="{top + plot_h}" stroke="rgba(255,255,255,.055)"/>')
+        grid.append(f'<line x1="{x:.1f}" y1="{top}" x2="{x:.1f}" y2="{top + plot_h}" stroke="rgba(0,0,0,.04)"/>')
 
     q1, q2, q3, q4 = quadrant_labels or (
         "strong benchmark fit", "trusted, needs proof", "evidence ahead of trust", "watchlist"
     )
     q_labels = (
-        '<text x="{right_x}" y="{q1_y}" text-anchor="end" fill="#2dd4bf" font-size="11" font-family="IBM Plex Mono, monospace">{q1}</text>'
-        '<text x="{left_x}" y="{top_y}" fill="#8fb3ff" font-size="11" font-family="IBM Plex Mono, monospace">{q2}</text>'
-        '<text x="{right_x}" y="{bottom_y}" text-anchor="end" fill="#d8a657" font-size="11" font-family="IBM Plex Mono, monospace">{q3}</text>'
-        '<text x="{left_x}" y="{bottom_y}" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">{q4}</text>'
+        '<text x="{right_x}" y="{q1_y}" text-anchor="end" fill="#2f6846" font-size="11" font-family="IBM Plex Mono, monospace">{q1}</text>'
+        '<text x="{left_x}" y="{top_y}" fill="#2c5282" font-size="11" font-family="IBM Plex Mono, monospace">{q2}</text>'
+        '<text x="{right_x}" y="{bottom_y}" text-anchor="end" fill="#8b6914" font-size="11" font-family="IBM Plex Mono, monospace">{q3}</text>'
+        '<text x="{left_x}" y="{bottom_y}" fill="#6b6560" font-size="11" font-family="IBM Plex Mono, monospace">{q4}</text>'
     ).format(
         right_x=width - right - 12,
         left_x=left + 12,
@@ -1424,20 +1525,20 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
     return (
         f'<svg class="insight-chart quadrant-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img" aria-label="{escape(title)}">'
         '<defs>'
-        '<radialGradient id="scatterGlow" cx="50%" cy="45%" r="70%"><stop offset="0" stop-color="rgba(143,179,255,.22)"/><stop offset="1" stop-color="rgba(143,179,255,0)"/></radialGradient>'
+        '<radialGradient id="scatterGlow" cx="50%" cy="45%" r="70%"><stop offset="0" stop-color="rgba(44,82,130,.06)"/><stop offset="1" stop-color="rgba(44,82,130,0)"/></radialGradient>'
         '<filter id="dotGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
         '</defs>'
-        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)" stroke="rgba(255,255,255,.10)" stroke-width="1"/>'
-        f'<rect x="{left}" y="{top}" width="{plot_w}" height="{plot_h}" rx="12" fill="url(#scatterGlow)" stroke="rgba(255,255,255,.11)"/>'
+        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(0,0,0,.02)" stroke="rgba(0,0,0,.10)" stroke-width="1"/>'
+        f'<rect x="{left}" y="{top}" width="{plot_w}" height="{plot_h}" rx="12" fill="url(#scatterGlow)" stroke="rgba(0,0,0,.08)"/>'
         + "".join(grid) +
         f'<line x1="{zero_x:.1f}" y1="{top}" x2="{zero_x:.1f}" y2="{top + plot_h}" stroke="rgba(238,242,246,.24)" stroke-dasharray="5 6"/>'
         f'<line x1="{left}" y1="{zero_y:.1f}" x2="{width - right}" y2="{zero_y:.1f}" stroke="rgba(238,242,246,.24)" stroke-dasharray="5 6"/>'
         + q_labels +
         f'<g filter="url(#dotGlow)">{"".join(dots)}</g>{"".join(marker_labels)}'
-        f'<rect x="{left}" y="{height - 101}" width="{plot_w}" height="65" rx="10" fill="rgba(7,10,14,.42)" stroke="rgba(255,255,255,.08)"/>'
+        f'<rect x="{left}" y="{height - 101}" width="{plot_w}" height="65" rx="10" fill="rgba(7,10,14,.42)" stroke="rgba(0,0,0,.08)"/>'
         + "".join(legend_items) +
-        f'<text x="{left + plot_w / 2:.1f}" y="{height - 24}" text-anchor="middle" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">{escape(x_label)}</text>'
-        f'<text transform="translate(20 {top + plot_h / 2:.1f}) rotate(-90)" text-anchor="middle" fill="#a8b3c2" font-size="11" font-family="IBM Plex Mono, monospace">{escape(y_label)}</text>'
+        f'<text x="{left + plot_w / 2:.1f}" y="{height - 24}" text-anchor="middle" fill="#6b6560" font-size="11" font-family="IBM Plex Mono, monospace">{escape(x_label)}</text>'
+        f'<text transform="translate(20 {top + plot_h / 2:.1f}) rotate(-90)" text-anchor="middle" fill="#6b6560" font-size="11" font-family="IBM Plex Mono, monospace">{escape(y_label)}</text>'
         '</svg>'
     )
 
@@ -1456,7 +1557,7 @@ def render_radar_svg(metrics: list[dict], width: int = 430, height: int = 430,
         for index in range(len(axes)):
             angle = -math.pi / 2 + index * 2 * math.pi / len(axes)
             pts.append(f'{cx + math.cos(angle) * radius * level:.1f},{cy + math.sin(angle) * radius * level:.1f}')
-        levels.append(f'<polygon points="{" ".join(pts)}" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="1"/>')
+        levels.append(f'<polygon points="{" ".join(pts)}" fill="none" stroke="rgba(0,0,0,.10)" stroke-width="1"/>')
 
     area_pts = []
     spokes = []
@@ -1465,7 +1566,7 @@ def render_radar_svg(metrics: list[dict], width: int = 430, height: int = 430,
         angle = -math.pi / 2 + index * 2 * math.pi / len(axes)
         pct = _clamp(float(metric.get("value") or 0) / float(metric.get("max") or 1), 0, 1)
         area_pts.append(f'{cx + math.cos(angle) * radius * pct:.1f},{cy + math.sin(angle) * radius * pct:.1f}')
-        spokes.append(f'<line x1="{cx:.1f}" y1="{cy:.1f}" x2="{cx + math.cos(angle) * radius:.1f}" y2="{cy + math.sin(angle) * radius:.1f}" stroke="rgba(255,255,255,.12)"/>')
+        spokes.append(f'<line x1="{cx:.1f}" y1="{cy:.1f}" x2="{cx + math.cos(angle) * radius:.1f}" y2="{cy + math.sin(angle) * radius:.1f}" stroke="rgba(0,0,0,.10)"/>')
         lx = cx + math.cos(angle) * (radius + 42)
         ly = cy + math.sin(angle) * (radius + 32)
         anchor = "middle"
@@ -1476,20 +1577,20 @@ def render_radar_svg(metrics: list[dict], width: int = 430, height: int = 430,
         label = escape(str(metric.get("label", ""))[:18])
         value = round(pct * 100)
         labels.append(
-            f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" fill="#eef2f6" font-size="11" font-family="Hanken Grotesk, sans-serif">{label}</text>'
-            f'<text x="{lx:.1f}" y="{ly + 14:.1f}" text-anchor="{anchor}" fill="#8fb3ff" font-size="10" font-family="IBM Plex Mono, monospace">{value}%</text>'
+            f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" fill="#1a1a1a" font-size="11" font-family="Hanken Grotesk, sans-serif">{label}</text>'
+            f'<text x="{lx:.1f}" y="{ly + 14:.1f}" text-anchor="{anchor}" fill="#2c5282" font-size="10" font-family="IBM Plex Mono, monospace">{value}%</text>'
         )
 
     return (
         f'<svg class="insight-chart radar-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img" aria-label="{escape(title)}">'
         '<defs>'
-        '<linearGradient id="radarFill" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset=".62" stop-color="#8fb3ff"/><stop offset="1" stop-color="#d8a657"/></linearGradient>'
+        '<linearGradient id="radarFill" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#2f6846"/><stop offset=".62" stop-color="#2c5282"/><stop offset="1" stop-color="#8b6914"/></linearGradient>'
         '<filter id="radarGlow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
         '</defs>'
-        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)" stroke="rgba(255,255,255,.10)" stroke-width="1"/>'
+        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(0,0,0,.02)" stroke="rgba(0,0,0,.10)" stroke-width="1"/>'
         + "".join(levels) + "".join(spokes) +
         f'<polygon points="{" ".join(area_pts)}" fill="url(#radarFill)" opacity=".28" stroke="url(#radarFill)" stroke-width="2.2" filter="url(#radarGlow)"/>'
-        f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="3" fill="#eef2f6" opacity=".75"/>'
+        f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="3" fill="#1a1a1a" opacity=".75"/>'
         + "".join(labels) +
         '</svg>'
     )
@@ -1533,7 +1634,7 @@ ACTIVITY_AXES = [
 def render_stacked_radar_svg(agents: list[dict], mode: str = "trust",
                               width: int = 430, height: int = 430,
                               title: str = "Stacked radar",
-                              color: str = "#2dd4bf") -> str:
+                              color: str = "#2f6846") -> str:
     """Render overlapping low-opacity radar polygons — one per agent — with average on top."""
     if mode == "trust":
         axis_defs = [(label.split(" / ")[0], mx) for _, (label, mx) in TRUST_DIMENSIONS.items()]
@@ -1555,7 +1656,7 @@ def render_stacked_radar_svg(agents: list[dict], mode: str = "trust",
             f'{cx + math.cos(a) * radius * level:.1f},{cy + math.sin(a) * radius * level:.1f}'
             for a in angles
         )
-        levels.append(f'<polygon points="{pts}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="0.5"/>')
+        levels.append(f'<polygon points="{pts}" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/>')
 
     # Spokes — fine hairlines
     spokes = []
@@ -1563,7 +1664,7 @@ def render_stacked_radar_svg(agents: list[dict], mode: str = "trust",
         spokes.append(
             f'<line x1="{cx:.1f}" y1="{cy:.1f}" '
             f'x2="{cx + math.cos(a) * radius:.1f}" y2="{cy + math.sin(a) * radius:.1f}" '
-            f'stroke="rgba(255,255,255,.08)" stroke-width="0.5"/>'
+            f'stroke="rgba(0,0,0,.08)" stroke-width="0.5"/>'
         )
 
     # Individual agent polygons (stacked, low opacity)
@@ -1618,9 +1719,9 @@ def render_stacked_radar_svg(agents: list[dict], mode: str = "trust",
         short_label = escape(str(label)[:14])
         value = round(avg_pcts[i] * 100)
         labels.append(
-            f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" fill="#eef2f6" '
+            f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" fill="#1a1a1a" '
             f'font-size="10" font-family="Hanken Grotesk, sans-serif">{short_label}</text>'
-            f'<text x="{lx:.1f}" y="{ly + 12:.1f}" text-anchor="{anchor}" fill="#8fb3ff" '
+            f'<text x="{lx:.1f}" y="{ly + 12:.1f}" text-anchor="{anchor}" fill="#2c5282" '
             f'font-size="9" font-family="IBM Plex Mono, monospace">{value}%</text>'
         )
 
@@ -1629,20 +1730,20 @@ def render_stacked_radar_svg(agents: list[dict], mode: str = "trust",
         f'viewBox="0 0 {width} {height}" role="img" aria-label="{escape(title)}">'
         f'<defs><filter id="sGlow"><feGaussianBlur stdDeviation="3" result="b"/>'
         f'<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'
-        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(255,255,255,.018)" stroke="rgba(255,255,255,.10)" stroke-width="1"/>'
+        f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(0,0,0,.02)" stroke="rgba(0,0,0,.10)" stroke-width="1"/>'
         + "".join(levels) + "".join(spokes)
         + "".join(polys)
         + f'<polygon points="{avg_pts}" fill="{color}" opacity="0.12" '
         f'stroke="{color}" stroke-width="1.2" stroke-opacity="0.55" filter="url(#sGlow)"/>'
-        f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="2" fill="#eef2f6" opacity=".6"/>'
+        f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="2" fill="#1a1a1a" opacity=".6"/>'
         + "".join(labels) +
         '</svg>'
     )
 
 
-def compute_movers_page_data(rows: list[dict], history: list[dict], window: int = 7) -> dict:
-    """Return richer mover rows and charts for the generated movers page."""
-    latest, baseline = select_completed_history_window(history, window)
+def compute_movers_page_data(rows: list[dict], history: list[dict]) -> dict:
+    """Return richer mover rows and charts for the daily movers page."""
+    latest, baseline = select_daily_pair(history)
     if not latest or not baseline:
         return {
             "up": [],
@@ -1657,11 +1758,13 @@ def compute_movers_page_data(rows: list[dict], history: list[dict], window: int 
     latest_rows = latest.get("agents", [])
     latest_by_repo = {a.get("repo", "").lower(): a for a in latest_rows}
     old_by_repo = {a.get("repo", "").lower(): a for a in baseline.get("agents", [])}
+    current_by_repo = {r.get("repo", "").lower(): r for r in rows}
     movers = []
     for repo, row in latest_by_repo.items():
         old = old_by_repo.get(repo)
         if not old:
             continue
+        current = current_by_repo.get(repo, {})
         delta = (old.get("rank") or row.get("rank") or 0) - (row.get("rank") or 0)
         if delta == 0:
             continue
@@ -1671,11 +1774,19 @@ def compute_movers_page_data(rows: list[dict], history: list[dict], window: int 
             "repo": row["repo"],
             "category": row.get("category") or "Uncategorized",
             "rank": row.get("rank"),
+            "old_rank": old.get("rank"),
             "delta": delta,
             "trust_score": row.get("trust_score") or 0,
             "evidence_grade": row.get("evidence_grade", "D"),
             "score": row.get("score") or 0,
             "stars": row.get("stars") or 0,
+            "listing_status": current.get("listing_status", row.get("listing_status", "listed")),
+            "display_listing_status": current.get("display_listing_status", row.get("listing_status", "listed")),
+            "display_status_label": current.get("display_status_label", current.get("display_listing_status", row.get("listing_status", "listed")).replace("_", " ").title()),
+            "has_warning": current.get("has_warning", False),
+            "warning_reasons": current.get("warning_reasons", []),
+            "recent_change_summary": current.get("recent_change_summary"),
+            "language": current.get("language", ""),
         })
     up = sorted([m for m in movers if m["delta"] > 0], key=lambda m: m["delta"], reverse=True)[:12]
     down = sorted([m for m in movers if m["delta"] < 0], key=lambda m: m["delta"])[:12]
@@ -1694,10 +1805,10 @@ def compute_movers_page_data(rows: list[dict], history: list[dict], window: int 
         "latest_date": latest.get("_date"),
         "baseline_date": baseline.get("_date"),
         "radar_up_svg": render_stacked_radar_svg(
-            up_rows, mode="trust", title="Rising agents — trust profile", color="#2dd4bf",
+            up_rows, mode="trust", title="Rising agents — trust profile", color="#2f6846",
         ),
         "radar_down_svg": render_stacked_radar_svg(
-            down_rows, mode="trust", title="Falling agents — trust profile", color="#e8798b",
+            down_rows, mode="trust", title="Falling agents — trust profile", color="#9b3c3c",
         ),
     }
 
@@ -1762,30 +1873,40 @@ def render_event_timeline_svg(events: list[dict]) -> str:
         return ""
     labels = {
         "listed": "Listed",
+        "listing_state_changed": "State",
         "score_changed": "Score",
+        "trust_score_changed": "HVTrust",
         "rank_changed": "Rank",
         "stale_warning": "Stale",
         "freshness_restored": "Fresh",
         "scorecard_added": "Scorecard",
+        "scorecard_removed": "Scorecard",
         "provenance_added": "Provenance",
+        "provenance_removed": "Provenance",
+        "license_changed": "License",
         "delisted": "Delisted",
     }
     colors = {
-        "listed": "#2dd4bf",
-        "score_changed": "#8fb3ff",
-        "rank_changed": "#d8a657",
-        "stale_warning": "#e8798b",
-        "freshness_restored": "#2dd4bf",
-        "scorecard_added": "#8fb3ff",
-        "provenance_added": "#2dd4bf",
-        "delisted": "#e8798b",
+        "listed": "#2f6846",
+        "listing_state_changed": "#6b6560",
+        "score_changed": "#2c5282",
+        "trust_score_changed": "#2f6846",
+        "rank_changed": "#8b6914",
+        "stale_warning": "#9b3c3c",
+        "freshness_restored": "#2f6846",
+        "scorecard_added": "#2c5282",
+        "scorecard_removed": "#9b3c3c",
+        "provenance_added": "#2f6846",
+        "provenance_removed": "#9b3c3c",
+        "license_changed": "#8b6914",
+        "delisted": "#9b3c3c",
     }
     counts: dict[str, int] = {}
     for event in events:
         event_type = event.get("type", "other")
         counts[event_type] = counts.get(event_type, 0) + 1
     groups = [
-        {"label": labels.get(event_type, event_type.replace("_", " ").title()), "value": value, "color": colors.get(event_type, "#a8b3c2")}
+        {"label": labels.get(event_type, event_type.replace("_", " ").title()), "value": value, "color": colors.get(event_type, "#6b6560")}
         for event_type, value in sorted(counts.items(), key=lambda item: item[1], reverse=True)
     ]
     return render_distribution_svg(groups, width=680, height=104)
@@ -1817,6 +1938,59 @@ def rank_delta_class(delta: int | None, is_new: bool) -> str:
     return "delta-down"
 
 
+VALID_LISTING_STATES = {"listed", "warning", "legacy", "rejected", "delisted"}
+
+EVENT_REASON_META = {
+    "listed": {"label": "Newly Listed", "short_label": "New", "tone": "positive"},
+    "delisted": {"label": "Removed From Active Tracking", "short_label": "Removed", "tone": "negative"},
+    "listing_state_changed": {"label": "Listing State Changed", "short_label": "State", "tone": "neutral"},
+    "warning_issued": {"label": "Warning Issued", "short_label": "Warning", "tone": "negative"},
+    "warning_cleared": {"label": "Warning Cleared", "short_label": "Cleared", "tone": "positive"},
+    "score_changed": {"label": "Activity Score Changed", "short_label": "Activity", "tone": "neutral"},
+    "trust_score_changed": {"label": "HVTrust Changed", "short_label": "HVTrust", "tone": "neutral"},
+    "rank_changed": {"label": "Rank Moved", "short_label": "Rank", "tone": "neutral"},
+    "stale_warning": {"label": "Activity Went Stale", "short_label": "Stale", "tone": "negative"},
+    "freshness_restored": {"label": "Activity Resumed", "short_label": "Fresh", "tone": "positive"},
+    "scorecard_added": {"label": "Scorecard Added", "short_label": "Scorecard", "tone": "positive"},
+    "scorecard_removed": {"label": "Scorecard Removed", "short_label": "Scorecard", "tone": "negative"},
+    "provenance_added": {"label": "Provenance Added", "short_label": "Provenance", "tone": "positive"},
+    "provenance_removed": {"label": "Provenance Removed", "short_label": "Provenance", "tone": "negative"},
+    "license_changed": {"label": "License Changed", "short_label": "License", "tone": "neutral"},
+}
+
+
+def make_agent_event(date: str, event_type: str, detail: str, *, reason_code: str | None = None) -> dict:
+    """Create a decorated, machine-readable agent event."""
+    meta = EVENT_REASON_META.get(event_type, {})
+    return {
+        "date": date,
+        "type": event_type,
+        "reason_code": reason_code or event_type,
+        "label": meta.get("label", event_type.replace("_", " ").title()),
+        "short_label": meta.get("short_label", event_type.replace("_", " ").title()),
+        "tone": meta.get("tone", "neutral"),
+        "detail": detail,
+    }
+
+
+def summarize_recent_events(events: list[dict]) -> dict | None:
+    """Return a compact homepage-friendly summary of recent changes."""
+    if not events:
+        return None
+    recent = sorted(events, key=lambda e: e["date"])
+    latest = recent[-1]
+    detail = latest.get("detail", "")
+    event_date = latest.get("date", "")
+    return {
+        "date": event_date,
+        "label": latest.get("label") or latest.get("type", "").replace("_", " ").title(),
+        "short_label": latest.get("short_label") or latest.get("type", "").replace("_", " ").title(),
+        "tone": latest.get("tone", "neutral"),
+        "detail": f"{event_date}: {detail}" if event_date and detail else detail,
+        "count": len(recent),
+    }
+
+
 def derive_agent_events(history_by_date: dict[str, dict[str, dict]], today_agents: dict[str, dict]) -> dict[str, list[dict]]:
     """Derive reputation events per agent by comparing daily snapshots.
 
@@ -1844,12 +2018,12 @@ def derive_agent_events(history_by_date: dict[str, dict[str, dict]], today_agent
 
             # First appearance → listed
             if curr and not prev:
-                repo_events.append({"date": curr_date, "type": "listed", "detail": f"First tracked at rank #{curr.get('rank', '?')}"})
+                repo_events.append(make_agent_event(curr_date, "listed", f"First tracked at rank #{curr.get('rank', '?')}", reason_code="listed"))
                 continue
 
             # Disappeared → delisted
             if prev and not curr:
-                repo_events.append({"date": curr_date, "type": "delisted", "detail": "Removed from active tracking"})
+                repo_events.append(make_agent_event(curr_date, "delisted", "Removed from active tracking", reason_code="delisted"))
                 continue
 
             if not prev or not curr:
@@ -1860,30 +2034,65 @@ def derive_agent_events(history_by_date: dict[str, dict[str, dict]], today_agent
             delta_score = cs - ps
             if abs(delta_score) >= 5:
                 direction = "up" if delta_score > 0 else "down"
-                repo_events.append({"date": curr_date, "type": "score_changed", "detail": f"Score {direction} {abs(delta_score):.0f}pts ({ps:.0f} → {cs:.0f})"})
+                repo_events.append(make_agent_event(curr_date, "score_changed", f"Activity score {direction} {abs(delta_score):.0f}pts ({ps:.0f} → {cs:.0f})", reason_code=f"activity_score_{direction}"))
+
+            # Trust score change ≥ 3 points
+            prev_trust = prev.get("trust_score")
+            curr_trust = curr.get("trust_score")
+            if prev_trust is not None and curr_trust is not None:
+                delta_trust = round(curr_trust - prev_trust, 1)
+                if abs(delta_trust) >= 3:
+                    direction = "up" if delta_trust > 0 else "down"
+                    repo_events.append(make_agent_event(curr_date, "trust_score_changed", f"HVTrust {direction} {abs(delta_trust):.1f}pts ({prev_trust:.1f} → {curr_trust:.1f})", reason_code=f"trust_score_{direction}"))
 
             # Rank change ≥ 10 positions
             pr, cr = prev.get("rank", 0) or 0, curr.get("rank", 0) or 0
             delta_rank = pr - cr  # positive = improved
             if abs(delta_rank) >= 10:
                 direction = "rose" if delta_rank > 0 else "dropped"
-                repo_events.append({"date": curr_date, "type": "rank_changed", "detail": f"Rank {direction} {abs(delta_rank)} spots (#{pr} → #{cr})"})
+                repo_events.append(make_agent_event(curr_date, "rank_changed", f"Rank {direction} {abs(delta_rank)} spots (#{pr} → #{cr})", reason_code=f"rank_{'up' if delta_rank > 0 else 'down'}"))
+
+            # Listing status changed
+            prev_status = prev.get("listing_status")
+            curr_status = curr.get("listing_status")
+            if prev_status and curr_status and prev_status != curr_status:
+                if curr_status == "warning" and prev_status == "listed":
+                    repo_events.append(make_agent_event(curr_date, "warning_issued", f"Warning: eligibility issues detected", reason_code="warning_issued"))
+                elif curr_status == "listed" and prev_status == "warning":
+                    repo_events.append(make_agent_event(curr_date, "warning_cleared", f"Warning cleared: eligibility issues resolved", reason_code="warning_cleared"))
+                else:
+                    repo_events.append(make_agent_event(curr_date, "listing_state_changed", f"Listing state changed from {prev_status} to {curr_status}", reason_code=f"listing_state_{curr_status}"))
 
             # Stale warning: crossed 90 days
             prev_days = prev.get("days_ago") or 0
             curr_days = curr.get("days_ago") or 0
             if prev_days < 90 and curr_days >= 90:
-                repo_events.append({"date": curr_date, "type": "stale_warning", "detail": f"No commits for {curr_days} days"})
+                repo_events.append(make_agent_event(curr_date, "stale_warning", f"No commits for {curr_days} days", reason_code="activity_stale"))
             elif prev_days >= 90 and curr_days < 90:
-                repo_events.append({"date": curr_date, "type": "freshness_restored", "detail": "Activity resumed"})
+                repo_events.append(make_agent_event(curr_date, "freshness_restored", "Activity resumed", reason_code="activity_resumed"))
 
             # Scorecard added
             if not prev.get("scorecard_score") and curr.get("scorecard_score"):
-                repo_events.append({"date": curr_date, "type": "scorecard_added", "detail": f"OSSF Scorecard: {curr['scorecard_score']:.1f}/10"})
+                repo_events.append(make_agent_event(curr_date, "scorecard_added", f"OSSF Scorecard: {curr['scorecard_score']:.1f}/10", reason_code="scorecard_added"))
+            elif prev.get("scorecard_score") and not curr.get("scorecard_score"):
+                repo_events.append(make_agent_event(curr_date, "scorecard_removed", "OSSF Scorecard no longer detected", reason_code="scorecard_removed"))
 
             # Provenance added
             if not prev.get("has_provenance") and curr.get("has_provenance"):
-                repo_events.append({"date": curr_date, "type": "provenance_added", "detail": "Package provenance attestation detected"})
+                repo_events.append(make_agent_event(curr_date, "provenance_added", "Package provenance attestation detected", reason_code="provenance_added"))
+            elif prev.get("has_provenance") and not curr.get("has_provenance"):
+                repo_events.append(make_agent_event(curr_date, "provenance_removed", "Package provenance attestation no longer detected", reason_code="provenance_removed"))
+
+            # License changed — compare like-for-like fields only.
+            prev_license_spdx = prev.get("license_spdx")
+            curr_license_spdx = curr.get("license_spdx")
+            if prev_license_spdx and curr_license_spdx and prev_license_spdx != curr_license_spdx:
+                repo_events.append(make_agent_event(curr_date, "license_changed", f"License changed from {prev_license_spdx} to {curr_license_spdx}", reason_code="license_changed"))
+            else:
+                prev_license_type = prev.get("license_type")
+                curr_license_type = curr.get("license_type")
+                if prev_license_type and curr_license_type and prev_license_type != curr_license_type:
+                    repo_events.append(make_agent_event(curr_date, "license_changed", f"License classification changed from {prev_license_type} to {curr_license_type}", reason_code="license_changed"))
 
     # Sort each agent's events chronologically
     for repo in events:
@@ -2010,6 +2219,7 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
                     "stars": snap_agent.get("stars"),
                 })
         agent_events = all_events.get(repo_key, [])
+        recent_changes = [e for e in agent_events if e["date"] >= (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%d")]
         # Machine-readable trust credential — the self-contained, versioned
         # payload an A2A client consumes to decide whether to trust this agent.
         # `signature` is reserved for Phase C (Ed25519 signing in CI); until
@@ -2029,7 +2239,8 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
             "signature": None,
         }
         agent_doc = {**meta, **agent, "trust_credential": trust_credential,
-                     "history": history_points, "events": agent_events}
+                     "history": history_points, "events": agent_events,
+                     "recent_changes": recent_changes}
         with open(os.path.join(data_dir, "agents", f"{slug}.json"), "w", encoding="utf-8") as f:
             json.dump(agent_doc, f, separators=(",", ":"), ensure_ascii=False)
 
@@ -2072,30 +2283,93 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
 <head>
   <meta charset="utf-8">
   <title>HVTracker — Data Endpoints</title>
-  <link rel="stylesheet" href="/spec/spec.css">
-  <style>body{{max-width:800px;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif}}</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <style>
+    *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
+    :root{{--bg:#f4f1eb;--surface:#eae6de;--border:#d4cfc5;--text:#1a1a1a;--muted:#6b6560;--accent:#2c5282;--accent-warm:#b05a3a;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}}
+    body{{background:var(--bg);background-image:url("/hex-bg.svg");background-size:2000px 2000px;color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.6;min-height:100vh}}
+    a{{color:var(--accent);text-decoration:none}}a:hover{{text-decoration:underline}}
+    .page{{max-width:800px;margin:0 auto;padding:24px 24px 48px;background:#f4f1eb;min-height:100vh}}
+    .site-header{{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border)}}
+    .site-header-inner{{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}}
+    .logo{{font-family:var(--font-mono);font-size:20px;font-weight:700}}.logo span{{color:var(--accent-warm)}}
+    .site-nav{{font-family:var(--font-mono);font-size:11px;display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}}
+    .site-nav a{{color:var(--muted);padding:5px 10px;border:1px solid transparent}}
+    .site-nav a:hover{{color:var(--text);text-decoration:none;border-color:var(--border);background:var(--surface)}}
+    h1{{font-size:26px;font-weight:700;margin:20px 0 8px}}
+    h2{{font-family:var(--font-mono);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}}
+    p{{margin-bottom:14px;color:var(--muted);font-size:14px}}p strong{{color:var(--text)}}
+    code{{font-family:var(--font-mono);font-size:12px;background:var(--surface);padding:1px 5px;color:var(--text)}}
+    ul{{list-style:none;margin:0 0 20px}}
+    li{{padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.06);font-size:14px}}
+    li a{{font-family:var(--font-mono);font-size:12px;color:var(--accent);border:1px solid var(--border);padding:3px 8px;margin-right:8px}}
+    li a:hover{{border-color:var(--accent-warm);color:var(--accent-warm);text-decoration:none}}
+    footer{{margin-top:32px;padding-top:16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);text-align:center}}
+    footer a{{color:var(--accent)}}
+  </style>
 </head>
 <body>
-  <h1>HVTracker Data Endpoints</h1>
-  <p>All endpoints are static JSON files updated daily at 06:00 UTC. CORS is open (<code>Access-Control-Allow-Origin: *</code>). License: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p>
-  <p>Schema version: <strong>{DATA_SCHEMA_VERSION}</strong> · Methodology: <strong>{METHODOLOGY_VERSION}</strong> · Last generated: {now_str}</p>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
+      </nav>
+    </div>
+  </header>
+  <div class="page">
 
-  <h2>Core</h2>
-  <ul>
-    <li><a href="/data/latest.json">/data/latest.json</a> — Full current snapshot (all agents, all fields)</li>
-    <li><a href="/data/history/{today_utc}.json">/data/history/YYYY-MM-DD.json</a> — Daily snapshots (e.g. <a href="/data/history/{today_utc}.json">{today_utc}</a>)</li>
-  </ul>
+    <h1>Data Endpoints</h1>
+    <p>All endpoints are static JSON files updated daily at 06:00 UTC. CORS is open (<code>Access-Control-Allow-Origin: *</code>). License: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p>
+    <p>Schema version: <strong>{DATA_SCHEMA_VERSION}</strong> · Methodology: <strong>{METHODOLOGY_VERSION}</strong> · Last generated: {now_str}</p>
 
-  <h2>Signal Subsets</h2>
-  <ul>
-    <li><a href="/data/signals/scorecard.json">/data/signals/scorecard.json</a> — OSSF Scorecard + signed commits for all agents</li>
-    <li><a href="/data/signals/provenance.json">/data/signals/provenance.json</a> — Supply-chain provenance signals for all agents</li>
-  </ul>
+    <h2>Core</h2>
+    <ul>
+      <li><a href="/data/latest.json">/data/latest.json</a> Full current snapshot (all agents, all fields)</li>
+      <li><a href="/data/history/{today_utc}.json">/data/history/YYYY-MM-DD.json</a> Daily snapshots (e.g. <a href="/data/history/{today_utc}.json">{today_utc}</a>)</li>
+    </ul>
 
-  <h2>Per-Agent (with 90-day history)</h2>
-  <ul>
+    <h2>Signal Subsets</h2>
+    <ul>
+      <li><a href="/data/signals/scorecard.json">/data/signals/scorecard.json</a> OSSF Scorecard + signed commits for all agents</li>
+      <li><a href="/data/signals/provenance.json">/data/signals/provenance.json</a> Supply-chain provenance signals for all agents</li>
+    </ul>
+
+    <h2>Per-Agent (with 90-day history)</h2>
+    <ul>
 {agent_links}
-  </ul>
+    </ul>
+
+    <footer>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
 </body>
 </html>"""
     with open(os.path.join(data_dir, "index.html"), "w", encoding="utf-8") as f:
@@ -2374,6 +2648,79 @@ def apply_legacy_classification(
     return len(moved)
 
 
+def restore_active_classification(
+    rows: list[dict], legacy_rows: list[dict], active_agents: list[dict]
+) -> int:
+    """Move rows back from legacy when agents.json marks them active again."""
+    active_meta = {a["repo"].lower(): a for a in active_agents}
+    if not active_meta:
+        return 0
+    existing_active = {r["repo"].lower() for r in rows}
+    moved = []
+    for r in list(legacy_rows):
+        repo_key = r["repo"].lower()
+        meta = active_meta.get(repo_key)
+        if not meta:
+            continue
+        r.pop("status", None)
+        r["listing_status"] = meta.get("listing_status", "listed")
+        moved.append(r)
+        legacy_rows.remove(r)
+    for r in moved:
+        if r["repo"].lower() not in existing_active:
+            rows.append(r)
+    return len(moved)
+
+
+def remove_legacy_public_artifacts(
+    script_dir: str, legacy_rows: list[dict], legacy_agents: list[dict]
+) -> int:
+    """Delete public per-agent artifacts for legacy rows.
+
+    `legacy` entries remain in internal state and historical snapshots, but they
+    are not part of the active public registry. Keep the canonical rule simple:
+    no public `/agents/<slug>/` page and no `/data/agents/<slug>.json` file for
+    legacy entries.
+    """
+    removed = 0
+    agents_dir = os.path.join(script_dir, "agents")
+    data_agents_dir = os.path.join(script_dir, "data", "agents")
+    repo_to_slug = {}
+    for row in legacy_rows:
+        repo = (row.get("repo") or "").lower()
+        slug = row.get("slug")
+        if repo and slug:
+            repo_to_slug[repo] = slug
+    if os.path.isdir(data_agents_dir):
+        for fname in os.listdir(data_agents_dir):
+            if not fname.endswith(".json"):
+                continue
+            path = os.path.join(data_agents_dir, fname)
+            try:
+                with open(path, encoding="utf-8") as f:
+                    agent_data = json.load(f)
+                repo = (agent_data.get("repo") or "").lower()
+                slug = agent_data.get("slug") or fname[:-5]
+                if repo and slug and repo not in repo_to_slug:
+                    repo_to_slug[repo] = slug
+            except (OSError, json.JSONDecodeError):
+                continue
+    for agent in legacy_agents:
+        repo = agent["repo"].lower()
+        slug = repo_to_slug.get(repo)
+        if not slug:
+            continue
+        profile_dir = os.path.join(agents_dir, slug)
+        if os.path.isdir(profile_dir):
+            shutil.rmtree(profile_dir)
+            removed += 1
+        agent_json = os.path.join(data_agents_dir, f"{slug}.json")
+        if os.path.isfile(agent_json):
+            os.remove(agent_json)
+            removed += 1
+    return removed
+
+
 def repair_missing_commit_counts(rows: list[dict], cached_commit_counts: dict[str, int]) -> int:
     """Retry commit-count collection for rows that still have no 4-week count."""
     repaired = 0
@@ -2478,8 +2825,14 @@ def main() -> None:
     agents = deduped
 
     # Split active vs legacy agents — legacy entries are fetched but rendered separately
-    legacy_agents = [a for a in agents if a.get("status") == "legacy"]
-    agents = [a for a in agents if a.get("status") != "legacy"]
+    legacy_agents = [
+        a for a in agents
+        if a.get("status") == "legacy" or a.get("listing_status") == "legacy"
+    ]
+    agents = [
+        a for a in agents
+        if a.get("status") != "legacy" and a.get("listing_status") != "legacy"
+    ]
 
     # In batch mode, only fetch a slice of active agents
     all_agents = agents  # keep full list for context
@@ -2668,6 +3021,9 @@ def main() -> None:
             _state = json.load(_f)
         rows = _state["rows"]
         legacy_rows = _state["legacy_rows"]
+        restored = restore_active_classification(rows, legacy_rows, all_agents)
+        if restored:
+            print(f"RENDER-ONLY: restored {restored} row(s) from legacy based on agents.json")
         moved = apply_legacy_classification(rows, legacy_rows, legacy_agents)
         if moved:
             print(f"RENDER-ONLY: reclassified {moved} row(s) as legacy from agents.json")
@@ -2837,6 +3193,9 @@ def main() -> None:
                 pass
         # Re-apply agents.json legacy classification so status flips in the
         # config propagate even when batch mode didn't refetch them.
+        restored = restore_active_classification(rows, legacy_rows, all_agents)
+        if restored:
+            print(f"Batch merge: restored {restored} row(s) from legacy based on agents.json")
         reclassified = apply_legacy_classification(rows, legacy_rows, legacy_agents)
         if reclassified:
             print(f"Batch merge: reclassified {reclassified} row(s) as legacy from agents.json")
@@ -2852,6 +3211,7 @@ def main() -> None:
     rows.sort(key=lambda x: x.get("score", 0) or 0, reverse=True)
 
     eligibility_violations = run_eligibility_checks(rows)
+    decorate_registry_states(rows, legacy_rows, eligibility_violations)
 
     # Build lookups for overrides from agents.json config
     _override_map = {a["repo"].lower(): a.get("license_override", "") for a in all_agents if a.get("license_override")}
@@ -3004,6 +3364,9 @@ def main() -> None:
             categories.append({"name": cat, "slug": slugify(cat), "count": len(cat_groups[cat])})
 
     assign_unique_slugs(rows + legacy_rows)
+    removed_legacy_artifacts = remove_legacy_public_artifacts(script_dir, legacy_rows, legacy_agents)
+    if removed_legacy_artifacts:
+        print(f"Removed {removed_legacy_artifacts} stale legacy public artifact(s).")
 
     # Precompute head-to-head comparison pairs (top 3 per category) so agent
     # and category pages can link to them — internal linking turns the
@@ -3067,6 +3430,10 @@ def main() -> None:
                 "public_actions": r.get("public_actions"),
                 "evidence_grade": r.get("evidence_grade", "D"),
                 "listing_status": r.get("listing_status", "listed"),
+                "display_listing_status": r.get("display_listing_status", r.get("listing_status", "listed")),
+                "display_status_label": r.get("display_status_label", r.get("display_listing_status", r.get("listing_status", "listed")).replace("_", " ").title()),
+                "has_warning": r.get("has_warning", False),
+                "warning_reasons": r.get("warning_reasons", []),
                 "license_spdx": r.get("license_spdx"),
                 "license_type": r.get("license_type", "unlicensed"),
                 "license_override": r.get("license_override", ""),
@@ -3105,10 +3472,21 @@ def main() -> None:
 
     # ── Inject recent_events into latest.json ────────────────────────────────
     cutoff_30d = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%d")
+    for row in rows:
+        repo_key = row["repo"].lower()
+        all_evts = agent_events.get(repo_key, [])
+        row["recent_events"] = [e for e in all_evts if e["date"] >= cutoff_30d]
+        row["recent_change_summary"] = summarize_recent_events(row["recent_events"])
+    for row in legacy_rows:
+        repo_key = row["repo"].lower()
+        all_evts = agent_events.get(repo_key, [])
+        row["recent_events"] = [e for e in all_evts if e["date"] >= cutoff_30d]
+        row["recent_change_summary"] = summarize_recent_events(row["recent_events"])
     for agent_dict in data_output["agents"]:
         repo_key = agent_dict["repo"].lower()
         all_evts = agent_events.get(repo_key, [])
         agent_dict["recent_events"] = [e for e in all_evts if e["date"] >= cutoff_30d]
+        agent_dict["recent_change_summary"] = summarize_recent_events(agent_dict["recent_events"])
     # Re-write latest.json with events included
     latest_path = os.path.join(script_dir, "data", "latest.json")
     with open(latest_path, "w", encoding="utf-8") as f:
@@ -3154,8 +3532,7 @@ def main() -> None:
         json.dump(build_report, f, indent=2, ensure_ascii=False)
     print(f"Wrote data/build_report.json (active={len(rows)}, legacy={len(legacy_rows)}, warnings={len(eligibility_violations)}, failed={len(failed_repos)}).")
 
-    # SVG badges are now served dynamically by the web service (/badge/...svg)
-    # from data.json, so static badge files are no longer generated here.
+    generate_badges(script_dir, rows)
 
     templates_dir = os.path.join(base_dir, "templates")
     env = Environment(
@@ -3163,7 +3540,7 @@ def main() -> None:
         autoescape=True,
     )
 
-    movers = compute_movers(history, {r["repo"].lower(): r["slug"] for r in rows})
+    movers = compute_movers(history, {r["repo"].lower(): r["slug"] for r in rows}, rows=rows)
     movers_page = compute_movers_page_data(rows, history)
     newly_added = compute_newly_added(rows, history)
     use_case_pages = build_use_case_pages(rows)
@@ -3207,6 +3584,24 @@ def main() -> None:
     with open(render_state_path, "w", encoding="utf-8") as _f:
         json.dump({"rows": rows, "legacy_rows": legacy_rows}, _f, ensure_ascii=False)
 
+    recent_change_window_start = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d")
+    recent_change_count = sum(
+        1
+        for repo_events in agent_events.values()
+        for event in repo_events
+        if event.get("date", "") >= recent_change_window_start
+    )
+    registry_summary = {
+        "active_count": len(rows),
+        "warning_count": sum(1 for r in rows if r.get("has_warning")),
+        "legacy_count": len(legacy_rows),
+        "provenance_count": sum(1 for r in rows if r.get("has_provenance")),
+        "fresh_count": sum(1 for r in rows if (r.get("days_ago") or 9999) <= 14),
+        "stale_count": sum(1 for r in rows if (r.get("days_ago") or 0) > 90),
+        "recent_change_count": recent_change_count,
+    }
+    warning_rows = [r for r in rows if r.get("has_warning")][:6]
+
     tmpl = env.get_template("template.html")
     html = tmpl.render(
         rows=rows,
@@ -3218,6 +3613,8 @@ def main() -> None:
         newly_added=newly_added,
         use_case_pages=use_case_pages,
         history_days=len(history),
+        registry_summary=registry_summary,
+        warning_rows=warning_rows,
     )
     out_path = os.path.join(script_dir, "index.html")
     with open(out_path, "w", encoding="utf-8") as f:
@@ -3248,6 +3645,7 @@ def main() -> None:
     for row in rows + legacy_rows:
         row["category_slug"] = slugify(row.get("category", "")) if row.get("category") else ""
         row["review_insights"] = agent_review_insights(row)
+        row["remediation_steps"] = agent_remediation_steps(row)
         row["safety_qa"] = agent_safety_qa(row)
         row["correction_url"] = agent_correction_url(row)
     for row in rows:
@@ -3262,25 +3660,13 @@ def main() -> None:
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
             f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, methodology_version=METHODOLOGY_VERSION, comparisons=compare_by_slug.get(row['slug'], [])))
 
-    for row in legacy_rows:
-        repo_key = row["repo"].lower()
-        points = sparkline_data.get(repo_key, [])
-        row["sparkline_svg"] = render_sparkline_svg(points)
-        row["rank_history"] = points
-        row["siblings"] = []
-        events = agent_events.get(repo_key, [])
-        row["event_chart_svg"] = render_event_timeline_svg(events)
-        slug_dir = os.path.join(agents_dir, row["slug"])
-        os.makedirs(slug_dir, exist_ok=True)
-        with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, methodology_version=METHODOLOGY_VERSION, comparisons=compare_by_slug.get(row['slug'], [])))
-    print(f"Built {len(rows)} active + {len(legacy_rows)} legacy agent profile pages under agents/.")
+    print(f"Built {len(rows)} active agent profile pages under agents/.")
 
     # Generate per-agent OG cards (1200×630 PNG)
     try:
         from generate_og_card import generate as generate_og
         og_count = 0
-        for row in rows + legacy_rows:
+        for row in rows:
             slug_dir = os.path.join(agents_dir, row["slug"])
             og_path = os.path.join(slug_dir, "og.png")
             try:
@@ -3309,6 +3695,7 @@ def main() -> None:
         total_stars_raw = sum(a.get("stars", 0) for a in cat_agents)
         avg_trust = round(sum(a.get("trust_score", 0) for a in cat_agents) / len(cat_agents))
         grade_a = sum(1 for a in cat_agents if a.get("evidence_grade") == "A")
+        warning_count = sum(1 for a in cat_agents if a.get("listing_status") == "warning")
         top3 = [a["name"] for a in cat_agents[:3]]
         cat_dir = os.path.join(categories_dir, cat_slug)
         os.makedirs(cat_dir, exist_ok=True)
@@ -3322,6 +3709,7 @@ def main() -> None:
                 avg_trust=avg_trust,
                 total_stars=fmt_num(total_stars_raw),
                 grade_a_count=grade_a,
+                warning_count=warning_count,
                 top3_names=", ".join(top3),
                 comparisons=compare_by_cat.get(cat_slug, []),
             ))

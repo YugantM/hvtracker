@@ -21,30 +21,50 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#0b0d10;--surface:rgba(21,25,32,.78);--surface-2:rgba(27,32,41,.82);--border:rgba(142,154,176,.22);--hairline:rgba(168,179,194,.12);--text:#eef2f6;--muted:#a8b3c2;--accent:#8fb3ff;--fresh:#2dd4bf;--mocha:#d8a657;--red:#e8798b;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}
-    body{min-height:100vh;background:var(--bg);color:var(--text);font:15px/1.62 var(--font-sans);background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E"),radial-gradient(circle at 16% -10%,rgba(45,212,191,.14),transparent 30%),radial-gradient(circle at 86% 4%,rgba(216,166,87,.12),transparent 28%),linear-gradient(180deg,#10141a 0%,#0b0d10 54%,#07090c 100%)}
+    :root{--paper:#f4f1eb;--paper-2:#ece4d6;--ink:#1f1b17;--muted:#6f665d;--line:#d5cbbc;--line-strong:#b9aa96;--blue:#a7bfd9;--blue-strong:#7f9cbd;--blue-soft:rgba(167,191,217,.18);--lobster:#c67c6d;--lobster-soft:rgba(198,124,109,.14);--moss:#6f876e;--green:#2f6846;--red:#9b3c3c;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}
+    body{min-height:100vh;background:var(--paper);background-image:url("/hex-bg.svg");background-size:2000px 2000px;color:var(--ink);font:15px/1.65 var(--font-sans)}
     a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}
-    .page{max-width:1080px;margin:0 auto;padding:28px 20px 44px}
-    header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding:16px 18px;border:1px solid var(--border);border-radius:10px;background:linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 18px 54px rgba(0,0,0,.28)}
-    .logo{font-family:var(--font-mono);font-weight:700;font-size:18px}.logo span{color:var(--accent)}
-    nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;font:11px var(--font-mono)}nav a{color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:5px 10px;background:rgba(255,255,255,.035)}
-    .hero{padding:32px 0 18px;border-bottom:1px solid var(--hairline)}
-    h1{font-size:34px;line-height:1.14;letter-spacing:0;margin-bottom:8px}.hero p{color:var(--muted);max-width:760px}
-    .meta{font:11px var(--font-mono);color:var(--muted);margin-top:14px}
-    .summary-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:22px 0}
-    .summary{border-top:1px solid var(--hairline);padding-top:12px}.summary strong{display:block;font:700 24px var(--font-mono);color:var(--fresh)}.summary span{color:var(--muted);font-size:12px}
-    .summary.down strong{color:var(--red)}
-    .chart-band{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:22px 0}
-    .chart-panel{border-top:1px solid var(--hairline);padding-top:16px;min-width:0}.chart-panel h2{font-size:14px;margin-bottom:10px}.insight-chart{width:100%;height:auto;display:block;overflow:visible}
-    .mover-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:20px}
-    .mover-list{border-top:1px solid var(--hairline);padding-top:14px}
-    .mover-list h2{font-size:15px;margin-bottom:10px}
-    .mover-item{display:grid;grid-template-columns:54px minmax(0,1fr) 54px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--hairline)}
-    .delta{font:700 13px var(--font-mono)}.up .delta{color:var(--fresh)}.down .delta{color:var(--red)}
-    .name{font-weight:700}.sub{display:block;color:var(--muted);font:11px var(--font-mono);margin-top:2px}.rank{font:12px var(--font-mono);color:var(--muted);text-align:right}
-    footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--hairline);font:11px var(--font-mono);color:var(--muted);text-align:center}
-    footer a{color:var(--accent)}
-    @media(max-width:760px){.summary-row,.chart-band,.mover-grid{grid-template-columns:1fr}h1{font-size:26px}nav{margin-left:0}}
+    .page{background:var(--paper);max-width:960px;margin:0 auto;padding:24px 24px 40px}
+    .site-header{position:sticky;top:0;z-index:100;background:var(--paper);border-bottom:1px solid var(--line-strong)}
+    .site-header-inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+    .logo{font-family:var(--font-mono);font-weight:700;font-size:20px}.logo span{color:var(--lobster)}
+    nav{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;font:11px var(--font-mono)}
+    .site-nav a{color:var(--muted);padding:5px 10px;border:1px solid transparent}
+    .site-nav a:hover{color:var(--ink);border-color:var(--line);background:var(--paper-2);text-decoration:none}
+    .hero{padding:24px 0 16px;border-bottom:1px solid var(--line)}
+    h1{font-size:26px;font-weight:700;margin-bottom:6px}.hero p{color:var(--muted);font-size:14px;max-width:680px}
+    .meta{font:11px var(--font-mono);color:var(--muted);margin-top:10px}
+    .summary-row{display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;font-family:var(--font-mono)}
+    .summary{padding:10px 12px;background:var(--paper-2);border-top:2px solid var(--line-strong);min-width:180px}
+    .summary strong{display:block;font-size:20px;font-weight:700;color:var(--moss)}.summary span{color:var(--muted);font-size:11px}
+    .summary.down strong{color:var(--lobster)}
+    .chart-band{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:16px 0}
+    .chart-panel{border-top:2px solid var(--line-strong);padding-top:12px;min-width:0;background:var(--paper-2);padding-left:12px;padding-right:12px;padding-bottom:12px}.chart-panel h2{font-size:13px;margin-bottom:8px}.insight-chart{width:100%;height:auto;display:block;overflow:visible}
+    .mover-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+    .mover-list{border-top:2px solid var(--line-strong);padding-top:12px;background:var(--paper-2);padding-left:12px;padding-right:12px;padding-bottom:4px}
+    .mover-list h2{font-size:14px;margin-bottom:8px}
+    .mover-item{display:grid;grid-template-columns:52px minmax(0,1fr) 48px;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}
+    .mover-item:last-child{border-bottom:none}
+    .delta{font:700 13px var(--font-mono)}.up .delta{color:var(--green)}.down .delta{color:var(--lobster)}
+    .name{font-weight:600;font-size:13px}
+    .sub{display:block;color:var(--muted);font:11px var(--font-mono);margin-top:2px}
+    .rank{font:11px var(--font-mono);color:var(--muted);text-align:right}
+    .rank-movement{display:block;font:11px var(--font-mono);color:var(--muted);margin-top:3px}
+    .state-chip{display:inline-block;font:600 9px var(--font-mono);margin-left:6px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:2px 6px;border:1px solid var(--line)}
+    .state-listed{color:var(--moss);background:rgba(111,135,110,.14)}
+    .state-warning{color:var(--lobster);background:var(--lobster-soft)}
+    .state-legacy{color:var(--muted);background:rgba(111,102,93,.10)}
+    .event-label{font:600 10px var(--font-mono);text-transform:uppercase;letter-spacing:.04em;color:var(--blue-strong);margin-top:5px;display:block}
+    .event-detail{display:block;color:var(--muted);font-size:11px;line-height:1.5;margin-top:2px}
+    .movers-ticker{padding:12px 0;border-bottom:1px solid var(--line)}
+    .movers-ticker-title{font-family:var(--font-mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+    .movers-ticker-row{display:flex;gap:12px;margin-top:6px;flex-wrap:wrap;font-family:var(--font-mono);font-size:12px}
+    .ticker-item{display:flex;align-items:center;gap:4px;color:var(--ink)}.ticker-item:hover{text-decoration:none;color:var(--blue-strong)}
+    .ticker-arrow{font-weight:700}.ticker-up .ticker-arrow{color:var(--green)}.ticker-down .ticker-arrow{color:var(--red)}
+    .ticker-rank{color:var(--muted);font-size:10px}
+    footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font:11px var(--font-mono);color:var(--muted);text-align:center}
+    footer a{color:var(--blue-strong)}
+    @media(max-width:760px){.chart-band,.mover-grid{grid-template-columns:1fr}h1{font-size:18px}nav{margin-left:0}}
   </style>
   <script type="application/ld+json">
   {
@@ -71,40 +91,92 @@
   <script defer src="/analytics.js"></script>
 </head>
 <body data-page-type="movers">
-  <div class="page">
-    <header>
+  <header class="site-header">
+    <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
-      <nav aria-label="Site">
+      <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
         <a href="/use-cases/">Use cases</a>
-        <a href="/compare/">Compare</a>
         <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
       </nav>
-    </header>
+    </div>
+  </header>
+  <div class="page">
 
     <section class="hero">
       <h1>AI Agent Rank Movers</h1>
-      <p>Daily movement from the current 11-day history window. Gains and drops are pinned to the most recent completed daily snapshot, so the page stays stable throughout the day instead of shifting on every partial refresh.</p>
-      <div class="meta">Updated 2026-06-02 21:06 UTC</div>
+      <p>Daily trust-rank changes. Each entry shows the net rank delta, the old→new position, and the latest tracked trust event.</p>
+      <div class="meta">Updated 2026-06-03 20:55 UTC</div>
     </section>
 
     <section class="summary-row" aria-label="Movement summary">
-      <div class="summary"><strong>12</strong><span>Agents rising</span></div>
+      <div class="summary"><strong>6</strong><span>Agents rising</span></div>
       <div class="summary down"><strong>12</strong><span>Agents falling</span></div>
       <div class="summary"><strong>Agent Frameworks</strong><span>Most active category</span></div>
     </section>
     
-    <div class="meta" style="margin-bottom:18px;">Snapshot 2026-06-01 vs 2026-05-26</div>
+    <div class="meta" style="margin-bottom:18px;">Snapshot 2026-06-02 vs 2026-06-01</div>
+    
+
+    
+    <div class="movers-ticker">
+      <span class="movers-ticker-title">Daily movers</span>
+      <div class="movers-ticker-row">
+        
+        <a href="/agents/librechat/" class="ticker-item ticker-up">
+          <span class="ticker-arrow">▲27</span>
+          <span>LibreChat</span>
+          <span class="ticker-rank">#42</span>
+        </a>
+        
+        <a href="/agents/crawl4ai/" class="ticker-item ticker-up">
+          <span class="ticker-arrow">▲25</span>
+          <span>Crawl4AI</span>
+          <span class="ticker-rank">#75</span>
+        </a>
+        
+        <a href="/agents/agentlite/" class="ticker-item ticker-up">
+          <span class="ticker-arrow">▲23</span>
+          <span>AgentLite</span>
+          <span class="ticker-rank">#146</span>
+        </a>
+        
+        
+        <a href="/agents/sotopia-agents/" class="ticker-item ticker-down">
+          <span class="ticker-arrow">▼23</span>
+          <span>Sotopia agents</span>
+          <span class="ticker-rank">#169</span>
+        </a>
+        
+        <a href="/agents/swarmzero/" class="ticker-item ticker-down">
+          <span class="ticker-arrow">▼19</span>
+          <span>SwarmZero</span>
+          <span class="ticker-rank">#185</span>
+        </a>
+        
+        <a href="/agents/agentops/" class="ticker-item ticker-down">
+          <span class="ticker-arrow">▼18</span>
+          <span>AgentOps</span>
+          <span class="ticker-rank">#186</span>
+        </a>
+        
+      </div>
+    </div>
     
 
     <section class="chart-band" aria-label="Trust profile comparison">
       <div class="chart-panel">
         <h2>Rising Agents — Trust Profile</h2>
-        <svg class="insight-chart radar-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 430" role="img" aria-label="Rising agents — trust profile"><defs><filter id="sGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect x="0" y="0" width="430" height="430" rx="16" fill="rgba(255,255,255,.018)" stroke="rgba(255,255,255,.10)" stroke-width="1"/><polygon points="215.0,192.8 245.7,215.0 234.0,251.1 196.0,251.1 184.3,215.0" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="0.5"/><polygon points="215.0,160.5 276.3,205.1 252.9,277.2 177.1,277.2 153.7,205.1" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="0.5"/><polygon points="215.0,128.2 307.0,195.1 271.9,303.3 158.1,303.3 123.0,195.1" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="0.5"/><polygon points="215.0,96.0 337.7,185.1 290.8,329.4 139.2,329.4 92.3,185.1" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="215.0" y2="96.0" stroke="rgba(255,255,255,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="337.7" y2="185.1" stroke="rgba(255,255,255,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="290.8" y2="329.4" stroke="rgba(255,255,255,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="139.2" y2="329.4" stroke="rgba(255,255,255,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="92.3" y2="185.1" stroke="rgba(255,255,255,.08)" stroke-width="0.5"/><polygon points="215.0,119.2 337.7,185.1 277.0,310.3 139.2,329.4 95.4,186.1" fill="#2dd4bf" opacity="0.06" stroke="#2dd4bf" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,119.2 337.7,185.1 277.0,310.3 139.2,329.4 107.0,189.9" fill="#2dd4bf" opacity="0.06" stroke="#2dd4bf" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,120.3 337.7,185.1 277.0,310.3 139.2,329.4 106.4,189.7" fill="#2dd4bf" opacity="0.06" stroke="#2dd4bf" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,124.9 337.7,185.1 274.8,307.3 139.2,329.4 105.8,189.5" fill="#2dd4bf" opacity="0.06" stroke="#2dd4bf" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,127.0 337.7,185.1 275.7,308.5 141.5,326.2 105.2,189.3" fill="#2dd4bf" opacity="0.06" stroke="#2dd4bf" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,129.0 337.7,185.1 274.8,307.3 139.2,329.4 107.0,189.9" fill="#2dd4bf" opacity="0.06" stroke="#2dd4bf" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,128.0 337.7,185.1 272.5,304.2 139.6,328.8 126.7,196.3" fill="#2dd4bf" opacity="0.06" stroke="#2dd4bf" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,162.0 337.7,185.1 252.9,277.2 139.6,328.8 108.9,190.5" fill="#2dd4bf" opacity="0.06" stroke="#2dd4bf" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,155.3 288.6,201.1 278.8,312.8 142.6,324.7 119.3,193.9" fill="#2dd4bf" opacity="0.06" stroke="#2dd4bf" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,160.0 288.6,201.1 278.8,312.8 143.0,324.1 129.7,197.3" fill="#2dd4bf" opacity="0.06" stroke="#2dd4bf" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,167.7 288.6,201.1 272.5,304.2 139.2,329.4 123.0,195.1" fill="#2dd4bf" opacity="0.06" stroke="#2dd4bf" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,158.4 288.6,201.1 277.0,310.3 154.3,308.5 134.6,198.9" fill="#2dd4bf" opacity="0.06" stroke="#2dd4bf" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,139.3 321.3,190.5 274.1,306.3 141.3,326.4 114.1,192.2" fill="#2dd4bf" opacity="0.12" stroke="#2dd4bf" stroke-width="1.2" stroke-opacity="0.55" filter="url(#sGlow)"/><circle cx="215.0" cy="225.0" r="2" fill="#eef2f6" opacity=".6"/><text x="215.0" y="68.0" text-anchor="middle" fill="#eef2f6" font-size="10" font-family="Hanken Grotesk, sans-serif">Safety</text><text x="215.0" y="80.0" text-anchor="middle" fill="#8fb3ff" font-size="9" font-family="IBM Plex Mono, monospace">66%</text><text x="354.8" y="172.2" text-anchor="start" fill="#eef2f6" font-size="10" font-family="Hanken Grotesk, sans-serif">Identity</text><text x="354.8" y="184.2" text-anchor="start" fill="#8fb3ff" font-size="9" font-family="IBM Plex Mono, monospace">87%</text><text x="301.4" y="352.0" text-anchor="start" fill="#eef2f6" font-size="10" font-family="Hanken Grotesk, sans-serif">Transparency</text><text x="301.4" y="364.0" text-anchor="start" fill="#8fb3ff" font-size="9" font-family="IBM Plex Mono, monospace">78%</text><text x="128.6" y="352.0" text-anchor="end" fill="#eef2f6" font-size="10" font-family="Hanken Grotesk, sans-serif">Maintenance</text><text x="128.6" y="364.0" text-anchor="end" fill="#8fb3ff" font-size="9" font-family="IBM Plex Mono, monospace">97%</text><text x="75.2" y="172.2" text-anchor="end" fill="#eef2f6" font-size="10" font-family="Hanken Grotesk, sans-serif">Adoption</text><text x="75.2" y="184.2" text-anchor="end" fill="#8fb3ff" font-size="9" font-family="IBM Plex Mono, monospace">82%</text></svg>
+        <svg class="insight-chart radar-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 430" role="img" aria-label="Rising agents — trust profile"><defs><filter id="sGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect x="0" y="0" width="430" height="430" rx="16" fill="rgba(0,0,0,.02)" stroke="rgba(0,0,0,.10)" stroke-width="1"/><polygon points="215.0,192.8 245.7,215.0 234.0,251.1 196.0,251.1 184.3,215.0" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><polygon points="215.0,160.5 276.3,205.1 252.9,277.2 177.1,277.2 153.7,205.1" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><polygon points="215.0,128.2 307.0,195.1 271.9,303.3 158.1,303.3 123.0,195.1" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><polygon points="215.0,96.0 337.7,185.1 290.8,329.4 139.2,329.4 92.3,185.1" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="215.0" y2="96.0" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="337.7" y2="185.1" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="290.8" y2="329.4" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="139.2" y2="329.4" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="92.3" y2="185.1" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><polygon points="215.0,123.3 337.7,185.1 276.1,309.1 139.2,329.4 92.3,185.1" fill="#2f6846" opacity="0.06" stroke="#2f6846" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,134.2 337.7,185.1 276.6,309.7 139.2,329.4 93.5,185.5" fill="#2f6846" opacity="0.06" stroke="#2f6846" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,156.9 288.6,201.1 277.9,311.6 147.5,317.9 92.3,185.1" fill="#2f6846" opacity="0.06" stroke="#2f6846" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,164.1 288.6,201.1 274.3,306.6 139.2,329.4 104.6,189.1" fill="#2f6846" opacity="0.06" stroke="#2f6846" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,186.8 288.6,201.1 271.6,303.0 148.3,316.8 97.8,186.9" fill="#2f6846" opacity="0.06" stroke="#2f6846" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,197.1 288.6,201.1 265.8,295.0 167.2,290.7 173.9,211.6" fill="#2f6846" opacity="0.06" stroke="#2f6846" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,160.4 305.0,195.8 273.7,305.8 146.8,318.9 109.1,190.6" fill="#2f6846" opacity="0.12" stroke="#2f6846" stroke-width="1.2" stroke-opacity="0.55" filter="url(#sGlow)"/><circle cx="215.0" cy="225.0" r="2" fill="#1a1a1a" opacity=".6"/><text x="215.0" y="68.0" text-anchor="middle" fill="#1a1a1a" font-size="10" font-family="Hanken Grotesk, sans-serif">Safety</text><text x="215.0" y="80.0" text-anchor="middle" fill="#2c5282" font-size="9" font-family="IBM Plex Mono, monospace">50%</text><text x="354.8" y="172.2" text-anchor="start" fill="#1a1a1a" font-size="10" font-family="Hanken Grotesk, sans-serif">Identity</text><text x="354.8" y="184.2" text-anchor="start" fill="#2c5282" font-size="9" font-family="IBM Plex Mono, monospace">73%</text><text x="301.4" y="352.0" text-anchor="start" fill="#1a1a1a" font-size="10" font-family="Hanken Grotesk, sans-serif">Transparency</text><text x="301.4" y="364.0" text-anchor="start" fill="#2c5282" font-size="9" font-family="IBM Plex Mono, monospace">77%</text><text x="128.6" y="352.0" text-anchor="end" fill="#1a1a1a" font-size="10" font-family="Hanken Grotesk, sans-serif">Maintenance</text><text x="128.6" y="364.0" text-anchor="end" fill="#2c5282" font-size="9" font-family="IBM Plex Mono, monospace">90%</text><text x="75.2" y="172.2" text-anchor="end" fill="#1a1a1a" font-size="10" font-family="Hanken Grotesk, sans-serif">Adoption</text><text x="75.2" y="184.2" text-anchor="end" fill="#2c5282" font-size="9" font-family="IBM Plex Mono, monospace">86%</text></svg>
       </div>
       <div class="chart-panel">
         <h2>Falling Agents — Trust Profile</h2>
-        <svg class="insight-chart radar-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 430" role="img" aria-label="Falling agents — trust profile"><defs><filter id="sGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect x="0" y="0" width="430" height="430" rx="16" fill="rgba(255,255,255,.018)" stroke="rgba(255,255,255,.10)" stroke-width="1"/><polygon points="215.0,192.8 245.7,215.0 234.0,251.1 196.0,251.1 184.3,215.0" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="0.5"/><polygon points="215.0,160.5 276.3,205.1 252.9,277.2 177.1,277.2 153.7,205.1" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="0.5"/><polygon points="215.0,128.2 307.0,195.1 271.9,303.3 158.1,303.3 123.0,195.1" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="0.5"/><polygon points="215.0,96.0 337.7,185.1 290.8,329.4 139.2,329.4 92.3,185.1" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="215.0" y2="96.0" stroke="rgba(255,255,255,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="337.7" y2="185.1" stroke="rgba(255,255,255,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="290.8" y2="329.4" stroke="rgba(255,255,255,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="139.2" y2="329.4" stroke="rgba(255,255,255,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="92.3" y2="185.1" stroke="rgba(255,255,255,.08)" stroke-width="0.5"/><polygon points="215.0,196.6 288.6,201.1 267.2,296.8 160.4,300.1 103.4,188.7" fill="#e8798b" opacity="0.06" stroke="#e8798b" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,167.2 288.6,201.1 272.1,303.6 139.2,329.4 150.6,204.1" fill="#e8798b" opacity="0.06" stroke="#e8798b" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,199.2 288.6,201.1 252.9,277.2 143.0,324.1 92.9,185.3" fill="#e8798b" opacity="0.06" stroke="#e8798b" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,176.0 288.6,201.1 272.1,303.6 146.0,320.0 144.5,202.1" fill="#e8798b" opacity="0.06" stroke="#e8798b" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,211.1 288.6,201.1 252.9,277.2 139.2,329.4 92.3,185.1" fill="#e8798b" opacity="0.06" stroke="#e8798b" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,205.9 288.6,201.1 252.9,277.2 139.2,329.4 102.7,188.5" fill="#e8798b" opacity="0.06" stroke="#e8798b" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,199.2 288.6,201.1 252.9,277.2 162.7,297.0 106.4,189.7" fill="#e8798b" opacity="0.06" stroke="#e8798b" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,199.2 288.6,201.1 252.9,277.2 139.2,329.4 102.7,188.5" fill="#e8798b" opacity="0.06" stroke="#e8798b" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,214.2 288.6,201.1 252.9,277.2 139.2,329.4 132.2,198.1" fill="#e8798b" opacity="0.06" stroke="#e8798b" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,220.9 288.6,201.1 252.9,277.2 139.2,329.4 117.5,193.3" fill="#e8798b" opacity="0.06" stroke="#e8798b" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,201.8 288.6,201.1 252.9,277.2 169.5,287.6 135.3,199.1" fill="#e8798b" opacity="0.06" stroke="#e8798b" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,199.2 288.6,201.1 252.9,277.2 154.0,309.0 155.5,205.7" fill="#e8798b" opacity="0.06" stroke="#e8798b" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,199.2 288.6,201.1 257.3,283.2 147.5,317.8 119.7,194.0" fill="#e8798b" opacity="0.12" stroke="#e8798b" stroke-width="1.2" stroke-opacity="0.55" filter="url(#sGlow)"/><circle cx="215.0" cy="225.0" r="2" fill="#eef2f6" opacity=".6"/><text x="215.0" y="68.0" text-anchor="middle" fill="#eef2f6" font-size="10" font-family="Hanken Grotesk, sans-serif">Safety</text><text x="215.0" y="80.0" text-anchor="middle" fill="#8fb3ff" font-size="9" font-family="IBM Plex Mono, monospace">20%</text><text x="354.8" y="172.2" text-anchor="start" fill="#eef2f6" font-size="10" font-family="Hanken Grotesk, sans-serif">Identity</text><text x="354.8" y="184.2" text-anchor="start" fill="#8fb3ff" font-size="9" font-family="IBM Plex Mono, monospace">60%</text><text x="301.4" y="352.0" text-anchor="start" fill="#eef2f6" font-size="10" font-family="Hanken Grotesk, sans-serif">Transparency</text><text x="301.4" y="364.0" text-anchor="start" fill="#8fb3ff" font-size="9" font-family="IBM Plex Mono, monospace">56%</text><text x="128.6" y="352.0" text-anchor="end" fill="#eef2f6" font-size="10" font-family="Hanken Grotesk, sans-serif">Maintenance</text><text x="128.6" y="364.0" text-anchor="end" fill="#8fb3ff" font-size="9" font-family="IBM Plex Mono, monospace">89%</text><text x="75.2" y="172.2" text-anchor="end" fill="#eef2f6" font-size="10" font-family="Hanken Grotesk, sans-serif">Adoption</text><text x="75.2" y="184.2" text-anchor="end" fill="#8fb3ff" font-size="9" font-family="IBM Plex Mono, monospace">78%</text></svg>
+        <svg class="insight-chart radar-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 430" role="img" aria-label="Falling agents — trust profile"><defs><filter id="sGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect x="0" y="0" width="430" height="430" rx="16" fill="rgba(0,0,0,.02)" stroke="rgba(0,0,0,.10)" stroke-width="1"/><polygon points="215.0,192.8 245.7,215.0 234.0,251.1 196.0,251.1 184.3,215.0" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><polygon points="215.0,160.5 276.3,205.1 252.9,277.2 177.1,277.2 153.7,205.1" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><polygon points="215.0,128.2 307.0,195.1 271.9,303.3 158.1,303.3 123.0,195.1" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><polygon points="215.0,96.0 337.7,185.1 290.8,329.4 139.2,329.4 92.3,185.1" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="215.0" y2="96.0" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="337.7" y2="185.1" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="290.8" y2="329.4" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="139.2" y2="329.4" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><line x1="215.0" y1="225.0" x2="92.3" y2="185.1" stroke="rgba(0,0,0,.08)" stroke-width="0.5"/><polygon points="215.0,197.7 288.6,201.1 269.0,299.3 202.5,242.2 160.4,207.3" fill="#9b3c3c" opacity="0.06" stroke="#9b3c3c" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,203.3 288.6,201.1 223.9,237.3 172.2,284.0 166.5,209.3" fill="#9b3c3c" opacity="0.06" stroke="#9b3c3c" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,206.9 288.6,201.1 252.9,277.2 139.2,329.4 148.7,203.5" fill="#9b3c3c" opacity="0.06" stroke="#9b3c3c" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,189.9 288.6,201.1 264.1,292.5 215.0,225.0 171.4,210.8" fill="#9b3c3c" opacity="0.06" stroke="#9b3c3c" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,199.2 288.6,201.1 252.9,277.2 188.5,261.5 119.3,193.9" fill="#9b3c3c" opacity="0.06" stroke="#9b3c3c" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,203.3 288.6,201.1 259.6,286.4 215.0,225.0 159.8,207.1" fill="#9b3c3c" opacity="0.06" stroke="#9b3c3c" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,203.8 288.6,201.1 225.7,239.7 209.3,232.8 172.7,211.2" fill="#9b3c3c" opacity="0.06" stroke="#9b3c3c" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,199.2 288.6,201.1 252.9,277.2 153.2,310.1 155.5,205.7" fill="#9b3c3c" opacity="0.06" stroke="#9b3c3c" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,204.9 288.6,201.1 264.5,293.1 215.0,225.0 168.4,209.9" fill="#9b3c3c" opacity="0.06" stroke="#9b3c3c" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,218.8 288.6,201.1 252.9,277.2 197.6,249.0 145.1,202.3" fill="#9b3c3c" opacity="0.06" stroke="#9b3c3c" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,206.4 288.6,201.1 263.6,291.9 215.0,225.0 153.0,204.9" fill="#9b3c3c" opacity="0.06" stroke="#9b3c3c" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,216.7 288.6,201.1 252.9,277.2 183.5,268.3 180.0,213.6" fill="#9b3c3c" opacity="0.06" stroke="#9b3c3c" stroke-width="0.5" stroke-opacity="0.12"/><polygon points="215.0,204.2 288.6,201.1 252.9,277.2 192.2,256.4 158.4,206.6" fill="#9b3c3c" opacity="0.12" stroke="#9b3c3c" stroke-width="1.2" stroke-opacity="0.55" filter="url(#sGlow)"/><circle cx="215.0" cy="225.0" r="2" fill="#1a1a1a" opacity=".6"/><text x="215.0" y="68.0" text-anchor="middle" fill="#1a1a1a" font-size="10" font-family="Hanken Grotesk, sans-serif">Safety</text><text x="215.0" y="80.0" text-anchor="middle" fill="#2c5282" font-size="9" font-family="IBM Plex Mono, monospace">16%</text><text x="354.8" y="172.2" text-anchor="start" fill="#1a1a1a" font-size="10" font-family="Hanken Grotesk, sans-serif">Identity</text><text x="354.8" y="184.2" text-anchor="start" fill="#2c5282" font-size="9" font-family="IBM Plex Mono, monospace">60%</text><text x="301.4" y="352.0" text-anchor="start" fill="#1a1a1a" font-size="10" font-family="Hanken Grotesk, sans-serif">Transparency</text><text x="301.4" y="364.0" text-anchor="start" fill="#2c5282" font-size="9" font-family="IBM Plex Mono, monospace">50%</text><text x="128.6" y="352.0" text-anchor="end" fill="#1a1a1a" font-size="10" font-family="Hanken Grotesk, sans-serif">Maintenance</text><text x="128.6" y="364.0" text-anchor="end" fill="#2c5282" font-size="9" font-family="IBM Plex Mono, monospace">30%</text><text x="75.2" y="172.2" text-anchor="end" fill="#1a1a1a" font-size="10" font-family="Hanken Grotesk, sans-serif">Adoption</text><text x="75.2" y="184.2" text-anchor="end" fill="#2c5282" font-size="9" font-family="IBM Plex Mono, monospace">46%</text></svg>
       </div>
     </section>
 
@@ -112,159 +184,229 @@
       <div class="mover-list">
         <h2>Biggest Gains</h2>
         
-        <a class="mover-item up" href="/agents/weights-biases-weave/">
-          <span class="delta">+108</span>
-          <span><span class="name">Weights &amp; Biases Weave</span><span class="sub">Observability &amp; Evaluation · Grade A · HVTrust 84.0</span></span>
-          <span class="rank">#22</span>
+        <a class="mover-item up" href="/agents/librechat/">
+          <span class="delta">+27</span>
+          <span>
+            <span class="name">LibreChat</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Memory &amp; Knowledge · Grade B · HVTrust 73.9</span>
+            <span class="rank-movement">#69 → #42</span>
+            <span class="event-label">Rank</span><span class="event-detail">2026-06-02: Rank rose 27 spots (#69 → #42)</span>
+          </span>
+          <span class="rank">#42</span>
         </a>
         
-        <a class="mover-item up" href="/agents/strands-agents/">
-          <span class="delta">+90</span>
-          <span><span class="name">Strands Agents</span><span class="sub">Agent Frameworks · Grade A · HVTrust 88.6</span></span>
-          <span class="rank">#12</span>
+        <a class="mover-item up" href="/agents/crawl4ai/">
+          <span class="delta">+25</span>
+          <span>
+            <span class="name">Crawl4AI</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Research &amp; Data · Grade B · HVTrust 67.6</span>
+            <span class="rank-movement">#100 → #75</span>
+            <span class="event-label">Rank</span><span class="event-detail">2026-06-02: Rank rose 25 spots (#100 → #75)</span>
+          </span>
+          <span class="rank">#75</span>
         </a>
         
-        <a class="mover-item up" href="/agents/vespa/">
-          <span class="delta">+84</span>
-          <span><span class="name">Vespa</span><span class="sub">Memory &amp; Knowledge · Grade A · HVTrust 87.6</span></span>
-          <span class="rank">#17</span>
+        <a class="mover-item up" href="/agents/agentlite/">
+          <span class="delta">+23</span>
+          <span>
+            <span class="name">AgentLite</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Agent Frameworks · Grade D · HVTrust 46.9</span>
+            <span class="rank-movement">#169 → #146</span>
+            <span class="event-label">Fresh</span><span class="event-detail">2026-06-02: Activity resumed</span>
+          </span>
+          <span class="rank">#146</span>
         </a>
         
-        <a class="mover-item up" href="/agents/lancedb/">
-          <span class="delta">+78</span>
-          <span><span class="name">LanceDB</span><span class="sub">Memory &amp; Knowledge · Grade A · HVTrust 87.9</span></span>
-          <span class="rank">#15</span>
+        <a class="mover-item up" href="/agents/flowise/">
+          <span class="delta">+13</span>
+          <span>
+            <span class="name">Flowise</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Workflow Platforms · Grade B · HVTrust 75.9</span>
+            <span class="rank-movement">#48 → #35</span>
+            <span class="event-label">Rank</span><span class="event-detail">2026-06-02: Rank rose 13 spots (#48 → #35)</span>
+          </span>
+          <span class="rank">#35</span>
         </a>
         
-        <a class="mover-item up" href="/agents/trigger-dev/">
-          <span class="delta">+70</span>
-          <span><span class="name">Trigger.dev</span><span class="sub">Workflow Platforms · Grade A · HVTrust 89.9</span></span>
-          <span class="rank">#9</span>
+        <a class="mover-item up" href="/agents/open-webui/">
+          <span class="delta">+6</span>
+          <span>
+            <span class="name">Open WebUI</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Memory &amp; Knowledge · Grade A · HVTrust 89.2</span>
+            <span class="rank-movement">#19 → #13</span>
+            <span class="event-label">Activity</span><span class="event-detail">2026-06-02: Activity score up 6pts (94 → 100)</span>
+          </span>
+          <span class="rank">#13</span>
         </a>
         
-        <a class="mover-item up" href="/agents/nemo-guardrails/">
-          <span class="delta">+68</span>
-          <span><span class="name">NeMo Guardrails</span><span class="sub">Security &amp; Guardrails · Grade B · HVTrust 73.3</span></span>
-          <span class="rank">#38</span>
-        </a>
-        
-        <a class="mover-item up" href="/agents/langwatch/">
-          <span class="delta">+63</span>
-          <span><span class="name">LangWatch</span><span class="sub">Observability &amp; Evaluation · Grade B · HVTrust 69.8</span></span>
-          <span class="rank">#58</span>
-        </a>
-        
-        <a class="mover-item up" href="/agents/livekit-agents/">
-          <span class="delta">+61</span>
-          <span><span class="name">LiveKit Agents</span><span class="sub">LLM Gateways &amp; Infra · Grade A · HVTrust 90.0</span></span>
+        <a class="mover-item up" href="/agents/cline/">
+          <span class="delta">+2</span>
+          <span>
+            <span class="name">Cline</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Coding Agents · Grade A · HVTrust 91.4</span>
+            <span class="rank-movement">#10 → #8</span>
+            <span class="event-label">HVTrust</span><span class="event-detail">2026-05-29: HVTrust up 10.0pts (78.4 → 88.4)</span>
+          </span>
           <span class="rank">#8</span>
-        </a>
-        
-        <a class="mover-item up" href="/agents/pydanticai/">
-          <span class="delta">+60</span>
-          <span><span class="name">PydanticAI</span><span class="sub">Agent Frameworks · Grade A · HVTrust 91.9</span></span>
-          <span class="rank">#4</span>
-        </a>
-        
-        <a class="mover-item up" href="/agents/giskard/">
-          <span class="delta">+57</span>
-          <span><span class="name">Giskard</span><span class="sub">Observability &amp; Evaluation · Grade B · HVTrust 70.6</span></span>
-          <span class="rank">#53</span>
-        </a>
-        
-        <a class="mover-item up" href="/agents/arize-phoenix/">
-          <span class="delta">+55</span>
-          <span><span class="name">Arize Phoenix</span><span class="sub">Observability &amp; Evaluation · Grade B · HVTrust 75.9</span></span>
-          <span class="rank">#32</span>
-        </a>
-        
-        <a class="mover-item up" href="/agents/griptape/">
-          <span class="delta">+53</span>
-          <span><span class="name">Griptape</span><span class="sub">Agent Frameworks · Grade B · HVTrust 66.7</span></span>
-          <span class="rank">#71</span>
         </a>
         
       </div>
       <div class="mover-list">
         <h2>Biggest Drops</h2>
         
-        <a class="mover-item down" href="/agents/eliza/">
-          <span class="delta">-157</span>
-          <span><span class="name">Eliza</span><span class="sub">Agent Frameworks · Grade D · HVTrust 37.3</span></span>
-          <span class="rank">#163</span>
+        <a class="mover-item down" href="/agents/sotopia-agents/">
+          <span class="delta">-23</span>
+          <span>
+            <span class="name">Sotopia agents</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Agent Frameworks · Grade D · HVTrust 40.4</span>
+            <span class="rank-movement">#146 → #169</span>
+            <span class="event-label">Rank</span><span class="event-detail">2026-06-03: Rank rose 11 spots (#169 → #158)</span>
+          </span>
+          <span class="rank">#169</span>
         </a>
         
-        <a class="mover-item down" href="/agents/activepieces/">
-          <span class="delta">-146</span>
-          <span><span class="name">Activepieces</span><span class="sub">Workflow Platforms · Grade D · HVTrust 41.7</span></span>
-          <span class="rank">#153</span>
+        <a class="mover-item down" href="/agents/swarmzero/">
+          <span class="delta">-19</span>
+          <span>
+            <span class="name">SwarmZero</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Agent Frameworks · Grade D · HVTrust 35.7</span>
+            <span class="rank-movement">#166 → #185</span>
+            <span class="event-label">Rank</span><span class="event-detail">2026-06-02: Rank dropped 19 spots (#166 → #185)</span>
+          </span>
+          <span class="rank">#185</span>
         </a>
         
-        <a class="mover-item down" href="/agents/agenta/">
-          <span class="delta">-145</span>
-          <span><span class="name">Agenta</span><span class="sub">Observability &amp; Evaluation · Grade D · HVTrust 41.2</span></span>
-          <span class="rank">#154</span>
+        <a class="mover-item down" href="/agents/agentops/">
+          <span class="delta">-18</span>
+          <span>
+            <span class="name">AgentOps</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Observability &amp; Evaluation · Grade D · HVTrust 35.2</span>
+            <span class="rank-movement">#168 → #186</span>
+            <span class="event-label">Rank</span><span class="event-detail">2026-06-02: Rank dropped 18 spots (#168 → #186)</span>
+          </span>
+          <span class="rank">#186</span>
         </a>
         
-        <a class="mover-item down" href="/agents/opencode/">
-          <span class="delta">-134</span>
-          <span><span class="name">opencode</span><span class="sub">Coding Agents · Grade D · HVTrust 46.5</span></span>
-          <span class="rank">#137</span>
+        <a class="mover-item down" href="/agents/plandex/">
+          <span class="delta">-18</span>
+          <span>
+            <span class="name">Plandex</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Coding Agents · Grade D · HVTrust 23.6</span>
+            <span class="rank-movement">#177 → #195</span>
+            <span class="event-label">Rank</span><span class="event-detail">2026-06-02: Rank dropped 18 spots (#177 → #195)</span>
+          </span>
+          <span class="rank">#195</span>
         </a>
         
-        <a class="mover-item down" href="/agents/continue/">
-          <span class="delta">-133</span>
-          <span><span class="name">Continue</span><span class="sub">Coding Agents · Grade D · HVTrust 32.5</span></span>
-          <span class="rank">#171</span>
+        <a class="mover-item down" href="/agents/lingxi/">
+          <span class="delta">-18</span>
+          <span>
+            <span class="name">Lingxi</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Agent Frameworks · Grade D · HVTrust 17.4</span>
+            <span class="rank-movement">#178 → #196</span>
+            <span class="event-label">Rank</span><span class="event-detail">2026-06-02: Rank dropped 18 spots (#178 → #196)</span>
+          </span>
+          <span class="rank">#196</span>
         </a>
         
-        <a class="mover-item down" href="/agents/mastra/">
-          <span class="delta">-123</span>
-          <span><span class="name">Mastra</span><span class="sub">Agent Frameworks · Grade D · HVTrust 49.0</span></span>
-          <span class="rank">#131</span>
+        <a class="mover-item down" href="/agents/open-operator/">
+          <span class="delta">-17</span>
+          <span>
+            <span class="name">Open Operator</span><span class="state-chip state-warning">Needs review</span>
+            <span class="sub">Browser &amp; Computer Use · Grade D · HVTrust 36.2</span>
+            <span class="rank-movement">#165 → #182</span>
+            <span class="event-label">Warning</span><span class="event-detail">2026-06-03: Warning: eligibility issues detected</span>
+          </span>
+          <span class="rank">#182</span>
         </a>
         
-        <a class="mover-item down" href="/agents/daytona/">
-          <span class="delta">-116</span>
-          <span><span class="name">Daytona</span><span class="sub">Sandboxes &amp; Runtimes · Grade D · HVTrust 46.0</span></span>
-          <span class="rank">#142</span>
+        <a class="mover-item down" href="/agents/odysseus/">
+          <span class="delta">-17</span>
+          <span>
+            <span class="name">Odysseus</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Memory &amp; Knowledge · Grade D · HVTrust 35.7</span>
+            <span class="rank-movement">#167 → #184</span>
+            <span class="event-label">Rank</span><span class="event-detail">2026-06-02: Rank dropped 17 spots (#167 → #184)</span>
+          </span>
+          <span class="rank">#184</span>
         </a>
         
-        <a class="mover-item down" href="/agents/anythingllm/">
-          <span class="delta">-106</span>
-          <span><span class="name">AnythingLLM</span><span class="sub">Memory &amp; Knowledge · Grade D · HVTrust 47.1</span></span>
-          <span class="rank">#136</span>
+        <a class="mover-item down" href="/agents/agent-laboratory/">
+          <span class="delta">-17</span>
+          <span>
+            <span class="name">Agent Laboratory</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Agent Frameworks · Grade D · HVTrust 34.0</span>
+            <span class="rank-movement">#170 → #187</span>
+            <span class="event-label">Rank</span><span class="event-detail">2026-06-02: Rank dropped 17 spots (#170 → #187)</span>
+          </span>
+          <span class="rank">#187</span>
         </a>
         
-        <a class="mover-item down" href="/agents/llamaindex/">
-          <span class="delta">-103</span>
-          <span><span class="name">LlamaIndex</span><span class="sub">Agent Frameworks · Grade D · HVTrust 47.4</span></span>
-          <span class="rank">#134</span>
-        </a>
-        
-        <a class="mover-item down" href="/agents/aider/">
-          <span class="delta">-95</span>
-          <span><span class="name">Aider</span><span class="sub">Coding Agents · Grade C · HVTrust 60.6</span></span>
-          <span class="rank">#105</span>
-        </a>
-        
-        <a class="mover-item down" href="/agents/smolagents/">
-          <span class="delta">-95</span>
-          <span><span class="name">smolagents</span><span class="sub">Agent Frameworks · Grade D · HVTrust 41.8</span></span>
-          <span class="rank">#152</span>
+        <a class="mover-item down" href="/agents/pearai/">
+          <span class="delta">-17</span>
+          <span>
+            <span class="name">PearAI</span><span class="state-chip state-warning">Needs review</span>
+            <span class="sub">Coding Agents · Grade D · HVTrust 25.7</span>
+            <span class="rank-movement">#173 → #190</span>
+            <span class="event-label">Warning</span><span class="event-detail">2026-06-03: Warning: eligibility issues detected</span>
+          </span>
+          <span class="rank">#190</span>
         </a>
         
         <a class="mover-item down" href="/agents/ten-framework/">
-          <span class="delta">-91</span>
-          <span><span class="name">TEN Framework</span><span class="sub">LLM Gateways &amp; Infra · Grade D · HVTrust 25.1</span></span>
-          <span class="rank">#174</span>
+          <span class="delta">-17</span>
+          <span>
+            <span class="name">TEN Framework</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">LLM Gateways &amp; Infra · Grade D · HVTrust 25.1</span>
+            <span class="rank-movement">#174 → #191</span>
+            <span class="event-label">Rank</span><span class="event-detail">2026-06-02: Rank dropped 17 spots (#174 → #191)</span>
+          </span>
+          <span class="rank">#191</span>
+        </a>
+        
+        <a class="mover-item down" href="/agents/ailice/">
+          <span class="delta">-17</span>
+          <span>
+            <span class="name">AIlice</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Agent Frameworks · Grade D · HVTrust 25.0</span>
+            <span class="rank-movement">#175 → #192</span>
+            <span class="event-label">Rank</span><span class="event-detail">2026-06-02: Rank dropped 17 spots (#175 → #192)</span>
+          </span>
+          <span class="rank">#192</span>
+        </a>
+        
+        <a class="mover-item down" href="/agents/openmanus/">
+          <span class="delta">-17</span>
+          <span>
+            <span class="name">OpenManus</span><span class="state-chip state-listed">Listed</span>
+            <span class="sub">Agent Frameworks · Grade D · HVTrust 24.3</span>
+            <span class="rank-movement">#176 → #193</span>
+            <span class="event-label">Rank</span><span class="event-detail">2026-06-02: Rank dropped 17 spots (#176 → #193)</span>
+          </span>
+          <span class="rank">#193</span>
         </a>
         
       </div>
     </section>
 
     <footer>
-      <a href="/">HVTracker</a> &middot; <a href="/data/latest.json">Data API</a> &middot; <a href="/feed.json">Feed</a>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
   </div>
 </body>

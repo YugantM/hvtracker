@@ -62,128 +62,84 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:#0b0d10; --surface:rgba(21,25,32,0.78); --surface-2:rgba(27,32,41,0.82); --border:rgba(142,154,176,0.22);
-      --hairline:rgba(168,179,194,0.12); --glass:rgba(21,25,32,0.72); --glass-hi:rgba(255,255,255,0.055);
-      --metal:linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.018) 34%, rgba(45,212,191,0.045) 72%, rgba(216,166,87,0.055));
-      --text:#eef2f6; --muted:#a8b3c2;
-      --accent:#8fb3ff; --accent-lt:rgba(143,179,255,0.10); --accent-dim:#5677aa;
-      --mocha:#d8a657; --mocha-lt:rgba(216,166,87,0.16);
-      --fresh:#2dd4bf; --aging:#d8a657; --stale:#737f91;
-      --score-hi-bg:rgba(45,212,191,0.16); --score-hi-fg:#5eead4;
-      --score-mid-bg:rgba(216,166,87,0.16); --score-mid-fg:#d8a657;
-      --score-lo-bg:rgba(100,100,120,0.12); --score-lo-fg:#737f91;
-      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --bg:#f4f1eb; --surface:#eae6de; --border:#d4cfc5;
+      --text:#1a1a1a; --muted:#6b6560; --accent:#2c5282; --accent-warm:#b05a3a;
+      --green:#2f6846; --red:#9b3c3c; --amber:#8b6914;
+      --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
       --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
     }
-    body {
-      background-color:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:14px; line-height:1.55; min-height:100vh;
-      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"), radial-gradient(circle at 18% -10%, rgba(45,212,191,0.14), transparent 30%), radial-gradient(circle at 86% 6%, rgba(216,166,87,0.12), transparent 26%), linear-gradient(135deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 11px), linear-gradient(180deg, #10141a 0%, var(--bg) 54%, #07090c 100%);
-      background-repeat:repeat, no-repeat, no-repeat, repeat, no-repeat; background-size:256px 256px, auto, auto, auto, auto;
-    }
+    body { background:var(--bg); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color:var(--text); font-family:var(--font-sans); font-size:15px; line-height:1.6; min-height:100vh; }
     a { color:inherit; text-decoration:none; }
     a:hover { text-decoration:underline; }
-    .page { max-width:920px; margin:0 auto; padding:24px 20px 0; }
+    .page { max-width:880px; margin:0 auto; padding:0 24px; background:var(--bg); min-height:100vh; }
 
-    header {
-      padding:16px 18px; border:1px solid var(--border); border-radius:10px;
-      background:var(--metal), var(--glass);
-      box-shadow:inset 0 1px 0 var(--glass-hi), 0 18px 54px rgba(0,0,0,0.28);
-      backdrop-filter:blur(18px) saturate(120%);
-      display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; position:relative;
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
     }
-    .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; }
-    .logo span { color:var(--accent); }
-    .back {
-      font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto;
-      border:1px solid var(--border); border-radius:999px; padding:5px 10px;
-      background:rgba(255,255,255,0.035);
+    .site-header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
     }
-    .back:hover { color:var(--text); border-color:var(--accent-dim); text-decoration:none; }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; }
+    .logo span { color:var(--accent-warm); }
+    .site-nav { font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; margin-left:auto; flex-wrap:wrap; }
+    .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--text); text-decoration:none; border-color:var(--border); background:var(--surface); }
 
-    .hero,
-    .stats-bar,
-    .cat-nav {
-      border:1px solid var(--border);
-      border-radius:10px;
-      background:linear-gradient(135deg, rgba(255,255,255,0.052), rgba(255,255,255,0.014)), var(--glass);
-      box-shadow:inset 0 1px 0 var(--glass-hi);
-      position:relative;
-    }
-    .hero { padding:24px 20px; margin:14px 0; border-bottom:1px solid var(--border); }
-    h1 { font-size:28px; font-weight:700; letter-spacing:-0.5px; margin-bottom:6px; }
-    .hero .subtitle { font-size:14px; color:var(--muted); margin-top:4px; }
-    .hero .seo-intro {
-      margin-top:18px; font-size:14px; color:var(--muted); line-height:1.7; max-width:680px;
-    }
+    .hero { padding:24px 0; border-bottom:1px solid var(--border); }
+    h1 { font-size:26px; font-weight:700; margin-bottom:4px; }
+    .hero .subtitle { font-size:13px; color:var(--muted); }
+    .hero .seo-intro { margin-top:12px; font-size:13px; color:var(--muted); line-height:1.7; max-width:640px; }
     .hero .seo-intro strong { color:var(--text); }
 
-    .stats-bar {
-      display:flex; gap:24px; padding:18px 0; margin:14px 0; border:0; border-top:1px solid var(--hairline); border-bottom:1px solid var(--hairline);
-      background:transparent; box-shadow:none; border-radius:0;
-      flex-wrap:wrap;
-    }
-    .stat { text-align:center; }
-    .stat .num { font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--accent); }
-    .stat .lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
+    .stats-bar { display:flex; gap:20px; padding:12px 0; border-bottom:1px solid var(--border); flex-wrap:wrap; font-family:var(--font-mono); }
+    .stat { }
+    .stat .num { font-size:18px; font-weight:700; }
+    .stat .lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; }
 
-    table {
-      width:100%; border-collapse:separate; border-spacing:0; margin-top:14px;
-      border:1px solid var(--border); border-radius:10px; overflow:hidden;
-      background:linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012)), rgba(12,15,23,0.76);
-      box-shadow:inset 0 1px 0 var(--glass-hi), 0 24px 70px rgba(0,0,0,0.30);
-    }
-    th {
-      text-align:left; font-family:var(--font-mono); font-size:10px;
-      text-transform:uppercase; letter-spacing:1px; color:var(--muted);
-      padding:10px 8px; border-bottom:1px solid var(--hairline); background:rgba(13,16,25,0.94);
-    }
-    td { padding:10px 8px; border-bottom:1px solid var(--hairline); font-size:13px; }
-    tr:hover td { background:rgba(143,179,255,0.08); }
+    table { width:100%; border-collapse:collapse; margin-top:12px; border-top:2px solid var(--text); }
+    th { text-align:left; font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); padding:8px 6px; border-bottom:1px solid var(--border); }
+    td { padding:8px 6px; border-bottom:1px solid rgba(0,0,0,0.06); font-size:13px; }
+    tr:hover td { background:rgba(0,0,0,0.03); }
 
-    .rank-cell { font-family:var(--font-mono); font-size:12px; color:var(--muted); width:36px; }
+    .rank-cell { font-family:var(--font-mono); font-size:12px; color:var(--muted); width:32px; }
     .name-cell a { font-weight:600; }
     .name-cell a:hover { color:var(--accent); }
-    .name-cell .desc { font-size:11px; color:var(--muted); margin-top:2px; display:block; max-width:380px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .grade {
-      display:inline-block; font-family:var(--font-mono); font-size:10px; font-weight:700;
-      padding:1px 5px; border-radius:2px; margin-left:6px;
-    }
-    .grade-A { background:rgba(45,212,191,0.16); color:#2dd4bf; }
-    .grade-B { background:rgba(163,230,53,0.15); color:#9ae6b4; }
-    .grade-C { background:rgba(216,166,87,0.16); color:#d8a657; }
-    .grade-D { background:var(--score-lo-bg); color:var(--score-lo-fg); }
+    .name-cell .desc { font-size:11px; color:var(--muted); margin-top:1px; display:block; max-width:360px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .grade { font-family:var(--font-mono); font-size:10px; font-weight:700; margin-left:4px; }
+    .grade-A { color:var(--green); }
+    .grade-B { color:var(--accent); }
+    .grade-C { color:var(--amber); }
+    .grade-D { color:var(--muted); }
+    .state-chip { font-family:var(--font-mono); font-size:9px; font-weight:600; margin-left:4px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); }
+    .state-listed { color:var(--green); }
+    .state-warning { color:var(--red); }
 
     .score-cell { font-family:var(--font-mono); font-size:13px; font-weight:600; }
-    .score-hi { color:var(--score-hi-fg); }
-    .score-mid { color:var(--score-mid-fg); }
-    .score-lo { color:var(--score-lo-fg); }
+    .score-hi { color:var(--green); }
+    .score-mid { color:var(--amber); }
+    .score-lo { color:var(--muted); }
 
     .stars-cell { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
     .lang-cell { font-size:11px; color:var(--muted); }
 
-    .cat-nav { padding:20px 0; margin:14px 0; border:0; border-top:1px solid var(--hairline); background:transparent; box-shadow:none; border-radius:0; }
-    .cat-nav h2 { font-size:16px; font-weight:600; margin-bottom:12px; }
-    .cat-pills { display:flex; gap:6px; flex-wrap:wrap; }
-    .cat-pill {
-      font-family:var(--font-mono); font-size:11px; padding:4px 10px;
-      border-radius:3px; background:rgba(255,255,255,0.045); color:var(--muted);
-      transition:all 0.15s;
-    }
-    .cat-pill:hover { background:var(--accent-lt); color:var(--accent); text-decoration:none; }
-    .cat-pill.active { background:var(--accent-lt); color:var(--accent); }
+    .cat-nav { padding:16px 0; border-top:1px solid var(--border); }
+    .cat-nav h2 { font-size:14px; font-weight:600; margin-bottom:8px; }
+    .cat-pills { display:flex; gap:4px; flex-wrap:wrap; }
+    .cat-pill { font-family:var(--font-mono); font-size:11px; padding:3px 8px; color:var(--muted); }
+    .cat-pill:hover { color:var(--accent); text-decoration:none; }
+    .cat-pill.active { color:var(--accent); font-weight:600; }
 
-    footer {
-      padding:28px 0; margin-top:20px; border-top:0;
-      font-size:11px; color:var(--muted); text-align:center;
-    }
-    footer a:hover { color:var(--accent); }
+    footer { padding:20px 0; margin-top:16px; border-top:1px solid var(--border); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--accent); }
 
     @media (max-width:600px) {
-      h1 { font-size:22px; }
-      .stats-bar { gap:16px; }
-      .stat .num { font-size:18px; }
-      td, th { padding:8px 4px; }
-      .name-cell .desc { max-width:200px; }
+      h1 { font-size:18px; }
+      .stats-bar { gap:12px; }
+      td, th { padding:6px 4px; }
+      .name-cell .desc { max-width:180px; }
     }
   </style>
   <script type="application/ld+json">
@@ -211,20 +167,31 @@
   <script defer src="/analytics.js"></script>
 </head>
 <body data-page-type="category_page" data-category="Robotics &amp; Embodied">
-  <div class="page">
-    <header>
+  <header class="site-header">
+    <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
-      <a href="/" class="back">&larr; All agents</a>
-    </header>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
+      </nav>
+    </div>
+  </header>
+  <div class="page">
 
     <section class="hero">
       <h1>Robotics &amp; Embodied</h1>
-      <p class="subtitle">1 open-source agents tracked &middot; Ranked by trust score &middot; Updated 2026-06-02 21:06 UTC</p>
+      <p class="subtitle">1 open-source agents tracked &middot; Ranked by trust score &middot; Updated 2026-06-03 20:55 UTC</p>
 
       <div class="seo-intro">
         <p>HVTracker independently evaluates <strong>1 open-source robotics &amp; embodied</strong> using daily signals from GitHub, package registries, and security databases.
         Each agent is scored on activity, adoption, transparency, safety, and identity.
-        The top-ranked robotics &amp; embodied is <strong>LeRobot</strong> with a trust score of 88.8/100 (Grade A).
+        The top-ranked robotics &amp; embodied is <strong>LeRobot</strong> with a trust score of 88.9/100 (Grade A).
         
         </p>
       </div>
@@ -247,6 +214,7 @@
         <div class="num">1</div>
         <div class="lbl">Grade A</div>
       </div>
+      
     </div>
 
     <table>
@@ -266,9 +234,10 @@
           <td class="name-cell">
             <a href="/agents/lerobot">LeRobot</a>
             <span class="grade grade-A">A</span>
+            <span class="state-chip state-listed">Listed</span>
             <span class="desc">🤗 LeRobot: Making AI for Robotics more accessible with end-to-end learning</span>
           </td>
-          <td class="score-cell score-hi">88.8</td>
+          <td class="score-cell score-hi">88.9</td>
           <td class="stars-cell">24.6k</td>
           <td class="lang-cell">Python</td>
         </tr>
@@ -284,7 +253,7 @@
         
         <a href="/categories/coding-agents" class="cat-pill ">Coding Agents (25)</a>
         
-        <a href="/categories/agent-frameworks" class="cat-pill ">Agent Frameworks (62)</a>
+        <a href="/categories/agent-frameworks" class="cat-pill ">Agent Frameworks (61)</a>
         
         <a href="/categories/workflow-platforms" class="cat-pill ">Workflow Platforms (15)</a>
         
@@ -316,8 +285,22 @@
     </nav>
 
     <footer>
-      <a href="/">HVTracker</a> &middot; AI Trust Registry &middot;
-      <a href="/methodology">Methodology</a> &middot;
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
       <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
   </div>

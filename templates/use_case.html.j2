@@ -21,22 +21,54 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#0b0d10;--surface:rgba(21,25,32,.78);--border:rgba(142,154,176,.22);--hairline:rgba(168,179,194,.12);--text:#eef2f6;--muted:#a8b3c2;--accent:#8fb3ff;--fresh:#2dd4bf;--mocha:#d8a657;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}
-    body{min-height:100vh;background:var(--bg);color:var(--text);font:15px/1.62 var(--font-sans);background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E"),radial-gradient(circle at 14% -8%,rgba(45,212,191,.14),transparent 30%),radial-gradient(circle at 86% 6%,rgba(143,179,255,.12),transparent 26%),linear-gradient(180deg,#10141a 0%,#0b0d10 54%,#07090c 100%)}
-    a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}
-    .page{max-width:1080px;margin:0 auto;padding:28px 20px 46px}
-    header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding:16px 18px;border:1px solid var(--border);border-radius:10px;background:linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 18px 54px rgba(0,0,0,.28)}
-    .logo{font-family:var(--font-mono);font-weight:700;font-size:18px}.logo span{color:var(--accent)}
-    nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;font:11px var(--font-mono)}nav a{color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:5px 10px;background:rgba(255,255,255,.035)}
-    .hero{padding:32px 0 18px;border-bottom:1px solid var(--hairline)}
-    h1{font-size:34px;line-height:1.14;letter-spacing:0;margin-bottom:8px}.hero p{color:var(--muted);max-width:760px}
-    .metric-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}
-    .metric{border-top:1px solid var(--hairline);padding-top:12px}.metric strong{display:block;font:700 24px var(--font-mono);color:var(--fresh)}.metric span{color:var(--muted);font-size:12px}
-    .chart-band{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:22px 0}
-    .chart-panel{border-top:1px solid var(--hairline);padding-top:16px;min-width:0}.chart-panel h2{font-size:14px;margin-bottom:10px}.insight-chart{width:100%;height:auto;display:block;overflow:visible}
-    .slice-nav{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 4px}.slice-nav a{font:11px var(--font-mono);color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:6px 10px;background:rgba(255,255,255,.035)}.slice-nav a.active{color:var(--text);border-color:rgba(45,212,191,.5)}
-    table{width:100%;border-collapse:collapse;margin-top:20px;font-size:14px}th,td{padding:11px 10px;border-bottom:1px solid var(--hairline);text-align:left}th{font:11px var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}td.num{text-align:right;font-family:var(--font-mono)}.agent{font-weight:700}.repo{display:block;color:var(--muted);font:11px var(--font-mono);margin-top:2px}.grade{display:inline-flex;min-width:24px;justify-content:center;border-radius:5px;padding:2px 7px;font:700 11px var(--font-mono);background:rgba(143,179,255,.16);color:var(--accent)}
-    footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--hairline);font:11px var(--font-mono);color:var(--muted);text-align:center}footer a{color:var(--accent)}
+    :root{
+      --paper:#f4f1eb;
+      --paper-2:#ece4d6;
+      --ink:#1f1b17;
+      --muted:#6f665d;
+      --line:#d5cbbc;
+      --blue:#a7bfd9;
+      --blue-strong:#7f9cbd;
+      --lobster:#c67c6d;
+      --moss:#6f876e;
+      --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif
+    }
+    body{min-height:100vh;background:var(--paper); background-image:url("/hex-bg.svg");background-size:2000px 2000px;color:var(--ink);font:15px/1.7 var(--font-sans)}
+    a{color:inherit;text-decoration:none}
+    a:hover{text-decoration:underline}
+    .page{background:var(--paper);max-width:1080px;margin:0 auto;padding:28px 24px 52px}
+    .site-header{position:sticky;top:0;z-index:100;background:var(--paper);border-bottom:1px solid var(--line)}
+    .site-header-inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+    .logo{font-family:var(--font-mono);font-weight:700;font-size:20px;letter-spacing:0}
+    .logo span{color:var(--lobster)}
+    nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;font:11px var(--font-mono)}
+    .site-nav a{color:var(--muted);padding:5px 10px;border:1px solid transparent}
+    .site-nav a:hover{color:var(--ink);border-color:var(--line);background:var(--paper-2);text-decoration:none}
+    .hero{padding:28px 0 18px;border-bottom:1px solid var(--line)}
+    h1{font-size:34px;line-height:1.12;letter-spacing:0;margin-bottom:10px}
+    .hero p{color:var(--muted);max-width:760px}
+    .metric-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:20px 0}
+    .metric{padding:12px 0;border-top:2px solid var(--ink)}
+    .metric strong{display:block;font:700 24px var(--font-mono);color:var(--ink)}
+    .metric span{color:var(--muted);font-size:12px}
+    .chart-band{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin:26px 0}
+    .chart-panel{min-width:0;padding-top:14px;border-top:1px solid var(--line)}
+    .chart-panel h2{font:700 13px var(--font-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+    .insight-chart{width:100%;height:auto;display:block;overflow:visible}
+    .slice-nav{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 4px}
+    .slice-nav a{font:11px var(--font-mono);color:var(--muted);padding:6px 10px;border:1px solid transparent}
+    .slice-nav a:hover{color:var(--ink);border-color:var(--line);background:var(--paper-2);text-decoration:none}
+    .slice-nav a.active{color:var(--ink);border-color:var(--line);background:var(--paper-2)}
+    table{width:100%;border-collapse:collapse;margin-top:24px;font-size:14px;border-top:2px solid var(--ink)}
+    th,td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{font:11px var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    td.num{text-align:right;font-family:var(--font-mono)}
+    .agent{font-weight:700}
+    .repo{display:block;color:var(--muted);font:11px var(--font-mono);margin-top:3px}
+    .grade{display:inline-flex;min-width:24px;justify-content:center;padding:3px 8px;font:700 11px var(--font-mono);border:1px solid var(--line);color:var(--lobster)}
+    footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font:11px var(--font-mono);color:var(--muted);text-align:center}
+    footer a{color:var(--lobster)}
     @media(max-width:760px){.metric-row,.chart-band{grid-template-columns:1fr}h1{font-size:26px}nav{margin-left:0}table{font-size:13px}th:nth-child(4),td:nth-child(4){display:none}}
   </style>
   <script type="application/ld+json">
@@ -65,16 +97,22 @@
   <script defer src="/analytics.js"></script>
 </head>
 <body data-page-type="{% if is_index %}use_cases_index{% else %}use_case{% endif %}">
-  <div class="page">
-    <header>
+  <header class="site-header">
+    <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
-      <nav aria-label="Site">
+      <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
         <a href="/movers/">Movers</a>
-        <a href="/compare/">Compare</a>
+        <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
       </nav>
-    </header>
+    </div>
+  </header>
+  <div class="page">
 
     <section class="hero">
       <h1>{{ page.title }}</h1>
@@ -123,7 +161,23 @@
     </table>
 
     <footer>
-      Updated {{ updated }} &middot; <a href="/data/latest.json">Data API</a> &middot; <a href="/feed.json">Feed</a>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
   </div>
 </body>

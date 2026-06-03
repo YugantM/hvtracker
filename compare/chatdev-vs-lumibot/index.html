@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ChatDev vs Lumibot: Trust Score & Security Comparison | HVTracker</title>
-  <meta name="description" content="ChatDev vs Lumibot compared on independent trust signals: HVTrust score (58.6 vs 56.9), evidence grade, supply-chain safety, maintenance, and adoption. ChatDev ranks higher.">
+  <meta name="description" content="ChatDev vs Lumibot compared on independent trust signals: HVTrust score (58.4 vs 57.0), evidence grade, supply-chain safety, maintenance, and adoption. ChatDev ranks higher.">
   <link rel="canonical" href="https://hvtracker.net/compare/chatdev-vs-lumibot/">
   <meta property="og:type" content="article">
   <meta property="og:title" content="ChatDev vs Lumibot — Trust Score Comparison">
-  <meta property="og:description" content="Independent trust comparison: HVTrust 58.6 vs 56.9. Supply-chain safety, maintenance, adoption.">
+  <meta property="og:description" content="Independent trust comparison: HVTrust 58.4 vs 57.0. Supply-chain safety, maintenance, adoption.">
   <meta property="og:url" content="https://hvtracker.net/compare/chatdev-vs-lumibot/">
   <meta name="twitter:card" content="summary">
   <script type="application/ld+json">
@@ -19,12 +19,12 @@
       {
         "@type": "Question",
         "name": "Is ChatDev or Lumibot more trustworthy?",
-        "acceptedAnswer": { "@type": "Answer", "text": "On HVTracker's evidence-weighted HVTrust score, ChatDev ranks higher (58.6 vs 56.9/100). Trust reflects verifiable supply-chain, transparency, maintenance, and adoption signals — not popularity." }
+        "acceptedAnswer": { "@type": "Answer", "text": "On HVTracker's evidence-weighted HVTrust score, ChatDev ranks higher (58.4 vs 57.0/100). Trust reflects verifiable supply-chain, transparency, maintenance, and adoption signals — not popularity." }
       },
       {
         "@type": "Question",
         "name": "What is the difference between ChatDev and Lumibot?",
-        "acceptedAnswer": { "@type": "Answer", "text": "ChatDev (OpenBMB/ChatDev) has an HVTrust score of 58.6 (Grade C) with 33.3k GitHub stars; Lumibot (Lumiwealth/lumibot) scores 56.9 (Grade C) with 1.6k stars. Both are Multi-Agent Systems." }
+        "acceptedAnswer": { "@type": "Answer", "text": "ChatDev (OpenBMB/ChatDev) has an HVTrust score of 58.4 (Grade C) with 33.3k GitHub stars; Lumibot (Lumiwealth/lumibot) scores 57.0 (Grade C) with 1.6k stars. Both are Multi-Agent Systems." }
       }
     ]
   }
@@ -45,30 +45,42 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#0b0d10;--surface:rgba(21,25,32,.78);--surface-2:rgba(27,32,41,.82);--border:rgba(255,255,255,.09);--hairline:rgba(168,179,194,.12);--text:#e8ecf2;--muted:#8b97a7;--accent:#8fb3ff;--accent-dim:#5677aa;--green:#3dd68c;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;--font-mono:"IBM Plex Mono","SF Mono",Menlo,monospace}
-    body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+    :root{--bg:#f4f1eb;--surface:#eae6de;--border:#d4cfc5;--text:#1a1a1a;--muted:#6b6560;--accent:#2c5282;--accent-warm:#b05a3a;--green:#2f6846;--red:#9b3c3c;--amber:#8b6914;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+    body{background:var(--bg);background-image:url("/hex-bg.svg");background-size:2000px 2000px;color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.6}
     a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-    .page{max-width:880px;margin:0 auto;padding:32px 20px 64px}
-    .crumbs{font-size:12px;color:var(--muted);margin-bottom:18px}
-    h1{font-size:30px;line-height:1.2;font-weight:700;letter-spacing:-.01em;margin-bottom:10px}
-    h1 .vs{color:var(--muted);font-weight:500}
-    .lede{color:var(--muted);font-size:15px;margin-bottom:24px}
-    .verdict{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:14px 18px;margin-bottom:28px;font-size:14px}
+    .page{background:var(--bg);max-width:820px;margin:0 auto;padding:0 24px 48px;min-height:100vh}
+    .site-header{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border)}
+    .site-header-inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+    .logo{font-family:var(--font-mono);font-size:20px;font-weight:700}
+    .logo span{color:var(--accent-warm)}
+    .site-nav{font-family:var(--font-mono);font-size:11px;display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+    .site-nav a{color:var(--muted);padding:5px 10px;border:1px solid transparent}
+    .site-nav a:hover{color:var(--text);text-decoration:none;border-color:var(--border);background:var(--surface)}
+    .crumbs{font-size:11px;color:var(--muted);padding:10px 0;border-bottom:1px solid var(--border)}
+    h1{font-size:26px;font-weight:700;margin:20px 0 6px}
+    h1 .vs{color:var(--muted);font-weight:400}
+    .lede{color:var(--muted);font-size:13px;margin-bottom:20px}
+    .verdict{border-left:3px solid var(--accent-warm);padding:12px 14px;margin-bottom:24px;font-size:13px;background:var(--surface)}
     .verdict strong{color:var(--text)}
-    table{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:28px}
-    th,td{padding:11px 12px;border-bottom:1px solid var(--hairline);text-align:left}
-    thead th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
-    tbody th{font-weight:500;color:var(--muted);width:38%}
-    td{font-family:var(--font-mono);font-size:13px}
+    table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:24px;border-top:2px solid var(--text)}
+    th,td{padding:8px 10px;border-bottom:1px solid rgba(0,0,0,0.06);text-align:left}
+    thead th{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
+    tbody th{font-weight:500;color:var(--muted);width:36%}
+    td{font-family:var(--font-mono);font-size:12px}
     td.win{color:var(--green);font-weight:600}
-    .name-col{font-family:var(--font-sans);font-weight:700;font-size:15px}
+    .name-col{font-family:var(--font-sans);font-weight:700;font-size:14px}
     .name-col a{color:var(--text)}
-    .grade{display:inline-block;font-family:var(--font-mono);font-weight:700;font-size:11px;padding:2px 7px;border-radius:4px;color:#fff}
-    .ga{background:#22c55e}.gb{background:#3b82f6}.gc{background:#d8a657}.gd{background:#666}
-    .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
-    .cta a{border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--text);background:var(--surface)}
-    .cta a:hover{border-color:var(--accent-dim);text-decoration:none}
-    footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--hairline);font-size:12px;color:var(--muted)}
+    .grade{font-family:var(--font-mono);font-weight:700;font-size:11px}
+    .ga{color:var(--green)}.gb{color:var(--accent)}.gc{color:var(--amber)}.gd{color:var(--muted)}
+    .state{font-family:var(--font-mono);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+    .state-listed{color:var(--green)}
+    .state-warning{color:var(--red)}
+    .warning-note{font-family:var(--font-sans);font-size:11px;color:var(--muted);line-height:1.5}
+    .cta{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+    .cta a{border:1px solid var(--border);padding:8px 14px;font-size:12px;font-family:var(--font-mono);color:var(--muted);background:var(--surface)}
+    .cta a:hover{border-color:var(--accent-warm);color:var(--accent-warm);text-decoration:none}
+    footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}
+    footer a{color:var(--accent)}
   </style>
   <script type="application/ld+json">
   {
@@ -96,14 +108,32 @@
   <script defer src="/analytics.js"></script>
 </head>
 <body data-page-type="compare_page" data-category="Multi-Agent Systems">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
+      </nav>
+    </div>
+  </header>
   <div class="page">
-    <div class="crumbs"><a href="/">HVTracker</a> › <a href="/categories/multi-agent-systems/">Multi-Agent Systems</a> › ChatDev vs Lumibot</div>
+
+    <div class="crumbs"><a href="/">Home</a> › <a href="/categories/multi-agent-systems/">Multi-Agent Systems</a> › ChatDev vs Lumibot</div>
     <h1>ChatDev <span class="vs">vs</span> Lumibot</h1>
     <p class="lede">An independent, evidence-weighted trust comparison of two multi-agent systems — ranked on verifiable signals, not popularity.</p>
 
     <div class="verdict">
-      <strong>ChatDev ranks higher</strong> with an HVTrust score of <strong>58.6</strong> vs 56.9/100
+      <strong>ChatDev ranks higher</strong> with an HVTrust score of <strong>58.4</strong> vs 57.0/100
       .
+      
+      
       HVTrust reflects supply-chain safety, transparency, maintenance, and adoption — weighted by how much verifiable evidence exists.
     </div>
 
@@ -112,18 +142,21 @@
         <tr><th>Signal</th><th class="name-col"><a href="/agents/chatdev/">ChatDev</a></th><th class="name-col"><a href="/agents/lumibot/">Lumibot</a></th></tr>
       </thead>
       <tbody>
-        <tr><th>HVTrust score</th><td class="win">58.6</td><td class="">56.9</td></tr>
+        <tr><th>HVTrust score</th><td class="win">58.4</td><td class="">57.0</td></tr>
         <tr><th>Evidence grade</th><td><span class="grade gc">C</span></td><td><span class="grade gc">C</span></td></tr>
+        <tr><th>Registry state</th><td><span class="state state-listed">Listed</span></td><td><span class="state state-listed">Listed</span></td></tr>
         <tr><th>Safety / Integrity (25)</th><td class="win">7.2</td><td class="">6.2</td></tr>
         <tr><th>Identity / Provenance (18)</th><td class="win">10.8</td><td class="">10.8</td></tr>
         <tr><th>Transparency (17)</th><td class="">11.9</td><td class="win">12.3</td></tr>
-        <tr><th>Maintenance (20)</th><td class="">15.9</td><td class="win">19.9</td></tr>
-        <tr><th>Adoption (20)</th><td class="win">12.8</td><td class="">7.7</td></tr>
+        <tr><th>Maintenance (20)</th><td class="">15.8</td><td class="win">20.0</td></tr>
+        <tr><th>Adoption (20)</th><td class="win">12.7</td><td class="">7.7</td></tr>
         <tr><th>GitHub stars</th><td class="win">33.3k</td><td class="">1.6k</td></tr>
-        <tr><th>Weekly downloads</th><td>27</td><td>—</td></tr>
-        <tr><th>Last push</th><td>2026-05-27</td><td>2026-06-01</td></tr>
+        <tr><th>Weekly downloads</th><td>25</td><td>—</td></tr>
+        <tr><th>Last push</th><td>2026-05-27</td><td>2026-06-03</td></tr>
         <tr><th>Language</th><td>Python</td><td>Python</td></tr>
         <tr><th>OSSF Scorecard</th><td>4.0</td><td>4.5</td></tr>
+        <tr><th>Review flags</th><td class="warning-note">—</td><td class="warning-note">—</td></tr>
+        <tr><th>Recent change</th><td class="warning-note">2026-06-01: Rank dropped 12 spots (#96 → #108)</td><td class="warning-note">2026-06-01: OSSF Scorecard: 4.5/10</td></tr>
       </tbody>
     </table>
 
@@ -134,7 +167,23 @@
     </div>
 
     <footer>
-      Methodology: <a href="/methodology">how HVTrust is computed</a>. Data updated 2026-06-02 21:06 UTC. HVTracker is independent and not affiliated with these projects.
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
   </div>
 </body>

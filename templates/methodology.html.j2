@@ -60,145 +60,124 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0b0d10;
-      --surface:   rgba(21,25,32,0.78);
-      --surface-2: rgba(27,32,41,0.82);
-      --border:    rgba(142,154,176,0.22);
-      --hairline:  rgba(168,179,194,0.12);
-      --glass-hi:  rgba(255,255,255,0.055);
-      --text:      #eef2f6;
-      --muted:     #a8b3c2;
-      --accent:    #8fb3ff;
-      --accent-lt: rgba(143,179,255,0.10);
-      --mocha:     #d8a657;
-      --panel-shadow: 0 24px 80px rgba(0,0,0,0.36), inset 0 1px 0 var(--glass-hi);
+      --paper: #f4f1eb;
+      --paper-2: #ece4d6;
+      --ink: #1f1b17;
+      --muted: #6f665d;
+      --line: #d5cbbc;
+      --line-strong: #b9aa96;
+      --blue-strong: #7f9cbd;
+      --blue-soft: rgba(167, 191, 217, 0.18);
+      --lobster: #c67c6d;
+      --lobster-soft: rgba(198, 124, 109, 0.14);
       --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
       --font-sans: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
     }
 
     body {
-      background-color: var(--bg);
-      color: var(--text);
+      background: var(--paper);
+      background-image: url("/hex-bg.svg");
+      background-size: 2000px 2000px;
+      color: var(--ink);
       font-family: var(--font-sans);
       font-size: 15px;
-      line-height: 1.65;
+      line-height: 1.7;
       min-height: 100vh;
-      background-image:
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
-        radial-gradient(ellipse at 18% -10%, rgba(45,212,191,0.15), transparent 34%),
-        radial-gradient(ellipse at 86% 4%, rgba(216,166,87,0.13), transparent 28%),
-        linear-gradient(180deg, #10141a 0%, #0b0d10 48%, #07090c 100%);
-      background-repeat: repeat, no-repeat, no-repeat, no-repeat;
-      background-size: 256px 256px, auto, auto, auto;
     }
 
-    a { color: var(--accent); text-decoration: none; }
+    a { color: var(--ink); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    .page { max-width: 1120px; margin: 0 auto; padding: 28px 22px 48px; }
+    .page { background: var(--paper); min-height: 100vh; max-width: 1120px; margin: 0 auto; padding: 24px 22px 48px; }
 
-    header {
-      padding: 16px 18px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.018)),
-        linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.018) 34%, rgba(45,212,191,0.045) 72%, rgba(216,166,87,0.055)),
-        rgba(12, 15, 22, 0.76);
-      box-shadow: var(--panel-shadow);
-      backdrop-filter: blur(18px) saturate(120%);
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+    }
+    .site-header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
     }
     .logo {
       font-family: var(--font-mono);
-      font-size: 24px;
+      font-size:20px;
       font-weight: 700;
-      letter-spacing: -0.5px;
-      color: var(--text);
+      letter-spacing:0;
+      color: var(--ink);
     }
-    .logo span { color: var(--accent); }
-
-    .tagline { font-size: 13px; color: var(--muted); }
+    .logo span { color: var(--lobster); }
+    .tagline { font-size: 12px; color: var(--muted); }
 
     .site-nav {
       margin-left: auto;
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size:11px;
       display: flex;
-      gap: 8px;
+      gap:6px;
       align-items: baseline;
+      flex-wrap: wrap;
     }
-    .site-nav a {
+    .site-nav a,
+    .site-nav span {
       color: var(--muted);
-      border: 1px solid var(--border);
-      border-radius: 999px;
       padding: 5px 10px;
-      background: rgba(255,255,255,0.03);
+      border: 1px solid transparent;
     }
     .site-nav a:hover {
-      color: var(--text);
-      border-color: var(--accent);
+      color: var(--ink);
+      border-color: var(--line);
+      background: var(--paper-2);
       text-decoration: none;
-    }
-    .site-nav .active {
-      color: var(--text);
-      border-color: var(--accent);
-      font-weight: 600;
     }
 
     .content {
-      max-width: 760px;
-      margin: 16px auto 0;
-      padding: 30px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background:
-        radial-gradient(circle at 10% 0%, rgba(143,179,255,0.13), transparent 30%),
-        linear-gradient(135deg, rgba(255,255,255,0.065), rgba(255,255,255,0.014)),
-        rgba(13, 16, 24, 0.78);
-      box-shadow: var(--panel-shadow);
+      max-width: 780px;
+      margin: 22px auto 0;
+      padding: 28px 0 0;
     }
 
     .doc-title {
-      font-family: var(--font-sans);
-      font-size: clamp(34px, 5vw, 52px);
+      font-size: clamp(34px, 5vw, 50px);
       font-weight: 700;
-      margin-bottom: 8px;
-      line-height: 1.02;
+      margin-bottom: 10px;
+      line-height: 1.04;
+      letter-spacing: -0.03em;
     }
 
     .doc-meta {
       font-family: var(--font-mono);
       font-size: 12px;
       color: var(--muted);
-      margin-bottom: 40px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--hairline);
+      margin-bottom: 38px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--line);
     }
 
-    section { margin-bottom: 40px; }
+    section { margin-bottom: 42px; }
 
     h2 {
       font-family: var(--font-mono);
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--accent);
-      margin-bottom: 16px;
+      letter-spacing: 0.08em;
+      color: var(--lobster);
+      margin-bottom: 14px;
     }
 
     p { margin-bottom: 14px; }
     p:last-child { margin-bottom: 0; }
 
-    .sources { list-style: none; border: 1px solid var(--border); border-radius: 10px; background: rgba(255,255,255,0.032); overflow:hidden; }
+    .sources {
+      list-style: none;
+      border-top: 2px solid var(--line-strong);
+      background: var(--paper-2);
+      overflow: hidden;
+    }
     .sources li {
       padding: 16px 18px;
-      border-bottom: 1px solid var(--hairline);
+      border-bottom: 1px solid var(--line);
     }
     .sources li:last-child { border-bottom: none; }
     .sources dt {
@@ -207,7 +186,7 @@
       font-weight: 600;
       margin-bottom: 6px;
     }
-    .sources dd { margin: 0; color: var(--text); font-size: 14px; }
+    .sources dd { margin: 0; color: var(--ink); font-size: 14px; }
     .sources .limitation {
       margin-top: 8px;
       font-size: 13px;
@@ -217,47 +196,54 @@
     .formula-block {
       font-family: var(--font-mono);
       font-size: 13px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      background: var(--paper-2);
+      border-top: 2px solid var(--lobster);
       padding: 18px 20px;
       margin: 16px 0;
       line-height: 1.7;
     }
 
-    .weights { list-style: none; margin: 16px 0; }
+    .weights {
+      list-style: none;
+      margin: 16px 0;
+      background: var(--paper-2);
+      border-top: 2px solid var(--line-strong);
+    }
     .weights li {
-      padding: 10px 0;
-      border-bottom: 1px solid var(--hairline);
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
       font-size: 14px;
     }
     .weights li:last-child { border-bottom: none; }
     .weights strong {
       font-family: var(--font-mono);
       font-size: 12px;
-      color: var(--accent);
+      color: var(--lobster);
       display: inline-block;
       min-width: 88px;
     }
 
     ul.bullets {
-      padding-left: 1.25em;
+      padding-left: 1.2em;
       margin: 0;
     }
     ul.bullets li { margin-bottom: 10px; }
     ul.bullets li:last-child { margin-bottom: 0; }
 
-    .changelog { list-style: none; }
+    .changelog {
+      list-style: none;
+      border-top: 2px solid var(--line-strong);
+    }
     .changelog li {
       padding: 12px 0;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--line);
       font-size: 14px;
     }
     .changelog li:last-child { border-bottom: none; }
     .changelog .ver {
       font-family: var(--font-mono);
       font-weight: 600;
-      color: var(--text);
+      color: var(--ink);
     }
 
     .note {
@@ -265,16 +251,15 @@
       color: var(--muted);
       margin-top: 16px;
       padding: 12px 14px;
-      background: var(--accent-lt);
-      border-radius: 4px;
-      border-left: 3px solid var(--accent);
+      background: var(--lobster-soft);
+      border-left: 3px solid var(--lobster);
     }
 
     footer {
-      max-width: 700px;
+      max-width: 780px;
       margin: 48px auto 0;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
       font-size: 13px;
       color: var(--muted);
       line-height: 1.7;
@@ -288,19 +273,21 @@
       gap: 8px 16px;
       margin-bottom: 20px;
     }
+    footer .footer-links a { color: var(--ink); }
+    footer .footer-links a:hover { color: var(--lobster); text-decoration: none; }
     footer .disclaimer {
       font-size: 12px;
       color: var(--muted);
       margin-top: 16px;
       padding-top: 16px;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--line);
     }
 
     @media (max-width: 640px) {
       .page { padding: 18px 14px 36px; }
-      header { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .site-header-inner { gap: 8px; }
       .site-nav { margin-left: 0; }
-      .content { padding: 22px 18px; }
+      .content { margin-top: 18px; }
       .doc-title { font-size: 34px; }
     }
   </style>
@@ -320,19 +307,22 @@
   <script defer src="/analytics.js"></script>
 </head>
 <body data-page-type="methodology">
-  <div class="page">
-
-    <header>
+  <header class="site-header">
+    <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
-      <span class="tagline">AI Trust Registry</span>
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
-        <span class="active">Methodology</span>
-        <a href="/badges/">Badges</a>
-        <a href="/roadmap/">Roadmap</a>
-        <a href="/spec/">Specifications</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
       </nav>
-    </header>
+    </div>
+  </header>
+  <div class="page">
 
     <article class="content">
       <h1 class="doc-title">Methodology</h1>
@@ -461,13 +451,23 @@
     </article>
 
     <footer>
-      <div class="footer-links">
-        <a href="/">← Leaderboard</a>
-        <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">Source code</a>
-        <a href="https://github.com/YugantM/hvtracker/issues" target="_blank" rel="noopener">Open an issue</a>
-      </div>
-      <p>Questions or critiques? <a href="https://github.com/YugantM/hvtracker/issues" target="_blank" rel="noopener">Open an issue</a> on GitHub.</p>
-      <p class="disclaimer">HVTracker is not affiliated with any of the projects listed. Data is collected from public APIs.</p>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
 
   </div>

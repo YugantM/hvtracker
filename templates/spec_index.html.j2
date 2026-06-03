@@ -9,104 +9,75 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:#0b0d10; --surface:#151920; --surface-2:#1b2029; --border:#303846;
-      --text:#eef2f6; --muted:#8a87a8; --muted-2:#5e5b78;
-      --accent:#8fb3ff; --accent-lt:rgba(143,179,255,0.10); --accent-dim:#5677aa;
-      --fresh:#2dd4bf; --aging:#d8a657; --stale:#737f91;
+      --paper:#f4f1eb; --paper-2:#ece4d6; --ink:#1f1b17; --muted:#6f665d; --muted-2:#8a7f72;
+      --line:#d5cbbc; --line-strong:#b9aa96; --blue-strong:#7f9cbd; --blue-soft:rgba(167,191,217,0.18);
+      --lobster:#c67c6d; --moss:#6f876e; --stale:#8d887e;
       --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
       --font-sans:"Inter",system-ui,-apple-system,sans-serif;
     }
-    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:14px; line-height:1.6; min-height:100vh; }
-    a { color:var(--accent); text-decoration:none; }
+    body { background:var(--paper); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color:var(--ink); font-family:var(--font-sans); font-size:14px; line-height:1.65; min-height:100vh; }
+    a { color:var(--ink); text-decoration:none; }
     a:hover { text-decoration:underline; }
-    .page { max-width:1000px; margin:0 auto; padding:0 20px 60px; }
-
-    /* ── Header ── */
-    header {
-      padding:28px 0 20px; border-bottom:1px solid var(--border);
-      display:flex; align-items:baseline; gap:20px; flex-wrap:wrap; position:relative;
-    }
-    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; letter-spacing:-0.5px; color:var(--text); }
-    .logo span { color:var(--accent); }
-    .site-nav { margin-left:auto; font-family:var(--font-mono); font-size:12px; display:flex; gap:8px; align-items:baseline; }
-    .site-nav a { color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:5px 10px; background:rgba(255,255,255,0.03); }
-    .site-nav a:hover { color:var(--text); border-color:var(--accent); text-decoration:none; }
-    .site-nav .active { color:var(--text); border-color:var(--accent); font-weight:600; }
-
-    /* ── Page header ── */
-    .content { padding:36px 0 0; }
+    .page { max-width:1000px; margin:0 auto; padding:24px 20px 60px; background:var(--paper); min-height:100vh; }
+    .site-header { position:sticky; top:0; z-index:100; background:var(--paper); border-bottom:1px solid var(--line-strong); }
+    .site-header-inner { max-width:1200px; margin:0 auto; padding:14px 24px; display:flex; align-items:baseline; gap:20px; flex-wrap:wrap; }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; letter-spacing:0; color:var(--ink); }
+    .logo span { color:var(--lobster); }
+    .site-nav { margin-left:auto; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; align-items:baseline; flex-wrap:wrap; }
+    .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--ink); border-color:var(--line); background:var(--paper-2); text-decoration:none; }
+    .content { padding:34px 0 0; }
     .page-head { margin-bottom:28px; }
     .page-head h1 { font-family:var(--font-mono); font-size:20px; font-weight:700; letter-spacing:-0.3px; margin-bottom:6px; }
     .page-head p { font-size:13px; color:var(--muted); max-width:640px; }
-
-    /* ── Meta bar ── */
     .meta-bar {
-      display:flex; align-items:center; gap:20px;
-      padding:8px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+      padding:8px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line);
       margin-bottom:0;
       font-family:var(--font-mono); font-size:11px; color:var(--muted-2);
     }
     .meta-bar strong { color:var(--muted); }
-
-    /* ── Document table ── */
     .doc-table { width:100%; border-collapse:collapse; }
     .doc-table thead th {
       font-family:var(--font-mono); font-size:10px; font-weight:600; text-transform:uppercase;
       letter-spacing:0.08em; color:var(--muted-2);
-      padding:10px 12px 8px; border-bottom:1px solid var(--border);
+      padding:10px 12px 8px; border-bottom:1px solid var(--line);
       text-align:left; white-space:nowrap;
     }
     .doc-table thead th:first-child { padding-left:0; }
-    .doc-table tbody tr {
-      border-bottom:1px solid var(--border);
-      transition:background 0.1s;
-    }
+    .doc-table tbody tr { border-bottom:1px solid var(--line); transition:background 0.1s; }
     .doc-table tbody tr:last-child { border-bottom:none; }
-    .doc-table tbody tr:hover { background:var(--surface); }
+    .doc-table tbody tr:hover { background:rgba(0,0,0,0.03); }
     .doc-table td { padding:13px 12px; vertical-align:top; }
     .doc-table td:first-child { padding-left:0; }
-
-    /* col: identifier */
     .col-id { width:190px; }
-    .doc-id {
-      font-family:var(--font-mono); font-size:12px; font-weight:600;
-      color:var(--accent); white-space:nowrap;
-    }
+    .doc-id { font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--lobster); white-space:nowrap; }
     .doc-id a { color:inherit; }
     .doc-id a:hover { text-decoration:underline; }
     .doc-series { font-family:var(--font-mono); font-size:10px; color:var(--muted-2); margin-top:3px; }
-
-    /* col: title + abstract */
-    .col-body { }
-    .doc-title { font-size:14px; font-weight:600; color:var(--text); margin-bottom:4px; }
+    .doc-title { font-size:14px; font-weight:600; color:var(--ink); margin-bottom:4px; }
     .doc-title a { color:inherit; }
-    .doc-title a:hover { color:var(--accent); text-decoration:none; }
+    .doc-title a:hover { color:var(--lobster); text-decoration:none; }
     .doc-abstract { font-size:12.5px; color:var(--muted); line-height:1.55; }
-
-    /* col: status */
     .col-status { width:110px; }
     .status-badge {
       display:inline-block; font-family:var(--font-mono); font-size:10px; font-weight:700;
-      padding:2px 7px; border-radius:3px; text-transform:uppercase; letter-spacing:0.06em;
+      padding:2px 7px; border-radius:999px; text-transform:uppercase; letter-spacing:0.06em;
       white-space:nowrap;
     }
-    .status-published  { background:rgba(45,212,191,0.14); color:var(--fresh); }
-    .status-draft      { background:rgba(245,158,11,0.12);  color:var(--aging); }
-    .status-review     { background:var(--accent-lt);        color:var(--accent); }
-    .status-superseded { background:rgba(107,114,128,0.12); color:var(--stale); }
-
-    /* col: date */
+    .status-published  { background:rgba(111,135,110,0.14); color:var(--moss); }
+    .status-draft      { background:rgba(198,124,109,0.14); color:var(--lobster); }
+    .status-review     { background:var(--blue-soft); color:var(--lobster); }
+    .status-superseded { background:rgba(141,136,126,0.16); color:var(--stale); }
     .col-date { width:100px; }
     .doc-date { font-family:var(--font-mono); font-size:11px; color:var(--muted-2); white-space:nowrap; }
-
-    /* ── Footer ── */
     footer {
-      margin:48px 0 0; padding-top:20px; border-top:1px solid var(--border);
+      margin:48px 0 0; padding-top:20px; border-top:1px solid var(--line);
       font-size:12px; color:var(--muted);
       display:flex; gap:14px; flex-wrap:wrap; align-items:center;
     }
-    footer a { color:var(--accent); }
-    .footer-sep { color:var(--border); }
+    footer a { color:var(--lobster); }
+    .footer-sep { color:var(--line-strong); }
   </style>
   <!-- Google tag (gtag.js) -->
   <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
@@ -123,16 +94,22 @@
   </script>
 </head>
 <body>
-  <div class="page">
-
-    <header>
+  <header class="site-header">
+    <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
-        <span class="active">Specifications</span>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
       </nav>
-    </header>
+    </div>
+  </header>
+  <div class="page">
 
     <div class="content">
       <div class="page-head">
@@ -181,10 +158,22 @@
     </div>
 
     <footer>
-      <a href="/">← Leaderboard</a>
-      <span class="footer-sep">·</span>
       <a href="/methodology">Methodology</a>
-      <span class="footer-sep">·</span>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
       <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
 

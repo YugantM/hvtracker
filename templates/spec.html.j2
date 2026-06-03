@@ -14,54 +14,42 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0b0d10;
-      --surface:   #151920;
-      --surface-2: #1b2029;
-      --border:    #303846;
-      --text:      #eef2f6;
-      --muted:     #8a87a8;
-      --accent:    #8fb3ff;
-      --accent-lt: rgba(143,179,255,0.10);
-      --accent-dim:#5677aa;
-      --mocha:     #d8a657;
-      --fresh:     #2dd4bf;
-      --aging:     #d8a657;
-      --stale:     #737f91;
-      --font-mono: "JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
-      --font-sans: "Inter",system-ui,-apple-system,sans-serif;
-      --font-serif: "Georgia","Times New Roman",serif;
+      --paper:#f4f1eb; --paper-2:#ece4d6; --ink:#1f1b17; --muted:#6f665d;
+      --line:#d5cbbc; --line-strong:#b9aa96; --blue-strong:#7f9cbd; --blue-soft:rgba(167,191,217,0.18);
+      --lobster:#c67c6d; --moss:#6f876e; --stale:#8d887e;
+      --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Inter",system-ui,-apple-system,sans-serif;
+      --font-serif:"Georgia","Times New Roman",serif;
     }
 
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--paper);
+      background-image: url("/hex-bg.svg");
+      background-size: 2000px 2000px;
+      color: var(--ink);
       font-family: var(--font-sans);
       font-size: 15px;
       line-height: 1.7;
       min-height: 100vh;
     }
 
-    a { color: var(--accent); text-decoration: none; }
+    a { color: var(--lobster); text-decoration: none; }
     a:hover { text-decoration: underline; }
-
-    /* ── Layout ── */
-    .page { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-
-    /* ── Header ── */
-    header {
-      padding: 28px 0 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap;
-      position: relative;
+    .page { max-width: 1100px; margin: 0 auto; padding: 24px 20px 0; background: var(--paper); min-height: 100vh; }
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line-strong);
     }
-    .logo { font-family: var(--font-mono); font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
-    .logo span { color: var(--accent); }
-    .site-nav { margin-left: auto; font-family: var(--font-mono); font-size: 12px; display: flex; gap: 8px; align-items: baseline; }
-    .site-nav a { color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 5px 10px; background: rgba(255,255,255,0.03); }
-    .site-nav a:hover { color: var(--text); border-color: var(--accent); text-decoration: none; }
-    .site-nav .active { color: var(--text); border-color: var(--accent); font-weight: 600; }
-
-    /* ── Two-column layout ── */
+    .site-header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 14px 20px;
+      display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap;
+    }
+    .logo { font-family: var(--font-mono); font-size:20px; font-weight: 700; letter-spacing:0; color: var(--ink); }
+    .logo span { color: var(--lobster); }
+    .site-nav { margin-left: auto; font-family: var(--font-mono); font-size:11px; display: flex; gap:6px; align-items: baseline; flex-wrap: wrap; }
+    .site-nav a { color: var(--muted); padding: 5px 10px; border: 1px solid transparent; }
+    .site-nav a:hover { color: var(--ink); border-color: var(--line); background: var(--paper-2); text-decoration: none; }
     .spec-layout {
       display: grid;
       grid-template-columns: 220px 1fr;
@@ -73,8 +61,6 @@
       .spec-layout { grid-template-columns: 1fr; }
       .toc { display: none; }
     }
-
-    /* ── Table of contents ── */
     .toc {
       position: sticky;
       top: 24px;
@@ -88,26 +74,23 @@
     }
     .toc a {
       display: block; color: var(--muted); padding: 3px 0;
-      border-left: 2px solid var(--border); padding-left: 10px;
+      border-left: 2px solid var(--line); padding-left: 10px;
       transition: all 0.1s;
     }
-    .toc a:hover { color: var(--accent); border-color: var(--accent-dim); text-decoration: none; }
-    .toc a.active { color: var(--accent); border-color: var(--accent); }
+    .toc a:hover { color: var(--lobster); border-color:var(--line); background:var(--paper-2); text-decoration: none; }
+    .toc a.active { color: var(--lobster); border-color:var(--line); background:var(--paper-2); }
     .toc-sub { padding-left: 22px !important; font-size: 11px; }
-
-    /* ── Spec document ── */
     .spec-doc { min-width: 0; max-width: 720px; }
-
-    /* Cover block */
     .spec-cover {
       padding-bottom: 28px;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--line);
       margin-bottom: 32px;
     }
     .spec-cover h1 {
       font-family: var(--font-mono);
       font-size: 26px; font-weight: 700; letter-spacing: -0.5px;
       line-height: 1.25; margin-bottom: 12px;
+      color: var(--ink);
     }
     .spec-meta {
       font-family: var(--font-mono); font-size: 11.5px;
@@ -115,91 +98,69 @@
       margin-bottom: 14px;
     }
     .spec-meta span { white-space: nowrap; }
-
-    /* Status badge */
     .status-badge {
       display: inline-block;
       font-family: var(--font-mono); font-size: 10px; font-weight: 700;
-      padding: 2px 8px; border-radius: 3px;
+      padding: 2px 8px; border-radius: 999px;
       text-transform: uppercase; letter-spacing: 0.06em;
     }
-    .status-published  { background: rgba(45,212,191,0.16); color: var(--fresh); }
-    .status-draft      { background: rgba(216,166,87,0.16);  color: var(--aging); }
-    .status-review     { background: var(--accent-lt);        color: var(--accent); }
-    .status-superseded { background: rgba(107,114,128,0.15); color: var(--stale); }
-
-    /* Permalink */
+    .status-published  { background: rgba(111,135,110,0.14); color: var(--moss); }
+    .status-draft      { background: rgba(198,124,109,0.14); color: var(--lobster); }
+    .status-review     { background: var(--blue-soft); color: var(--lobster); }
+    .status-superseded { background: rgba(141,136,126,0.16); color: var(--stale); }
     .permalink {
       font-family: var(--font-mono); font-size: 11px; color: var(--muted);
       margin-top: 10px;
     }
-    .permalink code { color: var(--accent); }
-
-    /* ── Section headings ── */
+    .permalink code { color: var(--lobster); }
     .spec-doc h2 {
       font-family: var(--font-mono); font-size: 13px; font-weight: 700;
       text-transform: uppercase; letter-spacing: 0.06em;
-      color: var(--accent); margin: 36px 0 14px;
-      padding-bottom: 8px; border-bottom: 1px solid var(--border);
+      color: var(--lobster); margin: 36px 0 14px;
+      padding-bottom: 8px; border-bottom: 1px solid var(--line);
       scroll-margin-top: 24px;
     }
     .spec-doc h3 {
       font-family: var(--font-mono); font-size: 12.5px; font-weight: 600;
-      color: var(--text); margin: 24px 0 10px;
+      color: var(--ink); margin: 24px 0 10px;
       scroll-margin-top: 24px;
     }
     .spec-doc h4 {
-      font-size: 13px; font-weight: 600; color: var(--mocha);
+      font-size: 13px; font-weight: 600; color: var(--lobster);
       margin: 18px 0 8px;
     }
-
-    /* ── Body copy ── */
-    .spec-doc p { margin-bottom: 14px; color: var(--text); font-size: 14.5px; }
+    .spec-doc p { margin-bottom: 14px; color: var(--ink); font-size: 14.5px; }
     .spec-doc p:last-child { margin-bottom: 0; }
-
-    /* ── Normative keywords ── */
-    .must   { font-weight: 700; color: #e8798b; }  /* red  */
-    .should { font-weight: 700; color: var(--aging); }
-    .may    { font-weight: 700; color: var(--fresh); }
-
-    /* ── Code ── */
+    .must   { font-weight: 700; color: #b25567; }
+    .should { font-weight: 700; color: var(--lobster); }
+    .may    { font-weight: 700; color: var(--moss); }
     code {
       font-family: var(--font-mono); font-size: 12.5px;
-      background: var(--surface-2); padding: 1px 5px; border-radius: 3px;
-      color: var(--mocha);
+      background: var(--paper-2); padding: 1px 5px; border-radius: 3px;
+      color: var(--lobster);
     }
     pre {
       font-family: var(--font-mono); font-size: 12px;
-      background: var(--surface-2); border: 1px solid var(--border);
+      background: var(--paper-2); border: 1px solid var(--line);
       border-radius: 6px; padding: 16px 18px; overflow-x: auto;
-      margin: 14px 0; line-height: 1.6; color: var(--text);
+      margin: 14px 0; line-height: 1.6; color: var(--ink);
     }
     pre code { background: none; padding: 0; color: inherit; }
-
-    /* ── Lists ── */
-    .spec-doc ul, .spec-doc ol {
-      padding-left: 1.4em; margin: 10px 0 14px;
-    }
+    .spec-doc ul, .spec-doc ol { padding-left: 1.4em; margin: 10px 0 14px; }
     .spec-doc li { margin-bottom: 6px; font-size: 14.5px; }
     .spec-doc li:last-child { margin-bottom: 0; }
-
-    /* ── Definition list ── */
     .spec-doc dl { margin: 10px 0 14px; }
     .spec-doc dt {
       font-family: var(--font-mono); font-size: 12.5px; font-weight: 600;
-      color: var(--text); margin-top: 12px;
+      color: var(--ink); margin-top: 12px;
     }
     .spec-doc dd { margin-left: 1.4em; font-size: 14px; color: var(--muted); }
-
-    /* ── Callout ── */
     .note {
-      font-size: 13.5px; color: var(--text);
-      padding: 12px 16px; background: var(--accent-lt);
-      border-left: 3px solid var(--accent); border-radius: 0 4px 4px 0;
+      font-size: 13.5px; color: var(--ink);
+      padding: 12px 16px; background: var(--blue-soft);
+      border-left: 3px solid var(--lobster); border-radius: 0 4px 4px 0;
       margin: 16px 0;
     }
-
-    /* ── Data table ── */
     .spec-table {
       width: 100%; border-collapse: collapse;
       font-size: 13px; margin: 14px 0;
@@ -207,28 +168,24 @@
     .spec-table th {
       font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
       text-transform: uppercase; letter-spacing: 0.06em;
-      color: var(--muted); background: var(--surface);
-      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      color: var(--muted); background: var(--paper-2);
+      padding: 8px 12px; border-bottom: 1px solid var(--line);
       text-align: left;
     }
     .spec-table td {
-      padding: 9px 12px; border-bottom: 1px solid var(--border);
+      padding: 9px 12px; border-bottom: 1px solid var(--line);
       vertical-align: top;
     }
     .spec-table tr:last-child td { border-bottom: none; }
-    .spec-table tr:nth-child(even) { background: rgba(255,255,255,0.018); }
-
-    /* ── Section number ── */
+    .spec-table tr:nth-child(even) { background: rgba(0,0,0,0.02); }
     .sec-num { color: var(--muted); margin-right: 8px; font-family: var(--font-mono); }
-
-    /* ── Footer ── */
     footer {
-      padding: 28px 0 48px; border-top: 1px solid var(--border);
+      padding: 28px 0 48px; border-top: 1px solid var(--line);
       font-size: 12px; color: var(--muted);
       display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
     }
-    footer a { color: var(--accent); }
-    .footer-sep { color: var(--border); }
+    footer a { color: var(--lobster); }
+    .footer-sep { color: var(--line-strong); }
   </style>
   <!-- Google tag (gtag.js) -->
   <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
@@ -245,16 +202,22 @@
   </script>
 </head>
 <body>
-  <div class="page">
-
-    <header>
+  <header class="site-header">
+    <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
-        <span class="active">Specifications</span>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
       </nav>
-    </header>
+    </div>
+  </header>
+  <div class="page">
 
     <div class="spec-layout">
 
@@ -300,12 +263,22 @@
     </div>
 
     <footer>
-      <a href="/spec/">← All Specifications</a>
-      <span class="footer-sep">·</span>
-      <a href="/">Leaderboard</a>
-      <span class="footer-sep">·</span>
       <a href="/methodology">Methodology</a>
-      <span class="footer-sep">·</span>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
       <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
 

@@ -17,7 +17,7 @@
   <meta name="twitter:description" content="Compare MLflow vs Weights &amp; Biases Weave for observability &amp; evaluation using HVTrust scores, evidence grade, safety, maintenance, adoption, and package signals.">
   <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
 
-  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Best Open-Source Observability & Evaluation: MLflow vs Weights & Biases Weave", "description": "Compare MLflow vs Weights & Biases Weave for observability & evaluation using HVTrust scores, evidence grade, safety, maintenance, adoption, and package signals.", "author": {"@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net"}, "publisher": {"@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net"}, "datePublished": "2026-06-02", "dateModified": "2026-06-02", "mainEntityOfPage": "https://hvtracker.net/blog/observability-evaluation-top-agents", "url": "https://hvtracker.net/blog/observability-evaluation-top-agents", "about": [{"@type": "SoftwareSourceCode", "name": "MLflow", "codeRepository": "https://github.com/mlflow/mlflow"}, {"@type": "SoftwareSourceCode", "name": "Weights & Biases Weave", "codeRepository": "https://github.com/wandb/weave"}]}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Best Open-Source Observability & Evaluation: MLflow vs Weights & Biases Weave", "description": "Compare MLflow vs Weights & Biases Weave for observability & evaluation using HVTrust scores, evidence grade, safety, maintenance, adoption, and package signals.", "author": {"@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net"}, "publisher": {"@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net"}, "datePublished": "2026-06-03", "dateModified": "2026-06-03", "mainEntityOfPage": "https://hvtracker.net/blog/observability-evaluation-top-agents", "url": "https://hvtracker.net/blog/observability-evaluation-top-agents", "about": [{"@type": "SoftwareSourceCode", "name": "MLflow", "codeRepository": "https://github.com/mlflow/mlflow"}, {"@type": "SoftwareSourceCode", "name": "Weights & Biases Weave", "codeRepository": "https://github.com/wandb/weave"}]}</script>
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which observability & evaluation ranks higher, MLflow or Weights & Biases Weave?", "acceptedAnswer": {"@type": "Answer", "text": "MLflow currently ranks higher on HVTracker with an HVTrust score of 90.7/100, compared with Weights & Biases Weave at 84.0/100."}}, {"@type": "Question", "name": "What does HVTracker compare for MLflow vs Weights & Biases Weave?", "acceptedAnswer": {"@type": "Answer", "text": "HVTracker compares safety and integrity, identity and provenance, transparency, maintenance, adoption, evidence grade, package signals, signed commits, and OSSF Scorecard data."}}]}</script>
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://hvtracker.net/blog/"}, {"@type": "ListItem", "position": 3, "name": "Best Open-Source Observability & Evaluation: MLflow vs Weights & Biases Weave", "item": "https://hvtracker.net/blog/observability-evaluation-top-agents"}]}</script>
 
@@ -27,68 +27,70 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:#0b0d10; --surface:rgba(21,25,32,0.78); --border:rgba(142,154,176,0.22);
-      --hairline:rgba(168,179,194,0.12); --glass-hi:rgba(255,255,255,0.055);
-      --text:#eef2f6; --muted:#a8b3c2; --accent:#8fb3ff; --accent-lt:rgba(143,179,255,0.10);
-      --mocha:#d8a657; --fresh:#2dd4bf; --warn:#f87171;
+      --paper:#f4f1eb; --paper-2:#ece4d6; --ink:#1f1b17; --muted:#6f665d;
+      --line:#d5cbbc; --line-strong:#b9aa96; --blue-strong:#7f9cbd;
+      --blue-soft:rgba(167,191,217,0.18); --lobster:#c67c6d; --lobster-soft:rgba(198,124,109,0.14);
+      --moss:#6f876e;
       --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
       --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
     }
-    body {
-      background-color:var(--bg); color:var(--text); font-family:var(--font-sans);
-      font-size:16px; line-height:1.72; min-height:100vh;
-      background-image:radial-gradient(circle at 18% -10%, rgba(45,212,191,0.12), transparent 30%), radial-gradient(circle at 86% 6%, rgba(216,166,87,0.10), transparent 26%), linear-gradient(180deg, #10141a 0%, var(--bg) 54%, #07090c 100%);
-    }
-    a { color:var(--accent); text-decoration:none; }
+    body { background:var(--paper); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color:var(--ink); font-family:var(--font-sans); font-size:16px; line-height:1.72; min-height:100vh; }
+    a { color:var(--lobster); text-decoration:none; }
     a:hover { text-decoration:underline; }
-    .page { max-width:860px; margin:0 auto; padding:24px 20px 0; }
-    header {
-      padding:16px 18px; border:1px solid var(--border); border-radius:10px;
-      background:linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.018)), var(--surface);
-      box-shadow:inset 0 1px 0 var(--glass-hi), 0 18px 54px rgba(0,0,0,0.28);
-      display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+    .page { background:var(--paper); max-width:860px; margin:0 auto; padding:24px 20px 0; }
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
     }
-    .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; color:var(--text); }
-    .logo span { color:var(--accent); }
-    .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; border:1px solid var(--border); border-radius:999px; padding:5px 10px; background:rgba(255,255,255,0.035); }
-    .back:hover { color:var(--text); border-color:var(--accent); text-decoration:none; }
-    article { padding:36px 0 46px; }
-    .eyebrow { font-family:var(--font-mono); font-size:12px; color:var(--mocha); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
-    h1 { font-size:34px; line-height:1.14; font-weight:700; letter-spacing:-0.02em; margin-bottom:12px; }
+    .site-header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+    }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; letter-spacing:0; color:var(--ink); }
+    .logo span { color:var(--lobster); }
+    .site-nav { margin-left:auto; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; }
+    .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--ink); border-color:var(--line); background:var(--paper-2); text-decoration:none; }
+    article { padding:34px 0 46px; }
+    .eyebrow { font-family:var(--font-mono); font-size:12px; color:var(--lobster); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+    h1 { font-size:34px; line-height:1.14; font-weight:700; letter-spacing:-0.02em; margin-bottom:12px; color:var(--ink); }
     .dek { color:var(--muted); font-size:17px; max-width:740px; }
     .meta { font-family:var(--font-mono); font-size:12px; color:var(--muted); margin:18px 0 28px; }
-    h2 { font-size:23px; line-height:1.25; margin:34px 0 12px; letter-spacing:-0.01em; }
+    h2 { font-size:23px; line-height:1.25; margin:34px 0 12px; letter-spacing:-0.01em; color:var(--ink); }
     h3 { font-size:17px; margin:22px 0 8px; }
     p { margin-bottom:16px; }
     .summary {
-      border:1px solid var(--border); border-radius:12px; padding:18px;
-      background:linear-gradient(135deg, rgba(255,255,255,0.052), rgba(255,255,255,0.014)), var(--surface);
-      box-shadow:inset 0 1px 0 var(--glass-hi); margin:26px 0;
+      border-top:2px solid var(--lobster);
+      padding:18px;
+      background:var(--paper-2);
+      margin:26px 0;
     }
-    .summary strong { color:var(--fresh); }
+    .summary strong { color:var(--moss); }
     .score-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:14px; margin:24px 0; }
     .agent-card {
-      border:1px solid var(--border); border-radius:12px; padding:16px;
-      background:rgba(255,255,255,0.035);
+      border-top:2px solid var(--line-strong);
+      padding:16px;
+      background:var(--paper-2);
     }
     .agent-card h3 { margin-top:0; font-size:20px; }
-    .score { font-family:var(--font-mono); color:var(--fresh); font-size:30px; font-weight:700; line-height:1; }
+    .score { font-family:var(--font-mono); color:var(--moss); font-size:30px; font-weight:700; line-height:1; }
     .rank { font-family:var(--font-mono); font-size:12px; color:var(--muted); margin:6px 0 12px; }
     .facts { display:grid; gap:8px; margin-top:12px; }
-    .fact { display:flex; justify-content:space-between; gap:10px; border-top:1px solid var(--hairline); padding-top:8px; font-size:14px; }
+    .fact { display:flex; justify-content:space-between; gap:10px; border-top:1px solid var(--line); padding-top:8px; font-size:14px; }
     .fact span:first-child { color:var(--muted); }
-    .fact span:last-child { font-family:var(--font-mono); font-size:13px; text-align:right; }
+    .fact span:last-child { font-family:var(--font-mono); font-size:13px; text-align:right; color:var(--ink); }
     table { width:100%; border-collapse:collapse; margin:22px 0; font-size:14px; }
-    th, td { border-bottom:1px solid var(--hairline); padding:10px 8px; text-align:left; }
+    th, td { border-bottom:1px solid var(--line); padding:10px 8px; text-align:left; }
     th { color:var(--muted); font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; }
-    td { font-family:var(--font-mono); font-size:13px; }
-    td.win { color:var(--fresh); font-weight:700; }
+    td { font-family:var(--font-mono); font-size:13px; color:var(--ink); }
+    td.win { color:var(--moss); font-weight:700; }
     .links { display:flex; gap:10px; flex-wrap:wrap; margin-top:26px; }
-    .links a { border:1px solid var(--border); border-radius:8px; padding:9px 13px; color:var(--text); background:rgba(255,255,255,0.035); font-size:13px; }
-    .links a:hover { border-color:var(--accent); text-decoration:none; }
+    .links a { border:1px solid var(--line); padding:9px 13px; color:var(--ink); background:var(--paper-2); font-size:13px; }
+    .links a:hover { border-color:var(--lobster); color:var(--lobster); text-decoration:none; }
     .note { color:var(--muted); font-size:14px; }
-    footer { padding:28px 0; border-top:1px solid var(--hairline); font-size:11px; color:var(--muted); text-align:center; }
-    footer a { color:var(--accent); }
+    footer { padding:28px 0; border-top:1px solid var(--line); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--lobster); }
     @media (max-width:720px) {
       h1 { font-size:26px; }
       .score-grid { grid-template-columns:1fr; }
@@ -109,17 +111,28 @@
   <script defer src="/analytics.js"></script>
 </head>
 <body data-page-type="blog_article" data-category="Observability &amp; Evaluation">
-  <div class="page">
-    <header>
+  <header class="site-header">
+    <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
-      <a href="/blog/" class="back">&larr; Blog</a>
-    </header>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
+      </nav>
+    </div>
+  </header>
+  <div class="page">
 
     <article>
       <div class="eyebrow">Observability &amp; Evaluation comparison</div>
       <h1>Best Open-Source Observability &amp; Evaluation: MLflow vs Weights &amp; Biases Weave</h1>
       <p class="dek">A data-backed comparison of the top two observability &amp; evaluation on HVTracker, built from public trust signals rather than stars alone.</p>
-      <div class="meta">June 2, 2026 &middot; 4 min read &middot; Data updated 2026-06-02 21:06 UTC</div>
+      <div class="meta">June 3, 2026 &middot; 4 min read &middot; Data updated 2026-06-03 20:55 UTC</div>
 
       <div class="summary">
         <p><strong>Short answer:</strong> MLflow currently leads Weights &amp; Biases Weave on HVTracker's evidence-weighted trust score: 90.7 vs 84.0/100. This is not a popularity ranking; it combines supply-chain safety, identity/provenance, transparency, maintenance, and adoption signals.</p>
@@ -130,28 +143,28 @@
         <section class="agent-card">
           <h3><a href="/agents/mlflow/">MLflow</a></h3>
           <div class="score">90.7</div>
-          <div class="rank">#8 overall &middot; #1 in Observability &amp; Evaluation &middot; Grade A</div>
+          <div class="rank">#9 overall &middot; #1 in Observability &amp; Evaluation &middot; Grade A</div>
           <p class="note">The open source AI engineering platform for agents, LLMs, and ML models. MLflow enables teams of all sizes to debug, eva</p>
           <div class="facts">
             <div class="fact"><span>Repository</span><span>mlflow/mlflow</span></div>
             <div class="fact"><span>Stars</span><span>26.3k</span></div>
-            <div class="fact"><span>Last push</span><span>2026-06-02</span></div>
-            <div class="fact"><span>Weekly commits</span><span>603</span></div>
-            <div class="fact"><span>Weekly downloads</span><span>8,746,537</span></div>
+            <div class="fact"><span>Last push</span><span>2026-06-03</span></div>
+            <div class="fact"><span>Weekly commits</span><span>615</span></div>
+            <div class="fact"><span>Weekly downloads</span><span>8,813,855</span></div>
           </div>
         </section>
         
         <section class="agent-card">
           <h3><a href="/agents/weights-biases-weave/">Weights &amp; Biases Weave</a></h3>
           <div class="score">84.0</div>
-          <div class="rank">#24 overall &middot; #2 in Observability &amp; Evaluation &middot; Grade A</div>
+          <div class="rank">#25 overall &middot; #2 in Observability &amp; Evaluation &middot; Grade A</div>
           <p class="note">Weave is a toolkit for developing AI-powered applications, built by Weights &amp; Biases.</p>
           <div class="facts">
             <div class="fact"><span>Repository</span><span>wandb/weave</span></div>
             <div class="fact"><span>Stars</span><span>1.1k</span></div>
-            <div class="fact"><span>Last push</span><span>2026-06-02</span></div>
-            <div class="fact"><span>Weekly commits</span><span>149</span></div>
-            <div class="fact"><span>Weekly downloads</span><span>220,440</span></div>
+            <div class="fact"><span>Last push</span><span>2026-06-03</span></div>
+            <div class="fact"><span>Weekly commits</span><span>159</span></div>
+            <div class="fact"><span>Weekly downloads</span><span>223,287</span></div>
           </div>
         </section>
         
@@ -191,7 +204,23 @@
     </article>
 
     <footer>
-      <a href="/">HVTracker</a> &middot; <a href="/methodology">Methodology</a> &middot; <a href="/blog/">Blog</a>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
   </div>
 </body>

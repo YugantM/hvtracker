@@ -17,8 +17,8 @@
   <meta name="twitter:description" content="Compare CAMEL vs ChatDev for multi-agent systems using HVTrust scores, evidence grade, safety, maintenance, adoption, and package signals.">
   <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
 
-  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Best Open-Source Multi-Agent Systems: CAMEL vs ChatDev", "description": "Compare CAMEL vs ChatDev for multi-agent systems using HVTrust scores, evidence grade, safety, maintenance, adoption, and package signals.", "author": {"@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net"}, "publisher": {"@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net"}, "datePublished": "2026-06-02", "dateModified": "2026-06-02", "mainEntityOfPage": "https://hvtracker.net/blog/multi-agent-systems-top-agents", "url": "https://hvtracker.net/blog/multi-agent-systems-top-agents", "about": [{"@type": "SoftwareSourceCode", "name": "CAMEL", "codeRepository": "https://github.com/camel-ai/camel"}, {"@type": "SoftwareSourceCode", "name": "ChatDev", "codeRepository": "https://github.com/OpenBMB/ChatDev"}]}</script>
-  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which multi-agent systems ranks higher, CAMEL or ChatDev?", "acceptedAnswer": {"@type": "Answer", "text": "CAMEL currently ranks higher on HVTracker with an HVTrust score of 70.9/100, compared with ChatDev at 58.6/100."}}, {"@type": "Question", "name": "What does HVTracker compare for CAMEL vs ChatDev?", "acceptedAnswer": {"@type": "Answer", "text": "HVTracker compares safety and integrity, identity and provenance, transparency, maintenance, adoption, evidence grade, package signals, signed commits, and OSSF Scorecard data."}}]}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Best Open-Source Multi-Agent Systems: CAMEL vs ChatDev", "description": "Compare CAMEL vs ChatDev for multi-agent systems using HVTrust scores, evidence grade, safety, maintenance, adoption, and package signals.", "author": {"@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net"}, "publisher": {"@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net"}, "datePublished": "2026-06-03", "dateModified": "2026-06-03", "mainEntityOfPage": "https://hvtracker.net/blog/multi-agent-systems-top-agents", "url": "https://hvtracker.net/blog/multi-agent-systems-top-agents", "about": [{"@type": "SoftwareSourceCode", "name": "CAMEL", "codeRepository": "https://github.com/camel-ai/camel"}, {"@type": "SoftwareSourceCode", "name": "ChatDev", "codeRepository": "https://github.com/OpenBMB/ChatDev"}]}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which multi-agent systems ranks higher, CAMEL or ChatDev?", "acceptedAnswer": {"@type": "Answer", "text": "CAMEL currently ranks higher on HVTracker with an HVTrust score of 70.7/100, compared with ChatDev at 58.4/100."}}, {"@type": "Question", "name": "What does HVTracker compare for CAMEL vs ChatDev?", "acceptedAnswer": {"@type": "Answer", "text": "HVTracker compares safety and integrity, identity and provenance, transparency, maintenance, adoption, evidence grade, package signals, signed commits, and OSSF Scorecard data."}}]}</script>
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://hvtracker.net/blog/"}, {"@type": "ListItem", "position": 3, "name": "Best Open-Source Multi-Agent Systems: CAMEL vs ChatDev", "item": "https://hvtracker.net/blog/multi-agent-systems-top-agents"}]}</script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,68 +27,70 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:#0b0d10; --surface:rgba(21,25,32,0.78); --border:rgba(142,154,176,0.22);
-      --hairline:rgba(168,179,194,0.12); --glass-hi:rgba(255,255,255,0.055);
-      --text:#eef2f6; --muted:#a8b3c2; --accent:#8fb3ff; --accent-lt:rgba(143,179,255,0.10);
-      --mocha:#d8a657; --fresh:#2dd4bf; --warn:#f87171;
+      --paper:#f4f1eb; --paper-2:#ece4d6; --ink:#1f1b17; --muted:#6f665d;
+      --line:#d5cbbc; --line-strong:#b9aa96; --blue-strong:#7f9cbd;
+      --blue-soft:rgba(167,191,217,0.18); --lobster:#c67c6d; --lobster-soft:rgba(198,124,109,0.14);
+      --moss:#6f876e;
       --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
       --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
     }
-    body {
-      background-color:var(--bg); color:var(--text); font-family:var(--font-sans);
-      font-size:16px; line-height:1.72; min-height:100vh;
-      background-image:radial-gradient(circle at 18% -10%, rgba(45,212,191,0.12), transparent 30%), radial-gradient(circle at 86% 6%, rgba(216,166,87,0.10), transparent 26%), linear-gradient(180deg, #10141a 0%, var(--bg) 54%, #07090c 100%);
-    }
-    a { color:var(--accent); text-decoration:none; }
+    body { background:var(--paper); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color:var(--ink); font-family:var(--font-sans); font-size:16px; line-height:1.72; min-height:100vh; }
+    a { color:var(--lobster); text-decoration:none; }
     a:hover { text-decoration:underline; }
-    .page { max-width:860px; margin:0 auto; padding:24px 20px 0; }
-    header {
-      padding:16px 18px; border:1px solid var(--border); border-radius:10px;
-      background:linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.018)), var(--surface);
-      box-shadow:inset 0 1px 0 var(--glass-hi), 0 18px 54px rgba(0,0,0,0.28);
-      display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+    .page { background:var(--paper); max-width:860px; margin:0 auto; padding:24px 20px 0; }
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
     }
-    .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; color:var(--text); }
-    .logo span { color:var(--accent); }
-    .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; border:1px solid var(--border); border-radius:999px; padding:5px 10px; background:rgba(255,255,255,0.035); }
-    .back:hover { color:var(--text); border-color:var(--accent); text-decoration:none; }
-    article { padding:36px 0 46px; }
-    .eyebrow { font-family:var(--font-mono); font-size:12px; color:var(--mocha); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
-    h1 { font-size:34px; line-height:1.14; font-weight:700; letter-spacing:-0.02em; margin-bottom:12px; }
+    .site-header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+    }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; letter-spacing:0; color:var(--ink); }
+    .logo span { color:var(--lobster); }
+    .site-nav { margin-left:auto; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; }
+    .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--ink); border-color:var(--line); background:var(--paper-2); text-decoration:none; }
+    article { padding:34px 0 46px; }
+    .eyebrow { font-family:var(--font-mono); font-size:12px; color:var(--lobster); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+    h1 { font-size:34px; line-height:1.14; font-weight:700; letter-spacing:-0.02em; margin-bottom:12px; color:var(--ink); }
     .dek { color:var(--muted); font-size:17px; max-width:740px; }
     .meta { font-family:var(--font-mono); font-size:12px; color:var(--muted); margin:18px 0 28px; }
-    h2 { font-size:23px; line-height:1.25; margin:34px 0 12px; letter-spacing:-0.01em; }
+    h2 { font-size:23px; line-height:1.25; margin:34px 0 12px; letter-spacing:-0.01em; color:var(--ink); }
     h3 { font-size:17px; margin:22px 0 8px; }
     p { margin-bottom:16px; }
     .summary {
-      border:1px solid var(--border); border-radius:12px; padding:18px;
-      background:linear-gradient(135deg, rgba(255,255,255,0.052), rgba(255,255,255,0.014)), var(--surface);
-      box-shadow:inset 0 1px 0 var(--glass-hi); margin:26px 0;
+      border-top:2px solid var(--lobster);
+      padding:18px;
+      background:var(--paper-2);
+      margin:26px 0;
     }
-    .summary strong { color:var(--fresh); }
+    .summary strong { color:var(--moss); }
     .score-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:14px; margin:24px 0; }
     .agent-card {
-      border:1px solid var(--border); border-radius:12px; padding:16px;
-      background:rgba(255,255,255,0.035);
+      border-top:2px solid var(--line-strong);
+      padding:16px;
+      background:var(--paper-2);
     }
     .agent-card h3 { margin-top:0; font-size:20px; }
-    .score { font-family:var(--font-mono); color:var(--fresh); font-size:30px; font-weight:700; line-height:1; }
+    .score { font-family:var(--font-mono); color:var(--moss); font-size:30px; font-weight:700; line-height:1; }
     .rank { font-family:var(--font-mono); font-size:12px; color:var(--muted); margin:6px 0 12px; }
     .facts { display:grid; gap:8px; margin-top:12px; }
-    .fact { display:flex; justify-content:space-between; gap:10px; border-top:1px solid var(--hairline); padding-top:8px; font-size:14px; }
+    .fact { display:flex; justify-content:space-between; gap:10px; border-top:1px solid var(--line); padding-top:8px; font-size:14px; }
     .fact span:first-child { color:var(--muted); }
-    .fact span:last-child { font-family:var(--font-mono); font-size:13px; text-align:right; }
+    .fact span:last-child { font-family:var(--font-mono); font-size:13px; text-align:right; color:var(--ink); }
     table { width:100%; border-collapse:collapse; margin:22px 0; font-size:14px; }
-    th, td { border-bottom:1px solid var(--hairline); padding:10px 8px; text-align:left; }
+    th, td { border-bottom:1px solid var(--line); padding:10px 8px; text-align:left; }
     th { color:var(--muted); font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; }
-    td { font-family:var(--font-mono); font-size:13px; }
-    td.win { color:var(--fresh); font-weight:700; }
+    td { font-family:var(--font-mono); font-size:13px; color:var(--ink); }
+    td.win { color:var(--moss); font-weight:700; }
     .links { display:flex; gap:10px; flex-wrap:wrap; margin-top:26px; }
-    .links a { border:1px solid var(--border); border-radius:8px; padding:9px 13px; color:var(--text); background:rgba(255,255,255,0.035); font-size:13px; }
-    .links a:hover { border-color:var(--accent); text-decoration:none; }
+    .links a { border:1px solid var(--line); padding:9px 13px; color:var(--ink); background:var(--paper-2); font-size:13px; }
+    .links a:hover { border-color:var(--lobster); color:var(--lobster); text-decoration:none; }
     .note { color:var(--muted); font-size:14px; }
-    footer { padding:28px 0; border-top:1px solid var(--hairline); font-size:11px; color:var(--muted); text-align:center; }
-    footer a { color:var(--accent); }
+    footer { padding:28px 0; border-top:1px solid var(--line); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--lobster); }
     @media (max-width:720px) {
       h1 { font-size:26px; }
       .score-grid { grid-template-columns:1fr; }
@@ -109,49 +111,60 @@
   <script defer src="/analytics.js"></script>
 </head>
 <body data-page-type="blog_article" data-category="Multi-Agent Systems">
-  <div class="page">
-    <header>
+  <header class="site-header">
+    <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
-      <a href="/blog/" class="back">&larr; Blog</a>
-    </header>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
+      </nav>
+    </div>
+  </header>
+  <div class="page">
 
     <article>
       <div class="eyebrow">Multi-Agent Systems comparison</div>
       <h1>Best Open-Source Multi-Agent Systems: CAMEL vs ChatDev</h1>
       <p class="dek">A data-backed comparison of the top two multi-agent systems on HVTracker, built from public trust signals rather than stars alone.</p>
-      <div class="meta">June 2, 2026 &middot; 4 min read &middot; Data updated 2026-06-02 21:06 UTC</div>
+      <div class="meta">June 3, 2026 &middot; 4 min read &middot; Data updated 2026-06-03 20:55 UTC</div>
 
       <div class="summary">
-        <p><strong>Short answer:</strong> CAMEL currently leads ChatDev on HVTracker's evidence-weighted trust score: 70.9 vs 58.6/100. This is not a popularity ranking; it combines supply-chain safety, identity/provenance, transparency, maintenance, and adoption signals.</p>
+        <p><strong>Short answer:</strong> CAMEL currently leads ChatDev on HVTracker's evidence-weighted trust score: 70.7 vs 58.4/100. This is not a popularity ranking; it combines supply-chain safety, identity/provenance, transparency, maintenance, and adoption signals.</p>
       </div>
 
       <div class="score-grid">
         
         <section class="agent-card">
           <h3><a href="/agents/camel/">CAMEL</a></h3>
-          <div class="score">70.9</div>
-          <div class="rank">#55 overall &middot; #1 in Multi-Agent Systems &middot; Grade B</div>
+          <div class="score">70.7</div>
+          <div class="rank">#60 overall &middot; #1 in Multi-Agent Systems &middot; Grade B</div>
           <p class="note">🐫 CAMEL: The first and the best multi-agent framework. Finding the Scaling Law of Agents. https://www.camel-ai.org</p>
           <div class="facts">
             <div class="fact"><span>Repository</span><span>camel-ai/camel</span></div>
             <div class="fact"><span>Stars</span><span>17.1k</span></div>
-            <div class="fact"><span>Last push</span><span>2026-05-30</span></div>
-            <div class="fact"><span>Weekly commits</span><span>34</span></div>
-            <div class="fact"><span>Weekly downloads</span><span>33,741</span></div>
+            <div class="fact"><span>Last push</span><span>2026-06-02</span></div>
+            <div class="fact"><span>Weekly commits</span><span>35</span></div>
+            <div class="fact"><span>Weekly downloads</span><span>21,451</span></div>
           </div>
         </section>
         
         <section class="agent-card">
           <h3><a href="/agents/chatdev/">ChatDev</a></h3>
-          <div class="score">58.6</div>
-          <div class="rank">#113 overall &middot; #2 in Multi-Agent Systems &middot; Grade C</div>
+          <div class="score">58.4</div>
+          <div class="rank">#114 overall &middot; #2 in Multi-Agent Systems &middot; Grade C</div>
           <p class="note">ChatDev 2.0: Dev All through LLM-powered Multi-Agent Collaboration</p>
           <div class="facts">
             <div class="fact"><span>Repository</span><span>OpenBMB/ChatDev</span></div>
             <div class="fact"><span>Stars</span><span>33.3k</span></div>
             <div class="fact"><span>Last push</span><span>2026-05-27</span></div>
             <div class="fact"><span>Weekly commits</span><span>11</span></div>
-            <div class="fact"><span>Weekly downloads</span><span>27</span></div>
+            <div class="fact"><span>Weekly downloads</span><span>25</span></div>
           </div>
         </section>
         
@@ -165,12 +178,12 @@
           <tr><th>Signal</th><th>CAMEL</th><th>ChatDev</th></tr>
         </thead>
         <tbody>
-          <tr><th>HVTrust score</th><td class="win">70.9</td><td class="">58.6</td></tr>
+          <tr><th>HVTrust score</th><td class="win">70.7</td><td class="">58.4</td></tr>
           <tr><th>Safety / Integrity</th><td class="win">11.5/30</td><td class="">7.2/30</td></tr>
           <tr><th>Identity / Provenance</th><td class="win">10.8/20</td><td class="">10.8/20</td></tr>
           <tr><th>Transparency</th><td class="win">14.4/20</td><td class="">11.9/20</td></tr>
-          <tr><th>Maintenance</th><td class="win">18.0/20</td><td class="">15.9/20</td></tr>
-          <tr><th>Adoption</th><td class="win">16.2/10</td><td class="">12.8/10</td></tr>
+          <tr><th>Maintenance</th><td class="win">18.1/20</td><td class="">15.8/20</td></tr>
+          <tr><th>Adoption</th><td class="win">15.9/10</td><td class="">12.7/10</td></tr>
           <tr><th>OSSF Scorecard</th><td>6.9</td><td>4.0</td></tr>
           <tr><th>Signed commits</th><td>57%</td><td>43%</td></tr>
           <tr><th>Package provenance</th><td>Not detected</td><td>Not detected</td></tr>
@@ -191,7 +204,23 @@
     </article>
 
     <footer>
-      <a href="/">HVTracker</a> &middot; <a href="/methodology">Methodology</a> &middot; <a href="/blog/">Blog</a>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
   </div>
 </body>

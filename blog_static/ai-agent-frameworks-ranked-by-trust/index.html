@@ -37,23 +37,24 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:#0b0d10; --surface:#151920; --surface-2:#1b2029; --border:#303846;
-      --text:#eef2f6; --muted:#8a87a8;
-      --accent:#8fb3ff; --accent-lt:rgba(143,179,255,0.10); --accent-dim:#5677aa;
-      --mocha:#d8a657; --mocha-lt:rgba(216,166,87,0.16);
-      --fresh:#2dd4bf; --stale:#737f91;
+      --bg:#f4f1eb; --surface:#eae6de; --surface-2:#e2ded6; --border:#d4cfc5;
+      --text:#1a1a1a; --muted:#6b6560;
+      --accent:#2c5282; --accent-lt:rgba(44,82,130,0.08); --accent-dim:#5677aa;
+      --mocha:#8b6914; --mocha-lt:rgba(139,105,20,0.10);
+      --fresh:#2f6846; --stale:#737f91;
       --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
       --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
     }
-    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:16px; line-height:1.7; min-height:100vh; }
+    body { background:var(--bg); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color:var(--text); font-family:var(--font-sans); font-size:16px; line-height:1.7; min-height:100vh; }
     a { color:var(--accent); text-decoration:none; }
     a:hover { text-decoration:underline; }
-    .page { max-width:720px; margin:0 auto; padding:0 20px; }
-    header { padding:28px 0 20px; border-bottom:1px solid var(--border); display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
-    .logo { font-family:var(--font-mono); font-size:18px; font-weight:700; letter-spacing:-0.5px; color:var(--text); }
+    .page { max-width:720px; margin:0 auto; padding:0 20px; background:#f4f1eb; min-height:100vh; }
+    .site-header { position:sticky; top:0; z-index:100; background:var(--bg); border-bottom:1px solid var(--border); }
+    .site-header-inner { max-width:1200px; margin:0 auto; padding:14px 20px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; letter-spacing:-0.5px; color:var(--text); }
     .logo span { color:var(--accent); }
-    .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; border:1px solid var(--border); border-radius:999px; padding:5px 10px; background:rgba(255,255,255,0.03); }
-    .back:hover { color:var(--text); border-color:var(--accent); text-decoration:none; }
+    .site-nav { margin-left:auto; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; } .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--text); border-color:var(--border); background:var(--surface); text-decoration:none; }
 
     article { padding:36px 0 48px; }
     h1 { font-size:28px; font-weight:700; letter-spacing:-0.5px; line-height:1.2; margin-bottom:12px; }
@@ -100,11 +101,22 @@
   <script defer src="/analytics.js"></script>
 </head>
 <body data-page-type="blog">
-  <div class="page">
-    <header>
+  <header class="site-header">
+    <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
-      <a href="/blog/" class="back">&larr; Blog</a>
-    </header>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
+      </nav>
+    </div>
+  </header>
+  <div class="page">
 
     <article>
       <h1>LangChain vs LangGraph vs CrewAI vs AutoGPT — Ranked by Trust, Not Hype</h1>
@@ -191,7 +203,23 @@
     </article>
 
     <footer>
-      <a href="/">HVTracker</a> &middot; <a href="/methodology">Methodology</a> &middot; <a href="/blog/">Blog</a>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
   </div>
 </body>

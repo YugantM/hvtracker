@@ -233,12 +233,15 @@ Use the [agent listing issue template](https://github.com/YugantM/hvtracker/issu
 
 A listed project should be:
 
-- A public, non-archived GitHub repository
-- Related to AI agents or agent infrastructure
+- A public, non-archived GitHub repository with an open-source license
+- An AI agent or an agent framework whose primary purpose is agent construction
+- Clearly agent-specific in its own codebase, not a general AI SDK, model repo, cookbook, or generic app framework
 - Active within the last 12 months
 - Not already listed
 
 Include the canonical repository, preferred display name, category suggestion, package names, and any correction details.
+
+For the strict plain-language boundary, see [docs/strict-inclusion-rubric.md](/Users/harsiddhipari/hv_tracker/docs/strict-inclusion-rubric.md).
 
 ---
 

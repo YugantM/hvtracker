@@ -6,63 +6,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="HVTracker changelog — methodology updates, new agents, scoring changes, and registry milestones.">
   <link rel="canonical" href="https://hvtracker.net/changelog/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
   <style>
     :root {
-      --bg: #0b0d10; --surface: rgba(21,25,32,0.78); --border: rgba(142,154,176,0.22);
-      --hairline: rgba(168,179,194,0.12); --glass-hi: rgba(255,255,255,0.055);
-      --text: #eef2f6; --muted: #a8b3c2; --accent: #8fb3ff;
-      --green: #2dd4bf; --blue: #8fb3ff; --yellow: #d8a657; --red: #e8798b;
-      --font: system-ui, -apple-system, sans-serif;
+      --bg:#f4f1eb;--surface:#eae6de;--border:#d4cfc5;
+      --text:#1a1a1a;--muted:#6b6560;--accent:#2c5282;--accent-warm:#b05a3a;
+      --green:#2f6846;--amber:#8b6914;--red:#9b3c3c;
+      --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+      --sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background-color: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.6;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"), radial-gradient(circle at 18% -10%, rgba(45,212,191,0.13), transparent 30%), radial-gradient(circle at 86% 6%, rgba(216,166,87,0.12), transparent 26%), linear-gradient(135deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 11px), linear-gradient(180deg, #10141a, var(--bg) 54%, #07090c);
-      background-repeat: repeat, no-repeat, no-repeat, repeat, no-repeat;
-      background-size: 256px 256px, auto, auto, auto, auto;
+      background: var(--bg);
+      background-image: url("/hex-bg.svg");
+      background-size: 2000px 2000px;
+      color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.6;
     }
-    .container { max-width: 760px; margin: 0 auto; padding: 24px 16px; }
-    header {
-      padding: 18px 20px;
-      margin-bottom: 24px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.018) 34%, rgba(45,212,191,0.045) 72%, rgba(216,166,87,0.055)), rgba(21,25,32,0.72);
-      box-shadow: inset 0 1px 0 var(--glass-hi), 0 18px 54px rgba(0,0,0,0.28);
-      position: relative;
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 760px; margin: 0 auto; padding: 24px 24px 48px; background: var(--bg); min-height: 100vh; }
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
     }
-    header h1 { font-size: 24px; color: var(--accent); margin-bottom: 4px; }
-    header p { color: var(--muted); font-size: 14px; margin-bottom: 0; }
-    header a { color: var(--accent); text-decoration: none; }
+    .site-header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+    }
+    .logo { font-family:var(--mono); font-size:20px; font-weight:700; }
+    .logo span { color:var(--accent-warm); }
+    .site-nav { font-family:var(--mono); font-size:11px; display:flex; gap:6px; margin-left:auto; flex-wrap:wrap; }
+    .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--text); text-decoration:none; border-color:var(--border); background:var(--surface); }
+    .page-title { width:100%; font-size:26px; font-weight:700; margin-top:4px; }
+    .page-subtitle { width:100%; color:var(--muted); font-size:14px; }
 
     .entry {
       border: 0;
-      border-top: 1px solid var(--hairline);
-      border-radius: 0;
+      border-top: 1px solid var(--border);
       padding: 18px 0;
       margin-bottom: 0;
-      position: relative;
       background: transparent;
-      box-shadow: none;
     }
-    .entry::before {
-      content: none;
-    }
-    .entry-date { font-size: 12px; color: var(--muted); font-family: monospace; margin-bottom: 4px; }
+    .entry-date { font-size: 12px; color: var(--muted); font-family: var(--mono); margin-bottom: 4px; }
     .entry-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
     .entry-body { font-size: 14px; color: var(--muted); }
     .entry-body ul { margin: 6px 0 0 18px; }
     .entry-body li { margin-bottom: 4px; }
-    .entry-body code { background: rgba(255,255,255,0.05); padding: 1px 5px; border-radius: 3px; font-size: 13px; color: var(--text); }
+    .entry-body code { background: var(--surface); padding: 1px 5px; font-size: 13px; color: var(--text); font-family: var(--mono); }
 
-    .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; }
-    .tag-feat { background: rgba(45,212,191,0.16); color: var(--green); }
-    .tag-fix { background: rgba(96,165,250,0.15); color: var(--blue); }
-    .tag-data { background: rgba(251,191,36,0.15); color: var(--yellow); }
-    .tag-breaking { background: rgba(248,113,113,0.15); color: var(--red); }
+    .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 8px; margin-left: 8px; vertical-align: middle; font-family: var(--mono); }
+    .tag-feat { color: var(--green); }
+    .tag-fix { color: var(--accent); }
+    .tag-data { color: var(--amber); }
+    .tag-breaking { color: var(--red); }
 
     footer { margin-top: 40px; text-align: center; font-size: 12px; color: var(--muted); }
-    footer a { color: var(--accent); text-decoration: none; }
+    footer a { color: var(--accent); }
   </style>
   <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
   <script>
@@ -78,11 +81,24 @@
   </script>
 </head>
 <body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
+      </nav>
+    </div>
+  </header>
   <div class="container">
-    <header>
-      <h1><a href="/">HVTracker</a> — Changelog</h1>
-      <p>Methodology updates, new features, scoring changes, and registry milestones.</p>
-    </header>
+    <h1 class="page-title" style="margin:20px 0 4px">Changelog</h1>
+    <p class="page-subtitle" style="margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:18px">Methodology updates, new features, scoring changes, and registry milestones.</p>
 
     <div class="entry">
       <div class="entry-date">2026-05-31</div>
@@ -167,7 +183,23 @@
     </div>
 
     <footer>
-      <a href="/">← Back to leaderboard</a> · <a href="/data/latest.json">API</a> · <a href="https://github.com/YugantM/hvtracker">GitHub</a>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
   </div>
 </body>
