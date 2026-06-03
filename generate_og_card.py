@@ -2,41 +2,38 @@
 """Generate a custom OG card (1200x630) for a project profile page."""
 
 import json
-import math
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageFont
 
 W, H = 1200, 630
 
-BG = "#08111b"
-PANEL = "#0f1b2b"
-PANEL_2 = "#122338"
-BORDER = "#26384f"
-TEXT = "#edf4ff"
-MUTED = "#95a9c5"
-SOFT = "#6e86a6"
-TEAL = "#2dd4bf"
-BLUE = "#62a5ff"
-GOLD = "#e1ae55"
-ROSE = "#ff7373"
-VIOLET = "#a78bfa"
+BG = "#f4f1eb"
+SURFACE = "#eae6de"
+BORDER = "#d4cfc5"
+TEXT = "#1a1a1a"
+MUTED = "#6b6560"
+ACCENT = "#2c5282"
+ACCENT_WARM = "#b05a3a"
+GREEN = "#2f6846"
+RED = "#9b3c3c"
+AMBER = "#8b6914"
 
 GRADE_COLORS = {
-    "A": ("#102f2a", "#3ce3c6", "#d9fff7"),
-    "B": ("#102946", "#69a8ff", "#e7f1ff"),
-    "C": ("#3a2a12", "#e1ae55", "#fff4da"),
-    "D": ("#472513", "#fb923c", "#fff0e2"),
-    "F": ("#47181d", "#ff7373", "#ffe9ec"),
+    "A": ("#e8f5e9", GREEN, GREEN),
+    "B": ("#e3ecf6", ACCENT, ACCENT),
+    "C": ("#fdf3e0", AMBER, AMBER),
+    "D": ("#f0ebe5", MUTED, MUTED),
+    "F": ("#fde8e8", RED, RED),
 }
 
 TRUST_COLORS = {
-    "safety": ROSE,
-    "identity": BLUE,
-    "transparency": GOLD,
-    "maintenance": TEAL,
-    "adoption": VIOLET,
+    "safety": "#c0392b",
+    "identity": ACCENT,
+    "transparency": AMBER,
+    "maintenance": GREEN,
+    "adoption": ACCENT_WARM,
 }
 TRUST_MAX = {
     "safety": 25,
@@ -119,34 +116,23 @@ def wrap_text(draw: ImageDraw.ImageDraw, text: str, font, max_width: int, max_li
     return lines
 
 
-def draw_gradient_background(img: Image.Image):
-    base = Image.new("RGBA", (W, H), hex_rgb(BG) + (255,))
-    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    gd = ImageDraw.Draw(glow)
-    gd.ellipse((-120, -80, 520, 480), fill=(45, 212, 191, 54))
-    gd.ellipse((700, -100, 1320, 420), fill=(98, 165, 255, 50))
-    gd.ellipse((820, 320, 1320, 760), fill=(225, 174, 85, 36))
-    glow = glow.filter(ImageFilter.GaussianBlur(60))
-    img.alpha_composite(base)
-    img.alpha_composite(glow)
-
-
 def stat_box(draw, x, y, w, value, label, accent):
-    rounded(draw, (x, y, x + w, y + 82), 20, fill=hex_rgb(PANEL_2), outline=hex_rgb(BORDER))
-    draw.text((x + 18, y + 14), value, font=load_font(28, bold=True), fill=hex_rgb(TEXT))
-    draw.text((x + 18, y + 48), label, font=load_font(16), fill=hex_rgb(accent))
+    rounded(draw, (x, y, x + w, y + 78), 14, fill=hex_rgb(SURFACE), outline=hex_rgb(BORDER))
+    draw.text((x + 16, y + 12), value, font=load_font(26, bold=True), fill=hex_rgb(TEXT))
+    draw.text((x + 16, y + 46), label, font=load_font(14), fill=hex_rgb(accent))
 
 
 def trust_bar(draw, x, y, w, label, score, maximum, color):
-    draw.text((x, y), label, font=load_font(16, bold=True), fill=hex_rgb(TEXT))
+    draw.text((x, y), label, font=load_font(15, bold=True), fill=hex_rgb(TEXT))
     value = f"{score:.0f}/{maximum}"
-    vb = draw.textbbox((0, 0), value, font=load_font(16, mono=True))
-    draw.text((x + w - (vb[2] - vb[0]), y), value, font=load_font(16, mono=True), fill=hex_rgb(MUTED))
-    y += 26
-    rounded(draw, (x, y, x + w, y + 14), 7, fill=(34, 49, 70), outline=None)
-    fill_w = max(18, int(w * min(max(score / maximum, 0), 1)))
-    rounded(draw, (x, y, x + fill_w, y + 14), 7, fill=hex_rgb(color), outline=None)
-    return y + 28
+    vfont = load_font(14, mono=True)
+    vb = draw.textbbox((0, 0), value, font=vfont)
+    draw.text((x + w - (vb[2] - vb[0]), y), value, font=vfont, fill=hex_rgb(MUTED))
+    y += 22
+    rounded(draw, (x, y, x + w, y + 12), 6, fill=hex_rgb(BORDER), outline=None)
+    fill_w = max(14, int(w * min(max(score / maximum, 0), 1)))
+    rounded(draw, (x, y, x + fill_w, y + 12), 6, fill=hex_rgb(color), outline=None)
+    return y + 24
 
 
 def category_label(text: str) -> str:
@@ -160,116 +146,204 @@ def safe_description(text: str) -> str:
 
 
 def generate(agent_data: dict, output_path: str):
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw_gradient_background(img)
+    img = Image.new("RGB", (W, H), hex_rgb(BG))
     draw = ImageDraw.Draw(img)
 
-    outer = (28, 24, W - 28, H - 24)
-    rounded(draw, outer, 34, fill=(10, 20, 33, 220), outline=(42, 60, 84), width=2)
-    rounded(draw, (42, 40, W - 42, H - 42), 28, outline=(255, 255, 255, 18), width=1)
+    # Top accent bar
+    draw.rectangle((0, 0, W, 6), fill=hex_rgb(ACCENT_WARM))
 
-    left_x = 72
-    top_y = 62
-    content_w = 610
+    left_x = 60
+    top_y = 36
+    content_w = 600
 
-    draw.text((left_x, top_y), "AI TRUST REGISTRY", font=load_font(22, bold=True), fill=hex_rgb(SOFT))
-    draw.text((left_x, top_y + 28), "Open-source AI project profile", font=load_font(18), fill=hex_rgb(MUTED))
+    # Header
+    draw.text((left_x, top_y), "HV", font=load_font(20, bold=True, mono=True), fill=hex_rgb(TEXT))
+    hv_w = draw.textbbox((0, 0), "HV", font=load_font(20, bold=True, mono=True))[2]
+    draw.text((left_x + hv_w, top_y), "Tracker", font=load_font(20, mono=True), fill=hex_rgb(ACCENT_WARM))
+    draw.text((left_x + hv_w + 80, top_y + 2), "AI Trust Registry", font=load_font(16), fill=hex_rgb(MUTED))
 
+    # Grade pill
     grade = agent_data.get("evidence_grade", "D")
-    grade_bg, grade_fg, grade_text = GRADE_COLORS.get(grade, GRADE_COLORS["D"])
+    grade_bg, grade_fg, _ = GRADE_COLORS.get(grade, GRADE_COLORS["D"])
     pill_text = f"Grade {grade}"
-    pill_font = load_font(24, bold=True)
+    pill_font = load_font(22, bold=True)
     pill_bbox = draw.textbbox((0, 0), pill_text, font=pill_font)
-    pill_w = (pill_bbox[2] - pill_bbox[0]) + 42
-    pill_h = 56
-    pill_x = W - 72 - pill_w
-    pill_y = 64
-    rounded(draw, (pill_x, pill_y, pill_x + pill_w, pill_y + pill_h), 18, fill=hex_rgb(grade_bg), outline=None)
-    draw.text((pill_x + 21, pill_y + 14), pill_text, font=pill_font, fill=hex_rgb(grade_fg))
+    pill_w = (pill_bbox[2] - pill_bbox[0]) + 36
+    pill_h = 46
+    pill_x = W - 60 - pill_w
+    pill_y = 30
+    rounded(draw, (pill_x, pill_y, pill_x + pill_w, pill_y + pill_h), 12, fill=hex_rgb(grade_bg), outline=hex_rgb(grade_fg))
+    draw.text((pill_x + 18, pill_y + 11), pill_text, font=pill_font, fill=hex_rgb(grade_fg))
 
+    # Separator line
+    draw.line((left_x, 76, W - 60, 76), fill=hex_rgb(BORDER), width=1)
+
+    # Agent name
     name = agent_data["name"]
-    name_font = fit_text(draw, name, content_w, 72, 44, bold=False)
-    draw.text((left_x, 128), name, font=name_font, fill=hex_rgb(TEXT))
+    name_font = fit_text(draw, name, content_w, 56, 36, bold=True)
+    draw.text((left_x, 96), name, font=name_font, fill=hex_rgb(TEXT))
 
-    desc_font = load_font(24)
+    # Description
+    desc_font = load_font(20)
     desc = safe_description(agent_data.get("description", ""))
     desc_lines = wrap_text(draw, desc, desc_font, content_w, 2)
-    desc_y = 128 + (draw.textbbox((0, 0), name, font=name_font)[3] + 20)
+    name_bbox = draw.textbbox((0, 0), name, font=name_font)
+    desc_y = 96 + name_bbox[3] + 12
     for line in desc_lines:
         draw.text((left_x, desc_y), line, font=desc_font, fill=hex_rgb(MUTED))
-        desc_y += 32
+        desc_y += 28
 
+    # Repo
     repo = agent_data.get("repo", "")
-    draw.text((left_x, desc_y + 8), repo, font=load_font(24, mono=True), fill=hex_rgb(BLUE))
+    draw.text((left_x, desc_y + 6), repo, font=load_font(18, mono=True), fill=hex_rgb(ACCENT))
 
+    # Trust score
     trust = float(agent_data.get("trust_score") or 0)
-    score_y = 308
-    score_font = load_font(84, bold=True)
+    score_y = 290
+    score_font = load_font(72, bold=True)
     score_text = f"{trust:.1f}"
     score_bbox = draw.textbbox((0, 0), score_text, font=score_font)
-    draw.text((left_x, score_y), score_text, font=score_font, fill=hex_rgb(TEAL))
-    draw.text((left_x + (score_bbox[2] - score_bbox[0]) + 12, score_y + 32), "/ 100", font=load_font(34, mono=True), fill=hex_rgb(MUTED))
-    draw.text((left_x, score_y + 88), "HVTrust score", font=load_font(22), fill=hex_rgb(SOFT))
+    draw.text((left_x, score_y), score_text, font=score_font, fill=hex_rgb(GREEN))
+    draw.text((left_x + (score_bbox[2] - score_bbox[0]) + 10, score_y + 28), "/ 100", font=load_font(28, mono=True), fill=hex_rgb(MUTED))
+    draw.text((left_x, score_y + 78), "HVTrust score", font=load_font(18), fill=hex_rgb(MUTED))
 
+    # Stat boxes
     stars = agent_data.get("stars_fmt", "—")
     commits = str(agent_data.get("weekly_commits") or 0)
     category = category_label(agent_data.get("category", "Uncategorized"))
-    stat_y = 454
-    stat_box(draw, left_x, stat_y, 146, stars, "stars", TEAL)
-    stat_box(draw, left_x + 162, stat_y, 146, commits, "commits / 4wk", BLUE)
-    stat_box(draw, left_x + 324, stat_y, 260, category, "category", GOLD)
+    stat_y = 440
+    stat_box(draw, left_x, stat_y, 140, stars, "stars", GREEN)
+    stat_box(draw, left_x + 154, stat_y, 140, commits, "commits / 4wk", ACCENT)
+    stat_box(draw, left_x + 308, stat_y, 248, category, "category", ACCENT_WARM)
 
-    panel_x = 700
-    panel_y = 142
-    panel_w = 430
-    panel_h = 360
-    rounded(draw, (panel_x, panel_y, panel_x + panel_w, panel_y + panel_h), 28, fill=hex_rgb(PANEL), outline=hex_rgb(BORDER), width=2)
-    draw.text((panel_x + 28, panel_y + 24), "Trust breakdown", font=load_font(28, bold=True), fill=hex_rgb(TEXT))
-    draw.text((panel_x + 28, panel_y + 58), "Public, checkable signals by dimension", font=load_font(18), fill=hex_rgb(MUTED))
+    # Trust breakdown panel
+    panel_x = 690
+    panel_y = 96
+    panel_w = 450
+    panel_h = 330
+    rounded(draw, (panel_x, panel_y, panel_x + panel_w, panel_y + panel_h), 18, fill=hex_rgb(SURFACE), outline=hex_rgb(BORDER), width=1)
+    draw.text((panel_x + 24, panel_y + 20), "Trust breakdown", font=load_font(24, bold=True), fill=hex_rgb(TEXT))
+    draw.text((panel_x + 24, panel_y + 50), "Public, checkable signals by dimension", font=load_font(14), fill=hex_rgb(MUTED))
 
-    by = panel_y + 104
+    by = panel_y + 84
     breakdown = agent_data.get("trust_breakdown", {})
     for dim in ["safety", "identity", "transparency", "maintenance", "adoption"]:
         by = trust_bar(
             draw,
-            panel_x + 28,
+            panel_x + 24,
             by,
-            panel_w - 56,
+            panel_w - 48,
             dim.capitalize(),
             float(breakdown.get(dim, 0) or 0),
             TRUST_MAX[dim],
             TRUST_COLORS[dim],
         )
 
-    footer_y = 536
-    draw.line((60, footer_y, W - 60, footer_y), fill=(46, 64, 89), width=1)
-    draw.text((72, footer_y + 18), "hvtracker.net", font=load_font(26, bold=True), fill=hex_rgb(TEXT))
-    draw.text((72 + 154, footer_y + 18), "AI Trust Registry", font=load_font(26), fill=hex_rgb(TEAL))
+    # Footer
+    footer_y = 560
+    draw.line((left_x, footer_y, W - 60, footer_y), fill=hex_rgb(BORDER), width=1)
+    draw.text((left_x, footer_y + 16), "hvtracker.net", font=load_font(22, bold=True, mono=True), fill=hex_rgb(TEXT))
 
     rank = agent_data.get("rank")
-    total = agent_data.get("total") or 197
-    rank_text = f"Rank #{rank} of {total}" if rank else "Rank unavailable"
-    rb = draw.textbbox((0, 0), rank_text, font=load_font(24, mono=True))
-    draw.text((W - 72 - (rb[2] - rb[0]), footer_y + 20), rank_text, font=load_font(24, mono=True), fill=hex_rgb(MUTED))
+    total = agent_data.get("total") or 196
+    rank_text = f"Rank #{rank} of {total}" if rank else ""
+    if rank_text:
+        rb = draw.textbbox((0, 0), rank_text, font=load_font(20, mono=True))
+        draw.text((W - 60 - (rb[2] - rb[0]), footer_y + 18), rank_text, font=load_font(20, mono=True), fill=hex_rgb(MUTED))
 
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-    img.convert("RGB").save(output_path, "PNG", optimize=True)
+    img.save(output_path, "PNG", optimize=True)
     print(f"Generated OG card: {output_path} ({W}x{H})")
+
+
+def generate_site_card(output_path: str, total: int = 196, categories: int = 15):
+    """Generate the site-level OG card for the homepage."""
+    img = Image.new("RGB", (W, H), hex_rgb(BG))
+    draw = ImageDraw.Draw(img)
+
+    # Top accent bar
+    draw.rectangle((0, 0, W, 6), fill=hex_rgb(ACCENT_WARM))
+
+    left_x = 60
+    top_y = 40
+
+    # Logo
+    draw.text((left_x, top_y), "HV", font=load_font(28, bold=True, mono=True), fill=hex_rgb(TEXT))
+    hv_w = draw.textbbox((0, 0), "HV", font=load_font(28, bold=True, mono=True))[2]
+    draw.text((left_x + hv_w, top_y), "Tracker", font=load_font(28, mono=True), fill=hex_rgb(ACCENT_WARM))
+
+    # Separator
+    draw.line((left_x, 86, W - 60, 86), fill=hex_rgb(BORDER), width=1)
+
+    # Title
+    draw.text((left_x, 110), "AI Trust Registry", font=load_font(52, bold=True), fill=hex_rgb(TEXT))
+
+    # Subtitle
+    sub_font = load_font(22)
+    sub_lines = [
+        "Independent trust scores for open-source AI agent projects.",
+        "Based on public, checkable signals across safety, provenance,",
+        "transparency, maintenance, and adoption.",
+    ]
+    sub_y = 180
+    for line in sub_lines:
+        draw.text((left_x, sub_y), line, font=sub_font, fill=hex_rgb(MUTED))
+        sub_y += 32
+
+    # Stats row
+    stat_y = 320
+    stat_w = 200
+    gap = 24
+
+    stats = [
+        (str(total), "active projects", GREEN),
+        (str(categories), "categories", ACCENT),
+        ("2h", "refresh cycle", ACCENT_WARM),
+        ("v3", "methodology", AMBER),
+    ]
+    for i, (val, label, color) in enumerate(stats):
+        x = left_x + i * (stat_w + gap)
+        rounded(draw, (x, stat_y, x + stat_w, stat_y + 90), 14, fill=hex_rgb(SURFACE), outline=hex_rgb(BORDER))
+        draw.text((x + 18, stat_y + 12), val, font=load_font(34, bold=True), fill=hex_rgb(TEXT))
+        draw.text((x + 18, stat_y + 54), label, font=load_font(14), fill=hex_rgb(color))
+
+    # Signals list
+    signals_y = 450
+    draw.text((left_x, signals_y), "Signals tracked:", font=load_font(16, bold=True), fill=hex_rgb(MUTED))
+    signals = "OSSF Scorecard · Build provenance · Signed commits · License · Maintenance · Adoption"
+    draw.text((left_x + 140, signals_y), signals, font=load_font(16), fill=hex_rgb(MUTED))
+
+    # Footer
+    footer_y = 540
+    draw.line((left_x, footer_y, W - 60, footer_y), fill=hex_rgb(BORDER), width=1)
+    draw.text((left_x, footer_y + 22), "hvtracker.net", font=load_font(24, bold=True, mono=True), fill=hex_rgb(TEXT))
+
+    tag = "Evidence-weighted trust scores · Badge ready · Public JSON API"
+    tb = draw.textbbox((0, 0), tag, font=load_font(18))
+    draw.text((W - 60 - (tb[2] - tb[0]), footer_y + 24), tag, font=load_font(18), fill=hex_rgb(MUTED))
+
+    img.save(output_path, "PNG", optimize=True)
+    print(f"Generated site OG card: {output_path} ({W}x{H})")
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python generate_og_card.py <slug> [output_path]")
+        print("       python generate_og_card.py --site [output_path]")
         sys.exit(1)
 
-    slug = sys.argv[1]
-    out = sys.argv[2] if len(sys.argv) > 2 else f"agents/{slug}/og.png"
-    data_path = Path(f"data/agents/{slug}.json")
+    if sys.argv[1] == "--site":
+        out = sys.argv[2] if len(sys.argv) > 2 else "og-v2.png"
+        generate_site_card(out)
+    else:
+        slug = sys.argv[1]
+        out = sys.argv[2] if len(sys.argv) > 2 else f"agents/{slug}/og.png"
+        data_path = Path(f"data/agents/{slug}.json")
 
-    if not data_path.exists():
-        print(f"Agent data not found: {data_path}")
-        sys.exit(1)
+        if not data_path.exists():
+            print(f"Agent data not found: {data_path}")
+            sys.exit(1)
 
-    with data_path.open() as fh:
-        data = json.load(fh)
-    generate(data, out)
+        with data_path.open(encoding="utf-8") as fh:
+            data = json.load(fh)
+        generate(data, out)

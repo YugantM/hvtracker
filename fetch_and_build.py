@@ -2144,7 +2144,7 @@ def load_scorecard_cache(script_dir: str) -> dict:
         print("scorecard-cache.json not found — scorecard data will be empty this run.")
         return {}
     try:
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             data = json.load(f)
         agents = data.get("agents", {})
         print(f"Loaded scorecard cache: {len(agents)} repos (scanned {data.get('scanned_at', 'unknown')})")
@@ -2505,7 +2505,7 @@ def merge_batch_into_data(data_path: str, fresh_rows: list[dict]) -> list[dict]:
     Returns the full merged agent list (fresh + unchanged old entries).
     """
     try:
-        with open(data_path) as f:
+        with open(data_path, encoding="utf-8") as f:
             existing = json.load(f)
         old_agents = existing.get("agents", [])
     except (FileNotFoundError, json.JSONDecodeError):
@@ -2520,7 +2520,7 @@ def merge_batch_into_data(data_path: str, fresh_rows: list[dict]) -> list[dict]:
 def load_existing_data_repos(data_path: str) -> set[str]:
     """Return repos already present in generated data.json with real signals."""
     try:
-        with open(data_path) as f:
+        with open(data_path, encoding="utf-8") as f:
             existing = json.load(f)
         return {
             a["repo"].lower()
@@ -2703,7 +2703,7 @@ def remove_legacy_public_artifacts(
                 slug = agent_data.get("slug") or fname[:-5]
                 if repo and slug and repo not in repo_to_slug:
                     repo_to_slug[repo] = slug
-            except (OSError, json.JSONDecodeError):
+            except (OSError, json.JSONDecodeError, UnicodeDecodeError):
                 continue
     for agent in legacy_agents:
         repo = agent["repo"].lower()
@@ -3017,7 +3017,7 @@ def main() -> None:
 
     if render_only:
         # Load fully-decorated rows from the render cache — no API calls.
-        with open(render_state_path) as _f:
+        with open(render_state_path, encoding="utf-8") as _f:
             _state = json.load(_f)
         rows = _state["rows"]
         legacy_rows = _state["legacy_rows"]
@@ -3185,7 +3185,7 @@ def main() -> None:
         # legacy_rows from the prior render so we don't lose them.
         if batch and not legacy_rows and os.path.isfile(render_state_path):
             try:
-                with open(render_state_path) as _f:
+                with open(render_state_path, encoding="utf-8") as _f:
                     legacy_rows = json.load(_f).get("legacy_rows", []) or []
                 if legacy_rows:
                     print(f"Batch merge: carried forward {len(legacy_rows)} legacy row(s) from prior render")
@@ -3662,9 +3662,9 @@ def main() -> None:
 
     print(f"Built {len(rows)} active agent profile pages under agents/.")
 
-    # Generate per-agent OG cards (1200×630 PNG)
+    # Generate OG cards (1200x630 PNG)
     try:
-        from generate_og_card import generate as generate_og
+        from generate_og_card import generate as generate_og, generate_site_card
         og_count = 0
         for row in rows:
             slug_dir = os.path.join(agents_dir, row["slug"])
@@ -3674,6 +3674,14 @@ def main() -> None:
                 og_count += 1
             except Exception as e:
                 print(f"  WARN: OG card failed for {row['slug']}: {e}")
+        try:
+            generate_site_card(
+                os.path.join(script_dir, "og-v2.png"),
+                total=len(rows),
+                categories=len(categories),
+            )
+        except Exception as e:
+            print(f"  WARN: Site OG card failed: {e}")
         print(f"Generated {og_count} agent OG cards.")
     except ImportError:
         print("WARN: generate_og_card not available — skipping OG cards.")

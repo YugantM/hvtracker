@@ -656,12 +656,17 @@ def data_api_post(email: str = Form(...), company: str = Form(""), message: str 
 
 # ---- Scheduler + startup --------------------------------------------------
 
-def _refresh(mode: str) -> None:
+def _refresh(mode: str) -> bool:
+    """Run a refresh cycle. Returns True on success, False on failure."""
     import fetch_and_build
     try:
         fetch_and_build.run_refresh(mode)
+        return True
     except Exception as e:  # never let a build error kill the scheduler thread
+        import traceback
         print(f"[scheduler] refresh ({mode}) failed: {e}")
+        traceback.print_exc()
+        return False
 
 
 def _compute_render_fingerprint() -> str:
@@ -712,8 +717,8 @@ def _write_render_fingerprint(fingerprint: str) -> None:
 
 
 def _refresh_and_record(mode: str, fingerprint: str) -> None:
-    _refresh(mode)
-    _write_render_fingerprint(fingerprint)
+    if _refresh(mode):
+        _write_render_fingerprint(fingerprint)
 
 
 def _seed_history_into_volume() -> int:
