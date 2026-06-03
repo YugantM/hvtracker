@@ -1125,7 +1125,8 @@ def compute_newly_added(rows: list[dict], history: list[dict], limit: int | None
     added = []
     for row in rows:
         repo_key = row.get("repo", "").lower()
-        if first_seen.get(repo_key) not in {latest_date, previous_date}:
+        fs_date = first_seen.get(repo_key)
+        if fs_date is not None and fs_date not in {latest_date, previous_date}:
             continue
         added.append({
             "name": row["name"],
