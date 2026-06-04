@@ -45,12 +45,14 @@ def test_healthz(client):
     j = client.get("/healthz").json()
     assert j["status"] == "ok"
     assert j["agents"] > 100
+    assert client.head("/healthz").status_code == 200
 
 
 def test_search(client):
     j = client.get("/api/agents", params={"q": "agent", "limit": 5}).json()
     assert j["total"] >= 1
     assert len(j["agents"]) <= 5
+    assert client.head("/api/agents").status_code == 200
 
 
 def test_category_filter(client):
@@ -63,6 +65,7 @@ def test_agent_detail_and_404(client):
     repo = client.get("/api/agents", params={"limit": 1}).json()["agents"][0]["repo"]
     owner, name = repo.split("/")
     assert client.get(f"/api/agents/{owner}/{name}").json()["repo"] == repo
+    assert client.head(f"/api/agents/{owner}/{name}").status_code == 200
     assert client.get("/api/agents/no/such-repo").status_code == 404
 
 
@@ -80,13 +83,18 @@ def test_dynamic_badges(client):
 def test_static_site_served(client):
     assert client.get("/").status_code == 200
     assert client.get("/api/feed").status_code == 200
+    assert client.head("/api/feed").status_code == 200
 
 
 def test_growth_pages_render(client):
     assert client.get("/alerts").status_code == 200
+    assert client.get("/alerts/").status_code == 200
     assert client.get("/sponsor").status_code == 200
+    assert client.get("/sponsor/").status_code == 200
     assert client.get("/data-api").status_code == 200
+    assert client.get("/data-api/").status_code == 200
     assert client.get("/track/codex").status_code == 200
+    assert client.get("/track/codex/").status_code == 200
     assert client.get("/track/not-a-real-agent").status_code == 404
 
 
@@ -100,9 +108,13 @@ def test_submit_validation_rejects_bad_repo(client):
 def test_growth_post_routes_fail_gracefully_without_db(client):
     for path, payload in (
         ("/alerts", {"email": "test@example.com"}),
+        ("/alerts/", {"email": "test@example.com"}),
         ("/sponsor", {"name": "Y", "company": "HV", "email": "test@example.com", "message": "Hi"}),
+        ("/sponsor/", {"name": "Y", "company": "HV", "email": "test@example.com", "message": "Hi"}),
         ("/data-api", {"email": "test@example.com", "message": "Need access"}),
+        ("/data-api/", {"email": "test@example.com", "message": "Need access"}),
         ("/track/codex", {"email": "test@example.com"}),
+        ("/track/codex/", {"email": "test@example.com"}),
     ):
         r = client.post(path, data=payload)
         assert r.status_code == 503

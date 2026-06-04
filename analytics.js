@@ -9,6 +9,7 @@
 
   var ATTRIBUTION_KEY = "hvtracker_attribution_v1";
   var LAST_COMPARE_KEY = "hvtracker_last_compare_v1";
+  var ALERT_POPUP_KEY = "hvtracker_alert_popup_state_v1";
 
   function safeStorage(kind) {
     try {
@@ -33,6 +34,18 @@
     try {
       storage.setItem(key, JSON.stringify(value));
     } catch (_) {}
+  }
+
+  function nowIso() {
+    return new Date().toISOString();
+  }
+
+  function readPopupState() {
+    return readJson(safeStorage("local"), ALERT_POPUP_KEY) || {};
+  }
+
+  function writePopupState(next) {
+    writeJson(safeStorage("local"), ALERT_POPUP_KEY, next);
   }
 
   function inferPageType(pathname) {
@@ -117,6 +130,178 @@
     window.gtag("event", eventName, Object.assign(baseParams(), params || {}));
   };
 
+  function shouldShowAlertPopup() {
+    var path = window.location.pathname || "/";
+    if (path.indexOf("/alerts") === 0) return false;
+    if (path.indexOf("/submit") === 0 || path.indexOf("/correct") === 0) return false;
+
+    var state = readPopupState();
+    if (state.submitted_at) return false;
+
+    if (state.dismissed_at) {
+      var dismissedAt = Date.parse(state.dismissed_at);
+      if (!isNaN(dismissedAt) && (Date.now() - dismissedAt) < 7 * 24 * 60 * 60 * 1000) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  function buildAlertPopup() {
+    if (document.getElementById("hvt-alert-popup")) return null;
+
+    var overlay = document.createElement("div");
+    overlay.id = "hvt-alert-popup";
+    overlay.setAttribute("hidden", "hidden");
+    overlay.innerHTML =
+      '<div class="hvt-alert-popup__backdrop" data-alert-close="backdrop"></div>' +
+      '<div class="hvt-alert-popup__panel" role="dialog" aria-modal="true" aria-labelledby="hvt-alert-popup-title">' +
+        '<button type="button" class="hvt-alert-popup__close" aria-label="Close alert signup" data-alert-close="button">×</button>' +
+        '<div class="hvt-alert-popup__eyebrow">Trust alerts</div>' +
+        '<h2 id="hvt-alert-popup-title">Get emailed when agent trust signals move.</h2>' +
+        '<p class="hvt-alert-popup__copy">Join the waitlist for rank changes, provenance regressions, and meaningful trust score drops.</p>' +
+        '<form class="hvt-alert-popup__form" id="hvt-alert-popup-form">' +
+          '<label for="hvt-alert-popup-email">Work email</label>' +
+          '<input id="hvt-alert-popup-email" name="email" type="email" placeholder="you@company.com" required />' +
+          '<div class="hvt-alert-popup__actions">' +
+            '<button type="submit">Join waitlist</button>' +
+            '<button type="button" class="secondary" data-alert-close="later">Maybe later</button>' +
+          '</div>' +
+          '<p class="hvt-alert-popup__status" id="hvt-alert-popup-status" aria-live="polite"></p>' +
+        '</form>' +
+      '</div>';
+
+    var style = document.createElement("style");
+    style.id = "hvt-alert-popup-style";
+    style.textContent =
+      '#hvt-alert-popup[hidden]{display:none}' +
+      '#hvt-alert-popup{position:fixed;inset:0;z-index:1200}' +
+      '.hvt-alert-popup__backdrop{position:absolute;inset:0;background:rgba(20,16,12,.42);backdrop-filter:blur(4px)}' +
+      '.hvt-alert-popup__panel{position:relative;max-width:430px;margin:min(14vh,120px) auto 0;background:#f4f1eb;color:#1f1b17;border:1px solid #d5cbbc;box-shadow:0 26px 90px rgba(34,28,22,.18);padding:24px 22px 22px}' +
+      '.hvt-alert-popup__close{position:absolute;top:10px;right:10px;border:none;background:none;color:#6f665d;font:400 24px/1 "IBM Plex Mono",ui-monospace,Menlo,monospace;cursor:pointer}' +
+      '.hvt-alert-popup__close:hover{color:#c67c6d}' +
+      '.hvt-alert-popup__eyebrow{margin-bottom:10px;color:#c67c6d;font:11px "IBM Plex Mono",ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.08em}' +
+      '.hvt-alert-popup__panel h2{margin:0 0 10px;font:700 28px/1.08 "Hanken Grotesk",system-ui,-apple-system,sans-serif;letter-spacing:-.03em}' +
+      '.hvt-alert-popup__copy{margin:0 0 16px;color:#6f665d;font:14px/1.6 "Hanken Grotesk",system-ui,-apple-system,sans-serif}' +
+      '.hvt-alert-popup__form{display:grid;gap:10px}' +
+      '.hvt-alert-popup__form label{font:600 13px/1.4 "Hanken Grotesk",system-ui,-apple-system,sans-serif}' +
+      '.hvt-alert-popup__form input{width:100%;padding:12px 13px;border:1px solid #d5cbbc;background:#fff;color:#1f1b17;font:14px "Hanken Grotesk",system-ui,-apple-system,sans-serif;outline:none}' +
+      '.hvt-alert-popup__form input:focus{border-color:#b05a3a}' +
+      '.hvt-alert-popup__actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}' +
+      '.hvt-alert-popup__actions button{border:1px solid #d5cbbc;background:#fff;color:#1f1b17;padding:11px 14px;cursor:pointer;font:700 12px "IBM Plex Mono",ui-monospace,Menlo,monospace}' +
+      '.hvt-alert-popup__actions button:hover{border-color:#c67c6d;color:#c67c6d}' +
+      '.hvt-alert-popup__actions .secondary{background:#ece4d6;color:#6f665d}' +
+      '.hvt-alert-popup__status{min-height:18px;color:#6f665d;font:12px/1.5 "IBM Plex Mono",ui-monospace,Menlo,monospace}' +
+      '.hvt-alert-popup__status.is-error{color:#9b3c3c}' +
+      '.hvt-alert-popup__status.is-success{color:#2f6846}' +
+      '@media (max-width:640px){.hvt-alert-popup__panel{margin:24px 16px 0;padding:22px 18px 18px}.hvt-alert-popup__panel h2{font-size:24px}}';
+
+    document.head.appendChild(style);
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  function markAlertPopupDismissed(reason) {
+    writePopupState({
+      dismissed_at: nowIso(),
+      submitted_at: readPopupState().submitted_at || null,
+      reason: reason || "dismissed"
+    });
+  }
+
+  function setupAlertPopup() {
+    if (!shouldShowAlertPopup()) return;
+
+    var popup = buildAlertPopup();
+    if (!popup) return;
+
+    var dismissed = false;
+    var form = document.getElementById("hvt-alert-popup-form");
+    var status = document.getElementById("hvt-alert-popup-status");
+    var emailInput = document.getElementById("hvt-alert-popup-email");
+
+    function closePopup(reason) {
+      if (dismissed) return;
+      popup.setAttribute("hidden", "hidden");
+      popup.classList.remove("is-open");
+      document.body.classList.remove("hvt-alert-popup-open");
+      markAlertPopupDismissed(reason);
+      dismissed = true;
+    }
+
+    function showPopup() {
+      if (dismissed) return;
+      popup.removeAttribute("hidden");
+      popup.classList.add("is-open");
+      document.body.classList.add("hvt-alert-popup-open");
+      if (typeof emailInput.focus === "function") emailInput.focus();
+      if (typeof window.hvtTrack === "function") {
+        window.hvtTrack("alert_popup_view", {});
+      }
+    }
+
+    popup.addEventListener("click", function (event) {
+      var action = event.target && event.target.getAttribute("data-alert-close");
+      if (!action) return;
+      if (typeof window.hvtTrack === "function") {
+        window.hvtTrack("alert_popup_dismiss", { dismiss_source: action });
+      }
+      closePopup(action);
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !popup.hasAttribute("hidden")) {
+        if (typeof window.hvtTrack === "function") {
+          window.hvtTrack("alert_popup_dismiss", { dismiss_source: "escape" });
+        }
+        closePopup("escape");
+      }
+    });
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      status.textContent = "Saving...";
+      status.className = "hvt-alert-popup__status";
+
+      var payload = new URLSearchParams();
+      payload.set("email", emailInput.value.trim());
+
+      fetch("/alerts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: payload.toString()
+      }).then(function (response) {
+        if (!response.ok) throw new Error("request_failed");
+        writePopupState({
+          dismissed_at: readPopupState().dismissed_at || null,
+          submitted_at: nowIso(),
+          reason: "submitted"
+        });
+        dismissed = true;
+        status.textContent = "You're on the list.";
+        status.className = "hvt-alert-popup__status is-success";
+        form.innerHTML =
+          '<p class="hvt-alert-popup__status is-success">You\'re on the list.</p>' +
+          '<p class="hvt-alert-popup__copy">I\'ll reach out when trust alerts are ready.</p>';
+        if (typeof window.hvtTrack === "function") {
+          window.hvtTrack("alert_popup_submit", {});
+        }
+        window.setTimeout(function () {
+          popup.setAttribute("hidden", "hidden");
+          document.body.classList.remove("hvt-alert-popup-open");
+        }, 1400);
+      }).catch(function () {
+        status.textContent = "Could not save right now. Please try again from the Alerts page.";
+        status.className = "hvt-alert-popup__status is-error";
+      });
+    });
+
+    window.setTimeout(showPopup, 18000);
+  }
+
   captureAttribution();
   if (typeof window.gtag === "function") {
     window.hvtTrack("hvt_pageview", {
@@ -124,6 +309,7 @@
       page_title: document.title
     });
   }
+  setupAlertPopup();
 
   document.addEventListener("click", function (event) {
     var link = event.target.closest("a");

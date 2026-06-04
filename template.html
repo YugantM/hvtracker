@@ -10,6 +10,7 @@
   <!-- Bing Webmaster Tools (also indexes for DuckDuckGo): paste token from bing.com/webmasters, then uncomment. -->
   <!-- <meta name="msvalidate.01" content="REPLACE_WITH_BING_TOKEN"> -->
   <link rel="canonical" href="https://hvtracker.net/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="alternate" type="application/feed+json" title="HVTracker — JSON Feed" href="/feed.json">
   <meta property="og:type" content="website">
   <meta property="og:title" content="AI Trust Registry — {{ total }} Open-Source AI Agent Projects | HVTracker">
@@ -413,7 +414,56 @@
 
     .formula-row { padding: 8px 0; font-size: 11px; color: var(--muted); }
 
-    footer { padding: 24px 0 36px; border-top: 1px solid var(--border); margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
+    .featured-footer {
+      margin-top: 0;
+      padding: 16px 18px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .featured-footer-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .featured-footer-list {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .featured-repo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text);
+    }
+    .featured-repo:hover {
+      text-decoration: none;
+      border-color: var(--accent-warm);
+      color: var(--accent-warm);
+    }
+    .featured-repo img {
+      width: 108px;
+      height: 30px;
+      object-fit: contain;
+      object-position: left center;
+      border-radius: 0;
+      display: block;
+      flex-shrink: 0;
+    }
+    footer { padding: 24px 0 36px; margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
     footer a { color: var(--accent); }
     .footer-sep { color: var(--border); }
 
@@ -447,6 +497,7 @@
       .registry-strip { flex-direction: column; }
       .registry-grid { gap: 12px; }
       .review-grid-list { grid-template-columns: 1fr; }
+      .featured-footer { align-items: flex-start; }
     }
   </style>
   <!-- Google tag (gtag.js) — opt out: localStorage.setItem('hvt_notrack','1') -->
@@ -725,6 +776,15 @@
         <button class="pg-btn" id="nextBtn">Next →</button>
       </div>
     </div>
+
+    <section class="featured-footer" aria-label="Featured in READMEs">
+      <div class="featured-footer-label">Featured in READMEs</div>
+      <div class="featured-footer-list">
+        <a class="featured-repo" href="https://github.com/deepset-ai/haystack" target="_blank" rel="noopener noreferrer">
+          <img src="/haystack-logo.png" alt="Haystack logo" loading="lazy" decoding="async">
+        </a>
+      </div>
+    </section>
 
     {% if warning_rows %}
     <section class="review-panel" aria-label="Projects needing review">

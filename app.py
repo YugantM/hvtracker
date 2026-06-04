@@ -103,13 +103,13 @@ def find_agent_by_slug(slug: str) -> dict | None:
 
 # ---- JSON API ------------------------------------------------------------
 
-@app.get("/healthz")
+@app.api_route("/healthz", methods=["GET", "HEAD"])
 def healthz():
     d = load_data()
     return {"status": "ok", "agents": d.get("total", 0), "updated": d.get("updated")}
 
 
-@app.get("/api/agents")
+@app.api_route("/api/agents", methods=["GET", "HEAD"])
 def api_agents(q: str = "", category: str = "", sort: str = "rank",
                order: str = "asc", limit: int = 50, offset: int = 0):
     """Search/filter/sort/paginate the leaderboard."""
@@ -129,7 +129,7 @@ def api_agents(q: str = "", category: str = "", sort: str = "rank",
     return {"total": total, "count": len(page), "offset": offset, "agents": page}
 
 
-@app.get("/api/agents/{owner}/{repo}")
+@app.api_route("/api/agents/{owner}/{repo}", methods=["GET", "HEAD"])
 def api_agent(owner: str, repo: str):
     agent = find_agent(f"{owner}/{repo}")
     if not agent:
@@ -137,7 +137,7 @@ def api_agent(owner: str, repo: str):
     return agent
 
 
-@app.get("/api/feed")
+@app.api_route("/api/feed", methods=["GET", "HEAD"])
 def api_feed():
     path = os.path.join(OUTPUT_DIR, "feed.json")
     if not os.path.isfile(path):
@@ -158,6 +158,16 @@ def compare_tool():
 @app.get("/og-v2.png")
 def og_v2():
     return FileResponse(os.path.join(BASE_DIR, "og-v2.png"), media_type="image/png")
+
+
+@app.get("/favicon.svg")
+def favicon_svg():
+    return FileResponse(os.path.join(BASE_DIR, "favicon.svg"), media_type="image/svg+xml")
+
+
+@app.get("/hex-bg.svg")
+def hex_bg():
+    return FileResponse(os.path.join(BASE_DIR, "hex-bg.svg"), media_type="image/svg+xml")
 
 
 # ---- Dynamic SVG badges --------------------------------------------------
@@ -224,77 +234,137 @@ def _page(name: str) -> str:
         return f.read()
 
 
-def _marketing_page(title: str, eyebrow: str, heading: str, body_html: str) -> str:
+def _marketing_page(
+    title: str,
+    eyebrow: str,
+    heading: str,
+    body_html: str,
+    *,
+    description: str = "HVTracker validates demand for alerts, data access, sponsorship, submissions, and corrections before building heavier workflows.",
+    path: str = "/",
+) -> str:
+    canonical = f"https://hvtracker.net{path}"
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{escape(title)}</title>
+  <meta name="description" content="{escape(description)}">
+  <link rel="canonical" href="{escape(canonical)}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{escape(title)}">
+  <meta property="og:description" content="{escape(description)}">
+  <meta property="og:url" content="{escape(canonical)}">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta property="og:image:secure_url" content="https://hvtracker.net/og-v2.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="HVTracker AI trust registry preview">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{escape(title)}">
+  <meta name="twitter:description" content="{escape(description)}">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:image:alt" content="HVTracker AI trust registry preview">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
   <style>
     :root {{
-      --bg:#0b0d10; --surface:rgba(18,22,29,0.84); --border:rgba(142,154,176,0.24);
-      --text:#eef2f6; --muted:#a8b3c2; --accent:#8fb3ff; --accent-soft:rgba(143,179,255,0.14);
-      --mocha:#d8a657; --fresh:#2dd4bf; --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+      --paper:#f4f1eb; --paper-2:#ece4d6; --ink:#1f1b17; --muted:#6f665d;
+      --line:#d5cbbc; --line-strong:#b9aa96; --lobster:#c67c6d;
+      --lobster-soft:rgba(198,124,109,.14); --blue-strong:#7f9cbd; --green:#2f6846;
+      --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
       --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
     }}
-    * {{ box-sizing:border-box; }}
+    * {{ box-sizing:border-box; margin:0; padding:0; }}
     body {{
-      margin:0; min-height:100vh; color:var(--text); font:15px/1.6 var(--font-sans);
-      background:
-        radial-gradient(circle at 14% -8%, rgba(45,212,191,0.16), transparent 28%),
-        radial-gradient(circle at 85% 4%, rgba(216,166,87,0.13), transparent 24%),
-        linear-gradient(180deg, #10141a 0%, #0b0d10 56%, #07090c 100%);
-      padding:32px 20px;
+      min-height:100vh; color:var(--ink); font:15px/1.65 var(--font-sans);
+      background:var(--paper);
+      background-image:url("/hex-bg.svg");
+      background-size:2000px 2000px;
     }}
-    .page {{ max-width:860px; margin:0 auto; }}
+    a {{ color:inherit; text-decoration:none; }}
+    a:hover {{ text-decoration:underline; }}
+    .site-header {{
+      position:sticky; top:0; z-index:100;
+      background:var(--paper);
+      border-bottom:1px solid var(--line);
+    }}
+    .site-header-inner {{
+      max-width:1200px; margin:0 auto; padding:14px 24px;
+      display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+    }}
+    .logo {{ font-family:var(--font-mono); font-size:20px; font-weight:700; color:var(--ink); }}
+    .logo span {{ color:var(--lobster); }}
+    .site-nav {{
+      margin-left:auto; font-family:var(--font-mono); font-size:11px;
+      display:flex; gap:6px; flex-wrap:wrap;
+    }}
+    .site-nav a {{
+      color:var(--muted); padding:5px 10px; border:1px solid transparent;
+    }}
+    .site-nav a:hover {{
+      color:var(--ink); border-color:var(--line); background:var(--paper-2); text-decoration:none;
+    }}
+    .page {{ max-width:1120px; margin:0 auto; padding:24px 24px 48px; background:var(--paper); min-height:100vh; }}
     .shell {{
-      border:1px solid var(--border); border-radius:18px; overflow:hidden;
-      background:linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.014)), var(--surface);
-      box-shadow:0 28px 90px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.05);
+      max-width:780px; margin:0 auto;
     }}
-    .hero {{ padding:28px 28px 20px; border-bottom:1px solid rgba(255,255,255,0.08); }}
+    .hero {{ padding:28px 0 20px; border-bottom:1px solid var(--line); }}
     .eyebrow {{
-      display:inline-block; margin-bottom:12px; color:var(--mocha); font:11px var(--font-mono);
+      display:inline-block; margin-bottom:12px; color:var(--lobster); font:11px var(--font-mono);
       text-transform:uppercase; letter-spacing:0.08em;
     }}
     h1 {{ margin:0 0 10px; font-size:34px; line-height:1.1; letter-spacing:-0.03em; }}
-    .lede {{ margin:0; max-width:640px; color:var(--muted); }}
-    .content {{ padding:24px 28px 30px; display:grid; gap:22px; }}
+    .lede {{ margin:0; max-width:680px; color:var(--muted); }}
+    .content {{ padding:24px 0 30px; display:grid; gap:22px; }}
     .card {{
-      border:1px solid var(--border); border-radius:14px; padding:18px;
-      background:rgba(255,255,255,0.03);
+      border-top:2px solid var(--line-strong); padding:18px;
+      background:var(--paper-2);
     }}
     .card h2 {{ margin:0 0 10px; font-size:15px; }}
     .card p {{ margin:0 0 10px; color:var(--muted); }}
     .grid {{ display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:14px; }}
     .pill {{
       display:inline-block; padding:4px 9px; border-radius:999px; font:11px var(--font-mono);
-      background:var(--accent-soft); color:var(--accent);
+      background:var(--lobster-soft); color:var(--lobster);
     }}
     ul {{ margin:10px 0 0 18px; padding:0; color:var(--muted); }}
     li + li {{ margin-top:6px; }}
     form {{ display:grid; gap:14px; }}
     label {{ display:grid; gap:6px; font-weight:600; }}
     input, textarea {{
-      width:100%; border:1px solid rgba(142,154,176,0.32); border-radius:10px; padding:12px 13px;
-      background:rgba(7,9,12,0.42); color:var(--text); font:14px var(--font-sans);
+      width:100%; border:1px solid var(--line); border-radius:10px; padding:12px 13px;
+      background:var(--paper); color:var(--ink); font:14px var(--font-sans);
     }}
     textarea {{ min-height:120px; resize:vertical; }}
     .actions {{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }}
     .button {{
       display:inline-flex; align-items:center; justify-content:center; padding:11px 16px; border-radius:10px;
-      background:var(--accent-soft); color:var(--text); border:1px solid var(--accent);
+      background:var(--paper); color:var(--ink); border:1px solid var(--line);
       font:700 12px var(--font-mono); text-decoration:none;
     }}
     .button.secondary {{
-      background:rgba(255,255,255,0.035); color:var(--muted); border-color:var(--border);
+      background:var(--paper-2); color:var(--muted); border-color:var(--line);
     }}
-    .button:hover {{ text-decoration:none; background:rgba(143,179,255,0.24); }}
-    .button.secondary:hover {{ color:var(--text); border-color:var(--accent); }}
-    .back {{ color:var(--muted); font:11px var(--font-mono); text-decoration:none; }}
-    .back:hover {{ color:var(--accent); }}
-    .ok {{ color:var(--fresh); font-weight:700; }}
+    .button:hover {{ text-decoration:none; border-color:var(--lobster); color:var(--lobster); }}
+    .button.secondary:hover {{ color:var(--ink); border-color:var(--lobster); }}
+    .ok {{ color:var(--green); font-weight:700; }}
+    footer {{
+      margin-top:28px; padding-top:16px; border-top:1px solid var(--line);
+      font:11px var(--font-mono); color:var(--muted); text-align:center;
+    }}
+    .footer-sep {{ color:var(--line-strong); }}
+    footer a {{ color:var(--blue-strong); }}
+    @media (max-width:760px) {{
+      .site-header-inner {{ gap:8px; }}
+      .site-nav {{ margin-left:0; }}
+      .page {{ padding:24px 20px 40px; }}
+      h1 {{ font-size:28px; }}
+    }}
   </style>
   <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
   <script>
@@ -308,8 +378,24 @@ def _marketing_page(title: str, eyebrow: str, heading: str, body_html: str) -> s
     gtag('js', new Date());
     gtag('config', 'G-TZ8921LR0K');
   </script>
+  <script defer src="/analytics.js"></script>
 </head>
 <body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
+      </nav>
+    </div>
+  </header>
   <div class="page">
     <div class="shell">
       <section class="hero">
@@ -319,10 +405,26 @@ def _marketing_page(title: str, eyebrow: str, heading: str, body_html: str) -> s
       </section>
       <section class="content">
         {body_html}
-        <div class="actions">
-          <a class="back" href="/">← Back to HVTracker</a>
-        </div>
       </section>
+      <footer>
+        <a href="/methodology">Methodology</a>
+        <span class="footer-sep">&middot;</span>
+        <a href="/spec/">Specifications</a>
+        <span class="footer-sep">&middot;</span>
+        <a href="/data/">Data API</a>
+        <span class="footer-sep">&middot;</span>
+        <a href="/compare/">Compare</a>
+        <span class="footer-sep">&middot;</span>
+        <a href="/badges/">Badges</a>
+        <span class="footer-sep">&middot;</span>
+        <a href="/changelog/">Changelog</a>
+        <span class="footer-sep">&middot;</span>
+        <a href="/blog/">Blog</a>
+        <span class="footer-sep">&middot;</span>
+        <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+        <span class="footer-sep">&middot;</span>
+        <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+      </footer>
     </div>
   </div>
 </body>
@@ -336,6 +438,7 @@ def _interest_unavailable() -> HTMLResponse:
             "Temporarily unavailable",
             "Interest capture is offline right now.",
             "<div class='card'><p>The site can still be browsed, but the lead queue is unavailable on this environment. Try again later or reach out through GitHub issues.</p></div>",
+            description="HVTracker interest capture is temporarily unavailable.",
         ),
         status_code=503,
     )
@@ -353,40 +456,133 @@ def _interest_thanks(title: str, message: str, repo: str | None = None) -> HTMLR
             "Request saved",
             "You are on the list.",
             f"<div class='card'><p class='ok'>{escape(message)}</p><p>For now this is a human-reviewed queue, not an automated onboarding flow. That is intentional: it helps validate which alerts, exports, and sponsor offers are worth building first.</p></div><div class='actions'><a class='button' href='/'>Open leaderboard</a>{next_action}</div>",
+            description=message,
         )
     )
 
 
 @app.get("/submit", response_class=HTMLResponse)
+@app.get("/submit/", response_class=HTMLResponse, include_in_schema=False)
 def submit_form():
-    return _page("submit.html")
+    body = """
+    <div class='card'>
+      <h2>Submit an agent for listing</h2>
+      <p>Submissions enter a moderation queue and appear after review. Keep it simple: repo, display name, optional category, and a contact email if you want follow-up.</p>
+      <form method='post' action='/submit'>
+        <label>GitHub repo (owner/name)
+          <input name='repo' placeholder='owner/name' required>
+        </label>
+        <label>Display name
+          <input name='name' placeholder='My Agent' required>
+        </label>
+        <label>Category (optional)
+          <input name='category' placeholder='Coding Agents'>
+        </label>
+        <label>Contact email (optional)
+          <input name='contact' type='email' placeholder='you@example.com'>
+        </label>
+        <div class='actions'>
+          <button class='button' type='submit'>Submit for review</button>
+        </div>
+      </form>
+    </div>
+    """
+    return _marketing_page(
+        "Submit an agent — HVTracker",
+        "Submission",
+        "Suggest a project for the trust registry.",
+        body,
+        description="Submit an AI agent project for review and possible inclusion in the HVTracker trust registry.",
+        path="/submit/",
+    )
 
 
 @app.post("/submit", response_class=HTMLResponse)
+@app.post("/submit/", response_class=HTMLResponse, include_in_schema=False)
 def submit_post(repo: str = Form(...), name: str = Form(...),
                 category: str = Form(""), contact: str = Form("")):
     repo = repo.strip().removeprefix("https://github.com/").strip("/")
     if repo.count("/") != 1:
-        return HTMLResponse("<p>Invalid repo. Use <code>owner/name</code>.</p>", status_code=400)
+        return HTMLResponse(
+            _marketing_page(
+                "Invalid repo — HVTracker",
+                "Submission",
+                "Use the GitHub owner/name format.",
+                "<div class='card'><p>Please submit the repository as <code>owner/name</code>, for example <code>openai/codex</code>.</p></div><div class='actions'><a class='button' href='/submit/'>Back to form</a></div>",
+                description="Submit an AI agent project for review and possible inclusion in the HVTracker trust registry.",
+                path="/submit/",
+            ),
+            status_code=400,
+        )
+    if not db.enabled():
+        return _interest_unavailable()
     db.add_submission(repo, {"name": name.strip(), "category": category.strip()}, contact.strip() or None)
-    return HTMLResponse("<p>Thanks — your submission is queued for review. "
-                        "<a href='/'>Back to the leaderboard</a></p>")
+    return HTMLResponse(
+        _marketing_page(
+            "Submission received — HVTracker",
+            "Submission saved",
+            "Your project is queued for review.",
+            "<div class='card'><p class='ok'>Thanks. The submission is in the review queue.</p><p>HVTracker reviews repos manually before adding them so the registry stays evidence-backed and comparable.</p></div><div class='actions'><a class='button' href='/'>Open leaderboard</a><a class='button secondary' href='/submit/'>Submit another</a></div>",
+            description="Your AI agent project submission has been received by HVTracker.",
+            path="/submit/",
+        )
+    )
 
 
 @app.get("/correct", response_class=HTMLResponse)
+@app.get("/correct/", response_class=HTMLResponse, include_in_schema=False)
 def correct_form():
-    return _page("correct.html")
+    body = """
+    <div class='card'>
+      <h2>Request a correction</h2>
+      <p>Spotted wrong data on a listing? Send the repo, explain what is wrong, and optionally leave a contact email for follow-up.</p>
+      <form method='post' action='/correct'>
+        <label>GitHub repo (owner/name)
+          <input name='repo' placeholder='owner/name' required>
+        </label>
+        <label>What's wrong?
+          <textarea name='message' rows='5' placeholder='Describe the issue...' required></textarea>
+        </label>
+        <label>Contact email (optional)
+          <input name='contact' type='email' placeholder='you@example.com'>
+        </label>
+        <div class='actions'>
+          <button class='button' type='submit'>Send correction</button>
+        </div>
+      </form>
+    </div>
+    """
+    return _marketing_page(
+        "Request a correction — HVTracker",
+        "Corrections",
+        "Flag data that needs review.",
+        body,
+        description="Request a correction to an HVTracker project listing.",
+        path="/correct/",
+    )
 
 
 @app.post("/correct", response_class=HTMLResponse)
+@app.post("/correct/", response_class=HTMLResponse, include_in_schema=False)
 def correct_post(repo: str = Form(...), message: str = Form(...), contact: str = Form("")):
+    if not db.enabled():
+        return _interest_unavailable()
     repo = repo.strip().removeprefix("https://github.com/").strip("/")
     db.add_correction(repo, {"message": message.strip()}, contact.strip() or None)
-    return HTMLResponse("<p>Thanks — your correction is queued for review. "
-                        "<a href='/'>Back to the leaderboard</a></p>")
+    return HTMLResponse(
+        _marketing_page(
+            "Correction received — HVTracker",
+            "Correction saved",
+            "The correction request is queued for review.",
+            "<div class='card'><p class='ok'>Thanks. The correction request is now in the review queue.</p><p>HVTracker reviews correction requests manually so trust signals stay accurate and auditable.</p></div><div class='actions'><a class='button' href='/'>Open leaderboard</a><a class='button secondary' href='/correct/'>Send another correction</a></div>",
+            description="Your HVTracker correction request has been received.",
+            path="/correct/",
+        )
+    )
 
 
 @app.get("/alerts", response_class=HTMLResponse)
+@app.get("/alerts/", response_class=HTMLResponse, include_in_schema=False)
 def alerts_page():
     body = """
     <div class='grid'>
@@ -407,19 +603,10 @@ def alerts_page():
     </div>
     <div class='card'>
       <h2>Join the alerts waitlist</h2>
-      <p>Tell me what you want tracked. A strong signal here is better than guessing what to ship next.</p>
+      <p>Leave your email and I will reach out when the first trust alerts are ready.</p>
       <form method='post' action='/alerts'>
         <label>Work email
           <input type='email' name='email' placeholder='you@company.com' required>
-        </label>
-        <label>Your role
-          <input type='text' name='role' placeholder='Security engineer, founder, platform lead'>
-        </label>
-        <label>Agents or categories you care about
-          <input type='text' name='agents' placeholder='Codex, Claude Code, browser agents, agent frameworks'>
-        </label>
-        <label>What alert would be useful first?
-          <textarea name='notes' placeholder='Example: email me when a tracked agent loses provenance, drops below 70 HVTrust, or changes rank materially.'></textarea>
         </label>
         <div class='actions'>
           <button class='button' type='submit'>Join waitlist</button>
@@ -427,10 +614,11 @@ def alerts_page():
       </form>
     </div>
     """
-    return HTMLResponse(_marketing_page("Alerts waitlist — HVTracker", "Growth", "Get trust alerts when agent risk changes.", body))
+    return HTMLResponse(_marketing_page("Alerts waitlist — HVTracker", "Growth", "Get trust alerts when agent risk changes.", body, description="Join the HVTracker alerts waitlist for rank changes, trust drops, and provenance regressions.", path="/alerts/"))
 
 
 @app.post("/alerts", response_class=HTMLResponse)
+@app.post("/alerts/", response_class=HTMLResponse, include_in_schema=False)
 def alerts_post(email: str = Form(...), role: str = Form(""), agents: str = Form(""), notes: str = Form("")):
     if not db.enabled():
         return _interest_unavailable()
@@ -449,6 +637,7 @@ def alerts_post(email: str = Form(...), role: str = Form(""), agents: str = Form
 
 
 @app.get("/track/{slug}", response_class=HTMLResponse)
+@app.get("/track/{slug}/", response_class=HTMLResponse, include_in_schema=False)
 def track_agent_page(slug: str):
     agent = find_agent_by_slug(slug)
     if not agent:
@@ -486,10 +675,11 @@ def track_agent_page(slug: str):
       </form>
     </div>
     """
-    return HTMLResponse(_marketing_page(f"Track {agent['name']} — HVTracker", "Watchlist", f"Track {agent['name']} changes before they surprise you.", body))
+    return HTMLResponse(_marketing_page(f"Track {agent['name']} — HVTracker", "Watchlist", f"Track {agent['name']} changes before they surprise you.", body, description=f"Track {agent['name']} on HVTracker and get notified when important trust signals move.", path=f"/track/{agent['slug']}/"))
 
 
 @app.post("/track/{slug}", response_class=HTMLResponse)
+@app.post("/track/{slug}/", response_class=HTMLResponse, include_in_schema=False)
 def track_agent_post(slug: str, email: str = Form(...), role: str = Form(""), notes: str = Form("")):
     agent = find_agent_by_slug(slug)
     if not agent:
@@ -510,6 +700,7 @@ def track_agent_post(slug: str, email: str = Form(...), role: str = Form(""), no
 
 
 @app.get("/sponsor", response_class=HTMLResponse)
+@app.get("/sponsor/", response_class=HTMLResponse, include_in_schema=False)
 def sponsor_page():
     body = """
     <div class='grid'>
@@ -550,10 +741,11 @@ def sponsor_page():
       </form>
     </div>
     """
-    return HTMLResponse(_marketing_page("Sponsor HVTracker", "Commercial", "Reach teams evaluating AI agents with context, not banner spam.", body))
+    return HTMLResponse(_marketing_page("Sponsor HVTracker", "Commercial", "Reach teams evaluating AI agents with context, not banner spam.", body, description="Sponsor HVTracker to reach teams evaluating AI agents with trust and comparison context.", path="/sponsor/"))
 
 
 @app.post("/sponsor", response_class=HTMLResponse)
+@app.post("/sponsor/", response_class=HTMLResponse, include_in_schema=False)
 def sponsor_post(name: str = Form(...), company: str = Form(...), email: str = Form(...), message: str = Form(...)):
     if not db.enabled():
         return _interest_unavailable()
@@ -572,6 +764,7 @@ def sponsor_post(name: str = Form(...), company: str = Form(...), email: str = F
 
 
 @app.get("/data-api", response_class=HTMLResponse)
+@app.get("/data-api/", response_class=HTMLResponse, include_in_schema=False)
 def data_api_page():
     body = """
     <div class='grid'>
@@ -634,10 +827,11 @@ def data_api_page():
       </form>
     </div>
     """
-    return HTMLResponse(_marketing_page("Data API and pricing — HVTracker", "Data", "Public data today. Commercial access next.", body))
+    return HTMLResponse(_marketing_page("Data API and pricing — HVTracker", "Data", "Public data today. Commercial access next.", body, description="Explore the HVTracker data API, exports, and future commercial access options.", path="/data-api/"))
 
 
 @app.post("/data-api", response_class=HTMLResponse)
+@app.post("/data-api/", response_class=HTMLResponse, include_in_schema=False)
 def data_api_post(email: str = Form(...), company: str = Form(""), message: str = Form(...)):
     if not db.enabled():
         return _interest_unavailable()

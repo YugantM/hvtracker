@@ -1717,7 +1717,7 @@ def render_stacked_radar_svg(agents: list[dict], mode: str = "trust",
             ly = cy + math.sin(a) * (radius + 28)
         elif math.sin(a) > 0.8:
             ly = cy + math.sin(a) * (radius + 28)
-        short_label = escape(str(label)[:14])
+        short_label = escape(str(label)[:18])
         value = round(avg_pcts[i] * 100)
         labels.append(
             f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" fill="#1a1a1a" '
