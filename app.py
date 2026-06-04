@@ -209,6 +209,11 @@ def favicon_svg():
     return FileResponse(os.path.join(BASE_DIR, "favicon.svg"), media_type="image/svg+xml")
 
 
+@app.get("/haystack-logo.png")
+def haystack_logo():
+    return FileResponse(os.path.join(BASE_DIR, "haystack-logo.png"), media_type="image/png")
+
+
 @app.get("/hex-bg.svg")
 def hex_bg():
     return FileResponse(os.path.join(BASE_DIR, "hex-bg.svg"), media_type="image/svg+xml")
