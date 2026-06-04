@@ -1033,10 +1033,13 @@ def startup():
         if prev_hash != agents_hash:
             for a in agents_seed:
                 db.upsert_agent(a)
+            # Remove agents from DB that were deleted from agents.json
+            valid_repos = [a["repo"] for a in agents_seed]
+            pruned = db.delete_agents_not_in(valid_repos)
             with open(agents_hash_path, "w") as f:
                 f.write(agents_hash)
             agents_changed = True
-            print(f"[startup] agents.json changed → synced {len(agents_seed)} entries into DB")
+            print(f"[startup] agents.json changed → synced {len(agents_seed)} entries into DB, pruned {pruned}")
         else:
             print(f"[startup] agents.json unchanged ({len(agents_seed)} entries) — DB sync skipped")
     # If the volume has no site yet, build one in the background so the service

@@ -95,6 +95,20 @@ def upsert_agent(agent: dict) -> None:
         conn.commit()
 
 
+def delete_agents_not_in(repos: list[str]) -> int:
+    """Remove agents from DB whose repo is not in the given list."""
+    if not enabled():
+        raise RuntimeError("delete_agents_not_in requires DATABASE_URL")
+    if not repos:
+        return 0
+    with _connect() as conn, conn.cursor() as cur:
+        placeholders = ", ".join(["%s"] * len(repos))
+        cur.execute(f"DELETE FROM agents WHERE repo NOT IN ({placeholders})", repos)
+        deleted = cur.rowcount
+        conn.commit()
+    return deleted
+
+
 # ---- submissions / corrections -------------------------------------------
 
 def add_submission(repo: str, payload: dict, contact: str | None) -> int:
