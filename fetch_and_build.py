@@ -3022,6 +3022,14 @@ def main() -> None:
             _state = json.load(_f)
         rows = _state["rows"]
         legacy_rows = _state["legacy_rows"]
+        # Prune cached rows for agents removed from agents.json
+        valid_repos = {a["repo"].lower() for a in all_agents + legacy_agents}
+        before = len(rows)
+        rows = [r for r in rows if r.get("repo", "").lower() in valid_repos]
+        legacy_rows = [r for r in legacy_rows if r.get("repo", "").lower() in valid_repos]
+        pruned = before - len(rows)
+        if pruned:
+            print(f"RENDER-ONLY: pruned {pruned} row(s) removed from agents.json")
         restored = restore_active_classification(rows, legacy_rows, all_agents)
         if restored:
             print(f"RENDER-ONLY: restored {restored} row(s) from legacy based on agents.json")
