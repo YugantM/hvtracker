@@ -45,6 +45,12 @@ def test_healthz(client):
     j = client.get("/healthz").json()
     assert j["status"] == "ok"
     assert j["agents"] > 100
+    assert j["catalog_agents"] >= j["agents"]
+    assert j["source_render_agents"] == j["agents"]
+    assert isinstance(j["source_render_fingerprint"], str)
+    assert len(j["source_render_fingerprint"]) == 64
+    if j["stored_render_fingerprint"] is not None:
+        assert j["render_in_sync"] == (j["stored_render_fingerprint"] == j["source_render_fingerprint"])
     assert client.head("/healthz").status_code == 200
 
 

@@ -67,3 +67,88 @@ jobs:
 
       - name: Validate rendered HTML (sample pages)
         run: python tests/validate_html.py
+
+  production-smoke:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: build-smoke
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Compute expected deploy markers
+        id: expected
+        run: |
+          EXPECTED_CATALOG_AGENTS=$(python - <<'PY'
+          import json
+          print(len(json.load(open("agents.json"))))
+          PY
+          )
+          EXPECTED_RENDER_AGENTS=$(python - <<'PY'
+          import json
+          print(len(json.load(open("data/render_state.json"))["rows"]))
+          PY
+          )
+          EXPECTED_FP=$(python - <<'PY'
+          import app
+          print(app._compute_render_fingerprint())
+          PY
+          )
+          echo "catalog_agents=${EXPECTED_CATALOG_AGENTS}" >> "$GITHUB_OUTPUT"
+          echo "render_agents=${EXPECTED_RENDER_AGENTS}" >> "$GITHUB_OUTPUT"
+          echo "fingerprint=${EXPECTED_FP}" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for production to report this build
+        env:
+          EXPECTED_CATALOG_AGENTS: ${{ steps.expected.outputs.catalog_agents }}
+          EXPECTED_RENDER_AGENTS: ${{ steps.expected.outputs.render_agents }}
+          EXPECTED_FINGERPRINT: ${{ steps.expected.outputs.fingerprint }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import sys
+          import time
+          import urllib.request
+
+          expected_catalog_agents = int(os.environ["EXPECTED_CATALOG_AGENTS"])
+          expected_render_agents = int(os.environ["EXPECTED_RENDER_AGENTS"])
+          expected_fp = os.environ["EXPECTED_FINGERPRINT"]
+          expected_sha = os.environ["EXPECTED_SHA"]
+          deadline = time.time() + 900
+          last = None
+
+          while time.time() < deadline:
+              try:
+                  with urllib.request.urlopen("https://hvtracker.net/healthz", timeout=20) as resp:
+                      last = json.loads(resp.read().decode("utf-8"))
+              except Exception as exc:
+                  last = {"error": str(exc)}
+              else:
+                  sha = last.get("git_sha")
+                  sha_ok = (not sha) or sha == expected_sha
+                  agents_ok = last.get("agents") == expected_render_agents
+                  render_agents_ok = last.get("source_render_agents") == expected_render_agents
+                  catalog_ok = last.get("catalog_agents") == expected_catalog_agents
+                  fp_ok = last.get("source_render_fingerprint") == expected_fp
+                  sync_ok = last.get("stored_render_fingerprint") == expected_fp and last.get("render_in_sync") is True
+                  if sha_ok and agents_ok and render_agents_ok and catalog_ok and fp_ok and sync_ok:
+                      print("Production matches expected build markers.")
+                      print(json.dumps(last, indent=2, sort_keys=True))
+                      sys.exit(0)
+              print("Waiting for production deploy...", json.dumps(last, sort_keys=True))
+              time.sleep(15)
+
+          print("Production did not converge to expected deploy markers in time.")
+          print(json.dumps(last, indent=2, sort_keys=True))
+          sys.exit(1)
+          PY

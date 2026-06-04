@@ -85,6 +85,38 @@ def load_data() -> dict:
     return _cache["data"]
 
 
+def _catalog_agent_count() -> int:
+    try:
+        with open(os.path.join(BASE_DIR, "agents.json"), encoding="utf-8") as f:
+            return len(json.load(f))
+    except (OSError, json.JSONDecodeError, TypeError):
+        return 0
+
+
+def _source_render_count() -> int:
+    path = os.path.join(BASE_DIR, "data", "render_state.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+        return len(payload.get("rows") or [])
+    except (OSError, json.JSONDecodeError, TypeError):
+        return 0
+
+
+def _runtime_git_sha() -> str | None:
+    for key in (
+        "RAILWAY_GIT_COMMIT_SHA",
+        "GIT_COMMIT_SHA",
+        "GITHUB_SHA",
+        "SOURCE_COMMIT",
+        "COMMIT_SHA",
+    ):
+        value = (os.environ.get(key) or "").strip()
+        if value:
+            return value
+    return None
+
+
 def find_agent(repo: str) -> dict | None:
     repo = repo.lower()
     for a in load_data().get("agents", []):
@@ -106,7 +138,19 @@ def find_agent_by_slug(slug: str) -> dict | None:
 @app.api_route("/healthz", methods=["GET", "HEAD"])
 def healthz():
     d = load_data()
-    return {"status": "ok", "agents": d.get("total", 0), "updated": d.get("updated")}
+    source_fingerprint = _compute_render_fingerprint()
+    stored_fingerprint = _read_render_fingerprint()
+    return {
+        "status": "ok",
+        "agents": d.get("total", 0),
+        "catalog_agents": _catalog_agent_count(),
+        "source_render_agents": _source_render_count(),
+        "updated": d.get("updated"),
+        "git_sha": _runtime_git_sha(),
+        "source_render_fingerprint": source_fingerprint,
+        "stored_render_fingerprint": stored_fingerprint,
+        "render_in_sync": bool(stored_fingerprint and stored_fingerprint == source_fingerprint),
+    }
 
 
 @app.api_route("/api/agents", methods=["GET", "HEAD"])
