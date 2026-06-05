@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OpenCUA Review — Trust Score & Safety Profile | HVTracker</title>
-  <meta name="description" content="Is OpenCUA trustworthy? Independent trust score 43.4/100 (Grade D). Ranked #162 of 206 open-source AI projects. 774 GitHub stars, Browser &amp; Computer Use. Safety, transparency, maintenance, and provenance signals reviewed.">
+  <meta name="description" content="Is OpenCUA trustworthy? Independent trust score 43.4/100 (Grade D). Ranked #167 of 203 open-source AI projects. 776 GitHub stars, Browser &amp; Computer Use. Safety, transparency, maintenance, and provenance signals reviewed.">
   <link rel="canonical" href="https://hvtracker.net/agents/opencua">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="OpenCUA — Trust Score 43.4/100 | HVTracker">
-  <meta property="og:description" content="Grade D · HVTrust 43.4/100 · 774 stars · Browser &amp; Computer Use. Independent trust signals for open-source AI projects.">
+  <meta property="og:description" content="Grade D · HVTrust 43.4/100 · 776 stars · Browser &amp; Computer Use. Independent trust signals for open-source AI projects.">
   <meta property="og:url" content="https://hvtracker.net/agents/opencua">
   <meta property="og:image" content="https://hvtracker.net/agents/opencua/og.png">
   <meta property="og:image:type" content="image/png">
@@ -39,7 +39,7 @@
       "ratingValue": "43.4",
       "bestRating": "100",
       "worstRating": "0",
-      "ratingCount": "774"
+      "ratingCount": "776"
     },
     "review": {
       "@type": "Review",
@@ -77,12 +77,12 @@
       {
         "@type": "Question",
         "name": "Is OpenCUA safe to use?",
-        "acceptedAnswer": { "@type": "Answer", "text": "OpenCUA has an HVTrust score of 43.4/100 (Grade D), ranked #162 of 206 open-source AI projects. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals." }
+        "acceptedAnswer": { "@type": "Answer", "text": "OpenCUA has an HVTrust score of 43.4/100 (Grade D), ranked #167 of 203 open-source AI projects. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals." }
       },
       {
         "@type": "Question",
         "name": "What is the trust score for OpenCUA?",
-        "acceptedAnswer": { "@type": "Answer", "text": "OpenCUA scores 43.4/100 on HVTracker's evidence-weighted HVTrust scale. It has 774 GitHub stars and is categorized under Browser &amp; Computer Use." }
+        "acceptedAnswer": { "@type": "Answer", "text": "OpenCUA scores 43.4/100 on HVTracker's evidence-weighted HVTrust scale. It has 776 GitHub stars and is categorized under Browser &amp; Computer Use." }
       }
     ]
   }
@@ -278,11 +278,28 @@
     .compare-strip .cmp-arrow { color:var(--accent); font-weight:700; }
 
     .runtime-soon { padding:18px 0; border-top:1px solid var(--border); }
-    .runtime-soon .rt-card { padding:12px; border:1px dashed var(--border); color:var(--muted); font-size:13px; line-height:1.6; }
+    .runtime-soon .rt-card { padding:14px; border:1px solid var(--border); background:linear-gradient(180deg, rgba(44,82,130,0.04), rgba(176,90,58,0.03)); color:var(--muted); font-size:13px; line-height:1.6; }
     .runtime-soon .rt-card strong { color:var(--text); font-weight:600; }
-    .runtime-soon .rt-fields { margin-top:8px; display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:6px 12px; font-family:var(--font-mono); font-size:11px; }
-    .runtime-soon .rt-fields li { list-style:none; padding:4px 8px; border:1px solid var(--border); color:var(--muted); }
-    .runtime-soon .rt-fields li::before { content:"◯ "; color:var(--muted); }
+    .runtime-intro { max-width:640px; }
+    .runtime-grid { margin-top:14px; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; }
+    .runtime-panel { border:1px solid var(--border); background:rgba(255,255,255,0.35); padding:12px; }
+    .runtime-panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .runtime-panel-title { font-size:12px; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; }
+    .runtime-status { display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border:1px solid var(--border); font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+    .runtime-status.positive { color:var(--green); border-color:rgba(47,104,70,0.3); }
+    .runtime-status.neutral { color:var(--accent); border-color:rgba(44,82,130,0.3); }
+    .runtime-status.muted { color:var(--muted); }
+    .runtime-confidence { margin-top:2px; font-family:var(--font-mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; }
+    .runtime-summary { color:var(--text); font-size:14px; line-height:1.5; }
+    .runtime-summary.muted { color:var(--muted); }
+    .runtime-provider-list { margin-top:8px; display:flex; flex-wrap:wrap; gap:6px; }
+    .runtime-provider { list-style:none; padding:4px 8px; border:1px solid var(--border); background:var(--bg); font-family:var(--font-mono); font-size:11px; color:var(--text); }
+    .runtime-note { margin-top:8px; font-size:11px; color:var(--muted); }
+    .runtime-note strong { color:var(--text); }
+    .runtime-mini { margin-top:8px; font-family:var(--font-mono); font-size:11px; color:var(--muted); }
+    .runtime-roadmap { margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; }
+    .runtime-roadmap li { list-style:none; padding:5px 9px; border:1px solid var(--border); font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); }
+    .runtime-roadmap li.live { color:var(--green); border-color:rgba(47,104,70,0.25); }
 
     .maintainer-cta { padding:16px 0; margin:0; border-bottom:1px solid var(--border); }
     .maintainer-cta .section-title { margin-bottom:6px; }
@@ -341,7 +358,7 @@
   }
   </script>
 </head>
-<body data-page-type="agent_profile" data-agent-slug="opencua" data-agent-name="OpenCUA" data-category="Browser &amp; Computer Use" data-global-rank="162" data-trust-score="43.4">
+<body data-page-type="agent_profile" data-agent-slug="opencua" data-agent-name="OpenCUA" data-category="Browser &amp; Computer Use" data-global-rank="167" data-trust-score="43.4">
   <header class="site-header">
     <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
@@ -391,7 +408,7 @@
         </div>
         <div class="hero-summary-item">
           <div class="hero-summary-label">Last push</div>
-          <div class="hero-summary-value">2026-05-25 · 10d ago</div>
+          <div class="hero-summary-value">2026-05-25 · 11d ago</div>
         </div>
         <div class="hero-summary-item">
           <div class="hero-summary-label">Recent change</div>
@@ -500,7 +517,7 @@
 
     <section class="rank-block">
       <div>
-        <div class="score-pill score-mid">54.0</div>
+        <div class="score-pill score-mid">53.9</div>
         <div class="rank-label">Activity Score · out of 100</div>
       </div>
       
@@ -510,8 +527,8 @@
       </div>
       
       <div>
-        <div class="rank-big">#162</div>
-        <div class="rank-label">Global Rank · of 206</div>
+        <div class="rank-big">#167</div>
+        <div class="rank-label">Global Rank · of 203</div>
       </div>
       
       <div>
@@ -529,20 +546,20 @@
     <div class="freshness-banner">
       <span class="dot"></span>
       <strong>Signals refreshed</strong>
-      <span class="meta">2026-06-04 16:46 UTC</span>
+      <span class="meta">2026-06-05 11:36 UTC</span>
       <span class="meta">·</span>
-      <span class="meta">Repo last pushed 10 days ago</span>
+      <span class="meta">Repo last pushed 11 days ago</span>
     </div>
 
     
     <section class="trend">
       <h2 class="section-title">Rank Trend</h2>
       <div class="sparkline-wrap">
-        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="40" viewBox="0 0 200 40" style="display:block"><path d="M0.0,19.7L20.0,19.7L40.0,19.7L60.0,4.0L80.0,13.9L100.0,13.9L120.0,18.0L140.0,27.9L160.0,33.7L180.0,35.4L200.0,36.0" fill="none" stroke="#7c6af6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="40" viewBox="0 0 200 40" style="display:block"><path d="M0.0,18.4L18.2,18.4L36.4,18.4L54.5,4.0L72.7,13.1L90.9,13.1L109.1,16.8L127.3,25.9L145.5,31.2L163.6,32.8L181.8,32.3L200.0,36.0" fill="none" stroke="#7c6af6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <div class="sparkline-labels">
           
           <span>2026-05-25</span>
-          <span>2026-06-04</span>
+          <span>2026-06-05</span>
           
         </div>
       </div>
@@ -554,16 +571,16 @@
       <div class="stats-grid">
         <div>
           <div class="stat-label">Stars</div>
-          <div class="stat-value">774</div>
+          <div class="stat-value">776</div>
         </div>
         <div>
           <div class="stat-label">Forks</div>
-          <div class="stat-value">100</div>
+          <div class="stat-value">101</div>
         </div>
         <div class="recent">
           <div class="stat-label">Last Push</div>
           <div class="stat-value"><span class="fresh-dot"></span>2026-05-25</div>
-          <div class="stat-sub">10 days ago</div>
+          <div class="stat-sub">11 days ago</div>
         </div>
         <div>
           <div class="stat-label">Commits (4 wk)</div>
@@ -576,7 +593,7 @@
         </div>
         <div>
           <div class="stat-label">HN mentions (30d)</div>
-          <div class="stat-value">93</div>
+          <div class="stat-value">605</div>
         </div>
         <div>
           <div class="stat-label">Open Issues</div>
@@ -584,8 +601,8 @@
         </div>
         <div>
           <div class="stat-label">Rank Change</div>
-          <div class="stat-value">▼1</div>
-          <div class="stat-sub">was #161</div>
+          <div class="stat-value">▼7</div>
+          <div class="stat-sub">was #160</div>
         </div>
       </div>
     </section>
@@ -631,7 +648,7 @@
           <div class="metric-section">
             <div class="metric-section-title">
               <h3>Activity Inputs</h3>
-              <span>54.0 / 100</span>
+              <span>53.9 / 100</span>
             </div>
             <div class="metric-list" aria-label="Activity inputs for OpenCUA">
               <div class="metric-row">
@@ -641,8 +658,8 @@
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Freshness</strong><span class="metric-sub">Last push recency</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:94.4%;--bar:var(--green);"></div></div>
-                <div class="metric-value">23.6 <span>/ 25</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:93.9%;--bar:var(--green);"></div></div>
+                <div class="metric-value">23.5 <span>/ 25</span></div>
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Activity</strong><span class="metric-sub">Recent commits</span></div>
@@ -651,7 +668,7 @@
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Community</strong><span class="metric-sub">Fork signal</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:46.6%;--bar:var(--amber);"></div></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:46.7%;--bar:var(--amber);"></div></div>
                 <div class="metric-value">9.3 <span>/ 20</span></div>
               </div>
             </div>
@@ -799,7 +816,7 @@
       </details>
       <details>
         <summary>Is OpenCUA actively maintained?</summary>
-        <div class="qa-answer">Maintained. Last push was 10 days ago.</div>
+        <div class="qa-answer">Maintained. Last push was 11 days ago.</div>
       </details>
       <details>
         <summary>What license does OpenCUA use?</summary>
@@ -819,14 +836,118 @@
     
 
     <section class="runtime-soon">
-      <h2 class="section-title">Runtime trust — coming soon</h2>
+      <h2 class="section-title">Runtime trust</h2>
       <div class="rt-card">
-        <p>HVTrust currently scores supply-chain signals. We're adding <strong>runtime trust</strong> next: what an agent actually does when it runs — what it can reach, which tools it carries, what external services it depends on. Track progress on the <a href="/roadmap/" style="color:var(--accent);">roadmap →</a></p>
-        <ul class="rt-fields">
-          <li>MCP support</li>
-          <li>Tool / plugin surface</li>
-          <li>External service deps</li>
-          <li>Package provenance drift</li>
+        
+        
+        
+        
+        <p class="runtime-intro">HVTrust currently <strong>does not score</strong> runtime-trust fields yet. This public view shows a compact runtime snapshot from repo docs and manifests. An experimental ranking preview is available in <a href="/score-lab/" style="color:var(--accent);">Score Lab →</a>, and progress is tracked on the <a href="/roadmap/" style="color:var(--accent);">roadmap →</a></p>
+
+        <div class="runtime-grid">
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">MCP Server Support</div>
+                
+              </div>
+              <span class="runtime-status muted">
+                
+                None detected
+                
+              </span>
+            </div>
+            <div class="runtime-summary muted">
+              
+              No MCP server signal detected.
+              
+            </div>
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">External Service Dependencies</div>
+                <div class="runtime-confidence">medium confidence</div>
+              </div>
+              <span class="runtime-status neutral">
+                
+                1 detected
+                
+              </span>
+            </div>
+            <div class="runtime-summary ">
+              
+              Public provider/service dependencies detected.
+              
+            </div>
+            
+            <ul class="runtime-provider-list">
+              
+              <li class="runtime-provider">OpenAI</li>
+              
+            </ul>
+            
+            <div class="runtime-note">
+              <strong>Credential signal:</strong>
+              
+              No explicit API-key/config marker detected.
+              
+            </div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">Tool / Plugin Surface</div>
+                <div class="runtime-confidence">high confidence</div>
+              </div>
+              <span class="runtime-status neutral">
+                
+                Declared
+                
+              </span>
+            </div>
+            <div class="runtime-summary ">
+              
+              Declared plugin/integration surface detected.
+              
+            </div>
+            
+            <ul class="runtime-provider-list">
+              
+              <li class="runtime-provider">code</li>
+              
+            </ul>
+            
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">Package Provenance Drift</div>
+                
+              </div>
+              <span class="runtime-status muted">
+                
+                N/A
+                
+              </span>
+            </div>
+            <div class="runtime-summary muted">
+              No package source configured
+            </div>
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+        </div>
+
+        <ul class="runtime-roadmap">
+          <li class="live">MCP support live</li>
+          <li class="live">External deps live</li>
+          <li class="live">Tool / plugin surface live</li>
+          <li class="live">Package provenance drift live</li>
         </ul>
       </div>
     </section>
@@ -937,7 +1058,7 @@
         
         <li>
           <a href="/agents/skyvern">
-            <span class="sib-rank">#18</span>
+            <span class="sib-rank">#17</span>
             <span class="sib-name">Skyvern</span>
             <span class="sib-score">91.4</span>
           </a>
@@ -945,15 +1066,15 @@
         
         <li>
           <a href="/agents/stagehand">
-            <span class="sib-rank">#22</span>
+            <span class="sib-rank">#21</span>
             <span class="sib-name">Stagehand</span>
-            <span class="sib-score">87.6</span>
+            <span class="sib-score">86.4</span>
           </a>
         </li>
         
         <li>
           <a href="/agents/openclaw">
-            <span class="sib-rank">#53</span>
+            <span class="sib-rank">#23</span>
             <span class="sib-name">OpenClaw</span>
             <span class="sib-score">100.0</span>
           </a>
@@ -961,15 +1082,15 @@
         
         <li>
           <a href="/agents/browser-use">
-            <span class="sib-rank">#61</span>
+            <span class="sib-rank">#77</span>
             <span class="sib-name">Browser Use</span>
-            <span class="sib-score">98.5</span>
+            <span class="sib-score">94.0</span>
           </a>
         </li>
         
         <li>
           <a href="/agents/cua">
-            <span class="sib-rank">#92</span>
+            <span class="sib-rank">#106</span>
             <span class="sib-name">Cua</span>
             <span class="sib-score">89.7</span>
           </a>
@@ -984,7 +1105,7 @@
     <section class="terminal-note" style="padding:18px 20px;font-size:11px;color:var(--muted);line-height:1.7;">
       <strong style="color:var(--text);font-size:12px;">Data sources</strong><br>
       GitHub REST API (repo, commits, stars, forks, license) · OSSF Scorecard via deps.dev · Algolia HN Search API
-      <br>Each agent's signals refresh once daily across 6 staggered batches. <a href="/methodology" style="color:var(--accent);">Methodology v3.1</a> · <a href="/data/agents/opencua.json" style="color:var(--accent);">Raw JSON</a>
+      <br>Each agent's signals refresh once daily across 6 staggered batches. <a href="/methodology" style="color:var(--accent);">Methodology v3.2</a> · <a href="/data/agents/opencua.json" style="color:var(--accent);">Raw JSON</a>
     </section>
 
     <footer>

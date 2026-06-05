@@ -4,18 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Claude Code Review — Trust Score & Safety Profile | HVTracker</title>
-  <meta name="description" content="Is Claude Code trustworthy? Independent trust score 51.1/100 (Grade C). Ranked #139 of 206 open-source AI projects. 129.7k GitHub stars, Coding Agents. Safety, transparency, maintenance, and provenance signals reviewed.">
+  <meta name="description" content="Is Claude Code trustworthy? Independent trust score 61.3/100 (Grade C). Ranked #117 of 203 open-source AI projects. 130.3k GitHub stars, Coding Agents. Safety, transparency, maintenance, and provenance signals reviewed.">
   <link rel="canonical" href="https://hvtracker.net/agents/claude-code">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Claude Code — Trust Score 51.1/100 | HVTracker">
-  <meta property="og:description" content="Grade C · HVTrust 51.1/100 · 129.7k stars · Coding Agents. Independent trust signals for open-source AI projects.">
+  <meta property="og:title" content="Claude Code — Trust Score 61.3/100 | HVTracker">
+  <meta property="og:description" content="Grade C · HVTrust 61.3/100 · 130.3k stars · Coding Agents. Independent trust signals for open-source AI projects.">
   <meta property="og:url" content="https://hvtracker.net/agents/claude-code">
   <meta property="og:image" content="https://hvtracker.net/agents/claude-code/og.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Claude Code — Trust Score 51.1/100 on HVTracker">
+  <meta property="og:image:alt" content="Claude Code — Trust Score 61.3/100 on HVTracker">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://hvtracker.net/agents/claude-code/og.png">
   <meta name="twitter:image:alt" content="Claude Code on HVTracker">
@@ -36,10 +36,10 @@
     },
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "51.1",
+      "ratingValue": "61.3",
       "bestRating": "100",
       "worstRating": "0",
-      "ratingCount": "129689"
+      "ratingCount": "130315"
     },
     "review": {
       "@type": "Review",
@@ -50,11 +50,11 @@
       },
       "reviewRating": {
         "@type": "Rating",
-        "ratingValue": "51.1",
+        "ratingValue": "61.3",
         "bestRating": "100",
         "worstRating": "0"
       },
-      "reviewBody": "Claude Code receives a trust score of 51.1/100 (Grade C) based on independent analysis of activity, adoption, transparency, safety, and identity signals."
+      "reviewBody": "Claude Code receives a trust score of 61.3/100 (Grade C) based on independent analysis of activity, adoption, transparency, safety, and identity signals."
     }
   }
   </script>
@@ -77,12 +77,12 @@
       {
         "@type": "Question",
         "name": "Is Claude Code safe to use?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Claude Code has an HVTrust score of 51.1/100 (Grade C), ranked #139 of 206 open-source AI projects. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Claude Code has an HVTrust score of 61.3/100 (Grade C), ranked #117 of 203 open-source AI projects. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals." }
       },
       {
         "@type": "Question",
         "name": "What is the trust score for Claude Code?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Claude Code scores 51.1/100 on HVTracker's evidence-weighted HVTrust scale. It has 129.7k GitHub stars and is categorized under Coding Agents." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Claude Code scores 61.3/100 on HVTracker's evidence-weighted HVTrust scale. It has 130.3k GitHub stars and is categorized under Coding Agents." }
       }
     ]
   }
@@ -278,11 +278,28 @@
     .compare-strip .cmp-arrow { color:var(--accent); font-weight:700; }
 
     .runtime-soon { padding:18px 0; border-top:1px solid var(--border); }
-    .runtime-soon .rt-card { padding:12px; border:1px dashed var(--border); color:var(--muted); font-size:13px; line-height:1.6; }
+    .runtime-soon .rt-card { padding:14px; border:1px solid var(--border); background:linear-gradient(180deg, rgba(44,82,130,0.04), rgba(176,90,58,0.03)); color:var(--muted); font-size:13px; line-height:1.6; }
     .runtime-soon .rt-card strong { color:var(--text); font-weight:600; }
-    .runtime-soon .rt-fields { margin-top:8px; display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:6px 12px; font-family:var(--font-mono); font-size:11px; }
-    .runtime-soon .rt-fields li { list-style:none; padding:4px 8px; border:1px solid var(--border); color:var(--muted); }
-    .runtime-soon .rt-fields li::before { content:"◯ "; color:var(--muted); }
+    .runtime-intro { max-width:640px; }
+    .runtime-grid { margin-top:14px; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; }
+    .runtime-panel { border:1px solid var(--border); background:rgba(255,255,255,0.35); padding:12px; }
+    .runtime-panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .runtime-panel-title { font-size:12px; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; }
+    .runtime-status { display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border:1px solid var(--border); font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+    .runtime-status.positive { color:var(--green); border-color:rgba(47,104,70,0.3); }
+    .runtime-status.neutral { color:var(--accent); border-color:rgba(44,82,130,0.3); }
+    .runtime-status.muted { color:var(--muted); }
+    .runtime-confidence { margin-top:2px; font-family:var(--font-mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; }
+    .runtime-summary { color:var(--text); font-size:14px; line-height:1.5; }
+    .runtime-summary.muted { color:var(--muted); }
+    .runtime-provider-list { margin-top:8px; display:flex; flex-wrap:wrap; gap:6px; }
+    .runtime-provider { list-style:none; padding:4px 8px; border:1px solid var(--border); background:var(--bg); font-family:var(--font-mono); font-size:11px; color:var(--text); }
+    .runtime-note { margin-top:8px; font-size:11px; color:var(--muted); }
+    .runtime-note strong { color:var(--text); }
+    .runtime-mini { margin-top:8px; font-family:var(--font-mono); font-size:11px; color:var(--muted); }
+    .runtime-roadmap { margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; }
+    .runtime-roadmap li { list-style:none; padding:5px 9px; border:1px solid var(--border); font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); }
+    .runtime-roadmap li.live { color:var(--green); border-color:rgba(47,104,70,0.25); }
 
     .maintainer-cta { padding:16px 0; margin:0; border-bottom:1px solid var(--border); }
     .maintainer-cta .section-title { margin-bottom:6px; }
@@ -341,7 +358,7 @@
   }
   </script>
 </head>
-<body data-page-type="agent_profile" data-agent-slug="claude-code" data-agent-name="Claude Code" data-category="Coding Agents" data-global-rank="139" data-trust-score="51.1">
+<body data-page-type="agent_profile" data-agent-slug="claude-code" data-agent-name="Claude Code" data-category="Coding Agents" data-global-rank="117" data-trust-score="61.3">
   <header class="site-header">
     <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
@@ -369,7 +386,7 @@
         <a href="/categories/coding-agents" class="badge cat" style="text-decoration:none">Coding Agents</a>
         <span class="badge lang">Python</span>
         <span class="badge grade-C" title="Grade C">Grade C</span>
-        <span class="badge state-legacy">Legacy</span>
+        <span class="badge state-warning">Needs review</span>
         
         <span class="badge" style="color:var(--red)">Proprietary</span>
       </div>
@@ -383,21 +400,21 @@
       <div class="hero-summary-grid">
         <div class="hero-summary-item">
           <div class="hero-summary-label">Listing state</div>
-          <div class="hero-summary-value muted">Legacy</div>
+          <div class="hero-summary-value negative">Needs review</div>
         </div>
         <div class="hero-summary-item">
           <div class="hero-summary-label">HVTrust</div>
-          <div class="hero-summary-value">51.1/100 · Grade C</div>
+          <div class="hero-summary-value">61.3/100 · Grade C</div>
         </div>
         <div class="hero-summary-item">
           <div class="hero-summary-label">Last push</div>
-          <div class="hero-summary-value">2026-06-02 · 2d ago</div>
+          <div class="hero-summary-value">2026-06-05 · 0d ago</div>
         </div>
         <div class="hero-summary-item">
           <div class="hero-summary-label">Recent change</div>
           <div class="hero-summary-value neutral">
             
-              State +12
+              State +15
             
           </div>
         </div>
@@ -419,8 +436,8 @@
       <div class="review-grid">
         <div class="review-item primary">
           <div class="review-kicker">Verdict</div>
-          <div class="review-value">Thin or incomplete trust evidence. Review carefully before production use.</div>
-          <div class="review-metric">51.1/100 · Grade C</div>
+          <div class="review-value">Promising trust profile, but some evidence still deserves review.</div>
+          <div class="review-metric">61.3/100 · Grade C</div>
         </div>
 
         <div class="review-item">
@@ -432,8 +449,8 @@
 
         <div class="review-item">
           <div class="review-kicker">Weakest Signal</div>
-          <div class="review-value">Identity / Provenance</div>
-          <div class="review-metric">0/18</div>
+          <div class="review-value">Transparency</div>
+          <div class="review-metric">4.7/17</div>
         </div>
 
         <div class="review-item wide">
@@ -447,26 +464,26 @@
         <div class="recent-change-list">
           
           <div class="recent-change-item">
-            <div class="recent-change-date">2026-06-03</div>
+            <div class="recent-change-date">2026-06-05</div>
             <div class="recent-change-body">
               <span class="recent-change-badge neutral">Listing State Changed</span>
-              <div class="recent-change-detail">Listing state changed from listed to legacy</div>
+              <div class="recent-change-detail">Listing state changed from legacy to warning</div>
             </div>
           </div>
           
           <div class="recent-change-item">
-            <div class="recent-change-date">2026-06-03</div>
+            <div class="recent-change-date">2026-06-05</div>
             <div class="recent-change-body">
               <span class="recent-change-badge neutral">Rank Moved</span>
-              <div class="recent-change-detail">Rank dropped 36 spots (#102 → #138)</div>
+              <div class="recent-change-detail">Rank rose 20 spots (#137 → #117)</div>
             </div>
           </div>
           
           <div class="recent-change-item">
-            <div class="recent-change-date">2026-06-03</div>
+            <div class="recent-change-date">2026-06-05</div>
             <div class="recent-change-body">
               <span class="recent-change-badge neutral">HVTrust Changed</span>
-              <div class="recent-change-detail">HVTrust down 10.6pts (61.8 → 51.2)</div>
+              <div class="recent-change-detail">HVTrust up 10.2pts (51.1 → 61.3)</div>
             </div>
           </div>
           
@@ -485,7 +502,7 @@
           
           <div class="remediation-item">
             <strong>Raise Scorecard signals</strong>
-            <span>Current OSSF Scorecard is 5.6/10. Tighten the weakest checks to improve public safety evidence.</span>
+            <span>Current OSSF Scorecard is 5.5/10. Tighten the weakest checks to improve public safety evidence.</span>
           </div>
           
           <div class="remediation-item">
@@ -523,22 +540,22 @@
 
     <section class="rank-block">
       <div>
-        <div class="score-pill score-high">95.4</div>
+        <div class="score-pill score-high">93.8</div>
         <div class="rank-label">Activity Score · out of 100</div>
       </div>
       
       <div>
-        <div class="score-pill score-mid">51.1</div>
+        <div class="score-pill score-high">61.3</div>
         <div class="rank-label">HVTrust Score · out of 100</div>
       </div>
       
       <div>
-        <div class="rank-big">#139</div>
-        <div class="rank-label">Global Rank · of 206</div>
+        <div class="rank-big">#117</div>
+        <div class="rank-label">Global Rank · of 203</div>
       </div>
       
       <div>
-        <div class="rank-big" style="color:var(--amber)">#15</div>
+        <div class="rank-big" style="color:var(--amber)">#14</div>
         <div class="rank-label">In <a href="/categories/coding-agents">Coding Agents</a></div>
       </div>
       
@@ -552,20 +569,20 @@
     <div class="freshness-banner">
       <span class="dot"></span>
       <strong>Signals refreshed</strong>
-      <span class="meta">2026-06-04 16:46 UTC</span>
+      <span class="meta">2026-06-05 11:36 UTC</span>
       <span class="meta">·</span>
-      <span class="meta">Repo last pushed 2 days ago</span>
+      <span class="meta">Repo last pushed today</span>
     </div>
 
     
     <section class="trend">
       <h2 class="section-title">Rank Trend</h2>
       <div class="sparkline-wrap">
-        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="40" viewBox="0 0 200 40" style="display:block"><path d="M0.0,6.0L20.0,4.0L40.0,5.8L60.0,19.5L80.0,26.5L100.0,26.2L120.0,21.8L140.0,24.8L160.0,26.8L180.0,35.8L200.0,36.0" fill="none" stroke="#7c6af6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="40" viewBox="0 0 200 40" style="display:block"><path d="M0.0,6.0L18.2,4.0L36.4,5.8L54.5,19.6L72.7,26.7L90.9,26.4L109.1,21.9L127.3,24.9L145.5,26.9L163.6,36.0L181.8,35.7L200.0,30.7" fill="none" stroke="#7c6af6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <div class="sparkline-labels">
           
           <span>2026-05-25</span>
-          <span>2026-06-04</span>
+          <span>2026-06-05</span>
           
         </div>
       </div>
@@ -577,38 +594,38 @@
       <div class="stats-grid">
         <div>
           <div class="stat-label">Stars</div>
-          <div class="stat-value">129.7k</div>
+          <div class="stat-value">130.3k</div>
         </div>
         <div>
           <div class="stat-label">Forks</div>
-          <div class="stat-value">21.1k</div>
+          <div class="stat-value">21.2k</div>
         </div>
         <div class="fresh">
           <div class="stat-label">Last Push</div>
-          <div class="stat-value"><span class="fresh-dot"></span>2026-06-02</div>
-          <div class="stat-sub">2 days ago</div>
+          <div class="stat-value"><span class="fresh-dot"></span>2026-06-05</div>
+          <div class="stat-sub">today</div>
         </div>
         <div>
           <div class="stat-label">Commits (4 wk)</div>
-          <div class="stat-value">42</div>
+          <div class="stat-value">31</div>
         </div>
         <div>
           <div class="stat-label">Downloads (7d)</div>
-          <div class="stat-value">8,690,156</div>
+          <div class="stat-value">9,738,911</div>
           <div class="stat-sub">npm</div>
         </div>
         <div>
           <div class="stat-label">HN mentions (30d)</div>
-          <div class="stat-value">565</div>
+          <div class="stat-value">0</div>
         </div>
         <div>
           <div class="stat-label">Open Issues</div>
-          <div class="stat-value">8449</div>
+          <div class="stat-value">8582</div>
         </div>
         <div>
           <div class="stat-label">Rank Change</div>
-          <div class="stat-value">▼1</div>
-          <div class="stat-sub">was #138</div>
+          <div class="stat-value">▲20</div>
+          <div class="stat-sub">was #137</div>
         </div>
       </div>
     </section>
@@ -621,28 +638,28 @@
           <div class="metric-section">
             <div class="metric-section-title">
               <h3>HVTrust Dimensions</h3>
-              <span>51.1 / 100 · 100.0% confidence</span>
+              <span>61.3 / 100 · 100.0% confidence</span>
             </div>
             <div class="metric-list" aria-label="HVTrust dimensions for Claude Code">
               <div class="metric-row">
                 <div class="metric-name"><strong>Safety / Integrity</strong><span class="metric-sub">OSSF, provenance, signatures</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:31.6%;--bar:var(--accent);"></div></div>
-                <div class="metric-value">7.9 <span>/ 25</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:31.2%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">7.8 <span>/ 25</span></div>
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Identity / Provenance</strong><span class="metric-sub">Listing and build link</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:0.0%;--bar:var(--accent);"></div></div>
-                <div class="metric-value">0.0 <span>/ 18</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:60.0%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">10.8 <span>/ 18</span></div>
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Transparency</strong><span class="metric-sub">License and public checks</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:28.2%;--bar:var(--accent);"></div></div>
-                <div class="metric-value">4.8 <span>/ 17</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:27.6%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">4.7 <span>/ 17</span></div>
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Maintenance</strong><span class="metric-sub">Freshness and commits</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:92.0%;--bar:var(--accent);"></div></div>
-                <div class="metric-value">18.4 <span>/ 20</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:90.0%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">18.0 <span>/ 20</span></div>
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Adoption</strong><span class="metric-sub">Stars and downloads</span></div>
@@ -654,7 +671,7 @@
           <div class="metric-section">
             <div class="metric-section-title">
               <h3>Activity Inputs</h3>
-              <span>95.4 / 100</span>
+              <span>93.8 / 100</span>
             </div>
             <div class="metric-list" aria-label="Activity inputs for Claude Code">
               <div class="metric-row">
@@ -664,13 +681,13 @@
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Freshness</strong><span class="metric-sub">Last push recency</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:98.9%;--bar:var(--green);"></div></div>
-                <div class="metric-value">24.7 <span>/ 25</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:100.0%;--bar:var(--green);"></div></div>
+                <div class="metric-value">25.0 <span>/ 25</span></div>
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Activity</strong><span class="metric-sub">Recent commits</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:81.5%;--bar:#9ae6b4;"></div></div>
-                <div class="metric-value">20.4 <span>/ 25</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:75.1%;--bar:#9ae6b4;"></div></div>
+                <div class="metric-value">18.8 <span>/ 25</span></div>
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Community</strong><span class="metric-sub">Fork signal</span></div>
@@ -697,7 +714,7 @@
         <div class="prov-signal">
           <div class="prov-label">OSSF Scorecard</div>
           
-          <div class="prov-value" style="color:var(--accent);">5.6 / 10</div>
+          <div class="prov-value" style="color:var(--accent);">5.5 / 10</div>
           <div class="prov-sub">via deps.dev · OpenSSF</div>
           
         </div>
@@ -724,7 +741,7 @@
         
         <div class="sc-check">
           <span class="sc-check-name">CI-Tests</span>
-          <span class="sc-check-val" style="color:var(--muted)">3</span>
+          <span class="sc-check-val" style="color:var(--muted)">2</span>
         </div>
         
         <div class="sc-check">
@@ -734,7 +751,7 @@
         
         <div class="sc-check">
           <span class="sc-check-name">Code-Review</span>
-          <span class="sc-check-val" style="color:var(--muted)">2</span>
+          <span class="sc-check-val" style="color:var(--muted)">1</span>
         </div>
         
         <div class="sc-check">
@@ -814,7 +831,7 @@
         <strong>Proprietary software.</strong> A lower HVTrust score reflects fewer <em>public</em> supply-chain artifacts (open license, build provenance, signed commits) — not a security finding. Claude Code may have internal security practices not visible through public signals.
       </div>
       
-      <div class="qa-summary">Public trust evidence for Claude Code is thin: several supply-chain signals are missing or weak. This does not mean the project is unsafe — it means an outside observer cannot easily verify the usual integrity checks. Treat with extra scrutiny.</div>
+      <div class="qa-summary">Claude Code has a mixed signal profile. Some trust indicators are present, others are missing. Whether it is safe for your use case depends on which gaps matter to you — review the breakdown below before adopting in production.</div>
 
       <details>
         <summary>Does Claude Code publish package provenance?</summary>
@@ -822,11 +839,11 @@
       </details>
       <details>
         <summary>Does Claude Code have an OpenSSF Scorecard?</summary>
-        <div class="qa-answer">Claude Code has an OpenSSF Scorecard score of 5.6/10. The Scorecard checks for branch protection, signed releases, dependency updates, fuzzing, code review, and other supply-chain hygiene items. See the full check breakdown on this page.</div>
+        <div class="qa-answer">Claude Code has an OpenSSF Scorecard score of 5.5/10. The Scorecard checks for branch protection, signed releases, dependency updates, fuzzing, code review, and other supply-chain hygiene items. See the full check breakdown on this page.</div>
       </details>
       <details>
         <summary>Is Claude Code actively maintained?</summary>
-        <div class="qa-answer">Actively maintained. The repository was pushed to within the last 2 day(s).</div>
+        <div class="qa-answer">Actively maintained. The repository was pushed to within the last 1 day(s).</div>
       </details>
       <details>
         <summary>What license does Claude Code use?</summary>
@@ -846,14 +863,120 @@
     
 
     <section class="runtime-soon">
-      <h2 class="section-title">Runtime trust — coming soon</h2>
+      <h2 class="section-title">Runtime trust</h2>
       <div class="rt-card">
-        <p>HVTrust currently scores supply-chain signals. We're adding <strong>runtime trust</strong> next: what an agent actually does when it runs — what it can reach, which tools it carries, what external services it depends on. Track progress on the <a href="/roadmap/" style="color:var(--accent);">roadmap →</a></p>
-        <ul class="rt-fields">
-          <li>MCP support</li>
-          <li>Tool / plugin surface</li>
-          <li>External service deps</li>
-          <li>Package provenance drift</li>
+        
+        
+        
+        
+        <p class="runtime-intro">HVTrust currently <strong>does not score</strong> runtime-trust fields yet. This public view shows a compact runtime snapshot from repo docs and manifests. An experimental ranking preview is available in <a href="/score-lab/" style="color:var(--accent);">Score Lab →</a>, and progress is tracked on the <a href="/roadmap/" style="color:var(--accent);">roadmap →</a></p>
+
+        <div class="runtime-grid">
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">MCP Server Support</div>
+                
+              </div>
+              <span class="runtime-status muted">
+                
+                None detected
+                
+              </span>
+            </div>
+            <div class="runtime-summary muted">
+              
+              No MCP server signal detected.
+              
+            </div>
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">External Service Dependencies</div>
+                <div class="runtime-confidence">medium confidence</div>
+              </div>
+              <span class="runtime-status neutral">
+                
+                1 detected
+                
+              </span>
+            </div>
+            <div class="runtime-summary ">
+              
+              Public provider/service dependencies detected.
+              
+            </div>
+            
+            <ul class="runtime-provider-list">
+              
+              <li class="runtime-provider">Anthropic</li>
+              
+            </ul>
+            
+            <div class="runtime-note">
+              <strong>Credential signal:</strong>
+              
+              No explicit API-key/config marker detected.
+              
+            </div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">Tool / Plugin Surface</div>
+                <div class="runtime-confidence">high confidence</div>
+              </div>
+              <span class="runtime-status neutral">
+                
+                Declared
+                
+              </span>
+            </div>
+            <div class="runtime-summary ">
+              
+              Declared plugin/integration surface detected.
+              
+            </div>
+            
+            <ul class="runtime-provider-list">
+              
+              <li class="runtime-provider">code</li>
+              
+              <li class="runtime-provider">shell</li>
+              
+            </ul>
+            
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">Package Provenance Drift</div>
+                <div class="runtime-confidence">high confidence</div>
+              </div>
+              <span class="runtime-status positive">
+                
+                Match
+                
+              </span>
+            </div>
+            <div class="runtime-summary ">
+              Published package metadata matches the tracked repo
+            </div>
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+        </div>
+
+        <ul class="runtime-roadmap">
+          <li class="live">MCP support live</li>
+          <li class="live">External deps live</li>
+          <li class="live">Tool / plugin surface live</li>
+          <li class="live">Package provenance drift live</li>
         </ul>
       </div>
     </section>
@@ -873,17 +996,17 @@
       <div style="display:flex;gap:32px;flex-wrap:wrap;margin-bottom:16px">
         <div>
           <div class="prov-label">Actions (30d)</div>
-          <div class="prov-value" style="color:var(--accent)">41242</div>
+          <div class="prov-value" style="color:var(--accent)">41889</div>
         </div>
         
         <div>
           <div class="prov-label">Merged (30d)</div>
-          <div class="prov-value" style="color:var(--accent)">32904</div>
+          <div class="prov-value" style="color:var(--accent)">33230</div>
         </div>
         
         <div>
           <div class="prov-label">Merge rate</div>
-          <div class="prov-value">80%</div>
+          <div class="prov-value">79%</div>
         </div>
         
         
@@ -893,7 +1016,17 @@
       <ul style="margin:0;padding:0;list-style:none;font-size:13px">
         
         <li style="margin-bottom:4px">
+          <a href="https://github.com/haolinsheng-hash/shanbay-content-review" target="_blank" rel="noopener" style="color:var(--accent)">haolinsheng-hash/shanbay-content-review</a>
+          <span style="color:var(--muted);margin-left:6px">1</span>
+        </li>
+        
+        <li style="margin-bottom:4px">
           <a href="https://github.com/Telran26512/python-bro-code-study" target="_blank" rel="noopener" style="color:var(--accent)">Telran26512/python-bro-code-study</a>
+          <span style="color:var(--muted);margin-left:6px">1</span>
+        </li>
+        
+        <li style="margin-bottom:4px">
+          <a href="https://github.com/rally-io/rally-web" target="_blank" rel="noopener" style="color:var(--accent)">rally-io/rally-web</a>
           <span style="color:var(--muted);margin-left:6px">1</span>
         </li>
         
@@ -903,17 +1036,7 @@
         </li>
         
         <li style="margin-bottom:4px">
-          <a href="https://github.com/MikkoNumminen/mikkonumminen.dev" target="_blank" rel="noopener" style="color:var(--accent)">MikkoNumminen/mikkonumminen.dev</a>
-          <span style="color:var(--muted);margin-left:6px">1</span>
-        </li>
-        
-        <li style="margin-bottom:4px">
-          <a href="https://github.com/amalgame-lang/Amalgame" target="_blank" rel="noopener" style="color:var(--accent)">amalgame-lang/Amalgame</a>
-          <span style="color:var(--muted);margin-left:6px">1</span>
-        </li>
-        
-        <li style="margin-bottom:4px">
-          <a href="https://github.com/co-univ/mait-frontend" target="_blank" rel="noopener" style="color:var(--accent)">co-univ/mait-frontend</a>
+          <a href="https://github.com/Jakub-Mikolajczyk-pl/job-ops" target="_blank" rel="noopener" style="color:var(--accent)">Jakub-Mikolajczyk-pl/job-ops</a>
           <span style="color:var(--muted);margin-left:6px">1</span>
         </li>
         
@@ -931,9 +1054,33 @@
     <section class="provenance">
       <h2 class="section-title">Reputation Timeline</h2>
       
-      <svg class="insight-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 104" role="img"><rect x="0" y="22" width="680" height="28" rx="5" fill="rgba(0,0,0,0.04)"/><rect x="0.0" y="22" width="261.5" height="28" rx="5" fill="#8b6914" opacity="0.88"/><rect x="261.5" y="22" width="209.2" height="28" rx="5" fill="#2f6846" opacity="0.88"/><rect x="470.7" y="22" width="52.3" height="28" rx="5" fill="#2f6846" opacity="0.88"/><rect x="523.0" y="22" width="52.3" height="28" rx="5" fill="#2c5282" opacity="0.88"/><rect x="575.3" y="22" width="52.3" height="28" rx="5" fill="#2c5282" opacity="0.88"/><rect x="627.5999999999999" y="22" width="52.3" height="28" rx="5" fill="#6b6560" opacity="0.88"/><foreignObject x="0" y="64" width="680" height="46"><div xmlns="http://www.w3.org/1999/xhtml" class="chart-legend"><span><i style="background:#8b6914"></i>Rank <strong>5</strong></span><span><i style="background:#2f6846"></i>HVTrust <strong>4</strong></span><span><i style="background:#2f6846"></i>Listed <strong>1</strong></span><span><i style="background:#2c5282"></i>Scorecard <strong>1</strong></span><span><i style="background:#2c5282"></i>Score <strong>1</strong></span><span><i style="background:#6b6560"></i>State <strong>1</strong></span></div></foreignObject></svg>
+      <svg class="insight-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 104" role="img"><rect x="0" y="22" width="680" height="28" rx="5" fill="rgba(0,0,0,0.04)"/><rect x="0.0" y="22" width="255.0" height="28" rx="5" fill="#8b6914" opacity="0.88"/><rect x="255.0" y="22" width="212.5" height="28" rx="5" fill="#2f6846" opacity="0.88"/><rect x="467.5" y="22" width="85.0" height="28" rx="5" fill="#6b6560" opacity="0.88"/><rect x="552.5" y="22" width="42.5" height="28" rx="5" fill="#2f6846" opacity="0.88"/><rect x="595.0" y="22" width="42.5" height="28" rx="5" fill="#2c5282" opacity="0.88"/><rect x="637.5" y="22" width="42.5" height="28" rx="5" fill="#2c5282" opacity="0.88"/><foreignObject x="0" y="64" width="680" height="46"><div xmlns="http://www.w3.org/1999/xhtml" class="chart-legend"><span><i style="background:#8b6914"></i>Rank <strong>6</strong></span><span><i style="background:#2f6846"></i>HVTrust <strong>5</strong></span><span><i style="background:#6b6560"></i>State <strong>2</strong></span><span><i style="background:#2f6846"></i>Listed <strong>1</strong></span><span><i style="background:#2c5282"></i>Scorecard <strong>1</strong></span><span><i style="background:#2c5282"></i>Score <strong>1</strong></span></div></foreignObject></svg>
       
       <div style="display:flex;flex-direction:column;gap:0;">
+        
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);white-space:nowrap;min-width:80px;">2026-06-05</span>
+          <div>
+            <span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;">Listing State Changed</span>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">Listing state changed from legacy to warning</div>
+          </div>
+        </div>
+        
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);white-space:nowrap;min-width:80px;">2026-06-05</span>
+          <div>
+            <span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;">Rank Moved</span>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">Rank rose 20 spots (#137 → #117)</div>
+          </div>
+        </div>
+        
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);white-space:nowrap;min-width:80px;">2026-06-05</span>
+          <div>
+            <span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;">HVTrust Changed</span>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">HVTrust up 10.2pts (51.1 → 61.3)</div>
+          </div>
+        </div>
         
         <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
           <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);white-space:nowrap;min-width:80px;">2026-06-03</span>
@@ -1052,7 +1199,7 @@
     <section class="provenance" id="embed-badge" style="margin-top:0;">
       <h2 class="section-title">Embed Badge <a href="/badges/" style="font-weight:400;color:var(--accent);font-size:11px;margin-left:8px;">Badge guide for maintainers →</a></h2>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-        <img src="/badge/claude-code.svg" alt="HVTrust 51.1" height="20">
+        <img src="/badge/claude-code.svg" alt="HVTrust 61.3" height="20">
         <img src="/badge/claude-code-grade.svg" alt="Grade C" height="20">
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--muted);word-break:break-all;line-height:1.6;">
@@ -1078,33 +1225,33 @@
         
         <li>
           <a href="/agents/cline">
-            <span class="sib-rank">#8</span>
+            <span class="sib-rank">#9</span>
             <span class="sib-name">Cline</span>
             <span class="sib-score">96.6</span>
           </a>
         </li>
         
         <li>
+          <a href="/agents/qwen-code">
+            <span class="sib-rank">#12</span>
+            <span class="sib-name">Qwen Code</span>
+            <span class="sib-score">92.2</span>
+          </a>
+        </li>
+        
+        <li>
+          <a href="/agents/openhands">
+            <span class="sib-rank">#46</span>
+            <span class="sib-name">OpenHands</span>
+            <span class="sib-score">97.8</span>
+          </a>
+        </li>
+        
+        <li>
           <a href="/agents/gemini-cli">
-            <span class="sib-rank">#43</span>
+            <span class="sib-rank">#47</span>
             <span class="sib-name">Gemini CLI</span>
             <span class="sib-score">99.3</span>
-          </a>
-        </li>
-        
-        <li>
-          <a href="/agents/goose">
-            <span class="sib-rank">#49</span>
-            <span class="sib-name">Goose</span>
-            <span class="sib-score">95.1</span>
-          </a>
-        </li>
-        
-        <li>
-          <a href="/agents/gptme">
-            <span class="sib-rank">#75</span>
-            <span class="sib-name">GPTMe</span>
-            <span class="sib-score">83.8</span>
           </a>
         </li>
         
@@ -1117,7 +1264,7 @@
     <section class="terminal-note" style="padding:18px 20px;font-size:11px;color:var(--muted);line-height:1.7;">
       <strong style="color:var(--text);font-size:12px;">Data sources</strong><br>
       GitHub REST API (repo, commits, stars, forks, license) · npm Registry (downloads, provenance) · OSSF Scorecard via deps.dev · Algolia HN Search API · GitHub Search API (fingerprint actions)
-      <br>Each agent's signals refresh once daily across 6 staggered batches. <a href="/methodology" style="color:var(--accent);">Methodology v3.1</a> · <a href="/data/agents/claude-code.json" style="color:var(--accent);">Raw JSON</a>
+      <br>Each agent's signals refresh once daily across 6 staggered batches. <a href="/methodology" style="color:var(--accent);">Methodology v3.2</a> · <a href="/data/agents/claude-code.json" style="color:var(--accent);">Raw JSON</a>
     </section>
 
     <footer>

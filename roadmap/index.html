@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="HVTracker's public roadmap. We're extending trust signals beyond supply chain into runtime trust — what an agent actually does when it runs.">
+  <meta name="description" content="HVTracker's public roadmap. Runtime-trust discovery is now live, and the next phase is calibrating how those signals should affect ranking.">
   <title>Roadmap — Runtime Trust for AI Agents | HVTracker</title>
   <link rel="canonical" href="https://hvtracker.net/roadmap/">
   <meta property="og:type" content="article">
   <meta property="og:title" content="Roadmap — Runtime Trust for AI Agents | HVTracker">
-  <meta property="og:description" content="What we're building next: runtime trust signals — MCP support, tool surface, external dependencies, provenance drift.">
+  <meta property="og:description" content="What we're building next: runtime scoring calibration, drift history, alerts, and maintainer self-service.">
   <meta property="og:url" content="https://hvtracker.net/roadmap/">
   <meta property="og:image" content="https://hvtracker.net/og-v2.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Roadmap — Runtime Trust for AI Agents | HVTracker">
-  <meta name="twitter:description" content="What we're building next: runtime trust signals — MCP support, tool surface, external dependencies, provenance drift.">
+  <meta name="twitter:description" content="What we're building next: runtime scoring calibration, drift history, alerts, and maintainer self-service.">
   <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
   <script type="application/ld+json">
   {
@@ -124,6 +124,7 @@
         <a href="/movers/">Movers</a>
         <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
+        <a href="/score-lab/">Score lab</a>
         <a href="/compare/">Compare</a>
         <a href="/alerts/">Alerts</a>
         <a href="/data/">Data API</a>
@@ -135,7 +136,7 @@
 
     <article class="content">
       <h1 class="doc-title">Roadmap</h1>
-      <p class="doc-lede">Today HVTrust scores <strong>supply-chain trust</strong> — how a project is built, signed, and released. Next, we're extending it to <strong>runtime trust</strong> — what an agent actually does when you run it.</p>
+      <p class="doc-lede">Today HVTrust still ranks on <strong>supply-chain trust</strong> — how a project is built, signed, and released. Runtime-trust discovery is now live on profiles, and the next step is deciding how much those new fields should actually affect rank.</p>
 
       <section>
         <h2>Now Shipped</h2>
@@ -153,6 +154,20 @@
             <li><strong>Confidence-weighted</strong> evidence grades A–D</li>
           </ul>
         </div>
+
+        <div class="stage">
+          <div class="stage-header">
+            <span class="stage-tag shipped">Live</span>
+            <span class="stage-title">Runtime trust — public discovery</span>
+          </div>
+          <p>Agent profiles now show a compact runtime snapshot sourced from public docs, manifests, and registry metadata. These fields are visible now, but they are <strong>not yet folded into the production HVTrust rank</strong>.</p>
+          <ul>
+            <li><strong>MCP server support</strong> — declared vs implemented server signals</li>
+            <li><strong>External service dependencies</strong> — model providers, storage, and third-party services</li>
+            <li><strong>Tool / plugin surface</strong> — broad capability and extension hints</li>
+            <li><strong>Package provenance drift</strong> — whether published package metadata still points back to the tracked repo</li>
+          </ul>
+        </div>
       </section>
 
       <section>
@@ -161,14 +176,14 @@
         <div class="stage">
           <div class="stage-header">
             <span class="stage-tag building">In progress</span>
-            <span class="stage-title">Runtime trust — discovery</span>
+            <span class="stage-title">Runtime trust — score calibration</span>
           </div>
-          <p>For each tracked agent, we're collecting <strong>static runtime characteristics</strong> from public sources (repo manifests, READMEs, registry metadata). Starting with non-invasive fields anyone can verify themselves:</p>
+          <p>We are now testing how runtime-trust signals should affect ranking without destabilising the leaderboard. The current calibration work happens in an experimental score preview rather than the production rank.</p>
           <ul>
-            <li><strong>MCP support</strong> — does the agent declare or implement Model Context Protocol?</li>
-            <li><strong>Tool / plugin surface</strong> — built-in tools, integrations, plugin ecosystem</li>
-            <li><strong>External service dependencies</strong> — required APIs, model providers, data services</li>
-            <li><strong>Package provenance drift</strong> — does the latest published package still match its source repo?</li>
+            <li><strong>Score Lab</strong> — preview old rank vs experimental <code>trust_score_v2</code></li>
+            <li><strong>Upset review</strong> — identify large rank swings before changing production scoring</li>
+            <li><strong>Weight tuning</strong> — keep provenance drift meaningful without over-penalising rich ecosystems</li>
+            <li><strong>Public explanations</strong> — make it easy to see why a runtime field helped or hurt a project</li>
           </ul>
         </div>
       </section>
@@ -179,11 +194,11 @@
         <div class="stage">
           <div class="stage-header">
             <span class="stage-tag next">Q3</span>
-            <span class="stage-title">Runtime trust — scored signals</span>
+            <span class="stage-title">Runtime trust — production scoring</span>
           </div>
-          <p>Once discovery stabilises, runtime signals get scored and folded into HVTrust as a new dimension — separate from supply-chain hygiene so readers can see them independently.</p>
+          <p>Once calibration stabilises, selected runtime signals will be folded into HVTrust as a visible, separate scoring slice so readers can distinguish supply-chain posture from runtime reach and complexity.</p>
           <ul>
-            <li>Per-agent <strong>capability surface</strong> page (what it can reach)</li>
+            <li>Per-agent <strong>capability surface</strong> page with clearer breakdowns</li>
             <li>Trend tracking for runtime drift over time</li>
             <li>Public spec at <code>/spec/runtime-trust</code></li>
           </ul>
@@ -192,19 +207,27 @@
         <div class="stage">
           <div class="stage-header">
             <span class="stage-tag next">Q3</span>
-            <span class="stage-title">Maintainer self-service</span>
+            <span class="stage-title">Weekly alerts and watchlists</span>
           </div>
-          <p>Today corrections flow through GitHub issues. Next we want maintainers to:</p>
+          <p>The free alert layer should stay low-friction and editorial: a simple weekly digest of meaningful leaderboard and trust changes. Granular watchlists can come later.</p>
           <ul>
-            <li>Claim their listing</li>
-            <li>Declare runtime fields (with evidence) before we infer them</li>
-            <li>Get notified when their score changes</li>
+            <li><strong>Weekly “what changed” digest</strong> for the leaderboard</li>
+            <li>Major trust/regression callouts when they truly matter</li>
+            <li>Historical runtime changes and drift summaries for watched projects</li>
           </ul>
         </div>
       </section>
 
       <section>
         <h2>Later</h2>
+
+        <div class="stage">
+          <div class="stage-header">
+            <span class="stage-tag later">Later</span>
+            <span class="stage-title">Maintainer self-service</span>
+          </div>
+          <p>Today corrections flow through GitHub issues. Longer term, maintainers should be able to claim listings, declare runtime fields with evidence, and respond to drift or provenance mismatches directly.</p>
+        </div>
 
         <div class="stage">
           <div class="stage-header">

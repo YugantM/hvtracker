@@ -33,12 +33,12 @@
       {
         "@type": "Question",
         "name": "What signals does HVTracker use?",
-        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker evaluates seven signal categories: Activity (commit recency, release frequency), Adoption (GitHub stars, forks, dependents), Transparency (license, README quality), Safety (OSSF Scorecard score), Identity (signed commits, verified publishers), Provenance (SLSA build attestation), and Evidence Quality (how many signals are actually checkable for a given agent)." }
+        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker's live rank uses public supply-chain and maintenance signals including adoption, transparency, safety, identity, provenance, and evidence quality. It also now displays runtime-trust discovery fields such as MCP support, external dependencies, tool surface, and package provenance drift, though those runtime fields are not yet part of the production score." }
       },
       {
         "@type": "Question",
         "name": "How often is HVTracker data updated?",
-        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker data is refreshed daily via an automated pipeline that fetches the latest signals from GitHub, OSSF Scorecard, and other public sources. The leaderboard, agent profiles, and all comparison pages update with each refresh cycle." }
+        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker data is refreshed automatically throughout the day. The Railway production job currently runs every 2 hours and rebuilds the leaderboard, agent profiles, public JSON endpoints, and historical snapshots." }
       }
     ]
   }
@@ -315,6 +315,7 @@
         <a href="/movers/">Movers</a>
         <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
+        <a href="/score-lab/">Score lab</a>
         <a href="/compare/">Compare</a>
         <a href="/alerts/">Alerts</a>
         <a href="/data/">Data API</a>
@@ -326,17 +327,17 @@
 
     <article class="content">
       <h1 class="doc-title">Methodology</h1>
-      <p class="doc-meta">v3.1 · Last updated 2026-06-04</p>
+      <p class="doc-meta">v3.2 · Last updated 2026-06-05</p>
 
       <section id="what-it-measures">
         <h2>What HVTracker Measures</h2>
-        <p>HVTracker measures open-source AI agent projects using public, independently checkable signals. The goal is to show project health, maintenance momentum, community adoption, and basic supply-chain trust without relying on vendor claims or self-reported submissions.</p>
-        <p>The leaderboard currently tracks GitHub activity, package downloads, Hacker News discussion, category ranking, rank movement, and trust/provenance signals where they are available in public APIs.</p>
+        <p>HVTracker measures open-source AI agent projects using public, independently checkable signals. The goal is to show project health, maintenance momentum, community adoption, supply-chain trust, and a first-pass runtime picture without relying on vendor claims or self-reported submissions.</p>
+        <p>The production leaderboard currently ranks on supply-chain-weighted HVTrust. Public runtime-trust discovery fields are now shown on agent pages, but they are not part of the live score yet.</p>
       </section>
 
       <section id="scoring">
         <h2>Health Score And Trust Score</h2>
-        <p><strong>The leaderboard ranks by the HVTrust score, not by popularity.</strong> HVTrust is a 0–100 composite designed so that the rank and the evidence grade tell the same story. It is built on four principles:</p>
+        <p><strong>The leaderboard ranks by the HVTrust score, not by popularity.</strong> HVTrust is a 0–100 composite designed so that the rank and the evidence grade tell the same story. As of v3.2, the live rank still uses the supply-chain-weighted formula below. Runtime-trust fields are being calibrated separately in an experimental score preview.</p>
         <ul class="weights">
           <li><strong>Trust is not just popularity — but adoption matters.</strong> Widely used software receives more scrutiny, bug reports, and security review. Adoption is log-scaled and capped, but carries meaningful weight (20%).</li>
           <li><strong>Harder-to-fake signals weigh more.</strong> Supply-chain integrity (provenance, signed commits, OSSF Scorecard) carries the highest weight.</li>
@@ -369,7 +370,7 @@
           </div>
           <div>
             <dt>Package downloads</dt>
-            <dd>Weekly downloads are fetched from npm and PyPI for projects that have package names configured in <code>agents.json</code>. If a project has both package ecosystems configured, the values are summed and labeled by source.</dd>
+            <dd>Weekly downloads are fetched from configured package and distribution sources, including npm, PyPI, crates.io, Docker Hub, and the VS Code Marketplace. If a project has multiple configured sources, the values are summed and labeled by source.</dd>
             <dd class="limitation">Downloads are install events, not unique users. They can include CI, mirrors, bots, and automated environments.</dd>
           </div>
           <div>
@@ -386,7 +387,7 @@
 
       <section id="provenance">
         <h2>Trust And Provenance Signals</h2>
-        <p>HVTracker surfaces supply-chain signals separately from the health score. These indicators help readers judge release hygiene and verifiability, but they do not currently affect rank.</p>
+        <p>HVTracker surfaces supply-chain signals separately from the health score. These indicators help readers judge release hygiene and verifiability, and they do affect the live HVTrust rank.</p>
 
         <dl class="sources">
           <div>
@@ -409,9 +410,35 @@
         </dl>
       </section>
 
+      <section id="runtime-discovery">
+        <h2>Runtime-Trust Discovery</h2>
+        <p>Runtime-trust discovery is now public on agent profile pages. These fields are intended to answer a different question from supply-chain trust: what can this agent reach, depend on, or expose when it runs?</p>
+        <p><strong>Important:</strong> these fields are not yet part of the production leaderboard score. They are displayed as discovery-only signals while the weighting is calibrated in the experimental <a href="/score-lab/">Score Lab</a>.</p>
+
+        <dl class="sources">
+          <div>
+            <dt>MCP server support</dt>
+            <dd>HVTracker looks for public evidence that a project declares or implements an MCP server, based on docs, manifests, and repository paths.</dd>
+          </div>
+          <div>
+            <dt>External service dependencies</dt>
+            <dd>HVTracker detects likely providers and services from README setup instructions, environment variable markers, and dependency manifests.</dd>
+          </div>
+          <div>
+            <dt>Tool / plugin surface</dt>
+            <dd>HVTracker summarizes broad capability hints such as browser, shell, database, search, filesystem, and plugin-system presence.</dd>
+          </div>
+          <div>
+            <dt>Package provenance drift</dt>
+            <dd>HVTracker checks whether configured package metadata still points back to the tracked source repository, which can reveal mismatches or stale registry references.</dd>
+            <dd class="limitation">This is a conservative metadata check, not a full cryptographic proof of package-to-source lineage.</dd>
+          </div>
+        </dl>
+      </section>
+
       <section id="updates">
         <h2>How Often Data Updates</h2>
-        <p>The GitHub Actions workflow runs six staggered batches per day, one every 4 hours. Each batch refreshes roughly one-sixth of the tracked agents, so any given agent's signals update approximately once per day. Each successful run regenerates the leaderboard, agent pages, public JSON endpoints, <code>feed.json</code>, <code>sitemap.xml</code>, and a dated history snapshot.</p>
+        <p>HVTracker is currently refreshed on Railway every 2 hours. Each successful run regenerates the leaderboard, agent pages, public JSON endpoints, <code>feed.json</code>, <code>sitemap.xml</code>, and a dated history snapshot. Some upstream APIs refresh more slowly than the site itself, so not every signal moves on every run.</p>
       </section>
 
       <section id="limitations">
@@ -422,6 +449,7 @@
           <li><strong>Downloads are not users.</strong> Package download numbers can include automation and duplicate installs.</li>
           <li><strong>HN mentions are approximate.</strong> Curated search terms reduce noise but cannot perfectly capture discussion.</li>
           <li><strong>Trust signals are partial.</strong> Missing provenance or Scorecard data can mean the signal is unavailable, not necessarily that a project is unsafe.</li>
+          <li><strong>Runtime signals are static.</strong> MCP, provider, tool, and drift fields are inferred from public docs/manifests and can miss hidden integrations or private deployment details.</li>
           <li><strong>No qualitative review yet.</strong> HVTracker does not currently score documentation quality, API stability, model/provider compatibility, benchmark performance, or real-world adoption.</li>
           <li><strong>No formal SLSA level.</strong> HVTracker displays observable provenance and Scorecard signals but does not claim an authoritative SLSA build level.</li>
         </ul>
@@ -441,7 +469,8 @@
       <section id="changelog">
         <h2>Changelog</h2>
         <ul class="changelog">
-          <li><span class="ver">v3.1</span> (current) — HVTrust now uses the live v3.1 weighting: Safety/Integrity 25, Identity/Provenance 18, Transparency 17, Maintenance 20, and Adoption 20. Adoption includes stars and package downloads, while supply-chain and provenance signals remain the strongest verifiability inputs.</li>
+          <li><span class="ver">v3.2</span> (current) — Runtime-trust discovery is now public on agent pages: MCP server support, external service dependencies, tool/plugin surface, and package provenance drift. These fields are visible but not yet included in the production HVTrust rank. Score calibration continues separately in the experimental Score Lab.</li>
+          <li><span class="ver">v3.1</span> — HVTrust now uses the live v3.1 weighting: Safety/Integrity 25, Identity/Provenance 18, Transparency 17, Maintenance 20, and Adoption 20. Adoption includes stars and package downloads, while supply-chain and provenance signals remain the strongest verifiability inputs.</li>
           <li><span class="ver">v3.0</span> — The leaderboard began ranking by HVTrust instead of the popularity-based health score. HVTrust is gated and confidence-scaled: missing evidence lowers the score via a confidence multiplier, staleness incurs a penalty, and deprecated or unverified listings are capped below the verified tier.</li>
           <li><span class="ver">v2.0</span> — Added supply chain trust signals: npm provenance, PyPI attestations (PEP 740), OSSF Scorecard (via deps.dev), signed commit ratio. These are displayed independently, not folded into the composite score.</li>
           <li><span class="ver">v1.1</span> — Added npm, PyPI, and Hacker News data sources. Daily historical snapshots now archived.</li>

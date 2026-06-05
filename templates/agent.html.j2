@@ -278,11 +278,28 @@
     .compare-strip .cmp-arrow { color:var(--accent); font-weight:700; }
 
     .runtime-soon { padding:18px 0; border-top:1px solid var(--border); }
-    .runtime-soon .rt-card { padding:12px; border:1px dashed var(--border); color:var(--muted); font-size:13px; line-height:1.6; }
+    .runtime-soon .rt-card { padding:14px; border:1px solid var(--border); background:linear-gradient(180deg, rgba(44,82,130,0.04), rgba(176,90,58,0.03)); color:var(--muted); font-size:13px; line-height:1.6; }
     .runtime-soon .rt-card strong { color:var(--text); font-weight:600; }
-    .runtime-soon .rt-fields { margin-top:8px; display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:6px 12px; font-family:var(--font-mono); font-size:11px; }
-    .runtime-soon .rt-fields li { list-style:none; padding:4px 8px; border:1px solid var(--border); color:var(--muted); }
-    .runtime-soon .rt-fields li::before { content:"◯ "; color:var(--muted); }
+    .runtime-intro { max-width:640px; }
+    .runtime-grid { margin-top:14px; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; }
+    .runtime-panel { border:1px solid var(--border); background:rgba(255,255,255,0.35); padding:12px; }
+    .runtime-panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .runtime-panel-title { font-size:12px; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; }
+    .runtime-status { display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border:1px solid var(--border); font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+    .runtime-status.positive { color:var(--green); border-color:rgba(47,104,70,0.3); }
+    .runtime-status.neutral { color:var(--accent); border-color:rgba(44,82,130,0.3); }
+    .runtime-status.muted { color:var(--muted); }
+    .runtime-confidence { margin-top:2px; font-family:var(--font-mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; }
+    .runtime-summary { color:var(--text); font-size:14px; line-height:1.5; }
+    .runtime-summary.muted { color:var(--muted); }
+    .runtime-provider-list { margin-top:8px; display:flex; flex-wrap:wrap; gap:6px; }
+    .runtime-provider { list-style:none; padding:4px 8px; border:1px solid var(--border); background:var(--bg); font-family:var(--font-mono); font-size:11px; color:var(--text); }
+    .runtime-note { margin-top:8px; font-size:11px; color:var(--muted); }
+    .runtime-note strong { color:var(--text); }
+    .runtime-mini { margin-top:8px; font-family:var(--font-mono); font-size:11px; color:var(--muted); }
+    .runtime-roadmap { margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; }
+    .runtime-roadmap li { list-style:none; padding:5px 9px; border:1px solid var(--border); font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); }
+    .runtime-roadmap li.live { color:var(--green); border-color:rgba(47,104,70,0.25); }
 
     .maintainer-cta { padding:16px 0; margin:0; border-bottom:1px solid var(--border); }
     .maintainer-cta .section-title { margin-bottom:6px; }
@@ -755,14 +772,154 @@
     {% endif %}
 
     <section class="runtime-soon">
-      <h2 class="section-title">Runtime trust — coming soon</h2>
+      <h2 class="section-title">Runtime trust</h2>
       <div class="rt-card">
-        <p>HVTrust currently scores supply-chain signals. We're adding <strong>runtime trust</strong> next: what an agent actually does when it runs — what it can reach, which tools it carries, what external services it depends on. Track progress on the <a href="/roadmap/" style="color:var(--accent);">roadmap →</a></p>
-        <ul class="rt-fields">
-          <li>MCP support</li>
-          <li>Tool / plugin surface</li>
-          <li>External service deps</li>
-          <li>Package provenance drift</li>
+        {% set mcp = row.mcp_server_support or {"status": "none", "confidence": none, "evidence": []} %}
+        {% set ext = row.external_service_dependencies or {"providers": [], "requires_api_keys": false, "confidence": none, "evidence": []} %}
+        {% set tooling = row.tool_plugin_surface or {"plugin_system": "none", "tool_tags": [], "confidence": none, "evidence": []} %}
+        {% set drift = row.package_provenance_drift or {"status": "not_applicable", "confidence": none, "summary": "No package source configured", "evidence": []} %}
+        <p class="runtime-intro">HVTrust currently <strong>does not score</strong> runtime-trust fields yet. This public view shows a compact runtime snapshot from repo docs and manifests. An experimental ranking preview is available in <a href="/score-lab/" style="color:var(--accent);">Score Lab →</a>, and progress is tracked on the <a href="/roadmap/" style="color:var(--accent);">roadmap →</a></p>
+
+        <div class="runtime-grid">
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">MCP Server Support</div>
+                {% if mcp.confidence %}<div class="runtime-confidence">{{ mcp.confidence }} confidence</div>{% endif %}
+              </div>
+              <span class="runtime-status {% if mcp.status == 'implemented' %}positive{% elif mcp.status == 'declared' %}neutral{% else %}muted{% endif %}">
+                {% if mcp.status == "implemented" %}
+                Implemented
+                {% elif mcp.status == "declared" %}
+                Declared
+                {% else %}
+                None detected
+                {% endif %}
+              </span>
+            </div>
+            <div class="runtime-summary {% if mcp.status == 'none' %}muted{% endif %}">
+              {% if mcp.status == "implemented" %}
+              {{ row.name }} appears to expose MCP server capabilities.
+              {% elif mcp.status == "declared" %}
+              MCP support appears present, but direct server implementation is less certain.
+              {% else %}
+              No MCP server signal detected.
+              {% endif %}
+            </div>
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">External Service Dependencies</div>
+                {% if ext.confidence %}<div class="runtime-confidence">{{ ext.confidence }} confidence</div>{% endif %}
+              </div>
+              <span class="runtime-status {% if ext.providers %}neutral{% else %}muted{% endif %}">
+                {% if ext.providers %}
+                {{ ext.providers|length }} detected
+                {% else %}
+                None detected
+                {% endif %}
+              </span>
+            </div>
+            <div class="runtime-summary {% if not ext.providers %}muted{% endif %}">
+              {% if ext.providers %}
+              Public provider/service dependencies detected.
+              {% else %}
+              No clear third-party provider dependency detected.
+              {% endif %}
+            </div>
+            {% if ext.providers %}
+            <ul class="runtime-provider-list">
+              {% for provider in ext.providers %}
+              <li class="runtime-provider">{{ provider }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            <div class="runtime-note">
+              <strong>Credential signal:</strong>
+              {% if ext.requires_api_keys %}
+              API keys or service config markers documented.
+              {% else %}
+              No explicit API-key/config marker detected.
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">Tool / Plugin Surface</div>
+                {% if tooling.confidence %}<div class="runtime-confidence">{{ tooling.confidence }} confidence</div>{% endif %}
+              </div>
+              <span class="runtime-status {% if tooling.plugin_system == 'marketplace' %}positive{% elif tooling.plugin_system != 'none' or tooling.tool_tags %}neutral{% else %}muted{% endif %}">
+                {% if tooling.plugin_system == "marketplace" %}
+                Marketplace
+                {% elif tooling.plugin_system == "extension-based" %}
+                Extensions
+                {% elif tooling.plugin_system == "declared" %}
+                Declared
+                {% else %}
+                {% if tooling.tool_tags %}
+                {{ tooling.tool_tags|length }} tags
+                {% else %}
+                None detected
+                {% endif %}
+                {% endif %}
+              </span>
+            </div>
+            <div class="runtime-summary {% if tooling.plugin_system == 'none' and not tooling.tool_tags %}muted{% endif %}">
+              {% if tooling.plugin_system != "none" %}
+              {{ tooling.plugin_system|replace('-', ' ')|capitalize }} plugin/integration surface detected.
+              {% elif tooling.tool_tags %}
+              Broad capability areas detected.
+              {% else %}
+              No clear plugin system or broad tool surface detected.
+              {% endif %}
+            </div>
+            {% if tooling.tool_tags %}
+            <ul class="runtime-provider-list">
+              {% for tag in tooling.tool_tags %}
+              <li class="runtime-provider">{{ tag }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">Package Provenance Drift</div>
+                {% if drift.confidence %}<div class="runtime-confidence">{{ drift.confidence }} confidence</div>{% endif %}
+              </div>
+              <span class="runtime-status {% if drift.status == 'match' %}positive{% elif drift.status in ('partial','unknown') %}neutral{% elif drift.status == 'warning' %}muted{% else %}muted{% endif %}">
+                {% if drift.status == "match" %}
+                Match
+                {% elif drift.status == "partial" %}
+                Partial
+                {% elif drift.status == "warning" %}
+                Warning
+                {% elif drift.status == "unknown" %}
+                Unknown
+                {% else %}
+                N/A
+                {% endif %}
+              </span>
+            </div>
+            <div class="runtime-summary {% if drift.status in ('unknown','not_applicable') %}muted{% endif %}">
+              {{ drift.summary }}
+            </div>
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+        </div>
+
+        <ul class="runtime-roadmap">
+          <li class="live">MCP support live</li>
+          <li class="live">External deps live</li>
+          <li class="live">Tool / plugin surface live</li>
+          <li class="live">Package provenance drift live</li>
         </ul>
       </div>
     </section>

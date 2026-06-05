@@ -12,9 +12,9 @@ The core question is simple:
 
 ---
 
-## Version 2
+## Version 3.2
 
-HVTracker v2 ships the refreshed public site, premium agent profile analysis UI, corrected HVTrust v3.1 weighting, normalized license detection for cached repositories, and updated social link preview card.
+HVTracker v3.2 ships public runtime-trust discovery fields on agent profiles, a local score-lab preview for experimental ranking calibration, corrected multi-source package coverage, and refreshed methodology/roadmap documentation.
 
 ---
 
@@ -39,8 +39,8 @@ HVTracker v2 ships the refreshed public site, premium agent profile analysis UI,
 
 - Active open-source AI agent projects (see [live count](https://hvtracker.net))
 - Curated categories spanning coding agents, frameworks, infra, security, and more
-- **12** staggered refresh batches per day
-- **12h** full refresh cycle
+- **2h** Railway refresh cadence
+- **~24h** expected full data sweep across sources
 - **90-day** per-agent history where available
 - **184** JSON feed items across agents and comparison guides
 - Railway-hosted site with a small FastAPI edge and generated public pages/data

@@ -4,18 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TruLens Review — Trust Score & Safety Profile | HVTracker</title>
-  <meta name="description" content="Is TruLens trustworthy? Independent trust score 42.1/100 (Grade D). Ranked #165 of 206 open-source AI projects. 3.4k GitHub stars, Observability &amp; Evaluation. Safety, transparency, maintenance, and provenance signals reviewed.">
+  <meta name="description" content="Is TruLens trustworthy? Independent trust score 42.0/100 (Grade D). Ranked #170 of 203 open-source AI projects. 3.4k GitHub stars, Observability &amp; Evaluation. Safety, transparency, maintenance, and provenance signals reviewed.">
   <link rel="canonical" href="https://hvtracker.net/agents/trulens">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="TruLens — Trust Score 42.1/100 | HVTracker">
-  <meta property="og:description" content="Grade D · HVTrust 42.1/100 · 3.4k stars · Observability &amp; Evaluation. Independent trust signals for open-source AI projects.">
+  <meta property="og:title" content="TruLens — Trust Score 42.0/100 | HVTracker">
+  <meta property="og:description" content="Grade D · HVTrust 42.0/100 · 3.4k stars · Observability &amp; Evaluation. Independent trust signals for open-source AI projects.">
   <meta property="og:url" content="https://hvtracker.net/agents/trulens">
   <meta property="og:image" content="https://hvtracker.net/agents/trulens/og.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="TruLens — Trust Score 42.1/100 on HVTracker">
+  <meta property="og:image:alt" content="TruLens — Trust Score 42.0/100 on HVTracker">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://hvtracker.net/agents/trulens/og.png">
   <meta name="twitter:image:alt" content="TruLens on HVTracker">
@@ -36,7 +36,7 @@
     },
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "42.1",
+      "ratingValue": "42.0",
       "bestRating": "100",
       "worstRating": "0",
       "ratingCount": "3358"
@@ -50,11 +50,11 @@
       },
       "reviewRating": {
         "@type": "Rating",
-        "ratingValue": "42.1",
+        "ratingValue": "42.0",
         "bestRating": "100",
         "worstRating": "0"
       },
-      "reviewBody": "TruLens receives a trust score of 42.1/100 (Grade D) based on independent analysis of activity, adoption, transparency, safety, and identity signals."
+      "reviewBody": "TruLens receives a trust score of 42.0/100 (Grade D) based on independent analysis of activity, adoption, transparency, safety, and identity signals."
     }
   }
   </script>
@@ -77,12 +77,12 @@
       {
         "@type": "Question",
         "name": "Is TruLens safe to use?",
-        "acceptedAnswer": { "@type": "Answer", "text": "TruLens has an HVTrust score of 42.1/100 (Grade D), ranked #165 of 206 open-source AI projects. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals." }
+        "acceptedAnswer": { "@type": "Answer", "text": "TruLens has an HVTrust score of 42.0/100 (Grade D), ranked #170 of 203 open-source AI projects. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals." }
       },
       {
         "@type": "Question",
         "name": "What is the trust score for TruLens?",
-        "acceptedAnswer": { "@type": "Answer", "text": "TruLens scores 42.1/100 on HVTracker's evidence-weighted HVTrust scale. It has 3.4k GitHub stars and is categorized under Observability &amp; Evaluation." }
+        "acceptedAnswer": { "@type": "Answer", "text": "TruLens scores 42.0/100 on HVTracker's evidence-weighted HVTrust scale. It has 3.4k GitHub stars and is categorized under Observability &amp; Evaluation." }
       }
     ]
   }
@@ -278,11 +278,28 @@
     .compare-strip .cmp-arrow { color:var(--accent); font-weight:700; }
 
     .runtime-soon { padding:18px 0; border-top:1px solid var(--border); }
-    .runtime-soon .rt-card { padding:12px; border:1px dashed var(--border); color:var(--muted); font-size:13px; line-height:1.6; }
+    .runtime-soon .rt-card { padding:14px; border:1px solid var(--border); background:linear-gradient(180deg, rgba(44,82,130,0.04), rgba(176,90,58,0.03)); color:var(--muted); font-size:13px; line-height:1.6; }
     .runtime-soon .rt-card strong { color:var(--text); font-weight:600; }
-    .runtime-soon .rt-fields { margin-top:8px; display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:6px 12px; font-family:var(--font-mono); font-size:11px; }
-    .runtime-soon .rt-fields li { list-style:none; padding:4px 8px; border:1px solid var(--border); color:var(--muted); }
-    .runtime-soon .rt-fields li::before { content:"◯ "; color:var(--muted); }
+    .runtime-intro { max-width:640px; }
+    .runtime-grid { margin-top:14px; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; }
+    .runtime-panel { border:1px solid var(--border); background:rgba(255,255,255,0.35); padding:12px; }
+    .runtime-panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .runtime-panel-title { font-size:12px; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; }
+    .runtime-status { display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border:1px solid var(--border); font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+    .runtime-status.positive { color:var(--green); border-color:rgba(47,104,70,0.3); }
+    .runtime-status.neutral { color:var(--accent); border-color:rgba(44,82,130,0.3); }
+    .runtime-status.muted { color:var(--muted); }
+    .runtime-confidence { margin-top:2px; font-family:var(--font-mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; }
+    .runtime-summary { color:var(--text); font-size:14px; line-height:1.5; }
+    .runtime-summary.muted { color:var(--muted); }
+    .runtime-provider-list { margin-top:8px; display:flex; flex-wrap:wrap; gap:6px; }
+    .runtime-provider { list-style:none; padding:4px 8px; border:1px solid var(--border); background:var(--bg); font-family:var(--font-mono); font-size:11px; color:var(--text); }
+    .runtime-note { margin-top:8px; font-size:11px; color:var(--muted); }
+    .runtime-note strong { color:var(--text); }
+    .runtime-mini { margin-top:8px; font-family:var(--font-mono); font-size:11px; color:var(--muted); }
+    .runtime-roadmap { margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; }
+    .runtime-roadmap li { list-style:none; padding:5px 9px; border:1px solid var(--border); font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); }
+    .runtime-roadmap li.live { color:var(--green); border-color:rgba(47,104,70,0.25); }
 
     .maintainer-cta { padding:16px 0; margin:0; border-bottom:1px solid var(--border); }
     .maintainer-cta .section-title { margin-bottom:6px; }
@@ -341,7 +358,7 @@
   }
   </script>
 </head>
-<body data-page-type="agent_profile" data-agent-slug="trulens" data-agent-name="TruLens" data-category="Observability &amp; Evaluation" data-global-rank="165" data-trust-score="42.1">
+<body data-page-type="agent_profile" data-agent-slug="trulens" data-agent-name="TruLens" data-category="Observability &amp; Evaluation" data-global-rank="170" data-trust-score="42.0">
   <header class="site-header">
     <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
@@ -387,11 +404,11 @@
         </div>
         <div class="hero-summary-item">
           <div class="hero-summary-label">HVTrust</div>
-          <div class="hero-summary-value">42.1/100 · Grade D</div>
+          <div class="hero-summary-value">42.0/100 · Grade D</div>
         </div>
         <div class="hero-summary-item">
           <div class="hero-summary-label">Last push</div>
-          <div class="hero-summary-value">2026-06-03 · 1d ago</div>
+          <div class="hero-summary-value">2026-06-04 · 1d ago</div>
         </div>
         <div class="hero-summary-item">
           <div class="hero-summary-label">Recent change</div>
@@ -411,13 +428,13 @@
         <div class="review-item primary">
           <div class="review-kicker">Verdict</div>
           <div class="review-value">Thin or incomplete trust evidence. Review carefully before production use.</div>
-          <div class="review-metric">42.1/100 · Grade D</div>
+          <div class="review-metric">42.0/100 · Grade D</div>
         </div>
 
         <div class="review-item">
           <div class="review-kicker">Strongest Signal</div>
           <div class="review-value">Maintenance</div>
-          <div class="review-metric">17.7/20</div>
+          <div class="review-metric">17.6/20</div>
         </div>
 
 
@@ -495,18 +512,18 @@
 
     <section class="rank-block">
       <div>
-        <div class="score-pill score-high">75.7</div>
+        <div class="score-pill score-high">75.2</div>
         <div class="rank-label">Activity Score · out of 100</div>
       </div>
       
       <div>
-        <div class="score-pill score-mid">42.1</div>
+        <div class="score-pill score-mid">42.0</div>
         <div class="rank-label">HVTrust Score · out of 100</div>
       </div>
       
       <div>
-        <div class="rank-big">#165</div>
-        <div class="rank-label">Global Rank · of 206</div>
+        <div class="rank-big">#170</div>
+        <div class="rank-label">Global Rank · of 203</div>
       </div>
       
       <div>
@@ -524,7 +541,7 @@
     <div class="freshness-banner">
       <span class="dot"></span>
       <strong>Signals refreshed</strong>
-      <span class="meta">2026-06-04 16:46 UTC</span>
+      <span class="meta">2026-06-05 11:36 UTC</span>
       <span class="meta">·</span>
       <span class="meta">Repo last pushed yesterday</span>
     </div>
@@ -533,11 +550,11 @@
     <section class="trend">
       <h2 class="section-title">Rank Trend</h2>
       <div class="sparkline-wrap">
-        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="40" viewBox="0 0 200 40" style="display:block"><path d="M0.0,9.0L20.0,9.0L40.0,9.0L60.0,4.0L80.0,16.5L100.0,16.5L120.0,17.2L140.0,26.6L160.0,32.9L180.0,35.4L200.0,36.0" fill="none" stroke="#7c6af6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="40" viewBox="0 0 200 40" style="display:block"><path d="M0.0,8.6L18.2,8.6L36.4,8.6L54.5,4.0L72.7,15.4L90.9,15.4L109.1,16.0L127.3,24.6L145.5,30.3L163.6,32.6L181.8,32.0L200.0,36.0" fill="none" stroke="#7c6af6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <div class="sparkline-labels">
           
           <span>2026-05-25</span>
-          <span>2026-06-04</span>
+          <span>2026-06-05</span>
           
         </div>
       </div>
@@ -557,21 +574,21 @@
         </div>
         <div class="fresh">
           <div class="stat-label">Last Push</div>
-          <div class="stat-value"><span class="fresh-dot"></span>2026-06-03</div>
+          <div class="stat-value"><span class="fresh-dot"></span>2026-06-04</div>
           <div class="stat-sub">yesterday</div>
         </div>
         <div>
           <div class="stat-label">Commits (4 wk)</div>
-          <div class="stat-value">27</div>
+          <div class="stat-value">25</div>
         </div>
         <div>
           <div class="stat-label">Downloads (7d)</div>
-          <div class="stat-value">16,763</div>
+          <div class="stat-value">16,616</div>
           <div class="stat-sub">pypi</div>
         </div>
         <div>
           <div class="stat-label">HN mentions (30d)</div>
-          <div class="stat-value">4</div>
+          <div class="stat-value">15</div>
         </div>
         <div>
           <div class="stat-label">Open Issues</div>
@@ -579,8 +596,8 @@
         </div>
         <div>
           <div class="stat-label">Rank Change</div>
-          <div class="stat-value">▼1</div>
-          <div class="stat-sub">was #164</div>
+          <div class="stat-value">▼7</div>
+          <div class="stat-sub">was #163</div>
         </div>
       </div>
     </section>
@@ -593,7 +610,7 @@
           <div class="metric-section">
             <div class="metric-section-title">
               <h3>HVTrust Dimensions</h3>
-              <span>42.1 / 100 · 75.0% confidence</span>
+              <span>42.0 / 100 · 75.0% confidence</span>
             </div>
             <div class="metric-list" aria-label="HVTrust dimensions for TruLens">
               <div class="metric-row">
@@ -613,8 +630,8 @@
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Maintenance</strong><span class="metric-sub">Freshness and commits</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:88.5%;--bar:var(--accent);"></div></div>
-                <div class="metric-value">17.7 <span>/ 20</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:88.0%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">17.6 <span>/ 20</span></div>
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Adoption</strong><span class="metric-sub">Stars and downloads</span></div>
@@ -626,7 +643,7 @@
           <div class="metric-section">
             <div class="metric-section-title">
               <h3>Activity Inputs</h3>
-              <span>75.7 / 100</span>
+              <span>75.2 / 100</span>
             </div>
             <div class="metric-list" aria-label="Activity inputs for TruLens">
               <div class="metric-row">
@@ -641,8 +658,8 @@
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Activity</strong><span class="metric-sub">Recent commits</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:72.2%;--bar:#9ae6b4;"></div></div>
-                <div class="metric-value">18.1 <span>/ 25</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:70.6%;--bar:#9ae6b4;"></div></div>
+                <div class="metric-value">17.6 <span>/ 25</span></div>
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Community</strong><span class="metric-sub">Fork signal</span></div>
@@ -720,14 +737,128 @@
     
 
     <section class="runtime-soon">
-      <h2 class="section-title">Runtime trust — coming soon</h2>
+      <h2 class="section-title">Runtime trust</h2>
       <div class="rt-card">
-        <p>HVTrust currently scores supply-chain signals. We're adding <strong>runtime trust</strong> next: what an agent actually does when it runs — what it can reach, which tools it carries, what external services it depends on. Track progress on the <a href="/roadmap/" style="color:var(--accent);">roadmap →</a></p>
-        <ul class="rt-fields">
-          <li>MCP support</li>
-          <li>Tool / plugin surface</li>
-          <li>External service deps</li>
-          <li>Package provenance drift</li>
+        
+        
+        
+        
+        <p class="runtime-intro">HVTrust currently <strong>does not score</strong> runtime-trust fields yet. This public view shows a compact runtime snapshot from repo docs and manifests. An experimental ranking preview is available in <a href="/score-lab/" style="color:var(--accent);">Score Lab →</a>, and progress is tracked on the <a href="/roadmap/" style="color:var(--accent);">roadmap →</a></p>
+
+        <div class="runtime-grid">
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">MCP Server Support</div>
+                <div class="runtime-confidence">low confidence</div>
+              </div>
+              <span class="runtime-status neutral">
+                
+                Declared
+                
+              </span>
+            </div>
+            <div class="runtime-summary ">
+              
+              MCP support appears present, but direct server implementation is less certain.
+              
+            </div>
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">External Service Dependencies</div>
+                <div class="runtime-confidence">high confidence</div>
+              </div>
+              <span class="runtime-status neutral">
+                
+                5 detected
+                
+              </span>
+            </div>
+            <div class="runtime-summary ">
+              
+              Public provider/service dependencies detected.
+              
+            </div>
+            
+            <ul class="runtime-provider-list">
+              
+              <li class="runtime-provider">Amazon Bedrock</li>
+              
+              <li class="runtime-provider">Anthropic</li>
+              
+              <li class="runtime-provider">Azure OpenAI</li>
+              
+              <li class="runtime-provider">Google Gemini</li>
+              
+              <li class="runtime-provider">OpenAI</li>
+              
+            </ul>
+            
+            <div class="runtime-note">
+              <strong>Credential signal:</strong>
+              
+              No explicit API-key/config marker detected.
+              
+            </div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">Tool / Plugin Surface</div>
+                <div class="runtime-confidence">high confidence</div>
+              </div>
+              <span class="runtime-status neutral">
+                
+                Declared
+                
+              </span>
+            </div>
+            <div class="runtime-summary ">
+              
+              Declared plugin/integration surface detected.
+              
+            </div>
+            
+            <ul class="runtime-provider-list">
+              
+              <li class="runtime-provider">code</li>
+              
+              <li class="runtime-provider">search</li>
+              
+            </ul>
+            
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">Package Provenance Drift</div>
+                <div class="runtime-confidence">high confidence</div>
+              </div>
+              <span class="runtime-status positive">
+                
+                Match
+                
+              </span>
+            </div>
+            <div class="runtime-summary ">
+              Published package metadata matches the tracked repo
+            </div>
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+        </div>
+
+        <ul class="runtime-roadmap">
+          <li class="live">MCP support live</li>
+          <li class="live">External deps live</li>
+          <li class="live">Tool / plugin surface live</li>
+          <li class="live">Package provenance drift live</li>
         </ul>
       </div>
     </section>
@@ -820,7 +951,7 @@
     <section class="provenance" id="embed-badge" style="margin-top:0;">
       <h2 class="section-title">Embed Badge <a href="/badges/" style="font-weight:400;color:var(--accent);font-size:11px;margin-left:8px;">Badge guide for maintainers →</a></h2>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-        <img src="/badge/trulens.svg" alt="HVTrust 42.1" height="20">
+        <img src="/badge/trulens.svg" alt="HVTrust 42.0" height="20">
         <img src="/badge/trulens-grade.svg" alt="Grade D" height="20">
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--muted);word-break:break-all;line-height:1.6;">
@@ -838,7 +969,7 @@
         
         <li>
           <a href="/agents/mlflow">
-            <span class="sib-rank">#9</span>
+            <span class="sib-rank">#10</span>
             <span class="sib-name">MLflow</span>
             <span class="sib-score">94.0</span>
           </a>
@@ -846,15 +977,23 @@
         
         <li>
           <a href="/agents/weights-biases-weave">
-            <span class="sib-rank">#26</span>
+            <span class="sib-rank">#27</span>
             <span class="sib-name">Weights &amp; Biases Weave</span>
             <span class="sib-score">78.4</span>
           </a>
         </li>
         
         <li>
+          <a href="/agents/langwatch">
+            <span class="sib-rank">#29</span>
+            <span class="sib-name">LangWatch</span>
+            <span class="sib-score">82.8</span>
+          </a>
+        </li>
+        
+        <li>
           <a href="/agents/langfuse">
-            <span class="sib-rank">#32</span>
+            <span class="sib-rank">#38</span>
             <span class="sib-name">Langfuse</span>
             <span class="sib-score">92.8</span>
           </a>
@@ -862,17 +1001,9 @@
         
         <li>
           <a href="/agents/promptfoo">
-            <span class="sib-rank">#37</span>
+            <span class="sib-rank">#41</span>
             <span class="sib-name">Promptfoo</span>
             <span class="sib-score">91.3</span>
-          </a>
-        </li>
-        
-        <li>
-          <a href="/agents/arize-phoenix">
-            <span class="sib-rank">#39</span>
-            <span class="sib-name">Arize Phoenix</span>
-            <span class="sib-score">87.8</span>
           </a>
         </li>
         
@@ -885,7 +1016,7 @@
     <section class="terminal-note" style="padding:18px 20px;font-size:11px;color:var(--muted);line-height:1.7;">
       <strong style="color:var(--text);font-size:12px;">Data sources</strong><br>
       GitHub REST API (repo, commits, stars, forks, license) · PyPI / pypistats (downloads, provenance) · Algolia HN Search API
-      <br>Each agent's signals refresh once daily across 6 staggered batches. <a href="/methodology" style="color:var(--accent);">Methodology v3.1</a> · <a href="/data/agents/trulens.json" style="color:var(--accent);">Raw JSON</a>
+      <br>Each agent's signals refresh once daily across 6 staggered batches. <a href="/methodology" style="color:var(--accent);">Methodology v3.2</a> · <a href="/data/agents/trulens.json" style="color:var(--accent);">Raw JSON</a>
     </section>
 
     <footer>

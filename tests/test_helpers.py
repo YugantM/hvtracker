@@ -150,6 +150,152 @@ def test_parse_link_last_page_absent():
     assert page is None and url is None
 
 
+def test_compute_trust_score_treats_all_download_sources_as_applicable():
+    baseline = fb.compute_trust_score({
+        "stars": 100,
+        "weekly_downloads": None,
+        "crate_package": "",
+        "docker_image": "",
+        "vscode_extension": "",
+        "scorecard_score": None,
+        "has_provenance": False,
+        "public_actions": None,
+        "hn_mentions_30d": None,
+        "listing_status": "listed",
+        "days_ago": 10,
+        "weekly_commits": 5,
+        "commits_low_confidence": False,
+        "license_spdx": "MIT",
+    })
+    score = fb.compute_trust_score({
+        "stars": 100,
+        "weekly_downloads": None,
+        "crate_package": "tool",
+        "docker_image": "",
+        "vscode_extension": "",
+        "scorecard_score": None,
+        "has_provenance": False,
+        "public_actions": None,
+        "hn_mentions_30d": None,
+        "listing_status": "listed",
+        "days_ago": 10,
+        "weekly_commits": 5,
+        "commits_low_confidence": False,
+        "license_spdx": "MIT",
+    })
+    assert baseline["trust_confidence"] == 0.5
+    assert score["trust_confidence"] == 0.4
+
+
+# ---- runtime trust -------------------------------------------------------
+
+def test_detect_mcp_server_support_marks_implemented_from_server_readme():
+    result = fb.detect_mcp_server_support(
+        readme_text="This project runs as an MCP server for Claude Desktop.",
+    )
+    assert result["status"] == "implemented"
+    assert result["confidence"] in {"medium", "high"}
+    assert result["evidence"]
+
+
+def test_detect_mcp_server_support_marks_implemented_from_dependency_and_path():
+    result = fb.detect_mcp_server_support(
+        tree_paths=["server/mcp_server.py", "pyproject.toml"],
+        manifest_text_by_path={"pyproject.toml": 'dependencies = ["fastmcp>=1.0"]'},
+    )
+    assert result["status"] == "implemented"
+    assert result["confidence"] == "high"
+
+
+def test_detect_mcp_server_support_marks_declared_from_generic_mcp_docs():
+    result = fb.detect_mcp_server_support(
+        readme_text="Roadmap: add Model Context Protocol support next quarter.",
+    )
+    assert result["status"] == "declared"
+    assert result["confidence"] == "low"
+
+
+def test_detect_mcp_server_support_does_not_treat_test_paths_as_implemented():
+    result = fb.detect_mcp_server_support(
+        tree_paths=["tests/mcp_server_status.rs", "package.json"],
+        manifest_text_by_path={"package.json": '{"dependencies":{"@modelcontextprotocol/sdk":"1.0.0"}}'},
+    )
+    assert result["status"] == "declared"
+    assert result["confidence"] == "medium"
+
+
+def test_detect_mcp_server_support_marks_none_without_evidence():
+    result = fb.detect_mcp_server_support()
+    assert result == {"status": "none", "confidence": None, "evidence": []}
+
+
+def test_detect_external_service_dependencies_from_readme_and_env_markers():
+    result = fb.detect_external_service_dependencies(
+        readme_text="Use OpenAI with OPENAI_API_KEY and Tavily with TAVILY_API_KEY.",
+    )
+    assert result["providers"] == ["OpenAI", "Tavily"]
+    assert result["requires_api_keys"] is True
+    assert result["confidence"] == "high"
+    assert result["evidence"]
+
+
+def test_detect_external_service_dependencies_from_manifest_dependencies():
+    result = fb.detect_external_service_dependencies(
+        manifest_text_by_path={"package.json": '{"dependencies":{"openai":"^4","redis":"^5"}}'},
+    )
+    assert result["providers"] == ["OpenAI", "Redis"]
+    assert result["requires_api_keys"] is False
+    assert result["confidence"] == "high"
+
+
+def test_detect_external_service_dependencies_none_without_evidence():
+    result = fb.detect_external_service_dependencies(
+        readme_text="Local CLI for markdown editing.",
+        manifest_text_by_path={"package.json": '{"dependencies":{"chalk":"^5"}}'},
+    )
+    assert result == {
+        "providers": [],
+        "requires_api_keys": False,
+        "confidence": None,
+        "evidence": [],
+    }
+
+
+def test_detect_tool_plugin_surface_from_extensions_and_browser_deps():
+    result = fb.detect_tool_plugin_surface(
+        readme_text="Extensions let users add browser automation integrations.",
+        tree_paths=["extensions/example/index.ts"],
+        manifest_text_by_path={"package.json": '{"dependencies":{"playwright":"^1.0"}}'},
+    )
+    assert result["plugin_system"] == "extension-based"
+    assert "browser" in result["tool_tags"]
+    assert result["confidence"] == "high"
+
+
+def test_detect_package_provenance_drift_match_and_warning():
+    match = fb.detect_package_provenance_drift(
+        "openai/codex",
+        npm_package="openai-codex",
+        npm_metadata={"repository": {"url": "git+https://github.com/openai/codex.git"}},
+    )
+    assert match["status"] == "match"
+    assert match["confidence"] == "high"
+
+    warning = fb.detect_package_provenance_drift(
+        "openai/codex",
+        pypi_package="openai-codex",
+        pypi_metadata={"info": {"project_urls": {"Source": "https://github.com/other/repo"}}},
+    )
+    assert warning["status"] == "warning"
+    assert warning["confidence"] == "high"
+
+
+def test_normalize_github_repo_url_variants():
+    assert fb._normalize_github_repo_url("git+https://github.com/OpenAI/Codex.git") == "openai/codex"
+    assert fb._normalize_github_repo_url("git@github.com:OpenAI/Codex.git") == "openai/codex"
+    assert fb._normalize_github_repo_url("https://example.com/nope") is None
+
+
 # ---- batch selection -----------------------------------------------------
 
 def test_parse_batch_arg(monkeypatch):

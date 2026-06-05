@@ -4,18 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Qwen Agent Review — Trust Score & Safety Profile | HVTracker</title>
-  <meta name="description" content="Is Qwen Agent trustworthy? Independent trust score 50.3/100 (Grade C). Ranked #140 of 206 open-source AI projects. 16.5k GitHub stars, Agent Frameworks. Safety, transparency, maintenance, and provenance signals reviewed.">
+  <meta name="description" content="Is Qwen Agent trustworthy? Independent trust score 50.1/100 (Grade C). Ranked #149 of 203 open-source AI projects. 16.5k GitHub stars, Agent Frameworks. Safety, transparency, maintenance, and provenance signals reviewed.">
   <link rel="canonical" href="https://hvtracker.net/agents/qwen-agent">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Qwen Agent — Trust Score 50.3/100 | HVTracker">
-  <meta property="og:description" content="Grade C · HVTrust 50.3/100 · 16.5k stars · Agent Frameworks. Independent trust signals for open-source AI projects.">
+  <meta property="og:title" content="Qwen Agent — Trust Score 50.1/100 | HVTracker">
+  <meta property="og:description" content="Grade C · HVTrust 50.1/100 · 16.5k stars · Agent Frameworks. Independent trust signals for open-source AI projects.">
   <meta property="og:url" content="https://hvtracker.net/agents/qwen-agent">
   <meta property="og:image" content="https://hvtracker.net/agents/qwen-agent/og.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Qwen Agent — Trust Score 50.3/100 on HVTracker">
+  <meta property="og:image:alt" content="Qwen Agent — Trust Score 50.1/100 on HVTracker">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://hvtracker.net/agents/qwen-agent/og.png">
   <meta name="twitter:image:alt" content="Qwen Agent on HVTracker">
@@ -36,10 +36,10 @@
     },
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "50.3",
+      "ratingValue": "50.1",
       "bestRating": "100",
       "worstRating": "0",
-      "ratingCount": "16459"
+      "ratingCount": "16480"
     },
     "review": {
       "@type": "Review",
@@ -50,11 +50,11 @@
       },
       "reviewRating": {
         "@type": "Rating",
-        "ratingValue": "50.3",
+        "ratingValue": "50.1",
         "bestRating": "100",
         "worstRating": "0"
       },
-      "reviewBody": "Qwen Agent receives a trust score of 50.3/100 (Grade C) based on independent analysis of activity, adoption, transparency, safety, and identity signals."
+      "reviewBody": "Qwen Agent receives a trust score of 50.1/100 (Grade C) based on independent analysis of activity, adoption, transparency, safety, and identity signals."
     }
   }
   </script>
@@ -77,12 +77,12 @@
       {
         "@type": "Question",
         "name": "Is Qwen Agent safe to use?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Qwen Agent has an HVTrust score of 50.3/100 (Grade C), ranked #140 of 206 open-source AI projects. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Qwen Agent has an HVTrust score of 50.1/100 (Grade C), ranked #149 of 203 open-source AI projects. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals." }
       },
       {
         "@type": "Question",
         "name": "What is the trust score for Qwen Agent?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Qwen Agent scores 50.3/100 on HVTracker's evidence-weighted HVTrust scale. It has 16.5k GitHub stars and is categorized under Agent Frameworks." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Qwen Agent scores 50.1/100 on HVTracker's evidence-weighted HVTrust scale. It has 16.5k GitHub stars and is categorized under Agent Frameworks." }
       }
     ]
   }
@@ -278,11 +278,28 @@
     .compare-strip .cmp-arrow { color:var(--accent); font-weight:700; }
 
     .runtime-soon { padding:18px 0; border-top:1px solid var(--border); }
-    .runtime-soon .rt-card { padding:12px; border:1px dashed var(--border); color:var(--muted); font-size:13px; line-height:1.6; }
+    .runtime-soon .rt-card { padding:14px; border:1px solid var(--border); background:linear-gradient(180deg, rgba(44,82,130,0.04), rgba(176,90,58,0.03)); color:var(--muted); font-size:13px; line-height:1.6; }
     .runtime-soon .rt-card strong { color:var(--text); font-weight:600; }
-    .runtime-soon .rt-fields { margin-top:8px; display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:6px 12px; font-family:var(--font-mono); font-size:11px; }
-    .runtime-soon .rt-fields li { list-style:none; padding:4px 8px; border:1px solid var(--border); color:var(--muted); }
-    .runtime-soon .rt-fields li::before { content:"◯ "; color:var(--muted); }
+    .runtime-intro { max-width:640px; }
+    .runtime-grid { margin-top:14px; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; }
+    .runtime-panel { border:1px solid var(--border); background:rgba(255,255,255,0.35); padding:12px; }
+    .runtime-panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .runtime-panel-title { font-size:12px; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; }
+    .runtime-status { display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border:1px solid var(--border); font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+    .runtime-status.positive { color:var(--green); border-color:rgba(47,104,70,0.3); }
+    .runtime-status.neutral { color:var(--accent); border-color:rgba(44,82,130,0.3); }
+    .runtime-status.muted { color:var(--muted); }
+    .runtime-confidence { margin-top:2px; font-family:var(--font-mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; }
+    .runtime-summary { color:var(--text); font-size:14px; line-height:1.5; }
+    .runtime-summary.muted { color:var(--muted); }
+    .runtime-provider-list { margin-top:8px; display:flex; flex-wrap:wrap; gap:6px; }
+    .runtime-provider { list-style:none; padding:4px 8px; border:1px solid var(--border); background:var(--bg); font-family:var(--font-mono); font-size:11px; color:var(--text); }
+    .runtime-note { margin-top:8px; font-size:11px; color:var(--muted); }
+    .runtime-note strong { color:var(--text); }
+    .runtime-mini { margin-top:8px; font-family:var(--font-mono); font-size:11px; color:var(--muted); }
+    .runtime-roadmap { margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; }
+    .runtime-roadmap li { list-style:none; padding:5px 9px; border:1px solid var(--border); font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); }
+    .runtime-roadmap li.live { color:var(--green); border-color:rgba(47,104,70,0.25); }
 
     .maintainer-cta { padding:16px 0; margin:0; border-bottom:1px solid var(--border); }
     .maintainer-cta .section-title { margin-bottom:6px; }
@@ -341,7 +358,7 @@
   }
   </script>
 </head>
-<body data-page-type="agent_profile" data-agent-slug="qwen-agent" data-agent-name="Qwen Agent" data-category="Agent Frameworks" data-global-rank="140" data-trust-score="50.3">
+<body data-page-type="agent_profile" data-agent-slug="qwen-agent" data-agent-name="Qwen Agent" data-category="Agent Frameworks" data-global-rank="149" data-trust-score="50.1">
   <header class="site-header">
     <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
@@ -387,17 +404,17 @@
         </div>
         <div class="hero-summary-item">
           <div class="hero-summary-label">HVTrust</div>
-          <div class="hero-summary-value">50.3/100 · Grade C</div>
+          <div class="hero-summary-value">50.1/100 · Grade C</div>
         </div>
         <div class="hero-summary-item">
           <div class="hero-summary-label">Last push</div>
-          <div class="hero-summary-value">2026-03-04 · 92d ago</div>
+          <div class="hero-summary-value">2026-03-04 · 93d ago</div>
         </div>
         <div class="hero-summary-item">
           <div class="hero-summary-label">Recent change</div>
-          <div class="hero-summary-value negative">
+          <div class="hero-summary-value neutral">
             
-              Stale +7
+              Rank +8
             
           </div>
         </div>
@@ -411,7 +428,7 @@
         <div class="review-item primary">
           <div class="review-kicker">Verdict</div>
           <div class="review-value">Thin or incomplete trust evidence. Review carefully before production use.</div>
-          <div class="review-metric">50.3/100 · Grade C</div>
+          <div class="review-metric">50.1/100 · Grade C</div>
         </div>
 
         <div class="review-item">
@@ -424,7 +441,7 @@
         <div class="review-item">
           <div class="review-kicker">Weakest Signal</div>
           <div class="review-value">Safety / Integrity</div>
-          <div class="review-metric">5.3/25</div>
+          <div class="review-metric">5.2/25</div>
         </div>
 
         <div class="review-item wide">
@@ -436,6 +453,14 @@
       <div class="recent-changes">
         <div class="review-kicker">Recent Changes</div>
         <div class="recent-change-list">
+          
+          <div class="recent-change-item">
+            <div class="recent-change-date">2026-06-05</div>
+            <div class="recent-change-body">
+              <span class="recent-change-badge neutral">Rank Moved</span>
+              <div class="recent-change-detail">Rank dropped 11 spots (#138 → #149)</div>
+            </div>
+          </div>
           
           <div class="recent-change-item">
             <div class="recent-change-date">2026-06-02</div>
@@ -453,14 +478,6 @@
             </div>
           </div>
           
-          <div class="recent-change-item">
-            <div class="recent-change-date">2026-05-31</div>
-            <div class="recent-change-body">
-              <span class="recent-change-badge neutral">HVTrust Changed</span>
-              <div class="recent-change-detail">HVTrust up 3.9pts (46.6 → 50.5)</div>
-            </div>
-          </div>
-          
         </div>
       </div>
       
@@ -471,7 +488,7 @@
           
           <div class="remediation-item">
             <strong>Raise Scorecard signals</strong>
-            <span>Current OSSF Scorecard is 3.7/10. Tighten the weakest checks to improve public safety evidence.</span>
+            <span>Current OSSF Scorecard is 3.6/10. Tighten the weakest checks to improve public safety evidence.</span>
           </div>
           
           <div class="remediation-item">
@@ -486,7 +503,7 @@
           
           <div class="remediation-item">
             <strong>Refresh maintenance signals</strong>
-            <span>The repo was last pushed 92 days ago. Fresh activity helps separate stable projects from stale ones.</span>
+            <span>The repo was last pushed 93 days ago. Fresh activity helps separate stable projects from stale ones.</span>
           </div>
           
         </div>
@@ -505,22 +522,22 @@
 
     <section class="rank-block">
       <div>
-        <div class="score-pill score-mid">52.6</div>
+        <div class="score-pill score-mid">52.3</div>
         <div class="rank-label">Activity Score · out of 100</div>
       </div>
       
       <div>
-        <div class="score-pill score-mid">50.3</div>
+        <div class="score-pill score-mid">50.1</div>
         <div class="rank-label">HVTrust Score · out of 100</div>
       </div>
       
       <div>
-        <div class="rank-big">#140</div>
-        <div class="rank-label">Global Rank · of 206</div>
+        <div class="rank-big">#149</div>
+        <div class="rank-label">Global Rank · of 203</div>
       </div>
       
       <div>
-        <div class="rank-big" style="color:var(--amber)">#40</div>
+        <div class="rank-big" style="color:var(--amber)">#43</div>
         <div class="rank-label">In <a href="/categories/agent-frameworks">Agent Frameworks</a></div>
       </div>
       
@@ -534,20 +551,20 @@
     <div class="freshness-banner">
       <span class="dot"></span>
       <strong>Signals refreshed</strong>
-      <span class="meta">2026-06-04 16:46 UTC</span>
+      <span class="meta">2026-06-05 11:36 UTC</span>
       <span class="meta">·</span>
-      <span class="meta">Repo last pushed 92 days ago</span>
+      <span class="meta">Repo last pushed 93 days ago</span>
     </div>
 
     
     <section class="trend">
       <h2 class="section-title">Rank Trend</h2>
       <div class="sparkline-wrap">
-        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="40" viewBox="0 0 200 40" style="display:block"><path d="M0.0,4.0L16.7,14.7L33.3,32.3L50.0,32.3L66.7,32.3L83.3,30.0L100.0,28.3L116.7,28.3L133.3,26.0L150.0,31.7L166.7,34.0L183.3,36.0L200.0,36.0" fill="none" stroke="#7c6af6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="40" viewBox="0 0 200 40" style="display:block"><path d="M0.0,4.0L15.4,13.8L30.8,29.9L46.2,29.9L61.5,29.9L76.9,27.8L92.3,26.2L107.7,26.2L123.1,24.1L138.5,29.3L153.8,31.4L169.2,33.3L184.6,32.6L200.0,36.0" fill="none" stroke="#7c6af6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <div class="sparkline-labels">
           
           <span>2026-05-23</span>
-          <span>2026-06-04</span>
+          <span>2026-06-05</span>
           
         </div>
       </div>
@@ -568,7 +585,7 @@
         <div class="stale">
           <div class="stat-label">Last Push</div>
           <div class="stat-value"><span class="fresh-dot"></span>2026-03-04</div>
-          <div class="stat-sub">92 days ago</div>
+          <div class="stat-sub">93 days ago</div>
         </div>
         <div>
           <div class="stat-label">Commits (4 wk)</div>
@@ -589,8 +606,8 @@
         </div>
         <div>
           <div class="stat-label">Rank Change</div>
-          <div class="stat-value">=</div>
-          <div class="stat-sub">was #140</div>
+          <div class="stat-value">▼11</div>
+          <div class="stat-sub">was #138</div>
         </div>
       </div>
     </section>
@@ -603,13 +620,13 @@
           <div class="metric-section">
             <div class="metric-section-title">
               <h3>HVTrust Dimensions</h3>
-              <span>50.3 / 100 · 100.0% confidence</span>
+              <span>50.1 / 100 · 100.0% confidence</span>
             </div>
             <div class="metric-list" aria-label="HVTrust dimensions for Qwen Agent">
               <div class="metric-row">
                 <div class="metric-name"><strong>Safety / Integrity</strong><span class="metric-sub">OSSF, provenance, signatures</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:21.2%;--bar:var(--accent);"></div></div>
-                <div class="metric-value">5.3 <span>/ 25</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:20.8%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">5.2 <span>/ 25</span></div>
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Identity / Provenance</strong><span class="metric-sub">Listing and build link</span></div>
@@ -623,8 +640,8 @@
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Maintenance</strong><span class="metric-sub">Freshness and commits</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:29.5%;--bar:var(--accent);"></div></div>
-                <div class="metric-value">5.9 <span>/ 20</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:29.0%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">5.8 <span>/ 20</span></div>
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Adoption</strong><span class="metric-sub">Stars and downloads</span></div>
@@ -636,7 +653,7 @@
           <div class="metric-section">
             <div class="metric-section-title">
               <h3>Activity Inputs</h3>
-              <span>52.6 / 100</span>
+              <span>52.3 / 100</span>
             </div>
             <div class="metric-list" aria-label="Activity inputs for Qwen Agent">
               <div class="metric-row">
@@ -646,8 +663,8 @@
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Freshness</strong><span class="metric-sub">Last push recency</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:48.9%;--bar:var(--green);"></div></div>
-                <div class="metric-value">12.2 <span>/ 25</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:48.3%;--bar:var(--green);"></div></div>
+                <div class="metric-value">12.1 <span>/ 25</span></div>
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Activity</strong><span class="metric-sub">Recent commits</span></div>
@@ -679,7 +696,7 @@
         <div class="prov-signal">
           <div class="prov-label">OSSF Scorecard</div>
           
-          <div class="prov-value" style="color:var(--accent);">3.7 / 10</div>
+          <div class="prov-value" style="color:var(--accent);">3.6 / 10</div>
           <div class="prov-sub">via deps.dev · OpenSSF</div>
           
         </div>
@@ -746,7 +763,7 @@
         
         <div class="sc-check">
           <span class="sc-check-name">Maintained</span>
-          <span class="sc-check-val" style="color:var(--muted)">1</span>
+          <span class="sc-check-val" style="color:var(--muted)">0</span>
         </div>
         
         <div class="sc-check">
@@ -800,11 +817,11 @@
       </details>
       <details>
         <summary>Does Qwen Agent have an OpenSSF Scorecard?</summary>
-        <div class="qa-answer">Qwen Agent has an OpenSSF Scorecard score of 3.7/10. The Scorecard checks for branch protection, signed releases, dependency updates, fuzzing, code review, and other supply-chain hygiene items. See the full check breakdown on this page.</div>
+        <div class="qa-answer">Qwen Agent has an OpenSSF Scorecard score of 3.6/10. The Scorecard checks for branch protection, signed releases, dependency updates, fuzzing, code review, and other supply-chain hygiene items. See the full check breakdown on this page.</div>
       </details>
       <details>
         <summary>Is Qwen Agent actively maintained?</summary>
-        <div class="qa-answer">Slowing down. Last push was 92 days ago — keep an eye on whether activity resumes.</div>
+        <div class="qa-answer">Slowing down. Last push was 93 days ago — keep an eye on whether activity resumes.</div>
       </details>
       <details>
         <summary>What license does Qwen Agent use?</summary>
@@ -824,14 +841,124 @@
     
 
     <section class="runtime-soon">
-      <h2 class="section-title">Runtime trust — coming soon</h2>
+      <h2 class="section-title">Runtime trust</h2>
       <div class="rt-card">
-        <p>HVTrust currently scores supply-chain signals. We're adding <strong>runtime trust</strong> next: what an agent actually does when it runs — what it can reach, which tools it carries, what external services it depends on. Track progress on the <a href="/roadmap/" style="color:var(--accent);">roadmap →</a></p>
-        <ul class="rt-fields">
-          <li>MCP support</li>
-          <li>Tool / plugin surface</li>
-          <li>External service deps</li>
-          <li>Package provenance drift</li>
+        
+        
+        
+        
+        <p class="runtime-intro">HVTrust currently <strong>does not score</strong> runtime-trust fields yet. This public view shows a compact runtime snapshot from repo docs and manifests. An experimental ranking preview is available in <a href="/score-lab/" style="color:var(--accent);">Score Lab →</a>, and progress is tracked on the <a href="/roadmap/" style="color:var(--accent);">roadmap →</a></p>
+
+        <div class="runtime-grid">
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">MCP Server Support</div>
+                <div class="runtime-confidence">medium confidence</div>
+              </div>
+              <span class="runtime-status positive">
+                
+                Implemented
+                
+              </span>
+            </div>
+            <div class="runtime-summary ">
+              
+              Qwen Agent appears to expose MCP server capabilities.
+              
+            </div>
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">External Service Dependencies</div>
+                <div class="runtime-confidence">high confidence</div>
+              </div>
+              <span class="runtime-status neutral">
+                
+                1 detected
+                
+              </span>
+            </div>
+            <div class="runtime-summary ">
+              
+              Public provider/service dependencies detected.
+              
+            </div>
+            
+            <ul class="runtime-provider-list">
+              
+              <li class="runtime-provider">OpenAI</li>
+              
+            </ul>
+            
+            <div class="runtime-note">
+              <strong>Credential signal:</strong>
+              
+              API keys or service config markers documented.
+              
+            </div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">Tool / Plugin Surface</div>
+                <div class="runtime-confidence">high confidence</div>
+              </div>
+              <span class="runtime-status neutral">
+                
+                
+                3 tags
+                
+                
+              </span>
+            </div>
+            <div class="runtime-summary ">
+              
+              Broad capability areas detected.
+              
+            </div>
+            
+            <ul class="runtime-provider-list">
+              
+              <li class="runtime-provider">code</li>
+              
+              <li class="runtime-provider">filesystem</li>
+              
+              <li class="runtime-provider">search</li>
+              
+            </ul>
+            
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+
+          <div class="runtime-panel">
+            <div class="runtime-panel-head">
+              <div>
+                <div class="runtime-panel-title">Package Provenance Drift</div>
+                <div class="runtime-confidence">high confidence</div>
+              </div>
+              <span class="runtime-status positive">
+                
+                Match
+                
+              </span>
+            </div>
+            <div class="runtime-summary ">
+              Published package metadata matches the tracked repo
+            </div>
+            <div class="runtime-mini">Detailed evidence is not shown in the public view.</div>
+          </div>
+        </div>
+
+        <ul class="runtime-roadmap">
+          <li class="live">MCP support live</li>
+          <li class="live">External deps live</li>
+          <li class="live">Tool / plugin surface live</li>
+          <li class="live">Package provenance drift live</li>
         </ul>
       </div>
     </section>
@@ -851,9 +978,17 @@
     <section class="provenance">
       <h2 class="section-title">Reputation Timeline</h2>
       
-      <svg class="insight-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 104" role="img"><rect x="0" y="22" width="680" height="28" rx="5" fill="rgba(0,0,0,0.04)"/><rect x="0.0" y="22" width="255.0" height="28" rx="5" fill="#8b6914" opacity="0.88"/><rect x="255.0" y="22" width="255.0" height="28" rx="5" fill="#2f6846" opacity="0.88"/><rect x="510.0" y="22" width="85.0" height="28" rx="5" fill="#2c5282" opacity="0.88"/><rect x="595.0" y="22" width="85.0" height="28" rx="5" fill="#9b3c3c" opacity="0.88"/><foreignObject x="0" y="64" width="680" height="46"><div xmlns="http://www.w3.org/1999/xhtml" class="chart-legend"><span><i style="background:#8b6914"></i>Rank <strong>3</strong></span><span><i style="background:#2f6846"></i>HVTrust <strong>3</strong></span><span><i style="background:#2c5282"></i>Scorecard <strong>1</strong></span><span><i style="background:#9b3c3c"></i>Stale <strong>1</strong></span></div></foreignObject></svg>
+      <svg class="insight-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 104" role="img"><rect x="0" y="22" width="680" height="28" rx="5" fill="rgba(0,0,0,0.04)"/><rect x="0.0" y="22" width="302.2" height="28" rx="5" fill="#8b6914" opacity="0.88"/><rect x="302.2" y="22" width="226.7" height="28" rx="5" fill="#2f6846" opacity="0.88"/><rect x="528.9" y="22" width="75.6" height="28" rx="5" fill="#2c5282" opacity="0.88"/><rect x="604.5" y="22" width="75.6" height="28" rx="5" fill="#9b3c3c" opacity="0.88"/><foreignObject x="0" y="64" width="680" height="46"><div xmlns="http://www.w3.org/1999/xhtml" class="chart-legend"><span><i style="background:#8b6914"></i>Rank <strong>4</strong></span><span><i style="background:#2f6846"></i>HVTrust <strong>3</strong></span><span><i style="background:#2c5282"></i>Scorecard <strong>1</strong></span><span><i style="background:#9b3c3c"></i>Stale <strong>1</strong></span></div></foreignObject></svg>
       
       <div style="display:flex;flex-direction:column;gap:0;">
+        
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);white-space:nowrap;min-width:80px;">2026-06-05</span>
+          <div>
+            <span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;">Rank Moved</span>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">Rank dropped 11 spots (#138 → #149)</div>
+          </div>
+        </div>
         
         <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
           <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);white-space:nowrap;min-width:80px;">2026-06-02</span>
@@ -932,7 +1067,7 @@
     <section class="provenance" id="embed-badge" style="margin-top:0;">
       <h2 class="section-title">Embed Badge <a href="/badges/" style="font-weight:400;color:var(--accent);font-size:11px;margin-left:8px;">Badge guide for maintainers →</a></h2>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-        <img src="/badge/qwen-agent.svg" alt="HVTrust 50.3" height="20">
+        <img src="/badge/qwen-agent.svg" alt="HVTrust 50.1" height="20">
         <img src="/badge/qwen-agent-grade.svg" alt="Grade C" height="20">
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--muted);word-break:break-all;line-height:1.6;">
@@ -947,6 +1082,14 @@
     <section class="siblings">
       <h2 class="section-title">Other agents in Agent Frameworks</h2>
       <ul>
+        
+        <li>
+          <a href="/agents/haystack">
+            <span class="sib-rank">#1</span>
+            <span class="sib-name">Haystack</span>
+            <span class="sib-score">92.5</span>
+          </a>
+        </li>
         
         <li>
           <a href="/agents/langgraph">
@@ -965,26 +1108,18 @@
         </li>
         
         <li>
+          <a href="/agents/openai-agents-sdk">
+            <span class="sib-rank">#6</span>
+            <span class="sib-name">OpenAI Agents SDK</span>
+            <span class="sib-score">92.1</span>
+          </a>
+        </li>
+        
+        <li>
           <a href="/agents/pydanticai">
-            <span class="sib-rank">#5</span>
+            <span class="sib-rank">#8</span>
             <span class="sib-name">PydanticAI</span>
             <span class="sib-score">91.0</span>
-          </a>
-        </li>
-        
-        <li>
-          <a href="/agents/openai-agents-sdk">
-            <span class="sib-rank">#7</span>
-            <span class="sib-name">OpenAI Agents SDK</span>
-            <span class="sib-score">93.0</span>
-          </a>
-        </li>
-        
-        <li>
-          <a href="/agents/haystack">
-            <span class="sib-rank">#11</span>
-            <span class="sib-name">Haystack</span>
-            <span class="sib-score">92.4</span>
           </a>
         </li>
         
@@ -997,7 +1132,7 @@
     <section class="terminal-note" style="padding:18px 20px;font-size:11px;color:var(--muted);line-height:1.7;">
       <strong style="color:var(--text);font-size:12px;">Data sources</strong><br>
       GitHub REST API (repo, commits, stars, forks, license) · PyPI / pypistats (downloads, provenance) · OSSF Scorecard via deps.dev · Algolia HN Search API
-      <br>Each agent's signals refresh once daily across 6 staggered batches. <a href="/methodology" style="color:var(--accent);">Methodology v3.1</a> · <a href="/data/agents/qwen-agent.json" style="color:var(--accent);">Raw JSON</a>
+      <br>Each agent's signals refresh once daily across 6 staggered batches. <a href="/methodology" style="color:var(--accent);">Methodology v3.2</a> · <a href="/data/agents/qwen-agent.json" style="color:var(--accent);">Raw JSON</a>
     </section>
 
     <footer>
