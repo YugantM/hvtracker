@@ -69,7 +69,11 @@ jobs:
         run: python tests/validate_html.py
 
   production-smoke:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Do not gate main-branch deploys on a post-deploy health poll. Railway
+    # may be configured to wait for GitHub checks before rolling out, which
+    # would deadlock this job against the deploy it is trying to observe.
+    # Keep it available for manual verification runs instead.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: build-smoke
     steps:
