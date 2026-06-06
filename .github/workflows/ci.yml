@@ -126,10 +126,25 @@ jobs:
           expected_sha = os.environ["EXPECTED_SHA"]
           deadline = time.time() + 900
           last = None
+          url = "https://hvtracker.net/healthz?source=github-actions"
+          headers = {
+              "Accept": "application/json",
+              # Cloudflare sometimes blocks Python's default urllib user agent.
+              # Use a plain browser-like UA so the production smoke check
+              # verifies deploy markers instead of tripping bot heuristics.
+              "User-Agent": (
+                  "Mozilla/5.0 (X11; Linux x86_64) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/137.0.0.0 Safari/537.36"
+              ),
+              "Cache-Control": "no-cache",
+              "Pragma": "no-cache",
+          }
 
           while time.time() < deadline:
               try:
-                  with urllib.request.urlopen("https://hvtracker.net/healthz", timeout=20) as resp:
+                  req = urllib.request.Request(url, headers=headers)
+                  with urllib.request.urlopen(req, timeout=20) as resp:
                       last = json.loads(resp.read().decode("utf-8"))
               except Exception as exc:
                   last = {"error": str(exc)}
