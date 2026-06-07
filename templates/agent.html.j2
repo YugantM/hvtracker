@@ -135,6 +135,8 @@
     .badge.state-warning { color:var(--red); }
     .badge.state-legacy { color:#999; }
     .badge.state-rejected, .badge.state-delisted { color:var(--red); }
+    .sponsor-badges { margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .sponsor-badge img { display:block; height:22px; width:auto; }
     .hero-actions { margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; }
     .hero-summary-grid { margin-top:16px; display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:1px; background:var(--border); }
     .hero-summary-item { padding:10px; background:var(--bg); }
@@ -402,6 +404,15 @@
         {% if row.license_spdx %}<span class="badge">{{ row.license_spdx }}</span>{% endif %}
         {% if row.license_type and row.license_type != 'open' %}<span class="badge" style="color:{% if row.license_type == 'proprietary' %}var(--red){% elif row.license_type == 'source-available' %}var(--amber){% else %}var(--muted){% endif %}">{{ row.license_type | capitalize }}</span>{% endif %}
       </div>
+      {% if row.sponsor_badges %}
+      <div class="sponsor-badges">
+        {% for badge in row.sponsor_badges %}
+        <a class="sponsor-badge" href="{{ badge.href }}" target="_blank" rel="noopener noreferrer">
+          <img src="{{ badge.img }}" alt="{{ badge.alt or badge.label or 'Sponsor badge' }}">
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
       <div class="hero-actions">
         <a class="compare-link" href="/compare/?a={{ row.slug }}">Compare</a>
         <button class="secondary-link watch-button" id="watchToggle" type="button" data-watch-slug="{{ row.slug }}" data-watch-name="{{ row.name }}" data-watch-repo="{{ row.repo }}">Save to watchlist</button>
