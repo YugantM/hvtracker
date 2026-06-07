@@ -3785,7 +3785,6 @@ def main() -> None:
         category = agent.get("category", "")
         npm_pkg = agent.get("npm_package", "")
         pypi_pkg = agent.get("pypi_package", "")
-        sponsor_badges = agent.get("sponsor_badges", [])
         existing_row = existing_agents_map.get(repo_id.lower())
 
         if repair_commits:
@@ -3931,7 +3930,6 @@ def main() -> None:
             "tool_plugin_surface": tool_plugin_surface,
             "package_provenance_drift": package_provenance_drift,
             "signed_commits_ratio": signed_ratio,
-            "sponsor_badges": sponsor_badges,
             "weekly_downloads": None,  # filled in serial pass below
             "dl_source": "",
             "listing_status": agent.get("listing_status", "listed"),
@@ -4152,7 +4150,6 @@ def main() -> None:
     _override_map = {a["repo"].lower(): a.get("license_override", "") for a in all_agents if a.get("license_override")}
     _category_map = {a["repo"].lower(): a.get("category", "") for a in all_agents if a.get("category")}
     _lang_override_map = {a["repo"].lower(): a.get("language_override", "") for a in all_agents if a.get("language_override")}
-    _sponsor_badges_map = {a["repo"].lower(): a.get("sponsor_badges", []) for a in all_agents if a.get("sponsor_badges")}
 
     # Add formatted download counts and slug/breakdown for template rendering
     for row in rows:
@@ -4170,7 +4167,6 @@ def main() -> None:
         language_override = _lang_override_map.get(repo_key)
         if language_override:
             row["language"] = language_override
-        row["sponsor_badges"] = _sponsor_badges_map.get(repo_key, row.get("sponsor_badges", []))
         row["license_type"] = normalize_license_type(row)
         # Always recompute freshness from the absolute last_push date so the
         # color coding (and the maintenance dimension) stay correct even when
