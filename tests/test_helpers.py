@@ -447,18 +447,21 @@ def test_github_get_retries_202_then_succeeds(monkeypatch):
 
 
 def test_repair_missing_commit_counts_uses_live_then_cached(monkeypatch):
+    from datetime import datetime, timezone, timedelta
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
     rows = [
         {
             "repo": "anthropics/claude-code",
             "weekly_commits": None,
-            "last_push": "2026-05-31",
+            "last_push": today,
             "days_ago": 0,
             "commits_low_confidence": False,
         },
         {
             "repo": "openai/codex",
             "weekly_commits": None,
-            "last_push": "2026-05-30",
+            "last_push": yesterday,
             "days_ago": 1,
             "commits_low_confidence": False,
         },
