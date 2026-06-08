@@ -463,6 +463,17 @@
       display: block;
       flex-shrink: 0;
     }
+    /* Tile variant for light-on-transparent logos (e.g. AIPass). */
+    .featured-repo--dark {
+      background: #0b0d10;
+      border-color: #1f242b;
+    }
+    .featured-repo--dark:hover {
+      border-color: var(--accent-warm);
+    }
+    .featured-repo--dark img {
+      object-position: center;
+    }
     footer { padding: 24px 0 36px; margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
     footer a { color: var(--accent); }
     .footer-sep { color: var(--border); }
@@ -785,7 +796,7 @@
         <a class="featured-repo" href="https://github.com/deepset-ai/haystack" target="_blank" rel="noopener noreferrer">
           <img src="/haystack-logo.png?v=20260604" alt="Haystack logo" loading="lazy" decoding="async">
         </a>
-        <a class="featured-repo" href="https://github.com/AIOSAI/AIPass" target="_blank" rel="noopener noreferrer">
+        <a class="featured-repo featured-repo--dark" href="https://github.com/AIOSAI/AIPass" target="_blank" rel="noopener noreferrer">
           <img src="/aipass-logo.png?v=20260608" alt="AIPass logo" loading="lazy" decoding="async">
         </a>
       </div>
