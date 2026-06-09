@@ -112,6 +112,8 @@ def test_submit_validation_rejects_bad_repo(client):
 
 
 def test_growth_post_routes_fail_gracefully_without_db(client):
+    import app as _app
+    _app._rate_log.clear()
     for path, payload in (
         ("/alerts", {"email": "test@example.com"}),
         ("/alerts/", {"email": "test@example.com"}),
@@ -122,8 +124,78 @@ def test_growth_post_routes_fail_gracefully_without_db(client):
         ("/track/codex", {"email": "test@example.com"}),
         ("/track/codex/", {"email": "test@example.com"}),
     ):
+        _app._rate_log.clear()
         r = client.post(path, data=payload)
         assert r.status_code == 503
+
+
+def test_honeypot_blocks_spam(client):
+    """POST with honeypot filled returns 200 but writes nothing."""
+    import app as _app
+    _app._rate_log.clear()
+    r = client.post("/alerts", data={"email": "bot@spam.com", "website": "http://spam.com"})
+    assert r.status_code == 200
+    assert "Thanks" in r.text
+
+
+def test_rate_limit_returns_429(client):
+    """6th rapid POST from same IP returns 429."""
+    import app as _app
+    _app._rate_log.clear()
+    for i in range(5):
+        r = client.post("/alerts", data={"email": f"user{i}@example.com"})
+        assert r.status_code in (200, 503)
+    r = client.post("/alerts", data={"email": "extra@example.com"})
+    assert r.status_code == 429
+
+
+def test_oversized_input_returns_400(client):
+    """Oversized message field returns 400."""
+    import app as _app
+    _app._rate_log.clear()
+    r = client.post("/correct", data={
+        "repo": "owner/name",
+        "message": "x" * 4001,
+    })
+    assert r.status_code == 400
+    assert "limit" in r.text.lower()
+
+
+def test_invalid_email_returns_400(client):
+    """Invalid email format returns 400."""
+    import app as _app
+    _app._rate_log.clear()
+    r = client.post("/alerts", data={"email": "not-an-email"})
+    assert r.status_code == 400
+    assert "email" in r.text.lower()
+
+
+def test_forms_contain_honeypot(client):
+    """All form pages include the honeypot field."""
+    for path in ("/submit", "/correct", "/alerts", "/sponsor", "/data-api", "/track/codex"):
+        r = client.get(path)
+        assert r.status_code == 200
+        assert 'name="website"' in r.text
+
+
+def test_security_headers_on_homepage(client):
+    """Homepage has all security headers."""
+    r = client.get("/")
+    assert r.headers["x-content-type-options"] == "nosniff"
+    assert r.headers["referrer-policy"] == "strict-origin-when-cross-origin"
+    assert r.headers["x-frame-options"] == "SAMEORIGIN"
+    assert "camera=()" in r.headers["permissions-policy"]
+    assert "content-security-policy-report-only" in r.headers
+
+
+def test_badge_has_no_x_frame_options(client):
+    """Badge SVG routes omit X-Frame-Options so they can be embedded."""
+    repo = client.get("/api/agents", params={"limit": 1}).json()["agents"][0]["repo"]
+    owner, name = repo.split("/")
+    r = client.get(f"/badge/{owner}/{name}/trust.svg")
+    assert r.status_code == 200
+    assert "x-frame-options" not in r.headers
+    assert r.headers["x-content-type-options"] == "nosniff"
 
 
 def test_startup_keeps_scheduler_alive(monkeypatch):

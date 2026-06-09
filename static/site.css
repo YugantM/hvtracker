@@ -1,0 +1,150 @@
+/* latin-ext */
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/static/fonts/hanken-grotesk-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/static/fonts/hanken-grotesk-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/static/fonts/ibm-plex-mono-400-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/static/fonts/ibm-plex-mono-400-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/static/fonts/ibm-plex-mono-500-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/static/fonts/ibm-plex-mono-500-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/static/fonts/ibm-plex-mono-600-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/static/fonts/ibm-plex-mono-600-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f4f1eb;
+  --surface: #eae6de;
+  --border: #d4cfc5;
+  --text: #1a1a1a;
+  --muted: #6b6560;
+  --accent: #2c5282;
+  --accent-warm: #b05a3a;
+  --green: #2f6846;
+  --red: #9b3c3c;
+  --amber: #8b6914;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --font-sans: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
+  /* Aliases used by blog/methodology/spec/movers/badges/roadmap templates */
+  --paper: #f4f1eb;
+  --paper-2: #ece4d6;
+  --ink: #1f1b17;
+  --line: #d5cbbc;
+  --line-strong: #b9aa96;
+  --lobster: #c67c6d;
+  --lobster-soft: rgba(198,124,109,.14);
+  --moss: #6f876e;
+  --moss-soft: rgba(111,135,110,.14);
+  --blue: #a7bfd9;
+  --blue-strong: #7f9cbd;
+  --blue-soft: rgba(167,191,217,.18);
+  --stale: #8d887e;
+  --muted-2: #8a7f72;
+}
+
+body {
+  background: var(--bg);
+  background-image: url("/hex-bg.svg");
+  background-size: 2000px 2000px;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: inherit; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.page { max-width: 1100px; margin: 0 auto; padding: 0 24px; background: var(--bg); min-height: 100vh; }
+
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.site-header-inner {
+  max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+  display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap;
+}
+.logo { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text); }
+.logo span { color: var(--accent-warm); }
+.site-nav { font-family: var(--font-mono); font-size: 11px; display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+.site-nav a { color: var(--muted); padding: 5px 10px; border: 1px solid transparent; }
+.site-nav a:hover { color: var(--text); text-decoration: none; border-color: var(--border); background: var(--surface); }
+
+.evidence-badge { display: inline-block; font-family: var(--font-mono); font-size: 9px; font-weight: 700; width: 20px; text-align: center; padding: 1px 0; border-radius: 3px; letter-spacing: .02em; }
+.grade-A { color: #fff; background: var(--green); }
+.grade-B { color: #fff; background: var(--accent); }
+.grade-C { color: #fff; background: var(--amber); }
+.grade-D { color: #fff; background: var(--muted); }
+
+footer { padding: 24px 0 36px; margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
+footer a { color: var(--accent); }
+.footer-sep { color: var(--border); }
+
+@media (max-width: 640px) {
+  .site-header-inner { flex-direction: column; gap: 4px; }
+  .site-nav { margin-left: 0; }
+}

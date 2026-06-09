@@ -25,46 +25,17 @@
     ]
   }
   </script>
+  <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --paper: #f4f1eb;
-      --paper-2: #ece4d6;
-      --ink: #1f1b17;
-      --muted: #6f665d;
-      --line: #d5cbbc;
-      --line-strong: #b9aa96;
-      --blue-strong: #7f9cbd;
-      --blue-soft: rgba(167, 191, 217, 0.18);
-      --lobster: #c67c6d;
-      --lobster-soft: rgba(198, 124, 109, 0.14);
-      --moss: #6f876e;
-      --moss-soft: rgba(111, 135, 110, 0.14);
       --font-mono: "JetBrains Mono", "Fira Mono", "Cascadia Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
       --font-sans: "Inter", system-ui, -apple-system, sans-serif;
     }
-
-    body { background: var(--paper); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color: var(--ink); font-family: var(--font-sans); font-size: 15px; line-height: 1.7; min-height: 100vh; }
-    a { color: var(--ink); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .page { background: var(--paper); min-height: 100vh; max-width: 1100px; margin: 0 auto; padding: 24px 20px 48px; }
-
-    .site-header {
-      position: sticky; top: 0; z-index: 100;
-      background: var(--paper);
-      border-bottom: 1px solid var(--line);
-    }
-    .site-header-inner {
-      max-width: 1200px; margin: 0 auto; padding: 14px 24px;
-      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
-    }
-    .logo { font-family: var(--font-mono); font-size:20px; font-weight: 700; letter-spacing:0; color: var(--ink); }
+    body { line-height: 1.7; }
+    a { color: var(--ink); }
+    .page { padding: 24px 20px 48px; }
     .logo span { color: var(--lobster); }
     .tagline { font-size: 12px; color: var(--muted); }
-    .site-nav { margin-left: auto; font-family: var(--font-mono); font-size:11px; display: flex; gap:6px; align-items: baseline; flex-wrap: wrap; }
-    .site-nav a { color: var(--muted); padding: 5px 10px; border: 1px solid transparent; }
-    .site-nav a:hover { color: var(--ink); border-color: var(--line); background: var(--paper-2); text-decoration: none; }
 
     .content { max-width: 780px; margin: 0 auto; padding: 28px 0 0; }
 

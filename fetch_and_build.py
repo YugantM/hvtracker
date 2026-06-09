@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Fetch GitHub data for tracked agents and render index.html."""
 
+import hashlib
 import json
 import math
 import os
@@ -3659,7 +3660,7 @@ def main() -> None:
             if os.path.isfile(src):
                 shutil.copy2(src, os.path.join(script_dir, asset))
         # Copy tracked static directories that the volume needs to serve
-        for static_dir in ("changelog", ".well-known"):
+        for static_dir in ("changelog", ".well-known", "static"):
             src = os.path.join(base_dir, static_dir)
             if os.path.isdir(src):
                 shutil.copytree(src, os.path.join(script_dir, static_dir), dirs_exist_ok=True)
@@ -4070,25 +4071,36 @@ def main() -> None:
             else:
                 row["pypi_provenance"] = None
 
-        # Load OSSF Scorecard from weekly CLI cache (scorecard-cache.json).
-        # Falls back to API if cache misses, then to None.
-        print("\nLoading OSSF Scorecard from cache...")
+        # Load OSSF Scorecard: prefer CLI cache, but hit the API when the
+        # cache entry is stale (>48h) or missing.
+        print("\nLoading OSSF Scorecard...")
         cache_hits = 0
         api_hits = 0
+        stale_threshold = datetime.now(timezone.utc) - timedelta(hours=48)
         for row in rows:
             repo_key = row["repo"]
             cached = scorecard_cache.get(repo_key)
+            cache_is_fresh = False
             if cached:
+                try:
+                    scanned = datetime.fromisoformat(cached["scanned_at"].replace("Z", "+00:00"))
+                    cache_is_fresh = scanned > stale_threshold
+                except (KeyError, ValueError):
+                    cache_is_fresh = False
+            if cached and cache_is_fresh:
                 row["scorecard_score"] = cached["score"]
                 row["scorecard_checks"] = cached["checks"]
                 cache_hits += 1
             else:
-                # Cache miss — try live API as fallback
                 sc = fetch_scorecard(repo_key)
                 if sc:
                     row["scorecard_score"] = sc["score"]
                     row["scorecard_checks"] = sc["checks"]
                     api_hits += 1
+                elif cached:
+                    row["scorecard_score"] = cached["score"]
+                    row["scorecard_checks"] = cached["checks"]
+                    cache_hits += 1
                 else:
                     row["scorecard_score"] = None
                     row["scorecard_checks"] = {}
@@ -4511,6 +4523,14 @@ def main() -> None:
         loader=FileSystemLoader([templates_dir, base_dir]),
         autoescape=True,
     )
+
+    css_path = os.path.join(base_dir, "static", "site.css")
+    if os.path.isfile(css_path):
+        with open(css_path, "rb") as f:
+            css_hash = hashlib.sha256(f.read()).hexdigest()[:8]
+    else:
+        css_hash = ""
+    env.globals["css_hash"] = css_hash
 
     movers = compute_movers(history, {r["repo"].lower(): r["slug"] for r in rows}, rows=rows)
     movers_page = compute_movers_page_data(rows, history)
