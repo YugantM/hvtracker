@@ -1896,8 +1896,10 @@ def compute_movers(history: list[dict], slug_map: dict[str, str] | None = None, 
         delta = old - a["rank"]  # positive = improved
         if delta != 0:
             current = rows_by_repo.get(repo, {})
+            if not current:
+                continue  # agent removed from roster — skip
             movers.append({"name": a["name"], "slug": (slug_map or {}).get(repo, slugify(a["name"])),
-                           "rank": a["rank"], "delta": delta, "score": a["score"],
+                           "rank": current.get("rank") or a["rank"], "delta": delta, "score": a["score"],
                            "category": current.get("category", ""),
                            "evidence_grade": current.get("evidence_grade", ""),
                            "language": current.get("language", "")})
@@ -2571,6 +2573,8 @@ def compute_movers_page_data(rows: list[dict], history: list[dict]) -> dict:
         if not old:
             continue
         current = current_by_repo.get(repo, {})
+        if not current:
+            continue  # agent removed from roster — skip
         delta = (old.get("rank") or row.get("rank") or 0) - (row.get("rank") or 0)
         if delta == 0:
             continue
@@ -2578,8 +2582,8 @@ def compute_movers_page_data(rows: list[dict], history: list[dict]) -> dict:
             "name": row["name"],
             "slug": row["slug"],
             "repo": row["repo"],
-            "category": row.get("category") or "Uncategorized",
-            "rank": row.get("rank"),
+            "category": current.get("category") or row.get("category") or "Uncategorized",
+            "rank": current.get("rank") or row.get("rank"),
             "old_rank": old.get("rank"),
             "delta": delta,
             "trust_score": row.get("trust_score") or 0,
@@ -2824,7 +2828,8 @@ def derive_agent_events(history_by_date: dict[str, dict[str, dict]], today_agent
 
             # First appearance → listed
             if curr and not prev:
-                repo_events.append(make_agent_event(curr_date, "listed", f"First tracked at rank #{curr.get('rank', '?')}", reason_code="listed"))
+                first_rank = min(curr.get('rank', 0) or 0, len(today_agents) or 999) or '?'
+                repo_events.append(make_agent_event(curr_date, "listed", f"First tracked at rank #{first_rank}", reason_code="listed"))
                 continue
 
             # Disappeared → delisted
@@ -2852,7 +2857,9 @@ def derive_agent_events(history_by_date: dict[str, dict[str, dict]], today_agent
                     repo_events.append(make_agent_event(curr_date, "trust_score_changed", f"HVTrust {direction} {abs(delta_trust):.1f}pts ({prev_trust:.1f} → {curr_trust:.1f})", reason_code=f"trust_score_{direction}"))
 
             # Rank change ≥ 10 positions
+            max_rank = len(today_agents) or 999
             pr, cr = prev.get("rank", 0) or 0, curr.get("rank", 0) or 0
+            pr, cr = min(pr, max_rank), min(cr, max_rank)  # clamp to current roster size
             delta_rank = pr - cr  # positive = improved
             if abs(delta_rank) >= 10:
                 direction = "rose" if delta_rank > 0 else "dropped"
