@@ -2678,6 +2678,67 @@ def build_use_case_pages(rows: list[dict]) -> list[dict]:
     return pages
 
 
+def build_graph(rows: list[dict]) -> dict:
+    """Build a knowledge-graph dict of entities and edges from the ranked rows."""
+    entities: dict[str, dict] = {}
+    edges: list[dict] = []
+
+    providers_seen: dict[str, str] = {}  # display name → slug
+    categories_seen: dict[str, str] = {}
+    orgs_seen: dict[str, str] = {}
+
+    for r in rows:
+        repo = r["repo"]
+        entities[repo] = {
+            "type": "project",
+            "repo": repo,
+            "name": r["name"],
+            "slug": r.get("slug", slugify(r["name"])),
+            "trust_score": r.get("trust_score"),
+            "rank": r.get("rank"),
+        }
+
+        # Providers
+        for pname in r.get("external_service_dependencies", {}).get("providers", []):
+            pslug = slugify(pname)
+            if pslug not in providers_seen:
+                providers_seen[pslug] = pname
+                entities[f"provider/{pslug}"] = {"type": "provider", "slug": pslug, "name": pname}
+            edges.append({"src": repo, "rel": "USES_PROVIDER", "dst": f"provider/{pslug}"})
+
+        # Category
+        cat = r.get("category")
+        if cat:
+            cslug = slugify(cat)
+            if cslug not in categories_seen:
+                categories_seen[cslug] = cat
+                entities[f"category/{cslug}"] = {"type": "category", "slug": cslug, "name": cat}
+            edges.append({"src": repo, "rel": "IN_CATEGORY", "dst": f"category/{cslug}"})
+
+        # Org
+        org = repo.split("/")[0]
+        if org not in orgs_seen:
+            orgs_seen[org] = org
+            entities[f"org/{org}"] = {"type": "org", "slug": org, "name": org}
+        edges.append({"src": repo, "rel": "OWNED_BY", "dst": f"org/{org}"})
+
+        # MCP support
+        mcp_status = r.get("mcp_server_support", {}).get("status")
+        if mcp_status in ("declared", "verified"):
+            edges.append({"src": repo, "rel": "SUPPORTS_MCP", "dst": "mcp"})
+
+        # Provenance
+        if r.get("has_provenance"):
+            edges.append({"src": repo, "rel": "HAS_PROVENANCE", "dst": "provenance"})
+
+    return {
+        "schema_version": 1,
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "entities": entities,
+        "edges": edges,
+    }
+
+
 def render_event_timeline_svg(events: list[dict]) -> str:
     """Render a compact distribution of recent reputation events."""
     if not events:
@@ -4424,13 +4485,33 @@ def main() -> None:
         json.dump(data_output, f, indent=2, ensure_ascii=False)
     print(f"\nWrote data.json with {len(rows)} agents.")
 
+    # Write data/graph.json (knowledge graph render artifact)
+    graph = build_graph(rows)
+    graph_path = os.path.join(script_dir, "data", "graph.json")
+    with open(graph_path, "w", encoding="utf-8") as f:
+        json.dump(graph, f, separators=(",", ":"), ensure_ascii=False)
+    print(f"Wrote graph.json with {len(graph['entities'])} entities, {len(graph['edges'])} edges.")
+
     # Historical snapshots enable trend analysis and are core IP — never delete these files.
     history_dir = os.path.join(script_dir, "output", "history")
     os.makedirs(history_dir, exist_ok=True)
     today_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     history_path = os.path.join(history_dir, f"{today_utc}.json")
+    # Task 5.2: graph_summary in history snapshots
+    provider_counts: dict[str, int] = {}
+    for e in graph["edges"]:
+        if e["rel"] == "USES_PROVIDER":
+            pslug = e["dst"].removeprefix("provider/")
+            provider_counts[pslug] = provider_counts.get(pslug, 0) + 1
+    graph_summary = {
+        "providers": provider_counts,
+        "mcp_count": sum(1 for e in graph["edges"] if e["rel"] == "SUPPORTS_MCP"),
+        "provenance_count": sum(1 for e in graph["edges"] if e["rel"] == "HAS_PROVENANCE"),
+        "org_count": sum(1 for v in graph["entities"].values() if v["type"] == "org"),
+    }
+    snapshot_output = {**data_output, "graph_summary": graph_summary}
     with open(history_path, "w", encoding="utf-8") as f:
-        json.dump(data_output, f, indent=2, ensure_ascii=False)
+        json.dump(snapshot_output, f, indent=2, ensure_ascii=False)
     print(f"Wrote history snapshot {history_path}.")
     if storage.put_file(f"history/{today_utc}.json", history_path, "application/json"):
         print(f"Archived history snapshot to bucket: history/{today_utc}.json")
