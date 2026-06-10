@@ -27,6 +27,7 @@ SAMPLES = [
     "blog/index.html",
     "roadmap/index.html",
     "badges/index.html",
+    "changes/index.html",
 ]
 
 

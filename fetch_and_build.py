@@ -1949,6 +1949,79 @@ def compute_newly_added(rows: list[dict], history: list[dict], limit: int | None
     return added if limit is None else added[:limit]
 
 
+def compute_weekly_changes(history: list[dict]) -> dict:
+    """Diff newest snapshot against the one ~7 days older (or oldest if <7 days)."""
+    if len(history) < 2:
+        return {"latest_date": "", "baseline_date": "", "newly_listed": [],
+                "trust_up": [], "trust_down": [], "provenance_gained": [], "mcp_gained": []}
+
+    latest = history[-1]
+    target_idx = 0
+    for i, snap in enumerate(history):
+        if snap["_date"] <= latest["_date"]:
+            target_idx = i
+            break
+    for i, snap in enumerate(history[:-1]):
+        if (datetime.strptime(latest["_date"], "%Y-%m-%d") -
+                datetime.strptime(snap["_date"], "%Y-%m-%d")).days >= 7:
+            target_idx = i
+    baseline = history[target_idx]
+
+    old_by_repo = {a["repo"].lower(): a for a in baseline.get("agents", [])}
+    new_by_repo = {a["repo"].lower(): a for a in latest.get("agents", [])}
+
+    newly_listed = []
+    trust_up, trust_down = [], []
+    provenance_gained, mcp_gained = [], []
+
+    for repo, agent in new_by_repo.items():
+        old = old_by_repo.get(repo)
+        slug = agent.get("slug", "")
+        name = agent.get("name", "")
+        category = agent.get("category", "")
+
+        if old is None:
+            newly_listed.append({"name": name, "slug": slug, "category": category,
+                                 "trust_score": agent.get("trust_score", 0)})
+            continue
+
+        old_ts = old.get("trust_score") or 0
+        new_ts = agent.get("trust_score") or 0
+        delta = round(new_ts - old_ts, 1)
+        if abs(delta) >= 3:
+            entry = {"name": name, "slug": slug, "old_score": old_ts,
+                     "new_score": new_ts, "delta": delta}
+            if delta > 0:
+                trust_up.append(entry)
+            else:
+                trust_down.append(entry)
+
+        old_prov = old.get("has_provenance", False)
+        new_prov = agent.get("has_provenance", False)
+        if new_prov and not old_prov:
+            provenance_gained.append({"name": name, "slug": slug, "category": category})
+
+        old_mcp = (old.get("mcp_server_support") or {}).get("status", "none")
+        new_mcp = (agent.get("mcp_server_support") or {}).get("status", "none")
+        if new_mcp in ("implemented", "declared") and old_mcp == "none":
+            mcp_gained.append({"name": name, "slug": slug, "category": category,
+                               "mcp_status": new_mcp})
+
+    trust_up.sort(key=lambda x: x["delta"], reverse=True)
+    trust_down.sort(key=lambda x: x["delta"])
+    newly_listed.sort(key=lambda x: x.get("trust_score", 0), reverse=True)
+
+    return {
+        "latest_date": latest["_date"],
+        "baseline_date": baseline["_date"],
+        "newly_listed": newly_listed,
+        "trust_up": trust_up,
+        "trust_down": trust_down,
+        "provenance_gained": provenance_gained,
+        "mcp_gained": mcp_gained,
+    }
+
+
 def compute_sparklines(history: list[dict]) -> dict[str, list[dict]]:
     """Build per-agent rank history for sparkline rendering.
     Returns {repo_lower: [{date, rank, score}, ...]}."""
@@ -3146,6 +3219,7 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
         <a href="/movers/">Movers</a>
+        <a href="/changes/">Changes</a>
         <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
         <a href="/compare/">Compare</a>
@@ -4763,6 +4837,50 @@ def main() -> None:
         ))
     print("Built movers page under movers/.")
 
+    # Changes page — /changes/ weekly diff + RSS feed.
+    weekly = compute_weekly_changes(history)
+    changes_tmpl = env.get_template("changes.html.j2")
+    changes_dir = os.path.join(script_dir, "changes")
+    os.makedirs(changes_dir, exist_ok=True)
+    with open(os.path.join(changes_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(changes_tmpl.render(updated=now_str, **weekly))
+
+    rss_items = []
+    base = "https://hvtracker.net/changes/"
+    pub_date = weekly["latest_date"]
+    sections = [
+        ("Newly Listed Projects", weekly["newly_listed"]),
+        ("Trust Score Up", weekly["trust_up"]),
+        ("Trust Score Down", weekly["trust_down"]),
+        ("Provenance Gained", weekly["provenance_gained"]),
+        ("MCP Support Gained", weekly["mcp_gained"]),
+    ]
+    for title, items in sections:
+        if items:
+            names = ", ".join(i["name"] for i in items[:10])
+            rss_items.append(
+                f"    <item>\n"
+                f"      <title>{title} ({len(items)}) — {pub_date}</title>\n"
+                f"      <link>{base}</link>\n"
+                f"      <description>{names}</description>\n"
+                f"      <pubDate>{pub_date}</pubDate>\n"
+                f"    </item>"
+            )
+    rss_xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<rss version="2.0">\n'
+        '  <channel>\n'
+        '    <title>HVTracker Weekly Changes</title>\n'
+        f'    <link>{base}</link>\n'
+        '    <description>Weekly diff of the HVTracker AI agent registry.</description>\n'
+        + "\n".join(rss_items) + "\n"
+        '  </channel>\n'
+        '</rss>\n'
+    )
+    with open(os.path.join(changes_dir, "feed.xml"), "w", encoding="utf-8") as f:
+        f.write(rss_xml)
+    print("Built changes page and RSS feed under changes/.")
+
     # Use-case landing pages — /use-cases/ and /use-cases/<slug>/.
     use_case_tmpl = env.get_template("use_case.html.j2")
     use_cases_dir = os.path.join(script_dir, "use-cases")
@@ -5000,6 +5118,7 @@ def main() -> None:
         ("https://hvtracker.net/", "1.0", "daily"),
         ("https://hvtracker.net/methodology", "0.5", "monthly"),
         ("https://hvtracker.net/movers/", "0.8", "daily"),
+        ("https://hvtracker.net/changes/", "0.8", "weekly"),
         ("https://hvtracker.net/use-cases/", "0.8", "daily"),
         ("https://hvtracker.net/badges/", "0.6", "weekly"),
         ("https://hvtracker.net/roadmap/", "0.5", "weekly"),
