@@ -2,17 +2,25 @@
 import json
 import os
 
+import pytest
+
 import fetch_and_build as fb
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_JSON = os.path.join(ROOT, "data.json")
+
+_needs_data_json = pytest.mark.skipif(
+    not os.path.isfile(DATA_JSON),
+    reason="data.json not present (generated at runtime)",
+)
 
 
 def _load_rows():
-    data_path = os.path.join(ROOT, "data.json")
-    with open(data_path) as f:
+    with open(DATA_JSON) as f:
         return json.load(f)["agents"]
 
 
+@_needs_data_json
 def test_build_graph_entity_and_edge_counts():
     rows = _load_rows()
     g = fb.build_graph(rows)
@@ -22,6 +30,7 @@ def test_build_graph_entity_and_edge_counts():
     assert len(providers) > 10
 
 
+@_needs_data_json
 def test_build_graph_edge_src_exists_in_entities():
     rows = _load_rows()
     g = fb.build_graph(rows)
@@ -30,6 +39,7 @@ def test_build_graph_edge_src_exists_in_entities():
         assert edge["src"] in entity_keys, f"edge src {edge['src']} missing from entities"
 
 
+@_needs_data_json
 def test_anthropic_provider_edges():
     rows = _load_rows()
     g = fb.build_graph(rows)
