@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Changes — AI Agent Trust Moves | HVTracker</title>
+  <meta name="description" content="Weekly diff of the HVTracker AI agent registry: new listings, trust-score moves, provenance and MCP changes.">
+  <link rel="canonical" href="https://hvtracker.net/changes/">
+  <link rel="alternate" type="application/rss+xml" title="HVTracker Weekly Changes" href="https://hvtracker.net/changes/feed.xml">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Weekly Changes | HVTracker">
+  <meta property="og:description" content="Weekly diff of trust scores, new listings, provenance, and MCP changes across open-source AI agents.">
+  <meta property="og:url" content="https://hvtracker.net/changes/">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Weekly Changes | HVTracker">
+  <meta name="twitter:description" content="Weekly diff of trust scores, new listings, provenance, and MCP changes across open-source AI agents.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--paper:#f4f1eb;--paper-2:#ece4d6;--ink:#1f1b17;--muted:#6f665d;--line:#d5cbbc;--line-strong:#b9aa96;--blue:#a7bfd9;--blue-strong:#7f9cbd;--blue-soft:rgba(167,191,217,.18);--lobster:#c67c6d;--lobster-soft:rgba(198,124,109,.14);--moss:#6f876e;--green:#2f6846;--red:#9b3c3c;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}
+    body{min-height:100vh;background:var(--paper);background-image:url("/hex-bg.svg");background-size:2000px 2000px;color:var(--ink);font:15px/1.65 var(--font-sans)}
+    a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}
+    .page{background:var(--paper);max-width:960px;margin:0 auto;padding:24px 24px 40px}
+    .site-header{position:sticky;top:0;z-index:100;background:var(--paper);border-bottom:1px solid var(--line-strong)}
+    .site-header-inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+    .logo{font-family:var(--font-mono);font-weight:700;font-size:20px}.logo span{color:var(--lobster)}
+    nav{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;font:11px var(--font-mono)}
+    .site-nav a{color:var(--muted);padding:5px 10px;border:1px solid transparent}
+    .site-nav a:hover{color:var(--ink);border-color:var(--line);background:var(--paper-2);text-decoration:none}
+    .hero{padding:24px 0 16px;border-bottom:1px solid var(--line)}
+    h1{font-size:26px;font-weight:700;margin-bottom:6px}.hero p{color:var(--muted);font-size:14px;max-width:680px}
+    .meta{font:11px var(--font-mono);color:var(--muted);margin-top:10px}
+    h2{font-size:16px;font-weight:700;margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+    .section-panel{background:var(--paper-2);border-top:2px solid var(--line-strong);padding:12px;margin-bottom:16px}
+    .change-item{display:grid;grid-template-columns:minmax(0,1fr) 80px;gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line)}
+    .change-item:last-child{border-bottom:none}
+    .name{font-weight:600;font-size:13px}
+    .sub{display:block;color:var(--muted);font:11px var(--font-mono);margin-top:2px}
+    .delta{font:700 13px var(--font-mono);text-align:right}
+    .delta-up{color:var(--green)}.delta-down{color:var(--lobster)}
+    .empty{color:var(--muted);font-style:italic;padding:12px 0}
+    footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font:11px var(--font-mono);color:var(--muted);text-align:center}
+    footer a{color:var(--blue-strong)}
+    @media(max-width:760px){h1{font-size:18px}nav{margin-left:0}}
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Changes" }
+    ]
+  }
+  </script>
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="changes">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/changes/">Changes</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
+      </nav>
+    </div>
+  </header>
+  <div class="page">
+
+    <section class="hero">
+      <h1>Weekly Changes</h1>
+      <p>What moved in the HVTracker registry over the past week: new listings, trust-score shifts, provenance and MCP status changes.</p>
+      <div class="meta">{{ latest_date }} vs {{ baseline_date }} &middot; Updated {{ updated }}</div>
+    </section>
+
+    <h2>Newly Listed Projects ({{ newly_listed|length }})</h2>
+    <div class="section-panel">
+      {% if newly_listed %}
+      {% for item in newly_listed %}
+      <div class="change-item">
+        <span>
+          <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
+          <span class="sub">{{ item.category }} &middot; HVTrust {{ item.trust_score }}</span>
+        </span>
+        <span class="delta">NEW</span>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="empty">No new listings this period.</div>
+      {% endif %}
+    </div>
+
+    <h2>Trust Score Up ({{ trust_up|length }})</h2>
+    <div class="section-panel">
+      {% if trust_up %}
+      {% for item in trust_up %}
+      <div class="change-item">
+        <span>
+          <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
+          <span class="sub">{{ item.old_score }} &rarr; {{ item.new_score }}</span>
+        </span>
+        <span class="delta delta-up">+{{ item.delta }}</span>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="empty">No trust score increases &ge;3 this period.</div>
+      {% endif %}
+    </div>
+
+    <h2>Trust Score Down ({{ trust_down|length }})</h2>
+    <div class="section-panel">
+      {% if trust_down %}
+      {% for item in trust_down %}
+      <div class="change-item">
+        <span>
+          <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
+          <span class="sub">{{ item.old_score }} &rarr; {{ item.new_score }}</span>
+        </span>
+        <span class="delta delta-down">{{ item.delta }}</span>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="empty">No trust score decreases &ge;3 this period.</div>
+      {% endif %}
+    </div>
+
+    <h2>Provenance Gained ({{ provenance_gained|length }})</h2>
+    <div class="section-panel">
+      {% if provenance_gained %}
+      {% for item in provenance_gained %}
+      <div class="change-item">
+        <span>
+          <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
+          <span class="sub">{{ item.category }}</span>
+        </span>
+        <span class="delta delta-up">+prov</span>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="empty">No provenance changes this period.</div>
+      {% endif %}
+    </div>
+
+    <h2>MCP Support Gained ({{ mcp_gained|length }})</h2>
+    <div class="section-panel">
+      {% if mcp_gained %}
+      {% for item in mcp_gained %}
+      <div class="change-item">
+        <span>
+          <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
+          <span class="sub">{{ item.category }} &middot; {{ item.mcp_status }}</span>
+        </span>
+        <span class="delta delta-up">+mcp</span>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="empty">No MCP status changes this period.</div>
+      {% endif %}
+    </div>
+
+    <footer>
+      <a href="/changes/feed.xml">RSS Feed</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>
