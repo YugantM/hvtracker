@@ -135,6 +135,7 @@ a:hover { text-decoration: underline; }
 .site-nav a:hover { color: var(--text); text-decoration: none; border-color: var(--border); background: var(--surface); }
 
 .evidence-badge { display: inline-block; font-family: var(--font-mono); font-size: 9px; font-weight: 700; width: 20px; text-align: center; padding: 1px 0; border-radius: 3px; letter-spacing: .02em; }
+.badge { display: inline-block; font-family: var(--font-mono); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; letter-spacing: .02em; }
 .grade-A { color: #fff; background: var(--green); }
 .grade-B { color: #fff; background: var(--accent); }
 .grade-C { color: #fff; background: var(--amber); }
