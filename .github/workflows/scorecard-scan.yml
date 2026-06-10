@@ -2,8 +2,8 @@ name: Scorecard scan
 
 on:
   schedule:
-    # Every Wednesday at 04:00 UTC (different day from daily cron at Mon-Sun 06:00)
-    - cron: "0 4 * * 3"
+    # Every other day at 04:00 UTC (Sun/Tue/Thu/Sat)
+    - cron: "0 4 * * 0,2,4,6"
   workflow_dispatch:
 
 permissions:
@@ -38,15 +38,26 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         run: python scan_scorecards.py
 
-      - name: Commit and push scorecard cache
+      - name: Commit and push scorecard cache to data branch
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp scorecard-cache.json /tmp/scorecard-cache.json
+
+          # Switch to orphan data branch (create if missing)
+          if git fetch origin data 2>/dev/null; then
+            git checkout data
+          else
+            git checkout --orphan data
+            git rm -rf . 2>/dev/null || true
+          fi
+
+          cp /tmp/scorecard-cache.json scorecard-cache.json
           git add scorecard-cache.json
           if git diff --cached --quiet; then
             echo "No changes to scorecard cache."
           else
             git commit -m "chore: update scorecard cache $(date -u '+%Y-%m-%d')"
-            git pull --rebase origin main || true
-            git push
+            git push origin data
           fi

@@ -10,46 +10,17 @@
   <meta property="og:title" content="{{ spec.title }}">
   <meta property="og:description" content="{{ spec.abstract[:160] }}">
   <meta property="og:url" content="https://hvtracker.net/spec/{{ spec.slug }}/{{ spec.version }}">
+  <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --paper:#f4f1eb; --paper-2:#ece4d6; --ink:#1f1b17; --muted:#6f665d;
-      --line:#d5cbbc; --line-strong:#b9aa96; --blue-strong:#7f9cbd; --blue-soft:rgba(167,191,217,0.18);
-      --lobster:#c67c6d; --moss:#6f876e; --stale:#8d887e;
       --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
       --font-sans:"Inter",system-ui,-apple-system,sans-serif;
       --font-serif:"Georgia","Times New Roman",serif;
     }
-
-    body {
-      background: var(--paper);
-      background-image: url("/hex-bg.svg");
-      background-size: 2000px 2000px;
-      color: var(--ink);
-      font-family: var(--font-sans);
-      font-size: 15px;
-      line-height: 1.7;
-      min-height: 100vh;
-    }
-
-    a { color: var(--lobster); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .page { max-width: 1100px; margin: 0 auto; padding: 24px 20px 0; background: var(--paper); min-height: 100vh; }
-    .site-header {
-      position: sticky; top: 0; z-index: 100;
-      background: var(--paper);
-      border-bottom: 1px solid var(--line-strong);
-    }
-    .site-header-inner {
-      max-width: 1200px; margin: 0 auto; padding: 14px 20px;
-      display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap;
-    }
-    .logo { font-family: var(--font-mono); font-size:20px; font-weight: 700; letter-spacing:0; color: var(--ink); }
+    body { line-height: 1.7; }
+    a { color: var(--lobster); }
+    .page { padding: 24px 20px 0; }
     .logo span { color: var(--lobster); }
-    .site-nav { margin-left: auto; font-family: var(--font-mono); font-size:11px; display: flex; gap:6px; align-items: baseline; flex-wrap: wrap; }
-    .site-nav a { color: var(--muted); padding: 5px 10px; border: 1px solid transparent; }
-    .site-nav a:hover { color: var(--ink); border-color: var(--line); background: var(--paper-2); text-decoration: none; }
     .spec-layout {
       display: grid;
       grid-template-columns: 220px 1fr;

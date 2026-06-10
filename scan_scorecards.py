@@ -30,7 +30,7 @@ import time
 from datetime import datetime, timezone
 
 CACHE_PATH = "scorecard-cache.json"
-SLEEP_BETWEEN = 5  # seconds between scans — rate limit courtesy
+SLEEP_BETWEEN = 1  # seconds between scans — burst throttle courtesy
 
 
 def find_scorecard_bin() -> str:
@@ -75,11 +75,33 @@ def main() -> None:
     bin_path = find_scorecard_bin()
 
     with open("agents.json") as f:
-        agents = json.load(f)
+        agents = [a for a in json.load(f) if a.get("listing_status") == "listed"]
+
+    # Optional: scan a single repo via --repo owner/name
+    single_repo = None
+    for arg in sys.argv[1:]:
+        if arg.startswith("--repo="):
+            single_repo = arg.split("=", 1)[1]
+        elif arg == "--repo" and sys.argv.index(arg) + 1 < len(sys.argv):
+            single_repo = sys.argv[sys.argv.index(arg) + 1]
+
+    if single_repo:
+        agents = [a for a in agents if a["repo"].lower() == single_repo.lower()]
+        if not agents:
+            sys.exit(f"ERROR: repo '{single_repo}' not found in agents.json")
 
     total = len(agents)
     results: dict[str, dict] = {}
     successes = 0
+
+    # Load existing cache so single-repo runs merge into it
+    existing: dict[str, dict] = {}
+    if os.path.isfile(CACHE_PATH):
+        try:
+            with open(CACHE_PATH) as f:
+                existing = json.load(f).get("agents", {})
+        except (json.JSONDecodeError, OSError):
+            pass
 
     run_start = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     print(f"Scorecard scan started at {run_start} — {total} repos\n")
@@ -99,10 +121,11 @@ def main() -> None:
         else:
             print("FAILED — skipped")
 
-        if i < total:
+        if i < total and not single_repo:
             time.sleep(SLEEP_BETWEEN)
 
-    cache = {"scanned_at": run_start, "agents": results}
+    merged = {**existing, **results}
+    cache = {"scanned_at": run_start, "agents": merged}
     with open(CACHE_PATH, "w") as f:
         json.dump(cache, f, indent=2)
 
