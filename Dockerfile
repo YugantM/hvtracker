@@ -33,11 +33,14 @@ COPY output/history/ /app/seed/history/
 # arrives (Railway keeps the old deployment live until healthcheck passes).
 RUN OUTPUT_DIR=/app/prebuilt python fetch_and_build.py --render-only
 
-# Non-root user for runtime
-RUN groupadd -r hvt && useradd -r -g hvt -d /app -s /sbin/nologin hvt \
+# Non-root user for runtime — gosu lets the entrypoint chown the volume
+# (which may have root-owned files from a prior image) then drop to hvt.
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends gosu && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r hvt && useradd -r -g hvt -d /app -s /sbin/nologin hvt \
     && mkdir -p /data/site \
     && chown -R hvt:hvt /app /data
-USER hvt
+
+COPY entrypoint.sh /app/entrypoint.sh
 
 ENV OUTPUT_DIR=/data/site
 EXPOSE 8080
@@ -45,5 +48,4 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz')"]
 
-# Generated site + state live on the volume mounted at /data, never in git.
-CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8080}"]
+ENTRYPOINT ["/app/entrypoint.sh"]
