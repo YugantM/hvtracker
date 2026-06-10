@@ -23,6 +23,9 @@ def client():
     os.makedirs(os.path.join(tmp, "output", "history"), exist_ok=True)
     shutil.copy(os.path.join(ROOT, "data", "render_state.json"),
                 os.path.join(tmp, "data", "render_state.json"))
+    graph_src = os.path.join(ROOT, "data", "graph.json")
+    if os.path.isfile(graph_src):
+        shutil.copy(graph_src, os.path.join(tmp, "data", "graph.json"))
     for h in glob.glob(os.path.join(ROOT, "output", "history", "*.json")):
         shutil.copy(h, os.path.join(tmp, "output", "history", os.path.basename(h)))
 
@@ -124,6 +127,25 @@ def test_growth_post_routes_fail_gracefully_without_db(client):
     ):
         r = client.post(path, data=payload)
         assert r.status_code == 503
+
+
+def test_api_v1_agents(client):
+    r = client.get("/api/v1/agents")
+    assert r.status_code == 200
+    assert r.headers["content-type"] == "application/json"
+    assert r.headers["access-control-allow-origin"] == "*"
+    assert "max-age=900" in r.headers["cache-control"]
+    data = r.json()
+    assert "agents" in data
+
+
+def test_api_v1_graph(client):
+    r = client.get("/api/v1/graph")
+    assert r.status_code == 200
+    assert r.headers["content-type"] == "application/json"
+    assert r.headers["access-control-allow-origin"] == "*"
+    assert "max-age=900" in r.headers["cache-control"]
+    assert isinstance(r.json(), (dict, list))
 
 
 def test_startup_keeps_scheduler_alive(monkeypatch):

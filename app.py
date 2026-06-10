@@ -190,6 +190,35 @@ def api_feed():
         return JSONResponse(json.load(f))
 
 
+_API_V1_CACHE = "public, max-age=900"
+_API_V1_CORS = "*"
+
+
+@app.get("/api/v1/graph")
+def api_v1_graph():
+    path = os.path.join(OUTPUT_DIR, "data", "graph.json")
+    if not os.path.isfile(path):
+        return JSONResponse({"error": "graph not built yet"}, status_code=503)
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    return JSONResponse(data, headers={
+        "Cache-Control": _API_V1_CACHE,
+        "Access-Control-Allow-Origin": _API_V1_CORS,
+    })
+
+
+@app.get("/api/v1/agents")
+def api_v1_agents():
+    if not os.path.isfile(DATA_PATH):
+        return JSONResponse({"error": "data not built yet"}, status_code=503)
+    with open(DATA_PATH, encoding="utf-8") as f:
+        data = json.load(f)
+    return JSONResponse(data, headers={
+        "Cache-Control": _API_V1_CACHE,
+        "Access-Control-Allow-Origin": _API_V1_CORS,
+    })
+
+
 @app.api_route("/compare", methods=["GET", "HEAD"], response_class=HTMLResponse)
 @app.api_route("/compare/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 def compare_tool():
@@ -829,6 +858,7 @@ def data_api_page():
           <li>Free leaderboard browsing</li>
           <li>Public JSON snapshot</li>
           <li>Open methodology and specs</li>
+          <li>Read-only REST API (v1)</li>
         </ul>
       </div>
       <div class='card'>
@@ -840,6 +870,21 @@ def data_api_page():
           <li>Watchlists, alerts, and shared team usage</li>
         </ul>
       </div>
+    </div>
+    <div class='card'>
+      <h2>REST API v1</h2>
+      <p>Two read-only endpoints are available now, no auth required. CORS-enabled for browser use.</p>
+      <div class='card' style='margin-top:12px'>
+        <h2 style='font-family:var(--font-mono);font-size:13px'><code>GET /api/v1/agents</code></h2>
+        <p>Full agent leaderboard with trust scores, evidence grades, and metadata.</p>
+        <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>curl -s https://hvtracker.net/api/v1/agents | python -m json.tool | head</code></pre>
+      </div>
+      <div class='card' style='margin-top:12px'>
+        <h2 style='font-family:var(--font-mono);font-size:13px'><code>GET /api/v1/graph</code></h2>
+        <p>Dependency and ecosystem graph data for all tracked agents.</p>
+        <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>curl -s https://hvtracker.net/api/v1/graph | python -m json.tool | head</code></pre>
+      </div>
+      <p style='margin-top:12px;color:var(--muted);font-size:13px'>Auth and rate quotas for a paid tier are intentionally out of scope for now.</p>
     </div>
     <div class='card'>
       <h2>Early pricing stub</h2>
