@@ -4528,7 +4528,9 @@ def main() -> None:
         json.dump(graph, f, separators=(",", ":"), ensure_ascii=False)
     print(f"Wrote graph.json with {len(graph['entities'])} entities, {len(graph['edges'])} edges.")
 
-    # Historical snapshots enable trend analysis and are core IP — never delete these files.
+    # DO NOT PRUNE — history snapshots are an append-only dataset used for
+    # trend analysis, movers, and the /changes/ page.  Only today's file is
+    # (over)written; older files must never be deleted or rotated.
     history_dir = os.path.join(script_dir, "output", "history")
     os.makedirs(history_dir, exist_ok=True)
     today_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d")
