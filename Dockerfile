@@ -10,8 +10,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app.py fetch_and_build.py generate_og_card.py specs.py db.py cache.py storage.py schema.sql ./
 # Generator inputs: curated seed, scorecard cache, and templates/assets
 COPY agents.json scorecard-cache.json template.html ./
+# Try fetching the latest scorecard cache from the data branch (falls back to COPY'd seed)
+RUN curl -sfL https://raw.githubusercontent.com/YugantM/hvtracker/data/scorecard-cache.json -o /tmp/sc.json \
+    && mv /tmp/sc.json scorecard-cache.json \
+    || echo "Using seed scorecard-cache.json (data branch fetch failed)"
 COPY templates/ templates/
 COPY compare/index.html compare/index.html
+COPY static/ static/
 COPY blog_static/ blog_static/
 COPY changelog/ changelog/
 COPY .well-known/ .well-known/
@@ -23,8 +28,24 @@ COPY data/render_state.json data/render_state.json
 # Needed so rank-deltas, sparklines, and movers have prior days to compare against.
 COPY output/history/ /app/seed/history/
 
+# Pre-render the static site at build time so deploys serve fresh HTML
+# immediately — the persistent volume is updated on startup before traffic
+# arrives (Railway keeps the old deployment live until healthcheck passes).
+RUN OUTPUT_DIR=/app/prebuilt python fetch_and_build.py --render-only
+
+# Non-root user for runtime — gosu lets the entrypoint chown the volume
+# (which may have root-owned files from a prior image) then drop to hvt.
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends gosu && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r hvt && useradd -r -g hvt -d /app -s /sbin/nologin hvt \
+    && mkdir -p /data/site \
+    && chown -R hvt:hvt /app /data
+
+COPY entrypoint.sh /app/entrypoint.sh
+
 ENV OUTPUT_DIR=/data/site
 EXPOSE 8080
 
-# Generated site + state live on the volume mounted at /data, never in git.
-CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8080}"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz')"]
+
+ENTRYPOINT ["/app/entrypoint.sh"]

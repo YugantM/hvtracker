@@ -8,9 +8,11 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import threading
 import hashlib
 import time
+from collections import deque
 from html import escape
 
 from fastapi import FastAPI, Form, Request
@@ -19,8 +21,62 @@ from fastapi.staticfiles import StaticFiles
 
 import db
 
+
+# ---- anti-spam helpers -----------------------------------------------------
+
+_RATE_WINDOW = 600  # 10 minutes
+_RATE_LIMIT = 5
+_rate_log: dict[str, deque] = {}
+_rate_lock = threading.Lock()
+
+
+def _client_ip(request: Request) -> str:
+    return (
+        request.headers.get("cf-connecting-ip")
+        or request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+        or (request.client.host if request.client else "unknown")
+    )
+
+
+def _is_rate_limited(request: Request) -> bool:
+    ip = _client_ip(request)
+    now = time.monotonic()
+    with _rate_lock:
+        q = _rate_log.setdefault(ip, deque())
+        while q and q[0] < now - _RATE_WINDOW:
+            q.popleft()
+        if len(q) >= _RATE_LIMIT:
+            return True
+        q.append(now)
+    return False
+
+
+_EMAIL_RE = re.compile(r".+@.+\..+")
+
+_FIELD_LIMITS = {
+    "repo": 200,
+    "name": 120,
+    "email": 254,
+    "contact": 254,
+    "message": 4000,
+    "notes": 4000,
+}
+_DEFAULT_LIMIT = 500
+
+
+def _check_field_lengths(**fields: str) -> str | None:
+    for name, value in fields.items():
+        limit = _FIELD_LIMITS.get(name, _DEFAULT_LIMIT)
+        if len(value) > limit:
+            return f"{name} exceeds the {limit}-character limit."
+    return None
+
+
+HONEYPOT_HTML = '<div style="position:absolute;left:-9999px;top:-9999px" aria-hidden="true"><label>Leave blank<input name="website" autocomplete="off" tabindex="-1"></label></div>'
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.environ.get("OUTPUT_DIR", BASE_DIR)
+PREBUILT_DIR = os.path.join(BASE_DIR, "prebuilt")
 os.makedirs(OUTPUT_DIR, exist_ok=True)  # volume subdir may not exist on first boot
 DATA_PATH = os.path.join(OUTPUT_DIR, "data.json")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
@@ -44,12 +100,29 @@ _HTML_CACHE = "public, max-age=300, s-maxage=900, stale-while-revalidate=86400"
 _JSON_CACHE = "public, max-age=600, s-maxage=1800, stale-while-revalidate=86400"
 
 
+_CSP = (
+    "default-src 'self'; "
+    "style-src 'self' 'unsafe-inline'; "
+    "font-src 'self'; "
+    "script-src 'self' 'unsafe-inline'; "
+    "img-src 'self' data:"
+)
+
+
 @app.middleware("http")
 async def _cache_headers(request, call_next):
     response = await call_next(request)
+    path = request.url.path
+
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["Content-Security-Policy-Report-Only"] = _CSP
+    if not path.startswith("/badge/"):
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
+
     if response.status_code != 200 or "cache-control" in {k.lower() for k in response.headers}:
         return response
-    path = request.url.path
     if path.startswith("/data/") and path.endswith(".json"):
         response.headers["Cache-Control"] = _JSON_CACHE
     elif path.endswith("/") or path.endswith(".html"):
@@ -190,6 +263,35 @@ def api_feed():
         return JSONResponse(json.load(f))
 
 
+_API_V1_CACHE = "public, max-age=900"
+_API_V1_CORS = "*"
+
+
+@app.get("/api/v1/graph")
+def api_v1_graph():
+    path = os.path.join(OUTPUT_DIR, "data", "graph.json")
+    if not os.path.isfile(path):
+        return JSONResponse({"error": "graph not built yet"}, status_code=503)
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    return JSONResponse(data, headers={
+        "Cache-Control": _API_V1_CACHE,
+        "Access-Control-Allow-Origin": _API_V1_CORS,
+    })
+
+
+@app.get("/api/v1/agents")
+def api_v1_agents():
+    if not os.path.isfile(DATA_PATH):
+        return JSONResponse({"error": "data not built yet"}, status_code=503)
+    with open(DATA_PATH, encoding="utf-8") as f:
+        data = json.load(f)
+    return JSONResponse(data, headers={
+        "Cache-Control": _API_V1_CACHE,
+        "Access-Control-Allow-Origin": _API_V1_CORS,
+    })
+
+
 @app.api_route("/compare", methods=["GET", "HEAD"], response_class=HTMLResponse)
 @app.api_route("/compare/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 def compare_tool():
@@ -322,9 +424,7 @@ def _marketing_page(
   <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
   <meta name="twitter:image:alt" content="HVTracker AI trust registry preview">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <link rel="stylesheet" href="/static/site.css">
   <style>
     :root {{
       --paper:#f4f1eb; --paper-2:#ece4d6; --ink:#1f1b17; --muted:#6f665d;
@@ -535,6 +635,7 @@ def submit_form():
         <label>Contact email (optional)
           <input name='contact' type='email' placeholder='you@example.com'>
         </label>
+        """ + HONEYPOT_HTML + """
         <div class='actions'>
           <button class='button' type='submit'>Submit for review</button>
         </div>
@@ -553,8 +654,30 @@ def submit_form():
 
 @app.post("/submit", response_class=HTMLResponse)
 @app.post("/submit/", response_class=HTMLResponse, include_in_schema=False)
-def submit_post(repo: str = Form(...), name: str = Form(...),
-                category: str = Form(""), contact: str = Form("")):
+def submit_post(request: Request, repo: str = Form(...), name: str = Form(...),
+                category: str = Form(""), contact: str = Form(""),
+                website: str = Form("")):
+    if website:
+        return HTMLResponse(
+            _marketing_page("Submission received — HVTracker", "Submission saved", "Your project is queued for review.",
+                "<div class='card'><p class='ok'>Thanks. The submission is in the review queue.</p></div>",
+                path="/submit/"))
+    if _is_rate_limited(request):
+        return HTMLResponse(
+            _marketing_page("Too many requests — HVTracker", "Slow down", "Please wait before submitting again.",
+                "<div class='card'><p>Too many submissions from this address. Try again in a few minutes.</p></div>",
+                path="/submit/"), status_code=429)
+    over = _check_field_lengths(repo=repo, name=name, category=category, contact=contact)
+    if over:
+        return HTMLResponse(
+            _marketing_page("Input too long — HVTracker", "Submission", over,
+                f"<div class='card'><p>{escape(over)}</p></div><div class='actions'><a class='button' href='/submit/'>Back to form</a></div>",
+                path="/submit/"), status_code=400)
+    if contact.strip() and not _EMAIL_RE.match(contact.strip()):
+        return HTMLResponse(
+            _marketing_page("Invalid email — HVTracker", "Submission", "Please provide a valid email address.",
+                "<div class='card'><p>The contact email does not look valid.</p></div><div class='actions'><a class='button' href='/submit/'>Back to form</a></div>",
+                path="/submit/"), status_code=400)
     repo = repo.strip().removeprefix("https://github.com/").strip("/")
     if repo.count("/") != 1:
         return HTMLResponse(
@@ -600,6 +723,7 @@ def correct_form():
         <label>Contact email (optional)
           <input name='contact' type='email' placeholder='you@example.com'>
         </label>
+        """ + HONEYPOT_HTML + """
         <div class='actions'>
           <button class='button' type='submit'>Send correction</button>
         </div>
@@ -618,7 +742,22 @@ def correct_form():
 
 @app.post("/correct", response_class=HTMLResponse)
 @app.post("/correct/", response_class=HTMLResponse, include_in_schema=False)
-def correct_post(repo: str = Form(...), message: str = Form(...), contact: str = Form("")):
+def correct_post(request: Request, repo: str = Form(...), message: str = Form(...),
+                 contact: str = Form(""), website: str = Form("")):
+    if website:
+        return HTMLResponse(
+            _marketing_page("Correction received — HVTracker", "Correction saved", "The correction request is queued for review.",
+                "<div class='card'><p class='ok'>Thanks.</p></div>", path="/correct/"))
+    if _is_rate_limited(request):
+        return HTMLResponse(
+            _marketing_page("Too many requests — HVTracker", "Slow down", "Please wait before submitting again.",
+                "<div class='card'><p>Too many submissions from this address. Try again in a few minutes.</p></div>",
+                path="/correct/"), status_code=429)
+    over = _check_field_lengths(repo=repo, message=message, contact=contact)
+    if over:
+        return HTMLResponse(
+            _marketing_page("Input too long — HVTracker", "Correction", over,
+                f"<div class='card'><p>{escape(over)}</p></div>", path="/correct/"), status_code=400)
     if not db.enabled():
         return _interest_unavailable()
     repo = repo.strip().removeprefix("https://github.com/").strip("/")
@@ -662,6 +801,7 @@ def alerts_page():
         <label>Work email
           <input type='email' name='email' placeholder='you@company.com' required>
         </label>
+        """ + HONEYPOT_HTML + """
         <div class='actions'>
           <button class='button' type='submit'>Join waitlist</button>
         </div>
@@ -673,7 +813,26 @@ def alerts_page():
 
 @app.post("/alerts", response_class=HTMLResponse)
 @app.post("/alerts/", response_class=HTMLResponse, include_in_schema=False)
-def alerts_post(email: str = Form(...), role: str = Form(""), agents: str = Form(""), notes: str = Form("")):
+def alerts_post(request: Request, email: str = Form(...), role: str = Form(""), agents: str = Form(""),
+                notes: str = Form(""), website: str = Form("")):
+    if website:
+        return HTMLResponse(
+            _marketing_page("Alerts waitlist — HVTracker", "Thanks", "Thanks. I saved your alert request.",
+                "<div class='card'><p class='ok'>Thanks.</p></div>", path="/alerts/"))
+    if _is_rate_limited(request):
+        return HTMLResponse(
+            _marketing_page("Too many requests — HVTracker", "Slow down", "Please wait before submitting again.",
+                "<div class='card'><p>Too many submissions from this address. Try again in a few minutes.</p></div>",
+                path="/alerts/"), status_code=429)
+    over = _check_field_lengths(email=email, notes=notes)
+    if over:
+        return HTMLResponse(
+            _marketing_page("Input too long — HVTracker", "Alerts", over,
+                f"<div class='card'><p>{escape(over)}</p></div>", path="/alerts/"), status_code=400)
+    if not _EMAIL_RE.match(email.strip()):
+        return HTMLResponse(
+            _marketing_page("Invalid email — HVTracker", "Alerts", "Please provide a valid email address.",
+                "<div class='card'><p>That email does not look valid.</p></div>", path="/alerts/"), status_code=400)
     if not db.enabled():
         return _interest_unavailable()
     db.add_interest_signup(
@@ -722,6 +881,7 @@ def track_agent_page(slug: str):
         <label>What would make this useful?
           <textarea name='notes' placeholder='Example: alert me when build provenance disappears, signed-commit coverage drops, or {escape(agent['name'])} falls behind similar tools.'></textarea>
         </label>
+        """ + HONEYPOT_HTML + f"""
         <div class='actions'>
           <button class='button' type='submit'>Track {escape(agent['name'])}</button>
           <a class='button secondary' href='/agents/{escape(agent["slug"])}'>Back to profile</a>
@@ -734,10 +894,29 @@ def track_agent_page(slug: str):
 
 @app.post("/track/{slug}", response_class=HTMLResponse)
 @app.post("/track/{slug}/", response_class=HTMLResponse, include_in_schema=False)
-def track_agent_post(slug: str, email: str = Form(...), role: str = Form(""), notes: str = Form("")):
+def track_agent_post(request: Request, slug: str, email: str = Form(...), role: str = Form(""),
+                     notes: str = Form(""), website: str = Form("")):
     agent = find_agent_by_slug(slug)
     if not agent:
         return HTMLResponse("<p>Agent not found.</p>", status_code=404)
+    if website:
+        return HTMLResponse(
+            _marketing_page(f"Track {agent['name']} — HVTracker", "Thanks", f"Thanks. I saved your request to track {agent['name']}.",
+                "<div class='card'><p class='ok'>Thanks.</p></div>", path=f"/track/{agent['slug']}/"))
+    if _is_rate_limited(request):
+        return HTMLResponse(
+            _marketing_page("Too many requests — HVTracker", "Slow down", "Please wait before submitting again.",
+                "<div class='card'><p>Too many submissions from this address. Try again in a few minutes.</p></div>",
+                path=f"/track/{agent['slug']}/"), status_code=429)
+    over = _check_field_lengths(email=email, role=role, notes=notes)
+    if over:
+        return HTMLResponse(
+            _marketing_page("Input too long — HVTracker", "Track", over,
+                f"<div class='card'><p>{escape(over)}</p></div>", path=f"/track/{agent['slug']}/"), status_code=400)
+    if not _EMAIL_RE.match(email.strip()):
+        return HTMLResponse(
+            _marketing_page("Invalid email — HVTracker", "Track", "Please provide a valid email address.",
+                "<div class='card'><p>That email does not look valid.</p></div>", path=f"/track/{agent['slug']}/"), status_code=400)
     if not db.enabled():
         return _interest_unavailable()
     db.add_interest_signup(
@@ -789,6 +968,7 @@ def sponsor_page():
         <label>What are you interested in?
           <textarea name='message' placeholder='Example: we sell agent observability and want to sponsor a category roundup or trust report aimed at platform and security teams.' required></textarea>
         </label>
+        """ + HONEYPOT_HTML + """
         <div class='actions'>
           <button class='button' type='submit'>Send sponsor interest</button>
         </div>
@@ -800,7 +980,26 @@ def sponsor_page():
 
 @app.post("/sponsor", response_class=HTMLResponse)
 @app.post("/sponsor/", response_class=HTMLResponse, include_in_schema=False)
-def sponsor_post(name: str = Form(...), company: str = Form(...), email: str = Form(...), message: str = Form(...)):
+def sponsor_post(request: Request, name: str = Form(...), company: str = Form(...),
+                 email: str = Form(...), message: str = Form(...), website: str = Form("")):
+    if website:
+        return HTMLResponse(
+            _marketing_page("Sponsor HVTracker", "Thanks", "Thanks. I saved your sponsorship inquiry.",
+                "<div class='card'><p class='ok'>Thanks.</p></div>", path="/sponsor/"))
+    if _is_rate_limited(request):
+        return HTMLResponse(
+            _marketing_page("Too many requests — HVTracker", "Slow down", "Please wait before submitting again.",
+                "<div class='card'><p>Too many submissions from this address. Try again in a few minutes.</p></div>",
+                path="/sponsor/"), status_code=429)
+    over = _check_field_lengths(name=name, email=email, message=message)
+    if over:
+        return HTMLResponse(
+            _marketing_page("Input too long — HVTracker", "Sponsor", over,
+                f"<div class='card'><p>{escape(over)}</p></div>", path="/sponsor/"), status_code=400)
+    if not _EMAIL_RE.match(email.strip()):
+        return HTMLResponse(
+            _marketing_page("Invalid email — HVTracker", "Sponsor", "Please provide a valid email address.",
+                "<div class='card'><p>That email does not look valid.</p></div>", path="/sponsor/"), status_code=400)
     if not db.enabled():
         return _interest_unavailable()
     db.add_interest_signup(
@@ -829,6 +1028,7 @@ def data_api_page():
           <li>Free leaderboard browsing</li>
           <li>Public JSON snapshot</li>
           <li>Open methodology and specs</li>
+          <li>Read-only REST API (v1)</li>
         </ul>
       </div>
       <div class='card'>
@@ -840,6 +1040,21 @@ def data_api_page():
           <li>Watchlists, alerts, and shared team usage</li>
         </ul>
       </div>
+    </div>
+    <div class='card'>
+      <h2>REST API v1</h2>
+      <p>Two read-only endpoints are available now, no auth required. CORS-enabled for browser use.</p>
+      <div class='card' style='margin-top:12px'>
+        <h2 style='font-family:var(--font-mono);font-size:13px'><code>GET /api/v1/agents</code></h2>
+        <p>Full agent leaderboard with trust scores, evidence grades, and metadata.</p>
+        <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>curl -s https://hvtracker.net/api/v1/agents | python -m json.tool | head</code></pre>
+      </div>
+      <div class='card' style='margin-top:12px'>
+        <h2 style='font-family:var(--font-mono);font-size:13px'><code>GET /api/v1/graph</code></h2>
+        <p>Dependency and ecosystem graph data for all tracked agents.</p>
+        <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>curl -s https://hvtracker.net/api/v1/graph | python -m json.tool | head</code></pre>
+      </div>
+      <p style='margin-top:12px;color:var(--muted);font-size:13px'>Auth and rate quotas for a paid tier are intentionally out of scope for now.</p>
     </div>
     <div class='card'>
       <h2>Early pricing stub</h2>
@@ -874,6 +1089,7 @@ def data_api_page():
         <label>What do you need?
           <textarea name='message' placeholder='Example: daily JSON export for internal evaluations, historical trust changes, compare data for content, or commercial redistribution rights.' required></textarea>
         </label>
+        """ + HONEYPOT_HTML + """
         <div class='actions'>
           <button class='button' type='submit'>Request access</button>
           <a class='button secondary' href='/data.json'>Open public data</a>
@@ -886,7 +1102,26 @@ def data_api_page():
 
 @app.post("/data-api", response_class=HTMLResponse)
 @app.post("/data-api/", response_class=HTMLResponse, include_in_schema=False)
-def data_api_post(email: str = Form(...), company: str = Form(""), message: str = Form(...)):
+def data_api_post(request: Request, email: str = Form(...), company: str = Form(""),
+                  message: str = Form(...), website: str = Form("")):
+    if website:
+        return HTMLResponse(
+            _marketing_page("Data API — HVTracker", "Thanks", "Thanks. I saved your request.",
+                "<div class='card'><p class='ok'>Thanks.</p></div>", path="/data-api/"))
+    if _is_rate_limited(request):
+        return HTMLResponse(
+            _marketing_page("Too many requests — HVTracker", "Slow down", "Please wait before submitting again.",
+                "<div class='card'><p>Too many submissions from this address. Try again in a few minutes.</p></div>",
+                path="/data-api/"), status_code=429)
+    over = _check_field_lengths(email=email, message=message)
+    if over:
+        return HTMLResponse(
+            _marketing_page("Input too long — HVTracker", "Data API", over,
+                f"<div class='card'><p>{escape(over)}</p></div>", path="/data-api/"), status_code=400)
+    if not _EMAIL_RE.match(email.strip()):
+        return HTMLResponse(
+            _marketing_page("Invalid email — HVTracker", "Data API", "Please provide a valid email address.",
+                "<div class='card'><p>That email does not look valid.</p></div>", path="/data-api/"), status_code=400)
     if not db.enabled():
         return _interest_unavailable()
     db.add_interest_signup(
@@ -926,6 +1161,9 @@ def _compute_render_fingerprint() -> str:
         os.path.join(BASE_DIR, "og-v2.png"),
         os.path.join(BASE_DIR, "agents.json"),
     ]
+    _css_path = os.path.join(BASE_DIR, "static", "site.css")
+    if os.path.isfile(_css_path):
+        tracked_paths.append(_css_path)
     # render_state.json lives on the volume in production (excluded from Docker
     # image by .dockerignore).  Include it when present so adding an agent
     # triggers a re-render; skip gracefully when the file doesn't exist yet.
@@ -994,6 +1232,27 @@ def _seed_history_into_volume() -> int:
     return copied
 
 
+def _sync_prebuilt_to_volume() -> bool:
+    """Copy the build-time rendered site into the volume so fresh HTML is
+    served immediately on deploy.  Preserves volume-only files (history
+    snapshots, data.json from prior full builds) — only overwrites HTML,
+    static assets, and render metadata that the build produced."""
+    import shutil
+    if not os.path.isdir(PREBUILT_DIR) or PREBUILT_DIR == OUTPUT_DIR:
+        return False
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    copied = 0
+    for root, dirs, files in os.walk(PREBUILT_DIR):
+        rel = os.path.relpath(root, PREBUILT_DIR)
+        dest = os.path.join(OUTPUT_DIR, rel)
+        os.makedirs(dest, exist_ok=True)
+        for f in files:
+            shutil.copy2(os.path.join(root, f), os.path.join(dest, f))
+            copied += 1
+    print(f"[startup] synced {copied} pre-rendered files from image → volume")
+    return copied > 0
+
+
 def _has_missing_commit_rows() -> bool:
     """Detect broken generated rows where weekly_commits is missing."""
     try:
@@ -1007,6 +1266,7 @@ def _has_missing_commit_rows() -> bool:
 @app.on_event("startup")
 def startup():
     global _scheduler
+    _sync_prebuilt_to_volume()
     seeded = _seed_history_into_volume()
     fingerprint = _compute_render_fingerprint()
     stored_fingerprint = _read_render_fingerprint()

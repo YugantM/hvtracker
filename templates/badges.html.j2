@@ -25,31 +25,13 @@
     ]
   }
   </script>
+  <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --paper:#f4f1eb; --paper-2:#ece4d6; --ink:#1f1b17; --muted:#6f665d; --line:#d5cbbc;
-      --blue:#a7bfd9; --blue-strong:#7f9cbd; --lobster:#c67c6d; --lobster-soft:rgba(198,124,109,.14);
-      --font-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
-      --font-sans:"Hanken Grotesk", system-ui, -apple-system, sans-serif;
-    }
-    body { background: var(--paper); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color: var(--ink); font-family: var(--font-sans); font-size: 15px; line-height: 1.7; min-height: 100vh; }
-    a { color: var(--lobster); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .page { max-width: 1100px; margin: 0 auto; padding: 0 24px 52px; background: var(--paper); min-height: 100vh; }
-    .site-header {
-      position: sticky; top: 0; z-index: 100;
-      background: var(--paper);
-      border-bottom: 1px solid var(--line);
-    }
-    .site-header-inner {
-      max-width: 1200px; margin: 0 auto; padding: 14px 24px;
-      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
-    }
-    .logo { font-family: var(--font-mono); font-size:20px; font-weight: 700; letter-spacing: 0; color: var(--ink); }
+    body { line-height:1.7; }
+    a { color: var(--lobster); }
+    .page { padding: 0 24px 52px; }
     .logo span { color: var(--lobster); }
     .tagline { font-size: 13px; color: var(--muted); }
-    .site-nav { margin-left: auto; font-family: var(--font-mono); font-size:11px; display: flex; gap:6px; align-items: baseline; flex-wrap: wrap; }
     .site-nav a,
     .site-nav a:hover { color: var(--ink); border-color: var(--line); background: var(--paper-2); text-decoration: none; }
     .content { max-width: 780px; margin: 0 auto; padding: 36px 0 0; }
@@ -112,6 +94,7 @@
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
         <a href="/movers/">Movers</a>
+        <a href="/changes/">Changes</a>
         <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
         <a href="/compare/">Compare</a>

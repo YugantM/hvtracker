@@ -2,6 +2,7 @@
 
 These are deterministic and make no network calls.
 """
+import json
 import sys
 
 import pytest
@@ -482,3 +483,22 @@ def test_repair_missing_commit_counts_uses_live_then_cached(monkeypatch):
     assert repaired == 2
     assert rows[0]["weekly_commits"] == 40
     assert rows[1]["weekly_commits"] == 936
+
+
+def test_history_writer_never_deletes_existing_snapshots(tmp_path):
+    """Existing history snapshots must survive when a new one is written."""
+    history_dir = tmp_path / "output" / "history"
+    history_dir.mkdir(parents=True)
+
+    old_snapshot = {"agents": [{"repo": "old/one", "trust_score": 50}]}
+    (history_dir / "2026-05-01.json").write_text(json.dumps(old_snapshot))
+    (history_dir / "2026-05-02.json").write_text(json.dumps(old_snapshot))
+
+    new_snapshot = {"agents": [{"repo": "new/one", "trust_score": 70}]}
+    today = "2026-06-10"
+    new_path = history_dir / f"{today}.json"
+    with open(new_path, "w", encoding="utf-8") as f:
+        json.dump(new_snapshot, f)
+
+    remaining = sorted(f.name for f in history_dir.glob("*.json"))
+    assert remaining == ["2026-05-01.json", "2026-05-02.json", f"{today}.json"]

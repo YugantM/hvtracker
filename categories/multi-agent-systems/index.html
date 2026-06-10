@@ -3,26 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Best Open-Source Multi-Agent Systems — Ranked by Trust Score | HVTracker</title>
-  <meta name="description" content="Compare 6 open-source multi-agent systems ranked by independent trust scores. CAMEL, Lumibot, Concordia. Updated daily with security, activity, and adoption signals.">
+  <title>Best Multi-Agent Systems — Ranked by Trust Score | HVTracker</title>
+  <meta name="description" content="Compare 10 multi-agent systems ranked by independent trust scores. Open-source-first, with limited public GitHub comparators where relevant. AIPass, CAMEL, Agency Swarm. Updated daily with security, activity, and adoption signals.">
   <link rel="canonical" href="https://hvtracker.net/categories/multi-agent-systems">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Best Open-Source Multi-Agent Systems — Ranked by Trust Score | HVTracker">
-  <meta property="og:description" content="Compare 6 open-source multi-agent systems ranked by trust score. Updated daily.">
+  <meta property="og:title" content="Best Multi-Agent Systems — Ranked by Trust Score | HVTracker">
+  <meta property="og:description" content="Compare 10 multi-agent systems ranked by trust score. Open-source-first, with limited public GitHub comparators where relevant.">
   <meta property="og:url" content="https://hvtracker.net/categories/multi-agent-systems">
   <meta property="og:image" content="https://hvtracker.net/og-v2.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Best Open-Source Multi-Agent Systems — Ranked by Trust Score | HVTracker">
-  <meta name="twitter:description" content="Compare 6 open-source multi-agent systems ranked by trust score. Updated daily.">
+  <meta name="twitter:title" content="Best Multi-Agent Systems — Ranked by Trust Score | HVTracker">
+  <meta name="twitter:description" content="Compare 10 multi-agent systems ranked by trust score. Open-source-first, with limited public GitHub comparators where relevant.">
   <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": "Best Open-Source Multi-Agent Systems",
-    "description": "6 open-source multi-agent systems ranked by independent trust scores on HVTracker.",
+    "name": "Best Multi-Agent Systems",
+    "description": "10 multi-agent systems ranked by independent trust scores on HVTracker. Open-source-first, with limited public GitHub comparators where relevant.",
     "url": "https://hvtracker.net/categories/multi-agent-systems",
     "isPartOf": {
       "@type": "WebSite",
@@ -31,47 +31,75 @@
     },
     "mainEntity": {
       "@type": "ItemList",
-      "numberOfItems": 6,
+      "numberOfItems": 10,
       "itemListElement": [
         
         {
           "@type": "ListItem",
           "position": 1,
+          "name": "AIPass",
+          "url": "https://hvtracker.net/agents/aipass"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 2,
           "name": "CAMEL",
           "url": "https://hvtracker.net/agents/camel"
         },
         
         {
           "@type": "ListItem",
-          "position": 2,
-          "name": "Lumibot",
-          "url": "https://hvtracker.net/agents/lumibot"
+          "position": 3,
+          "name": "Agency Swarm",
+          "url": "https://hvtracker.net/agents/agency-swarm"
         },
         
         {
           "@type": "ListItem",
-          "position": 3,
+          "position": 4,
           "name": "Concordia",
           "url": "https://hvtracker.net/agents/concordia"
         },
         
         {
           "@type": "ListItem",
-          "position": 4,
+          "position": 5,
           "name": "ChatDev",
           "url": "https://hvtracker.net/agents/chatdev"
         },
         
         {
           "@type": "ListItem",
-          "position": 5,
+          "position": 6,
+          "name": "TinyTroupe",
+          "url": "https://hvtracker.net/agents/tinytroupe"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 7,
+          "name": "Swarm by OpenAI",
+          "url": "https://hvtracker.net/agents/swarm-by-openai"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 8,
           "name": "MetaGPT",
           "url": "https://hvtracker.net/agents/metagpt"
         },
         
         {
           "@type": "ListItem",
-          "position": 6,
+          "position": 9,
+          "name": "SwarmZero",
+          "url": "https://hvtracker.net/agents/swarmzero"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 10,
           "name": "Agency Agents",
           "url": "https://hvtracker.net/agents/agency-agents"
         }
@@ -91,37 +119,9 @@
   }
   </script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <link rel="stylesheet" href="/static/site.css?v=bd3d3ecb">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg:#f4f1eb; --surface:#eae6de; --border:#d4cfc5;
-      --text:#1a1a1a; --muted:#6b6560; --accent:#2c5282; --accent-warm:#b05a3a;
-      --green:#2f6846; --red:#9b3c3c; --amber:#8b6914;
-      --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
-      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
-    }
-    body { background:var(--bg); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color:var(--text); font-family:var(--font-sans); font-size:15px; line-height:1.6; min-height:100vh; }
-    a { color:inherit; text-decoration:none; }
-    a:hover { text-decoration:underline; }
-    .page { max-width:880px; margin:0 auto; padding:0 24px; background:var(--bg); min-height:100vh; }
-
-    .site-header {
-      position: sticky; top: 0; z-index: 100;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-    }
-    .site-header-inner {
-      max-width: 1200px; margin: 0 auto; padding: 14px 24px;
-      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
-    }
-    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; }
-    .logo span { color:var(--accent-warm); }
-    .site-nav { font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; margin-left:auto; flex-wrap:wrap; }
-    .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
-    .site-nav a:hover { color:var(--text); text-decoration:none; border-color:var(--border); background:var(--surface); }
+    .page { max-width:880px; }
 
     .hero { padding:24px 0; border-bottom:1px solid var(--border); }
     h1 { font-size:26px; font-weight:700; margin-bottom:4px; }
@@ -189,7 +189,7 @@
   </script>
   <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
   <script>
-    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    (function(){var host=window.location.hostname||"";if(/^(localhost|127(?:\.\d{1,3}){3}|0(?:\.\d{1,3}){3}|::1)$/i.test(host)){window["ga-disable-G-TZ8921LR0K"]=true;return}try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
     var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
   </script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
@@ -221,20 +221,20 @@
 
     <section class="hero">
       <h1>Multi-Agent Systems</h1>
-      <p class="subtitle">6 open-source agents tracked &middot; Ranked by trust score &middot; Updated 2026-06-05 11:36 UTC</p>
+      <p class="subtitle">10 agents tracked &middot; Open-source-first, with limited public GitHub comparators &middot; Ranked by trust score &middot; Updated 2026-06-09 22:24 UTC</p>
 
       <div class="seo-intro">
-        <p>HVTracker independently evaluates <strong>6 open-source multi-agent systems</strong> using daily signals from GitHub, package registries, and security databases.
+        <p>HVTracker independently evaluates <strong>10 multi-agent systems</strong> using daily signals from GitHub, package registries, and security databases. The category is open-source-first, with a limited set of public GitHub-hosted proprietary or source-available comparators when they are important ecosystem reference points.
         Each agent is scored on activity, adoption, transparency, safety, and identity.
-        The top-ranked multi-agent systems is <strong>CAMEL</strong> with a trust score of 71.0/100 (Grade B).
-        Other leading projects include Lumibot and Concordia.
+        The top-ranked multi-agent systems is <strong>AIPass</strong> with a trust score of 77.5/100 (Grade B).
+        Other leading projects include CAMEL and Agency Swarm.
         </p>
       </div>
     </section>
 
     <div class="stats-bar">
       <div class="stat">
-        <div class="num">6</div>
+        <div class="num">10</div>
         <div class="lbl">Agents</div>
       </div>
       <div class="stat">
@@ -242,7 +242,7 @@
         <div class="lbl">Avg Trust</div>
       </div>
       <div class="stat">
-        <div class="num">229.7k</div>
+        <div class="num">262.9k</div>
         <div class="lbl">Total Stars</div>
       </div>
       <div class="stat">
@@ -267,78 +267,130 @@
         <tr>
           <td class="rank-cell">1</td>
           <td class="name-cell">
-            <a href="/agents/camel">CAMEL</a>
+            <a href="/agents/aipass">AIPass</a>
             <span class="grade grade-B">B</span>
             <span class="state-chip state-listed">Listed</span>
-            <span class="desc">🐫 CAMEL: The first and the best multi-agent framework. Finding the Scaling Law of Agents. https://www.camel-ai.org</span>
+            <span class="desc">Persistent Agent Workspace — AI agents that remember, collaborate, and never start from zero.</span>
           </td>
-          <td class="score-cell score-hi">71.0</td>
-          <td class="stars-cell">17.1k</td>
+          <td class="score-cell score-hi">77.5</td>
+          <td class="stars-cell">190</td>
           <td class="lang-cell">Python</td>
         </tr>
         
         <tr>
           <td class="rank-cell">2</td>
           <td class="name-cell">
-            <a href="/agents/lumibot">Lumibot</a>
-            <span class="grade grade-C">C</span>
+            <a href="/agents/camel">CAMEL</a>
+            <span class="grade grade-B">B</span>
             <span class="state-chip state-listed">Listed</span>
-            <span class="desc">Backtestable AI trading agents and Python algorithmic trading strategies for stocks, options, crypto, futures, forex, SE</span>
+            <span class="desc">🐫 CAMEL: The first and the best multi-agent framework. Finding the Scaling Law of Agents. https://www.camel-ai.org</span>
           </td>
-          <td class="score-cell score-hi">62.6</td>
-          <td class="stars-cell">1.6k</td>
+          <td class="score-cell score-hi">69.4</td>
+          <td class="stars-cell">17.1k</td>
           <td class="lang-cell">Python</td>
         </tr>
         
         <tr>
           <td class="rank-cell">3</td>
           <td class="name-cell">
-            <a href="/agents/concordia">Concordia</a>
+            <a href="/agents/agency-swarm">Agency Swarm</a>
             <span class="grade grade-C">C</span>
             <span class="state-chip state-listed">Listed</span>
-            <span class="desc">A library for generative social simulation</span>
+            <span class="desc">Reliable Multi-Agent Orchestration Framework</span>
           </td>
-          <td class="score-cell score-mid">59.1</td>
-          <td class="stars-cell">1.5k</td>
+          <td class="score-cell score-hi">61.7</td>
+          <td class="stars-cell">4.4k</td>
           <td class="lang-cell">Python</td>
         </tr>
         
         <tr>
           <td class="rank-cell">4</td>
           <td class="name-cell">
-            <a href="/agents/chatdev">ChatDev</a>
+            <a href="/agents/concordia">Concordia</a>
             <span class="grade grade-C">C</span>
             <span class="state-chip state-listed">Listed</span>
-            <span class="desc">ChatDev 2.0: Dev All through LLM-powered Multi-Agent Collaboration</span>
+            <span class="desc">A library for generative social simulation</span>
           </td>
-          <td class="score-cell score-mid">57.2</td>
-          <td class="stars-cell">33.3k</td>
+          <td class="score-cell score-mid">58.8</td>
+          <td class="stars-cell">1.5k</td>
           <td class="lang-cell">Python</td>
         </tr>
         
         <tr>
           <td class="rank-cell">5</td>
           <td class="name-cell">
-            <a href="/agents/metagpt">MetaGPT</a>
-            <span class="grade grade-D">D</span>
+            <a href="/agents/chatdev">ChatDev</a>
+            <span class="grade grade-C">C</span>
             <span class="state-chip state-listed">Listed</span>
-            <span class="desc">🌟 The Multi-Agent Framework: First AI Software Company, Towards Natural Language Programming</span>
+            <span class="desc">ChatDev 2.0: Dev All through LLM-powered Multi-Agent Collaboration</span>
           </td>
-          <td class="score-cell score-mid">45.8</td>
-          <td class="stars-cell">68.6k</td>
+          <td class="score-cell score-mid">56.9</td>
+          <td class="stars-cell">33.3k</td>
           <td class="lang-cell">Python</td>
         </tr>
         
         <tr>
           <td class="rank-cell">6</td>
           <td class="name-cell">
+            <a href="/agents/tinytroupe">TinyTroupe</a>
+            <span class="grade grade-C">C</span>
+            <span class="state-chip state-listed">Listed</span>
+            <span class="desc">LLM-powered multiagent persona simulation for imagination enhancement and business insights.</span>
+          </td>
+          <td class="score-cell score-mid">54.0</td>
+          <td class="stars-cell">7.5k</td>
+          <td class="lang-cell">Jupyter Notebook</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">7</td>
+          <td class="name-cell">
+            <a href="/agents/swarm-by-openai">Swarm by OpenAI</a>
+            <span class="grade grade-C">C</span>
+            <span class="state-chip state-listed">Listed</span>
+            <span class="desc">Educational framework exploring ergonomic, lightweight multi-agent orchestration. Managed by OpenAI Solution team.</span>
+          </td>
+          <td class="score-cell score-mid">52.4</td>
+          <td class="stars-cell">21.6k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">8</td>
+          <td class="name-cell">
+            <a href="/agents/metagpt">MetaGPT</a>
+            <span class="grade grade-D">D</span>
+            <span class="state-chip state-listed">Listed</span>
+            <span class="desc">🌟 The Multi-Agent Framework: First AI Software Company, Towards Natural Language Programming</span>
+          </td>
+          <td class="score-cell score-mid">45.5</td>
+          <td class="stars-cell">68.6k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">9</td>
+          <td class="name-cell">
+            <a href="/agents/swarmzero">SwarmZero</a>
+            <span class="grade grade-D">D</span>
+            <span class="state-chip state-listed">Listed</span>
+            <span class="desc">SwarmZero&#39;s SDK for building AI agents, swarms of agents and much more.</span>
+          </td>
+          <td class="score-cell score-mid">35.7</td>
+          <td class="stars-cell">272</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">10</td>
+          <td class="name-cell">
             <a href="/agents/agency-agents">Agency Agents</a>
             <span class="grade grade-D">D</span>
             <span class="state-chip state-listed">Listed</span>
             <span class="desc">A complete AI agency at your fingertips - From frontend wizards to Reddit community ninjas, from whimsy injectors to rea</span>
           </td>
-          <td class="score-cell score-lo">27.1</td>
-          <td class="stars-cell">107.6k</td>
+          <td class="score-cell score-lo">27.5</td>
+          <td class="stars-cell">108.5k</td>
           <td class="lang-cell">Shell</td>
         </tr>
         
@@ -350,11 +402,11 @@
       <h2>Popular Multi-Agent Systems comparisons</h2>
       <div class="cat-pills">
         
-        <a href="/compare/camel-vs-lumibot/" class="cat-pill">CAMEL vs Lumibot</a>
+        <a href="/compare/aipass-vs-camel/" class="cat-pill">AIPass vs CAMEL</a>
         
-        <a href="/compare/camel-vs-concordia/" class="cat-pill">CAMEL vs Concordia</a>
+        <a href="/compare/aipass-vs-agency-swarm/" class="cat-pill">AIPass vs Agency Swarm</a>
         
-        <a href="/compare/lumibot-vs-concordia/" class="cat-pill">Lumibot vs Concordia</a>
+        <a href="/compare/camel-vs-agency-swarm/" class="cat-pill">CAMEL vs Agency Swarm</a>
         
       </div>
     </nav>
@@ -364,35 +416,35 @@
       <h2>All Categories</h2>
       <div class="cat-pills">
         
-        <a href="/categories/coding-agents" class="cat-pill ">Coding Agents (30)</a>
+        <a href="/categories/coding-agents" class="cat-pill ">Coding Agents (32)</a>
         
-        <a href="/categories/agent-frameworks" class="cat-pill ">Agent Frameworks (61)</a>
+        <a href="/categories/agent-frameworks" class="cat-pill ">Agent Frameworks (53)</a>
         
         <a href="/categories/workflow-platforms" class="cat-pill ">Workflow Platforms (15)</a>
         
-        <a href="/categories/browser-computer-use" class="cat-pill ">Browser &amp; Computer Use (14)</a>
+        <a href="/categories/browser-computer-use" class="cat-pill ">Browser &amp; Computer Use (16)</a>
         
-        <a href="/categories/memory-knowledge" class="cat-pill ">Memory &amp; Knowledge (27)</a>
+        <a href="/categories/memory-knowledge" class="cat-pill ">Memory &amp; Knowledge (22)</a>
         
-        <a href="/categories/research-data" class="cat-pill ">Research &amp; Data (9)</a>
+        <a href="/categories/research-data" class="cat-pill ">Research &amp; Data (13)</a>
         
-        <a href="/categories/observability-evaluation" class="cat-pill ">Observability &amp; Evaluation (15)</a>
+        <a href="/categories/observability-evaluation" class="cat-pill ">Observability &amp; Evaluation (18)</a>
         
         <a href="/categories/security-guardrails" class="cat-pill ">Security &amp; Guardrails (5)</a>
         
-        <a href="/categories/protocols-tool-integration" class="cat-pill ">Protocols &amp; Tool Integration (5)</a>
+        <a href="/categories/protocols-tool-integration" class="cat-pill ">Protocols &amp; Tool Integration (6)</a>
         
-        <a href="/categories/voice-conversational" class="cat-pill ">Voice &amp; Conversational (2)</a>
+        <a href="/categories/voice-conversational" class="cat-pill ">Voice &amp; Conversational (5)</a>
         
-        <a href="/categories/sandboxes-runtimes" class="cat-pill ">Sandboxes &amp; Runtimes (1)</a>
+        <a href="/categories/sandboxes-runtimes" class="cat-pill ">Sandboxes &amp; Runtimes (2)</a>
         
         <a href="/categories/robotics-embodied" class="cat-pill ">Robotics &amp; Embodied (1)</a>
         
-        <a href="/categories/llm-gateways-infra" class="cat-pill ">LLM Gateways &amp; Infra (11)</a>
+        <a href="/categories/llm-gateways-infra" class="cat-pill ">LLM Gateways &amp; Infra (8)</a>
         
-        <a href="/categories/multi-agent-systems" class="cat-pill active">Multi-Agent Systems (6)</a>
+        <a href="/categories/multi-agent-systems" class="cat-pill active">Multi-Agent Systems (10)</a>
         
-        <a href="/categories/ui-app-builders" class="cat-pill ">UI &amp; App Builders (1)</a>
+        <a href="/categories/ui-app-builders" class="cat-pill ">UI &amp; App Builders (7)</a>
         
       </div>
     </nav>

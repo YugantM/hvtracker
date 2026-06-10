@@ -1,0 +1,13 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - site_data:/data/site
+    environment:
+      - OUTPUT_DIR=/data/site
+      - DISABLE_SCHEDULER=1
+
+volumes:
+  site_data:

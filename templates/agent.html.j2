@@ -88,37 +88,9 @@
   }
   </script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg:#f4f1eb; --surface:#eae6de; --border:#d4cfc5;
-      --text:#1a1a1a; --muted:#6b6560; --accent:#2c5282; --accent-warm:#b05a3a;
-      --green:#2f6846; --red:#9b3c3c; --amber:#8b6914;
-      --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
-      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
-    }
-    body { background:var(--bg); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color:var(--text); font-family:var(--font-sans); font-size:15px; line-height:1.6; min-height:100vh; }
-    a { color:inherit; text-decoration:none; }
-    a:hover { text-decoration:underline; }
-    .page { max-width:780px; margin:0 auto; padding:0 24px; background:var(--bg); min-height:100vh; }
-
-    .site-header {
-      position: sticky; top: 0; z-index: 100;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-    }
-    .site-header-inner {
-      max-width: 1200px; margin: 0 auto; padding: 14px 24px;
-      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
-    }
-    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; }
-    .logo span { color:var(--accent-warm); }
-    .site-nav { font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; margin-left:auto; flex-wrap:wrap; }
-    .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
-    .site-nav a:hover { color:var(--text); text-decoration:none; border-color:var(--border); background:var(--surface); }
+    .page { max-width:780px; }
     .back { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:auto; }
     .back:hover { color:var(--text); }
 
@@ -328,9 +300,6 @@
     .siblings .sib-name { flex:1; font-weight:500; font-size:12px; }
     .siblings .sib-score { font-family:var(--font-mono); font-size:11px; color:var(--accent); }
 
-    footer { padding:20px 0 32px; border-top:1px solid var(--border); font-size:11px; color:var(--muted); display:flex; gap:12px; flex-wrap:wrap; }
-    footer a { color:var(--accent); }
-    .footer-sep { color:var(--border); }
     .terminal-note { border-top:1px solid var(--border); }
     @media (max-width:720px) {
       .hero-summary-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
@@ -377,6 +346,7 @@
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
         <a href="/movers/">Movers</a>
+        <a href="/changes/">Changes</a>
         <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
         <a href="/compare/">Compare</a>
@@ -391,7 +361,7 @@
     <section class="hero">
       <h1>{{ row.name }}</h1>
       <div class="repo">
-        <a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>
+        {% if row.org_slug_or_none %}<a href="/org/{{ row.org_slug_or_none }}/">{{ row.repo.split('/')[0] }}</a>/<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo.split('/')[1] }}</a>{% else %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>{% endif %}
       </div>
       {% if row.description %}<p class="desc">{{ row.description }}</p>{% endif %}
       <div class="badges">

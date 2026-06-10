@@ -16,35 +16,11 @@
   <meta name="twitter:title" content="{{ page.title }} | HVTracker">
   <meta name="twitter:description" content="{{ page.description }}">
   <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --paper:#f4f1eb;
-      --paper-2:#ece4d6;
-      --ink:#1f1b17;
-      --muted:#6f665d;
-      --line:#d5cbbc;
-      --blue:#a7bfd9;
-      --blue-strong:#7f9cbd;
-      --lobster:#c67c6d;
-      --moss:#6f876e;
-      --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
-      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif
-    }
-    body{min-height:100vh;background:var(--paper); background-image:url("/hex-bg.svg");background-size:2000px 2000px;color:var(--ink);font:15px/1.7 var(--font-sans)}
-    a{color:inherit;text-decoration:none}
-    a:hover{text-decoration:underline}
-    .page{background:var(--paper);max-width:1080px;margin:0 auto;padding:28px 24px 52px}
-    .site-header{position:sticky;top:0;z-index:100;background:var(--paper);border-bottom:1px solid var(--line)}
-    .site-header-inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-    .logo{font-family:var(--font-mono);font-weight:700;font-size:20px;letter-spacing:0}
+    body{line-height:1.7}
+    .page{max-width:1080px;padding:28px 24px 52px}
     .logo span{color:var(--lobster)}
-    nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;font:11px var(--font-mono)}
-    .site-nav a{color:var(--muted);padding:5px 10px;border:1px solid transparent}
-    .site-nav a:hover{color:var(--ink);border-color:var(--line);background:var(--paper-2);text-decoration:none}
     .hero{padding:28px 0 18px;border-bottom:1px solid var(--line)}
     h1{font-size:34px;line-height:1.12;letter-spacing:0;margin-bottom:10px}
     .hero p{color:var(--muted);max-width:760px}
@@ -103,6 +79,7 @@
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
         <a href="/movers/">Movers</a>
+        <a href="/changes/">Changes</a>
         <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
         <a href="/compare/">Compare</a>

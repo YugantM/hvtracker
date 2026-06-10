@@ -53,71 +53,14 @@
     ]
   }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --paper: #f4f1eb;
-      --paper-2: #ece4d6;
-      --ink: #1f1b17;
-      --muted: #6f665d;
-      --line: #d5cbbc;
-      --line-strong: #b9aa96;
-      --blue-strong: #7f9cbd;
-      --blue-soft: rgba(167, 191, 217, 0.18);
-      --lobster: #c67c6d;
-      --lobster-soft: rgba(198, 124, 109, 0.14);
-      --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-      --font-sans: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
-    }
-
-    body {
-      background: var(--paper);
-      background-image: url("/hex-bg.svg");
-      background-size: 2000px 2000px;
-      color: var(--ink);
-      font-family: var(--font-sans);
-      font-size: 15px;
-      line-height: 1.7;
-      min-height: 100vh;
-    }
-
-    a { color: var(--ink); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    .page { background: var(--paper); min-height: 100vh; max-width: 1120px; margin: 0 auto; padding: 24px 22px 48px; }
-
-    .site-header {
-      position: sticky; top: 0; z-index: 100;
-      background: var(--paper);
-      border-bottom: 1px solid var(--line);
-    }
-    .site-header-inner {
-      max-width: 1200px; margin: 0 auto; padding: 14px 24px;
-      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
-    }
-    .logo {
-      font-family: var(--font-mono);
-      font-size:20px;
-      font-weight: 700;
-      letter-spacing:0;
-      color: var(--ink);
-    }
+    body { line-height: 1.7; }
+    a { color: var(--ink); }
+    .page { max-width: 1120px; padding: 24px 22px 48px; }
     .logo span { color: var(--lobster); }
     .tagline { font-size: 12px; color: var(--muted); }
 
-    .site-nav {
-      margin-left: auto;
-      font-family: var(--font-mono);
-      font-size:11px;
-      display: flex;
-      gap:6px;
-      align-items: baseline;
-      flex-wrap: wrap;
-    }
     .site-nav a,
     .site-nav span {
       color: var(--muted);
@@ -313,6 +256,7 @@
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
         <a href="/movers/">Movers</a>
+        <a href="/changes/">Changes</a>
         <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
         <a href="/score-lab/">Score lab</a>

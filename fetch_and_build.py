@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Fetch GitHub data for tracked agents and render index.html."""
 
+import hashlib
 import json
 import math
 import os
@@ -1949,6 +1950,79 @@ def compute_newly_added(rows: list[dict], history: list[dict], limit: int | None
     return added if limit is None else added[:limit]
 
 
+def compute_weekly_changes(history: list[dict]) -> dict:
+    """Diff newest snapshot against the one ~7 days older (or oldest if <7 days)."""
+    if len(history) < 2:
+        return {"latest_date": "", "baseline_date": "", "newly_listed": [],
+                "trust_up": [], "trust_down": [], "provenance_gained": [], "mcp_gained": []}
+
+    latest = history[-1]
+    target_idx = 0
+    for i, snap in enumerate(history):
+        if snap["_date"] <= latest["_date"]:
+            target_idx = i
+            break
+    for i, snap in enumerate(history[:-1]):
+        if (datetime.strptime(latest["_date"], "%Y-%m-%d") -
+                datetime.strptime(snap["_date"], "%Y-%m-%d")).days >= 7:
+            target_idx = i
+    baseline = history[target_idx]
+
+    old_by_repo = {a["repo"].lower(): a for a in baseline.get("agents", [])}
+    new_by_repo = {a["repo"].lower(): a for a in latest.get("agents", [])}
+
+    newly_listed = []
+    trust_up, trust_down = [], []
+    provenance_gained, mcp_gained = [], []
+
+    for repo, agent in new_by_repo.items():
+        old = old_by_repo.get(repo)
+        slug = agent.get("slug", "")
+        name = agent.get("name", "")
+        category = agent.get("category", "")
+
+        if old is None:
+            newly_listed.append({"name": name, "slug": slug, "category": category,
+                                 "trust_score": agent.get("trust_score", 0)})
+            continue
+
+        old_ts = old.get("trust_score") or 0
+        new_ts = agent.get("trust_score") or 0
+        delta = round(new_ts - old_ts, 1)
+        if abs(delta) >= 3:
+            entry = {"name": name, "slug": slug, "old_score": old_ts,
+                     "new_score": new_ts, "delta": delta}
+            if delta > 0:
+                trust_up.append(entry)
+            else:
+                trust_down.append(entry)
+
+        old_prov = old.get("has_provenance", False)
+        new_prov = agent.get("has_provenance", False)
+        if new_prov and not old_prov:
+            provenance_gained.append({"name": name, "slug": slug, "category": category})
+
+        old_mcp = (old.get("mcp_server_support") or {}).get("status", "none")
+        new_mcp = (agent.get("mcp_server_support") or {}).get("status", "none")
+        if new_mcp in ("implemented", "declared") and old_mcp == "none":
+            mcp_gained.append({"name": name, "slug": slug, "category": category,
+                               "mcp_status": new_mcp})
+
+    trust_up.sort(key=lambda x: x["delta"], reverse=True)
+    trust_down.sort(key=lambda x: x["delta"])
+    newly_listed.sort(key=lambda x: x.get("trust_score", 0), reverse=True)
+
+    return {
+        "latest_date": latest["_date"],
+        "baseline_date": baseline["_date"],
+        "newly_listed": newly_listed,
+        "trust_up": trust_up,
+        "trust_down": trust_down,
+        "provenance_gained": provenance_gained,
+        "mcp_gained": mcp_gained,
+    }
+
+
 def compute_sparklines(history: list[dict]) -> dict[str, list[dict]]:
     """Build per-agent rank history for sparkline rendering.
     Returns {repo_lower: [{date, rank, score}, ...]}."""
@@ -2677,6 +2751,133 @@ def build_use_case_pages(rows: list[dict]) -> list[dict]:
     return pages
 
 
+def build_graph(rows: list[dict]) -> dict:
+    """Build a knowledge-graph dict of entities and edges from the ranked rows."""
+    entities: dict[str, dict] = {}
+    edges: list[dict] = []
+
+    providers_seen: dict[str, str] = {}  # display name → slug
+    categories_seen: dict[str, str] = {}
+    orgs_seen: dict[str, str] = {}
+
+    for r in rows:
+        repo = r["repo"]
+        entities[repo] = {
+            "type": "project",
+            "repo": repo,
+            "name": r["name"],
+            "slug": r.get("slug", slugify(r["name"])),
+            "trust_score": r.get("trust_score"),
+            "rank": r.get("rank"),
+        }
+
+        # Providers
+        for pname in r.get("external_service_dependencies", {}).get("providers", []):
+            pslug = slugify(pname)
+            if pslug not in providers_seen:
+                providers_seen[pslug] = pname
+                entities[f"provider/{pslug}"] = {"type": "provider", "slug": pslug, "name": pname}
+            edges.append({"src": repo, "rel": "USES_PROVIDER", "dst": f"provider/{pslug}"})
+
+        # Category
+        cat = r.get("category")
+        if cat:
+            cslug = slugify(cat)
+            if cslug not in categories_seen:
+                categories_seen[cslug] = cat
+                entities[f"category/{cslug}"] = {"type": "category", "slug": cslug, "name": cat}
+            edges.append({"src": repo, "rel": "IN_CATEGORY", "dst": f"category/{cslug}"})
+
+        # Org
+        org = repo.split("/")[0]
+        if org not in orgs_seen:
+            orgs_seen[org] = org
+            entities[f"org/{org}"] = {"type": "org", "slug": org, "name": org}
+        edges.append({"src": repo, "rel": "OWNED_BY", "dst": f"org/{org}"})
+
+        # MCP support
+        mcp_status = r.get("mcp_server_support", {}).get("status")
+        if mcp_status in ("declared", "verified"):
+            edges.append({"src": repo, "rel": "SUPPORTS_MCP", "dst": "mcp"})
+
+        # Provenance
+        if r.get("has_provenance"):
+            edges.append({"src": repo, "rel": "HAS_PROVENANCE", "dst": "provenance"})
+
+    return {
+        "schema_version": 1,
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "entities": entities,
+        "edges": edges,
+    }
+
+
+def build_ecosystem_pages(rows: list[dict]) -> list[dict]:
+    """Generate one page per LLM provider found in external_service_dependencies.providers."""
+    provider_agents: dict[str, list[dict]] = {}
+    for r in rows:
+        ext = r.get("external_service_dependencies") or {}
+        for prov in ext.get("providers") or []:
+            provider_agents.setdefault(prov, []).append(r)
+
+    pages = []
+    for provider in sorted(provider_agents):
+        agents = sorted(
+            provider_agents[provider],
+            key=lambda r: (-(r.get("trust_score") or 0), r.get("rank") or 9999),
+        )
+        slug = re.sub(r"[^a-z0-9]+", "-", provider.lower()).strip("-")
+        top5 = ", ".join(a["name"] for a in agents[:5])
+        faq_answer = (
+            f"As of today, {len(agents)} open-source AI projects in the HVTracker registry "
+            f"use {provider}. The highest-ranked by trust are {top5}."
+        )
+        pages.append({
+            "slug": slug,
+            "provider": provider,
+            "title": f"Projects Using {provider} — Trust-Ranked",
+            "description": (
+                f"{len(agents)} open-source AI agent projects that integrate {provider}, "
+                f"ranked by evidence-based HVTrust scores."
+            ),
+            "agents": agents,
+            "faq_answer": faq_answer,
+            "avg_trust": round(sum(r.get("trust_score") or 0 for r in agents) / max(len(agents), 1)),
+            "fresh_count": sum(1 for r in agents if (r.get("days_ago") or 9999) <= 14),
+        })
+    return pages
+
+
+def build_org_pages(rows: list[dict]) -> list[dict]:
+    """Build org pages for GitHub owners with >=2 tracked projects."""
+    owner_map: dict[str, list[dict]] = {}
+    display_names: dict[str, str] = {}
+    for row in rows:
+        owner = row["repo"].split("/")[0]
+        key = owner.lower()
+        owner_map.setdefault(key, []).append(row)
+        display_names.setdefault(key, owner)
+
+    orgs = []
+    for key, agents in owner_map.items():
+        if len(agents) < 2:
+            continue
+        agents_sorted = sorted(agents, key=lambda r: (-(r.get("trust_score") or 0), r.get("rank") or 9999))
+        combined_stars = sum(r.get("stars", 0) or 0 for r in agents_sorted)
+        avg_trust = round(sum(r.get("trust_score") or 0 for r in agents_sorted) / len(agents_sorted))
+        orgs.append({
+            "name": display_names[key],
+            "slug": key,
+            "project_count": len(agents_sorted),
+            "combined_stars": combined_stars,
+            "combined_stars_fmt": fmt_num(combined_stars),
+            "avg_trust": avg_trust,
+            "agents": agents_sorted,
+        })
+    orgs.sort(key=lambda o: (-sum(r.get("trust_score") or 0 for r in o["agents"]), o["name"].lower()))
+    return orgs
+
+
 def render_event_timeline_svg(events: list[dict]) -> str:
     """Render a compact distribution of recent reputation events."""
     if not events:
@@ -3146,6 +3347,7 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
         <a href="/movers/">Movers</a>
+        <a href="/changes/">Changes</a>
         <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
         <a href="/compare/">Compare</a>
@@ -3659,7 +3861,7 @@ def main() -> None:
             if os.path.isfile(src):
                 shutil.copy2(src, os.path.join(script_dir, asset))
         # Copy tracked static directories that the volume needs to serve
-        for static_dir in ("changelog", ".well-known"):
+        for static_dir in ("changelog", ".well-known", "static"):
             src = os.path.join(base_dir, static_dir)
             if os.path.isdir(src):
                 shutil.copytree(src, os.path.join(script_dir, static_dir), dirs_exist_ok=True)
@@ -4070,25 +4272,36 @@ def main() -> None:
             else:
                 row["pypi_provenance"] = None
 
-        # Load OSSF Scorecard from weekly CLI cache (scorecard-cache.json).
-        # Falls back to API if cache misses, then to None.
-        print("\nLoading OSSF Scorecard from cache...")
+        # Load OSSF Scorecard: prefer CLI cache, but hit the API when the
+        # cache entry is stale (>48h) or missing.
+        print("\nLoading OSSF Scorecard...")
         cache_hits = 0
         api_hits = 0
+        stale_threshold = datetime.now(timezone.utc) - timedelta(hours=48)
         for row in rows:
             repo_key = row["repo"]
             cached = scorecard_cache.get(repo_key)
+            cache_is_fresh = False
             if cached:
+                try:
+                    scanned = datetime.fromisoformat(cached["scanned_at"].replace("Z", "+00:00"))
+                    cache_is_fresh = scanned > stale_threshold
+                except (KeyError, ValueError):
+                    cache_is_fresh = False
+            if cached and cache_is_fresh:
                 row["scorecard_score"] = cached["score"]
                 row["scorecard_checks"] = cached["checks"]
                 cache_hits += 1
             else:
-                # Cache miss — try live API as fallback
                 sc = fetch_scorecard(repo_key)
                 if sc:
                     row["scorecard_score"] = sc["score"]
                     row["scorecard_checks"] = sc["checks"]
                     api_hits += 1
+                elif cached:
+                    row["scorecard_score"] = cached["score"]
+                    row["scorecard_checks"] = cached["checks"]
+                    cache_hits += 1
                 else:
                     row["scorecard_score"] = None
                     row["scorecard_checks"] = {}
@@ -4412,13 +4625,35 @@ def main() -> None:
         json.dump(data_output, f, indent=2, ensure_ascii=False)
     print(f"\nWrote data.json with {len(rows)} agents.")
 
-    # Historical snapshots enable trend analysis and are core IP — never delete these files.
+    # Write data/graph.json (knowledge graph render artifact)
+    graph = build_graph(rows)
+    graph_path = os.path.join(script_dir, "data", "graph.json")
+    with open(graph_path, "w", encoding="utf-8") as f:
+        json.dump(graph, f, separators=(",", ":"), ensure_ascii=False)
+    print(f"Wrote graph.json with {len(graph['entities'])} entities, {len(graph['edges'])} edges.")
+
+    # DO NOT PRUNE — history snapshots are an append-only dataset used for
+    # trend analysis, movers, and the /changes/ page.  Only today's file is
+    # (over)written; older files must never be deleted or rotated.
     history_dir = os.path.join(script_dir, "output", "history")
     os.makedirs(history_dir, exist_ok=True)
     today_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     history_path = os.path.join(history_dir, f"{today_utc}.json")
+    # Task 5.2: graph_summary in history snapshots
+    provider_counts: dict[str, int] = {}
+    for e in graph["edges"]:
+        if e["rel"] == "USES_PROVIDER":
+            pslug = e["dst"].removeprefix("provider/")
+            provider_counts[pslug] = provider_counts.get(pslug, 0) + 1
+    graph_summary = {
+        "providers": provider_counts,
+        "mcp_count": sum(1 for e in graph["edges"] if e["rel"] == "SUPPORTS_MCP"),
+        "provenance_count": sum(1 for e in graph["edges"] if e["rel"] == "HAS_PROVENANCE"),
+        "org_count": sum(1 for v in graph["entities"].values() if v["type"] == "org"),
+    }
+    snapshot_output = {**data_output, "graph_summary": graph_summary}
     with open(history_path, "w", encoding="utf-8") as f:
-        json.dump(data_output, f, indent=2, ensure_ascii=False)
+        json.dump(snapshot_output, f, indent=2, ensure_ascii=False)
     print(f"Wrote history snapshot {history_path}.")
     if storage.put_file(f"history/{today_utc}.json", history_path, "application/json"):
         print(f"Archived history snapshot to bucket: history/{today_utc}.json")
@@ -4512,10 +4747,21 @@ def main() -> None:
         autoescape=True,
     )
 
+    css_path = os.path.join(base_dir, "static", "site.css")
+    if os.path.isfile(css_path):
+        with open(css_path, "rb") as f:
+            css_hash = hashlib.sha256(f.read()).hexdigest()[:8]
+    else:
+        css_hash = ""
+    env.globals["css_hash"] = css_hash
+
     movers = compute_movers(history, {r["repo"].lower(): r["slug"] for r in rows}, rows=rows)
     movers_page = compute_movers_page_data(rows, history)
     newly_added = compute_newly_added(rows, history)
     use_case_pages = build_use_case_pages(rows)
+    ecosystem_pages = build_ecosystem_pages(rows)
+    org_pages = build_org_pages(rows)
+    org_slug_set = {o["slug"] for o in org_pages}
 
     # Sort legacy rows by stars descending for display; populate fields needed by templates
     for lr in legacy_rows:
@@ -4672,6 +4918,8 @@ def main() -> None:
     # Add category_slug so agent pages can link to category pages
     for row in rows + legacy_rows:
         row["category_slug"] = slugify(row.get("category", "")) if row.get("category") else ""
+        owner = row["repo"].split("/")[0].lower()
+        row["org_slug_or_none"] = owner if owner in org_slug_set else None
         row["review_insights"] = agent_review_insights(row)
         row["remediation_steps"] = agent_remediation_steps(row)
         row["safety_qa"] = agent_safety_qa(row)
@@ -4763,6 +5011,50 @@ def main() -> None:
         ))
     print("Built movers page under movers/.")
 
+    # Changes page — /changes/ weekly diff + RSS feed.
+    weekly = compute_weekly_changes(history)
+    changes_tmpl = env.get_template("changes.html.j2")
+    changes_dir = os.path.join(script_dir, "changes")
+    os.makedirs(changes_dir, exist_ok=True)
+    with open(os.path.join(changes_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(changes_tmpl.render(updated=now_str, **weekly))
+
+    rss_items = []
+    base = "https://hvtracker.net/changes/"
+    pub_date = weekly["latest_date"]
+    sections = [
+        ("Newly Listed Projects", weekly["newly_listed"]),
+        ("Trust Score Up", weekly["trust_up"]),
+        ("Trust Score Down", weekly["trust_down"]),
+        ("Provenance Gained", weekly["provenance_gained"]),
+        ("MCP Support Gained", weekly["mcp_gained"]),
+    ]
+    for title, items in sections:
+        if items:
+            names = ", ".join(i["name"] for i in items[:10])
+            rss_items.append(
+                f"    <item>\n"
+                f"      <title>{title} ({len(items)}) — {pub_date}</title>\n"
+                f"      <link>{base}</link>\n"
+                f"      <description>{names}</description>\n"
+                f"      <pubDate>{pub_date}</pubDate>\n"
+                f"    </item>"
+            )
+    rss_xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<rss version="2.0">\n'
+        '  <channel>\n'
+        '    <title>HVTracker Weekly Changes</title>\n'
+        f'    <link>{base}</link>\n'
+        '    <description>Weekly diff of the HVTracker AI agent registry.</description>\n'
+        + "\n".join(rss_items) + "\n"
+        '  </channel>\n'
+        '</rss>\n'
+    )
+    with open(os.path.join(changes_dir, "feed.xml"), "w", encoding="utf-8") as f:
+        f.write(rss_xml)
+    print("Built changes page and RSS feed under changes/.")
+
     # Use-case landing pages — /use-cases/ and /use-cases/<slug>/.
     use_case_tmpl = env.get_template("use_case.html.j2")
     use_cases_dir = os.path.join(script_dir, "use-cases")
@@ -4791,6 +5083,39 @@ def main() -> None:
         with open(os.path.join(page_dir, "index.html"), "w", encoding="utf-8") as f:
             f.write(use_case_tmpl.render(page=page, pages=use_case_pages, updated=now_str, is_index=False))
     print(f"Built {len(use_case_pages)} use-case pages under use-cases/.")
+
+    # Ecosystem pages — /ecosystem/ and /ecosystem/<slug>/.
+    eco_tmpl = env.get_template("ecosystem.html.j2")
+    eco_dir = os.path.join(script_dir, "ecosystem")
+    os.makedirs(eco_dir, exist_ok=True)
+    eco_index_page = {
+        "title": "AI Agent Ecosystem by Provider",
+        "description": "Open-source AI agent projects grouped by LLM provider, ranked by evidence-based HVTrust scores.",
+        "slug": "",
+        "agents": rows[:12],
+        "avg_trust": round(sum(r.get("trust_score") or 0 for r in rows[:12]) / max(len(rows[:12]), 1)),
+        "fresh_count": sum(1 for r in rows[:12] if (r.get("days_ago") or 9999) <= 14),
+    }
+    with open(os.path.join(eco_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(eco_tmpl.render(page=eco_index_page, pages=ecosystem_pages, updated=now_str, is_index=True))
+    for page in ecosystem_pages:
+        page_dir = os.path.join(eco_dir, page["slug"])
+        os.makedirs(page_dir, exist_ok=True)
+        with open(os.path.join(page_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(eco_tmpl.render(page=page, pages=ecosystem_pages, updated=now_str, is_index=False))
+    print(f"Built {len(ecosystem_pages)} ecosystem pages under ecosystem/.")
+    # Organization pages — /org/ and /org/<owner>/
+    org_tmpl = env.get_template("org.html.j2")
+    org_dir = os.path.join(script_dir, "org")
+    os.makedirs(org_dir, exist_ok=True)
+    with open(os.path.join(org_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(org_tmpl.render(orgs=org_pages, is_index=True, org=None, updated=now_str))
+    for org in org_pages:
+        page_dir = os.path.join(org_dir, org["slug"])
+        os.makedirs(page_dir, exist_ok=True)
+        with open(os.path.join(page_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(org_tmpl.render(org=org, orgs=org_pages, is_index=False, updated=now_str))
+    print(f"Built {len(org_pages)} org pages under org/.")
 
     # Comparison pages — /compare/<a>-vs-<b>/ from the precomputed pairs
     # (top 3 per category). High-intent "X vs Y" search + LLM-citable.
@@ -5000,6 +5325,7 @@ def main() -> None:
         ("https://hvtracker.net/", "1.0", "daily"),
         ("https://hvtracker.net/methodology", "0.5", "monthly"),
         ("https://hvtracker.net/movers/", "0.8", "daily"),
+        ("https://hvtracker.net/changes/", "0.8", "weekly"),
         ("https://hvtracker.net/use-cases/", "0.8", "daily"),
         ("https://hvtracker.net/badges/", "0.6", "weekly"),
         ("https://hvtracker.net/roadmap/", "0.5", "weekly"),
@@ -5015,6 +5341,12 @@ def main() -> None:
         sitemap_urls.append((f"https://hvtracker.net/categories/{cat_m['slug']}", "0.7", "daily"))
     for page in use_case_pages:
         sitemap_urls.append((f"https://hvtracker.net/use-cases/{page['slug']}/", "0.8", "daily"))
+    sitemap_urls.append(("https://hvtracker.net/ecosystem/", "0.8", "daily"))
+    for page in ecosystem_pages:
+        sitemap_urls.append((f"https://hvtracker.net/ecosystem/{page['slug']}/", "0.8", "daily"))
+    sitemap_urls.append(("https://hvtracker.net/org/", "0.7", "daily"))
+    for org in org_pages:
+        sitemap_urls.append((f"https://hvtracker.net/org/{org['slug']}/", "0.7", "daily"))
     sitemap_urls.append(("https://hvtracker.net/blog/", "0.6", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety", "0.8", "monthly"))
     sitemap_urls.append(("https://hvtracker.net/blog/most-starred-ai-agents-no-provenance", "0.9", "weekly"))

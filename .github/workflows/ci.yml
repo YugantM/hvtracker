@@ -35,6 +35,13 @@ jobs:
       - name: Run unit and data-integrity tests
         run: python -m pytest
 
+      - name: Lint Python (ruff)
+        run: ruff check .
+
+      - name: Audit dependencies (pip-audit)
+        continue-on-error: true
+        run: pip-audit -r requirements.txt
+
       - name: Lint shell scripts
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
