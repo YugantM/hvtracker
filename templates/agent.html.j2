@@ -391,7 +391,7 @@
     <section class="hero">
       <h1>{{ row.name }}</h1>
       <div class="repo">
-        <a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>
+        {% if row.org_slug_or_none %}<a href="/org/{{ row.org_slug_or_none }}/">{{ row.repo.split('/')[0] }}</a>/<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo.split('/')[1] }}</a>{% else %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>{% endif %}
       </div>
       {% if row.description %}<p class="desc">{{ row.description }}</p>{% endif %}
       <div class="badges">
