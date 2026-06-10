@@ -18,7 +18,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6.0.3
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6.0.3
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -84,7 +84,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-smoke
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6.0.3
 
       - name: Set up Python
         uses: actions/setup-python@v6
