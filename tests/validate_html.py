@@ -30,6 +30,8 @@ SAMPLES = [
     "ecosystem/index.html",
     "ecosystem/anthropic/index.html",
     "changes/index.html",
+    "org/index.html",
+    "org/microsoft/index.html",
 ]
 
 

@@ -2848,6 +2848,36 @@ def build_ecosystem_pages(rows: list[dict]) -> list[dict]:
     return pages
 
 
+def build_org_pages(rows: list[dict]) -> list[dict]:
+    """Build org pages for GitHub owners with >=2 tracked projects."""
+    owner_map: dict[str, list[dict]] = {}
+    display_names: dict[str, str] = {}
+    for row in rows:
+        owner = row["repo"].split("/")[0]
+        key = owner.lower()
+        owner_map.setdefault(key, []).append(row)
+        display_names.setdefault(key, owner)
+
+    orgs = []
+    for key, agents in owner_map.items():
+        if len(agents) < 2:
+            continue
+        agents_sorted = sorted(agents, key=lambda r: (-(r.get("trust_score") or 0), r.get("rank") or 9999))
+        combined_stars = sum(r.get("stars", 0) or 0 for r in agents_sorted)
+        avg_trust = round(sum(r.get("trust_score") or 0 for r in agents_sorted) / len(agents_sorted))
+        orgs.append({
+            "name": display_names[key],
+            "slug": key,
+            "project_count": len(agents_sorted),
+            "combined_stars": combined_stars,
+            "combined_stars_fmt": fmt_num(combined_stars),
+            "avg_trust": avg_trust,
+            "agents": agents_sorted,
+        })
+    orgs.sort(key=lambda o: (-sum(r.get("trust_score") or 0 for r in o["agents"]), o["name"].lower()))
+    return orgs
+
+
 def render_event_timeline_svg(events: list[dict]) -> str:
     """Render a compact distribution of recent reputation events."""
     if not events:
@@ -4730,6 +4760,8 @@ def main() -> None:
     newly_added = compute_newly_added(rows, history)
     use_case_pages = build_use_case_pages(rows)
     ecosystem_pages = build_ecosystem_pages(rows)
+    org_pages = build_org_pages(rows)
+    org_slug_set = {o["slug"] for o in org_pages}
 
     # Sort legacy rows by stars descending for display; populate fields needed by templates
     for lr in legacy_rows:
@@ -4886,6 +4918,8 @@ def main() -> None:
     # Add category_slug so agent pages can link to category pages
     for row in rows + legacy_rows:
         row["category_slug"] = slugify(row.get("category", "")) if row.get("category") else ""
+        owner = row["repo"].split("/")[0].lower()
+        row["org_slug_or_none"] = owner if owner in org_slug_set else None
         row["review_insights"] = agent_review_insights(row)
         row["remediation_steps"] = agent_remediation_steps(row)
         row["safety_qa"] = agent_safety_qa(row)
@@ -5070,6 +5104,18 @@ def main() -> None:
         with open(os.path.join(page_dir, "index.html"), "w", encoding="utf-8") as f:
             f.write(eco_tmpl.render(page=page, pages=ecosystem_pages, updated=now_str, is_index=False))
     print(f"Built {len(ecosystem_pages)} ecosystem pages under ecosystem/.")
+    # Organization pages — /org/ and /org/<owner>/
+    org_tmpl = env.get_template("org.html.j2")
+    org_dir = os.path.join(script_dir, "org")
+    os.makedirs(org_dir, exist_ok=True)
+    with open(os.path.join(org_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(org_tmpl.render(orgs=org_pages, is_index=True, org=None, updated=now_str))
+    for org in org_pages:
+        page_dir = os.path.join(org_dir, org["slug"])
+        os.makedirs(page_dir, exist_ok=True)
+        with open(os.path.join(page_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(org_tmpl.render(org=org, orgs=org_pages, is_index=False, updated=now_str))
+    print(f"Built {len(org_pages)} org pages under org/.")
 
     # Comparison pages — /compare/<a>-vs-<b>/ from the precomputed pairs
     # (top 3 per category). High-intent "X vs Y" search + LLM-citable.
@@ -5298,6 +5344,9 @@ def main() -> None:
     sitemap_urls.append(("https://hvtracker.net/ecosystem/", "0.8", "daily"))
     for page in ecosystem_pages:
         sitemap_urls.append((f"https://hvtracker.net/ecosystem/{page['slug']}/", "0.8", "daily"))
+    sitemap_urls.append(("https://hvtracker.net/org/", "0.7", "daily"))
+    for org in org_pages:
+        sitemap_urls.append((f"https://hvtracker.net/org/{org['slug']}/", "0.7", "daily"))
     sitemap_urls.append(("https://hvtracker.net/blog/", "0.6", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety", "0.8", "monthly"))
     sitemap_urls.append(("https://hvtracker.net/blog/most-starred-ai-agents-no-provenance", "0.9", "weekly"))
