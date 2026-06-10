@@ -2739,6 +2739,42 @@ def build_graph(rows: list[dict]) -> dict:
     }
 
 
+def build_ecosystem_pages(rows: list[dict]) -> list[dict]:
+    """Generate one page per LLM provider found in external_service_dependencies.providers."""
+    provider_agents: dict[str, list[dict]] = {}
+    for r in rows:
+        ext = r.get("external_service_dependencies") or {}
+        for prov in ext.get("providers") or []:
+            provider_agents.setdefault(prov, []).append(r)
+
+    pages = []
+    for provider in sorted(provider_agents):
+        agents = sorted(
+            provider_agents[provider],
+            key=lambda r: (-(r.get("trust_score") or 0), r.get("rank") or 9999),
+        )
+        slug = re.sub(r"[^a-z0-9]+", "-", provider.lower()).strip("-")
+        top5 = ", ".join(a["name"] for a in agents[:5])
+        faq_answer = (
+            f"As of today, {len(agents)} open-source AI projects in the HVTracker registry "
+            f"use {provider}. The highest-ranked by trust are {top5}."
+        )
+        pages.append({
+            "slug": slug,
+            "provider": provider,
+            "title": f"Projects Using {provider} — Trust-Ranked",
+            "description": (
+                f"{len(agents)} open-source AI agent projects that integrate {provider}, "
+                f"ranked by evidence-based HVTrust scores."
+            ),
+            "agents": agents,
+            "faq_answer": faq_answer,
+            "avg_trust": round(sum(r.get("trust_score") or 0 for r in agents) / max(len(agents), 1)),
+            "fresh_count": sum(1 for r in agents if (r.get("days_ago") or 9999) <= 14),
+        })
+    return pages
+
+
 def render_event_timeline_svg(events: list[dict]) -> str:
     """Render a compact distribution of recent reputation events."""
     if not events:
@@ -4617,6 +4653,7 @@ def main() -> None:
     movers_page = compute_movers_page_data(rows, history)
     newly_added = compute_newly_added(rows, history)
     use_case_pages = build_use_case_pages(rows)
+    ecosystem_pages = build_ecosystem_pages(rows)
 
     # Sort legacy rows by stars descending for display; populate fields needed by templates
     for lr in legacy_rows:
@@ -4893,6 +4930,27 @@ def main() -> None:
             f.write(use_case_tmpl.render(page=page, pages=use_case_pages, updated=now_str, is_index=False))
     print(f"Built {len(use_case_pages)} use-case pages under use-cases/.")
 
+    # Ecosystem pages — /ecosystem/ and /ecosystem/<slug>/.
+    eco_tmpl = env.get_template("ecosystem.html.j2")
+    eco_dir = os.path.join(script_dir, "ecosystem")
+    os.makedirs(eco_dir, exist_ok=True)
+    eco_index_page = {
+        "title": "AI Agent Ecosystem by Provider",
+        "description": "Open-source AI agent projects grouped by LLM provider, ranked by evidence-based HVTrust scores.",
+        "slug": "",
+        "agents": rows[:12],
+        "avg_trust": round(sum(r.get("trust_score") or 0 for r in rows[:12]) / max(len(rows[:12]), 1)),
+        "fresh_count": sum(1 for r in rows[:12] if (r.get("days_ago") or 9999) <= 14),
+    }
+    with open(os.path.join(eco_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(eco_tmpl.render(page=eco_index_page, pages=ecosystem_pages, updated=now_str, is_index=True))
+    for page in ecosystem_pages:
+        page_dir = os.path.join(eco_dir, page["slug"])
+        os.makedirs(page_dir, exist_ok=True)
+        with open(os.path.join(page_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(eco_tmpl.render(page=page, pages=ecosystem_pages, updated=now_str, is_index=False))
+    print(f"Built {len(ecosystem_pages)} ecosystem pages under ecosystem/.")
+
     # Comparison pages — /compare/<a>-vs-<b>/ from the precomputed pairs
     # (top 3 per category). High-intent "X vs Y" search + LLM-citable.
     cmp_tmpl = env.get_template("compare.html.j2")
@@ -5116,6 +5174,9 @@ def main() -> None:
         sitemap_urls.append((f"https://hvtracker.net/categories/{cat_m['slug']}", "0.7", "daily"))
     for page in use_case_pages:
         sitemap_urls.append((f"https://hvtracker.net/use-cases/{page['slug']}/", "0.8", "daily"))
+    sitemap_urls.append(("https://hvtracker.net/ecosystem/", "0.8", "daily"))
+    for page in ecosystem_pages:
+        sitemap_urls.append((f"https://hvtracker.net/ecosystem/{page['slug']}/", "0.8", "daily"))
     sitemap_urls.append(("https://hvtracker.net/blog/", "0.6", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety", "0.8", "monthly"))
     sitemap_urls.append(("https://hvtracker.net/blog/most-starred-ai-agents-no-provenance", "0.9", "weekly"))
