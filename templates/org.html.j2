@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="s2YUWbGP7cJsI6HUCKRX9YCtbVJVyA1Q1_jsNWj1RHc">
   <title>{% if is_index %}Organizations — AI Agent Publishers | HVTracker{% else %}{{ org.name }} — {{ org.project_count }} AI Agent Projects | HVTracker{% endif %}</title>
   <meta name="description" content="{% if is_index %}{{ orgs|length }} organizations that publish 2 or more tracked AI agent projects, ranked by combined HVTrust.{% else %}{{ org.project_count }} tracked AI agent projects by {{ org.name }}, with {{ org.combined_stars_fmt }} combined GitHub stars and an average HVTrust of {{ org.avg_trust }}/100.{% endif %}">
   <link rel="canonical" href="https://hvtracker.net/org/{% if not is_index %}{{ org.slug }}/{% endif %}">
