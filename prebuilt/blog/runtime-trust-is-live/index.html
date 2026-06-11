@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Runtime Trust Is Live on HVTracker | HVTracker</title>
+  <meta name="description" content="HVTracker v3.2 adds public runtime-trust discovery fields and an experimental score lab. Here is how the current top 10 would move under the first v2 calibration.">
+  <link rel="canonical" href="https://hvtracker.net/blog/runtime-trust-is-live">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Runtime Trust Is Live on HVTracker">
+  <meta property="og:description" content="HVTracker v3.2 adds public runtime-trust discovery and an experimental score lab. See how the current top 10 would change under the first calibration.">
+  <meta property="og:url" content="https://hvtracker.net/blog/runtime-trust-is-live">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Runtime Trust Is Live on HVTracker">
+  <meta name="twitter:description" content="HVTracker v3.2 adds public runtime-trust discovery and an experimental score lab. See how the current top 10 would change under the first calibration.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Runtime Trust Is Live on HVTracker",
+    "description": "HVTracker v3.2 adds public runtime-trust discovery fields and an experimental score lab. The article walks through what shipped and how the current top 10 would move under the first v2 calibration.",
+    "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "publisher": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "datePublished": "2026-06-05",
+    "dateModified": "2026-06-05",
+    "mainEntityOfPage": "https://hvtracker.net/blog/runtime-trust-is-live"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://hvtracker.net/blog/" },
+      { "@type": "ListItem", "position": 3, "name": "Runtime Trust Is Live" }
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#f4f1eb; --surface:#eae6de; --border:#d4cfc5; --text:#1a1a1a; --muted:#6b6560;
+      --accent:#2c5282; --green:#2f6846; --red:#9b3c3c; --amber:#8b6914;
+      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg); background-image:url("/hex-bg.svg"); background-size:2000px 2000px; color:var(--text); font-family:var(--font-sans); font-size:16px; line-height:1.7; min-height:100vh; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:760px; margin:0 auto; padding:0 20px; background:var(--bg); min-height:100vh; }
+    .site-header { position:sticky; top:0; z-index:100; background:var(--bg); border-bottom:1px solid var(--border); }
+    .site-header-inner { max-width:1200px; margin:0 auto; padding:14px 20px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; color:var(--text); }
+    .logo span { color:var(--accent); }
+    .site-nav { margin-left:auto; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; }
+    .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--text); border-color:var(--border); background:var(--surface); text-decoration:none; }
+    article { padding:36px 0 48px; }
+    h1 { font-size:34px; font-weight:700; line-height:1.15; margin-bottom:12px; }
+    .meta { font-size:13px; color:var(--muted); margin-bottom:32px; font-family:var(--font-mono); }
+    h2 { font-size:22px; font-weight:700; margin-top:36px; margin-bottom:12px; }
+    p { margin-bottom:16px; }
+    code { font-family:var(--font-mono); font-size:14px; background:var(--surface); padding:2px 6px; border-radius:3px; }
+    .callout { background:rgba(44,82,130,0.08); border-left:3px solid var(--accent); padding:16px 20px; margin:24px 0; border-radius:0 6px 6px 0; font-size:14px; }
+    .callout strong { color:var(--accent); }
+    .big-stat { text-align:center; padding:32px 0; margin:24px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+    .big-stat .number { font:700 44px var(--font-mono); color:var(--accent); }
+    .big-stat .label { font-size:14px; color:var(--muted); margin-top:4px; }
+    table { width:100%; border-collapse:collapse; margin:24px 0; font-size:14px; }
+    th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:top; }
+    th { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
+    td.name a { font-weight:600; color:var(--text); }
+    td.name a:hover { color:var(--accent); }
+    td.rank, td.score { font-family:var(--font-mono); }
+    .up { color:var(--green); font-weight:700; font-family:var(--font-mono); }
+    .down { color:var(--red); font-weight:700; font-family:var(--font-mono); }
+    .neutral { color:var(--muted); font-family:var(--font-mono); }
+    .cta-box { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:24px; margin:36px 0; text-align:center; }
+    .cta-box h3 { margin-bottom:8px; font-size:18px; }
+    .cta-box p { font-size:14px; color:var(--muted); margin-bottom:16px; }
+    .cta-btn { display:inline-block; background:var(--accent); color:#fff; padding:10px 24px; border-radius:5px; font-weight:600; font-size:14px; text-decoration:none; }
+    .cta-btn:hover { opacity:0.9; text-decoration:none; }
+    footer { padding:28px 0; border-top:1px solid var(--border); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--accent); }
+    @media (max-width:600px) { h1 { font-size:26px; } table { font-size:12px; } th,td { padding:8px 6px; } }
+  </style>
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TZ8921LR0K');</script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="blog_article">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/score-lab/">Score lab</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+      </nav>
+    </div>
+  </header>
+  <div class="page">
+    <article>
+      <h1>Runtime Trust Is Live on HVTracker</h1>
+      <div class="meta">June 5, 2026 &middot; 5 min read &middot; HVTracker Research</div>
+
+      <p>HVTracker v3.2 adds a new public layer to every agent profile: <strong>runtime-trust discovery</strong>. We already ranked projects on supply-chain trust, provenance, maintenance, and adoption. Now we also expose four lightweight runtime fields that help answer a different question: <em>what does this thing look like once it actually runs?</em></p>
+
+      <p>The four new public fields are:</p>
+      <p><strong>MCP server support</strong>, <strong>external service dependencies</strong>, <strong>tool / plugin surface</strong>, and <strong>package provenance drift</strong>.</p>
+
+      <div class="callout">
+        <strong>Important:</strong> these runtime fields are live on agent pages now, but they do <strong>not</strong> affect the production leaderboard yet. We are calibrating them separately in an experimental <a href="/score-lab/">Score Lab</a> so we can study upsets before changing the live rank.
+      </div>
+
+      <h2>What actually shipped</h2>
+
+      <p>This release is intentionally conservative. We are only showing public, checkable signals from repo docs, manifests, and registry metadata. No private annotations, no secret analyst layer, and no pretending we can perfectly infer runtime behavior from static files.</p>
+
+      <p>That gives us a useful first snapshot:</p>
+
+      <ul style="margin:0 0 16px 24px; line-height:2;">
+        <li>Does the project look MCP-aware, and does it appear to expose an MCP server?</li>
+        <li>Which external providers or services appear to be required?</li>
+        <li>How broad is the public tool or plugin surface?</li>
+        <li>Do the latest published package references still point back to the tracked source repo?</li>
+      </ul>
+
+      <div class="big-stat">
+        <div class="number">60</div>
+        <div class="label">agents currently shift by 10 or more ranks in the first experimental v2 calibration</div>
+      </div>
+
+      <h2>How the current top 10 would change</h2>
+
+      <p>The current production top 10 is still the official leaderboard. But the first local v2 calibration already tells us something interesting: the biggest movements come from strong MCP and provenance matches on one side, and package-provenance drift warnings on the other.</p>
+
+      <table>
+        <thead>
+          <tr><th>Agent</th><th>Current</th><th>V2</th><th>Delta</th><th>Score change</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="name"><a href="/agents/haystack/">Haystack</a></td><td class="rank">#1</td><td class="rank">#3</td><td class="down">-2</td><td class="score">94.3 → 96.1</td></tr>
+          <tr><td class="name"><a href="/agents/langgraph/">LangGraph</a></td><td class="rank">#2</td><td class="rank">#17</td><td class="down">-15</td><td class="score">93.2 → 86.8</td></tr>
+          <tr><td class="name"><a href="/agents/codex/">Codex</a></td><td class="rank">#3</td><td class="rank">#1</td><td class="up">+2</td><td class="score">92.8 → 97.9</td></tr>
+          <tr><td class="name"><a href="/agents/vercel-ai-sdk/">Vercel AI SDK</a></td><td class="rank">#4</td><td class="rank">#2</td><td class="up">+2</td><td class="score">92.6 → 97.8</td></tr>
+          <tr><td class="name"><a href="/agents/n8n/">n8n</a></td><td class="rank">#5</td><td class="rank">#4</td><td class="up">+1</td><td class="score">91.8 → 94.3</td></tr>
+          <tr><td class="name"><a href="/agents/openai-agents-sdk/">OpenAI Agents SDK</a></td><td class="rank">#6</td><td class="rank">#10</td><td class="down">-4</td><td class="score">91.2 → 91.4</td></tr>
+          <tr><td class="name"><a href="/agents/livekit-agents/">LiveKit Agents</a></td><td class="rank">#7</td><td class="rank">#9</td><td class="down">-2</td><td class="score">91.2 → 92.4</td></tr>
+          <tr><td class="name"><a href="/agents/pydanticai/">PydanticAI</a></td><td class="rank">#8</td><td class="rank">#5</td><td class="up">+3</td><td class="score">91.1 → 93.4</td></tr>
+          <tr><td class="name"><a href="/agents/cline/">Cline</a></td><td class="rank">#9</td><td class="rank">#6</td><td class="up">+3</td><td class="score">91.0 → 92.9</td></tr>
+          <tr><td class="name"><a href="/agents/mlflow/">MLflow</a></td><td class="rank">#10</td><td class="rank">#11</td><td class="down">-1</td><td class="score">90.7 → 89.5</td></tr>
+        </tbody>
+      </table>
+
+      <h2>The most interesting upset</h2>
+
+      <p><strong>LangGraph</strong> is the obvious surprise. It is currently ranked #2, but the first v2 calibration drops it to #17. That is not because the project suddenly looks weak overall. It is because the runtime layer found a <strong>package provenance drift warning</strong>, and that penalty is currently strong enough to dominate the new runtime slice.</p>
+
+      <p>That is exactly why Score Lab exists. A result like that does not mean we should immediately change the live ranking. It means we should inspect the evidence, review whether the drift penalty is too sharp, and decide if the formula is rewarding and punishing the right things.</p>
+
+      <h2>What looks good in the first pass</h2>
+
+      <p><strong>Codex</strong> and <strong>Vercel AI SDK</strong> both move into the top two positions under the first calibration. Both benefit from strong MCP signals plus clean package-source matches. <strong>PydanticAI</strong> and <strong>Cline</strong> also climb, though more modestly.</p>
+
+      <p>That feels directionally right. The runtime layer should reward projects that are both verifiable and explicit about the surfaces they expose, without letting runtime complexity alone overpower the stronger supply-chain core of HVTrust.</p>
+
+      <h2>What happens next</h2>
+
+      <p>For now, the production leaderboard remains unchanged. The next work is calibration, not immediate launch:</p>
+
+      <ul style="margin:0 0 16px 24px; line-height:2;">
+        <li>review large rank swings case by case</li>
+        <li>soften penalties that create noisy or premature upsets</li>
+        <li>separate “interesting signal” from “deserves ranking impact”</li>
+        <li>add historical runtime drift and a simple weekly digest later on</li>
+      </ul>
+
+      <div class="cta-box">
+        <h3>See the experimental ranking preview</h3>
+        <p>Open the Score Lab to inspect the raw current-vs-v2 changes, biggest movers, and the full comparison table.</p>
+        <a class="cta-btn" href="/score-lab/">Open Score Lab</a>
+      </div>
+
+      <p>If there is a better product pattern here, it is probably this: <strong>keep raw discovery public, keep score changes conservative, and let people inspect the “what if” ranking before we touch the main leaderboard.</strong> That gives us more trust, not less.</p>
+    </article>
+
+    <footer>
+      <a href="/methodology">Methodology</a> &middot;
+      <a href="/roadmap/">Roadmap</a> &middot;
+      <a href="/score-lab/">Score Lab</a> &middot;
+      <a href="/blog/">Blog</a>
+    </footer>
+  </div>
+</body>
+</html>

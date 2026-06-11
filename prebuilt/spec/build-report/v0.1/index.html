@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build Integrity Report — HVTracker Specifications</title>
+  <meta name="description" content="Machine-readable self-audit of the HVTracker build pipeline. Generated on each cron run, reporting configured agents, active agents, eligibility warnings, faile">
+  <link rel="canonical" href="https://hvtracker.net/spec/build-report/v0.1">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Build Integrity Report">
+  <meta property="og:description" content="Machine-readable self-audit of the HVTracker build pipeline. Generated on each cron run, reporting configured agents, active agents, eligibility warnings, faile">
+  <meta property="og:url" content="https://hvtracker.net/spec/build-report/v0.1">
+  <link rel="stylesheet" href="/static/site.css?v=f9997149">
+  <style>
+    :root {
+      --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Inter",system-ui,-apple-system,sans-serif;
+      --font-serif:"Georgia","Times New Roman",serif;
+    }
+    body { line-height: 1.7; }
+    a { color: var(--lobster); }
+    .page { padding: 24px 20px 0; }
+    .logo span { color: var(--lobster); }
+    .spec-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 0 48px;
+      padding: 40px 0 60px;
+      align-items: start;
+    }
+    @media (max-width: 760px) {
+      .spec-layout { grid-template-columns: 1fr; }
+      .toc { display: none; }
+    }
+    .toc {
+      position: sticky;
+      top: 24px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      line-height: 1.6;
+    }
+    .toc-title {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); margin-bottom: 10px; font-weight: 600;
+    }
+    .toc a {
+      display: block; color: var(--muted); padding: 3px 0;
+      border-left: 2px solid var(--line); padding-left: 10px;
+      transition: all 0.1s;
+    }
+    .toc a:hover { color: var(--lobster); border-color:var(--line); background:var(--paper-2); text-decoration: none; }
+    .toc a.active { color: var(--lobster); border-color:var(--line); background:var(--paper-2); }
+    .toc-sub { padding-left: 22px !important; font-size: 11px; }
+    .spec-doc { min-width: 0; max-width: 720px; }
+    .spec-cover {
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 32px;
+    }
+    .spec-cover h1 {
+      font-family: var(--font-mono);
+      font-size: 26px; font-weight: 700; letter-spacing: -0.5px;
+      line-height: 1.25; margin-bottom: 12px;
+      color: var(--ink);
+    }
+    .spec-meta {
+      font-family: var(--font-mono); font-size: 11.5px;
+      color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 18px;
+      margin-bottom: 14px;
+    }
+    .spec-meta span { white-space: nowrap; }
+    .status-badge {
+      display: inline-block;
+      font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+      padding: 2px 8px; border-radius: 999px;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .status-published  { background: rgba(111,135,110,0.14); color: var(--moss); }
+    .status-draft      { background: rgba(198,124,109,0.14); color: var(--lobster); }
+    .status-review     { background: var(--blue-soft); color: var(--lobster); }
+    .status-superseded { background: rgba(141,136,126,0.16); color: var(--stale); }
+    .permalink {
+      font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+      margin-top: 10px;
+    }
+    .permalink code { color: var(--lobster); }
+    .spec-doc h2 {
+      font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--lobster); margin: 36px 0 14px;
+      padding-bottom: 8px; border-bottom: 1px solid var(--line);
+      scroll-margin-top: 24px;
+    }
+    .spec-doc h3 {
+      font-family: var(--font-mono); font-size: 12.5px; font-weight: 600;
+      color: var(--ink); margin: 24px 0 10px;
+      scroll-margin-top: 24px;
+    }
+    .spec-doc h4 {
+      font-size: 13px; font-weight: 600; color: var(--lobster);
+      margin: 18px 0 8px;
+    }
+    .spec-doc p { margin-bottom: 14px; color: var(--ink); font-size: 14.5px; }
+    .spec-doc p:last-child { margin-bottom: 0; }
+    .must   { font-weight: 700; color: #b25567; }
+    .should { font-weight: 700; color: var(--lobster); }
+    .may    { font-weight: 700; color: var(--moss); }
+    code {
+      font-family: var(--font-mono); font-size: 12.5px;
+      background: var(--paper-2); padding: 1px 5px; border-radius: 3px;
+      color: var(--lobster);
+    }
+    pre {
+      font-family: var(--font-mono); font-size: 12px;
+      background: var(--paper-2); border: 1px solid var(--line);
+      border-radius: 6px; padding: 16px 18px; overflow-x: auto;
+      margin: 14px 0; line-height: 1.6; color: var(--ink);
+    }
+    pre code { background: none; padding: 0; color: inherit; }
+    .spec-doc ul, .spec-doc ol { padding-left: 1.4em; margin: 10px 0 14px; }
+    .spec-doc li { margin-bottom: 6px; font-size: 14.5px; }
+    .spec-doc li:last-child { margin-bottom: 0; }
+    .spec-doc dl { margin: 10px 0 14px; }
+    .spec-doc dt {
+      font-family: var(--font-mono); font-size: 12.5px; font-weight: 600;
+      color: var(--ink); margin-top: 12px;
+    }
+    .spec-doc dd { margin-left: 1.4em; font-size: 14px; color: var(--muted); }
+    .note {
+      font-size: 13.5px; color: var(--ink);
+      padding: 12px 16px; background: var(--blue-soft);
+      border-left: 3px solid var(--lobster); border-radius: 0 4px 4px 0;
+      margin: 16px 0;
+    }
+    .spec-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 13px; margin: 14px 0;
+    }
+    .spec-table th {
+      font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted); background: var(--paper-2);
+      padding: 8px 12px; border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+    .spec-table td {
+      padding: 9px 12px; border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    .spec-table tr:last-child td { border-bottom: none; }
+    .spec-table tr:nth-child(even) { background: rgba(0,0,0,0.02); }
+    .sec-num { color: var(--muted); margin-right: 8px; font-family: var(--font-mono); }
+    footer {
+      padding: 28px 0 48px; border-top: 1px solid var(--line);
+      font-size: 12px; color: var(--muted);
+      display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
+    }
+    footer a { color: var(--lobster); }
+    .footer-sep { color: var(--line-strong); }
+  </style>
+  <!-- Google tag (gtag.js) -->
+  <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+</head>
+<body>
+  <header class="site-header">
+  <div class="site-header-inner">
+    <a href="/" class="logo">HV<span>Tracker</span></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="/">Leaderboard</a>
+      <a href="/movers/">Movers</a>
+      <a href="/changes/">Changes</a>
+      <a href="/use-cases/">Use cases</a>
+      <a href="/methodology">Methodology</a>
+      <a href="/score-lab/">Score lab</a>
+      <a href="/compare/">Compare</a>
+      <a href="/alerts/">Alerts</a>
+      <a href="/data/">Data API</a>
+      <a href="/sponsor/">Sponsor</a>
+    </nav>
+    <div class="meta">
+      <span class="live-dot"></span>updated 2026-06-11 10:26 UTC
+    </div>
+  </div>
+</header>
+  <div class="page">
+
+    <div class="spec-layout">
+
+      <!-- Table of contents -->
+      <nav class="toc" aria-label="Table of contents">
+        <div class="toc-title">Contents</div>
+        
+        <a href="#s1" class="active">
+          1 Purpose
+        </a>
+        
+        
+        <a href="#s2" >
+          2 Endpoint
+        </a>
+        
+        
+        <a href="#s3" >
+          3 Fields
+        </a>
+        
+        
+        <a href="#s4" >
+          4 Usage
+        </a>
+        
+        
+        
+      </nav>
+
+      <!-- Specification document -->
+      <article class="spec-doc">
+
+        <div class="spec-cover">
+          <h1>Build Integrity Report</h1>
+          <div class="spec-meta">
+            <span>Version: <strong>v0.1</strong></span>
+            <span>Status: <span class="status-badge status-draft">Draft</span></span>
+            <span>Published: 2026-05-26</span>
+            <span>Authors: HVTracker</span>
+          </div>
+          <div class="permalink">
+            Permalink: <code>https://hvtracker.net/spec/build-report/v0.1</code>
+          </div>
+        </div>
+
+        
+<h2 id="s1">1. Purpose</h2>
+<p>The build integrity report provides a machine-readable summary of each HVTracker data pipeline run. It answers: <em>"What exactly was generated, from what source, how many succeeded, and what failed?"</em></p>
+<p>If HVTracker is to serve as a trust registry, its own data pipeline must be transparent. This report is the self-audit.</p>
+
+<h2 id="s2">2. Endpoint</h2>
+<p><code>GET /data/build_report.json</code></p>
+<p>Generated during every cron run by <code>fetch_and_build.py</code>. Refreshes daily at 06:00 UTC alongside all other data endpoints.</p>
+
+<h2 id="s3">3. Fields</h2>
+<table>
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>generated_at</code></td><td>string (ISO 8601)</td><td>Timestamp when the report was generated</td></tr>
+    <tr><td><code>data_timestamp</code></td><td>string</td><td>Human-readable timestamp shown on the leaderboard</td></tr>
+    <tr><td><code>schema_version</code></td><td>string</td><td>Data schema version (e.g. "v0.1")</td></tr>
+    <tr><td><code>methodology_version</code></td><td>string</td><td>Methodology version (e.g. "v2.0")</td></tr>
+    <tr><td><code>configured_agents</code></td><td>integer</td><td>Total entries in agents.json (active + legacy)</td></tr>
+    <tr><td><code>active_agents</code></td><td>integer</td><td>Successfully fetched and scored agents</td></tr>
+    <tr><td><code>legacy_agents</code></td><td>integer</td><td>Legacy agents (inactive &ge;365 days, rendered separately)</td></tr>
+    <tr><td><code>total_generated</code></td><td>integer</td><td>Total agent profile pages generated (active + legacy)</td></tr>
+    <tr><td><code>categories</code></td><td>object</td><td>Map of category name &rarr; agent count</td></tr>
+    <tr><td><code>warnings</code></td><td>array</td><td>Eligibility violations (criterion, repo, detail)</td></tr>
+    <tr><td><code>warning_count</code></td><td>integer</td><td>Number of eligibility warnings</td></tr>
+    <tr><td><code>failed_fetches</code></td><td>array</td><td>Repos that could not be fetched (404, rate limit, etc.)</td></tr>
+    <tr><td><code>missing_repos_count</code></td><td>integer</td><td>Count of failed fetches</td></tr>
+    <tr><td><code>package_failures</code></td><td>array</td><td>Repos with configured package but no download data</td></tr>
+    <tr><td><code>package_failure_count</code></td><td>integer</td><td>Count of package lookup failures</td></tr>
+    <tr><td><code>scorecard_unavailable_count</code></td><td>integer</td><td>Agents without OSSF Scorecard data</td></tr>
+    <tr><td><code>fingerprint_agents</code></td><td>array</td><td>Repos with fingerprint-based action tracking configured</td></tr>
+    <tr><td><code>fingerprint_agent_count</code></td><td>integer</td><td>Count of fingerprint-tracked agents</td></tr>
+  </tbody>
+</table>
+
+<h2 id="s4">4. Usage</h2>
+<p>Consumers can use this report to:</p>
+<ul>
+  <li>Monitor pipeline health (failed fetch count trending up = API issue)</li>
+  <li>Verify data freshness (compare <code>generated_at</code> against expectations)</li>
+  <li>Audit signal coverage (scorecard unavailable count, package failures)</li>
+  <li>Track growth (configured vs active agents over time)</li>
+</ul>
+<p>This report is public. It is part of HVTracker's commitment to transparent data sourcing.</p>
+
+
+      </article>
+    </div>
+
+    <footer>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">·</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">·</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">·</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">·</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">·</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">·</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+
+  </div>
+
+  <script>
+    // Active ToC highlighting on scroll
+    (function () {
+      const headings = document.querySelectorAll('.spec-doc h2[id], .spec-doc h3[id]');
+      const links = document.querySelectorAll('.toc a');
+      if (!headings.length || !links.length) return;
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const active = document.querySelector('.toc a[href="#' + e.target.id + '"]');
+            if (active) active.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -60% 0px' });
+      headings.forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-06-11T10:26:35Z",
+  "data_timestamp": "2026-06-11 10:26 UTC",
+  "schema_version": "v0.1",
+  "methodology_version": "v3.2",
+  "configured_agents": 246,
+  "active_agents": 223,
+  "legacy_agents": 0,
+  "total_generated": 223,
+  "categories": {
+    "Coding Agents": 32,
+    "Agent Frameworks": 53,
+    "Workflow Platforms": 15,
+    "Browser & Computer Use": 16,
+    "Memory & Knowledge": 22,
+    "Research & Data": 13,
+    "Observability & Evaluation": 18,
+    "Security & Guardrails": 5,
+    "Protocols & Tool Integration": 6,
+    "Voice & Conversational": 5,
+    "Sandboxes & Runtimes": 2,
+    "Robotics & Embodied": 1,
+    "LLM Gateways & Infra": 8,
+    "Multi-Agent Systems": 10,
+    "UI & App Builders": 7,
+    "Needs review": 10
+  },
+  "warnings": [
+    {
+      "repo": "anthropics/claude-code",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "google-antigravity/antigravity-cli",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "browserbase/open-operator",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "yoheinakajima/babyagi",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    },
+    {
+      "repo": "stackblitz/bolt.new",
+      "criterion": "4.2.1",
+      "detail": "no meaningful activity in 12 months (last push 2024-12-17)"
+    },
+    {
+      "repo": "trypear/pearai-master",
+      "criterion": "4.1.1",
+      "detail": "no declared license (GitHub license field is null)"
+    }
+  ],
+  "warning_count": 6,
+  "failed_fetches": [
+    "AbanteAI/archive-old-cli-mentat",
+    "MineDojo/Voyager",
+    "MinorJerry/WebVoyager",
+    "OpenBMB/AgentVerse",
+    "OpenBMB/XAgent",
+    "TransformerOptimus/SuperAGI",
+    "agiresearch/OpenAGI",
+    "albertvillanova/tinyagents",
+    "aymenfurter/microagents",
+    "biobootloader/wolverine",
+    "entropy-research/Devon",
+    "idosal/AgentLLM",
+    "joonspk-research/generative_agents",
+    "kuafuai/DevOpsGPT",
+    "langchain-ai/langgraph-codeact",
+    "lavague-ai/LaVague",
+    "microsoft/TaskWeaver",
+    "microsoft/guidance",
+    "nickscamara/open-deep-research",
+    "protectai/rebuff",
+    "smol-ai/developer",
+    "wisdom-pan/Agent_Hospital",
+    "xlang-ai/OpenAgents"
+  ],
+  "missing_repos_count": 23,
+  "package_failures": [
+    "sipyourdrink-ltd/bernstein",
+    "mastra-ai/mastra",
+    "Mintplex-Labs/anything-llm",
+    "leon-ai/leon",
+    "myshell-ai/AIlice",
+    "plandex-ai/plandex",
+    "FoundationAgents/OpenManus"
+  ],
+  "package_failure_count": 7,
+  "scorecard_unavailable_count": 33,
+  "fingerprint_agents": [
+    "anthropics/claude-code",
+    "OpenHands/OpenHands",
+    "Aider-AI/aider",
+    "google-gemini/gemini-cli",
+    "QwenLM/qwen-code"
+  ],
+  "fingerprint_agent_count": 5
+}

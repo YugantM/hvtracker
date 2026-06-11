@@ -38,9 +38,15 @@
     }
     .logo { font-family:var(--mono); font-size:20px; font-weight:700; }
     .logo span { color:var(--accent-warm); }
-    .site-nav { font-family:var(--mono); font-size:11px; display:flex; gap:6px; margin-left:auto; flex-wrap:wrap; }
+    .site-nav { font-family:var(--mono); font-size:11px; display:flex; gap:6px; margin-left:24px; flex-wrap:wrap; }
     .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
     .site-nav a:hover { color:var(--text); text-decoration:none; border-color:var(--border); background:var(--surface); }
+    .site-status { font:11px var(--mono); color:var(--muted); margin-left:auto; white-space:nowrap; }
+    .live-dot {
+      display:inline-block; width:7px; height:7px; border-radius:999px;
+      background:var(--green); margin-right:6px; vertical-align:middle;
+      box-shadow:0 0 0 3px color-mix(in srgb, var(--green) 18%, transparent);
+    }
     .page-title { width:100%; font-size:26px; font-weight:700; margin-top:4px; }
     .page-subtitle { width:100%; color:var(--muted); font-size:14px; }
 
@@ -79,6 +85,8 @@
     gtag('js', new Date());
     gtag('config', 'G-TZ8921LR0K');
   </script>
+  <script defer src="/analytics.js"></script>
+  <script defer src="/static/site-status.js"></script>
 </head>
 <body>
   <header class="site-header">
@@ -87,13 +95,18 @@
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
         <a href="/movers/">Movers</a>
+        <a href="/changes/">Changes</a>
         <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
+        <a href="/score-lab/">Score lab</a>
         <a href="/compare/">Compare</a>
         <a href="/alerts/">Alerts</a>
         <a href="/data/">Data API</a>
         <a href="/sponsor/">Sponsor</a>
       </nav>
+      <div class="site-status" data-updated="">
+        <span class="live-dot"></span>updated <span class="site-status-value"></span>
+      </div>
     </div>
   </header>
   <div class="container">

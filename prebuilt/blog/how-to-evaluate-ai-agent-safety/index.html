@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Evaluate AI Agent Safety — 5 Signals That Matter | HVTracker</title>
+  <meta name="description" content="How do you know if an open-source AI agent is safe to use? Learn the 5 key trust signals: OSSF Scorecard, package provenance, signed commits, activity patterns, and transparency indicators.">
+  <link rel="canonical" href="https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="How to Evaluate AI Agent Safety — 5 Signals That Matter">
+  <meta property="og:description" content="How do you know if an open-source AI agent is safe? Learn the 5 key trust signals developers should check before adopting any AI agent.">
+  <meta property="og:url" content="https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety">
+  <meta property="og:image" content="https://hvtracker.net/og-v1.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="How to Evaluate AI Agent Safety — 5 Signals That Matter">
+  <meta name="twitter:description" content="How do you know if an open-source AI agent is safe? Learn the 5 key trust signals developers should check.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v1.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "How to Evaluate AI Agent Safety — 5 Signals That Matter",
+    "description": "A practical guide to evaluating the safety and trustworthiness of open-source AI agents using evidence-based signals.",
+    "author": {
+      "@type": "Organization",
+      "name": "HVTracker",
+      "url": "https://hvtracker.net"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "HVTracker",
+      "url": "https://hvtracker.net"
+    },
+    "datePublished": "2026-05-27",
+    "dateModified": "2026-05-27",
+    "mainEntityOfPage": "https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety",
+    "url": "https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety"
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#f4f1eb; --surface:#eae6de; --surface-2:#e2ded6; --border:#d4cfc5;
+      --text:#1a1a1a; --muted:#6b6560;
+      --accent:#2c5282; --accent-lt:rgba(44,82,130,0.08); --accent-dim:#5677aa;
+      --mocha:#8b6914; --mocha-lt:rgba(139,105,20,0.10);
+      --fresh:#2f6846;
+      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color:var(--text); font-family:var(--font-sans); font-size:16px; line-height:1.7; min-height:100vh; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:720px; margin:0 auto; padding:0 20px; background:#f4f1eb; min-height:100vh; }
+
+    header {
+      padding:28px 0 20px; border-bottom:1px solid var(--border);
+      display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; position:relative;
+    }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; letter-spacing:-0.5px; color:var(--text); }
+    .logo span { color:var(--accent); }
+    .site-nav { margin-left:auto; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; } .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--text); border-color:var(--border); background:var(--surface); text-decoration:none; }
+
+    article { padding:36px 0 48px; }
+    h1 { font-size:32px; font-weight:700; letter-spacing:-0.5px; line-height:1.2; margin-bottom:12px; }
+    .meta { font-size:13px; color:var(--muted); margin-bottom:32px; font-family:var(--font-mono); }
+
+    h2 { font-size:22px; font-weight:700; margin-top:36px; margin-bottom:12px; letter-spacing:-0.3px; }
+    h3 { font-size:17px; font-weight:600; margin-top:24px; margin-bottom:8px; }
+    p { margin-bottom:16px; color:var(--text); }
+    p.muted { color:var(--muted); }
+
+    .signal-card {
+      background:var(--surface); border:1px solid var(--border); border-radius:6px;
+      padding:20px; margin:20px 0;
+    }
+    .signal-card h3 { margin-top:0; color:var(--accent); }
+    .signal-card .why { font-size:14px; color:var(--muted); margin-bottom:8px; }
+    .signal-card .detail { font-size:14px; }
+
+    .callout {
+      background:var(--accent-lt); border-left:3px solid var(--accent);
+      padding:16px 20px; margin:24px 0; border-radius:0 6px 6px 0;
+      font-size:14px;
+    }
+    .callout strong { color:var(--accent); }
+
+    .cta-box {
+      background:var(--surface); border:1px solid var(--border); border-radius:8px;
+      padding:24px; margin:36px 0; text-align:center;
+    }
+    .cta-box h3 { color:var(--text); margin-top:0; font-size:18px; }
+    .cta-box p { font-size:14px; color:var(--muted); margin-bottom:16px; }
+    .cta-btn {
+      display:inline-block; background:var(--accent); color:#fff; padding:10px 24px;
+      border-radius:5px; font-weight:600; font-size:14px; text-decoration:none;
+    }
+    .cta-btn:hover { opacity:0.9; text-decoration:none; }
+
+    ul { padding-left:24px; margin-bottom:16px; }
+    li { margin-bottom:6px; font-size:15px; }
+
+    .toc { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:16px 20px; margin:24px 0; }
+    .toc h3 { margin-top:0; font-size:14px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:8px; }
+    .toc ol { padding-left:20px; margin-bottom:0; }
+    .toc li { font-size:14px; margin-bottom:4px; }
+    .toc a { color:var(--text); }
+    .toc a:hover { color:var(--accent); }
+
+    footer {
+      padding:28px 0; border-top:1px solid var(--border);
+      font-size:11px; color:var(--muted); text-align:center;
+    }
+    footer a { color:var(--accent); }
+
+    @media (max-width:600px) {
+      h1 { font-size:24px; }
+      h2 { font-size:19px; }
+      .signal-card { padding:14px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
+      </nav>
+    </div>
+  </header>
+  <div class="page">
+
+    <article>
+      <h1>How to Evaluate AI Agent Safety: 5 Signals That Actually Matter</h1>
+      <div class="meta">May 27, 2026 &middot; 6 min read &middot; HVTracker Research</div>
+
+      <p>Open-source AI agents are being adopted at an unprecedented rate. Developers are integrating coding assistants, research agents, and workflow automation tools into production systems that handle sensitive data and make real decisions.</p>
+
+      <p>But how do you know if an AI agent is safe to use? GitHub stars measure popularity, not trustworthiness. A project with 50,000 stars can still have unsigned releases, no security policy, and dependencies riddled with known vulnerabilities.</p>
+
+      <p>At HVTracker, we track trust signals for hundreds of open-source AI agents daily. Here are the 5 evidence-based signals that actually predict whether an agent is safe to adopt.</p>
+
+      <div class="toc">
+        <h3>In this article</h3>
+        <ol>
+          <li><a href="#ossf-scorecard">OpenSSF Scorecard</a></li>
+          <li><a href="#provenance">Package Provenance</a></li>
+          <li><a href="#signed-commits">Signed Commits</a></li>
+          <li><a href="#activity">Activity Patterns</a></li>
+          <li><a href="#transparency">Transparency Indicators</a></li>
+        </ol>
+      </div>
+
+      <h2 id="ossf-scorecard">1. OpenSSF Scorecard</h2>
+
+      <div class="signal-card">
+        <h3>What it measures</h3>
+        <p class="why">Supply-chain security practices across 18 automated checks</p>
+        <p class="detail">The OpenSSF Scorecard is a tool maintained by the Open Source Security Foundation that runs automated checks against a GitHub repository. It evaluates branch protection, dependency pinning, vulnerability disclosure policies, CI/CD security, and more. Each check produces a score from 0-10.</p>
+      </div>
+
+      <p>This is the single most informative signal for supply-chain safety. A project scoring 7+/10 on the Scorecard has branch protection enabled, pins its dependencies, uses SAST tools, and has a vulnerability disclosure process.</p>
+
+      <p>The problem? Most AI agent projects don't score well. In our dataset, the median Scorecard score across tracked agents is below 5/10. The agents that score 7+ tend to be backed by established organizations with mature security practices.</p>
+
+      <div class="callout">
+        <strong>What to look for:</strong> A Scorecard score of 6+ is good. 7+ is excellent. Below 4 means basic security hygiene is missing. You can check any repo yourself at <a href="https://securityscorecards.dev/" target="_blank" rel="noopener">securityscorecards.dev</a>.
+      </div>
+
+      <h2 id="provenance">2. Package Provenance</h2>
+
+      <div class="signal-card">
+        <h3>What it measures</h3>
+        <p class="why">Whether published packages can be traced back to their source code</p>
+        <p class="detail">Package provenance creates a cryptographic link between a published npm or PyPI package and the specific source code commit and CI/CD pipeline that produced it. It uses SLSA (Supply-chain Levels for Software Artifacts) attestations to prove a package wasn't tampered with between the repository and the registry.</p>
+      </div>
+
+      <p>This matters because the supply-chain attack surface for AI agents is enormous. When you run <code>pip install</code> or <code>npm install</code>, you're trusting that the published package matches the source code you reviewed on GitHub. Without provenance, there's no way to verify this.</p>
+
+      <p>Provenance adoption is still early. In our tracking, only a fraction of AI agents publish packages with verified provenance attestations. But the ones that do are signaling a level of security maturity that goes beyond the basics.</p>
+
+      <div class="callout">
+        <strong>What to look for:</strong> Check the package page on npm or PyPI for a provenance badge or SLSA attestation. On HVTracker, we flag this as "Package provenance verified" on agent profile pages.
+      </div>
+
+      <h2 id="signed-commits">3. Signed Commits</h2>
+
+      <div class="signal-card">
+        <h3>What it measures</h3>
+        <p class="why">Whether code contributions are cryptographically authenticated</p>
+        <p class="detail">Signed commits use GPG or SSH keys to cryptographically prove that a commit was actually made by the claimed author. Without signing, anyone who gains write access to a repository (through a compromised token, for example) can push commits that appear to come from a trusted maintainer.</p>
+      </div>
+
+      <p>A high signed-commit ratio (80%+) indicates that a project's maintainers take code integrity seriously. It's not a perfect signal — some legitimate maintainers don't sign commits — but when combined with other signals, it's a strong indicator of security culture.</p>
+
+      <p>We measure this by sampling recent commits and calculating the ratio that are cryptographically verified. Projects backed by organizations with security policies tend to score highest here.</p>
+
+      <div class="callout">
+        <strong>What to look for:</strong> On GitHub, look for the green "Verified" badge next to commits. A project where 80%+ of recent commits are signed has strong identity controls.
+      </div>
+
+      <h2 id="activity">4. Activity Patterns</h2>
+
+      <div class="signal-card">
+        <h3>What it measures</h3>
+        <p class="why">Whether a project is actively maintained and responsive</p>
+        <p class="detail">Activity isn't just about commit frequency. The pattern matters: regular commits over time indicate sustained maintenance. A burst of commits followed by silence suggests a project might be abandoned. We look at commit cadence over 30 days, time since last push, and issue response patterns.</p>
+      </div>
+
+      <p>An unmaintained AI agent is a security liability. Vulnerabilities in dependencies go unpatched. Breaking changes in APIs go unaddressed. Users who report bugs get silence.</p>
+
+      <p>But very high activity can also be a warning sign. A project with hundreds of commits per week from a single contributor might be moving too fast for proper review. The healthiest pattern is consistent, multi-contributor activity with a reasonable cadence.</p>
+
+      <div class="callout">
+        <strong>What to look for:</strong> Last push within the past 7 days is ideal. 30+ days without a push is a yellow flag. 90+ days is a red flag for any project that people rely on in production.
+      </div>
+
+      <h2 id="transparency">5. Transparency Indicators</h2>
+
+      <div class="signal-card">
+        <h3>What it measures</h3>
+        <p class="why">Whether the project makes its practices and policies visible</p>
+        <p class="detail">Transparency includes having a clear license, a security policy (SECURITY.md), a code of conduct, contributing guidelines, and documentation. These aren't just nice-to-have — they signal that a project is run with governance and accountability in mind.</p>
+      </div>
+
+      <p>A project that lacks a security policy is telling you something: they haven't thought about what happens when a vulnerability is discovered. A project with no license leaves you legally exposed. Missing documentation makes it harder to audit what the agent actually does.</p>
+
+      <p>We also look at whether the project uses public GitHub Actions (visible CI/CD) versus private pipelines. Public CI/CD means anyone can verify how the software is built, tested, and released.</p>
+
+      <div class="callout">
+        <strong>What to look for:</strong> At minimum, look for a license, README, and SECURITY.md. Extra credit for CONTRIBUTING.md, a code of conduct, and visible CI/CD pipelines.
+      </div>
+
+      <h2>Putting It All Together</h2>
+
+      <p>No single signal tells the full story. An agent with a perfect Scorecard score but no activity in 6 months might be abandoned. An agent with thousands of commits but no provenance might have supply-chain risks.</p>
+
+      <p>The most trustworthy agents score well across multiple dimensions: they have reasonable Scorecard scores, some form of provenance or signing, active maintenance, and transparent governance.</p>
+
+      <p>This is exactly what HVTracker's Trust Score measures — a composite of activity, adoption, transparency, safety, and identity signals, weighted to reflect real-world risk. Each agent gets a score from 0-100, updated daily.</p>
+
+      <div class="cta-box">
+        <h3>Check the trust score for any AI agent</h3>
+        <p>HVTracker independently evaluates hundreds of open-source AI agents daily. Browse the full leaderboard, compare agents side by side, and see exactly which trust signals each agent has.</p>
+        <a href="/" class="cta-btn">Browse the Trust Registry</a>
+      </div>
+
+      <h2>Further Reading</h2>
+      <ul>
+        <li><a href="/methodology">HVTracker Methodology</a> — how trust scores are computed</li>
+        <li><a href="/categories/security-guardrails">Security & Guardrails Agents</a> — agents specifically built for AI safety</li>
+        <li><a href="/categories/coding-agents">Coding Agents</a> — ranked by trust score</li>
+        <li><a href="https://securityscorecards.dev/" target="_blank" rel="noopener">OpenSSF Scorecard</a> — check any repo's supply-chain security</li>
+        <li><a href="https://slsa.dev/" target="_blank" rel="noopener">SLSA Framework</a> — supply-chain integrity standard</li>
+      </ul>
+    </article>
+
+    <footer>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>

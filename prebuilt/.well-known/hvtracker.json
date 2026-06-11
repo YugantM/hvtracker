@@ -1,0 +1,26 @@
+{
+  "authority": "hvtracker.net",
+  "name": "HVTracker — AI Agent Trust Registry",
+  "description": "Independent trust registry for open-source AI agents. Ranks agents by evidence-weighted trust (HVTrust), not popularity.",
+  "version": "0.1",
+  "methodology": "https://hvtracker.net/methodology",
+  "specs": {
+    "trust_credential": "https://hvtracker.net/spec/trust-credential/v0.1",
+    "methodology": "https://hvtracker.net/spec/methodology",
+    "data_schema": "https://hvtracker.net/spec/data-schema"
+  },
+  "endpoints": {
+    "registry": "https://hvtracker.net/data/latest.json",
+    "agent_lookup": "https://hvtracker.net/data/agents/{slug}.json",
+    "build_report": "https://hvtracker.net/data/build_report.json"
+  },
+  "trust_credential": {
+    "format": "json",
+    "signed": false,
+    "signature_algorithm": null,
+    "public_key": null,
+    "verification": "Until signed credentials (Phase C) are issued, a credential is verified by re-fetching the public signals and recomputing the score with the published methodology."
+  },
+  "contact": "https://github.com/YugantM/hvtracker/issues",
+  "license": "CC BY 4.0"
+}

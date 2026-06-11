@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Best Security &amp; Guardrails — Ranked by Trust Score | HVTracker</title>
+  <meta name="description" content="Compare 5 security &amp; guardrails ranked by independent trust scores. Open-source-first, with limited public GitHub comparators where relevant. Guardrails AI, NeMo Guardrails, Garak. Updated daily with security, activity, and adoption signals.">
+  <link rel="canonical" href="https://hvtracker.net/categories/security-guardrails">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Best Security &amp; Guardrails — Ranked by Trust Score | HVTracker">
+  <meta property="og:description" content="Compare 5 security &amp; guardrails ranked by trust score. Open-source-first, with limited public GitHub comparators where relevant.">
+  <meta property="og:url" content="https://hvtracker.net/categories/security-guardrails">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Best Security &amp; Guardrails — Ranked by Trust Score | HVTracker">
+  <meta name="twitter:description" content="Compare 5 security &amp; guardrails ranked by trust score. Open-source-first, with limited public GitHub comparators where relevant.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Best Security &amp; Guardrails",
+    "description": "5 security &amp; guardrails ranked by independent trust scores on HVTracker. Open-source-first, with limited public GitHub comparators where relevant.",
+    "url": "https://hvtracker.net/categories/security-guardrails",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "HVTracker",
+      "url": "https://hvtracker.net/"
+    },
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": 5,
+      "itemListElement": [
+        
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Guardrails AI",
+          "url": "https://hvtracker.net/agents/guardrails-ai"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "NeMo Guardrails",
+          "url": "https://hvtracker.net/agents/nemo-guardrails"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Garak",
+          "url": "https://hvtracker.net/agents/garak"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Llama Guard",
+          "url": "https://hvtracker.net/agents/llama-guard"
+        },
+        
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "LLM Guard",
+          "url": "https://hvtracker.net/agents/llm-guard"
+        }
+        
+      ]
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Security &amp; Guardrails" }
+    ]
+  }
+  </script>
+
+  <link rel="stylesheet" href="/static/site.css?v=f9997149">
+  <style>
+    .page { max-width:880px; }
+
+    .hero { padding:24px 0; border-bottom:1px solid var(--border); }
+    h1 { font-size:26px; font-weight:700; margin-bottom:4px; }
+    .hero .subtitle { font-size:13px; color:var(--muted); }
+    .hero .seo-intro { margin-top:12px; font-size:13px; color:var(--muted); line-height:1.7; max-width:640px; }
+    .hero .seo-intro strong { color:var(--text); }
+
+    .stats-bar { display:flex; gap:20px; padding:12px 0; border-bottom:1px solid var(--border); flex-wrap:wrap; font-family:var(--font-mono); }
+    .stat { }
+    .stat .num { font-size:18px; font-weight:700; }
+    .stat .lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; }
+
+    table { width:100%; border-collapse:collapse; margin-top:12px; border-top:2px solid var(--text); }
+    th { text-align:left; font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); padding:8px 6px; border-bottom:1px solid var(--border); }
+    td { padding:8px 6px; border-bottom:1px solid rgba(0,0,0,0.06); font-size:13px; }
+    tr:hover td { background:rgba(0,0,0,0.03); }
+
+    .rank-cell { font-family:var(--font-mono); font-size:12px; color:var(--muted); width:32px; }
+    .name-cell a { font-weight:600; }
+    .name-cell a:hover { color:var(--accent); }
+    .name-cell .desc { font-size:11px; color:var(--muted); margin-top:1px; display:block; max-width:360px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .grade { font-family:var(--font-mono); font-size:10px; font-weight:700; margin-left:4px; }
+    .grade-A { color:var(--green); }
+    .grade-B { color:var(--accent); }
+    .grade-C { color:var(--amber); }
+    .grade-D { color:var(--muted); }
+    .state-chip { font-family:var(--font-mono); font-size:9px; font-weight:600; margin-left:4px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); }
+    .state-listed { color:var(--green); }
+    .state-warning { color:var(--red); }
+
+    .score-cell { font-family:var(--font-mono); font-size:13px; font-weight:600; }
+    .score-hi { color:var(--green); }
+    .score-mid { color:var(--amber); }
+    .score-lo { color:var(--muted); }
+
+    .stars-cell { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
+    .lang-cell { font-size:11px; color:var(--muted); }
+
+    .cat-nav { padding:16px 0; border-top:1px solid var(--border); }
+    .cat-nav h2 { font-size:14px; font-weight:600; margin-bottom:8px; }
+    .cat-pills { display:flex; gap:4px; flex-wrap:wrap; }
+    .cat-pill { font-family:var(--font-mono); font-size:11px; padding:3px 8px; color:var(--muted); }
+    .cat-pill:hover { color:var(--accent); text-decoration:none; }
+    .cat-pill.active { color:var(--accent); font-weight:600; }
+
+    footer { padding:20px 0; margin-top:16px; border-top:1px solid var(--border); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--accent); }
+
+    @media (max-width:600px) {
+      h1 { font-size:18px; }
+      .stats-bar { gap:12px; }
+      td, th { padding:6px 4px; }
+      .name-cell .desc { max-width:180px; }
+    }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Security &amp; Guardrails", "item": "https://hvtracker.net/categories/security-guardrails/" }
+    ]
+  }
+  </script>
+  <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
+  <script>
+    (function(){var host=window.location.hostname||"";if(/^(localhost|127(?:\.\d{1,3}){3}|0(?:\.\d{1,3}){3}|::1)$/i.test(host)){window["ga-disable-G-TZ8921LR0K"]=true;return}try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="category_page" data-category="Security &amp; Guardrails">
+  <header class="site-header">
+  <div class="site-header-inner">
+    <a href="/" class="logo">HV<span>Tracker</span></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="/">Leaderboard</a>
+      <a href="/movers/">Movers</a>
+      <a href="/changes/">Changes</a>
+      <a href="/use-cases/">Use cases</a>
+      <a href="/methodology">Methodology</a>
+      <a href="/score-lab/">Score lab</a>
+      <a href="/compare/">Compare</a>
+      <a href="/alerts/">Alerts</a>
+      <a href="/data/">Data API</a>
+      <a href="/sponsor/">Sponsor</a>
+    </nav>
+    <div class="meta">
+      <span class="live-dot"></span>updated 2026-06-11 10:26 UTC
+    </div>
+  </div>
+</header>
+  <div class="page">
+
+    <section class="hero">
+      <h1>Security &amp; Guardrails</h1>
+      <p class="subtitle">5 agents tracked &middot; Open-source-first, with limited public GitHub comparators &middot; Ranked by trust score &middot; Updated 2026-06-11 10:26 UTC</p>
+
+      <div class="seo-intro">
+        <p>HVTracker independently evaluates <strong>5 security &amp; guardrails</strong> using daily signals from GitHub, package registries, and security databases. The category is open-source-first, with a limited set of public GitHub-hosted proprietary or source-available comparators when they are important ecosystem reference points.
+        Each agent is scored on activity, adoption, transparency, safety, and identity.
+        The top-ranked security &amp; guardrails is <strong>Guardrails AI</strong> with a trust score of 81.7/100 (Grade A).
+        Other leading projects include NeMo Guardrails and Garak.
+        </p>
+      </div>
+    </section>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="num">5</div>
+        <div class="lbl">Agents</div>
+      </div>
+      <div class="stat">
+        <div class="num">65</div>
+        <div class="lbl">Avg Trust</div>
+      </div>
+      <div class="stat">
+        <div class="num">28.7k</div>
+        <div class="lbl">Total Stars</div>
+      </div>
+      <div class="stat">
+        <div class="num">1</div>
+        <div class="lbl">Grade A</div>
+      </div>
+      
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Agent</th>
+          <th>Trust</th>
+          <th>Stars</th>
+          <th>Language</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td class="rank-cell">1</td>
+          <td class="name-cell">
+            <a href="/agents/guardrails-ai">Guardrails AI</a>
+            <span class="grade grade-A">A</span>
+            <span class="state-chip state-listed">Listed</span>
+            <span class="desc">Adding guardrails to large language models.</span>
+          </td>
+          <td class="score-cell score-hi">81.7</td>
+          <td class="stars-cell">7.0k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">2</td>
+          <td class="name-cell">
+            <a href="/agents/nemo-guardrails">NeMo Guardrails</a>
+            <span class="grade grade-B">B</span>
+            <span class="state-chip state-listed">Listed</span>
+            <span class="desc">NeMo Guardrails is an open-source toolkit for easily adding programmable guardrails to LLM-based conversational systems.</span>
+          </td>
+          <td class="score-cell score-hi">71.1</td>
+          <td class="stars-cell">6.4k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">3</td>
+          <td class="name-cell">
+            <a href="/agents/garak">Garak</a>
+            <span class="grade grade-B">B</span>
+            <span class="state-chip state-listed">Listed</span>
+            <span class="desc">the LLM vulnerability scanner</span>
+          </td>
+          <td class="score-cell score-hi">67.4</td>
+          <td class="stars-cell">8.1k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">4</td>
+          <td class="name-cell">
+            <a href="/agents/llama-guard">Llama Guard</a>
+            <span class="grade grade-C">C</span>
+            <span class="state-chip state-listed">Listed</span>
+            <span class="desc">Set of tools to assess and improve LLM security.</span>
+          </td>
+          <td class="score-cell score-mid">53.6</td>
+          <td class="stars-cell">4.2k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+        <tr>
+          <td class="rank-cell">5</td>
+          <td class="name-cell">
+            <a href="/agents/llm-guard">LLM Guard</a>
+            <span class="grade grade-D">D</span>
+            <span class="state-chip state-listed">Listed</span>
+            <span class="desc">The Security Toolkit for LLM Interactions</span>
+          </td>
+          <td class="score-cell score-mid">49.8</td>
+          <td class="stars-cell">3.0k</td>
+          <td class="lang-cell">Python</td>
+        </tr>
+        
+      </tbody>
+    </table>
+
+    
+    <nav class="cat-nav">
+      <h2>Popular Security &amp; Guardrails comparisons</h2>
+      <div class="cat-pills">
+        
+        <a href="/compare/guardrails-ai-vs-nemo-guardrails/" class="cat-pill">Guardrails AI vs NeMo Guardrails</a>
+        
+        <a href="/compare/guardrails-ai-vs-garak/" class="cat-pill">Guardrails AI vs Garak</a>
+        
+        <a href="/compare/nemo-guardrails-vs-garak/" class="cat-pill">NeMo Guardrails vs Garak</a>
+        
+      </div>
+    </nav>
+    
+
+    <nav class="cat-nav">
+      <h2>All Categories</h2>
+      <div class="cat-pills">
+        
+        <a href="/categories/coding-agents" class="cat-pill ">Coding Agents (32)</a>
+        
+        <a href="/categories/agent-frameworks" class="cat-pill ">Agent Frameworks (53)</a>
+        
+        <a href="/categories/workflow-platforms" class="cat-pill ">Workflow Platforms (15)</a>
+        
+        <a href="/categories/browser-computer-use" class="cat-pill ">Browser &amp; Computer Use (16)</a>
+        
+        <a href="/categories/memory-knowledge" class="cat-pill ">Memory &amp; Knowledge (22)</a>
+        
+        <a href="/categories/research-data" class="cat-pill ">Research &amp; Data (13)</a>
+        
+        <a href="/categories/observability-evaluation" class="cat-pill ">Observability &amp; Evaluation (18)</a>
+        
+        <a href="/categories/security-guardrails" class="cat-pill active">Security &amp; Guardrails (5)</a>
+        
+        <a href="/categories/protocols-tool-integration" class="cat-pill ">Protocols &amp; Tool Integration (6)</a>
+        
+        <a href="/categories/voice-conversational" class="cat-pill ">Voice &amp; Conversational (5)</a>
+        
+        <a href="/categories/sandboxes-runtimes" class="cat-pill ">Sandboxes &amp; Runtimes (2)</a>
+        
+        <a href="/categories/robotics-embodied" class="cat-pill ">Robotics &amp; Embodied (1)</a>
+        
+        <a href="/categories/llm-gateways-infra" class="cat-pill ">LLM Gateways &amp; Infra (8)</a>
+        
+        <a href="/categories/multi-agent-systems" class="cat-pill ">Multi-Agent Systems (10)</a>
+        
+        <a href="/categories/ui-app-builders" class="cat-pill ">UI &amp; App Builders (7)</a>
+        
+        <a href="/categories/needs-review" class="cat-pill ">Needs review (10)</a>
+        
+      </div>
+    </nav>
+
+    <footer>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">·</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">·</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">·</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">·</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">·</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">·</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>

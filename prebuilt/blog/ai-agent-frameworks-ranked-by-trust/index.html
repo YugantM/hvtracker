@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LangChain vs LangGraph vs CrewAI vs AutoGPT — Ranked by Trust, Not Hype | HVTracker</title>
+  <meta name="description" content="We ranked the top AI agent frameworks by supply-chain trust. LangGraph #1, AutoGPT #39, LlamaIndex #126, smolagents #138. Stars don't tell this story — provenance, scorecards, and signed commits do.">
+  <link rel="canonical" href="https://hvtracker.net/blog/ai-agent-frameworks-ranked-by-trust">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="LangChain vs LangGraph vs CrewAI vs AutoGPT — Ranked by Trust, Not Hype">
+  <meta property="og:description" content="LangGraph #1, AutoGPT #39, LlamaIndex #126. We ranked the top AI frameworks by supply-chain trust instead of stars.">
+  <meta property="og:url" content="https://hvtracker.net/blog/ai-agent-frameworks-ranked-by-trust">
+  <meta property="og:image" content="https://hvtracker.net/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="LangChain vs LangGraph vs CrewAI vs AutoGPT — Ranked by Trust, Not Hype">
+  <meta name="twitter:description" content="LangGraph #1, AutoGPT #39, LlamaIndex #126. Trust rankings for AI frameworks.">
+  <meta name="twitter:image" content="https://hvtracker.net/og.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "LangChain vs LangGraph vs CrewAI vs AutoGPT — Ranked by Trust, Not Hype",
+    "description": "We ranked the top AI agent frameworks by supply-chain trust signals. Stars don't tell this story.",
+    "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "publisher": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "datePublished": "2026-05-30",
+    "dateModified": "2026-05-30",
+    "mainEntityOfPage": "https://hvtracker.net/blog/ai-agent-frameworks-ranked-by-trust"
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#f4f1eb; --surface:#eae6de; --surface-2:#e2ded6; --border:#d4cfc5;
+      --text:#1a1a1a; --muted:#6b6560;
+      --accent:#2c5282; --accent-lt:rgba(44,82,130,0.08); --accent-dim:#5677aa;
+      --mocha:#8b6914; --mocha-lt:rgba(139,105,20,0.10);
+      --fresh:#2f6846; --stale:#737f91;
+      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color:var(--text); font-family:var(--font-sans); font-size:16px; line-height:1.7; min-height:100vh; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:720px; margin:0 auto; padding:0 20px; background:#f4f1eb; min-height:100vh; }
+    .site-header { position:sticky; top:0; z-index:100; background:var(--bg); border-bottom:1px solid var(--border); }
+    .site-header-inner { max-width:1200px; margin:0 auto; padding:14px 20px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; letter-spacing:-0.5px; color:var(--text); }
+    .logo span { color:var(--accent); }
+    .site-nav { margin-left:auto; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; } .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--text); border-color:var(--border); background:var(--surface); text-decoration:none; }
+
+    article { padding:36px 0 48px; }
+    h1 { font-size:28px; font-weight:700; letter-spacing:-0.5px; line-height:1.2; margin-bottom:12px; }
+    .meta { font-size:13px; color:var(--muted); margin-bottom:32px; font-family:var(--font-mono); }
+    h2 { font-size:22px; font-weight:700; margin-top:36px; margin-bottom:12px; letter-spacing:-0.3px; }
+    h3 { font-size:17px; font-weight:600; margin-top:24px; margin-bottom:8px; }
+    p { margin-bottom:16px; }
+    ul { padding-left:24px; margin-bottom:16px; }
+    li { margin-bottom:6px; }
+
+    .callout { background:var(--accent-lt); border-left:3px solid var(--accent); padding:16px 20px; margin:24px 0; border-radius:0 6px 6px 0; font-size:14px; }
+    .callout strong { color:var(--accent); }
+    .callout.warn { border-left-color:var(--mocha); background:var(--mocha-lt); }
+    .callout.warn strong { color:var(--mocha); }
+
+    table { width:100%; border-collapse:collapse; margin:24px 0; font-size:14px; }
+    th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
+    td.name a { font-weight:600; color:var(--text); }
+    td.name a:hover { color:var(--accent); }
+    td.good { color:var(--fresh); font-weight:600; }
+    td.bad { color:var(--stale); }
+    td.ugly { color:#ef4444; font-weight:600; }
+    td.mono { font-family:var(--font-mono); }
+
+    .tier { margin:24px 0; padding:18px; border:1px solid var(--border); border-radius:8px; background:var(--surface); }
+    .tier h3 { margin-top:0; font-family:var(--font-mono); font-size:14px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tier p { font-size:14px; margin-bottom:8px; }
+    .tier ul { margin-bottom:0; font-size:14px; }
+
+    .cta-box { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:24px; margin:36px 0; text-align:center; }
+    .cta-box h3 { color:var(--text); margin-top:0; font-size:18px; margin-bottom:8px; }
+    .cta-box p { font-size:14px; color:var(--muted); margin-bottom:16px; }
+    .cta-btn { display:inline-block; background:var(--accent); color:#fff; padding:10px 24px; border-radius:5px; font-weight:600; font-size:14px; text-decoration:none; margin:4px; }
+    .cta-btn:hover { opacity:0.9; text-decoration:none; }
+    .cta-btn.secondary { background:transparent; border:1px solid var(--accent); color:var(--accent); }
+
+    footer { padding:28px 0; border-top:1px solid var(--border); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--accent); }
+    @media (max-width:600px) { h1 { font-size:22px; } table { font-size:12px; } th,td { padding:8px 6px; } }
+  </style>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TZ8921LR0K');</script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="blog">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
+      </nav>
+    </div>
+  </header>
+  <div class="page">
+
+    <article>
+      <h1>LangChain vs LangGraph vs CrewAI vs AutoGPT — Ranked by Trust, Not Hype</h1>
+      <div class="meta">May 30, 2026 &middot; 7 min read &middot; HVTracker Research</div>
+
+      <p>Every "best AI agent framework" post ranks by stars, features, or vibes. Nobody ranks by whether you can actually verify the thing you're installing.</p>
+
+      <p>We do. HVTracker ranks hundreds of open-source AI agents — including every major framework — by <a href="/methodology">supply-chain trust signals</a>: provenance, OSSF Scorecard, signed commits, maintenance, and evidence coverage. Here's the framework tier list nobody asked for but everyone needs.</p>
+
+      <h2>The full rankings</h2>
+
+      <table>
+        <thead>
+          <tr><th>Framework</th><th>Stars</th><th>Trust Rank</th><th>Score</th><th>Provenance</th><th>Scorecard</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="name"><a href="/agents/langgraph">LangGraph</a></td><td class="mono">33k</td><td class="mono good">#1</td><td class="mono">91.9</td><td class="good">Verified</td><td class="mono">6.8</td></tr>
+          <tr><td class="name"><a href="/agents/pydanticai">PydanticAI</a></td><td class="mono">17k</td><td class="mono good">#2</td><td class="mono">90.6</td><td class="good">Verified</td><td class="mono">5.8</td></tr>
+          <tr><td class="name"><a href="/agents/openai-agents-sdk">OpenAI Agents SDK</a></td><td class="mono">26k</td><td class="mono good">#4</td><td class="mono">90.2</td><td class="good">Verified</td><td class="mono">4.2</td></tr>
+          <tr><td class="name"><a href="/agents/autogen">AutoGen</a></td><td class="mono">58k</td><td class="mono">#22</td><td class="mono">78.1</td><td class="good">Verified</td><td class="mono">5.9</td></tr>
+          <tr><td class="name"><a href="/agents/crewai">CrewAI</a></td><td class="mono">52k</td><td class="mono">#23</td><td class="mono">77.9</td><td class="bad">None</td><td class="mono good">8.0</td></tr>
+          <tr><td class="name"><a href="/agents/langchain">LangChain</a></td><td class="mono">138k</td><td class="mono">#24</td><td class="mono">74.9</td><td class="bad">None</td><td class="mono">6.8</td></tr>
+          <tr><td class="name"><a href="/agents/autogpt">AutoGPT</a></td><td class="mono">184k</td><td class="mono">#39</td><td class="mono">69.2</td><td class="bad">None</td><td class="mono">5.7</td></tr>
+          <tr><td class="name"><a href="/agents/controlflow">ControlFlow</a></td><td class="mono">3k</td><td class="mono">#45</td><td class="mono">68.5</td><td class="good">Verified</td><td class="mono">5.1</td></tr>
+          <tr><td class="name"><a href="/agents/agno">Agno</a></td><td class="mono">40k</td><td class="mono">#48</td><td class="mono">68.4</td><td class="bad">None</td><td class="mono">4.7</td></tr>
+          <tr><td class="name"><a href="/agents/llamaindex">LlamaIndex</a></td><td class="mono">49k</td><td class="mono ugly">#126</td><td class="mono">42.8</td><td class="bad">None</td><td class="mono bad">N/A</td></tr>
+          <tr><td class="name"><a href="/agents/smolagents">smolagents</a></td><td class="mono">27k</td><td class="mono ugly">#138</td><td class="mono">38.0</td><td class="bad">None</td><td class="mono bad">N/A</td></tr>
+          <tr><td class="name"><a href="/agents/openmanus">OpenManus</a></td><td class="mono">56k</td><td class="mono ugly">#167</td><td class="mono">22.6</td><td class="bad">None</td><td class="mono bad">N/A</td></tr>
+        </tbody>
+      </table>
+
+      <h2>The tier breakdown</h2>
+
+      <div class="tier">
+        <h3 style="color:var(--fresh)">Tier 1: actually verifiable (rank &lt; 25)</h3>
+        <p><strong>LangGraph, PydanticAI, OpenAI Agents SDK, AutoGen, CrewAI, LangChain</strong></p>
+        <p>These projects have enough independent signals — provenance, Scorecard, signed commits, active maintenance — to give an outsider confidence in the supply chain. The top 3 all publish build provenance. CrewAI doesn't publish provenance but compensates with the highest Scorecard in the category (8.0/10).</p>
+      </div>
+
+      <div class="tier">
+        <h3 style="color:var(--mocha)">Tier 2: popular but incomplete (rank 25–80)</h3>
+        <p><strong>AutoGPT, ControlFlow, Agno, Semantic Kernel</strong></p>
+        <p>Signal coverage is partial. Some have provenance but no Scorecard. Others have Scorecard but no provenance. Trust scores in the high 60s — decent but with verifiable gaps. AutoGPT, the most-starred framework at 184k stars, ranks #39 because stars are capped and weighted last in HVTrust.</p>
+      </div>
+
+      <div class="tier">
+        <h3 style="color:#ef4444">Tier 3: thin evidence (rank &gt; 100)</h3>
+        <p><strong>LlamaIndex, smolagents, OpenManus</strong></p>
+        <p>These are active, widely-used projects — but their public trust evidence is thin. No provenance, no Scorecard, low signed-commit ratios or missing data. OpenManus has 56k stars and ranks <strong>#167 of 172</strong>. LlamaIndex — one of the most widely adopted RAG frameworks — ranks #126.</p>
+        <p>This is not a quality judgment. These projects may have excellent internal security practices. But from the outside, with only public signals to work with, the verifiable evidence is not there.</p>
+      </div>
+
+      <h2>What the data says about "best framework" posts</h2>
+
+      <p>The internet is full of "LangChain vs LlamaIndex" comparison posts. Almost all of them compare features, developer experience, and LLM provider support. None of them ask:</p>
+
+      <ul>
+        <li>Can I verify the package I'm installing matches the source code?</li>
+        <li>Does the project use branch protection and code review?</li>
+        <li>Are the commits signed?</li>
+        <li>Is there a security disclosure policy?</li>
+      </ul>
+
+      <p>If you're evaluating a framework that will execute LLM-generated code in your infrastructure, these questions matter more than whether it supports streaming or has a nicer API for tool calling.</p>
+
+      <div class="callout">
+        <strong>The gap is closeable.</strong> Every project in Tier 3 could move to Tier 1 by enabling provenance, adding a SECURITY.md, and running the Scorecard GitHub Action. These are not hard — they're just not prioritized. Yet.
+      </div>
+
+      <h2>Why PydanticAI at #2 matters</h2>
+
+      <p>PydanticAI has 17k stars — a fraction of LangChain's 138k or AutoGPT's 184k. But it ranks #2 globally because it nails the signals that are hardest to fake: build provenance is published, commits are signed, the Scorecard is public, and evidence coverage is broad enough for a Grade B.</p>
+
+      <p>This is the confidence multiplier in action. PydanticAI doesn't have the most impressive number for any single signal. It has <em>consistent, verifiable evidence across all of them</em>. That's what trust looks like when you measure it instead of counting stars.</p>
+
+      <div class="cta-box">
+        <h3>Dig into the data yourself</h3>
+        <p>Every score, signal, and check on this page is independently verifiable from the links on each agent's profile.</p>
+        <a class="cta-btn" href="/categories/agent-frameworks">All agent frameworks</a>
+        <a class="cta-btn secondary" href="/methodology">How we score</a>
+      </div>
+
+      <p style="font-size:13px;color:var(--muted);">Data from HVTracker signals as of May 30, 2026. Rankings change daily. <a href="/methodology">Methodology</a>. Found an error? <a href="https://github.com/YugantM/hvtracker/issues/new" target="_blank" rel="noopener">Open an issue</a>.</p>
+    </article>
+
+    <footer>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>

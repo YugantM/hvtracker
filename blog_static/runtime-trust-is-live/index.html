@@ -61,9 +61,11 @@
     .site-header-inner { max-width:1200px; margin:0 auto; padding:14px 20px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
     .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; color:var(--text); }
     .logo span { color:var(--accent); }
-    .site-nav { margin-left:auto; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; }
+    .site-nav { margin-left:24px; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; }
     .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
     .site-nav a:hover { color:var(--text); border-color:var(--border); background:var(--surface); text-decoration:none; }
+    .site-status { font:11px var(--font-mono); color:var(--muted); margin-left:auto; white-space:nowrap; }
+    .live-dot { display:inline-block; width:7px; height:7px; border-radius:999px; background:var(--green, var(--fresh)); margin-right:6px; vertical-align:middle; box-shadow:0 0 0 3px color-mix(in srgb, var(--green, var(--fresh)) 18%, transparent); }
     article { padding:36px 0 48px; }
     h1 { font-size:34px; font-weight:700; line-height:1.15; margin-bottom:12px; }
     .meta { font-size:13px; color:var(--muted); margin-bottom:32px; font-family:var(--font-mono); }
@@ -100,6 +102,7 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TZ8921LR0K');</script>
   <script defer src="/analytics.js"></script>
+  <script defer src="/static/site-status.js"></script>
 </head>
 <body data-page-type="blog_article">
   <header class="site-header">
@@ -108,12 +111,18 @@
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
         <a href="/movers/">Movers</a>
+        <a href="/changes/">Changes</a>
         <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
         <a href="/score-lab/">Score lab</a>
         <a href="/compare/">Compare</a>
         <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
       </nav>
+      <div class="site-status" data-updated="">
+        <span class="live-dot"></span>updated <span class="site-status-value"></span>
+      </div>
     </div>
   </header>
   <div class="page">

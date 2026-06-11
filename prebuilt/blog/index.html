@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — AI Agent Trust Insights | HVTracker</title>
+  <meta name="description" content="Research, comparisons, and SEO-friendly guides on AI agent safety, trust, adoption, and open-source agent selection.">
+  <link rel="canonical" href="https://hvtracker.net/blog/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Blog — AI Agent Trust Insights | HVTracker">
+  <meta property="og:description" content="Research and comparisons on AI agent safety, trust, and adoption.">
+  <meta property="og:url" content="https://hvtracker.net/blog/">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Blog — AI Agent Trust Insights | HVTracker">
+  <meta name="twitter:description" content="Research and comparisons on AI agent safety, trust, and adoption.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Blog", "name": "HVTracker Blog", "description": "Research and comparisons on AI agent safety, trust, and adoption.", "url": "https://hvtracker.net/blog/", "publisher": {"@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net"}, "blogPost": [{"@type": "BlogPosting", "headline": "Best Open-Source Coding Agents: Codex vs Cline", "url": "https://hvtracker.net/blog/coding-agents-top-agents"}, {"@type": "BlogPosting", "headline": "Best Open-Source Agent Frameworks: LangGraph vs Haystack", "url": "https://hvtracker.net/blog/agent-frameworks-top-agents"}, {"@type": "BlogPosting", "headline": "Best Open-Source Workflow Platforms: n8n vs Trigger.dev", "url": "https://hvtracker.net/blog/workflow-platforms-top-agents"}, {"@type": "BlogPosting", "headline": "Best Open-Source Browser & Computer Use: Skyvern vs Stagehand", "url": "https://hvtracker.net/blog/browser-computer-use-top-agents"}, {"@type": "BlogPosting", "headline": "Best Open-Source Memory & Knowledge: LanceDB vs Mem0", "url": "https://hvtracker.net/blog/memory-knowledge-top-agents"}, {"@type": "BlogPosting", "headline": "Best Open-Source Research & Data: Docling vs Unstructured", "url": "https://hvtracker.net/blog/research-data-top-agents"}, {"@type": "BlogPosting", "headline": "Best Open-Source Observability & Evaluation: MLflow vs Weights & Biases Weave", "url": "https://hvtracker.net/blog/observability-evaluation-top-agents"}, {"@type": "BlogPosting", "headline": "Best Open-Source Security & Guardrails: Guardrails AI vs NeMo Guardrails", "url": "https://hvtracker.net/blog/security-guardrails-top-agents"}, {"@type": "BlogPosting", "headline": "Best Open-Source Protocols & Tool Integration: A2A / Agent2Agent Protocol vs CLI-Anything", "url": "https://hvtracker.net/blog/protocols-tool-integration-top-agents"}, {"@type": "BlogPosting", "headline": "Best Open-Source Voice & Conversational: LiveKit Agents vs Pipecat", "url": "https://hvtracker.net/blog/voice-conversational-top-agents"}, {"@type": "BlogPosting", "headline": "Best Open-Source Sandboxes & Runtimes: E2B vs Daytona", "url": "https://hvtracker.net/blog/sandboxes-runtimes-top-agents"}, {"@type": "BlogPosting", "headline": "Best Open-Source LLM Gateways & Infra: Headroom vs vLLM", "url": "https://hvtracker.net/blog/llm-gateways-infra-top-agents"}]}</script>
+
+  <link rel="stylesheet" href="/static/site.css?v=f9997149">
+  <style>
+    body { line-height:1.65; }
+    .page { max-width:920px; padding:24px 20px 0; }
+    .logo span { color:var(--lobster); }
+    .hero { padding:30px 0 20px; border-bottom:1px solid var(--line); }
+    h1 { font-size:30px; line-height:1.16; font-weight:700; letter-spacing:-0.02em; margin-bottom:8px; }
+    .subtitle { color:var(--muted); max-width:680px; }
+    .section-title { font-family:var(--font-mono); color:var(--lobster); font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:26px 0 12px; }
+    .post-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px; padding-bottom:18px; }
+    .post-card {
+      border-top:2px solid var(--line-strong);
+      padding:18px;
+      min-height:100%;
+      background:var(--paper-2);
+    }
+    .post-card:hover { border-top-color:var(--lobster); }
+    .post-card h2 { font-size:18px; line-height:1.25; margin-bottom:8px; letter-spacing:-0.01em; }
+    .post-card h2 a:hover { color:var(--lobster); text-decoration:none; }
+    .post-meta { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-bottom:10px; }
+    .post-excerpt { color:var(--muted); font-size:14px; }
+    .read-more { display:inline-block; margin-top:14px; color:var(--lobster); font-size:13px; font-weight:600; }
+    .featured { grid-column:1 / -1; display:grid; grid-template-columns:1.2fr .8fr; gap:18px; align-items:center; border-top-color:var(--lobster); }
+    .metric-strip { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+    .metric { border:1px solid var(--line); padding:10px; background:var(--paper-2); }
+    .metric strong { display:block; font-family:var(--font-mono); color:var(--moss); font-size:18px; }
+    .metric span { color:var(--muted); font-size:11px; }
+    footer { padding:28px 0; border-top:1px solid var(--line); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--lobster); }
+    @media (max-width:760px) {
+      .post-grid { grid-template-columns:1fr; }
+      .featured { grid-template-columns:1fr; }
+    }
+  </style>
+  <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="blog_index">
+  <header class="site-header">
+  <div class="site-header-inner">
+    <a href="/" class="logo">HV<span>Tracker</span></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="/">Leaderboard</a>
+      <a href="/movers/">Movers</a>
+      <a href="/changes/">Changes</a>
+      <a href="/use-cases/">Use cases</a>
+      <a href="/methodology">Methodology</a>
+      <a href="/score-lab/">Score lab</a>
+      <a href="/compare/">Compare</a>
+      <a href="/alerts/">Alerts</a>
+      <a href="/data/">Data API</a>
+      <a href="/sponsor/">Sponsor</a>
+    </nav>
+    <div class="meta">
+      <span class="live-dot"></span>updated 2026-06-11 10:26 UTC
+    </div>
+  </div>
+</header>
+  <div class="page">
+
+    <section class="hero">
+      <h1>AI Agent Trust Insights</h1>
+      <p class="subtitle">Data-backed guides and comparisons for choosing open-source AI agents, coding agents, frameworks, guardrails, memory systems, and agent infrastructure.</p>
+    </section>
+
+    <div class="section-title">Research</div>
+    <div class="post-grid">
+      <article class="post-card featured">
+        <div>
+          <h2><a href="/blog/github-stars-dont-predict-ai-agent-trust">GitHub Stars Don't Predict AI Agent Trust. I Scored 192 to Prove It.</a></h2>
+          <div class="post-meta">May 31, 2026 &middot; 6 min read</div>
+          <p class="post-excerpt">24 of the 30 most-starred AI agents ship with no build provenance. Here's the full list, the six that get it right, and why stars are the wrong way to choose an agent.</p>
+          <a href="/blog/github-stars-dont-predict-ai-agent-trust" class="read-more">Read article &rarr;</a>
+        </div>
+        <div class="metric-strip">
+          <div class="metric"><strong>223</strong><span>agents tracked</span></div>
+          <div class="metric"><strong>16</strong><span>categories</span></div>
+          <div class="metric"><strong>92.9</strong><span>top HVTrust</span></div>
+        </div>
+      </article>
+    </div>
+
+    <div class="section-title">Trend Reports</div>
+    <div class="post-grid">
+      <article class="post-card">
+        <h2><a href="/blog/runtime-trust-is-live">Runtime Trust Is Live on HVTracker</a></h2>
+        <div class="post-meta">June 5, 2026 &middot; 5 min read</div>
+        <p class="post-excerpt">HVTracker v3.2 adds public runtime-trust discovery and an experimental score lab. See how the current top 10 would move under the first calibration.</p>
+        <a href="/blog/runtime-trust-is-live" class="read-more">Read article &rarr;</a>
+      </article>
+      <article class="post-card">
+        <h2><a href="/blog/you-are-not-installing-what-you-think">You're Not Installing What You Think You Are</a></h2>
+        <div class="post-meta">June 2, 2026 &middot; 6 min read</div>
+        <p class="post-excerpt">122 million weekly downloads, zero proof the package matches the source code. 83% of AI agents ship without build provenance. Here's what sits in the gap.</p>
+        <a href="/blog/you-are-not-installing-what-you-think" class="read-more">Read article &rarr;</a>
+      </article>
+      <article class="post-card">
+        <h2><a href="/blog/how-to-evaluate-ai-agent-safety">How to Evaluate AI Agent Safety: 5 Signals That Actually Matter</a></h2>
+        <div class="post-meta">May 27, 2026 &middot; 6 min read</div>
+        <p class="post-excerpt">GitHub stars measure popularity, not trustworthiness. Here are the evidence-based signals that actually help evaluate whether an open-source AI agent is safe to adopt.</p>
+        <a href="/blog/how-to-evaluate-ai-agent-safety" class="read-more">Read article &rarr;</a>
+      </article>
+      <article class="post-card">
+        <h2><a href="/blog/most-starred-ai-agents-no-provenance">The Most Popular AI Agents Ship Without Provenance</a></h2>
+        <div class="post-meta">May 30, 2026 &middot; 5 min read</div>
+        <p class="post-excerpt">375k stars, 184k stars, 167k stars — and zero build provenance. We checked the 10 most-starred AI agents. Eight ship without any package attestation.</p>
+        <a href="/blog/most-starred-ai-agents-no-provenance" class="read-more">Read article &rarr;</a>
+      </article>
+      <article class="post-card">
+        <h2><a href="/blog/codex-vs-claude-code">Codex vs Claude Code: Which Coding Agent Is Easier to Trust?</a></h2>
+        <div class="post-meta">June 1, 2026 &middot; 5 min read</div>
+        <p class="post-excerpt">Claude Code has more stars. Codex ranks dramatically higher on HVTracker. The gap comes from provenance, signed commits, and public verifiability.</p>
+        <a href="/blog/codex-vs-claude-code" class="read-more">Read article &rarr;</a>
+      </article>
+      <article class="post-card">
+        <h2><a href="/blog/coding-agents-trust-rankings">Coding Agents Ranked by Trust, Not Stars — The Results Are Embarrassing</a></h2>
+        <div class="post-meta">May 30, 2026 &middot; 6 min read</div>
+        <p class="post-excerpt">opencode (167k stars) ranks #127. GPT Pilot has 1% signed commits. Only one coding agent cracks the global top 10.</p>
+        <a href="/blog/coding-agents-trust-rankings" class="read-more">Read article &rarr;</a>
+      </article>
+      <article class="post-card">
+        <h2><a href="/blog/ai-agent-frameworks-ranked-by-trust">LangChain vs LangGraph vs CrewAI vs AutoGPT — Ranked by Trust, Not Hype</a></h2>
+        <div class="post-meta">May 30, 2026 &middot; 7 min read</div>
+        <p class="post-excerpt">LangGraph #1, AutoGPT #39, LlamaIndex #126, smolagents #138. Stars don't tell this story — provenance, scorecards, and signed commits do.</p>
+        <a href="/blog/ai-agent-frameworks-ranked-by-trust" class="read-more">Read article &rarr;</a>
+      </article>
+    </div>
+
+    <div class="section-title">Top Category Comparisons</div>
+    <div class="post-grid">
+      
+      <article class="post-card">
+        <h2><a href="/blog/coding-agents-top-agents/">Best Open-Source Coding Agents: Codex vs Cline</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; Coding Agents</div>
+        <p class="post-excerpt">Codex and Cline lead coding agents. Compare HVTrust 92.2 vs 91.0, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/coding-agents-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+      <article class="post-card">
+        <h2><a href="/blog/agent-frameworks-top-agents/">Best Open-Source Agent Frameworks: LangGraph vs Haystack</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; Agent Frameworks</div>
+        <p class="post-excerpt">LangGraph and Haystack lead agent frameworks. Compare HVTrust 92.9 vs 92.6, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/agent-frameworks-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+      <article class="post-card">
+        <h2><a href="/blog/workflow-platforms-top-agents/">Best Open-Source Workflow Platforms: n8n vs Trigger.dev</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; Workflow Platforms</div>
+        <p class="post-excerpt">n8n and Trigger.dev lead workflow platforms. Compare HVTrust 91.4 vs 90.4, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/workflow-platforms-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+      <article class="post-card">
+        <h2><a href="/blog/browser-computer-use-top-agents/">Best Open-Source Browser &amp; Computer Use: Skyvern vs Stagehand</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; Browser &amp; Computer Use</div>
+        <p class="post-excerpt">Skyvern and Stagehand lead browser &amp; computer use. Compare HVTrust 88.3 vs 87.2, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/browser-computer-use-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+      <article class="post-card">
+        <h2><a href="/blog/memory-knowledge-top-agents/">Best Open-Source Memory &amp; Knowledge: LanceDB vs Mem0</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; Memory &amp; Knowledge</div>
+        <p class="post-excerpt">LanceDB and Mem0 lead memory &amp; knowledge. Compare HVTrust 88.2 vs 87.5, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/memory-knowledge-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+      <article class="post-card">
+        <h2><a href="/blog/research-data-top-agents/">Best Open-Source Research &amp; Data: Docling vs Unstructured</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; Research &amp; Data</div>
+        <p class="post-excerpt">Docling and Unstructured lead research &amp; data. Compare HVTrust 87.3 vs 85.0, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/research-data-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+      <article class="post-card">
+        <h2><a href="/blog/observability-evaluation-top-agents/">Best Open-Source Observability &amp; Evaluation: MLflow vs Weights &amp; Biases Weave</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; Observability &amp; Evaluation</div>
+        <p class="post-excerpt">MLflow and Weights &amp; Biases Weave lead observability &amp; evaluation. Compare HVTrust 90.5 vs 84.6, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/observability-evaluation-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+      <article class="post-card">
+        <h2><a href="/blog/security-guardrails-top-agents/">Best Open-Source Security &amp; Guardrails: Guardrails AI vs NeMo Guardrails</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; Security &amp; Guardrails</div>
+        <p class="post-excerpt">Guardrails AI and NeMo Guardrails lead security &amp; guardrails. Compare HVTrust 81.7 vs 71.1, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/security-guardrails-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+      <article class="post-card">
+        <h2><a href="/blog/protocols-tool-integration-top-agents/">Best Open-Source Protocols &amp; Tool Integration: A2A / Agent2Agent Protocol vs CLI-Anything</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; Protocols &amp; Tool Integration</div>
+        <p class="post-excerpt">A2A / Agent2Agent Protocol and CLI-Anything lead protocols &amp; tool integration. Compare HVTrust 89.1 vs 80.1, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/protocols-tool-integration-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+      <article class="post-card">
+        <h2><a href="/blog/voice-conversational-top-agents/">Best Open-Source Voice &amp; Conversational: LiveKit Agents vs Pipecat</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; Voice &amp; Conversational</div>
+        <p class="post-excerpt">LiveKit Agents and Pipecat lead voice &amp; conversational. Compare HVTrust 90.6 vs 85.2, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/voice-conversational-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+      <article class="post-card">
+        <h2><a href="/blog/sandboxes-runtimes-top-agents/">Best Open-Source Sandboxes &amp; Runtimes: E2B vs Daytona</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; Sandboxes &amp; Runtimes</div>
+        <p class="post-excerpt">E2B and Daytona lead sandboxes &amp; runtimes. Compare HVTrust 72.3 vs 46.1, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/sandboxes-runtimes-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+      <article class="post-card">
+        <h2><a href="/blog/llm-gateways-infra-top-agents/">Best Open-Source LLM Gateways &amp; Infra: Headroom vs vLLM</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; LLM Gateways &amp; Infra</div>
+        <p class="post-excerpt">Headroom and vLLM lead llm gateways &amp; infra. Compare HVTrust 85.1 vs 78.4, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/llm-gateways-infra-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+      <article class="post-card">
+        <h2><a href="/blog/multi-agent-systems-top-agents/">Best Open-Source Multi-Agent Systems: AIPass vs CAMEL</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; Multi-Agent Systems</div>
+        <p class="post-excerpt">AIPass and CAMEL lead multi-agent systems. Compare HVTrust 78.1 vs 69.3, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/multi-agent-systems-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+      <article class="post-card">
+        <h2><a href="/blog/ui-app-builders-top-agents/">Best Open-Source UI &amp; App Builders: Open WebUI vs OpenUI</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; UI &amp; App Builders</div>
+        <p class="post-excerpt">Open WebUI and OpenUI lead ui &amp; app builders. Compare HVTrust 88.1 vs 83.7, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/ui-app-builders-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+      <article class="post-card">
+        <h2><a href="/blog/needs-review-top-agents/">Best Open-Source Needs review: Supervision vs Turbovec</a></h2>
+        <div class="post-meta">June 11, 2026 &middot; 4 min read &middot; Needs review</div>
+        <p class="post-excerpt">Supervision and Turbovec lead needs review. Compare HVTrust 26.3 vs 24.9, evidence grades, safety signals, and maintenance.</p>
+        <a href="/blog/needs-review-top-agents/" class="read-more">Read comparison &rarr;</a>
+      </article>
+      
+    </div>
+
+    <footer>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">·</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">·</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">·</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">·</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">·</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">·</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>

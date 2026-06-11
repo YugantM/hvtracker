@@ -202,6 +202,27 @@ python fetch_and_build.py --render-only
 - `--pending-only` refreshes newly listed agents without running a full batch.
 - `--render-only` rebuilds pages from cached render state without API calls.
 
+### Manual Production Deploy
+
+If you want to deploy production yourself without waiting on an automated
+GitHub-triggered Railway build:
+
+```bash
+./scripts/deploy_production.sh --source
+```
+
+Use `--source` after your change is already pushed or merged to `main`.
+
+If you need an emergency deploy from your current local workspace instead:
+
+```bash
+./scripts/deploy_production.sh --local
+```
+
+Both modes target the current Railway production `web` service and wait for
+the deployment to finish. Add `--skip-checks` if you intentionally want to
+skip the local verification step.
+
 ---
 
 ## Running Locally
