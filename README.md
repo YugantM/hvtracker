@@ -219,6 +219,44 @@ python3 -m http.server 4173
 
 Open [http://127.0.0.1:4173](http://127.0.0.1:4173).
 
+### Local Docker Workflow
+
+Use Docker when you want discovery, dry-run additions, renders, and the app
+to run in the same local container environment.
+
+```bash
+docker compose up --build web
+```
+
+This serves the app at [http://127.0.0.1:8080](http://127.0.0.1:8080).
+
+For registry work, run the tooling service against your checked-out repo so
+changes to `agents.json` or `candidates.json` persist locally:
+
+```bash
+export GITHUB_TOKEN=...  # required for GitHub discovery/API-backed refreshes
+
+docker compose run --rm tooling python discover_agents.py
+docker compose run --rm tooling python auto_add_agents.py --dry-run
+docker compose run --rm tooling python fetch_and_build.py --render-only
+docker compose run --rm tooling python -m pytest tests/test_discovery.py tests/test_data_integrity.py
+```
+
+For manual candidate review, edit `docs/import-candidates.json` with either
+`owner/name`, full GitHub URLs, or object entries, then query:
+
+```bash
+curl -s http://127.0.0.1:8080/api/import-candidates | python -m json.tool
+curl -s "http://127.0.0.1:8080/api/import-candidates?status=new&tracked=false" | python -m json.tool
+```
+
+Notes:
+
+- `tooling` bind-mounts the repo into `/workspace`, so file changes are written
+  back to your local checkout.
+- `auto_add_agents.py` writes to `agents.json` only without `--dry-run`.
+- `fetch_and_build.py --render-only` stays local and avoids external API calls.
+
 Production runs on Railway with:
 
 - FastAPI for health, API, forms, and dynamic badge routes

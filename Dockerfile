@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY requirements.txt requirements-dev.txt ./
 RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends fonts-dejavu-core && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -15,6 +15,7 @@ RUN curl -sfL https://raw.githubusercontent.com/YugantM/hvtracker/data/scorecard
     && mv /tmp/sc.json scorecard-cache.json \
     || echo "Using seed scorecard-cache.json (data branch fetch failed)"
 COPY templates/ templates/
+COPY docs/import-candidates.json docs/import-candidates.json
 COPY compare/index.html compare/index.html
 COPY static/ static/
 COPY blog_static/ blog_static/

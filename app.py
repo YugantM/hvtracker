@@ -13,6 +13,7 @@ import threading
 import hashlib
 import time
 from collections import deque
+from datetime import datetime, timezone, timedelta
 from html import escape
 
 from fastapi import FastAPI, Form, Request
@@ -82,9 +83,24 @@ DATA_PATH = os.path.join(OUTPUT_DIR, "data.json")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 COMPARE_TOOL_PATH = os.path.join(BASE_DIR, "compare", "index.html")
 RENDER_FINGERPRINT_PATH = os.path.join(OUTPUT_DIR, ".render_fingerprint")
+REFRESH_STATUS_PATH = os.path.join(OUTPUT_DIR, ".refresh_status.json")
+MAX_DATA_AGE = timedelta(hours=int(os.environ.get("MAX_DATA_AGE_HOURS", "6")))
 
 app = FastAPI(title="HVTracker", docs_url="/api/docs", openapi_url="/api/openapi.json")
 _scheduler = None
+_refresh_lock = threading.Lock()
+SITE_NAV_ITEMS = (
+    ("Leaderboard", "/"),
+    ("Movers", "/movers/"),
+    ("Changes", "/changes/"),
+    ("Use cases", "/use-cases/"),
+    ("Methodology", "/methodology"),
+    ("Score lab", "/score-lab/"),
+    ("Compare", "/compare/"),
+    ("Alerts", "/alerts/"),
+    ("Data API", "/data/"),
+    ("Sponsor", "/sponsor/"),
+)
 
 
 # ---- cache headers -------------------------------------------------------
@@ -176,6 +192,89 @@ def _source_render_count() -> int:
         return 0
 
 
+def _normalize_github_repo(value: str | None) -> str | None:
+    if not value:
+        return None
+    text = value.strip()
+    if not text:
+        return None
+    text = text.replace("git@github.com:", "https://github.com/")
+    text = text.replace("ssh://git@github.com/", "https://github.com/")
+    text = text.replace("git+https://github.com/", "https://github.com/")
+    text = text.replace("git://github.com/", "https://github.com/")
+    if "github.com/" in text.lower():
+        m = re.search(r"github\.com[:/]+([^/\s]+)/([^/\s?#]+)", text, re.IGNORECASE)
+        if not m:
+            return None
+        owner, repo = m.group(1), m.group(2)
+    else:
+        parts = [part for part in text.strip("/").split("/") if part]
+        if len(parts) != 2:
+            return None
+        owner, repo = parts
+    repo = repo.removesuffix(".git")
+    return f"{owner.lower()}/{repo.lower()}" if owner and repo else None
+
+
+def _tracked_repo_lookup() -> dict[str, dict]:
+    return {
+        (agent.get("repo") or "").lower(): agent
+        for agent in db.load_agents()
+        if agent.get("repo")
+    }
+
+
+def load_manual_candidates() -> list[dict]:
+    path = os.path.join(BASE_DIR, "docs", "import-candidates.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+    except (OSError, json.JSONDecodeError, TypeError):
+        return []
+    if not isinstance(payload, list):
+        return []
+
+    tracked = _tracked_repo_lookup()
+    items = []
+    for entry in payload:
+        if isinstance(entry, str):
+            source_repo = entry
+            item = {"repo": entry}
+        elif isinstance(entry, dict):
+            source_repo = entry.get("repo") or entry.get("url") or entry.get("github")
+            item = dict(entry)
+        else:
+            continue
+        normalized_repo = _normalize_github_repo(source_repo)
+        if not normalized_repo:
+            continue
+        tracked_agent = tracked.get(normalized_repo)
+        item["repo"] = normalized_repo
+        item["url"] = f"https://github.com/{normalized_repo}"
+        item["tracked"] = tracked_agent is not None
+        item["tracked_name"] = tracked_agent.get("name") if tracked_agent else None
+        items.append(item)
+    return items
+
+
+def _site_header_html(updated: str) -> str:
+    nav_links = "".join(
+        f'<a href="{href}">{escape(label)}</a>'
+        for label, href in SITE_NAV_ITEMS
+    )
+    return f"""<header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        {nav_links}
+      </nav>
+      <div class="meta">
+        <span class="live-dot"></span>updated {updated}
+      </div>
+    </div>
+  </header>"""
+
+
 def _runtime_git_sha() -> str | None:
     for key in (
         "RAILWAY_GIT_COMMIT_SHA",
@@ -188,6 +287,52 @@ def _runtime_git_sha() -> str | None:
         if value:
             return value
     return None
+
+
+def _utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _parse_updated_timestamp(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    text = value.strip()
+    for fmt in ("%Y-%m-%d %H:%M UTC", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S.%f%z"):
+        try:
+            parsed = datetime.strptime(text, fmt)
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(tzinfo=timezone.utc)
+            return parsed.astimezone(timezone.utc)
+        except ValueError:
+            continue
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc)
+    except ValueError:
+        return None
+
+
+def _read_refresh_status() -> dict:
+    try:
+        with open(REFRESH_STATUS_PATH, encoding="utf-8") as f:
+            payload = json.load(f)
+        return payload if isinstance(payload, dict) else {}
+    except (OSError, json.JSONDecodeError, TypeError):
+        return {}
+
+
+def _write_refresh_status(status: dict) -> None:
+    with open(REFRESH_STATUS_PATH, "w", encoding="utf-8") as f:
+        json.dump(status, f, indent=2, sort_keys=True)
+
+
+def _mark_refresh_status(**updates) -> dict:
+    status = _read_refresh_status()
+    status.update(updates)
+    _write_refresh_status(status)
+    return status
 
 
 def find_agent(repo: str) -> dict | None:
@@ -213,16 +358,32 @@ def healthz():
     d = load_data()
     source_fingerprint = _compute_render_fingerprint()
     stored_fingerprint = _read_render_fingerprint()
+    refresh_status = _read_refresh_status()
+    updated_at = _parse_updated_timestamp(d.get("updated"))
+    data_age_seconds = None
+    data_fresh = None
+    if updated_at is not None:
+        data_age_seconds = max(0, int((datetime.now(timezone.utc) - updated_at).total_seconds()))
+        data_fresh = data_age_seconds <= int(MAX_DATA_AGE.total_seconds())
     return {
         "status": "ok",
         "agents": d.get("total", 0),
         "catalog_agents": _catalog_agent_count(),
         "source_render_agents": _source_render_count(),
         "updated": d.get("updated"),
+        "max_data_age_seconds": int(MAX_DATA_AGE.total_seconds()),
+        "data_age_seconds": data_age_seconds,
+        "data_fresh": data_fresh,
         "git_sha": _runtime_git_sha(),
         "source_render_fingerprint": source_fingerprint,
         "stored_render_fingerprint": stored_fingerprint,
         "render_in_sync": bool(stored_fingerprint and stored_fingerprint == source_fingerprint),
+        "refresh_in_progress": bool(refresh_status.get("in_progress")),
+        "last_refresh_started_at": refresh_status.get("last_started_at"),
+        "last_refresh_completed_at": refresh_status.get("last_completed_at"),
+        "last_refresh_succeeded": refresh_status.get("last_succeeded"),
+        "last_refresh_mode": refresh_status.get("last_mode"),
+        "last_refresh_error": refresh_status.get("last_error"),
     }
 
 
@@ -261,6 +422,26 @@ def api_feed():
         return JSONResponse({"error": "feed not built yet"}, status_code=503)
     with open(path, encoding="utf-8") as f:
         return JSONResponse(json.load(f))
+
+
+@app.api_route("/api/import-candidates", methods=["GET", "HEAD"])
+def api_import_candidates(status: str = "", category: str = "", tracked: str = "",
+                          limit: int = 100, offset: int = 0):
+    candidates = load_manual_candidates()
+    if status:
+        status_l = status.lower()
+        candidates = [c for c in candidates if (c.get("status") or "").lower() == status_l]
+    if category:
+        category_l = category.lower()
+        candidates = [c for c in candidates if (c.get("category") or "").lower() == category_l]
+    if tracked:
+        tracked_flag = tracked.lower()
+        want_tracked = tracked_flag in ("1", "true", "yes")
+        if tracked_flag in ("1", "true", "yes", "0", "false", "no"):
+            candidates = [c for c in candidates if bool(c.get("tracked")) is want_tracked]
+    total = len(candidates)
+    page = candidates[offset:offset + max(0, min(limit, 500))]
+    return {"total": total, "count": len(page), "offset": offset, "candidates": page}
 
 
 _API_V1_CACHE = "public, max-age=900"
@@ -442,27 +623,7 @@ def _marketing_page(
     }}
     a {{ color:inherit; text-decoration:none; }}
     a:hover {{ text-decoration:underline; }}
-    .site-header {{
-      position:sticky; top:0; z-index:100;
-      background:var(--paper);
-      border-bottom:1px solid var(--line);
-    }}
-    .site-header-inner {{
-      max-width:1200px; margin:0 auto; padding:14px 24px;
-      display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
-    }}
-    .logo {{ font-family:var(--font-mono); font-size:20px; font-weight:700; color:var(--ink); }}
     .logo span {{ color:var(--lobster); }}
-    .site-nav {{
-      margin-left:auto; font-family:var(--font-mono); font-size:11px;
-      display:flex; gap:6px; flex-wrap:wrap;
-    }}
-    .site-nav a {{
-      color:var(--muted); padding:5px 10px; border:1px solid transparent;
-    }}
-    .site-nav a:hover {{
-      color:var(--ink); border-color:var(--line); background:var(--paper-2); text-decoration:none;
-    }}
     .page {{ max-width:1120px; margin:0 auto; padding:24px 24px 48px; background:var(--paper); min-height:100vh; }}
     .shell {{
       max-width:780px; margin:0 auto;
@@ -514,8 +675,6 @@ def _marketing_page(
     .footer-sep {{ color:var(--line-strong); }}
     footer a {{ color:var(--blue-strong); }}
     @media (max-width:760px) {{
-      .site-header-inner {{ gap:8px; }}
-      .site-nav {{ margin-left:0; }}
       .page {{ padding:24px 20px 40px; }}
       h1 {{ font-size:28px; }}
     }}
@@ -535,21 +694,7 @@ def _marketing_page(
   <script defer src="/analytics.js"></script>
 </head>
 <body>
-  <header class="site-header">
-    <div class="site-header-inner">
-      <a href="/" class="logo">HV<span>Tracker</span></a>
-      <nav class="site-nav" aria-label="Site">
-        <a href="/">Leaderboard</a>
-        <a href="/movers/">Movers</a>
-        <a href="/use-cases/">Use cases</a>
-        <a href="/methodology">Methodology</a>
-        <a href="/compare/">Compare</a>
-        <a href="/alerts/">Alerts</a>
-        <a href="/data/">Data API</a>
-        <a href="/sponsor/">Sponsor</a>
-      </nav>
-    </div>
-  </header>
+  {_site_header_html(datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC'))}
   <div class="page">
     <div class="shell">
       <section class="hero">
@@ -1202,9 +1347,42 @@ def _write_render_fingerprint(fingerprint: str) -> None:
         f.write(fingerprint)
 
 
-def _refresh_and_record(mode: str, fingerprint: str) -> None:
-    if _refresh(mode):
-        _write_render_fingerprint(fingerprint)
+def _refresh_and_record(mode: str, fingerprint: str, trigger: str = "internal") -> bool:
+    if not _refresh_lock.acquire(blocking=False):
+        print(f"[scheduler] skipped refresh ({mode}) from {trigger}: another refresh is already running")
+        _mark_refresh_status(
+            in_progress=True,
+            last_mode=mode,
+            last_trigger=trigger,
+            last_skipped_at=_utc_now_iso(),
+            last_error="refresh skipped because another refresh is already running",
+        )
+        return False
+    started_at = _utc_now_iso()
+    _mark_refresh_status(
+        in_progress=True,
+        last_mode=mode,
+        last_trigger=trigger,
+        last_started_at=started_at,
+        last_succeeded=None,
+        last_error=None,
+    )
+    try:
+        ok = _refresh(mode)
+        completed_at = _utc_now_iso()
+        if ok:
+            _write_render_fingerprint(fingerprint)
+        _mark_refresh_status(
+            in_progress=False,
+            last_mode=mode,
+            last_trigger=trigger,
+            last_completed_at=completed_at,
+            last_succeeded=ok,
+            last_error=None if ok else f"refresh failed in mode {mode}",
+        )
+        return ok
+    finally:
+        _refresh_lock.release()
 
 
 def _seed_history_into_volume() -> int:
@@ -1310,10 +1488,10 @@ def startup():
     # If the volume has no site yet, build one in the background so the service
     # comes up immediately and the site appears shortly after.
     if not os.path.isfile(DATA_PATH):
-        threading.Thread(target=_refresh_and_record, args=("full", fingerprint), daemon=True).start()
+        threading.Thread(target=_refresh_and_record, args=("full", fingerprint, "startup"), daemon=True).start()
         print("[startup] no data.json on volume — kicked off initial full build")
     elif _has_missing_commit_rows():
-        threading.Thread(target=_refresh_and_record, args=("repair-commits", fingerprint), daemon=True).start()
+        threading.Thread(target=_refresh_and_record, args=("repair-commits", fingerprint, "startup"), daemon=True).start()
         print("[startup] detected rows with missing commit counts — kicked off targeted repair refresh")
     elif seeded > 0 or stored_fingerprint != fingerprint or agents_changed:
         # Re-render when:
@@ -1321,7 +1499,7 @@ def startup():
         #     had a site rendered without them, or
         #   - templates/assets changed in the image, or
         #   - agents.json content changed since last deploy (DB resync above)
-        threading.Thread(target=_refresh_and_record, args=("render", fingerprint), daemon=True).start()
+        threading.Thread(target=_refresh_and_record, args=("render", fingerprint, "startup"), daemon=True).start()
         if seeded > 0:
             print("[startup] history seeded into existing volume — kicked off render-only rebuild")
         elif stored_fingerprint != fingerprint:
@@ -1333,7 +1511,14 @@ def startup():
         from apscheduler.schedulers.background import BackgroundScheduler
         if _scheduler is None:
             _scheduler = BackgroundScheduler(timezone="UTC")
-            _scheduler.add_job(lambda: _refresh("auto"), "cron", hour="*/2", id="refresh")
+            _scheduler.add_job(
+                lambda: _refresh_and_record("auto", _compute_render_fingerprint(), "scheduler"),
+                "cron",
+                hour="*/2",
+                id="refresh",
+                max_instances=1,
+                coalesce=True,
+            )
             _scheduler.start()
         print("[startup] scheduler started (refresh every 2h)")
 

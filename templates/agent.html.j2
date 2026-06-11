@@ -341,22 +341,7 @@
   </script>
 </head>
 <body data-page-type="agent_profile" data-agent-slug="{{ row.slug }}" data-agent-name="{{ row.name }}" data-category="{{ row.category }}" data-global-rank="{{ row.rank }}" data-trust-score="{{ row.trust_score }}">
-  <header class="site-header">
-    <div class="site-header-inner">
-      <a href="/" class="logo">HV<span>Tracker</span></a>
-      <nav class="site-nav" aria-label="Site">
-        <a href="/">Leaderboard</a>
-        <a href="/movers/">Movers</a>
-        <a href="/changes/">Changes</a>
-        <a href="/use-cases/">Use cases</a>
-        <a href="/methodology">Methodology</a>
-        <a href="/compare/">Compare</a>
-        <a href="/alerts/">Alerts</a>
-        <a href="/data/">Data API</a>
-        <a href="/sponsor/">Sponsor</a>
-      </nav>
-    </div>
-  </header>
+  {% include "_site_header.html.j2" %}
   <div class="page">
 
     <section class="hero">
@@ -992,11 +977,43 @@
         <img src="/badge/{{ row.slug }}-grade.svg" alt="Grade {{ row.evidence_grade }}" height="20">
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--muted);word-break:break-all;line-height:1.6;">
-        <span style="color:var(--text);">Markdown:</span><br>
-        [![HVTrust](https://hvtracker.net/badge/{{ row.slug }}.svg)](https://hvtracker.net/agents/{{ row.slug }})<br>
-        <span style="color:var(--text);margin-top:6px;display:inline-block;">HTML:</span><br>
-        &lt;a href="https://hvtracker.net/agents/{{ row.slug }}"&gt;&lt;img src="https://hvtracker.net/badge/{{ row.slug }}.svg" alt="HVTrust"&gt;&lt;/a&gt;
+        {% set badge_markdown = '[![HVTrust](https://hvtracker.net/badge/' ~ row.slug ~ '.svg)](https://hvtracker.net/agents/' ~ row.slug ~ ')' %}
+        {% set badge_html = '<a href="https://hvtracker.net/agents/' ~ row.slug ~ '"><img src="https://hvtracker.net/badge/' ~ row.slug ~ '.svg" alt="HVTrust"></a>' %}
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="color:var(--text);">Markdown:</span>
+          <button type="button"
+                  data-copy-badge="{{ badge_markdown }}"
+                  style="border:1px solid var(--border);background:var(--paper);color:var(--text);border-radius:999px;padding:2px 8px;font:600 10px var(--font-mono);cursor:pointer;">
+            Copy
+          </button>
+        </div>
+        {{ badge_markdown }}<br>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;">
+          <span style="color:var(--text);display:inline-block;">HTML:</span>
+          <button type="button"
+                  data-copy-badge="{{ badge_html }}"
+                  style="border:1px solid var(--border);background:var(--paper);color:var(--text);border-radius:999px;padding:2px 8px;font:600 10px var(--font-mono);cursor:pointer;">
+            Copy
+          </button>
+        </div>
+        {{ badge_html | e }}
       </div>
+      <script>
+        document.querySelectorAll('[data-copy-badge]').forEach((button) => {
+          button.addEventListener('click', async () => {
+            const original = button.textContent;
+            try {
+              await navigator.clipboard.writeText(button.getAttribute('data-copy-badge') || '');
+              button.textContent = 'Copied';
+            } catch {
+              button.textContent = 'Failed';
+            }
+            window.setTimeout(() => {
+              button.textContent = original;
+            }, 1200);
+          });
+        });
+      </script>
     </section>
 
     {% if row.siblings %}
@@ -1040,21 +1057,21 @@
 
     <footer>
       <a href="/methodology">Methodology</a>
-      <span class="footer-sep">&middot;</span>
+      <span class="footer-sep">·</span>
       <a href="/spec/">Specifications</a>
-      <span class="footer-sep">&middot;</span>
+      <span class="footer-sep">·</span>
       <a href="/data/">Data API</a>
-      <span class="footer-sep">&middot;</span>
+      <span class="footer-sep">·</span>
       <a href="/compare/">Compare</a>
-      <span class="footer-sep">&middot;</span>
+      <span class="footer-sep">·</span>
       <a href="/badges/">Badges</a>
-      <span class="footer-sep">&middot;</span>
+      <span class="footer-sep">·</span>
       <a href="/changelog/">Changelog</a>
-      <span class="footer-sep">&middot;</span>
+      <span class="footer-sep">·</span>
       <a href="/blog/">Blog</a>
-      <span class="footer-sep">&middot;</span>
+      <span class="footer-sep">·</span>
       <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
-      <span class="footer-sep">&middot;</span>
+      <span class="footer-sep">·</span>
       <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
 

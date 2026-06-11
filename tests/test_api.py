@@ -5,6 +5,7 @@ render cache, then drives the FastAPI app with TestClient. No Postgres/Redis.
 """
 import glob
 import importlib
+import json
 import os
 import shutil
 import tempfile
@@ -50,10 +51,17 @@ def test_healthz(client):
     assert j["agents"] > 100
     assert j["catalog_agents"] >= j["agents"]
     assert j["source_render_agents"] == j["agents"]
+    assert isinstance(j["max_data_age_seconds"], int)
+    assert j["max_data_age_seconds"] > 0
+    assert isinstance(j["data_fresh"], bool)
+    assert isinstance(j["refresh_in_progress"], bool)
     assert isinstance(j["source_render_fingerprint"], str)
     assert len(j["source_render_fingerprint"]) == 64
     if j["stored_render_fingerprint"] is not None:
         assert j["render_in_sync"] == (j["stored_render_fingerprint"] == j["source_render_fingerprint"])
+    if j["data_age_seconds"] is not None:
+        assert isinstance(j["data_age_seconds"], int)
+        assert j["data_age_seconds"] >= 0
     assert client.head("/healthz").status_code == 200
 
 
@@ -220,6 +228,45 @@ def test_api_v1_graph(client):
     assert isinstance(r.json(), (dict, list))
 
 
+def test_api_import_candidates_supports_manual_links(client, monkeypatch):
+    import app as _app
+
+    tmp = tempfile.mkdtemp()
+    docs_dir = os.path.join(tmp, "docs")
+    os.makedirs(docs_dir, exist_ok=True)
+    with open(os.path.join(docs_dir, "import-candidates.json"), "w", encoding="utf-8") as f:
+        json.dump([
+            "https://github.com/OpenAI/Codex",
+            {
+                "name": "Manual Candidate",
+                "url": "git@github.com:Example/Agent.git",
+                "status": "new",
+                "category": "Coding Agents",
+            },
+            {"repo": "not-a-repo"},
+        ], f)
+
+    monkeypatch.setattr(_app, "BASE_DIR", tmp)
+    monkeypatch.setattr(_app.db, "load_agents", lambda: [{"repo": "openai/codex", "name": "Codex"}])
+
+    r = client.get("/api/import-candidates")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["total"] == 2
+    assert body["count"] == 2
+    assert body["candidates"][0]["repo"] == "openai/codex"
+    assert body["candidates"][0]["tracked"] is True
+    assert body["candidates"][0]["tracked_name"] == "Codex"
+    assert body["candidates"][1]["repo"] == "example/agent"
+    assert body["candidates"][1]["tracked"] is False
+
+    filtered = client.get("/api/import-candidates", params={"status": "new", "tracked": "false"}).json()
+    assert filtered["total"] == 1
+    assert filtered["candidates"][0]["repo"] == "example/agent"
+
+    shutil.rmtree(tmp, ignore_errors=True)
+
+
 def test_startup_keeps_scheduler_alive(monkeypatch):
     import app
     importlib.reload(app)
@@ -231,12 +278,13 @@ def test_startup_keeps_scheduler_alive(monkeypatch):
             self.started = False
             self.shutdown_called = False
 
-        def add_job(self, func, trigger, hour, id):
+        def add_job(self, func, trigger, hour, id, **kwargs):
             self.jobs.append({
                 "func": func,
                 "trigger": trigger,
                 "hour": hour,
                 "id": id,
+                **kwargs,
             })
 
         def start(self):
