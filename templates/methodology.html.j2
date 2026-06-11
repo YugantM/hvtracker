@@ -61,18 +61,6 @@
     .logo span { color: var(--lobster); }
     .tagline { font-size: 12px; color: var(--muted); }
 
-    .site-nav a,
-    .site-nav span {
-      color: var(--muted);
-      padding: 5px 10px;
-      border: 1px solid transparent;
-    }
-    .site-nav a:hover {
-      color: var(--ink);
-      border-color: var(--line);
-      background: var(--paper-2);
-      text-decoration: none;
-    }
 
     .content {
       max-width: 780px;
@@ -228,8 +216,6 @@
 
     @media (max-width: 640px) {
       .page { padding: 18px 14px 36px; }
-      .site-header-inner { gap: 8px; }
-      .site-nav { margin-left: 0; }
       .content { margin-top: 18px; }
       .doc-title { font-size: 34px; }
     }
@@ -250,23 +236,7 @@
   <script defer src="/analytics.js"></script>
 </head>
 <body data-page-type="methodology">
-  <header class="site-header">
-    <div class="site-header-inner">
-      <a href="/" class="logo">HV<span>Tracker</span></a>
-      <nav class="site-nav" aria-label="Site">
-        <a href="/">Leaderboard</a>
-        <a href="/movers/">Movers</a>
-        <a href="/changes/">Changes</a>
-        <a href="/use-cases/">Use cases</a>
-        <a href="/methodology">Methodology</a>
-        <a href="/score-lab/">Score lab</a>
-        <a href="/compare/">Compare</a>
-        <a href="/alerts/">Alerts</a>
-        <a href="/data/">Data API</a>
-        <a href="/sponsor/">Sponsor</a>
-      </nav>
-    </div>
-  </header>
+  {% include "_site_header.html.j2" %}
   <div class="page">
 
     <article class="content">

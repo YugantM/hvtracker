@@ -979,37 +979,43 @@
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--muted);word-break:break-all;line-height:1.6;">
         {% set badge_markdown = '[![HVTrust](https://hvtracker.net/badge/' ~ row.slug ~ '.svg)](https://hvtracker.net/agents/' ~ row.slug ~ ')' %}
         {% set badge_html = '<a href="https://hvtracker.net/agents/' ~ row.slug ~ '"><img src="https://hvtracker.net/badge/' ~ row.slug ~ '.svg" alt="HVTrust"></a>' %}
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <span style="color:var(--text);">Markdown:</span>
-          <button type="button"
-                  data-copy-badge="{{ badge_markdown }}"
-                  style="border:1px solid var(--border);background:var(--paper);color:var(--text);border-radius:999px;padding:2px 8px;font:600 10px var(--font-mono);cursor:pointer;">
-            Copy
-          </button>
+        <div style="margin-bottom:8px;">
+          <span style="color:var(--text);font-weight:600;">Markdown:</span>
+          <div style="position:relative;margin-top:4px;background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:8px 40px 8px 10px;">
+            <code>{{ badge_markdown }}</code>
+            <button type="button" data-copy-badge="{{ badge_markdown }}"
+                    style="position:absolute;top:4px;right:4px;border:1px solid var(--border);background:var(--surface);color:var(--muted);border-radius:4px;padding:4px 6px;cursor:pointer;line-height:1;font-size:13px;"
+                    title="Copy to clipboard">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
         </div>
-        {{ badge_markdown }}<br>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;">
-          <span style="color:var(--text);display:inline-block;">HTML:</span>
-          <button type="button"
-                  data-copy-badge="{{ badge_html }}"
-                  style="border:1px solid var(--border);background:var(--paper);color:var(--text);border-radius:999px;padding:2px 8px;font:600 10px var(--font-mono);cursor:pointer;">
-            Copy
-          </button>
+        <div>
+          <span style="color:var(--text);font-weight:600;">HTML:</span>
+          <div style="position:relative;margin-top:4px;background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:8px 40px 8px 10px;">
+            <code>{{ badge_html | e }}</code>
+            <button type="button" data-copy-badge="{{ badge_html }}"
+                    style="position:absolute;top:4px;right:4px;border:1px solid var(--border);background:var(--surface);color:var(--muted);border-radius:4px;padding:4px 6px;cursor:pointer;line-height:1;font-size:13px;"
+                    title="Copy to clipboard">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
         </div>
-        {{ badge_html | e }}
       </div>
       <script>
         document.querySelectorAll('[data-copy-badge]').forEach((button) => {
           button.addEventListener('click', async () => {
-            const original = button.textContent;
+            const original = button.innerHTML;
             try {
               await navigator.clipboard.writeText(button.getAttribute('data-copy-badge') || '');
-              button.textContent = 'Copied';
+              button.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+              button.style.color = '#16a34a';
             } catch {
-              button.textContent = 'Failed';
+              button.style.color = '#dc2626';
             }
             window.setTimeout(() => {
-              button.textContent = original;
+              button.innerHTML = original;
+              button.style.color = '';
             }, 1200);
           });
         });

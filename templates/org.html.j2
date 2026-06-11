@@ -18,6 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -37,13 +38,8 @@
     a{color:inherit;text-decoration:none}
     a:hover{text-decoration:underline}
     .page{background:var(--paper);max-width:1080px;margin:0 auto;padding:28px 24px 52px}
-    .site-header{position:sticky;top:0;z-index:100;background:var(--paper);border-bottom:1px solid var(--line)}
-    .site-header-inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
     .logo{font-family:var(--font-mono);font-weight:700;font-size:20px;letter-spacing:0}
     .logo span{color:var(--lobster)}
-    nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;font:11px var(--font-mono)}
-    .site-nav a{color:var(--muted);padding:5px 10px;border:1px solid transparent}
-    .site-nav a:hover{color:var(--ink);border-color:var(--line);background:var(--paper-2);text-decoration:none}
     .hero{padding:28px 0 18px;border-bottom:1px solid var(--line)}
     h1{font-size:34px;line-height:1.12;letter-spacing:0;margin-bottom:10px}
     .hero p{color:var(--muted);max-width:760px}
@@ -61,7 +57,7 @@
     .gh-link{font:11px var(--font-mono);color:var(--muted)}
     footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font:11px var(--font-mono);color:var(--muted);text-align:center}
     footer a{color:var(--lobster)}
-    @media(max-width:760px){.metric-row{grid-template-columns:1fr}h1{font-size:26px}nav{margin-left:0}table{font-size:13px}th:nth-child(4),td:nth-child(4){display:none}}
+    @media(max-width:760px){.metric-row{grid-template-columns:1fr}h1{font-size:26px}table{font-size:13px}th:nth-child(4),td:nth-child(4){display:none}}
   </style>
   <script type="application/ld+json">
   {
@@ -88,21 +84,7 @@
   <script defer src="/analytics.js"></script>
 </head>
 <body data-page-type="{% if is_index %}org_index{% else %}org{% endif %}">
-  <header class="site-header">
-    <div class="site-header-inner">
-      <a href="/" class="logo">HV<span>Tracker</span></a>
-      <nav class="site-nav" aria-label="Site">
-        <a href="/">Leaderboard</a>
-        <a href="/movers/">Movers</a>
-        <a href="/use-cases/">Use cases</a>
-        <a href="/methodology">Methodology</a>
-        <a href="/compare/">Compare</a>
-        <a href="/alerts/">Alerts</a>
-        <a href="/data/">Data API</a>
-        <a href="/sponsor/">Sponsor</a>
-      </nav>
-    </div>
-  </header>
+  {% include "_site_header.html.j2" %}
   <div class="page">
 
 {% if is_index %}

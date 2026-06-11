@@ -18,6 +18,7 @@
     gtag('config', 'G-TZ8921LR0K');
   </script>
   <script defer src="/analytics.js"></script>
+  <script defer src="/static/site-status.js"></script>
   <link rel="stylesheet" href="/static/site.css">
   <style>
     :root {
@@ -42,15 +43,6 @@
     a:hover { text-decoration: underline; }
     .container { max-width: 1120px; margin: 0 auto; padding: 24px 24px 48px; background: var(--bg); min-height: 100vh; }
 
-    .site-header {
-      position: sticky; top: 0; z-index: 100;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-    }
-    .site-header-inner {
-      max-width: 1200px; margin: 0 auto; padding: 14px 24px;
-      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
-    }
     .page-title {
       width: 100%;
       font-size: 26px;
@@ -66,21 +58,7 @@
       font-size: 14px;
       line-height: 1.65;
     }
-    .logo { font-family:var(--mono); font-size:20px; font-weight:700; }
     .logo span { color:var(--accent-warm); }
-    .site-nav {
-      margin-left: auto;
-      display: flex;
-      gap:6px;
-      font-size:11px;
-      font-family: var(--mono);
-      flex-wrap: wrap;
-    }
-    .site-nav a {
-      color: var(--muted);
-      padding: 5px 10px;
-      border: 1px solid transparent;
-    }
     .site-nav a:hover,
     .site-nav a.active {
       color: var(--text);
@@ -698,13 +676,18 @@
       <nav class="site-nav" aria-label="Site">
         <a href="/">Leaderboard</a>
         <a href="/movers/">Movers</a>
+        <a href="/changes/">Changes</a>
         <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
+        <a href="/score-lab/">Score lab</a>
         <a href="/compare/">Compare</a>
         <a href="/alerts/">Alerts</a>
         <a href="/data/">Data API</a>
         <a href="/sponsor/">Sponsor</a>
       </nav>
+      <div class="site-status" data-updated="">
+        <span class="live-dot"></span>updated <span class="site-status-value"></span>
+      </div>
     </div>
   </header>
   <div class="container">

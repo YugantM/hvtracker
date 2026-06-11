@@ -3174,6 +3174,12 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
     os.makedirs(os.path.join(data_dir, "agents"), exist_ok=True)
     os.makedirs(os.path.join(data_dir, "signals"), exist_ok=True)
     os.makedirs(os.path.join(data_dir, "history"), exist_ok=True)
+    css_path = os.path.join(script_dir, "static", "site.css")
+    try:
+        with open(css_path, "rb") as f:
+            css_hash = hashlib.sha256(f.read()).hexdigest()[:8]
+    except OSError:
+        css_hash = ""
 
     meta = {
         "schema_version": DATA_SCHEMA_VERSION,
@@ -3316,18 +3322,14 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <link rel="stylesheet" href="/static/site.css?v={css_hash}">
   <style>
     *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
     :root{{--bg:#f4f1eb;--surface:#eae6de;--border:#d4cfc5;--text:#1a1a1a;--muted:#6b6560;--accent:#2c5282;--accent-warm:#b05a3a;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}}
     body{{background:var(--bg);background-image:url("/hex-bg.svg");background-size:2000px 2000px;color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.6;min-height:100vh}}
     a{{color:var(--accent);text-decoration:none}}a:hover{{text-decoration:underline}}
     .page{{max-width:800px;margin:0 auto;padding:24px 24px 48px;background:#f4f1eb;min-height:100vh}}
-    .site-header{{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border)}}
-    .site-header-inner{{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}}
     .logo{{font-family:var(--font-mono);font-size:20px;font-weight:700}}.logo span{{color:var(--accent-warm)}}
-    .site-nav{{font-family:var(--font-mono);font-size:11px;display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}}
-    .site-nav a{{color:var(--muted);padding:5px 10px;border:1px solid transparent}}
-    .site-nav a:hover{{color:var(--text);text-decoration:none;border-color:var(--border);background:var(--surface)}}
     h1{{font-size:26px;font-weight:700;margin:20px 0 8px}}
     h2{{font-family:var(--font-mono);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}}
     p{{margin-bottom:14px;color:var(--muted);font-size:14px}}p strong{{color:var(--text)}}
@@ -3350,11 +3352,15 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
         <a href="/changes/">Changes</a>
         <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
+        <a href="/score-lab/">Score lab</a>
         <a href="/compare/">Compare</a>
         <a href="/alerts/">Alerts</a>
         <a href="/data/">Data API</a>
         <a href="/sponsor/">Sponsor</a>
       </nav>
+      <div class="site-status" data-updated="{now_str}">
+        <span class="live-dot"></span>updated <span class="site-status-value">{now_str}</span>
+      </div>
     </div>
   </header>
   <div class="page">
@@ -5313,6 +5319,7 @@ def main() -> None:
         total=len(rows),
         top_agent=rows[0],
         blog_schema_json=json.dumps(blog_schema, ensure_ascii=False),
+        updated=now_str,
     )
     with open(os.path.join(blog_dir, "index.html"), "w", encoding="utf-8") as f:
         f.write(blog_index_html)
@@ -5556,10 +5563,9 @@ HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Ma
         json.dump(feed, f, indent=2, ensure_ascii=False)
     print(f"Wrote feed.json with {len(blog_feed_items) + len(agent_feed_items)} items.")
 
-    methodology_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     methodology_html = env.get_template("methodology.html.j2").render(
         methodology_version=METHODOLOGY_VERSION,
-        updated=methodology_date,
+        updated=now_str,
     )
     output_dir = os.path.join(script_dir, "output")
     os.makedirs(output_dir, exist_ok=True)
@@ -5568,14 +5574,14 @@ HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Ma
         os.makedirs(meth_dir, exist_ok=True)
         with open(os.path.join(meth_dir, "index.html"), "w", encoding="utf-8") as f:
             f.write(methodology_html)
-    print(f"Built methodology/index.html ({METHODOLOGY_VERSION}, updated {methodology_date}).")
+    print(f"Built methodology/index.html ({METHODOLOGY_VERSION}, updated {now_str}).")
 
     # Build /badges/ — Badge for Maintainers page
     badges_html = env.get_template("badges.html.j2").render(
         top_repos=rows[:12],
         sample=rows[0],
         total=len(rows),
-        updated=methodology_date,
+        updated=now_str,
     )
     badges_dir = os.path.join(script_dir, "badges")
     os.makedirs(badges_dir, exist_ok=True)
@@ -5584,7 +5590,7 @@ HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Ma
     print("Built badges/index.html (Badge for Maintainers).")
 
     # Build /roadmap/ — public roadmap (P2 Runtime Trust direction)
-    roadmap_html = env.get_template("roadmap.html.j2").render()
+    roadmap_html = env.get_template("roadmap.html.j2").render(updated=now_str)
     roadmap_dir = os.path.join(script_dir, "roadmap")
     os.makedirs(roadmap_dir, exist_ok=True)
     with open(os.path.join(roadmap_dir, "index.html"), "w", encoding="utf-8") as f:
@@ -5602,13 +5608,13 @@ HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Ma
     for spec in ALL_SPECS:
         spec_dir = os.path.join(spec_base, spec["slug"], spec["version"])
         os.makedirs(spec_dir, exist_ok=True)
-        html = spec_tmpl.render(spec=spec)
+        html = spec_tmpl.render(spec=spec, updated=now_str)
         with open(os.path.join(spec_dir, "index.html"), "w", encoding="utf-8") as f:
             f.write(html)
         print(f"Built spec: /spec/{spec['slug']}/{spec['version']}")
 
     # /spec/ index
-    index_html = spec_index_tmpl.render(specs=ALL_SPECS)
+    index_html = spec_index_tmpl.render(specs=ALL_SPECS, updated=now_str)
     with open(os.path.join(spec_base, "index.html"), "w", encoding="utf-8") as f:
         f.write(index_html)
     print(f"Built spec index with {len(ALL_SPECS)} spec(s).")

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>HVTracker — Data Endpoints</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <link rel="stylesheet" href="/static/site.css?v=978b81bf">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#f4f1eb;--surface:#eae6de;--border:#d4cfc5;--text:#1a1a1a;--muted:#6b6560;--accent:#2c5282;--accent-warm:#b05a3a;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}
+    body{background:var(--bg);background-image:url("/hex-bg.svg");background-size:2000px 2000px;color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.6;min-height:100vh}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+    .page{max-width:800px;margin:0 auto;padding:24px 24px 48px;background:#f4f1eb;min-height:100vh}
+    .logo{font-family:var(--font-mono);font-size:20px;font-weight:700}.logo span{color:var(--accent-warm)}
+    h1{font-size:26px;font-weight:700;margin:20px 0 8px}
+    h2{font-family:var(--font-mono);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+    p{margin-bottom:14px;color:var(--muted);font-size:14px}p strong{color:var(--text)}
+    code{font-family:var(--font-mono);font-size:12px;background:var(--surface);padding:1px 5px;color:var(--text)}
+    ul{list-style:none;margin:0 0 20px}
+    li{padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.06);font-size:14px}
+    li a{font-family:var(--font-mono);font-size:12px;color:var(--accent);border:1px solid var(--border);padding:3px 8px;margin-right:8px}
+    li a:hover{border-color:var(--accent-warm);color:var(--accent-warm);text-decoration:none}
+    footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);text-align:center}
+    footer a{color:var(--accent)}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/changes/">Changes</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/score-lab/">Score lab</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
+      </nav>
+      <div class="site-status" data-updated="2026-06-11 14:48 UTC">
+        <span class="live-dot"></span>updated <span class="site-status-value">2026-06-11 14:48 UTC</span>
+      </div>
+    </div>
+  </header>
+  <div class="page">
+
+    <h1>Data Endpoints</h1>
+    <p>All endpoints are static JSON files updated daily at 06:00 UTC. CORS is open (<code>Access-Control-Allow-Origin: *</code>). License: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p>
+    <p>Schema version: <strong>v0.1</strong> · Methodology: <strong>v3.2</strong> · Last generated: 2026-06-11 14:48 UTC</p>
+
+    <h2>Core</h2>
+    <ul>
+      <li><a href="/data/latest.json">/data/latest.json</a> Full current snapshot (all agents, all fields)</li>
+      <li><a href="/data/history/2026-06-11.json">/data/history/YYYY-MM-DD.json</a> Daily snapshots (e.g. <a href="/data/history/2026-06-11.json">2026-06-11</a>)</li>
+    </ul>
+
+    <h2>Signal Subsets</h2>
+    <ul>
+      <li><a href="/data/signals/scorecard.json">/data/signals/scorecard.json</a> OSSF Scorecard + signed commits for all agents</li>
+      <li><a href="/data/signals/provenance.json">/data/signals/provenance.json</a> Supply-chain provenance signals for all agents</li>
+      <li><a href="/data/signals/runtime.json">/data/signals/runtime.json</a> Runtime-trust discovery signals (MCP, external deps, tool/plugin surface, package provenance drift)</li>
+    </ul>
+
+    <h2>Per-Agent (with 90-day history)</h2>
+    <ul>
+    <li><a href="/data/agents/haystack.json">/data/agents/haystack.json</a> — Haystack</li>
+    <li><a href="/data/agents/langgraph.json">/data/agents/langgraph.json</a> — LangGraph</li>
+    <li><a href="/data/agents/codex.json">/data/agents/codex.json</a> — Codex</li>
+    <li><a href="/data/agents/vercel-ai-sdk.json">/data/agents/vercel-ai-sdk.json</a> — Vercel AI SDK</li>
+    <li><a href="/data/agents/n8n.json">/data/agents/n8n.json</a> — n8n</li>
+    <li><a href="/data/agents/cline.json">/data/agents/cline.json</a> — Cline</li>
+    <li><a href="/data/agents/livekit-agents.json">/data/agents/livekit-agents.json</a> — LiveKit Agents</li>
+    <li><a href="/data/agents/mlflow.json">/data/agents/mlflow.json</a> — MLflow</li>
+    <li><a href="/data/agents/pydanticai.json">/data/agents/pydanticai.json</a> — PydanticAI</li>
+    <li><a href="/data/agents/trigger-dev.json">/data/agents/trigger-dev.json</a> — Trigger.dev</li>
+    <li><a href="/data/agents/openai-agents-sdk.json">/data/agents/openai-agents-sdk.json</a> — OpenAI Agents SDK</li>
+    <li><a href="/data/agents/strands-agents.json">/data/agents/strands-agents.json</a> — Strands Agents</li>
+    <li><a href="/data/agents/a2a-agent2agent-protocol.json">/data/agents/a2a-agent2agent-protocol.json</a> — A2A / Agent2Agent Protocol</li>
+    <li><a href="/data/agents/open-webui.json">/data/agents/open-webui.json</a> — Open WebUI</li>
+    <li><a href="/data/agents/lancedb.json">/data/agents/lancedb.json</a> — LanceDB</li>
+    <li><a href="/data/agents/skyvern.json">/data/agents/skyvern.json</a> — Skyvern</li>
+    <li><a href="/data/agents/mem0.json">/data/agents/mem0.json</a> — Mem0</li>
+    <li><a href="/data/agents/stagehand.json">/data/agents/stagehand.json</a> — Stagehand</li>
+    <li><a href="/data/agents/docling.json">/data/agents/docling.json</a> — Docling</li>
+    <li><a href="/data/agents/qwen-code.json">/data/agents/qwen-code.json</a> — Qwen Code</li>
+    <li><a href="/data/agents/lerobot.json">/data/agents/lerobot.json</a> — LeRobot</li>
+    <li><a href="/data/agents/hermes-agent.json">/data/agents/hermes-agent.json</a> — Hermes Agent</li>
+    <li><a href="/data/agents/headroom.json">/data/agents/headroom.json</a> — Headroom</li>
+    <li><a href="/data/agents/vespa.json">/data/agents/vespa.json</a> — Vespa</li>
+    <li><a href="/data/agents/botpress.json">/data/agents/botpress.json</a> — Botpress</li>
+    <li><a href="/data/agents/openclaw.json">/data/agents/openclaw.json</a> — OpenClaw</li>
+    <li><a href="/data/agents/unstructured.json">/data/agents/unstructured.json</a> — Unstructured</li>
+    <li><a href="/data/agents/graphiti.json">/data/agents/graphiti.json</a> — Graphiti</li>
+    <li><a href="/data/agents/pipecat.json">/data/agents/pipecat.json</a> — Pipecat</li>
+    <li><a href="/data/agents/weights-biases-weave.json">/data/agents/weights-biases-weave.json</a> — Weights & Biases Weave</li>
+    <li><a href="/data/agents/lightrag.json">/data/agents/lightrag.json</a> — LightRAG</li>
+    <li><a href="/data/agents/openui.json">/data/agents/openui.json</a> — OpenUI</li>
+    <li><a href="/data/agents/bernstein.json">/data/agents/bernstein.json</a> — Bernstein</li>
+    <li><a href="/data/agents/wrenai.json">/data/agents/wrenai.json</a> — WrenAI</li>
+    <li><a href="/data/agents/guardrails-ai.json">/data/agents/guardrails-ai.json</a> — Guardrails AI</li>
+    <li><a href="/data/agents/crewai.json">/data/agents/crewai.json</a> — CrewAI</li>
+    <li><a href="/data/agents/cli-anything.json">/data/agents/cli-anything.json</a> — CLI-Anything</li>
+    <li><a href="/data/agents/dify.json">/data/agents/dify.json</a> — Dify</li>
+    <li><a href="/data/agents/vllm.json">/data/agents/vllm.json</a> — vLLM</li>
+    <li><a href="/data/agents/aipass.json">/data/agents/aipass.json</a> — AIPass</li>
+    <li><a href="/data/agents/autogen.json">/data/agents/autogen.json</a> — AutoGen</li>
+    <li><a href="/data/agents/langchain.json">/data/agents/langchain.json</a> — LangChain</li>
+    <li><a href="/data/agents/langfuse.json">/data/agents/langfuse.json</a> — Langfuse</li>
+    <li><a href="/data/agents/litellm.json">/data/agents/litellm.json</a> — LiteLLM</li>
+    <li><a href="/data/agents/promptfoo.json">/data/agents/promptfoo.json</a> — Promptfoo</li>
+    <li><a href="/data/agents/ragflow.json">/data/agents/ragflow.json</a> — RAGFlow</li>
+    <li><a href="/data/agents/arize-phoenix.json">/data/agents/arize-phoenix.json</a> — Arize Phoenix</li>
+    <li><a href="/data/agents/deep-agents.json">/data/agents/deep-agents.json</a> — Deep Agents</li>
+    <li><a href="/data/agents/weaviate.json">/data/agents/weaviate.json</a> — Weaviate</li>
+    <li><a href="/data/agents/dspy.json">/data/agents/dspy.json</a> — DSPy</li>
+    <li><a href="/data/agents/copilotkit.json">/data/agents/copilotkit.json</a> — CopilotKit</li>
+    <li><a href="/data/agents/qdrant.json">/data/agents/qdrant.json</a> — Qdrant</li>
+    <li><a href="/data/agents/flowise.json">/data/agents/flowise.json</a> — Flowise</li>
+    <li><a href="/data/agents/librechat.json">/data/agents/librechat.json</a> — LibreChat</li>
+    <li><a href="/data/agents/langflow.json">/data/agents/langflow.json</a> — Langflow</li>
+    <li><a href="/data/agents/e2b.json">/data/agents/e2b.json</a> — E2B</li>
+    <li><a href="/data/agents/gemini-cli.json">/data/agents/gemini-cli.json</a> — Gemini CLI</li>
+    <li><a href="/data/agents/chroma.json">/data/agents/chroma.json</a> — Chroma</li>
+    <li><a href="/data/agents/ecc.json">/data/agents/ecc.json</a> — ECC</li>
+    <li><a href="/data/agents/firecrawl.json">/data/agents/firecrawl.json</a> — Firecrawl</li>
+    <li><a href="/data/agents/microsoft-agent-framework.json">/data/agents/microsoft-agent-framework.json</a> — Microsoft Agent Framework</li>
+    <li><a href="/data/agents/goose.json">/data/agents/goose.json</a> — Goose</li>
+    <li><a href="/data/agents/agno.json">/data/agents/agno.json</a> — Agno</li>
+    <li><a href="/data/agents/langwatch.json">/data/agents/langwatch.json</a> — LangWatch</li>
+    <li><a href="/data/agents/evidently.json">/data/agents/evidently.json</a> — Evidently</li>
+    <li><a href="/data/agents/agentmemory.json">/data/agents/agentmemory.json</a> — agentmemory</li>
+    <li><a href="/data/agents/milvus.json">/data/agents/milvus.json</a> — Milvus</li>
+    <li><a href="/data/agents/agent-governance-toolkit.json">/data/agents/agent-governance-toolkit.json</a> — Agent Governance Toolkit</li>
+    <li><a href="/data/agents/faiss.json">/data/agents/faiss.json</a> — FAISS</li>
+    <li><a href="/data/agents/giskard.json">/data/agents/giskard.json</a> — Giskard</li>
+    <li><a href="/data/agents/autogpt.json">/data/agents/autogpt.json</a> — AutoGPT</li>
+    <li><a href="/data/agents/nemo-guardrails.json">/data/agents/nemo-guardrails.json</a> — NeMo Guardrails</li>
+    <li><a href="/data/agents/deerflow.json">/data/agents/deerflow.json</a> — DeerFlow</li>
+    <li><a href="/data/agents/google-adk-python.json">/data/agents/google-adk-python.json</a> — Google ADK (Python)</li>
+    <li><a href="/data/agents/google-genkit.json">/data/agents/google-genkit.json</a> — Google Genkit</li>
+    <li><a href="/data/agents/codewhale.json">/data/agents/codewhale.json</a> — CodeWhale</li>
+    <li><a href="/data/agents/agentscope.json">/data/agents/agentscope.json</a> — AgentScope</li>
+    <li><a href="/data/agents/camel.json">/data/agents/camel.json</a> — CAMEL</li>
+    <li><a href="/data/agents/browser-use.json">/data/agents/browser-use.json</a> — Browser Use</li>
+    <li><a href="/data/agents/composio.json">/data/agents/composio.json</a> — Composio</li>
+    <li><a href="/data/agents/nx.json">/data/agents/nx.json</a> — Nx</li>
+    <li><a href="/data/agents/tidb.json">/data/agents/tidb.json</a> — Tidb</li>
+    <li><a href="/data/agents/open-interpreter.json">/data/agents/open-interpreter.json</a> — Open Interpreter</li>
+    <li><a href="/data/agents/flyte.json">/data/agents/flyte.json</a> — Flyte</li>
+    <li><a href="/data/agents/gptme.json">/data/agents/gptme.json</a> — GPTMe</li>
+    <li><a href="/data/agents/odysseus.json">/data/agents/odysseus.json</a> — Odysseus</li>
+    <li><a href="/data/agents/garak.json">/data/agents/garak.json</a> — Garak</li>
+    <li><a href="/data/agents/cognee.json">/data/agents/cognee.json</a> — Cognee</li>
+    <li><a href="/data/agents/smolagents.json">/data/agents/smolagents.json</a> — smolagents</li>
+    <li><a href="/data/agents/1panel.json">/data/agents/1panel.json</a> — 1Panel</li>
+    <li><a href="/data/agents/semantic-kernel.json">/data/agents/semantic-kernel.json</a> — Semantic Kernel</li>
+    <li><a href="/data/agents/neo.json">/data/agents/neo.json</a> — Neo</li>
+    <li><a href="/data/agents/holmesgpt.json">/data/agents/holmesgpt.json</a> — Holmesgpt</li>
+    <li><a href="/data/agents/ollama.json">/data/agents/ollama.json</a> — Ollama</li>
+    <li><a href="/data/agents/open-swe.json">/data/agents/open-swe.json</a> — Open SWE</li>
+    <li><a href="/data/agents/jan.json">/data/agents/jan.json</a> — Jan</li>
+    <li><a href="/data/agents/deepeval.json">/data/agents/deepeval.json</a> — DeepEval</li>
+    <li><a href="/data/agents/openhuman.json">/data/agents/openhuman.json</a> — OpenHuman</li>
+    <li><a href="/data/agents/vellum-assistant.json">/data/agents/vellum-assistant.json</a> — Vellum Assistant</li>
+    <li><a href="/data/agents/agency-swarm.json">/data/agents/agency-swarm.json</a> — Agency Swarm</li>
+    <li><a href="/data/agents/crawl4ai.json">/data/agents/crawl4ai.json</a> — Crawl4AI</li>
+    <li><a href="/data/agents/gpt-researcher.json">/data/agents/gpt-researcher.json</a> — GPT Researcher</li>
+    <li><a href="/data/agents/mcp-registry.json">/data/agents/mcp-registry.json</a> — MCP Registry</li>
+    <li><a href="/data/agents/portkey-ai-gateway.json">/data/agents/portkey-ai-gateway.json</a> — Portkey AI Gateway</li>
+    <li><a href="/data/agents/khoj.json">/data/agents/khoj.json</a> — Khoj</li>
+    <li><a href="/data/agents/agency-agents.json">/data/agents/agency-agents.json</a> — Agency Agents</li>
+    <li><a href="/data/agents/kilo-code.json">/data/agents/kilo-code.json</a> — Kilo Code</li>
+    <li><a href="/data/agents/google-adk-go.json">/data/agents/google-adk-go.json</a> — Google ADK (Go)</li>
+    <li><a href="/data/agents/instructor.json">/data/agents/instructor.json</a> — Instructor</li>
+    <li><a href="/data/agents/airbyte.json">/data/agents/airbyte.json</a> — Airbyte</li>
+    <li><a href="/data/agents/cua.json">/data/agents/cua.json</a> — Cua</li>
+    <li><a href="/data/agents/bee-agent-framework.json">/data/agents/bee-agent-framework.json</a> — Bee Agent Framework</li>
+    <li><a href="/data/agents/beeai-framework.json">/data/agents/beeai-framework.json</a> — BeeAI Framework</li>
+    <li><a href="/data/agents/voltagent.json">/data/agents/voltagent.json</a> — VoltAgent</li>
+    <li><a href="/data/agents/traceroot.json">/data/agents/traceroot.json</a> — Traceroot</li>
+    <li><a href="/data/agents/budibase.json">/data/agents/budibase.json</a> — Budibase</li>
+    <li><a href="/data/agents/privategpt.json">/data/agents/privategpt.json</a> — PrivateGPT</li>
+    <li><a href="/data/agents/insforge.json">/data/agents/insforge.json</a> — InsForge</li>
+    <li><a href="/data/agents/model-context-protocol-mcp.json">/data/agents/model-context-protocol-mcp.json</a> — Model Context Protocol / MCP</li>
+    <li><a href="/data/agents/maxun.json">/data/agents/maxun.json</a> — Maxun</li>
+    <li><a href="/data/agents/nocobase.json">/data/agents/nocobase.json</a> — Nocobase</li>
+    <li><a href="/data/agents/pyod.json">/data/agents/pyod.json</a> — Pyod</li>
+    <li><a href="/data/agents/langroid.json">/data/agents/langroid.json</a> — Langroid</li>
+    <li><a href="/data/agents/claude-code.json">/data/agents/claude-code.json</a> — Claude Code</li>
+    <li><a href="/data/agents/txtai.json">/data/agents/txtai.json</a> — txtai</li>
+    <li><a href="/data/agents/helicone.json">/data/agents/helicone.json</a> — Helicone</li>
+    <li><a href="/data/agents/rasa.json">/data/agents/rasa.json</a> — Rasa</li>
+    <li><a href="/data/agents/spring-ai-alibaba.json">/data/agents/spring-ai-alibaba.json</a> — Spring AI Alibaba</li>
+    <li><a href="/data/agents/verl-agent.json">/data/agents/verl-agent.json</a> — Verl Agent</li>
+    <li><a href="/data/agents/superpowers.json">/data/agents/superpowers.json</a> — Superpowers</li>
+    <li><a href="/data/agents/concordia.json">/data/agents/concordia.json</a> — Concordia</li>
+    <li><a href="/data/agents/atomic-agents.json">/data/agents/atomic-agents.json</a> — Atomic Agents</li>
+    <li><a href="/data/agents/ui-tars-desktop.json">/data/agents/ui-tars-desktop.json</a> — UI-TARS Desktop</li>
+    <li><a href="/data/agents/kimi-code.json">/data/agents/kimi-code.json</a> — Kimi Code</li>
+    <li><a href="/data/agents/browsergym-agents.json">/data/agents/browsergym-agents.json</a> — BrowserGym agents</li>
+    <li><a href="/data/agents/github-copilot-cli.json">/data/agents/github-copilot-cli.json</a> — GitHub Copilot CLI</li>
+    <li><a href="/data/agents/chatdev.json">/data/agents/chatdev.json</a> — ChatDev</li>
+    <li><a href="/data/agents/adalflow.json">/data/agents/adalflow.json</a> — AdalFlow</li>
+    <li><a href="/data/agents/junie.json">/data/agents/junie.json</a> — Junie</li>
+    <li><a href="/data/agents/ragas.json">/data/agents/ragas.json</a> — Ragas</li>
+    <li><a href="/data/agents/ufo.json">/data/agents/ufo.json</a> — UFO</li>
+    <li><a href="/data/agents/letta.json">/data/agents/letta.json</a> — Letta</li>
+    <li><a href="/data/agents/coze-studio.json">/data/agents/coze-studio.json</a> — Coze Studio</li>
+    <li><a href="/data/agents/llama-guard.json">/data/agents/llama-guard.json</a> — Llama Guard</li>
+    <li><a href="/data/agents/tinytroupe.json">/data/agents/tinytroupe.json</a> — TinyTroupe</li>
+    <li><a href="/data/agents/pgvector.json">/data/agents/pgvector.json</a> — pgvector</li>
+    <li><a href="/data/agents/swarm-by-openai.json">/data/agents/swarm-by-openai.json</a> — Swarm by OpenAI</li>
+    <li><a href="/data/agents/sotopia-agents.json">/data/agents/sotopia-agents.json</a> — Sotopia agents</li>
+    <li><a href="/data/agents/qwen-agent.json">/data/agents/qwen-agent.json</a> — Qwen Agent</li>
+    <li><a href="/data/agents/fastagency.json">/data/agents/fastagency.json</a> — FastAgency</li>
+    <li><a href="/data/agents/openhands.json">/data/agents/openhands.json</a> — OpenHands</li>
+    <li><a href="/data/agents/browser-use-web-ui.json">/data/agents/browser-use-web-ui.json</a> — Browser Use Web UI</li>
+    <li><a href="/data/agents/auto-deep-researcher-24x7.json">/data/agents/auto-deep-researcher-24x7.json</a> — auto-deep-researcher-24x7</li>
+    <li><a href="/data/agents/superagent.json">/data/agents/superagent.json</a> — Superagent</li>
+    <li><a href="/data/agents/agent-s.json">/data/agents/agent-s.json</a> — Agent-S</li>
+    <li><a href="/data/agents/llm-guard.json">/data/agents/llm-guard.json</a> — LLM Guard</li>
+    <li><a href="/data/agents/gpt-pilot.json">/data/agents/gpt-pilot.json</a> — GPT Pilot</li>
+    <li><a href="/data/agents/tabby.json">/data/agents/tabby.json</a> — Tabby</li>
+    <li><a href="/data/agents/agentlite.json">/data/agents/agentlite.json</a> — AgentLite</li>
+    <li><a href="/data/agents/mastra.json">/data/agents/mastra.json</a> — Mastra</li>
+    <li><a href="/data/agents/crewai-tools.json">/data/agents/crewai-tools.json</a> — CrewAI tools</li>
+    <li><a href="/data/agents/anythingllm.json">/data/agents/anythingllm.json</a> — AnythingLLM</li>
+    <li><a href="/data/agents/omniparser.json">/data/agents/omniparser.json</a> — OmniParser</li>
+    <li><a href="/data/agents/daytona.json">/data/agents/daytona.json</a> — Daytona</li>
+    <li><a href="/data/agents/controlflow.json">/data/agents/controlflow.json</a> — ControlFlow</li>
+    <li><a href="/data/agents/llamaindex.json">/data/agents/llamaindex.json</a> — LlamaIndex</li>
+    <li><a href="/data/agents/opencode.json">/data/agents/opencode.json</a> — opencode</li>
+    <li><a href="/data/agents/opik.json">/data/agents/opik.json</a> — Opik</li>
+    <li><a href="/data/agents/quivr.json">/data/agents/quivr.json</a> — Quivr</li>
+    <li><a href="/data/agents/agent-e.json">/data/agents/agent-e.json</a> — Agent-E</li>
+    <li><a href="/data/agents/ra-aid.json">/data/agents/ra-aid.json</a> — RA.Aid</li>
+    <li><a href="/data/agents/fedml.json">/data/agents/fedml.json</a> — Fedml</li>
+    <li><a href="/data/agents/molmoweb.json">/data/agents/molmoweb.json</a> — MolmoWeb</li>
+    <li><a href="/data/agents/ui-tars.json">/data/agents/ui-tars.json</a> — UI-TARS</li>
+    <li><a href="/data/agents/opencua.json">/data/agents/opencua.json</a> — OpenCUA</li>
+    <li><a href="/data/agents/storm.json">/data/agents/storm.json</a> — STORM</li>
+    <li><a href="/data/agents/activepieces.json">/data/agents/activepieces.json</a> — Activepieces</li>
+    <li><a href="/data/agents/sweep.json">/data/agents/sweep.json</a> — Sweep</li>
+    <li><a href="/data/agents/leon.json">/data/agents/leon.json</a> — Leon</li>
+    <li><a href="/data/agents/agenta.json">/data/agents/agenta.json</a> — Agenta</li>
+    <li><a href="/data/agents/aider.json">/data/agents/aider.json</a> — Aider</li>
+    <li><a href="/data/agents/lingxi.json">/data/agents/lingxi.json</a> — Lingxi</li>
+    <li><a href="/data/agents/continue.json">/data/agents/continue.json</a> — Continue</li>
+    <li><a href="/data/agents/promptflow.json">/data/agents/promptflow.json</a> — PromptFlow</li>
+    <li><a href="/data/agents/eliza.json">/data/agents/eliza.json</a> — Eliza</li>
+    <li><a href="/data/agents/trulens.json">/data/agents/trulens.json</a> — TruLens</li>
+    <li><a href="/data/agents/devika.json">/data/agents/devika.json</a> — Devika</li>
+    <li><a href="/data/agents/mindsearch.json">/data/agents/mindsearch.json</a> — MindSearch</li>
+    <li><a href="/data/agents/burr.json">/data/agents/burr.json</a> — Burr</li>
+    <li><a href="/data/agents/swe-agent.json">/data/agents/swe-agent.json</a> — SWE-agent</li>
+    <li><a href="/data/agents/webarena.json">/data/agents/webarena.json</a> — Webarena</li>
+    <li><a href="/data/agents/griptape.json">/data/agents/griptape.json</a> — Griptape</li>
+    <li><a href="/data/agents/antigravity-cli.json">/data/agents/antigravity-cli.json</a> — Antigravity CLI</li>
+    <li><a href="/data/agents/praisonai.json">/data/agents/praisonai.json</a> — PraisonAI</li>
+    <li><a href="/data/agents/jarvis-hugginggpt.json">/data/agents/jarvis-hugginggpt.json</a> — JARVIS / HuggingGPT</li>
+    <li><a href="/data/agents/localai.json">/data/agents/localai.json</a> — LocalAI</li>
+    <li><a href="/data/agents/openssa.json">/data/agents/openssa.json</a> — OpenSSA</li>
+    <li><a href="/data/agents/swarmzero.json">/data/agents/swarmzero.json</a> — SwarmZero</li>
+    <li><a href="/data/agents/marvin.json">/data/agents/marvin.json</a> — Marvin</li>
+    <li><a href="/data/agents/roo-code.json">/data/agents/roo-code.json</a> — Roo Code</li>
+    <li><a href="/data/agents/bolt.json">/data/agents/bolt.json</a> — Bolt</li>
+    <li><a href="/data/agents/agentops.json">/data/agents/agentops.json</a> — AgentOps</li>
+    <li><a href="/data/agents/open-operator.json">/data/agents/open-operator.json</a> — Open Operator</li>
+    <li><a href="/data/agents/agent-laboratory.json">/data/agents/agent-laboratory.json</a> — Agent Laboratory</li>
+    <li><a href="/data/agents/lagent.json">/data/agents/lagent.json</a> — Lagent</li>
+    <li><a href="/data/agents/babyagi.json">/data/agents/babyagi.json</a> — BabyAGI</li>
+    <li><a href="/data/agents/metagpt.json">/data/agents/metagpt.json</a> — MetaGPT</li>
+    <li><a href="/data/agents/openmanus.json">/data/agents/openmanus.json</a> — OpenManus</li>
+    <li><a href="/data/agents/mcp-agent.json">/data/agents/mcp-agent.json</a> — mcp-agent</li>
+    <li><a href="/data/agents/pearai.json">/data/agents/pearai.json</a> — PearAI</li>
+    <li><a href="/data/agents/ten-framework.json">/data/agents/ten-framework.json</a> — TEN Framework</li>
+    <li><a href="/data/agents/ailice.json">/data/agents/ailice.json</a> — AIlice</li>
+    <li><a href="/data/agents/supervision.json">/data/agents/supervision.json</a> — Supervision</li>
+    <li><a href="/data/agents/engram.json">/data/agents/engram.json</a> — Engram</li>
+    <li><a href="/data/agents/obsidian-second-brain.json">/data/agents/obsidian-second-brain.json</a> — Obsidian Second Brain</li>
+    <li><a href="/data/agents/turbovec.json">/data/agents/turbovec.json</a> — Turbovec</li>
+    <li><a href="/data/agents/plandex.json">/data/agents/plandex.json</a> — Plandex</li>
+    <li><a href="/data/agents/hivemind.json">/data/agents/hivemind.json</a> — Hivemind</li>
+    <li><a href="/data/agents/tencentdb-agent-memory.json">/data/agents/tencentdb-agent-memory.json</a> — TencentDB Agent Memory</li>
+    <li><a href="/data/agents/asm.json">/data/agents/asm.json</a> — ASM</li>
+    <li><a href="/data/agents/hyperagent.json">/data/agents/hyperagent.json</a> — HyperAgent</li>
+    <li><a href="/data/agents/ai-town.json">/data/agents/ai-town.json</a> — AI Town</li>
+    <li><a href="/data/agents/clawwork.json">/data/agents/clawwork.json</a> — ClawWork</li>
+    </ul>
+
+    <footer>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>

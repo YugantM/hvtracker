@@ -54,7 +54,7 @@
     .ticker-rank{color:var(--muted);font-size:10px}
     footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font:11px var(--font-mono);color:var(--muted);text-align:center}
     footer a{color:var(--blue-strong)}
-    @media(max-width:760px){.chart-band,.mover-grid{grid-template-columns:1fr}h1{font-size:18px}nav{margin-left:0}}
+    @media(max-width:760px){.chart-band,.mover-grid{grid-template-columns:1fr}h1{font-size:18px}}
   </style>
   <script type="application/ld+json">
   {
@@ -81,22 +81,7 @@
   <script defer src="/analytics.js"></script>
 </head>
 <body data-page-type="movers">
-  <header class="site-header">
-    <div class="site-header-inner">
-      <a href="/" class="logo">HV<span>Tracker</span></a>
-      <nav class="site-nav" aria-label="Site">
-        <a href="/">Leaderboard</a>
-        <a href="/movers/">Movers</a>
-        <a href="/changes/">Changes</a>
-        <a href="/use-cases/">Use cases</a>
-        <a href="/methodology">Methodology</a>
-        <a href="/compare/">Compare</a>
-        <a href="/alerts/">Alerts</a>
-        <a href="/data/">Data API</a>
-        <a href="/sponsor/">Sponsor</a>
-      </nav>
-    </div>
-  </header>
+  {% include "_site_header.html.j2" %}
   <div class="page">
 
     <section class="hero">
