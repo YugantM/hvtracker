@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HVTracker Trust Credential Specification — HVTracker Specifications</title>
+  <meta name="description" content="This document defines the Trust Credential: a machine-readable, versioned record by which HVTracker attests the evidence-weighted trust of an open-source AI age">
+  <link rel="canonical" href="https://hvtracker.net/spec/trust-credential/v0.1">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="HVTracker Trust Credential Specification">
+  <meta property="og:description" content="This document defines the Trust Credential: a machine-readable, versioned record by which HVTracker attests the evidence-weighted trust of an open-source AI age">
+  <meta property="og:url" content="https://hvtracker.net/spec/trust-credential/v0.1">
+  <link rel="stylesheet" href="/static/site.css?v=f9997149">
+  <style>
+    :root {
+      --font-mono:"JetBrains Mono","Fira Mono","Cascadia Code",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Inter",system-ui,-apple-system,sans-serif;
+      --font-serif:"Georgia","Times New Roman",serif;
+    }
+    body { line-height: 1.7; }
+    a { color: var(--lobster); }
+    .page { padding: 24px 20px 0; }
+    .logo span { color: var(--lobster); }
+    .spec-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 0 48px;
+      padding: 40px 0 60px;
+      align-items: start;
+    }
+    @media (max-width: 760px) {
+      .spec-layout { grid-template-columns: 1fr; }
+      .toc { display: none; }
+    }
+    .toc {
+      position: sticky;
+      top: 24px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      line-height: 1.6;
+    }
+    .toc-title {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); margin-bottom: 10px; font-weight: 600;
+    }
+    .toc a {
+      display: block; color: var(--muted); padding: 3px 0;
+      border-left: 2px solid var(--line); padding-left: 10px;
+      transition: all 0.1s;
+    }
+    .toc a:hover { color: var(--lobster); border-color:var(--line); background:var(--paper-2); text-decoration: none; }
+    .toc a.active { color: var(--lobster); border-color:var(--line); background:var(--paper-2); }
+    .toc-sub { padding-left: 22px !important; font-size: 11px; }
+    .spec-doc { min-width: 0; max-width: 720px; }
+    .spec-cover {
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 32px;
+    }
+    .spec-cover h1 {
+      font-family: var(--font-mono);
+      font-size: 26px; font-weight: 700; letter-spacing: -0.5px;
+      line-height: 1.25; margin-bottom: 12px;
+      color: var(--ink);
+    }
+    .spec-meta {
+      font-family: var(--font-mono); font-size: 11.5px;
+      color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 18px;
+      margin-bottom: 14px;
+    }
+    .spec-meta span { white-space: nowrap; }
+    .status-badge {
+      display: inline-block;
+      font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+      padding: 2px 8px; border-radius: 999px;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .status-published  { background: rgba(111,135,110,0.14); color: var(--moss); }
+    .status-draft      { background: rgba(198,124,109,0.14); color: var(--lobster); }
+    .status-review     { background: var(--blue-soft); color: var(--lobster); }
+    .status-superseded { background: rgba(141,136,126,0.16); color: var(--stale); }
+    .permalink {
+      font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+      margin-top: 10px;
+    }
+    .permalink code { color: var(--lobster); }
+    .spec-doc h2 {
+      font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--lobster); margin: 36px 0 14px;
+      padding-bottom: 8px; border-bottom: 1px solid var(--line);
+      scroll-margin-top: 24px;
+    }
+    .spec-doc h3 {
+      font-family: var(--font-mono); font-size: 12.5px; font-weight: 600;
+      color: var(--ink); margin: 24px 0 10px;
+      scroll-margin-top: 24px;
+    }
+    .spec-doc h4 {
+      font-size: 13px; font-weight: 600; color: var(--lobster);
+      margin: 18px 0 8px;
+    }
+    .spec-doc p { margin-bottom: 14px; color: var(--ink); font-size: 14.5px; }
+    .spec-doc p:last-child { margin-bottom: 0; }
+    .must   { font-weight: 700; color: #b25567; }
+    .should { font-weight: 700; color: var(--lobster); }
+    .may    { font-weight: 700; color: var(--moss); }
+    code {
+      font-family: var(--font-mono); font-size: 12.5px;
+      background: var(--paper-2); padding: 1px 5px; border-radius: 3px;
+      color: var(--lobster);
+    }
+    pre {
+      font-family: var(--font-mono); font-size: 12px;
+      background: var(--paper-2); border: 1px solid var(--line);
+      border-radius: 6px; padding: 16px 18px; overflow-x: auto;
+      margin: 14px 0; line-height: 1.6; color: var(--ink);
+    }
+    pre code { background: none; padding: 0; color: inherit; }
+    .spec-doc ul, .spec-doc ol { padding-left: 1.4em; margin: 10px 0 14px; }
+    .spec-doc li { margin-bottom: 6px; font-size: 14.5px; }
+    .spec-doc li:last-child { margin-bottom: 0; }
+    .spec-doc dl { margin: 10px 0 14px; }
+    .spec-doc dt {
+      font-family: var(--font-mono); font-size: 12.5px; font-weight: 600;
+      color: var(--ink); margin-top: 12px;
+    }
+    .spec-doc dd { margin-left: 1.4em; font-size: 14px; color: var(--muted); }
+    .note {
+      font-size: 13.5px; color: var(--ink);
+      padding: 12px 16px; background: var(--blue-soft);
+      border-left: 3px solid var(--lobster); border-radius: 0 4px 4px 0;
+      margin: 16px 0;
+    }
+    .spec-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 13px; margin: 14px 0;
+    }
+    .spec-table th {
+      font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted); background: var(--paper-2);
+      padding: 8px 12px; border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+    .spec-table td {
+      padding: 9px 12px; border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    .spec-table tr:last-child td { border-bottom: none; }
+    .spec-table tr:nth-child(even) { background: rgba(0,0,0,0.02); }
+    .sec-num { color: var(--muted); margin-right: 8px; font-family: var(--font-mono); }
+    footer {
+      padding: 28px 0 48px; border-top: 1px solid var(--line);
+      font-size: 12px; color: var(--muted);
+      display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
+    }
+    footer a { color: var(--lobster); }
+    .footer-sep { color: var(--line-strong); }
+  </style>
+  <!-- Google tag (gtag.js) -->
+  <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+</head>
+<body>
+  <header class="site-header">
+  <div class="site-header-inner">
+    <a href="/" class="logo">HV<span>Tracker</span></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="/">Leaderboard</a>
+      <a href="/movers/">Movers</a>
+      <a href="/changes/">Changes</a>
+      <a href="/use-cases/">Use cases</a>
+      <a href="/methodology">Methodology</a>
+      <a href="/score-lab/">Score lab</a>
+      <a href="/compare/">Compare</a>
+      <a href="/alerts/">Alerts</a>
+      <a href="/data/">Data API</a>
+      <a href="/sponsor/">Sponsor</a>
+    </nav>
+    <div class="meta">
+      <span class="live-dot"></span>updated 2026-06-11 10:26 UTC
+    </div>
+  </div>
+</header>
+  <div class="page">
+
+    <div class="spec-layout">
+
+      <!-- Table of contents -->
+      <nav class="toc" aria-label="Table of contents">
+        <div class="toc-title">Contents</div>
+        
+        <a href="#s1" class="active">
+          1. Abstract
+        </a>
+        
+        
+        <a href="#s2" >
+          2. Terminology
+        </a>
+        
+        
+        <a href="#s3" >
+          3. Discovery
+        </a>
+        
+        
+        <a href="#s4" >
+          4. Credential Format
+        </a>
+        
+        
+        <a href="#s5" >
+          5. Verification
+        </a>
+        
+        
+        <a href="#s6" >
+          6. Revocation and Freshness
+        </a>
+        
+        
+        <a href="#s7" >
+          7. Signing (Future)
+        </a>
+        
+        
+        <a href="#s8" >
+          8. Versioning
+        </a>
+        
+        
+        
+      </nav>
+
+      <!-- Specification document -->
+      <article class="spec-doc">
+
+        <div class="spec-cover">
+          <h1>HVTracker Trust Credential Specification</h1>
+          <div class="spec-meta">
+            <span>Version: <strong>v0.1</strong></span>
+            <span>Status: <span class="status-badge status-draft">Draft</span></span>
+            <span>Published: 2026-05-28</span>
+            <span>Authors: HVTracker</span>
+          </div>
+          <div class="permalink">
+            Permalink: <code>https://hvtracker.net/spec/trust-credential/v0.1</code>
+          </div>
+        </div>
+
+        
+<h2 id="s1"><span class="sec-num">1.</span> Abstract</h2>
+<p>This document defines the <strong>Trust Credential</strong>: a machine-readable record by which HVTracker attests the evidence-weighted trust of an open-source AI agent. The credential lets a consumer — including another agent (agent-to-agent, A2A) — decide whether to trust an agent before interacting with it.</p>
+<p>The key words <span class="must">MUST</span>, <span class="must">MUST NOT</span>, <span class="should">SHOULD</span>, and <span class="may">MAY</span> are to be interpreted as described in <a href="https://www.rfc-editor.org/rfc/rfc2119" target="_blank" rel="noopener">RFC 2119</a>.</p>
+
+<h2 id="s2"><span class="sec-num">2.</span> Terminology</h2>
+<dl class="terms">
+  <dt>Issuer</dt><dd>The trust authority that produces credentials. For this specification the issuer is <code>hvtracker.net</code>.</dd>
+  <dt>Subject</dt><dd>The AI agent a credential describes, identified by its source repository and HVTracker slug.</dd>
+  <dt>Consumer</dt><dd>Any party — human, tool, or agent — that reads a credential to make a trust decision.</dd>
+</dl>
+
+<h2 id="s3"><span class="sec-num">3.</span> Discovery</h2>
+<p>A consumer <span class="should">SHOULD</span> begin at the authority descriptor <code>https://hvtracker.net/.well-known/hvtracker.json</code>, which declares the issuer, the methodology, and the endpoint templates.</p>
+<p>An agent's credential is retrieved from <code>https://hvtracker.net/data/agents/{slug}.json</code> under the <code>trust_credential</code> key. The full registry is available at <code>https://hvtracker.net/data/latest.json</code>.</p>
+
+<h2 id="s4"><span class="sec-num">4.</span> Credential Format</h2>
+<p>A Trust Credential is a JSON object with the following members:</p>
+<pre>
+{
+  "spec": "https://hvtracker.net/spec/trust-credential/v0.1",
+  "version": "0.1",
+  "issuer": "hvtracker.net",
+  "subject": { "repo": "owner/name", "slug": "name", "agent_url": "https://hvtracker.net/agents/name" },
+  "methodology_version": "v3.0",
+  "issued_at": "2026-05-28 12:00 UTC",
+  "trust_score": 0-100,
+  "confidence": 0.0-1.0,
+  "evidence_grade": "A|B|C|D",
+  "dimensions": { "safety": n, "identity": n, "transparency": n, "maintenance": n, "adoption": n },
+  "listing_status": "listed|legacy|delisted|...",
+  "signature": null
+}
+</pre>
+<p>A consumer <span class="must">MUST</span> treat <code>confidence</code> as a first-class factor: a high <code>trust_score</code> with low <code>confidence</code> reflects thin evidence and <span class="should">SHOULD NOT</span> be relied upon for high-stakes interactions.</p>
+
+<h2 id="s5"><span class="sec-num">5.</span> Verification</h2>
+<p>Until signed credentials are issued (Section 7), a credential is verified by <strong>reproduction</strong>: the consumer re-fetches the public signals named in the methodology and recomputes the score. An implementation conforming to the methodology specification <span class="must">MUST</span> produce a score within 0.1 points of the credential given identical inputs.</p>
+<p>A consumer <span class="should">SHOULD</span> reject a credential whose <code>methodology_version</code> it does not recognize.</p>
+
+<h2 id="s6"><span class="sec-num">6.</span> Revocation and Freshness</h2>
+<p>Credentials are regenerated each build cycle; <code>issued_at</code> records issuance time. A consumer <span class="should">SHOULD</span> treat a credential older than one full refresh cycle (24 hours) as stale. A <code>listing_status</code> of <code>delisted</code> <span class="must">MUST</span> be treated as revocation regardless of score.</p>
+
+<h2 id="s7"><span class="sec-num">7.</span> Signing (Future)</h2>
+<p>The <code>signature</code> member is reserved. A future revision will publish an issuer public key at <code>/.well-known/hvtracker.json</code> and populate <code>signature</code> with a detached signature over the canonicalized credential, enabling offline verification without re-fetching public signals.</p>
+
+<h2 id="s8"><span class="sec-num">8.</span> Versioning</h2>
+<p>This specification uses <code>vMAJOR.MINOR</code> versioning. Published versions remain accessible at their versioned URLs and <span class="must">MUST NOT</span> be modified after publication.</p>
+
+
+      </article>
+    </div>
+
+    <footer>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">·</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">·</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">·</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">·</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">·</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">·</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+
+  </div>
+
+  <script>
+    // Active ToC highlighting on scroll
+    (function () {
+      const headings = document.querySelectorAll('.spec-doc h2[id], .spec-doc h3[id]');
+      const links = document.querySelectorAll('.toc a');
+      if (!headings.length || !links.length) return;
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const active = document.querySelector('.toc a[href="#' + e.target.id + '"]');
+            if (active) active.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -60% 0px' });
+      headings.forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

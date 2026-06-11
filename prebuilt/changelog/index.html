@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Changelog — HVTracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="HVTracker changelog — methodology updates, new agents, scoring changes, and registry milestones.">
+  <link rel="canonical" href="https://hvtracker.net/changelog/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <style>
+    :root {
+      --bg:#f4f1eb;--surface:#eae6de;--border:#d4cfc5;
+      --text:#1a1a1a;--muted:#6b6560;--accent:#2c5282;--accent-warm:#b05a3a;
+      --green:#2f6846;--amber:#8b6914;--red:#9b3c3c;
+      --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+      --sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      background-image: url("/hex-bg.svg");
+      background-size: 2000px 2000px;
+      color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.6;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 760px; margin: 0 auto; padding: 24px 24px 48px; background: var(--bg); min-height: 100vh; }
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .site-header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+    }
+    .logo { font-family:var(--mono); font-size:20px; font-weight:700; }
+    .logo span { color:var(--accent-warm); }
+    .site-nav { font-family:var(--mono); font-size:11px; display:flex; gap:6px; margin-left:auto; flex-wrap:wrap; }
+    .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--text); text-decoration:none; border-color:var(--border); background:var(--surface); }
+    .page-title { width:100%; font-size:26px; font-weight:700; margin-top:4px; }
+    .page-subtitle { width:100%; color:var(--muted); font-size:14px; }
+
+    .entry {
+      border: 0;
+      border-top: 1px solid var(--border);
+      padding: 18px 0;
+      margin-bottom: 0;
+      background: transparent;
+    }
+    .entry-date { font-size: 12px; color: var(--muted); font-family: var(--mono); margin-bottom: 4px; }
+    .entry-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .entry-body { font-size: 14px; color: var(--muted); }
+    .entry-body ul { margin: 6px 0 0 18px; }
+    .entry-body li { margin-bottom: 4px; }
+    .entry-body code { background: var(--surface); padding: 1px 5px; font-size: 13px; color: var(--text); font-family: var(--mono); }
+
+    .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 8px; margin-left: 8px; vertical-align: middle; font-family: var(--mono); }
+    .tag-feat { color: var(--green); }
+    .tag-fix { color: var(--accent); }
+    .tag-data { color: var(--amber); }
+    .tag-breaking { color: var(--red); }
+
+    footer { margin-top: 40px; text-align: center; font-size: 12px; color: var(--muted); }
+    footer a { color: var(--accent); }
+  </style>
+  <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
+      </nav>
+    </div>
+  </header>
+  <div class="container">
+    <h1 class="page-title" style="margin:20px 0 4px">Changelog</h1>
+    <p class="page-subtitle" style="margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:18px">Methodology updates, new features, scoring changes, and registry milestones.</p>
+
+    <div class="entry">
+      <div class="entry-date">2026-05-31</div>
+      <div class="entry-title">Methodology v3.1 — fair scoring &amp; honest presentation <span class="tag tag-breaking">methodology</span></div>
+      <div class="entry-body">
+        <ul>
+          <li><strong>Adoption weight doubled</strong> (10 → 20). Real-world usage is a meaningful trust signal — widely-used software receives more scrutiny. Safety 30→25, Identity 20→18, Transparency 20→17, Maintenance stays at 20.</li>
+          <li><strong>License type detection</strong>: every project is now classified as Open, Source-available, Proprietary, or Unlicensed. Proprietary tools show an explanatory note rather than a misleading low-trust framing.</li>
+          <li><strong>Download sources expanded</strong>: Docker Hub pulls and VS Code Marketplace installs now count toward adoption alongside npm/PyPI/crates.io.</li>
+          <li><strong>Evidence grade reworked</strong>: now reflects trust score bands (A ≥ 80, B ≥ 65, C ≥ 50, D &lt; 50) instead of signal-type count. Grade and rank now tell the same story.</li>
+          <li><strong>License filter on leaderboard</strong>: filter by Open source / Source-available / Proprietary to compare like with like.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">2026-05-26</div>
+      <div class="entry-title">Phase 3: Badges, comparison, changelog <span class="tag tag-feat">feature</span></div>
+      <div class="entry-body">
+        <ul>
+          <li>SVG badges for every agent — embed <code>![HVTrust](https://hvtracker.net/badge/{slug}.svg)</code> in READMEs</li>
+          <li>Agent comparison page — compare 2–3 agents side-by-side at <code>/compare?a=langchain,crewai</code></li>
+          <li>This changelog page for tracking methodology and registry changes</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">2026-05-26</div>
+      <div class="entry-title">Phase 2: Trust trends & API events <span class="tag tag-feat">feature</span></div>
+      <div class="entry-body">
+        <ul>
+          <li>7-day trust score trend indicator (▲/▼) on the leaderboard</li>
+          <li><code>recent_events</code> field added to <code>/data/latest.json</code> per agent</li>
+          <li><code>trust_score</code> and <code>evidence_grade</code> added to history data points</li>
+          <li>Fixed push failures in scorecard-scan and discover-agents workflows</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">2026-05-26</div>
+      <div class="entry-title">v1 Launch <span class="tag tag-feat">feature</span> <span class="tag tag-data">data</span></div>
+      <div class="entry-body">
+        <ul>
+          <li>171 active agents across 14 categories</li>
+          <li>HVTrust score: 5-dimension composite (Activity 25 + Adoption 20 + Transparency 20 + Safety 20 + Identity 15 = 100)</li>
+          <li>Evidence grades A/B/C/D based on independent signal coverage</li>
+          <li>Staggered batch builds — 6 batches every 4 hours, full refresh in 24h</li>
+          <li>Build integrity report at <code>/data/build_report.json</code></li>
+          <li>Agent submission via GitHub issue template</li>
+          <li>7 formal specifications published</li>
+          <li>Open data API under CC BY 4.0</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">2026-05-24</div>
+      <div class="entry-title">Methodology v2.2 — HVTrust scoring <span class="tag tag-breaking">methodology</span></div>
+      <div class="entry-body">
+        <ul>
+          <li>Replaced single health score with 5-dimension HVTrust composite</li>
+          <li>Added transparency dimension (license + docs + OSSF Scorecard)</li>
+          <li>Added safety dimension (OSSF + provenance + signed commits)</li>
+          <li>Added identity dimension (listing status + evidence grade)</li>
+          <li>Old health score preserved as <code>score</code> field for backwards compatibility</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-date">2026-05-23</div>
+      <div class="entry-title">Initial build — 171 agents catalogued <span class="tag tag-data">data</span></div>
+      <div class="entry-body">
+        <ul>
+          <li>First full signal fetch for all 171 active + 7 legacy agents</li>
+          <li>GitHub stats, npm/PyPI downloads, OSSF Scorecard, provenance, HN mentions</li>
+          <li>Reputation event derivation from history snapshots</li>
+        </ul>
+      </div>
+    </div>
+
+    <footer>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>

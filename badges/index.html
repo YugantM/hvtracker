@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="s2YUWbGP7cJsI6HUCKRX9YCtbVJVyA1Q1_jsNWj1RHc">
   <meta name="description" content="Add the HVTrust badge to your README. Show a transparent, independent trust score built from live public signals — no self-reporting, no vendor claims. Free for open-source AI agent maintainers.">
   <title>Badge for Maintainers — Add Your HVTrust Score | HVTracker</title>
   <link rel="canonical" href="https://hvtracker.net/badges/">
@@ -25,15 +26,13 @@
     ]
   }
   </script>
-  <link rel="stylesheet" href="/static/site.css?v=bd3d3ecb">
+  <link rel="stylesheet" href="/static/site.css?v=978b81bf">
   <style>
     body { line-height:1.7; }
     a { color: var(--lobster); }
     .page { padding: 0 24px 52px; }
     .logo span { color: var(--lobster); }
     .tagline { font-size: 13px; color: var(--muted); }
-    .site-nav a,
-    .site-nav a:hover { color: var(--ink); border-color: var(--line); background: var(--paper-2); text-decoration: none; }
     .content { max-width: 780px; margin: 0 auto; padding: 36px 0 0; }
     .doc-title { font-family: var(--font-sans); font-size: 30px; font-weight: 700; margin-bottom: 10px; line-height: 1.16; }
     .doc-lede { font-size: 16px; color: var(--muted); margin-bottom: 34px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
@@ -65,8 +64,6 @@
     footer .footer-links { font-family: var(--font-mono); font-size: 12px; display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 20px; }
     footer .disclaimer { font-size: 12px; color: var(--muted); margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
     @media (max-width: 640px) {
-      .site-header-inner { flex-direction: column; gap: 8px; }
-      .site-nav { margin-left: 0; }
       .doc-title { font-size: 24px; }
       .why-grid { grid-template-columns: 1fr; }
       table.top-repos td.snippet-cell, table.top-repos th.snippet-col { display: none; }
@@ -92,15 +89,11 @@
     <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
       <nav class="site-nav" aria-label="Site">
-        <a href="/">Leaderboard</a>
-        <a href="/movers/">Movers</a>
-        <a href="/use-cases/">Use cases</a>
-        <a href="/methodology">Methodology</a>
-        <a href="/compare/">Compare</a>
-        <a href="/alerts/">Alerts</a>
-        <a href="/data/">Data API</a>
-        <a href="/sponsor/">Sponsor</a>
+        <a href="/">Leaderboard</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a><a href="/use-cases/">Use cases</a><a href="/methodology">Methodology</a><a href="/score-lab/">Score lab</a><a href="/compare/">Compare</a><a href="/alerts/">Alerts</a><a href="/data/">Data API</a><a href="/sponsor/">Sponsor</a>
       </nav>
+      <div class="site-status" data-updated="2026-06-11 20:41 UTC">
+        <span class="live-dot"></span>updated <span class="site-status-value">2026-06-11 20:41 UTC</span>
+      </div>
     </div>
   </header>
   <div class="page">
@@ -132,8 +125,8 @@
         <p>Every tracked project has two badges at <code>/badge/&lt;slug&gt;.svg</code> (trust score) and <code>/badge/&lt;slug&gt;-grade.svg</code> (evidence grade). Find your project on the <a href="/">leaderboard</a>, open its page, and copy the snippet from the <em>Embed Badge</em> section — or use the pattern below, replacing <code>your-slug</code> with your project's slug.</p>
 
         <div class="badge-preview">
-          <img src="/badge/haystack.svg" alt="HVTrust score badge example" height="20">
-          <img src="/badge/haystack-grade.svg" alt="Evidence grade badge example" height="20">
+          <img src="/badge/langgraph.svg" alt="HVTrust score badge example" height="20">
+          <img src="/badge/langgraph-grade.svg" alt="Evidence grade badge example" height="20">
         </div>
 
         <div class="snippet-label">Markdown</div>
@@ -167,91 +160,91 @@
             
             <tr>
               <td class="rank">#1</td>
-              <td class="name"><a href="/agents/haystack">Haystack</a></td>
-              <td><img src="/badge/haystack.svg" alt="HVTrust 94.0" height="20"></td>
-              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/haystack.svg)](https://hvtracker.net/agents/haystack)</code></td>
-            </tr>
-            
-            <tr>
-              <td class="rank">#2</td>
               <td class="name"><a href="/agents/langgraph">LangGraph</a></td>
-              <td><img src="/badge/langgraph.svg" alt="HVTrust 93.0" height="20"></td>
+              <td><img src="/badge/langgraph.svg" alt="HVTrust 92.9" height="20"></td>
               <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/langgraph.svg)](https://hvtracker.net/agents/langgraph)</code></td>
             </tr>
             
             <tr>
+              <td class="rank">#2</td>
+              <td class="name"><a href="/agents/haystack">Haystack</a></td>
+              <td><img src="/badge/haystack.svg" alt="HVTrust 92.6" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/haystack.svg)](https://hvtracker.net/agents/haystack)</code></td>
+            </tr>
+            
+            <tr>
               <td class="rank">#3</td>
-              <td class="name"><a href="/agents/codex">Codex</a></td>
-              <td><img src="/badge/codex.svg" alt="HVTrust 92.5" height="20"></td>
-              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/codex.svg)](https://hvtracker.net/agents/codex)</code></td>
+              <td class="name"><a href="/agents/vercel-ai-sdk">Vercel AI SDK</a></td>
+              <td><img src="/badge/vercel-ai-sdk.svg" alt="HVTrust 92.4" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/vercel-ai-sdk.svg)](https://hvtracker.net/agents/vercel-ai-sdk)</code></td>
             </tr>
             
             <tr>
               <td class="rank">#4</td>
-              <td class="name"><a href="/agents/vercel-ai-sdk">Vercel AI SDK</a></td>
-              <td><img src="/badge/vercel-ai-sdk.svg" alt="HVTrust 92.3" height="20"></td>
-              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/vercel-ai-sdk.svg)](https://hvtracker.net/agents/vercel-ai-sdk)</code></td>
+              <td class="name"><a href="/agents/codex">Codex</a></td>
+              <td><img src="/badge/codex.svg" alt="HVTrust 92.2" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/codex.svg)](https://hvtracker.net/agents/codex)</code></td>
             </tr>
             
             <tr>
               <td class="rank">#5</td>
               <td class="name"><a href="/agents/n8n">n8n</a></td>
-              <td><img src="/badge/n8n.svg" alt="HVTrust 91.7" height="20"></td>
+              <td><img src="/badge/n8n.svg" alt="HVTrust 91.4" height="20"></td>
               <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/n8n.svg)](https://hvtracker.net/agents/n8n)</code></td>
             </tr>
             
             <tr>
               <td class="rank">#6</td>
               <td class="name"><a href="/agents/cline">Cline</a></td>
-              <td><img src="/badge/cline.svg" alt="HVTrust 91.1" height="20"></td>
+              <td><img src="/badge/cline.svg" alt="HVTrust 91.0" height="20"></td>
               <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/cline.svg)](https://hvtracker.net/agents/cline)</code></td>
             </tr>
             
             <tr>
               <td class="rank">#7</td>
-              <td class="name"><a href="/agents/livekit-agents">LiveKit Agents</a></td>
-              <td><img src="/badge/livekit-agents.svg" alt="HVTrust 91.1" height="20"></td>
-              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/livekit-agents.svg)](https://hvtracker.net/agents/livekit-agents)</code></td>
-            </tr>
-            
-            <tr>
-              <td class="rank">#8</td>
               <td class="name"><a href="/agents/openai-agents-sdk">OpenAI Agents SDK</a></td>
-              <td><img src="/badge/openai-agents-sdk.svg" alt="HVTrust 90.9" height="20"></td>
+              <td><img src="/badge/openai-agents-sdk.svg" alt="HVTrust 90.8" height="20"></td>
               <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/openai-agents-sdk.svg)](https://hvtracker.net/agents/openai-agents-sdk)</code></td>
             </tr>
             
             <tr>
-              <td class="rank">#9</td>
+              <td class="rank">#8</td>
               <td class="name"><a href="/agents/pydanticai">PydanticAI</a></td>
-              <td><img src="/badge/pydanticai.svg" alt="HVTrust 90.8" height="20"></td>
+              <td><img src="/badge/pydanticai.svg" alt="HVTrust 90.7" height="20"></td>
               <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/pydanticai.svg)](https://hvtracker.net/agents/pydanticai)</code></td>
+            </tr>
+            
+            <tr>
+              <td class="rank">#9</td>
+              <td class="name"><a href="/agents/livekit-agents">LiveKit Agents</a></td>
+              <td><img src="/badge/livekit-agents.svg" alt="HVTrust 90.6" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/livekit-agents.svg)](https://hvtracker.net/agents/livekit-agents)</code></td>
             </tr>
             
             <tr>
               <td class="rank">#10</td>
               <td class="name"><a href="/agents/mlflow">MLflow</a></td>
-              <td><img src="/badge/mlflow.svg" alt="HVTrust 90.6" height="20"></td>
+              <td><img src="/badge/mlflow.svg" alt="HVTrust 90.5" height="20"></td>
               <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/mlflow.svg)](https://hvtracker.net/agents/mlflow)</code></td>
             </tr>
             
             <tr>
               <td class="rank">#11</td>
               <td class="name"><a href="/agents/trigger-dev">Trigger.dev</a></td>
-              <td><img src="/badge/trigger-dev.svg" alt="HVTrust 90.1" height="20"></td>
+              <td><img src="/badge/trigger-dev.svg" alt="HVTrust 90.4" height="20"></td>
               <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/trigger-dev.svg)](https://hvtracker.net/agents/trigger-dev)</code></td>
             </tr>
             
             <tr>
               <td class="rank">#12</td>
-              <td class="name"><a href="/agents/qwen-code">Qwen Code</a></td>
-              <td><img src="/badge/qwen-code.svg" alt="HVTrust 89.2" height="20"></td>
-              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/qwen-code.svg)](https://hvtracker.net/agents/qwen-code)</code></td>
+              <td class="name"><a href="/agents/strands-agents">Strands Agents</a></td>
+              <td><img src="/badge/strands-agents.svg" alt="HVTrust 89.2" height="20"></td>
+              <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/strands-agents.svg)](https://hvtracker.net/agents/strands-agents)</code></td>
             </tr>
             
           </tbody>
         </table>
-        <p class="note">Don't see your project? It may rank outside the top 12 — every one of the 213 tracked projects has its own badge on its <a href="/">leaderboard</a> page.</p>
+        <p class="note">Don't see your project? It may rank outside the top 12 — every one of the 223 tracked projects has its own badge on its <a href="/">leaderboard</a> page.</p>
       </section>
     </article>
 

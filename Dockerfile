@@ -30,10 +30,9 @@ COPY data/render_state.json data/render_state.json
 COPY output/history/ /app/seed/history/
 RUN test -n "$(find /app/seed/history -name '*.json' -print -quit)"
 
-# Pre-render the static site at build time so deploys serve fresh HTML
-# immediately — the persistent volume is updated on startup before traffic
-# arrives (Railway keeps the old deployment live until healthcheck passes).
-RUN OUTPUT_DIR=/app/prebuilt python fetch_and_build.py --render-only
+# Ship the exact prebuilt site snapshot from the workspace. This keeps
+# emergency hotfix deploys aligned with the verified local container state.
+COPY prebuilt/ /app/prebuilt/
 
 # Non-root user for runtime — gosu lets the entrypoint chown the volume
 # (which may have root-owned files from a prior image) then drop to hvt.

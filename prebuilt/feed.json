@@ -1,0 +1,2705 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "HVTracker — AI Trust Registry",
+  "description": "AI agent trust registry — daily signals for trust, activity, safety, and adoption.",
+  "home_page_url": "https://hvtracker.net/",
+  "feed_url": "https://hvtracker.net/feed.json",
+  "language": "en",
+  "items": [
+    {
+      "id": "https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety",
+      "url": "https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety",
+      "title": "How to Evaluate AI Agent Safety: 5 Signals That Actually Matter",
+      "content_text": "A practical guide to evaluating open-source AI agent safety using OSSF Scorecard, package provenance, signed commits, activity patterns, and transparency indicators.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "AI agent safety",
+        "Trust signals"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/most-starred-ai-agents-no-provenance",
+      "url": "https://hvtracker.net/blog/most-starred-ai-agents-no-provenance",
+      "title": "The Most Popular AI Agents Ship Without Provenance — Here's the List",
+      "content_text": "375k stars, 184k stars, 167k stars — and zero package provenance. We checked the top 10 most-starred AI agents.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Provenance",
+        "Supply chain trust"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/coding-agents-trust-rankings",
+      "url": "https://hvtracker.net/blog/coding-agents-trust-rankings",
+      "title": "Coding Agents Ranked by Trust, Not Stars — The Results Are Embarrassing",
+      "content_text": "We ranked 26 coding agents by supply-chain trust. opencode (167k stars) lands at #127. Only one coding agent cracks the top 10.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding agents",
+        "Trust rankings"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/ai-agent-frameworks-ranked-by-trust",
+      "url": "https://hvtracker.net/blog/ai-agent-frameworks-ranked-by-trust",
+      "title": "LangChain vs LangGraph vs CrewAI vs AutoGPT — Ranked by Trust, Not Hype",
+      "content_text": "LangGraph #1, AutoGPT #39, LlamaIndex #126. We ranked the top AI frameworks by supply-chain trust instead of stars.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent frameworks",
+        "Trust rankings"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/github-stars-dont-predict-ai-agent-trust",
+      "url": "https://hvtracker.net/blog/github-stars-dont-predict-ai-agent-trust",
+      "title": "GitHub Stars Don't Predict AI Agent Trust — I Scored 192 to Prove It",
+      "content_text": "24 of the 30 most-starred AI agents ship with no build provenance. The full list, the six exceptions, and why stars are the wrong metric.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Provenance",
+        "Trust rankings"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/codex-vs-claude-code",
+      "url": "https://hvtracker.net/blog/codex-vs-claude-code",
+      "title": "Codex vs Claude Code: Which Coding Agent Is Easier to Trust?",
+      "content_text": "Claude Code has more stars, but Codex ranks far higher on HVTracker. The gap is about provenance, signed commits, and public verifiability.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding agents",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/runtime-trust-is-live",
+      "url": "https://hvtracker.net/blog/runtime-trust-is-live",
+      "title": "Runtime Trust Is Live on HVTracker",
+      "content_text": "HVTracker v3.2 adds public runtime-trust discovery and an experimental score lab. See how the current top 10 would move under the first calibration.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Runtime trust",
+        "Methodology"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/coding-agents-top-agents",
+      "url": "https://hvtracker.net/blog/coding-agents-top-agents",
+      "title": "Best Open-Source Coding Agents: Codex vs Cline",
+      "content_text": "Codex and Cline lead coding agents. Compare HVTrust 92.2 vs 91.0, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/agent-frameworks-top-agents",
+      "url": "https://hvtracker.net/blog/agent-frameworks-top-agents",
+      "title": "Best Open-Source Agent Frameworks: LangGraph vs Haystack",
+      "content_text": "LangGraph and Haystack lead agent frameworks. Compare HVTrust 92.9 vs 92.6, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/workflow-platforms-top-agents",
+      "url": "https://hvtracker.net/blog/workflow-platforms-top-agents",
+      "title": "Best Open-Source Workflow Platforms: n8n vs Trigger.dev",
+      "content_text": "n8n and Trigger.dev lead workflow platforms. Compare HVTrust 91.4 vs 90.4, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/browser-computer-use-top-agents",
+      "url": "https://hvtracker.net/blog/browser-computer-use-top-agents",
+      "title": "Best Open-Source Browser & Computer Use: Skyvern vs Stagehand",
+      "content_text": "Skyvern and Stagehand lead browser & computer use. Compare HVTrust 88.3 vs 87.2, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/memory-knowledge-top-agents",
+      "url": "https://hvtracker.net/blog/memory-knowledge-top-agents",
+      "title": "Best Open-Source Memory & Knowledge: LanceDB vs Mem0",
+      "content_text": "LanceDB and Mem0 lead memory & knowledge. Compare HVTrust 88.2 vs 87.5, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/research-data-top-agents",
+      "url": "https://hvtracker.net/blog/research-data-top-agents",
+      "title": "Best Open-Source Research & Data: Docling vs Unstructured",
+      "content_text": "Docling and Unstructured lead research & data. Compare HVTrust 87.3 vs 85.0, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Research & Data",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/observability-evaluation-top-agents",
+      "url": "https://hvtracker.net/blog/observability-evaluation-top-agents",
+      "title": "Best Open-Source Observability & Evaluation: MLflow vs Weights & Biases Weave",
+      "content_text": "MLflow and Weights & Biases Weave lead observability & evaluation. Compare HVTrust 90.5 vs 84.6, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/security-guardrails-top-agents",
+      "url": "https://hvtracker.net/blog/security-guardrails-top-agents",
+      "title": "Best Open-Source Security & Guardrails: Guardrails AI vs NeMo Guardrails",
+      "content_text": "Guardrails AI and NeMo Guardrails lead security & guardrails. Compare HVTrust 81.7 vs 71.1, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Security & Guardrails",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/protocols-tool-integration-top-agents",
+      "url": "https://hvtracker.net/blog/protocols-tool-integration-top-agents",
+      "title": "Best Open-Source Protocols & Tool Integration: A2A / Agent2Agent Protocol vs CLI-Anything",
+      "content_text": "A2A / Agent2Agent Protocol and CLI-Anything lead protocols & tool integration. Compare HVTrust 89.1 vs 80.1, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Protocols & Tool Integration",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/voice-conversational-top-agents",
+      "url": "https://hvtracker.net/blog/voice-conversational-top-agents",
+      "title": "Best Open-Source Voice & Conversational: LiveKit Agents vs Pipecat",
+      "content_text": "LiveKit Agents and Pipecat lead voice & conversational. Compare HVTrust 90.6 vs 85.2, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Voice & Conversational",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/sandboxes-runtimes-top-agents",
+      "url": "https://hvtracker.net/blog/sandboxes-runtimes-top-agents",
+      "title": "Best Open-Source Sandboxes & Runtimes: E2B vs Daytona",
+      "content_text": "E2B and Daytona lead sandboxes & runtimes. Compare HVTrust 72.3 vs 46.1, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Sandboxes & Runtimes",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/llm-gateways-infra-top-agents",
+      "url": "https://hvtracker.net/blog/llm-gateways-infra-top-agents",
+      "title": "Best Open-Source LLM Gateways & Infra: Headroom vs vLLM",
+      "content_text": "Headroom and vLLM lead llm gateways & infra. Compare HVTrust 85.1 vs 78.4, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "LLM Gateways & Infra",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/multi-agent-systems-top-agents",
+      "url": "https://hvtracker.net/blog/multi-agent-systems-top-agents",
+      "title": "Best Open-Source Multi-Agent Systems: AIPass vs CAMEL",
+      "content_text": "AIPass and CAMEL lead multi-agent systems. Compare HVTrust 78.1 vs 69.3, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Multi-Agent Systems",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/ui-app-builders-top-agents",
+      "url": "https://hvtracker.net/blog/ui-app-builders-top-agents",
+      "title": "Best Open-Source UI & App Builders: Open WebUI vs OpenUI",
+      "content_text": "Open WebUI and OpenUI lead ui & app builders. Compare HVTrust 88.1 vs 83.7, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "UI & App Builders",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/blog/needs-review-top-agents",
+      "url": "https://hvtracker.net/blog/needs-review-top-agents",
+      "title": "Best Open-Source Needs review: Supervision vs Turbovec",
+      "content_text": "Supervision and Turbovec lead needs review. Compare HVTrust 26.3 vs 24.9, evidence grades, safety signals, and maintenance.",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Needs review",
+        "Comparison"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/langgraph",
+      "url": "https://hvtracker.net/agents/langgraph",
+      "external_url": "https://github.com/langchain-ai/langgraph",
+      "title": "#1 LangGraph — score 94.7",
+      "content_text": "Build resilient agents.\n\nScore 94.7/100 · 34,028 stars · last push 2026-06-05 · 104 commits in last 4 weeks · pkg provenance: npm · OSSF 6.8/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/haystack",
+      "url": "https://hvtracker.net/agents/haystack",
+      "external_url": "https://github.com/deepset-ai/haystack",
+      "title": "#2 Haystack — score 92.5",
+      "content_text": "Open-source AI orchestration framework for building context-engineered, production-ready LLM applications. Design modula\n\nScore 92.5/100 · 25,465 stars · last push 2026-06-05 · 129 commits in last 4 weeks · pkg provenance: pypi · OSSF 7.8/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/vercel-ai-sdk",
+      "url": "https://hvtracker.net/agents/vercel-ai-sdk",
+      "external_url": "https://github.com/vercel/ai",
+      "title": "#3 Vercel AI SDK — score 93.4",
+      "content_text": "The AI Toolkit for TypeScript. From the creators of Next.js, the AI SDK is a free open-source library for building AI-po\n\nScore 93.4/100 · 24,794 stars · last push 2026-06-11 · 225 commits in last 4 weeks · pkg provenance: npm · OSSF 6.4/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/codex",
+      "url": "https://hvtracker.net/agents/codex",
+      "external_url": "https://github.com/openai/codex",
+      "title": "#4 Codex — score 98.8",
+      "content_text": "Lightweight coding agent that runs in your terminal\n\nScore 98.8/100 · 88,952 stars · last push 2026-06-05 · 848 commits in last 4 weeks · pkg provenance: npm,pypi · OSSF 6.5/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/n8n",
+      "url": "https://hvtracker.net/agents/n8n",
+      "external_url": "https://github.com/n8n-io/n8n",
+      "title": "#5 n8n — score 100.0",
+      "content_text": "Fair-code workflow automation platform with native AI capabilities. Combine visual building with custom code, self-host \n\nScore 100.0/100 · 191,616 stars · last push 2026-06-08 · 1115 commits in last 4 weeks · pkg provenance: npm · OSSF 6.0/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/cline",
+      "url": "https://hvtracker.net/agents/cline",
+      "external_url": "https://github.com/cline/cline",
+      "title": "#6 Cline — score 96.6",
+      "content_text": "Autonomous coding agent as an SDK, IDE extension, or CLI assistant.\n\nScore 96.6/100 · 62,965 stars · last push 2026-06-09 · 179 commits in last 4 weeks · pkg provenance: npm · OSSF 6.0/10 · 90% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/openai-agents-sdk",
+      "url": "https://hvtracker.net/agents/openai-agents-sdk",
+      "external_url": "https://github.com/openai/openai-agents-python",
+      "title": "#7 OpenAI Agents SDK — score 92.1",
+      "content_text": "A lightweight, powerful framework for multi-agent workflows\n\nScore 92.1/100 · 26,940 stars · last push 2026-06-05 · 79 commits in last 4 weeks · pkg provenance: pypi · OSSF 6.3/10 · 93% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/pydanticai",
+      "url": "https://hvtracker.net/agents/pydanticai",
+      "external_url": "https://github.com/pydantic/pydantic-ai",
+      "title": "#8 PydanticAI — score 91.0",
+      "content_text": "AI Agent Framework, the Pydantic way\n\nScore 91.0/100 · 17,542 stars · last push 2026-06-05 · 117 commits in last 4 weeks · pkg provenance: pypi · OSSF 6.1/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/livekit-agents",
+      "url": "https://hvtracker.net/agents/livekit-agents",
+      "external_url": "https://github.com/livekit/agents",
+      "title": "#9 LiveKit Agents — score 90.5",
+      "content_text": "A framework for building realtime voice AI agents 🤖🎙️📹 \n\nScore 90.5/100 · 10,900 stars · last push 2026-06-08 · 138 commits in last 4 weeks · pkg provenance: pypi · OSSF 6.7/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Voice & Conversational"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/mlflow",
+      "url": "https://hvtracker.net/agents/mlflow",
+      "external_url": "https://github.com/mlflow/mlflow",
+      "title": "#10 MLflow — score 94.0",
+      "content_text": "The open source AI engineering platform for agents, LLMs, and ML models. MLflow enables teams of all sizes to debug, eva\n\nScore 94.0/100 · 26,359 stars · last push 2026-06-08 · 452 commits in last 4 weeks · pkg provenance: pypi · OSSF 5.6/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/trigger-dev",
+      "url": "https://hvtracker.net/agents/trigger-dev",
+      "external_url": "https://github.com/triggerdotdev/trigger.dev",
+      "title": "#11 Trigger.dev — score 89.6",
+      "content_text": "Trigger.dev – build and deploy fully‑managed AI agents and workflows\n\nScore 89.6/100 · 15,298 stars · last push 2026-06-11 · 172 commits in last 4 weeks · pkg provenance: npm · OSSF 6.5/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/strands-agents",
+      "url": "https://hvtracker.net/agents/strands-agents",
+      "external_url": "https://github.com/strands-agents/harness-sdk",
+      "title": "#12 Strands Agents — score 86.4",
+      "content_text": "A model-driven approach to building AI agents in just a few lines of code.\n\nScore 86.4/100 · 6,103 stars · last push 2026-06-11 · 142 commits in last 4 weeks · pkg provenance: pypi · OSSF 5.8/10 · 96% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/a2a-agent2agent-protocol",
+      "url": "https://hvtracker.net/agents/a2a-agent2agent-protocol",
+      "external_url": "https://github.com/a2aproject/A2A",
+      "title": "#13 A2A / Agent2Agent Protocol — score 82.0",
+      "content_text": "Agent2Agent (A2A) is an open protocol enabling communication and interoperability between opaque agentic applications.\n\nScore 82.0/100 · 24,156 stars · last push 2026-06-05 · 15 commits in last 4 weeks · pkg provenance: pypi · OSSF 7.0/10 · 99% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Protocols & Tool Integration"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/skyvern",
+      "url": "https://hvtracker.net/agents/skyvern",
+      "external_url": "https://github.com/Skyvern-AI/skyvern",
+      "title": "#14 Skyvern — score 91.4",
+      "content_text": "Automate browser based workflows with AI\n\nScore 91.4/100 · 21,832 stars · last push 2026-06-05 · 405 commits in last 4 weeks · pkg provenance: pypi · OSSF 7.1/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/lancedb",
+      "url": "https://hvtracker.net/agents/lancedb",
+      "external_url": "https://github.com/lancedb/lancedb",
+      "title": "#15 LanceDB — score 87.1",
+      "content_text": "Developer-friendly OSS embedded retrieval library for multimodal AI. Search More; Manage Less.\n\nScore 87.1/100 · 10,520 stars · last push 2026-06-06 · 87 commits in last 4 weeks · pkg provenance: pypi · OSSF 6.0/10 · 86% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/open-webui",
+      "url": "https://hvtracker.net/agents/open-webui",
+      "external_url": "https://github.com/open-webui/open-webui",
+      "title": "#16 Open WebUI — score 99.9",
+      "content_text": "User-friendly AI Interface (Supports Ollama, OpenAI API, ...)\n\nScore 99.9/100 · 140,193 stars · last push 2026-06-04 · 375 commits in last 4 weeks · pkg provenance: pypi · OSSF 5.9/10 · 48% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "UI & App Builders"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/lerobot",
+      "url": "https://hvtracker.net/agents/lerobot",
+      "external_url": "https://github.com/huggingface/lerobot",
+      "title": "#17 LeRobot — score 88.7",
+      "content_text": "🤗 LeRobot: Making AI for Robotics more accessible with end-to-end learning\n\nScore 88.7/100 · 24,737 stars · last push 2026-06-06 · 41 commits in last 4 weeks · pkg provenance: pypi · OSSF 6.6/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Robotics & Embodied"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/ecc",
+      "url": "https://hvtracker.net/agents/ecc",
+      "external_url": "https://github.com/affaan-m/ECC",
+      "title": "#18 ECC — score 100.0",
+      "content_text": "The agent harness performance optimization system. Skills, instincts, memory, security, and research-first development f\n\nScore 100.0/100 · 211,423 stars · last push 2026-06-09 · 243 commits in last 4 weeks · pkg provenance: npm · OSSF 5.8/10 · 77% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/mem0",
+      "url": "https://hvtracker.net/agents/mem0",
+      "external_url": "https://github.com/mem0ai/mem0",
+      "title": "#19 Mem0 — score 92.8",
+      "content_text": "Universal memory layer for AI Agents\n\nScore 92.8/100 · 58,062 stars · last push 2026-06-08 · 51 commits in last 4 weeks · pkg provenance: npm,pypi · OSSF 5.0/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/qwen-code",
+      "url": "https://hvtracker.net/agents/qwen-code",
+      "external_url": "https://github.com/QwenLM/qwen-code",
+      "title": "#20 Qwen Code — score 92.2",
+      "content_text": "An open-source AI coding agent that lives in your terminal.\n\nScore 92.2/100 · 24,933 stars · last push 2026-06-05 · 320 commits in last 4 weeks · pkg provenance: pypi · OSSF 5.6/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/docling",
+      "url": "https://hvtracker.net/agents/docling",
+      "external_url": "https://github.com/docling-project/docling",
+      "title": "#21 Docling — score 91.7",
+      "content_text": "Get your documents ready for gen AI\n\nScore 91.7/100 · 61,003 stars · last push 2026-06-05 · 48 commits in last 4 weeks · pkg provenance: pypi · OSSF 5.0/10 · 91% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Research & Data"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/stagehand",
+      "url": "https://hvtracker.net/agents/stagehand",
+      "external_url": "https://github.com/browserbase/stagehand",
+      "title": "#22 Stagehand — score 84.7",
+      "content_text": "The SDK For Browser Agents\n\nScore 84.7/100 · 23,034 stars · last push 2026-06-09 · 30 commits in last 4 weeks · pkg provenance: npm · OSSF 5.7/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/hermes-agent",
+      "url": "https://hvtracker.net/agents/hermes-agent",
+      "external_url": "https://github.com/NousResearch/hermes-agent",
+      "title": "#23 Hermes Agent — score 100.0",
+      "content_text": "The agent that grows with you\n\nScore 100.0/100 · 187,132 stars · last push 2026-06-08 · 2404 commits in last 4 weeks · pkg provenance: npm,pypi · OSSF 5.4/10 · 31% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/vespa",
+      "url": "https://hvtracker.net/agents/vespa",
+      "external_url": "https://github.com/vespa-engine/vespa",
+      "title": "#24 Vespa — score 86.4",
+      "content_text": "The AI search platform\n\nScore 86.4/100 · 6,958 stars · last push 2026-06-11 · 548 commits in last 4 weeks · pkg provenance: pypi · OSSF 5.7/10 · 54% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/pipecat",
+      "url": "https://hvtracker.net/agents/pipecat",
+      "external_url": "https://github.com/pipecat-ai/pipecat",
+      "title": "#25 Pipecat — score 90.1",
+      "content_text": "Open Source framework for voice and multimodal conversational AI\n\nScore 90.1/100 · 12,668 stars · last push 2026-06-05 · 358 commits in last 4 weeks · pkg provenance: pypi · OSSF 6.4/10 · 24% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Voice & Conversational"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/botpress",
+      "url": "https://hvtracker.net/agents/botpress",
+      "external_url": "https://github.com/botpress/botpress",
+      "title": "#26 Botpress — score 88.4",
+      "content_text": "The open-source hub to build & deploy GPT/LLM Agents ⚡️\n\nScore 88.4/100 · 14,732 stars · last push 2026-06-08 · 66 commits in last 4 weeks · pkg provenance: npm · OSSF 5.2/10 · 96% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/headroom",
+      "url": "https://hvtracker.net/agents/headroom",
+      "external_url": "https://github.com/chopratejas/headroom",
+      "title": "#27 Headroom — score 90.2",
+      "content_text": "Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 60-95% fewer tokens, same answers. Library\n\nScore 90.2/100 · 19,741 stars · last push 2026-06-09 · 114 commits in last 4 weeks · pkg provenance: pypi · OSSF 5.3/10 · 54% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "LLM Gateways & Infra"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/unstructured",
+      "url": "https://hvtracker.net/agents/unstructured",
+      "external_url": "https://github.com/Unstructured-IO/unstructured",
+      "title": "#28 Unstructured — score 75.7",
+      "content_text": "Convert documents to structured data effortlessly. Unstructured is open-source ETL solution for transforming complex doc\n\nScore 75.7/100 · 14,887 stars · last push 2026-06-10 · 7 commits in last 4 weeks · pkg provenance: pypi · OSSF 6.7/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Research & Data"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/openclaw",
+      "url": "https://hvtracker.net/agents/openclaw",
+      "external_url": "https://github.com/openclaw/openclaw",
+      "title": "#29 OpenClaw — score 100.0",
+      "content_text": "Your own personal AI assistant. Any OS. Any Platform. The lobster way. 🦞 \n\nScore 100.0/100 · 377,079 stars · last push 2026-06-05 · 12761 commits in last 4 weeks · pkg provenance: npm · OSSF 4.9/10 · 46% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/weights-biases-weave",
+      "url": "https://hvtracker.net/agents/weights-biases-weave",
+      "external_url": "https://github.com/wandb/weave",
+      "title": "#30 Weights & Biases Weave — score 78.5",
+      "content_text": "Weave is a toolkit for developing AI-powered applications, built by Weights & Biases.\n\nScore 78.5/100 · 1,100 stars · last push 2026-06-11 · 167 commits in last 4 weeks · pkg provenance: npm,pypi · OSSF 5.2/10 · 96% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/lightrag",
+      "url": "https://hvtracker.net/agents/lightrag",
+      "external_url": "https://github.com/HKUDS/LightRAG",
+      "title": "#31 LightRAG — score 94.6",
+      "content_text": "[EMNLP2025] \"LightRAG: Simple and Fast Retrieval-Augmented Generation\"\n\nScore 94.6/100 · 36,226 stars · last push 2026-06-06 · 522 commits in last 4 weeks · pkg provenance: pypi · OSSF 5.3/10 · 33% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/openui",
+      "url": "https://hvtracker.net/agents/openui",
+      "external_url": "https://github.com/thesysdev/openui",
+      "title": "#32 OpenUI — score 81.8",
+      "content_text": "The Open Standard for Generative UI\n\nScore 81.8/100 · 6,931 stars · last push 2026-06-11 · 49 commits in last 4 weeks · pkg provenance: npm · OSSF 5.4/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "UI & App Builders"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/langwatch",
+      "url": "https://hvtracker.net/agents/langwatch",
+      "external_url": "https://github.com/langwatch/langwatch",
+      "title": "#33 LangWatch — score 82.8",
+      "content_text": "The platform for LLM evaluations and AI agent testing\n\nScore 82.8/100 · 3,291 stars · last push 2026-06-06 · 317 commits in last 4 weeks · pkg provenance: npm · OSSF 4.8/10 · 92% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/wrenai",
+      "url": "https://hvtracker.net/agents/wrenai",
+      "external_url": "https://github.com/Canner/WrenAI",
+      "title": "#34 WrenAI — score 85.4",
+      "content_text": "Give AI agents the context to query business data correctly through the open context layer that gives AI agents grounded\n\nScore 85.4/100 · 15,495 stars · last push 2026-06-09 · 41 commits in last 4 weeks · pkg provenance: npm · OSSF 5.9/10 · 95% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Research & Data"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/guardrails-ai",
+      "url": "https://hvtracker.net/agents/guardrails-ai",
+      "external_url": "https://github.com/guardrails-ai/guardrails",
+      "title": "#35 Guardrails AI — score 75.7",
+      "content_text": "Adding guardrails to large language models.\n\nScore 75.7/100 · 6,970 stars · last push 2026-06-04 · 14 commits in last 4 weeks · pkg provenance: pypi · OSSF 5.9/10 · 92% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Security & Guardrails"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/crewai",
+      "url": "https://hvtracker.net/agents/crewai",
+      "external_url": "https://github.com/crewAIInc/crewAI",
+      "title": "#36 CrewAI — score 95.9",
+      "content_text": "Framework for orchestrating role-playing, autonomous AI agents. By fostering collaborative intelligence, CrewAI empowers\n\nScore 95.9/100 · 52,878 stars · last push 2026-06-05 · 92 commits in last 4 weeks · OSSF 8.0/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/cli-anything",
+      "url": "https://hvtracker.net/agents/cli-anything",
+      "external_url": "https://github.com/HKUDS/CLI-Anything",
+      "title": "#37 CLI-Anything — score 93.0",
+      "content_text": "\"CLI-Anything: Making ALL Software Agent-Native\" -- CLI-Hub: https://clianything.cc/\n\nScore 93.0/100 · 42,191 stars · last push 2026-06-04 · 80 commits in last 4 weeks · pkg provenance: pypi · OSSF 4.6/10 · 29% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Protocols & Tool Integration"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/vllm",
+      "url": "https://hvtracker.net/agents/vllm",
+      "external_url": "https://github.com/vllm-project/vllm",
+      "title": "#38 vLLM — score 99.3",
+      "content_text": "A high-throughput and memory-efficient inference and serving engine for LLMs\n\nScore 99.3/100 · 82,508 stars · last push 2026-06-11 · 1131 commits in last 4 weeks · OSSF 6.7/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "LLM Gateways & Infra"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/graphiti",
+      "url": "https://hvtracker.net/agents/graphiti",
+      "external_url": "https://github.com/getzep/graphiti",
+      "title": "#39 Graphiti — score 76.3",
+      "content_text": "Build Real-Time Knowledge Graphs for AI Agents\n\nScore 76.3/100 · 27,032 stars · last push 2026-06-04 · 4 commits in last 4 weeks · pkg provenance: pypi · OSSF 5.1/10 · 65% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/autogen",
+      "url": "https://hvtracker.net/agents/autogen",
+      "external_url": "https://github.com/microsoft/autogen",
+      "title": "#40 AutoGen — score 64.5",
+      "content_text": "A programming framework for agentic AI\n\nScore 64.5/100 · 58,777 stars · last push 2026-04-15 · 0 commits in last 4 weeks · pkg provenance: pypi · OSSF 5.8/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/dify",
+      "url": "https://hvtracker.net/agents/dify",
+      "external_url": "https://github.com/langgenius/dify",
+      "title": "#41 Dify — score 100.0",
+      "content_text": "Production-ready platform for agentic workflow development.\n\nScore 100.0/100 · 144,138 stars · last push 2026-06-06 · 650 commits in last 4 weeks · OSSF 6.7/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/aipass",
+      "url": "https://hvtracker.net/agents/aipass",
+      "external_url": "https://github.com/AIOSAI/AIPass",
+      "title": "#42 AIPass — score 69.5",
+      "content_text": "Persistent Agent Workspace — AI agents that remember, collaborate, and never start from zero.\n\nScore 69.5/100 · 190 stars · last push 2026-06-09 · 82 commits in last 4 weeks · pkg provenance: pypi · OSSF 7.0/10 · 23% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Multi-Agent Systems"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/langfuse",
+      "url": "https://hvtracker.net/agents/langfuse",
+      "external_url": "https://github.com/langfuse/langfuse",
+      "title": "#43 Langfuse — score 92.8",
+      "content_text": "🪢 Open source LLM engineering platform: LLM Observability, metrics, evals, prompt management, playground, datasets. Inte\n\nScore 92.8/100 · 28,583 stars · last push 2026-06-06 · 256 commits in last 4 weeks · OSSF 6.6/10 · 98% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/langchain",
+      "url": "https://hvtracker.net/agents/langchain",
+      "external_url": "https://github.com/langchain-ai/langchain",
+      "title": "#44 LangChain — score 100.0",
+      "content_text": "The agent engineering platform.\n\nScore 100.0/100 · 138,662 stars · last push 2026-06-06 · 208 commits in last 4 weeks · OSSF 6.4/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/litellm",
+      "url": "https://hvtracker.net/agents/litellm",
+      "external_url": "https://github.com/BerriAI/litellm",
+      "title": "#45 LiteLLM — score 96.5",
+      "content_text": "Python SDK, Proxy Server (AI Gateway) to call 100+ LLM APIs in OpenAI (or native) format, with cost tracking, guardrails\n\nScore 96.5/100 · 49,760 stars · last push 2026-06-09 · 879 commits in last 4 weeks · OSSF 6.1/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "LLM Gateways & Infra"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/promptfoo",
+      "url": "https://hvtracker.net/agents/promptfoo",
+      "external_url": "https://github.com/promptfoo/promptfoo",
+      "title": "#46 Promptfoo — score 91.3",
+      "content_text": "Test your prompts, agents, and RAGs. Red teaming/pentesting/vulnerability scanning for AI. Compare performance of GPT, C\n\nScore 91.3/100 · 21,928 stars · last push 2026-06-05 · 358 commits in last 4 weeks · pkg provenance: npm · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/openhands",
+      "url": "https://hvtracker.net/agents/openhands",
+      "external_url": "https://github.com/OpenHands/OpenHands",
+      "title": "#47 OpenHands — score 97.8",
+      "content_text": "🙌 OpenHands: AI-Driven Development\n\nScore 97.8/100 · 76,300 stars · last push 2026-06-09 · 102 commits in last 4 weeks · OSSF 5.9/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/arize-phoenix",
+      "url": "https://hvtracker.net/agents/arize-phoenix",
+      "external_url": "https://github.com/Arize-ai/phoenix",
+      "title": "#48 Arize Phoenix — score 87.8",
+      "content_text": "AI Observability & Evaluation\n\nScore 87.8/100 · 10,056 stars · last push 2026-06-09 · 184 commits in last 4 weeks · pkg provenance: pypi · 99% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/weaviate",
+      "url": "https://hvtracker.net/agents/weaviate",
+      "external_url": "https://github.com/weaviate/weaviate",
+      "title": "#49 Weaviate — score 89.8",
+      "content_text": "Weaviate is an open-source vector database that stores both objects and vectors, allowing for the combination of vector \n\nScore 89.8/100 · 16,309 stars · last push 2026-06-11 · 637 commits in last 4 weeks · OSSF 6.7/10 · 51% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/dspy",
+      "url": "https://hvtracker.net/agents/dspy",
+      "external_url": "https://github.com/stanfordnlp/dspy",
+      "title": "#50 DSPy — score 87.9",
+      "content_text": "DSPy: The framework for programming—not prompting—language models\n\nScore 87.9/100 · 34,984 stars · last push 2026-06-10 · 35 commits in last 4 weeks · OSSF 6.9/10 · 98% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/ragflow",
+      "url": "https://hvtracker.net/agents/ragflow",
+      "external_url": "https://github.com/infiniflow/ragflow",
+      "title": "#51 RAGFlow — score 97.9",
+      "content_text": "RAGFlow is a leading open-source Retrieval-Augmented Generation (RAG) engine that fuses cutting-edge RAG with Agent capa\n\nScore 97.9/100 · 82,032 stars · last push 2026-06-05 · 468 commits in last 4 weeks · OSSF 5.7/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/deep-agents",
+      "url": "https://hvtracker.net/agents/deep-agents",
+      "external_url": "https://github.com/langchain-ai/deepagents",
+      "title": "#52 Deep Agents — score 92.7",
+      "content_text": "The batteries-included agent harness.\n\nScore 92.7/100 · 23,991 stars · last push 2026-06-06 · 323 commits in last 4 weeks · OSSF 6.2/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/qdrant",
+      "url": "https://hvtracker.net/agents/qdrant",
+      "external_url": "https://github.com/qdrant/qdrant",
+      "title": "#53 Qdrant — score 92.7",
+      "content_text": "Qdrant - High-performance, massive-scale Vector Database and Vector Search Engine for the next generation of AI. Also av\n\nScore 92.7/100 · 31,833 stars · last push 2026-06-05 · 201 commits in last 4 weeks · OSSF 5.0/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/flowise",
+      "url": "https://hvtracker.net/agents/flowise",
+      "external_url": "https://github.com/FlowiseAI/Flowise",
+      "title": "#54 Flowise — score 87.3",
+      "content_text": "Build AI Agents, Visually\n\nScore 87.3/100 · 53,357 stars · last push 2026-06-05 · 12 commits in last 4 weeks · OSSF 6.6/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/gemini-cli",
+      "url": "https://hvtracker.net/agents/gemini-cli",
+      "external_url": "https://github.com/google-gemini/gemini-cli",
+      "title": "#55 Gemini CLI — score 99.3",
+      "content_text": "An open-source AI agent that brings the power of Gemini directly into your terminal.\n\nScore 99.3/100 · 104,963 stars · last push 2026-06-05 · 135 commits in last 4 weeks · OSSF 4.7/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/chroma",
+      "url": "https://hvtracker.net/agents/chroma",
+      "external_url": "https://github.com/chroma-core/chroma",
+      "title": "#56 Chroma — score 90.9",
+      "content_text": "Search infrastructure for AI\n\nScore 90.9/100 · 28,321 stars · last push 2026-06-09 · 77 commits in last 4 weeks · OSSF 5.0/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/librechat",
+      "url": "https://hvtracker.net/agents/librechat",
+      "external_url": "https://github.com/danny-avila/LibreChat",
+      "title": "#57 LibreChat — score 95.6",
+      "content_text": "Enhanced ChatGPT Clone: Features Agents, MCP, DeepSeek, Anthropic, AWS, OpenAI, Responses API, Azure, Groq, o1, GPT-5, M\n\nScore 95.6/100 · 38,180 stars · last push 2026-06-05 · 214 commits in last 4 weeks · OSSF 5.7/10 · 94% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "UI & App Builders"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/evidently",
+      "url": "https://hvtracker.net/agents/evidently",
+      "external_url": "https://github.com/evidentlyai/evidently",
+      "title": "#58 Evidently — score 57.3",
+      "content_text": "Evidently is ​​an open-source ML and LLM observability framework. Evaluate, test, and monitor any AI-powered system or d\n\nScore 57.3/100 · 7,573 stars · last push 2026-05-02 · 0 commits in last 4 weeks · pkg provenance: pypi · OSSF 4.3/10 · 90% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/microsoft-agent-framework",
+      "url": "https://hvtracker.net/agents/microsoft-agent-framework",
+      "external_url": "https://github.com/microsoft/agent-framework",
+      "title": "#59 Microsoft Agent Framework — score 89.5",
+      "content_text": "A framework for building, orchestrating and deploying AI agents and multi-agent workflows with support for Python and .N\n\nScore 89.5/100 · 11,141 stars · last push 2026-06-08 · 141 commits in last 4 weeks · OSSF 5.8/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/agno",
+      "url": "https://hvtracker.net/agents/agno",
+      "external_url": "https://github.com/agno-agi/agno",
+      "title": "#60 Agno — score 95.1",
+      "content_text": "Build, run, and manage agent platforms.\n\nScore 95.1/100 · 40,605 stars · last push 2026-06-09 · 115 commits in last 4 weeks · OSSF 4.8/10 · 95% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/copilotkit",
+      "url": "https://hvtracker.net/agents/copilotkit",
+      "external_url": "https://github.com/CopilotKit/CopilotKit",
+      "title": "#61 CopilotKit — score 93.9",
+      "content_text": "The Frontend Stack for Agents & Generative UI. React + Angular.  Makers of the AG-UI Protocol\n\nScore 93.9/100 · 32,305 stars · last push 2026-06-05 · 1817 commits in last 4 weeks · pkg provenance: npm · 25% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "UI & App Builders"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/goose",
+      "url": "https://hvtracker.net/agents/goose",
+      "external_url": "https://github.com/aaif-goose/goose",
+      "title": "#62 Goose — score 95.3",
+      "content_text": "an open source, extensible AI agent that goes beyond code suggestions - install, execute, edit, and test with any LLM\n\nScore 95.3/100 · 48,312 stars · last push 2026-06-09 · 159 commits in last 4 weeks · OSSF 5.5/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/firecrawl",
+      "url": "https://hvtracker.net/agents/firecrawl",
+      "external_url": "https://github.com/firecrawl/firecrawl",
+      "title": "#63 Firecrawl — score 98.1",
+      "content_text": "The API to search, scrape, and interact with the web at scale. 🔥\n\nScore 98.1/100 · 128,916 stars · last push 2026-06-05 · 150 commits in last 4 weeks · OSSF 5.5/10 · 40% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Research & Data"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/e2b",
+      "url": "https://hvtracker.net/agents/e2b",
+      "external_url": "https://github.com/e2b-dev/E2B",
+      "title": "#64 E2B — score 83.9",
+      "content_text": "Open-source, secure environment with real-world tools for enterprise-grade agents.\n\nScore 83.9/100 · 12,482 stars · last push 2026-06-05 · 43 commits in last 4 weeks · OSSF 6.4/10 · 73% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Sandboxes & Runtimes"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/langflow",
+      "url": "https://hvtracker.net/agents/langflow",
+      "external_url": "https://github.com/langflow-ai/langflow",
+      "title": "#65 Langflow — score 98.4",
+      "content_text": "Langflow is a powerful tool for building and deploying AI-powered agents and workflows.\n\nScore 98.4/100 · 149,292 stars · last push 2026-06-06 · 130 commits in last 4 weeks · OSSF 5.7/10 · 62% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/milvus",
+      "url": "https://hvtracker.net/agents/milvus",
+      "external_url": "https://github.com/milvus-io/milvus",
+      "title": "#66 Milvus — score 94.7",
+      "content_text": "Milvus is a high-performance, cloud-native vector database built for scalable vector ANN search\n\nScore 94.7/100 · 44,682 stars · last push 2026-06-08 · 163 commits in last 4 weeks · OSSF 3.9/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/agent-governance-toolkit",
+      "url": "https://hvtracker.net/agents/agent-governance-toolkit",
+      "external_url": "https://github.com/microsoft/agent-governance-toolkit",
+      "title": "#67 Agent Governance Toolkit — score 84.5",
+      "content_text": "AI Agent Governance Toolkit — Policy enforcement, zero-trust identity, execution sandboxing, and reliability engineering\n\nScore 84.5/100 · 4,120 stars · last push 2026-06-08 · 361 commits in last 4 weeks · OSSF 7.5/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/agentmemory",
+      "url": "https://hvtracker.net/agents/agentmemory",
+      "external_url": "https://github.com/rohitg00/agentmemory",
+      "title": "#68 agentmemory — score 91.1",
+      "content_text": "#1 Persistent memory for AI coding agents based on real-world benchmarks\n\nScore 91.1/100 · 21,381 stars · last push 2026-06-05 · 169 commits in last 4 weeks · OSSF 5.7/10 · 87% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/composio",
+      "url": "https://hvtracker.net/agents/composio",
+      "external_url": "https://github.com/ComposioHQ/composio",
+      "title": "#69 Composio — score 92.1",
+      "content_text": "Composio powers 1000+ toolkits, tool search, context management, authentication, and a sandboxed workbench to help you b\n\nScore 92.1/100 · 28,635 stars · last push 2026-06-05 · 74 commits in last 4 weeks · OSSF 6.0/10 · 56% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Protocols & Tool Integration"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/giskard",
+      "url": "https://hvtracker.net/agents/giskard",
+      "external_url": "https://github.com/Giskard-AI/giskard-oss",
+      "title": "#70 Giskard — score 83.3",
+      "content_text": "🐢 Open-Source Evaluation & Testing library for LLM Agents\n\nScore 83.3/100 · 5,418 stars · last push 2026-06-05 · 76 commits in last 4 weeks · OSSF 7.0/10 · 83% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/nemo-guardrails",
+      "url": "https://hvtracker.net/agents/nemo-guardrails",
+      "external_url": "https://github.com/NVIDIA-NeMo/Guardrails",
+      "title": "#71 NeMo Guardrails — score 80.7",
+      "content_text": "NeMo Guardrails is an open-source toolkit for easily adding programmable guardrails to LLM-based conversational systems.\n\nScore 80.7/100 · 6,379 stars · last push 2026-06-08 · 36 commits in last 4 weeks · OSSF 6.2/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Security & Guardrails"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/faiss",
+      "url": "https://hvtracker.net/agents/faiss",
+      "external_url": "https://github.com/facebookresearch/faiss",
+      "title": "#72 FAISS — score 92.0",
+      "content_text": "A library for efficient similarity search and clustering of dense vectors.\n\nScore 92.0/100 · 40,210 stars · last push 2026-06-05 · 63 commits in last 4 weeks · OSSF 6.1/10 · 0% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/deerflow",
+      "url": "https://hvtracker.net/agents/deerflow",
+      "external_url": "https://github.com/bytedance/deer-flow",
+      "title": "#73 DeerFlow — score 97.6",
+      "content_text": "An open-source long-horizon SuperAgent harness that researches, codes, and creates. With the help of sandboxes, memories\n\nScore 97.6/100 · 70,805 stars · last push 2026-06-09 · 124 commits in last 4 weeks · OSSF 7.1/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Research & Data"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/semantic-kernel",
+      "url": "https://hvtracker.net/agents/semantic-kernel",
+      "external_url": "https://github.com/microsoft/semantic-kernel",
+      "title": "#74 Semantic Kernel — score 83.4",
+      "content_text": "Integrate cutting-edge LLM technology quickly and easily into your apps\n\nScore 83.4/100 · 28,079 stars · last push 2026-06-08 · 14 commits in last 4 weeks · OSSF 5.3/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/google-adk-python",
+      "url": "https://hvtracker.net/agents/google-adk-python",
+      "external_url": "https://github.com/google/adk-python",
+      "title": "#75 Google ADK (Python) — score 92.2",
+      "content_text": "An open-source, code-first Python toolkit for building, evaluating, and deploying sophisticated AI agents with flexibili\n\nScore 92.2/100 · 20,003 stars · last push 2026-06-05 · 176 commits in last 4 weeks · OSSF 5.6/10 · 0% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/google-genkit",
+      "url": "https://hvtracker.net/agents/google-genkit",
+      "external_url": "https://github.com/genkit-ai/genkit",
+      "title": "#76 Google Genkit — score 83.5",
+      "content_text": "Open-source framework for building AI-powered apps in JavaScript, Go, and Python, built and used in production by Google\n\nScore 83.5/100 · 6,088 stars · last push 2026-06-04 · 61 commits in last 4 weeks · OSSF 5.3/10 · 94% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/smolagents",
+      "url": "https://hvtracker.net/agents/smolagents",
+      "external_url": "https://github.com/huggingface/smolagents",
+      "title": "#77 smolagents — score 80.3",
+      "content_text": "🤗 smolagents: a barebones library for agents that think in code.\n\nScore 80.3/100 · 27,732 stars · last push 2026-06-04 · 10 commits in last 4 weeks · OSSF 5.9/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/agentscope",
+      "url": "https://hvtracker.net/agents/agentscope",
+      "external_url": "https://github.com/agentscope-ai/agentscope",
+      "title": "#78 AgentScope — score 89.2",
+      "content_text": "Build and run agents you can see, understand and trust.\n\nScore 89.2/100 · 26,571 stars · last push 2026-06-09 · 53 commits in last 4 weeks · OSSF 4.7/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/nx",
+      "url": "https://hvtracker.net/agents/nx",
+      "external_url": "https://github.com/nrwl/nx",
+      "title": "#79 Nx — score 92.8",
+      "content_text": "The Monorepo Platform that amplifies both developers and AI agents. Nx optimizes your builds, scales your CI, and fixes \n\nScore 92.8/100 · 28,858 stars · last push 2026-06-08 · 211 commits in last 4 weeks · OSSF 7.0/10 · 98% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/browser-use",
+      "url": "https://hvtracker.net/agents/browser-use",
+      "external_url": "https://github.com/browser-use/browser-use",
+      "title": "#80 Browser Use — score 98.7",
+      "content_text": "🌐 Make websites accessible for AI agents. Automate tasks online with ease.\n\nScore 98.7/100 · 97,903 stars · last push 2026-06-08 · 431 commits in last 4 weeks · OSSF 4.7/10 · 7% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/camel",
+      "url": "https://hvtracker.net/agents/camel",
+      "external_url": "https://github.com/camel-ai/camel",
+      "title": "#81 CAMEL — score 81.0",
+      "content_text": "🐫 CAMEL: The first and the best multi-agent framework. Finding the Scaling Law of Agents. https://www.camel-ai.org\n\nScore 81.0/100 · 17,146 stars · last push 2026-06-05 · 18 commits in last 4 weeks · OSSF 6.9/10 · 57% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Multi-Agent Systems"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/autogpt",
+      "url": "https://hvtracker.net/agents/autogpt",
+      "external_url": "https://github.com/Significant-Gravitas/AutoGPT",
+      "title": "#82 AutoGPT — score 98.5",
+      "content_text": "AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so tha\n\nScore 98.5/100 · 184,787 stars · last push 2026-06-05 · 76 commits in last 4 weeks · OSSF 5.5/10 · 94% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/tidb",
+      "url": "https://hvtracker.net/agents/tidb",
+      "external_url": "https://github.com/pingcap/tidb",
+      "title": "#83 Tidb — score 95.2",
+      "content_text": "TiDB is built for agentic workloads that grow unpredictably, with ACID guarantees and native support for transactions, a\n\nScore 95.2/100 · 40,130 stars · last push 2026-06-05 · 142 commits in last 4 weeks · OSSF 6.7/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/gptme",
+      "url": "https://hvtracker.net/agents/gptme",
+      "external_url": "https://github.com/gptme/gptme",
+      "title": "#84 GPTMe — score 83.8",
+      "content_text": "Your agent in your terminal, equipped with local tools: writes code, uses the terminal, browses the web. Make your own p\n\nScore 83.8/100 · 4,316 stars · last push 2026-06-06 · 347 commits in last 4 weeks · OSSF 5.0/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/codewhale",
+      "url": "https://hvtracker.net/agents/codewhale",
+      "external_url": "https://github.com/Hmbown/CodeWhale",
+      "title": "#85 CodeWhale — score 93.7",
+      "content_text": "DeepSeek + MiMo coding agent in terminal\n\nScore 93.7/100 · 37,304 stars · last push 2026-06-06 · 999 commits in last 4 weeks · OSSF 5.7/10 · 17% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/odysseus",
+      "url": "https://hvtracker.net/agents/odysseus",
+      "external_url": "https://github.com/pewdiepie-archdaemon/odysseus",
+      "title": "#86 Odysseus — score 96.1",
+      "content_text": "Self-hosted AI workspace. \n\nScore 96.1/100 · 55,144 stars · last push 2026-06-05 · 882 commits in last 4 weeks · OSSF 6.1/10 · 94% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "UI & App Builders"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/cognee",
+      "url": "https://hvtracker.net/agents/cognee",
+      "external_url": "https://github.com/topoteretes/cognee",
+      "title": "#87 Cognee — score 90.7",
+      "content_text": "Cognee is the open-source AI memory platform for agents. Give your AI agents persistent long-term memory across sessions\n\nScore 90.7/100 · 17,781 stars · last push 2026-06-11 · 145 commits in last 4 weeks · OSSF 5.2/10 · 33% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/1panel",
+      "url": "https://hvtracker.net/agents/1panel",
+      "external_url": "https://github.com/1Panel-dev/1Panel",
+      "title": "#88 1Panel — score 93.6",
+      "content_text": "🔥 1Panel is a modern, open-source VPS control panel — and the only one with native AI agent support. Run Ollama models, \n\nScore 93.6/100 · 35,818 stars · last push 2026-06-09 · 120 commits in last 4 weeks · OSSF 5.9/10 · 99% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/flyte",
+      "url": "https://hvtracker.net/agents/flyte",
+      "external_url": "https://github.com/flyteorg/flyte",
+      "title": "#89 Flyte — score 83.7",
+      "content_text": "Dynamic, resilient AI orchestration. Coordinate data, models, and compute as you build AI workflows.\n\nScore 83.7/100 · 7,067 stars · last push 2026-06-05 · 57 commits in last 4 weeks · OSSF 4.1/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/garak",
+      "url": "https://hvtracker.net/agents/garak",
+      "external_url": "https://github.com/NVIDIA/garak",
+      "title": "#90 Garak — score 81.0",
+      "content_text": "the LLM vulnerability scanner\n\nScore 81.0/100 · 8,058 stars · last push 2026-06-05 · 32 commits in last 4 weeks · OSSF 5.4/10 · 79% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Security & Guardrails"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/neo",
+      "url": "https://hvtracker.net/agents/neo",
+      "external_url": "https://github.com/neomjs/neo",
+      "title": "#91 Neo — score 81.8",
+      "content_text": "Neo.mjs is a self-evolving software organism: a professional end-to-end AI engineering team whose cross-model swarm inha\n\nScore 81.8/100 · 3,199 stars · last push 2026-06-08 · 1282 commits in last 4 weeks · OSSF 5.4/10 · 71% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "UI & App Builders"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/holmesgpt",
+      "url": "https://hvtracker.net/agents/holmesgpt",
+      "external_url": "https://github.com/HolmesGPT/holmesgpt",
+      "title": "#92 Holmesgpt — score 79.7",
+      "content_text": "SRE Agent - CNCF Sandbox Project\n\nScore 79.7/100 · 2,577 stars · last push 2026-06-06 · 60 commits in last 4 weeks · OSSF 4.9/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/ollama",
+      "url": "https://hvtracker.net/agents/ollama",
+      "external_url": "https://github.com/ollama/ollama",
+      "title": "#93 Ollama — score 97.6",
+      "content_text": "Get up and running with Kimi-K2.6, GLM-5.1, MiniMax, DeepSeek, gpt-oss, Qwen, Gemma and other models.\n\nScore 97.6/100 · 173,369 stars · last push 2026-06-06 · 69 commits in last 4 weeks · OSSF 5.2/10 · 91% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "LLM Gateways & Infra"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/deepeval",
+      "url": "https://hvtracker.net/agents/deepeval",
+      "external_url": "https://github.com/confident-ai/deepeval",
+      "title": "#94 DeepEval — score 90.0",
+      "content_text": "The LLM Evaluation Framework\n\nScore 90.0/100 · 15,930 stars · last push 2026-06-05 · 138 commits in last 4 weeks · OSSF 3.6/10 · 28% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/openhuman",
+      "url": "https://hvtracker.net/agents/openhuman",
+      "external_url": "https://github.com/tinyhumansai/openhuman",
+      "title": "#95 OpenHuman — score 93.2",
+      "content_text": "Your Personal AI super intelligence. Private, Simple and extremely powerful.\n\nScore 93.2/100 · 31,465 stars · last push 2026-06-11 · 1031 commits in last 4 weeks · OSSF 5.3/10 · 85% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/open-swe",
+      "url": "https://hvtracker.net/agents/open-swe",
+      "external_url": "https://github.com/langchain-ai/open-swe",
+      "title": "#96 Open SWE — score 88.2",
+      "content_text": "An Open-Source Asynchronous Coding Agent\n\nScore 88.2/100 · 9,923 stars · last push 2026-06-06 · 114 commits in last 4 weeks · OSSF 5.9/10 · 98% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/vellum-assistant",
+      "url": "https://hvtracker.net/agents/vellum-assistant",
+      "external_url": "https://github.com/vellum-ai/vellum-assistant",
+      "title": "#97 Vellum Assistant — score 76.0",
+      "content_text": "Personal AI that just works. Runs 24/7 for free. macOS/iOS/Web apps plus Slack, Telegram, and Twilio. 8 types of memory \n\nScore 76.0/100 · 641 stars · last push 2026-06-11 · 3565 commits in last 4 weeks · OSSF 5.3/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/agency-swarm",
+      "url": "https://hvtracker.net/agents/agency-swarm",
+      "external_url": "https://github.com/VRSEN/agency-swarm",
+      "title": "#98 Agency Swarm — score 85.4",
+      "content_text": "Reliable Multi-Agent Orchestration Framework\n\nScore 85.4/100 · 4,443 stars · last push 2026-06-11 · 89 commits in last 4 weeks · OSSF 5.3/10 · 26% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Multi-Agent Systems"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/gpt-researcher",
+      "url": "https://hvtracker.net/agents/gpt-researcher",
+      "external_url": "https://github.com/assafelovic/gpt-researcher",
+      "title": "#99 GPT Researcher — score 76.2",
+      "content_text": "An autonomous agent that conducts deep research on any data using any LLM providers\n\nScore 76.2/100 · 27,585 stars · last push 2026-05-28 · 5 commits in last 4 weeks · OSSF 6.2/10 · 54% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Research & Data"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/portkey-ai-gateway",
+      "url": "https://hvtracker.net/agents/portkey-ai-gateway",
+      "external_url": "https://github.com/Portkey-AI/gateway",
+      "title": "#100 Portkey AI Gateway — score 72.7",
+      "content_text": "A blazing fast AI Gateway with integrated guardrails. Route to 1,600+ LLMs, 50+ AI Guardrails with 1 fast & friendly API\n\nScore 72.7/100 · 11,979 stars · last push 2026-05-25 · 6 commits in last 4 weeks · OSSF 5.6/10 · 74% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "LLM Gateways & Infra"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/jan",
+      "url": "https://hvtracker.net/agents/jan",
+      "external_url": "https://github.com/janhq/jan",
+      "title": "#101 Jan — score 93.3",
+      "content_text": "Jan is an open source alternative to ChatGPT that runs 100% offline on your computer.\n\nScore 93.3/100 · 42,904 stars · last push 2026-06-02 · 122 commits in last 4 weeks · OSSF 5.9/10 · 68% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "LLM Gateways & Infra"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/crawl4ai",
+      "url": "https://hvtracker.net/agents/crawl4ai",
+      "external_url": "https://github.com/unclecode/crawl4ai",
+      "title": "#102 Crawl4AI — score 84.8",
+      "content_text": "🚀🤖 Crawl4AI: Open-source LLM Friendly Web Crawler & Scraper. Don't be shy, join here: https://discord.gg/jP8KfhDhyN\n\nScore 84.8/100 · 68,259 stars · last push 2026-06-04 · 12 commits in last 4 weeks · OSSF 4.7/10 · 26% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Research & Data"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/roo-code",
+      "url": "https://hvtracker.net/agents/roo-code",
+      "external_url": "https://github.com/RooCodeInc/Roo-Code",
+      "title": "#103 Roo Code — score 80.5",
+      "content_text": "Roo Code gives you a whole dev team of AI agents in your code editor.\n\nScore 80.5/100 · 24,208 stars · last push 2026-05-15 · 17 commits in last 4 weeks · OSSF 3.4/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/mcp-registry",
+      "url": "https://hvtracker.net/agents/mcp-registry",
+      "external_url": "https://github.com/modelcontextprotocol/registry",
+      "title": "#104 MCP Registry — score 77.7",
+      "content_text": "A community driven registry service for Model Context Protocol (MCP) servers.\n\nScore 77.7/100 · 6,908 stars · last push 2026-06-05 · 20 commits in last 4 weeks · OSSF 7.1/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Protocols & Tool Integration"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/khoj",
+      "url": "https://hvtracker.net/agents/khoj",
+      "external_url": "https://github.com/khoj-ai/khoj",
+      "title": "#105 Khoj — score 57.9",
+      "content_text": "Your AI second brain. Self-hostable. Get answers from the web or your docs. Build custom agents, schedule automations, d\n\nScore 57.9/100 · 34,907 stars · last push 2026-03-26 · 0 commits in last 4 weeks · pkg provenance: pypi · OSSF 3.6/10 · 16% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/instructor",
+      "url": "https://hvtracker.net/agents/instructor",
+      "external_url": "https://github.com/567-labs/instructor",
+      "title": "#106 Instructor — score 71.3",
+      "content_text": "structured outputs for llms \n\nScore 71.3/100 · 13,129 stars · last push 2026-06-08 · 3 commits in last 4 weeks · OSSF 5.0/10 · 74% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "LLM Gateways & Infra"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/agency-agents",
+      "url": "https://hvtracker.net/agents/agency-agents",
+      "external_url": "https://github.com/msitarzewski/agency-agents",
+      "title": "#107 Agency Agents — score 95.9",
+      "content_text": "A complete AI agency at your fingertips - From frontend wizards to Reddit community ninjas, from whimsy injectors to rea\n\nScore 95.9/100 · 108,477 stars · last push 2026-06-07 · 48 commits in last 4 weeks · OSSF 4.9/10 · 98% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Multi-Agent Systems"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/google-adk-go",
+      "url": "https://hvtracker.net/agents/google-adk-go",
+      "external_url": "https://github.com/google/adk-go",
+      "title": "#108 Google ADK (Go) — score 80.6",
+      "content_text": "An open-source, code-first Go toolkit for building, evaluating, and deploying sophisticated AI agents with flexibility a\n\nScore 80.6/100 · 8,102 stars · last push 2026-06-06 · 32 commits in last 4 weeks · OSSF 6.5/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/airbyte",
+      "url": "https://hvtracker.net/agents/airbyte",
+      "external_url": "https://github.com/airbytehq/airbyte",
+      "title": "#109 Airbyte — score 93.3",
+      "content_text": "Open-source data movement for ELT pipelines and AI agents — from APIs, databases & files to warehouses, lakes, and AI ap\n\nScore 93.3/100 · 21,418 stars · last push 2026-06-09 · 1849 commits in last 4 weeks · OSSF 4.9/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/kilo-code",
+      "url": "https://hvtracker.net/agents/kilo-code",
+      "external_url": "https://github.com/Kilo-Org/kilocode",
+      "title": "#110 Kilo Code — score 91.7",
+      "content_text": "Kilo is the all-in-one agentic engineering platform. Build, ship, and iterate faster with the most popular open source c\n\nScore 91.7/100 · 19,879 stars · last push 2026-06-06 · 1384 commits in last 4 weeks · OSSF 5.1/10 · 41% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/burr",
+      "url": "https://hvtracker.net/agents/burr",
+      "external_url": "https://github.com/apache/burr",
+      "title": "#111 Burr — score 69.5",
+      "content_text": "Build applications that make decisions (chatbots, agents, simulations, etc...). Monitor, trace, persist, and execute on \n\nScore 69.5/100 · 2,019 stars · last push 2026-06-04 · 14 commits in last 4 weeks · OSSF 6.4/10 · 59% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/cua",
+      "url": "https://hvtracker.net/agents/cua",
+      "external_url": "https://github.com/trycua/cua",
+      "title": "#112 Cua — score 89.7",
+      "content_text": "Open-source infrastructure for Computer-Use Agents. Sandboxes, SDKs, and benchmarks to train and evaluate AI agents that\n\nScore 89.7/100 · 17,832 stars · last push 2026-06-11 · 245 commits in last 4 weeks · OSSF 2.8/10 · 72% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/griptape",
+      "url": "https://hvtracker.net/agents/griptape",
+      "external_url": "https://github.com/griptape-ai/griptape",
+      "title": "#113 Griptape — score 68.6",
+      "content_text": "Modular Python framework for AI agents and workflows with chain-of-thought reasoning, tools, and memory. \n\nScore 68.6/100 · 2,537 stars · last push 2026-06-03 · 9 commits in last 4 weeks · OSSF 6.3/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/voltagent",
+      "url": "https://hvtracker.net/agents/voltagent",
+      "external_url": "https://github.com/VoltAgent/voltagent",
+      "title": "#114 VoltAgent — score 76.4",
+      "content_text": "AI Agent Engineering Platform built on an Open Source TypeScript AI Agent Framework\n\nScore 76.4/100 · 9,536 stars · last push 2026-06-08 · 12 commits in last 4 weeks · OSSF 4.5/10 · 81% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/nocobase",
+      "url": "https://hvtracker.net/agents/nocobase",
+      "external_url": "https://github.com/nocobase/nocobase",
+      "title": "#115 Nocobase — score 91.7",
+      "content_text": "NocoBase is an open-source AI + no-code platform for building business systems fast. Instead of generating everything fr\n\nScore 91.7/100 · 22,676 stars · last push 2026-06-08 · 94 commits in last 4 weeks · OSSF 3.9/10 · 78% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/budibase",
+      "url": "https://hvtracker.net/agents/budibase",
+      "external_url": "https://github.com/Budibase/budibase",
+      "title": "#116 Budibase — score 92.2",
+      "content_text": "AI agents, automations and apps that run your operations. Model agnostic.\n\nScore 92.2/100 · 27,999 stars · last push 2026-06-09 · 620 commits in last 4 weeks · OSSF 5.1/10 · 60% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/traceroot",
+      "url": "https://hvtracker.net/agents/traceroot",
+      "external_url": "https://github.com/traceroot-ai/traceroot",
+      "title": "#117 Traceroot — score 76.9",
+      "content_text": "TraceRoot - open-source observability and self-healing layer for AI agents. YC S25\n\nScore 76.9/100 · 615 stars · last push 2026-06-11 · 202 commits in last 4 weeks · OSSF 7.7/10 · 24% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/insforge",
+      "url": "https://hvtracker.net/agents/insforge",
+      "external_url": "https://github.com/InsForge/InsForge",
+      "title": "#118 InsForge — score 88.3",
+      "content_text": "The all-in-one, open-source backend platform for agentic coding. InsForge gives your coding agent database, auth, storag\n\nScore 88.3/100 · 11,576 stars · last push 2026-06-08 · 254 commits in last 4 weeks · OSSF 5.9/10 · 38% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/open-interpreter",
+      "url": "https://hvtracker.net/agents/open-interpreter",
+      "external_url": "https://github.com/openinterpreter/open-interpreter",
+      "title": "#119 Open Interpreter — score 75.0",
+      "content_text": "A natural language interface for computers\n\nScore 75.0/100 · 63,817 stars · last push 2026-06-04 · 1 commits in last 4 weeks · OSSF 5.6/10 · 41% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/bee-agent-framework",
+      "url": "https://hvtracker.net/agents/bee-agent-framework",
+      "external_url": "https://github.com/i-am-bee/beeai-framework",
+      "title": "#120 Bee Agent Framework — score 69.1",
+      "content_text": "Build production-ready AI agents in both Python and Typescript.\n\nScore 69.1/100 · 3,283 stars · last push 2026-05-28 · 8 commits in last 4 weeks · OSSF 5.6/10 · 50% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/beeai-framework",
+      "url": "https://hvtracker.net/agents/beeai-framework",
+      "external_url": "https://github.com/i-am-bee/beeai-framework",
+      "title": "#121 BeeAI Framework — score 69.1",
+      "content_text": "Build production-ready AI agents in both Python and Typescript.\n\nScore 69.1/100 · 3,283 stars · last push 2026-05-28 · 8 commits in last 4 weeks · OSSF 5.6/10 · 50% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/marvin",
+      "url": "https://hvtracker.net/agents/marvin",
+      "external_url": "https://github.com/PrefectHQ/marvin",
+      "title": "#122 Marvin — score 65.2",
+      "content_text": "an ambient intelligence library\n\nScore 65.2/100 · 6,166 stars · last push 2026-05-12 · 4 commits in last 4 weeks · OSSF 5.3/10 · 90% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/privategpt",
+      "url": "https://hvtracker.net/agents/privategpt",
+      "external_url": "https://github.com/zylon-ai/private-gpt",
+      "title": "#123 PrivateGPT — score 89.8",
+      "content_text": "Interact with your documents using the power of GPT, 100% privately, no data leaks\n\nScore 89.8/100 · 57,206 stars · last push 2026-06-05 · 29 commits in last 4 weeks · OSSF 4.3/10 · 97% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/model-context-protocol-mcp",
+      "url": "https://hvtracker.net/agents/model-context-protocol-mcp",
+      "external_url": "https://github.com/modelcontextprotocol/servers",
+      "title": "#124 Model Context Protocol / MCP — score 84.7",
+      "content_text": "Model Context Protocol Servers\n\nScore 84.7/100 · 86,905 stars · last push 2026-06-07 · 7 commits in last 4 weeks · OSSF 6.4/10 · 78% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Protocols & Tool Integration"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/pyod",
+      "url": "https://hvtracker.net/agents/pyod",
+      "external_url": "https://github.com/yzhao062/pyod",
+      "title": "#125 Pyod — score 74.8",
+      "content_text": "A Python library for anomaly detection across tabular, time series, graph, text, and image data. 60+ detectors, benchmar\n\nScore 74.8/100 · 9,871 stars · last push 2026-06-05 · 8 commits in last 4 weeks · OSSF 4.9/10 · 23% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/claude-code",
+      "url": "https://hvtracker.net/agents/claude-code",
+      "external_url": "https://github.com/anthropics/claude-code",
+      "title": "#126 Claude Code — score 93.6",
+      "content_text": "Claude Code is an agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster \n\nScore 93.6/100 · 131,239 stars · last push 2026-06-09 · 30 commits in last 4 weeks · OSSF 5.5/10 · 16% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/helicone",
+      "url": "https://hvtracker.net/agents/helicone",
+      "external_url": "https://github.com/Helicone/helicone",
+      "title": "#127 Helicone — score 67.7",
+      "content_text": "🧊 Open source LLM observability platform. One line of code to monitor, evaluate, and experiment. YC W23 🍓\n\nScore 67.7/100 · 5,782 stars · last push 2026-05-18 · 5 commits in last 4 weeks · OSSF 5.2/10 · 99% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/rasa",
+      "url": "https://hvtracker.net/agents/rasa",
+      "external_url": "https://github.com/RasaHQ/rasa",
+      "title": "#128 Rasa — score 66.3",
+      "content_text": "💬   Open source machine learning framework to automate text- and voice-based conversations: NLU, dialogue management, co\n\nScore 66.3/100 · 21,197 stars · last push 2026-05-22 · 0 commits in last 4 weeks · OSSF 5.3/10 · 59% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Voice & Conversational"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/spring-ai-alibaba",
+      "url": "https://hvtracker.net/agents/spring-ai-alibaba",
+      "external_url": "https://github.com/alibaba/spring-ai-alibaba",
+      "title": "#129 Spring AI Alibaba — score 82.1",
+      "content_text": "Agentic AI Framework for Java Developers\n\nScore 82.1/100 · 9,941 stars · last push 2026-06-07 · 25 commits in last 4 weeks · OSSF 4.8/10 · 86% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/txtai",
+      "url": "https://hvtracker.net/agents/txtai",
+      "external_url": "https://github.com/neuml/txtai",
+      "title": "#130 txtai — score 78.9",
+      "content_text": "💡 All-in-one AI framework for semantic search, LLM orchestration and language model workflows\n\nScore 78.9/100 · 12,640 stars · last push 2026-06-08 · 17 commits in last 4 weeks · OSSF 4.5/10 · 4% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/langroid",
+      "url": "https://hvtracker.net/agents/langroid",
+      "external_url": "https://github.com/langroid/langroid",
+      "title": "#131 Langroid — score 71.0",
+      "content_text": "Harness LLMs with Multi-Agent Programming\n\nScore 71.0/100 · 4,029 stars · last push 2026-06-02 · 10 commits in last 4 weeks · OSSF 4.3/10 · 48% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/maxun",
+      "url": "https://hvtracker.net/agents/maxun",
+      "external_url": "https://github.com/getmaxun/maxun",
+      "title": "#132 Maxun — score 87.9",
+      "content_text": "🔥 The open-source no-code platform for web scraping, crawling, search and AI data extraction • Turn websites into struct\n\nScore 87.9/100 · 15,742 stars · last push 2026-06-04 · 71 commits in last 4 weeks · OSSF 4.0/10 · 28% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Research & Data"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/aider",
+      "url": "https://hvtracker.net/agents/aider",
+      "external_url": "https://github.com/Aider-AI/aider",
+      "title": "#133 Aider — score 77.8",
+      "content_text": "aider is AI pair programming in your terminal\n\nScore 77.8/100 · 45,812 stars · last push 2026-05-22 · 5 commits in last 4 weeks · OSSF 3.8/10 · 16% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/verl-agent",
+      "url": "https://hvtracker.net/agents/verl-agent",
+      "external_url": "https://github.com/langfengQ/verl-agent",
+      "title": "#134 Verl Agent — score 58.0",
+      "content_text": "verl-agent is an extension of veRL, designed for training LLM/VLM agents via RL. verl-agent is also the official code fo\n\nScore 58.0/100 · 1,978 stars · last push 2026-05-28 · 1 commits in last 4 weeks · OSSF 5.4/10 · 59% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/concordia",
+      "url": "https://hvtracker.net/agents/concordia",
+      "external_url": "https://github.com/google-deepmind/concordia",
+      "title": "#135 Concordia — score 59.1",
+      "content_text": "A library for generative social simulation\n\nScore 59.1/100 · 1,459 stars · last push 2026-06-02 · 1 commits in last 4 weeks · OSSF 8.0/10 · 0% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Multi-Agent Systems"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/superpowers",
+      "url": "https://hvtracker.net/agents/superpowers",
+      "external_url": "https://github.com/obra/superpowers",
+      "title": "#136 Superpowers — score 78.1",
+      "content_text": "An agentic skills framework & software development methodology that works.\n\nScore 78.1/100 · 221,298 stars · last push 2026-06-03 · 1 commits in last 4 weeks · OSSF 5.0/10 · 10% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/ui-tars-desktop",
+      "url": "https://hvtracker.net/agents/ui-tars-desktop",
+      "external_url": "https://github.com/bytedance/UI-TARS-desktop",
+      "title": "#137 UI-TARS Desktop — score 69.7",
+      "content_text": "The Open-Source Multimodal AI Agent Stack: Connecting Cutting-Edge AI Models and Agent Infra\n\nScore 69.7/100 · 36,257 stars · last push 2026-05-18 · 1 commits in last 4 weeks · OSSF 5.9/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/atomic-agents",
+      "url": "https://hvtracker.net/agents/atomic-agents",
+      "external_url": "https://github.com/BrainBlend-AI/atomic-agents",
+      "title": "#138 Atomic Agents — score 68.2",
+      "content_text": "Building AI agents, atomically\n\nScore 68.2/100 · 5,973 stars · last push 2026-06-03 · 4 commits in last 4 weeks · OSSF 5.2/10 · 31% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/kimi-code",
+      "url": "https://hvtracker.net/agents/kimi-code",
+      "external_url": "https://github.com/MoonshotAI/kimi-code",
+      "title": "#139 Kimi Code — score 80.8",
+      "content_text": "Kimi Code CLI  —  The Starting Point for Next-Gen Agents\n\nScore 80.8/100 · 2,077 stars · last push 2026-06-08 · 245 commits in last 4 weeks · OSSF 3.2/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/browsergym-agents",
+      "url": "https://hvtracker.net/agents/browsergym-agents",
+      "external_url": "https://github.com/ServiceNow/BrowserGym",
+      "title": "#140 BrowserGym agents — score 43.0",
+      "content_text": "🌎💪 BrowserGym, a Gym environment for web task automation\n\nScore 43.0/100 · 1,241 stars · last push 2026-03-17 · 0 commits in last 4 weeks · pkg provenance: pypi · 94% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/github-copilot-cli",
+      "url": "https://hvtracker.net/agents/github-copilot-cli",
+      "external_url": "https://github.com/github/copilot-cli",
+      "title": "#141 GitHub Copilot CLI — score 78.8",
+      "content_text": "GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. \n\nScore 78.8/100 · 10,710 stars · last push 2026-06-04 · 14 commits in last 4 weeks · OSSF 5.4/10 · 19% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/chatdev",
+      "url": "https://hvtracker.net/agents/chatdev",
+      "external_url": "https://github.com/OpenBMB/ChatDev",
+      "title": "#142 ChatDev — score 77.4",
+      "content_text": "ChatDev 2.0: Dev All through LLM-powered Multi-Agent Collaboration\n\nScore 77.4/100 · 33,323 stars · last push 2026-05-27 · 5 commits in last 4 weeks · OSSF 4.0/10 · 43% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Multi-Agent Systems"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/adalflow",
+      "url": "https://hvtracker.net/agents/adalflow",
+      "external_url": "https://github.com/SylphAI-Inc/AdalFlow",
+      "title": "#143 AdalFlow — score 66.6",
+      "content_text": "AdalFlow: The library to build & auto-optimize LLM applications.\n\nScore 66.6/100 · 4,168 stars · last push 2026-05-29 · 5 commits in last 4 weeks · OSSF 3.9/10 · 32% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/junie",
+      "url": "https://hvtracker.net/agents/junie",
+      "external_url": "https://github.com/JetBrains/junie",
+      "title": "#144 Junie — score 70.7",
+      "content_text": "An AI coding agent by JetBrains that ships code from your terminal, IDE, or CI/CD pipeline - powered by any LLM you choo\n\nScore 70.7/100 · 276 stars · last push 2026-06-06 · 494 commits in last 4 weeks · OSSF 3.4/10 · 5% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/ragas",
+      "url": "https://hvtracker.net/agents/ragas",
+      "external_url": "https://github.com/vibrantlabsai/ragas",
+      "title": "#145 Ragas — score 50.6",
+      "content_text": "Supercharge Your LLM Application Evaluations 🚀\n\nScore 50.6/100 · 14,244 stars · last push 2026-02-24 · 0 commits in last 4 weeks · OSSF 4.4/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/ufo",
+      "url": "https://hvtracker.net/agents/ufo",
+      "external_url": "https://github.com/microsoft/UFO",
+      "title": "#146 UFO — score 69.9",
+      "content_text": "UFO³: Weaving the Digital Agent Galaxy\n\nScore 69.9/100 · 8,919 stars · last push 2026-06-06 · 3 commits in last 4 weeks · OSSF 5.7/10 · 34% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/letta",
+      "url": "https://hvtracker.net/agents/letta",
+      "external_url": "https://github.com/letta-ai/letta",
+      "title": "#147 Letta — score 63.5",
+      "content_text": "Letta is the platform for building stateful agents: AI with advanced memory that can learn and self-improve over time.\n\nScore 63.5/100 · 23,215 stars · last push 2026-05-14 · 0 commits in last 4 weeks · OSSF 4.2/10 · 3% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/coze-studio",
+      "url": "https://hvtracker.net/agents/coze-studio",
+      "external_url": "https://github.com/coze-dev/coze-studio",
+      "title": "#148 Coze Studio — score 60.7",
+      "content_text": "An AI agent development platform with all-in-one visual tools, simplifying agent creation, debugging, and deployment lik\n\nScore 60.7/100 · 20,928 stars · last push 2026-04-20 · 0 commits in last 4 weeks · OSSF 5.3/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/tinytroupe",
+      "url": "https://hvtracker.net/agents/tinytroupe",
+      "external_url": "https://github.com/microsoft/TinyTroupe",
+      "title": "#149 TinyTroupe — score 57.0",
+      "content_text": "LLM-powered multiagent persona simulation for imagination enhancement and business insights.\n\nScore 57.0/100 · 7,465 stars · last push 2026-05-07 · 0 commits in last 4 weeks · OSSF 5.9/10 · 21% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Multi-Agent Systems"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/llama-guard",
+      "url": "https://hvtracker.net/agents/llama-guard",
+      "external_url": "https://github.com/meta-llama/PurpleLlama",
+      "title": "#150 Llama Guard — score 69.9",
+      "content_text": "Set of tools to assess and improve LLM security.\n\nScore 69.9/100 · 4,211 stars · last push 2026-06-03 · 6 commits in last 4 weeks · OSSF 5.9/10 · 1% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Security & Guardrails"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/swarm-by-openai",
+      "url": "https://hvtracker.net/agents/swarm-by-openai",
+      "external_url": "https://github.com/openai/swarm",
+      "title": "#151 Swarm by OpenAI — score 59.5",
+      "content_text": "Educational framework exploring ergonomic, lightweight multi-agent orchestration. Managed by OpenAI Solution team.\n\nScore 59.5/100 · 21,581 stars · last push 2026-04-15 · 0 commits in last 4 weeks · OSSF 3.5/10 · 72% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Multi-Agent Systems"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/agent-s",
+      "url": "https://hvtracker.net/agents/agent-s",
+      "external_url": "https://github.com/simular-ai/Agent-S",
+      "title": "#152 Agent-S — score 66.7",
+      "content_text": "Agent S: an open agentic framework that uses computers like a human\n\nScore 66.7/100 · 11,783 stars · last push 2026-05-13 · 2 commits in last 4 weeks · OSSF 3.9/10 · 54% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/sotopia-agents",
+      "url": "https://hvtracker.net/agents/sotopia-agents",
+      "external_url": "https://github.com/sotopia-lab/sotopia",
+      "title": "#153 Sotopia agents — score 47.7",
+      "content_text": "Sotopia: an Open-ended Social Learning Environment (ICLR 2024 spotlight)\n\nScore 47.7/100 · 308 stars · last push 2026-06-05 · 0 commits in last 4 weeks · OSSF 4.2/10 · 67% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Research & Data"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/pgvector",
+      "url": "https://hvtracker.net/agents/pgvector",
+      "external_url": "https://github.com/pgvector/pgvector",
+      "title": "#154 pgvector — score 73.2",
+      "content_text": "Open-source vector similarity search for Postgres\n\nScore 73.2/100 · 21,617 stars · last push 2026-05-30 · 4 commits in last 4 weeks · OSSF 4.4/10 · 5% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/qwen-agent",
+      "url": "https://hvtracker.net/agents/qwen-agent",
+      "external_url": "https://github.com/QwenLM/Qwen-Agent",
+      "title": "#155 Qwen Agent — score 52.3",
+      "content_text": "Agent framework and applications built upon Qwen>=3.0, featuring Function Calling, MCP, Code Interpreter, RAG, Chrome ex\n\nScore 52.3/100 · 16,481 stars · last push 2026-03-04 · 0 commits in last 4 weeks · OSSF 4.5/10 · 14% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/fastagency",
+      "url": "https://hvtracker.net/agents/fastagency",
+      "external_url": "https://github.com/ag2ai/fastagency",
+      "title": "#156 FastAgency — score 35.1",
+      "content_text": "The fastest way to bring multi-agent workflows to production.\n\nScore 35.1/100 · 540 stars · last push 2026-02-23 · 0 commits in last 4 weeks · OSSF 5.9/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/bernstein",
+      "url": "https://hvtracker.net/agents/bernstein",
+      "external_url": "https://github.com/sipyourdrink-ltd/bernstein",
+      "title": "#157 Bernstein — score 74.1",
+      "content_text": "Audit-grade multi-agent orchestration for CLI coding agents (Claude Code, Codex, Gemini CLI, +40 more). HMAC-chained aud\n\nScore 74.1/100 · 548 stars · last push 2026-06-05 · 645 commits in last 4 weeks · pkg provenance: pypi · OSSF 5.5/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/browser-use-web-ui",
+      "url": "https://hvtracker.net/agents/browser-use-web-ui",
+      "external_url": "https://github.com/browser-use/web-ui",
+      "title": "#158 Browser Use Web UI — score 62.7",
+      "content_text": "🖥️ Run AI Agent in your browser.\n\nScore 62.7/100 · 16,045 stars · last push 2026-05-15 · 0 commits in last 4 weeks · OSSF 4.2/10 · 45% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/auto-deep-researcher-24x7",
+      "url": "https://hvtracker.net/agents/auto-deep-researcher-24x7",
+      "external_url": "https://github.com/Xiangyue-Zhang/auto-deep-researcher-24x7",
+      "title": "#159 auto-deep-researcher-24x7 — score 62.3",
+      "content_text": "🔥 An autonomous AI agent that runs your deep learning experiments 24/7 while you sleep. Zero-cost monitoring, Leader-Wor\n\nScore 62.3/100 · 1,245 stars · last push 2026-06-03 · 6 commits in last 4 weeks · OSSF 4.3/10 · 0% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Research & Data"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/superagent",
+      "url": "https://hvtracker.net/agents/superagent",
+      "external_url": "https://github.com/superagent-ai/superagent",
+      "title": "#160 Superagent — score 54.0",
+      "content_text": "Superagent protects your AI applications against prompt injections, data leaks, and harmful outputs. Embed safety direct\n\nScore 54.0/100 · 6,622 stars · last push 2026-04-11 · 0 commits in last 4 weeks · OSSF 2.7/10 · 55% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/llm-guard",
+      "url": "https://hvtracker.net/agents/llm-guard",
+      "external_url": "https://github.com/protectai/llm-guard",
+      "title": "#161 LLM Guard — score 34.1",
+      "content_text": "The Security Toolkit for LLM Interactions\n\nScore 34.1/100 · 3,041 stars · last push 2025-12-15 · 0 commits in last 4 weeks · OSSF 6.0/10 · 60% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Security & Guardrails"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/tabby",
+      "url": "https://hvtracker.net/agents/tabby",
+      "external_url": "https://github.com/TabbyML/tabby",
+      "title": "#162 Tabby — score 53.4",
+      "content_text": "Self-hosted AI coding assistant\n\nScore 53.4/100 · 33,586 stars · last push 2026-03-02 · 0 commits in last 4 weeks · OSSF 4.3/10 · 99% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/crewai-tools",
+      "url": "https://hvtracker.net/agents/crewai-tools",
+      "external_url": "https://github.com/crewAIInc/crewAI-tools",
+      "title": "#163 CrewAI tools — score 31.6",
+      "content_text": "Extend the capabilities of your CrewAI agents with Tools\n\nScore 31.6/100 · 1,432 stars · last push 2025-10-23 · 0 commits in last 4 weeks · OSSF 4.3/10 · 93% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Protocols & Tool Integration"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/mastra",
+      "url": "https://hvtracker.net/agents/mastra",
+      "external_url": "https://github.com/mastra-ai/mastra",
+      "title": "#164 Mastra — score 91.9",
+      "content_text": "From the team behind Gatsby, Mastra is a framework for building AI-powered applications and agents with a modern TypeScr\n\nScore 91.9/100 · 24,883 stars · last push 2026-06-08 · 772 commits in last 4 weeks · OSSF 5.0/10 · 96% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/agentlite",
+      "url": "https://hvtracker.net/agents/agentlite",
+      "external_url": "https://github.com/SalesforceAIResearch/AgentLite",
+      "title": "#165 AgentLite — score 54.1",
+      "content_text": "Score 54.1/100 · 644 stars · last push 2026-06-02 · 1 commits in last 4 weeks · OSSF 3.4/10 · 24% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/omniparser",
+      "url": "https://hvtracker.net/agents/omniparser",
+      "external_url": "https://github.com/microsoft/OmniParser",
+      "title": "#166 OmniParser — score 59.3",
+      "content_text": "A simple screen parsing tool towards pure vision based GUI agent\n\nScore 59.3/100 · 24,869 stars · last push 2026-04-13 · 0 commits in last 4 weeks · OSSF 4.2/10 · 12% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/controlflow",
+      "url": "https://hvtracker.net/agents/controlflow",
+      "external_url": "https://github.com/prefect-archive/ControlFlow",
+      "title": "#167 ControlFlow — score 28.5",
+      "content_text": "🦾 Take control of your AI agents\n\nScore 28.5/100 · 1,391 stars · last push 2025-08-22 · 0 commits in last 4 weeks · pkg provenance: pypi · 29% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/anythingllm",
+      "url": "https://hvtracker.net/agents/anythingllm",
+      "external_url": "https://github.com/Mintplex-Labs/anything-llm",
+      "title": "#168 AnythingLLM — score 92.7",
+      "content_text": "Stop renting your intelligence. Own it with AnythingLLM. Everything you need for a powerful local-first agent experience\n\nScore 92.7/100 · 61,256 stars · last push 2026-06-08 · 49 commits in last 4 weeks · OSSF 5.0/10 · 60% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/llamaindex",
+      "url": "https://hvtracker.net/agents/llamaindex",
+      "external_url": "https://github.com/run-llama/llama_index",
+      "title": "#169 LlamaIndex — score 92.7",
+      "content_text": "LlamaIndex is the leading document agent and OCR platform\n\nScore 92.7/100 · 49,935 stars · last push 2026-06-04 · 53 commits in last 4 weeks · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/opencode",
+      "url": "https://hvtracker.net/agents/opencode",
+      "external_url": "https://github.com/anomalyco/opencode",
+      "title": "#170 opencode — score 100.0",
+      "content_text": "The open source coding agent.\n\nScore 100.0/100 · 170,468 stars · last push 2026-06-05 · 1334 commits in last 4 weeks · 65% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/opik",
+      "url": "https://hvtracker.net/agents/opik",
+      "external_url": "https://github.com/comet-ml/opik",
+      "title": "#171 Opik — score 90.5",
+      "content_text": "Debug, evaluate, and monitor your LLM applications, RAG systems, and agentic workflows with comprehensive tracing, autom\n\nScore 90.5/100 · 19,434 stars · last push 2026-06-05 · 272 commits in last 4 weeks · 90% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/daytona",
+      "url": "https://hvtracker.net/agents/daytona",
+      "external_url": "https://github.com/daytonaio/daytona",
+      "title": "#172 Daytona — score 96.6",
+      "content_text": "Daytona is a Secure and Elastic Infrastructure for Running AI-Generated Code\n\nScore 96.6/100 · 72,503 stars · last push 2026-06-05 · 170 commits in last 4 weeks · 77% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Sandboxes & Runtimes"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/quivr",
+      "url": "https://hvtracker.net/agents/quivr",
+      "external_url": "https://github.com/QuivrHQ/quivr",
+      "title": "#173 Quivr — score 44.2",
+      "content_text": "Opiniated RAG for integrating GenAI in your apps 🧠   Focus on your product rather than the RAG. Easy integration in exis\n\nScore 44.2/100 · 39,172 stars · last push 2025-07-09 · 0 commits in last 4 weeks · OSSF 4.3/10 · 86% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Memory & Knowledge"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/agent-e",
+      "url": "https://hvtracker.net/agents/agent-e",
+      "external_url": "https://github.com/EmergenceAI/Agent-E",
+      "title": "#174 Agent-E — score 49.8",
+      "content_text": "Agent driven automation starting with the web. Try it: https://www.emergence.ai/web-automation-api\n\nScore 49.8/100 · 1,238 stars · last push 2026-05-04 · 0 commits in last 4 weeks · OSSF 3.6/10 · 36% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/metagpt",
+      "url": "https://hvtracker.net/agents/metagpt",
+      "external_url": "https://github.com/FoundationAgents/MetaGPT",
+      "title": "#175 MetaGPT — score 53.7",
+      "content_text": "🌟 The Multi-Agent Framework: First AI Software Company, Towards Natural Language Programming\n\nScore 53.7/100 · 68,561 stars · last push 2026-01-21 · 0 commits in last 4 weeks · OSSF 2.4/10 · 33% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Multi-Agent Systems"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/gpt-pilot",
+      "url": "https://hvtracker.net/agents/gpt-pilot",
+      "external_url": "https://github.com/Pythagora-io/gpt-pilot",
+      "title": "#176 GPT Pilot — score 61.9",
+      "content_text": "The first real AI developer\n\nScore 61.9/100 · 33,751 stars · last push 2026-04-17 · 0 commits in last 4 weeks · OSSF 2.5/10 · 1% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/ra-aid",
+      "url": "https://hvtracker.net/agents/ra-aid",
+      "external_url": "https://github.com/ai-christianson/RA.Aid",
+      "title": "#177 RA.Aid — score 38.0",
+      "content_text": "Develop software autonomously.\n\nScore 38.0/100 · 2,224 stars · last push 2026-01-30 · 0 commits in last 4 weeks · OSSF 4.4/10 · 17% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/ui-tars",
+      "url": "https://hvtracker.net/agents/ui-tars",
+      "external_url": "https://github.com/bytedance/UI-TARS",
+      "title": "#178 UI-TARS — score 44.2",
+      "content_text": "Pioneering Automated GUI Interaction with Native Agents\n\nScore 44.2/100 · 10,893 stars · last push 2026-01-27 · 0 commits in last 4 weeks · OSSF 3.1/10 · 19% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/opencua",
+      "url": "https://hvtracker.net/agents/opencua",
+      "external_url": "https://github.com/xlang-ai/OpenCUA",
+      "title": "#179 OpenCUA — score 53.1",
+      "content_text": "[NeurIPS 2025 Spotlight] OpenCUA: Open Foundations for Computer-Use Agents\n\nScore 53.1/100 · 777 stars · last push 2026-05-25 · 1 commits in last 4 weeks · OSSF 1.6/10 · 27% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/storm",
+      "url": "https://hvtracker.net/agents/storm",
+      "external_url": "https://github.com/stanford-oval/storm",
+      "title": "#180 STORM — score 42.6",
+      "content_text": "An LLM-powered knowledge curation system that researches a topic and generates a full-length report with citations.\n\nScore 42.6/100 · 28,351 stars · last push 2025-09-30 · 0 commits in last 4 weeks · OSSF 3.3/10 · 33% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Research & Data"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/activepieces",
+      "url": "https://hvtracker.net/agents/activepieces",
+      "external_url": "https://github.com/activepieces/activepieces",
+      "title": "#181 Activepieces — score 92.7",
+      "content_text": "AI Agents & MCPs & AI Workflow Automation • (~400 MCP servers for AI agents) • AI Automation / AI Agent with MCPs • AI W\n\nScore 92.7/100 · 22,657 stars · last push 2026-06-09 · 338 commits in last 4 weeks · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/leon",
+      "url": "https://hvtracker.net/agents/leon",
+      "external_url": "https://github.com/leon-ai/leon",
+      "title": "#182 Leon — score 89.7",
+      "content_text": "🧠 Leon is your open-source personal assistant.\n\nScore 89.7/100 · 17,292 stars · last push 2026-06-06 · 92 commits in last 4 weeks · OSSF 4.5/10 · 82% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Voice & Conversational"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/sweep",
+      "url": "https://hvtracker.net/agents/sweep",
+      "external_url": "https://github.com/sweepai/sweep",
+      "title": "#183 Sweep — score 35.7",
+      "content_text": "Sweep: AI coding assistant for JetBrains\n\nScore 35.7/100 · 7,703 stars · last push 2025-09-18 · 0 commits in last 4 weeks · OSSF 4.2/10 · 24% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/fedml",
+      "url": "https://hvtracker.net/agents/fedml",
+      "external_url": "https://github.com/FedML-AI/FedML",
+      "title": "#184 Fedml — score 35.0",
+      "content_text": "FEDML - The unified and scalable ML library for large-scale distributed training, model serving, and federated learning.\n\nScore 35.0/100 · 4,048 stars · last push 2025-10-28 · 0 commits in last 4 weeks · OSSF 4.0/10 · 37% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/agenta",
+      "url": "https://hvtracker.net/agents/agenta",
+      "external_url": "https://github.com/Agenta-AI/agenta",
+      "title": "#185 Agenta — score 84.4",
+      "content_text": "The open-source LLMOps platform: prompt playground, prompt management, LLM evaluation, and LLM observability all in one \n\nScore 84.4/100 · 4,187 stars · last push 2026-06-09 · 1135 commits in last 4 weeks · 37% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/lingxi",
+      "url": "https://hvtracker.net/agents/lingxi",
+      "external_url": "https://github.com/lingxi-agent/Lingxi",
+      "title": "#186 Lingxi — score 38.2",
+      "content_text": "Score 38.2/100 · 246 stars · last push 2026-04-07 · 0 commits in last 4 weeks · OSSF 2.9/10 · 32% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/promptflow",
+      "url": "https://hvtracker.net/agents/promptflow",
+      "external_url": "https://github.com/microsoft/promptflow",
+      "title": "#187 PromptFlow — score 66.7",
+      "content_text": "Build high-quality LLM apps - from prototyping, testing to production deployment and monitoring.\n\nScore 66.7/100 · 11,142 stars · last push 2026-06-04 · 1 commits in last 4 weeks · 99% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Workflow Platforms"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/trulens",
+      "url": "https://hvtracker.net/agents/trulens",
+      "external_url": "https://github.com/truera/trulens",
+      "title": "#188 TruLens — score 68.9",
+      "content_text": "Evaluation and Tracking for LLM Experiments and AI Agents\n\nScore 68.9/100 · 3,373 stars · last push 2026-06-05 · 8 commits in last 4 weeks · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/molmoweb",
+      "url": "https://hvtracker.net/agents/molmoweb",
+      "external_url": "https://github.com/allenai/molmoweb",
+      "title": "#189 MolmoWeb — score 42.1",
+      "content_text": "Score 42.1/100 · 565 stars · last push 2026-04-10 · 0 commits in last 4 weeks · OSSF 1.8/10 · 24% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/devika",
+      "url": "https://hvtracker.net/agents/devika",
+      "external_url": "https://github.com/stitionai/devika",
+      "title": "#190 Devika — score 41.6",
+      "content_text": "Devika is the first open-source implementation of an Agentic Software Engineer. Initially started as an open-source alte\n\nScore 41.6/100 · 19,511 stars · last push 2025-09-25 · 0 commits in last 4 weeks · OSSF 3.0/10 · 56% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/mindsearch",
+      "url": "https://hvtracker.net/agents/mindsearch",
+      "external_url": "https://github.com/InternLM/MindSearch",
+      "title": "#191 MindSearch — score 36.2",
+      "content_text": "🔍 An LLM-based Multi-agent Framework of Web Search Engine (like Perplexity.ai Pro and SearchGPT)\n\nScore 36.2/100 · 6,868 stars · last push 2025-07-04 · 0 commits in last 4 weeks · OSSF 2.3/10 · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Research & Data"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/swe-agent",
+      "url": "https://hvtracker.net/agents/swe-agent",
+      "external_url": "https://github.com/SWE-agent/SWE-agent",
+      "title": "#192 SWE-agent — score 78.7",
+      "content_text": "SWE-agent takes a GitHub issue and tries to automatically fix it, using your LM of choice. It can also be employed for o\n\nScore 78.7/100 · 19,480 stars · last push 2026-06-10 · 9 commits in last 4 weeks · 91% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/webarena",
+      "url": "https://hvtracker.net/agents/webarena",
+      "external_url": "https://github.com/web-arena-x/webarena",
+      "title": "#193 Webarena — score 30.2",
+      "content_text": "Code repo for \"WebArena: A Realistic Web Environment for Building Autonomous Agents\"\n\nScore 30.2/100 · 1,504 stars · last push 2025-11-26 · 0 commits in last 4 weeks · OSSF 4.2/10 · 49% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/praisonai",
+      "url": "https://hvtracker.net/agents/praisonai",
+      "external_url": "https://github.com/MervinPraison/PraisonAI",
+      "title": "#194 PraisonAI — score 87.9",
+      "content_text": "PraisonAI 🦞 — Hire a 24/7 AI Workforce. Stop writing boilerplate and start shipping autonomous self-improving agents tha\n\nScore 87.9/100 · 8,102 stars · last push 2026-06-08 · 141 commits in last 4 weeks · 69% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/antigravity-cli",
+      "url": "https://hvtracker.net/agents/antigravity-cli",
+      "external_url": "https://github.com/google-antigravity/antigravity-cli",
+      "title": "#195 Antigravity CLI — score 62.6",
+      "content_text": "Score 62.6/100 · 863 stars · last push 2026-06-03 · 8 commits in last 4 weeks · OSSF 2.5/10 · 22% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/jarvis-hugginggpt",
+      "url": "https://hvtracker.net/agents/jarvis-hugginggpt",
+      "external_url": "https://github.com/microsoft/JARVIS",
+      "title": "#196 JARVIS / HuggingGPT — score 41.9",
+      "content_text": "JARVIS, a system to connect LLMs with ML community. Paper: https://arxiv.org/pdf/2303.17580.pdf\n\nScore 41.9/100 · 24,823 stars · last push 2025-07-29 · 0 commits in last 4 weeks · OSSF 2.3/10 · 55% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/eliza",
+      "url": "https://hvtracker.net/agents/eliza",
+      "external_url": "https://github.com/elizaOS/eliza",
+      "title": "#197 Eliza — score 93.0",
+      "content_text": "Open source agentic operating system\n\nScore 93.0/100 · 18,512 stars · last push 2026-06-05 · 4650 commits in last 4 weeks · 12% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/openssa",
+      "url": "https://hvtracker.net/agents/openssa",
+      "external_url": "https://github.com/aitomatic/openssa",
+      "title": "#198 OpenSSA — score 23.2",
+      "content_text": "OpenSSA: Small Specialist Agents based on Domain-Aware Neurosymbolic Agent (DANA) architecture for industrial problem-so\n\nScore 23.2/100 · 326 stars · last push 2025-08-14 · 0 commits in last 4 weeks · OSSF 4.0/10 · 42% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/localai",
+      "url": "https://hvtracker.net/agents/localai",
+      "external_url": "https://github.com/mudler/LocalAI",
+      "title": "#199 LocalAI — score 94.8",
+      "content_text": "LocalAI is the open-source AI engine. Run any model - LLMs, vision, voice, image, video - on any hardware. No GPU requir\n\nScore 94.8/100 · 46,745 stars · last push 2026-06-08 · 233 commits in last 4 weeks · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "LLM Gateways & Infra"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/swarmzero",
+      "url": "https://hvtracker.net/agents/swarmzero",
+      "external_url": "https://github.com/swarmzero/swarmzero",
+      "title": "#200 SwarmZero — score 22.5",
+      "content_text": "SwarmZero's SDK for building AI agents, swarms of agents and much more.\n\nScore 22.5/100 · 273 stars · last push 2025-08-06 · 0 commits in last 4 weeks · OSSF 2.9/10 · 63% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Multi-Agent Systems"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/continue",
+      "url": "https://hvtracker.net/agents/continue",
+      "external_url": "https://github.com/continuedev/continue",
+      "title": "#201 Continue — score 69.2",
+      "content_text": "⏩ Source-controlled AI checks, enforceable in CI. Powered by the open-source Continue CLI\n\nScore 69.2/100 · 33,544 stars · last push 2026-06-04 · 0 commits in last 4 weeks · 89% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/bolt",
+      "url": "https://hvtracker.net/agents/bolt",
+      "external_url": "https://github.com/stackblitz/bolt.new",
+      "title": "#202 Bolt — score 44.7",
+      "content_text": "Prompt, run, edit, and deploy full-stack web applications. -- bolt.new -- Help Center: https://support.bolt.new/ -- Comm\n\nScore 44.7/100 · 16,409 stars · last push 2024-12-17 · 0 commits in last 4 weeks · OSSF 3.5/10 · 65% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "UI & App Builders"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/agentops",
+      "url": "https://hvtracker.net/agents/agentops",
+      "external_url": "https://github.com/AgentOps-AI/agentops",
+      "title": "#203 AgentOps — score 49.2",
+      "content_text": "Python SDK for AI agent monitoring, LLM cost tracking, benchmarking, and more. Integrates with most LLMs and agent frame\n\nScore 49.2/100 · 5,614 stars · last push 2026-03-19 · 0 commits in last 4 weeks · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Observability & Evaluation"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/open-operator",
+      "url": "https://hvtracker.net/agents/open-operator",
+      "external_url": "https://github.com/browserbase/open-operator",
+      "title": "#204 Open Operator — score 51.5",
+      "content_text": "A template for building web agents with Stagehand on Browserbase\n\nScore 51.5/100 · 1,948 stars · last push 2026-05-04 · 0 commits in last 4 weeks · OSSF 2.4/10 · 23% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Browser & Computer Use"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/agent-laboratory",
+      "url": "https://hvtracker.net/agents/agent-laboratory",
+      "external_url": "https://github.com/SamuelSchmidgall/AgentLaboratory",
+      "title": "#205 Agent Laboratory — score 36.0",
+      "content_text": "Agent Laboratory is an end-to-end autonomous research workflow meant to assist you as the human researcher toward implem\n\nScore 36.0/100 · 5,667 stars · last push 2025-08-20 · 0 commits in last 4 weeks · OSSF 1.8/10 · 39% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Research & Data"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/lagent",
+      "url": "https://hvtracker.net/agents/lagent",
+      "external_url": "https://github.com/InternLM/lagent",
+      "title": "#206 Lagent — score 55.8",
+      "content_text": "A lightweight framework for building LLM-based agents\n\nScore 55.8/100 · 2,256 stars · last push 2026-06-04 · 0 commits in last 4 weeks · 100% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/babyagi",
+      "url": "https://hvtracker.net/agents/babyagi",
+      "external_url": "https://github.com/yoheinakajima/babyagi",
+      "title": "#207 BabyAGI — score 49.0",
+      "content_text": "Score 49.0/100 · 22,300 stars · last push 2026-01-31 · 0 commits in last 4 weeks · OSSF 1.2/10 · 40% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/mcp-agent",
+      "url": "https://hvtracker.net/agents/mcp-agent",
+      "external_url": "https://github.com/lastmile-ai/mcp-agent",
+      "title": "#208 mcp-agent — score 43.9",
+      "content_text": "Build effective agents using Model Context Protocol and simple workflow patterns\n\nScore 43.9/100 · 8,351 stars · last push 2026-01-25 · 0 commits in last 4 weeks · 72% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/supervision",
+      "url": "https://hvtracker.net/agents/supervision",
+      "external_url": "https://github.com/roboflow/supervision",
+      "title": "#209 Supervision — score 89.5",
+      "content_text": "We write your reusable computer vision tools. 💜\n\nScore 89.5/100 · 43,764 stars · last push 2026-06-11 · 39 commits in last 4 weeks · 75% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Needs review"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/pearai",
+      "url": "https://hvtracker.net/agents/pearai",
+      "external_url": "https://github.com/trypear/pearai-master",
+      "title": "#210 PearAI — score 28.7",
+      "content_text": "Master Repo For PearAI\n\nScore 28.7/100 · 748 stars · last push 2025-12-27 · 0 commits in last 4 weeks · OSSF 2.8/10 · 13% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/ten-framework",
+      "url": "https://hvtracker.net/agents/ten-framework",
+      "external_url": "https://github.com/TEN-framework/ten-framework",
+      "title": "#211 TEN Framework — score 76.6",
+      "content_text": "Open-source framework for conversational voice AI agents\n\nScore 76.6/100 · 10,667 stars · last push 2026-06-09 · 10 commits in last 4 weeks · 99% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Voice & Conversational"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/ailice",
+      "url": "https://hvtracker.net/agents/ailice",
+      "external_url": "https://github.com/myshell-ai/AIlice",
+      "title": "#212 AIlice — score 29.6",
+      "content_text": "AIlice is a fully autonomous, general-purpose AI agent.\n\nScore 29.6/100 · 1,407 stars · last push 2025-08-18 · 0 commits in last 4 weeks · OSSF 3.1/10 · 0% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/turbovec",
+      "url": "https://hvtracker.net/agents/turbovec",
+      "external_url": "https://github.com/RyanCodrai/turbovec",
+      "title": "#213 Turbovec — score 83.4",
+      "content_text": "A vector index built on TurboQuant, written in Rust with Python bindings\n\nScore 83.4/100 · 10,941 stars · last push 2026-06-10 · 42 commits in last 4 weeks · 45% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Needs review"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/engram",
+      "url": "https://hvtracker.net/agents/engram",
+      "external_url": "https://github.com/Gentleman-Programming/engram",
+      "title": "#214 Engram — score 77.0",
+      "content_text": "Persistent memory system for AI coding agents. Agent-agnostic Go binary with SQLite + FTS5, MCP server, HTTP API, CLI, a\n\nScore 77.0/100 · 4,280 stars · last push 2026-05-29 · 34 commits in last 4 weeks · 60% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Needs review"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/obsidian-second-brain",
+      "url": "https://hvtracker.net/agents/obsidian-second-brain",
+      "external_url": "https://github.com/eugeniughelbur/obsidian-second-brain",
+      "title": "#215 Obsidian Second Brain — score 77.1",
+      "content_text": "Cross-CLI skill for Obsidian: turn your vault into a living AI-first second brain across Claude Code, Codex, Gemini, and\n\nScore 77.1/100 · 2,376 stars · last push 2026-06-07 · 46 commits in last 4 weeks · 40% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Needs review"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/hivemind",
+      "url": "https://hvtracker.net/agents/hivemind",
+      "external_url": "https://github.com/activeloopai/hivemind",
+      "title": "#216 Hivemind — score 76.3",
+      "content_text": "One brain for all your agents\n\nScore 76.3/100 · 1,017 stars · last push 2026-06-11 · 613 commits in last 4 weeks · 19% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Needs review"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/tencentdb-agent-memory",
+      "url": "https://hvtracker.net/agents/tencentdb-agent-memory",
+      "external_url": "https://github.com/TencentCloud/TencentDB-Agent-Memory",
+      "title": "#217 TencentDB Agent Memory — score 76.2",
+      "content_text": "TencentDB Agent Memory delivers fully local long-term memory for AI Agents via a 4-tier progressive pipeline, with zero \n\nScore 76.2/100 · 5,260 stars · last push 2026-06-11 · 20 commits in last 4 weeks · 43% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Needs review"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/plandex",
+      "url": "https://hvtracker.net/agents/plandex",
+      "external_url": "https://github.com/plandex-ai/plandex",
+      "title": "#218 Plandex — score 39.3",
+      "content_text": "Open source AI coding agent. Designed for large projects and real world tasks.\n\nScore 39.3/100 · 15,438 stars · last push 2025-10-03 · 0 commits in last 4 weeks · OSSF 2.8/10 · 3% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Coding Agents"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/asm",
+      "url": "https://hvtracker.net/agents/asm",
+      "external_url": "https://github.com/luongnv89/asm",
+      "title": "#219 ASM — score 64.6",
+      "content_text": "The universal skill manager for AI coding agents.\n\nScore 64.6/100 · 559 stars · last push 2026-06-09 · 18 commits in last 4 weeks · 59% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Needs review"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/hyperagent",
+      "url": "https://hvtracker.net/agents/hyperagent",
+      "external_url": "https://github.com/hyperbrowserai/HyperAgent",
+      "title": "#220 HyperAgent — score 50.1",
+      "content_text": "AI Browser Automation\n\nScore 50.1/100 · 1,422 stars · last push 2026-05-11 · 0 commits in last 4 weeks · 51% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Needs review"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/ai-town",
+      "url": "https://hvtracker.net/agents/ai-town",
+      "external_url": "https://github.com/a16z-infra/ai-town",
+      "title": "#221 AI Town — score 51.8",
+      "content_text": "A MIT-licensed, deployable starter kit for building and customizing your own version of AI town - a virtual town where A\n\nScore 51.8/100 · 9,988 stars · last push 2026-03-21 · 0 commits in last 4 weeks · 26% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Needs review"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/openmanus",
+      "url": "https://hvtracker.net/agents/openmanus",
+      "external_url": "https://github.com/FoundationAgents/OpenManus",
+      "title": "#222 OpenManus — score 56.4",
+      "content_text": "No fortress, purely open ground.  OpenManus is Coming.\n\nScore 56.4/100 · 56,452 stars · last push 2026-02-11 · 0 commits in last 4 weeks · 24% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Agent Frameworks"
+      ]
+    },
+    {
+      "id": "https://hvtracker.net/agents/clawwork",
+      "url": "https://hvtracker.net/agents/clawwork",
+      "external_url": "https://github.com/HKUDS/ClawWork",
+      "title": "#223 ClawWork — score 48.8",
+      "content_text": "\"ClawWork: OpenClaw as Your AI Coworker - 💰 $15K earned in 11 Hours\"\n\nScore 48.8/100 · 8,194 stars · last push 2026-03-03 · 0 commits in last 4 weeks · 30% signed commits",
+      "date_modified": "2026-06-11T10:26:52Z",
+      "tags": [
+        "Needs review"
+      ]
+    }
+  ]
+}

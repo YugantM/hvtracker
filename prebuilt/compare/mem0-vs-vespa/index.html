@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mem0 vs Vespa: Trust Score & Security Comparison | HVTracker</title>
+  <meta name="description" content="Mem0 vs Vespa compared on independent trust signals: HVTrust score (87.5 vs 86.1), evidence grade, supply-chain safety, maintenance, and adoption. Mem0 ranks higher.">
+  <link rel="canonical" href="https://hvtracker.net/compare/mem0-vs-vespa/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Mem0 vs Vespa — Trust Score Comparison">
+  <meta property="og:description" content="Independent trust comparison: HVTrust 87.5 vs 86.1. Supply-chain safety, maintenance, adoption.">
+  <meta property="og:url" content="https://hvtracker.net/compare/mem0-vs-vespa/">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is Mem0 or Vespa more trustworthy?",
+        "acceptedAnswer": { "@type": "Answer", "text": "On HVTracker's evidence-weighted HVTrust score, Mem0 ranks higher (87.5 vs 86.1/100). Trust reflects verifiable supply-chain, transparency, maintenance, and adoption signals — not popularity." }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between Mem0 and Vespa?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Mem0 (mem0ai/mem0) has an HVTrust score of 87.5 (Grade A) with 58.1k GitHub stars; Vespa (vespa-engine/vespa) scores 86.1 (Grade A) with 7.0k stars. Both are Memory &amp; Knowledge." }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Compare", "item": "https://hvtracker.net/compare/" },
+      { "@type": "ListItem", "position": 3, "name": "Mem0 vs Vespa" }
+    ]
+  }
+  </script>
+  <link rel="stylesheet" href="/static/site.css?v=f9997149">
+  <style>
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+    .page{max-width:820px;padding:0 24px 48px}
+    .crumbs{font-size:11px;color:var(--muted);padding:10px 0;border-bottom:1px solid var(--border)}
+    h1{font-size:26px;font-weight:700;margin:20px 0 6px}
+    h1 .vs{color:var(--muted);font-weight:400}
+    .lede{color:var(--muted);font-size:13px;margin-bottom:20px}
+    .verdict{border-left:3px solid var(--accent-warm);padding:12px 14px;margin-bottom:24px;font-size:13px;background:var(--surface)}
+    .verdict strong{color:var(--text)}
+    table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:24px;border-top:2px solid var(--text)}
+    th,td{padding:8px 10px;border-bottom:1px solid rgba(0,0,0,0.06);text-align:left}
+    thead th{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
+    tbody th{font-weight:500;color:var(--muted);width:36%}
+    td{font-family:var(--font-mono);font-size:12px}
+    td.win{color:var(--green);font-weight:600}
+    .name-col{font-family:var(--font-sans);font-weight:700;font-size:14px}
+    .name-col a{color:var(--text)}
+    .grade{font-family:var(--font-mono);font-weight:700;font-size:11px}
+    .ga{color:var(--green)}.gb{color:var(--accent)}.gc{color:var(--amber)}.gd{color:var(--muted)}
+    .state{font-family:var(--font-mono);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+    .state-listed{color:var(--green)}
+    .state-warning{color:var(--red)}
+    .warning-note{font-family:var(--font-sans);font-size:11px;color:var(--muted);line-height:1.5}
+    .cta{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+    .cta a{border:1px solid var(--border);padding:8px 14px;font-size:12px;font-family:var(--font-mono);color:var(--muted);background:var(--surface)}
+    .cta a:hover{border-color:var(--accent-warm);color:var(--accent-warm);text-decoration:none}
+    footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}
+    footer a{color:var(--accent)}
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Memory &amp; Knowledge", "item": "https://hvtracker.net/categories/memory-knowledge/" },
+      { "@type": "ListItem", "position": 3, "name": "Mem0 vs Vespa", "item": "https://hvtracker.net/compare/mem0-vs-vespa/" }
+    ]
+  }
+  </script>
+  <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="compare_page" data-category="Memory &amp; Knowledge">
+  <header class="site-header">
+  <div class="site-header-inner">
+    <a href="/" class="logo">HV<span>Tracker</span></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="/">Leaderboard</a>
+      <a href="/movers/">Movers</a>
+      <a href="/changes/">Changes</a>
+      <a href="/use-cases/">Use cases</a>
+      <a href="/methodology">Methodology</a>
+      <a href="/score-lab/">Score lab</a>
+      <a href="/compare/">Compare</a>
+      <a href="/alerts/">Alerts</a>
+      <a href="/data/">Data API</a>
+      <a href="/sponsor/">Sponsor</a>
+    </nav>
+    <div class="meta">
+      <span class="live-dot"></span>updated 2026-06-11 10:26 UTC
+    </div>
+  </div>
+</header>
+  <div class="page">
+
+    <div class="crumbs"><a href="/">Home</a> › <a href="/categories/memory-knowledge/">Memory &amp; Knowledge</a> › Mem0 vs Vespa</div>
+    <h1>Mem0 <span class="vs">vs</span> Vespa</h1>
+    <p class="lede">An independent, evidence-weighted trust comparison of two memory &amp; knowledge — ranked on verifiable signals, not popularity.</p>
+
+    <div class="verdict">
+      <strong>Mem0 ranks higher</strong> with an HVTrust score of <strong>87.5</strong> vs 86.1/100
+      .
+      
+      
+      HVTrust reflects supply-chain safety, transparency, maintenance, and adoption — weighted by how much verifiable evidence exists.
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Signal</th><th class="name-col"><a href="/agents/mem0/">Mem0</a></th><th class="name-col"><a href="/agents/vespa/">Vespa</a></th></tr>
+      </thead>
+      <tbody>
+        <tr><th>HVTrust score</th><td class="win">87.5</td><td class="">86.1</td></tr>
+        <tr><th>Evidence grade</th><td><span class="grade ga">A</span></td><td><span class="grade ga">A</span></td></tr>
+        <tr><th>Registry state</th><td><span class="state state-listed">Listed</span></td><td><span class="state state-listed">Listed</span></td></tr>
+        <tr><th>Safety / Integrity (25)</th><td class="win">18.8</td><td class="">17.3</td></tr>
+        <tr><th>Identity / Provenance (18)</th><td class="win">18.0</td><td class="">18.0</td></tr>
+        <tr><th>Transparency (17)</th><td class="">12.8</td><td class="win">13.3</td></tr>
+        <tr><th>Maintenance (20)</th><td class="">18.6</td><td class="win">20.0</td></tr>
+        <tr><th>Adoption (20)</th><td class="win">19.3</td><td class="">17.5</td></tr>
+        <tr><th>GitHub stars</th><td class="win">58.1k</td><td class="">7.0k</td></tr>
+        <tr><th>Weekly downloads</th><td>796,464</td><td>1,739,374</td></tr>
+        <tr><th>Last push</th><td>2026-06-08</td><td>2026-06-11</td></tr>
+        <tr><th>Language</th><td>Python</td><td>Java</td></tr>
+        <tr><th>OSSF Scorecard</th><td>5.0</td><td>5.7</td></tr>
+        <tr><th>Review flags</th><td class="warning-note">—</td><td class="warning-note">—</td></tr>
+        <tr><th>Recent change</th><td class="warning-note">2026-05-29: HVTrust up 10.0pts (75.9 → 85.9)</td><td class="warning-note">2026-05-29: Rank dropped 10 spots (#4 → #14)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="cta">
+      <a href="/agents/mem0/">Full Mem0 report →</a>
+      <a href="/agents/vespa/">Full Vespa report →</a>
+      <a href="/categories/memory-knowledge/">All Memory &amp; Knowledge →</a>
+    </div>
+
+    <footer>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">·</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">·</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">·</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">·</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">·</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">·</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coding Agents Ranked by Trust, Not Stars — The Results Are Embarrassing | HVTracker</title>
+  <meta name="description" content="We ranked 26 coding agents by supply-chain trust instead of GitHub stars. opencode (167k stars) lands at #127. GPT Pilot (33k stars) has 1% signed commits. Only one coding agent cracks the top 10.">
+  <link rel="canonical" href="https://hvtracker.net/blog/coding-agents-trust-rankings">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Coding Agents Ranked by Trust, Not Stars — The Results Are Embarrassing">
+  <meta property="og:description" content="We ranked 26 coding agents by supply-chain trust. 167k stars, rank #127. Only one cracks the top 10.">
+  <meta property="og:url" content="https://hvtracker.net/blog/coding-agents-trust-rankings">
+  <meta property="og:image" content="https://hvtracker.net/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Coding Agents Ranked by Trust, Not Stars — The Results Are Embarrassing">
+  <meta name="twitter:description" content="We ranked 26 coding agents by supply-chain trust. 167k stars, rank #127.">
+  <meta name="twitter:image" content="https://hvtracker.net/og.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Coding Agents Ranked by Trust, Not Stars — The Results Are Embarrassing",
+    "description": "We ranked 26 coding agents by supply-chain trust signals instead of GitHub stars. The most popular agents perform worst.",
+    "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "publisher": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "datePublished": "2026-05-30",
+    "dateModified": "2026-05-30",
+    "mainEntityOfPage": "https://hvtracker.net/blog/coding-agents-trust-rankings"
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#f4f1eb; --surface:#eae6de; --surface-2:#e2ded6; --border:#d4cfc5;
+      --text:#1a1a1a; --muted:#6b6560;
+      --accent:#2c5282; --accent-lt:rgba(44,82,130,0.08); --accent-dim:#5677aa;
+      --mocha:#8b6914; --mocha-lt:rgba(139,105,20,0.10);
+      --fresh:#2f6846; --stale:#737f91;
+      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color:var(--text); font-family:var(--font-sans); font-size:16px; line-height:1.7; min-height:100vh; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:720px; margin:0 auto; padding:0 20px; background:#f4f1eb; min-height:100vh; }
+    .site-header { position:sticky; top:0; z-index:100; background:var(--bg); border-bottom:1px solid var(--border); }
+    .site-header-inner { max-width:1200px; margin:0 auto; padding:14px 20px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; letter-spacing:-0.5px; color:var(--text); }
+    .logo span { color:var(--accent); }
+    .site-nav { margin-left:auto; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; } .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--text); border-color:var(--border); background:var(--surface); text-decoration:none; }
+
+    article { padding:36px 0 48px; }
+    h1 { font-size:30px; font-weight:700; letter-spacing:-0.5px; line-height:1.2; margin-bottom:12px; }
+    .meta { font-size:13px; color:var(--muted); margin-bottom:32px; font-family:var(--font-mono); }
+    h2 { font-size:22px; font-weight:700; margin-top:36px; margin-bottom:12px; letter-spacing:-0.3px; }
+    p { margin-bottom:16px; }
+
+    .callout { background:var(--accent-lt); border-left:3px solid var(--accent); padding:16px 20px; margin:24px 0; border-radius:0 6px 6px 0; font-size:14px; }
+    .callout strong { color:var(--accent); }
+    .callout.warn { border-left-color:var(--mocha); background:var(--mocha-lt); }
+    .callout.warn strong { color:var(--mocha); }
+
+    table { width:100%; border-collapse:collapse; margin:24px 0; font-size:14px; }
+    th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
+    td.name a { font-weight:600; color:var(--text); }
+    td.name a:hover { color:var(--accent); }
+    td.good { color:var(--fresh); font-weight:600; }
+    td.bad { color:var(--stale); }
+    td.ugly { color:#ef4444; font-weight:600; }
+    td.mono { font-family:var(--font-mono); }
+
+    .versus { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:24px 0; }
+    .versus .card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:18px; }
+    .versus .card h3 { font-size:16px; margin-bottom:8px; margin-top:0; }
+    .versus .card .stat { font-family:var(--font-mono); font-size:13px; color:var(--muted); margin-bottom:4px; }
+    .versus .card .stat strong { color:var(--text); }
+
+    .cta-box { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:24px; margin:36px 0; text-align:center; }
+    .cta-box h3 { color:var(--text); margin-top:0; font-size:18px; margin-bottom:8px; }
+    .cta-box p { font-size:14px; color:var(--muted); margin-bottom:16px; }
+    .cta-btn { display:inline-block; background:var(--accent); color:#fff; padding:10px 24px; border-radius:5px; font-weight:600; font-size:14px; text-decoration:none; }
+    .cta-btn:hover { opacity:0.9; text-decoration:none; }
+
+    footer { padding:28px 0; border-top:1px solid var(--border); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--accent); }
+    @media (max-width:600px) { h1 { font-size:24px; } .versus { grid-template-columns:1fr; } table { font-size:12px; } th,td { padding:8px 6px; } }
+  </style>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TZ8921LR0K');</script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="blog">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <a href="/">Leaderboard</a>
+        <a href="/movers/">Movers</a>
+        <a href="/use-cases/">Use cases</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/compare/">Compare</a>
+        <a href="/alerts/">Alerts</a>
+        <a href="/data/">Data API</a>
+        <a href="/sponsor/">Sponsor</a>
+      </nav>
+    </div>
+  </header>
+  <div class="page">
+
+    <article>
+      <h1>Coding Agents Ranked by Trust, Not Stars — The Results Are Embarrassing</h1>
+      <div class="meta">May 30, 2026 &middot; 6 min read &middot; HVTracker Research</div>
+
+      <p>Everyone knows which coding agents are popular. opencode has 167k stars. Claude Code has 127k. Gemini CLI hit 104k in weeks. But popularity and trustworthiness are different questions, and when you ask the second one, the leaderboard flips.</p>
+
+      <p>We rank hundreds of open-source AI agents by <a href="/methodology">HVTrust</a> — a composite of supply-chain signals weighted so that harder-to-fake evidence (OSSF Scorecard, provenance, signed commits) counts more than stars. Here's what the coding agent category looks like when you sort by trust instead of GitHub hype.</p>
+
+      <h2>The table nobody wants to see</h2>
+
+      <table>
+        <thead>
+          <tr><th>Agent</th><th>Stars</th><th>Trust Rank</th><th>Trust Score</th><th>Provenance</th><th>Signed</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="name"><a href="/agents/cline">Cline</a></td><td class="mono">62k</td><td class="mono good">#10</td><td class="mono">88.5</td><td class="good">Verified</td><td class="good">91%</td></tr>
+          <tr><td class="name"><a href="/agents/openhands">OpenHands</a></td><td class="mono">75k</td><td class="mono">#31</td><td class="mono">72.0</td><td class="bad">None</td><td class="good">100%</td></tr>
+          <tr><td class="name"><a href="/agents/codex">Codex</a></td><td class="mono">86k</td><td class="mono">#36</td><td class="mono">70.3</td><td class="bad">None</td><td class="good">100%</td></tr>
+          <tr><td class="name"><a href="/agents/gemini-cli">Gemini CLI</a></td><td class="mono">104k</td><td class="mono">#63</td><td class="mono">66.9</td><td class="bad">None</td><td class="good">100%</td></tr>
+          <tr><td class="name"><a href="/agents/goose">Goose</a></td><td class="mono">46k</td><td class="mono">#56</td><td class="mono">67.5</td><td class="bad">None</td><td class="good">100%</td></tr>
+          <tr><td class="name"><a href="/agents/open-interpreter">Open Interpreter</a></td><td class="mono">63k</td><td class="mono">#80</td><td class="mono">61.3</td><td class="bad">None</td><td class="bad">41%</td></tr>
+          <tr><td class="name"><a href="/agents/claude-code">Claude Code</a></td><td class="mono">127k</td><td class="mono">#101</td><td class="mono">55.5</td><td class="bad">None</td><td class="ugly">18%</td></tr>
+          <tr><td class="name"><a href="/agents/aider">Aider</a></td><td class="mono">45k</td><td class="mono">#102</td><td class="mono">54.6</td><td class="bad">None</td><td class="ugly">16%</td></tr>
+          <tr><td class="name"><a href="/agents/gpt-pilot">GPT Pilot</a></td><td class="mono">33k</td><td class="mono">#122</td><td class="mono">43.9</td><td class="bad">None</td><td class="ugly">1%</td></tr>
+          <tr><td class="name"><a href="/agents/opencode">opencode</a></td><td class="mono">167k</td><td class="mono ugly">#127</td><td class="mono">42.1</td><td class="bad">None</td><td class="bad">70%</td></tr>
+        </tbody>
+      </table>
+
+      <p><strong>opencode</strong> — the most-starred coding agent — ranks <strong>#127 out of 172</strong>. That's not a rounding error. It's a project with 167k stars, no provenance, no OSSF Scorecard, and a Grade D evidence rating. The signals we can verify are thin.</p>
+
+      <p><strong>GPT Pilot</strong> has 1% signed commits. One percent. Out of the last 100 commits, one was verified-signed.</p>
+
+      <p><strong>Claude Code</strong> — Anthropic's own agent — ranks #101 with 18% signed commits and no provenance. Being built by a major AI lab doesn't automatically translate to supply-chain hygiene.</p>
+
+      <h2>The one that gets it right</h2>
+
+      <div class="versus">
+        <div class="card">
+          <h3><a href="/agents/cline">Cline</a></h3>
+          <div class="stat">Stars: <strong>62k</strong></div>
+          <div class="stat">HVTrust Rank: <strong style="color:var(--fresh)">#10</strong></div>
+          <div class="stat">Provenance: <strong style="color:var(--fresh)">Verified (npm)</strong></div>
+          <div class="stat">Signed commits: <strong>91%</strong></div>
+          <div class="stat">Scorecard: <strong>6.1/10</strong></div>
+          <div class="stat">Security Policy: <strong style="color:var(--fresh)">10/10</strong></div>
+        </div>
+        <div class="card">
+          <h3><a href="/agents/opencode">opencode</a></h3>
+          <div class="stat">Stars: <strong>167k</strong></div>
+          <div class="stat">HVTrust Rank: <strong style="color:#ef4444">#127</strong></div>
+          <div class="stat">Provenance: <strong style="color:var(--stale)">None</strong></div>
+          <div class="stat">Signed commits: <strong>70%</strong></div>
+          <div class="stat">Scorecard: <strong style="color:var(--stale)">N/A</strong></div>
+          <div class="stat">Security Policy: <strong style="color:var(--stale)">N/A</strong></div>
+        </div>
+      </div>
+
+      <p>Cline is the <strong>only coding agent in the global top 10</strong>. It ships npm provenance, maintains 91% signed commits, has a security policy, and scores 6.1/10 on the OSSF Scorecard. It's not the most popular coding agent. It's the most verifiable one.</p>
+
+      <h2>The pattern</h2>
+
+      <p>Across all agents we track, the correlation between stars and trust score is weak. Projects that rank high on trust tend to share three traits:</p>
+
+      <ul>
+        <li><strong>They publish build provenance</strong> — linking the package on the registry back to a specific commit and CI run.</li>
+        <li><strong>They sign their commits</strong> — not just one or two, but consistently across the team.</li>
+        <li><strong>They have an OSSF Scorecard</strong> — branch protection, dependency updates, code review policies.</li>
+      </ul>
+
+      <p>These are not exotic requirements. They're table stakes for any serious dependency. But in the AI agent ecosystem, most projects haven't gotten there yet — even the ones with six-figure star counts.</p>
+
+      <div class="callout warn">
+        <strong>This is not a hit piece.</strong> Every project listed here is open-source, actively developed, and useful. Low trust scores reflect missing <em>verifiable evidence</em>, not poor intent. Many of these gaps are straightforward to close — enable Scorecard, sign commits, publish provenance. The agents that have done it rank accordingly.
+      </div>
+
+      <div class="cta-box">
+        <h3>Compare any two agents head-to-head</h3>
+        <p>See the full signal breakdown side by side.</p>
+        <a class="cta-btn" href="/compare/?a=cline">Compare Cline vs...</a>
+      </div>
+
+      <p style="font-size:13px;color:var(--muted);">Data from HVTracker signals as of May 30, 2026. Rankings change daily as signals refresh. <a href="/methodology">Full methodology</a>. <a href="/categories/coding-agents">View all coding agents</a>.</p>
+    </article>
+
+    <footer>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>

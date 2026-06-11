@@ -114,3 +114,18 @@ def test_volume_render_state_not_overwritten_when_present(tmp_path):
     # The volume's fresh copy must survive.
     after = json.load(open(volume_rs))
     assert after == fresh
+
+
+def test_history_seeded_into_separate_output_root(tmp_path):
+    """Render-only output roots should inherit baked history snapshots so
+    rank deltas and sparklines are available during image builds."""
+    base_dir = tmp_path / "base"
+    script_dir = tmp_path / "prebuilt"
+    seed_dir = base_dir / "seed" / "history"
+    seed_dir.mkdir(parents=True)
+    (seed_dir / "2026-06-10.json").write_text(json.dumps({"agents": []}))
+
+    copied = fb.seed_history_into_output_root(str(base_dir), str(script_dir))
+
+    assert copied == 1
+    assert (script_dir / "output" / "history" / "2026-06-10.json").exists()

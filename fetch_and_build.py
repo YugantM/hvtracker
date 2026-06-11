@@ -1843,6 +1843,34 @@ def load_history(history_dir: str) -> list[dict]:
     return snapshots
 
 
+def seed_history_into_output_root(base_dir: str, script_dir: str) -> int:
+    """Copy baked history snapshots into the active output root when missing.
+
+    In Docker deploys, prior daily snapshots live in ``<base_dir>/seed/history``.
+    Build-time render-only output goes to a different ``script_dir`` (for example
+    ``/app/prebuilt``), so without this seed step the renderer sees an empty
+    ``output/history`` directory and marks every agent as NEW.
+    """
+    if script_dir == base_dir:
+        return 0
+    seed_dir = os.path.join(base_dir, "seed", "history")
+    if not os.path.isdir(seed_dir):
+        return 0
+    history_dir = os.path.join(script_dir, "output", "history")
+    os.makedirs(history_dir, exist_ok=True)
+    copied = 0
+    for fn in sorted(os.listdir(seed_dir)):
+        if not fn.endswith(".json"):
+            continue
+        dst = os.path.join(history_dir, fn)
+        if not os.path.exists(dst):
+            shutil.copy2(os.path.join(seed_dir, fn), dst)
+            copied += 1
+    if copied:
+        print(f"Seeded {copied} history snapshot(s) into output root")
+    return copied
+
+
 def select_completed_history_window(history: list[dict], window: int = 7) -> tuple[dict | None, dict | None]:
     """Return the latest completed daily snapshot and its baseline snapshot.
 
@@ -3871,6 +3899,7 @@ def main() -> None:
             src = os.path.join(base_dir, static_dir)
             if os.path.isdir(src):
                 shutil.copytree(src, os.path.join(script_dir, static_dir), dirs_exist_ok=True)
+    seed_history_into_output_root(base_dir, script_dir)
     data_path = os.path.join(script_dir, "data.json")
 
     batch = parse_batch_arg()
