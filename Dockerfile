@@ -28,6 +28,7 @@ COPY data/render_state.json data/render_state.json
 # Seed history snapshots — copied into the volume on first startup if missing.
 # Needed so rank-deltas, sparklines, and movers have prior days to compare against.
 COPY output/history/ /app/seed/history/
+RUN test -n "$(find /app/seed/history -name '*.json' -print -quit)"
 
 # Pre-render the static site at build time so deploys serve fresh HTML
 # immediately — the persistent volume is updated on startup before traffic
