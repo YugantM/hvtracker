@@ -26,23 +26,57 @@
     :root{--paper:#f4f1eb;--paper-2:#ece4d6;--ink:#1f1b17;--muted:#6f665d;--line:#d5cbbc;--line-strong:#b9aa96;--blue:#a7bfd9;--blue-strong:#7f9cbd;--blue-soft:rgba(167,191,217,.18);--lobster:#c67c6d;--lobster-soft:rgba(198,124,109,.14);--moss:#6f876e;--green:#2f6846;--red:#9b3c3c;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}
     body{min-height:100vh;background:var(--paper);background-image:url("/hex-bg.svg");background-size:2000px 2000px;color:var(--ink);font:15px/1.65 var(--font-sans)}
     a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}
-    .page{background:var(--paper);max-width:960px;margin:0 auto;padding:24px 24px 40px}
+    .page{background:var(--paper);max-width:1180px;margin:0 auto;padding:24px 24px 48px}
     .logo{font-family:var(--font-mono);font-weight:700;font-size:20px}.logo span{color:var(--lobster)}
-    .hero{padding:24px 0 16px;border-bottom:1px solid var(--line)}
-    h1{font-size:26px;font-weight:700;margin-bottom:6px}.hero p{color:var(--muted);font-size:14px;max-width:680px}
-    .meta{font:11px var(--font-mono);color:var(--muted);margin-top:10px}
-    h2{font-size:16px;font-weight:700;margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
-    .section-panel{background:var(--paper-2);border-top:2px solid var(--line-strong);padding:12px;margin-bottom:16px}
-    .change-item{display:grid;grid-template-columns:minmax(0,1fr) 80px;gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line)}
+    .hero{padding:26px 0 22px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);gap:18px;align-items:end}
+    h1{font-size:34px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px}.hero p{color:var(--muted);font-size:15px;max-width:720px}
+    .meta{font:11px var(--font-mono);color:var(--muted);margin-top:14px}
+    .hero-panel{background:linear-gradient(180deg,var(--paper-2),rgba(236,228,214,.55));border:1px solid var(--line);border-top:2px solid var(--line-strong);padding:16px 18px}
+    .hero-panel-title{font:11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+    .hero-panel-copy{font-size:14px;line-height:1.6;color:var(--ink)}
+    .hero-panel-copy strong{color:var(--green)}
+    .summary-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:22px 0 28px}
+    .summary-card{background:rgba(255,255,255,.28);border:1px solid var(--line);border-top:2px solid var(--line-strong);padding:14px 14px 12px;min-height:92px}
+    .summary-label{font:10px var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .summary-value{font-size:28px;line-height:1;font-weight:700;letter-spacing:-.04em;margin:10px 0 6px}
+    .summary-note{font:11px var(--font-mono);color:var(--muted)}
+    .summary-card.up .summary-value,.summary-card.prov .summary-value,.summary-card.mcp .summary-value{color:var(--green)}
+    .summary-card.down .summary-value{color:var(--lobster)}
+    .changes-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .changes-card{background:rgba(255,255,255,.24);border:1px solid var(--line);border-top:2px solid var(--line-strong);display:flex;flex-direction:column;min-height:100%}
+    .changes-card.span-2{grid-column:span 2}
+    .card-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:16px 18px 14px;border-bottom:1px solid var(--line)}
+    .card-title-wrap{display:grid;gap:4px}
+    .card-kicker{font:10px var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .card-title{font-size:18px;font-weight:700;line-height:1.1}
+    .card-subtitle{color:var(--muted);font-size:13px}
+    .card-count{font:600 12px var(--font-mono);padding:7px 10px;border:1px solid var(--line);background:var(--paper-2);color:var(--muted);white-space:nowrap}
+    .card-body{padding:6px 18px 10px}
+    .changes-card.span-2 .card-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px}
+    .change-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;padding:13px 0;border-bottom:1px solid rgba(185,170,150,.65)}
     .change-item:last-child{border-bottom:none}
-    .name{font-weight:600;font-size:13px}
-    .sub{display:block;color:var(--muted);font:11px var(--font-mono);margin-top:2px}
-    .delta{font:700 13px var(--font-mono);text-align:right}
+    .name{font-weight:600;font-size:14px;line-height:1.3}
+    .sub{display:block;color:var(--muted);font:11px var(--font-mono);margin-top:4px}
+    .delta{font:700 12px var(--font-mono);text-align:right;padding-top:2px}
     .delta-up{color:var(--green)}.delta-down{color:var(--lobster)}
-    .empty{color:var(--muted);font-style:italic;padding:12px 0}
+    .empty{color:var(--muted);font-style:italic;padding:14px 0 10px}
     footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font:11px var(--font-mono);color:var(--muted);text-align:center}
     footer a{color:var(--blue-strong)}
-    @media(max-width:760px){h1{font-size:18px}}
+    @media(max-width:960px){
+      .hero{grid-template-columns:1fr}
+      .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .changes-grid{grid-template-columns:1fr}
+      .changes-card.span-2{grid-column:auto}
+      .changes-card.span-2 .card-body{display:block}
+    }
+    @media(max-width:640px){
+      .page{padding:18px 16px 34px}
+      h1{font-size:24px}
+      .summary-grid{grid-template-columns:1fr}
+      .card-head{align-items:start;flex-direction:column}
+      .change-item{grid-template-columns:minmax(0,1fr)}
+      .delta{text-align:left}
+    }
   </style>
   <script type="application/ld+json">
   {
@@ -72,1596 +106,496 @@
     <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
       <nav class="site-nav" aria-label="Site">
-        <a href="/">Leaderboard</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a><a href="/use-cases/">Use cases</a><a href="/methodology">Methodology</a><a href="/score-lab/">Score lab</a><a href="/compare/">Compare</a><a href="/alerts/">Alerts</a><a href="/data/">Data API</a><a href="/sponsor/">Sponsor</a>
+        <a href="/">Leaderboard</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a><a href="/use-cases/">Use cases</a><a href="/methodology/">Methodology</a><a href="/score-lab/">Score lab</a><a href="/compare/">Compare</a><a href="/alerts/">Alerts</a><a href="/data/">Data API</a><a href="/sponsor/">Sponsor</a>
       </nav>
-      <div class="site-status" data-updated="2026-06-11 20:41 UTC">
-        <span class="live-dot"></span>updated <span class="site-status-value">2026-06-11 20:41 UTC</span>
+      <div class="site-status" data-updated="2026-06-12 10:17 UTC">
+        <span class="live-dot"></span>updated <span class="site-status-value">2026-06-12 10:17 UTC</span>
       </div>
     </div>
   </header>
   <div class="page">
 
     <section class="hero">
-      <h1>Weekly Changes</h1>
-      <p>What moved in the HVTracker registry over the past week: new listings, trust-score shifts, provenance and MCP status changes.</p>
-      <div class="meta">2026-06-11 vs 2026-06-04 &middot; Updated 2026-06-11 20:41 UTC</div>
+      <div>
+        <h1>Weekly Changes</h1>
+        <p>What moved in the HVTracker registry over the past week: new listings, trust-score shifts, provenance and MCP status changes.</p>
+        <div class="meta">2026-06-12 vs 2026-06-05 &middot; Updated 2026-06-12 10:17 UTC</div>
+      </div>
+      <aside class="hero-panel">
+        <div class="hero-panel-title">Change Window</div>
+        <div class="hero-panel-copy">
+          This view highlights <strong>44</strong>
+          notable registry updates across launches, trust movement, and capability signals.
+        </div>
+      </aside>
     </section>
 
-    <h2>Newly Listed Projects (28)</h2>
-    <div class="section-panel">
-      
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/openui/">OpenUI</a>
-          <span class="sub">UI &amp; App Builders &middot; HVTrust 83.7</span>
-        </span>
-        <span class="delta">NEW</span>
+    <section class="summary-grid" aria-label="Weekly change summary">
+      <div class="summary-card">
+        <div class="summary-label">New Listings</div>
+        <div class="summary-value">28</div>
+        <div class="summary-note">Fresh additions to the registry</div>
       </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/openhands/">OpenHands</a>
-          <span class="sub">Coding Agents &middot; HVTrust 76.1</span>
-        </span>
-        <span class="delta">NEW</span>
+      <div class="summary-card up">
+        <div class="summary-label">Trust Up</div>
+        <div class="summary-value">15</div>
+        <div class="summary-note">Score increases of 3+ points</div>
       </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/deep-agents/">Deep Agents</a>
-          <span class="sub">Agent Frameworks &middot; HVTrust 75.7</span>
-        </span>
-        <span class="delta">NEW</span>
+      <div class="summary-card down">
+        <div class="summary-label">Trust Down</div>
+        <div class="summary-value">1</div>
+        <div class="summary-note">Score drops of 3+ points</div>
       </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/vellum-assistant/">Vellum Assistant</a>
-          <span class="sub">Memory &amp; Knowledge &middot; HVTrust 65.9</span>
-        </span>
-        <span class="delta">NEW</span>
+      <div class="summary-card prov">
+        <div class="summary-label">Provenance Gained</div>
+        <div class="summary-value">0</div>
+        <div class="summary-note">Projects that added provenance</div>
       </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/roo-code/">Roo Code</a>
-          <span class="sub">Coding Agents &middot; HVTrust 65.4</span>
-        </span>
-        <span class="delta">NEW</span>
+      <div class="summary-card mcp">
+        <div class="summary-label">MCP Gained</div>
+        <div class="summary-value">0</div>
+        <div class="summary-note">Projects that added MCP support</div>
       </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/insforge/">InsForge</a>
-          <span class="sub">Workflow Platforms &middot; HVTrust 63.2</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/beeai-framework/">BeeAI Framework</a>
-          <span class="sub">Agent Frameworks &middot; HVTrust 62.5</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/aider/">Aider</a>
-          <span class="sub">Coding Agents &middot; HVTrust 60.0</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/kimi-code/">Kimi Code</a>
-          <span class="sub">Coding Agents &middot; HVTrust 58.8</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/junie/">Junie</a>
-          <span class="sub">Coding Agents &middot; HVTrust 56.1</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/agent-s/">Agent-S</a>
-          <span class="sub">Browser &amp; Computer Use &middot; HVTrust 52.0</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/auto-deep-researcher-24x7/">auto-deep-researcher-24x7</a>
-          <span class="sub">Research &amp; Data &middot; HVTrust 50.6</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/metagpt/">MetaGPT</a>
-          <span class="sub">Multi-Agent Systems &middot; HVTrust 45.4</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/molmoweb/">MolmoWeb</a>
-          <span class="sub">Browser &amp; Computer Use &middot; HVTrust 38.8</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/mindsearch/">MindSearch</a>
-          <span class="sub">Research &amp; Data &middot; HVTrust 38.4</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/swe-agent/">SWE-agent</a>
-          <span class="sub">Coding Agents &middot; HVTrust 38.2</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/lagent/">Lagent</a>
-          <span class="sub">Agent Frameworks &middot; HVTrust 31.7</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/mcp-agent/">mcp-agent</a>
-          <span class="sub">Agent Frameworks &middot; HVTrust 26.9</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/supervision/">Supervision</a>
-          <span class="sub">Needs review &middot; HVTrust 26.3</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/turbovec/">Turbovec</a>
-          <span class="sub">Needs review &middot; HVTrust 24.9</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/engram/">Engram</a>
-          <span class="sub">Needs review &middot; HVTrust 24.1</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/obsidian-second-brain/">Obsidian Second Brain</a>
-          <span class="sub">Needs review &middot; HVTrust 23.9</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/hivemind/">Hivemind</a>
-          <span class="sub">Needs review &middot; HVTrust 23.8</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/tencentdb-agent-memory/">TencentDB Agent Memory</a>
-          <span class="sub">Needs review &middot; HVTrust 23.8</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/asm/">ASM</a>
-          <span class="sub">Needs review &middot; HVTrust 22.9</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/hyperagent/">HyperAgent</a>
-          <span class="sub">Needs review &middot; HVTrust 19.7</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/ai-town/">AI Town</a>
-          <span class="sub">Needs review &middot; HVTrust 18.4</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/clawwork/">ClawWork</a>
-          <span class="sub">Needs review &middot; HVTrust 17.8</span>
-        </span>
-        <span class="delta">NEW</span>
-      </div>
-      
-      
-    </div>
+    </section>
 
-    <h2>Trust Score Up (37)</h2>
-    <div class="section-panel">
-      
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/ecc/">ECC</a>
-          <span class="sub">26.8 &rarr; 87.5</span>
-        </span>
-        <span class="delta delta-up">+60.7</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/hermes-agent/">Hermes Agent</a>
-          <span class="sub">26.4 &rarr; 86.1</span>
-        </span>
-        <span class="delta delta-up">+59.7</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/openhuman/">OpenHuman</a>
-          <span class="sub">27.4 &rarr; 65.9</span>
-        </span>
-        <span class="delta delta-up">+38.5</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/agency-agents/">Agency Agents</a>
-          <span class="sub">26.8 &rarr; 65.1</span>
-        </span>
-        <span class="delta delta-up">+38.3</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/superpowers/">Superpowers</a>
-          <span class="sub">22.5 &rarr; 59.3</span>
-        </span>
-        <span class="delta delta-up">+36.8</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/docling/">Docling</a>
-          <span class="sub">51.6 &rarr; 87.3</span>
-        </span>
-        <span class="delta delta-up">+35.7</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/bee-agent-framework/">Bee Agent Framework</a>
-          <span class="sub">29.8 &rarr; 62.5</span>
-        </span>
-        <span class="delta delta-up">+32.7</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/agentmemory/">agentmemory</a>
-          <span class="sub">39.9 &rarr; 71.3</span>
-        </span>
-        <span class="delta delta-up">+31.4</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/odysseus/">Odysseus</a>
-          <span class="sub">36.9 &rarr; 67.8</span>
-        </span>
-        <span class="delta delta-up">+30.9</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/codewhale/">CodeWhale</a>
-          <span class="sub">37.5 &rarr; 68.0</span>
-        </span>
-        <span class="delta delta-up">+30.5</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/jan/">Jan</a>
-          <span class="sub">35.8 &rarr; 65.6</span>
-        </span>
-        <span class="delta delta-up">+29.8</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/smolagents/">smolagents</a>
-          <span class="sub">43.5 &rarr; 70.0</span>
-        </span>
-        <span class="delta delta-up">+26.5</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/google-genkit/">Google Genkit</a>
-          <span class="sub">44.8 &rarr; 70.1</span>
-        </span>
-        <span class="delta delta-up">+25.3</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/portkey-ai-gateway/">Portkey AI Gateway</a>
-          <span class="sub">41.2 &rarr; 65.8</span>
-        </span>
-        <span class="delta delta-up">+24.6</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/kilo-code/">Kilo Code</a>
-          <span class="sub">40.6 &rarr; 64.8</span>
-        </span>
-        <span class="delta delta-up">+24.2</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/instructor/">Instructor</a>
-          <span class="sub">41.2 &rarr; 65.2</span>
-        </span>
-        <span class="delta delta-up">+24.0</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/lingxi/">Lingxi</a>
-          <span class="sub">17.4 &rarr; 40.4</span>
-        </span>
-        <span class="delta delta-up">+23.0</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/antigravity-cli/">Antigravity CLI</a>
-          <span class="sub">16.4 &rarr; 37.5</span>
-        </span>
-        <span class="delta delta-up">+21.1</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/qwen-code/">Qwen Code</a>
-          <span class="sub">68.1 &rarr; 87.5</span>
-        </span>
-        <span class="delta delta-up">+19.4</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/guardrails-ai/">Guardrails AI</a>
-          <span class="sub">62.3 &rarr; 81.7</span>
-        </span>
-        <span class="delta delta-up">+19.4</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/wrenai/">WrenAI</a>
-          <span class="sub">65.1 &rarr; 81.9</span>
-        </span>
-        <span class="delta delta-up">+16.8</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/langwatch/">LangWatch</a>
-          <span class="sub">69.8 &rarr; 83.4</span>
-        </span>
-        <span class="delta delta-up">+13.6</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/headroom/">Headroom</a>
-          <span class="sub">71.6 &rarr; 85.1</span>
-        </span>
-        <span class="delta delta-up">+13.5</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/openclaw/">OpenClaw</a>
-          <span class="sub">72.6 &rarr; 84.7</span>
-        </span>
-        <span class="delta delta-up">+12.1</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/lightrag/">LightRAG</a>
-          <span class="sub">72.4 &rarr; 83.8</span>
-        </span>
-        <span class="delta delta-up">+11.4</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/claude-code/">Claude Code</a>
-          <span class="sub">51.1 &rarr; 61.0</span>
-        </span>
-        <span class="delta delta-up">+9.9</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/cli-anything/">CLI-Anything</a>
-          <span class="sub">71.3 &rarr; 80.1</span>
-        </span>
-        <span class="delta delta-up">+8.8</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/sotopia-agents/">Sotopia agents</a>
-          <span class="sub">43.6 &rarr; 52.0</span>
-        </span>
-        <span class="delta delta-up">+8.4</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/microsoft-agent-framework/">Microsoft Agent Framework</a>
-          <span class="sub">66.1 &rarr; 73.2</span>
-        </span>
-        <span class="delta delta-up">+7.1</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/verl-agent/">Verl Agent</a>
-          <span class="sub">53.8 &rarr; 59.6</span>
-        </span>
-        <span class="delta delta-up">+5.8</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/privategpt/">PrivateGPT</a>
-          <span class="sub">57.3 &rarr; 62.1</span>
-        </span>
-        <span class="delta delta-up">+4.8</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/bolt/">Bolt</a>
-          <span class="sub">30.0 &rarr; 34.8</span>
-        </span>
-        <span class="delta delta-up">+4.8</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/holmesgpt/">Holmesgpt</a>
-          <span class="sub">62.0 &rarr; 66.5</span>
-        </span>
-        <span class="delta delta-up">+4.5</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/agency-swarm/">Agency Swarm</a>
-          <span class="sub">61.6 &rarr; 65.8</span>
-        </span>
-        <span class="delta delta-up">+4.2</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/fedml/">Fedml</a>
-          <span class="sub">38.3 &rarr; 41.7</span>
-        </span>
-        <span class="delta delta-up">+3.4</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/neo/">Neo</a>
-          <span class="sub">63.6 &rarr; 66.8</span>
-        </span>
-        <span class="delta delta-up">+3.2</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/concordia/">Concordia</a>
-          <span class="sub">56.5 &rarr; 59.5</span>
-        </span>
-        <span class="delta delta-up">+3.0</span>
-      </div>
-      
-      
-    </div>
+    <section class="changes-grid">
+      <article class="changes-card span-2">
+        <div class="card-head">
+          <div class="card-title-wrap">
+            <div class="card-kicker">Registry</div>
+            <h2 class="card-title">Newly Listed Projects</h2>
+            <p class="card-subtitle">Fresh entries added during this weekly comparison window.</p>
+          </div>
+          <div class="card-count">28 projects</div>
+        </div>
+        <div class="card-body">
+          
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/openui/">OpenUI</a>
+              <span class="sub">UI &amp; App Builders &middot; HVTrust 83.6</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/openhands/">OpenHands</a>
+              <span class="sub">Coding Agents &middot; HVTrust 76.0</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/deep-agents/">Deep Agents</a>
+              <span class="sub">Agent Frameworks &middot; HVTrust 75.6</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/vellum-assistant/">Vellum Assistant</a>
+              <span class="sub">Memory &amp; Knowledge &middot; HVTrust 65.8</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/roo-code/">Roo Code</a>
+              <span class="sub">Coding Agents &middot; HVTrust 65.3</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/insforge/">InsForge</a>
+              <span class="sub">Workflow Platforms &middot; HVTrust 63.1</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/beeai-framework/">BeeAI Framework</a>
+              <span class="sub">Agent Frameworks &middot; HVTrust 62.4</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/aider/">Aider</a>
+              <span class="sub">Coding Agents &middot; HVTrust 59.9</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/kimi-code/">Kimi Code</a>
+              <span class="sub">Coding Agents &middot; HVTrust 58.7</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/junie/">Junie</a>
+              <span class="sub">Coding Agents &middot; HVTrust 56.0</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/agent-s/">Agent-S</a>
+              <span class="sub">Browser &amp; Computer Use &middot; HVTrust 51.9</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/auto-deep-researcher-24x7/">auto-deep-researcher-24x7</a>
+              <span class="sub">Research &amp; Data &middot; HVTrust 50.6</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/metagpt/">MetaGPT</a>
+              <span class="sub">Multi-Agent Systems &middot; HVTrust 45.3</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/molmoweb/">MolmoWeb</a>
+              <span class="sub">Browser &amp; Computer Use &middot; HVTrust 38.7</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/mindsearch/">MindSearch</a>
+              <span class="sub">Research &amp; Data &middot; HVTrust 38.4</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/swe-agent/">SWE-agent</a>
+              <span class="sub">Coding Agents &middot; HVTrust 38.2</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/lagent/">Lagent</a>
+              <span class="sub">Agent Frameworks &middot; HVTrust 31.7</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/mcp-agent/">mcp-agent</a>
+              <span class="sub">Agent Frameworks &middot; HVTrust 26.8</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/supervision/">Supervision</a>
+              <span class="sub">Needs review &middot; HVTrust 26.3</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/turbovec/">Turbovec</a>
+              <span class="sub">Needs review &middot; HVTrust 24.9</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/engram/">Engram</a>
+              <span class="sub">Needs review &middot; HVTrust 24.1</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/obsidian-second-brain/">Obsidian Second Brain</a>
+              <span class="sub">Needs review &middot; HVTrust 23.9</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/hivemind/">Hivemind</a>
+              <span class="sub">Needs review &middot; HVTrust 23.7</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/tencentdb-agent-memory/">TencentDB Agent Memory</a>
+              <span class="sub">Needs review &middot; HVTrust 23.7</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/asm/">ASM</a>
+              <span class="sub">Needs review &middot; HVTrust 22.9</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/hyperagent/">HyperAgent</a>
+              <span class="sub">Needs review &middot; HVTrust 19.7</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/ai-town/">AI Town</a>
+              <span class="sub">Needs review &middot; HVTrust 18.4</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/clawwork/">ClawWork</a>
+              <span class="sub">Needs review &middot; HVTrust 17.8</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          
+          
+        </div>
+      </article>
 
-    <h2>Trust Score Down (7)</h2>
-    <div class="section-panel">
-      
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/bernstein/">Bernstein</a>
-          <span class="sub">62.4 &rarr; 51.2</span>
-        </span>
-        <span class="delta delta-down">-11.2</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/openmanus/">OpenManus</a>
-          <span class="sub">24.3 &rarr; 17.9</span>
-        </span>
-        <span class="delta delta-down">-6.4</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/gpt-researcher/">GPT Researcher</a>
-          <span class="sub">70.0 &rarr; 65.8</span>
-        </span>
-        <span class="delta delta-down">-4.2</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/ufo/">UFO</a>
-          <span class="sub">59.0 &rarr; 55.3</span>
-        </span>
-        <span class="delta delta-down">-3.7</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/trulens/">TruLens</a>
-          <span class="sub">42.1 &rarr; 38.9</span>
-        </span>
-        <span class="delta delta-down">-3.2</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/copilotkit/">CopilotKit</a>
-          <span class="sub">76.0 &rarr; 73.0</span>
-        </span>
-        <span class="delta delta-down">-3.0</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/model-context-protocol-mcp/">Model Context Protocol / MCP</a>
-          <span class="sub">65.0 &rarr; 62.0</span>
-        </span>
-        <span class="delta delta-down">-3.0</span>
-      </div>
-      
-      
-    </div>
+      <article class="changes-card">
+        <div class="card-head">
+          <div class="card-title-wrap">
+            <div class="card-kicker">Trust Movement</div>
+            <h2 class="card-title">Trust Score Up</h2>
+            <p class="card-subtitle">Projects with material positive movement.</p>
+          </div>
+          <div class="card-count">15 moves</div>
+        </div>
+        <div class="card-body">
+          
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/agency-agents/">Agency Agents</a>
+              <span class="sub">27.1 &rarr; 65.0</span>
+            </span>
+            <span class="delta delta-up">+37.9</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/agentmemory/">agentmemory</a>
+              <span class="sub">39.8 &rarr; 71.2</span>
+            </span>
+            <span class="delta delta-up">+31.4</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/codewhale/">CodeWhale</a>
+              <span class="sub">37.6 &rarr; 67.9</span>
+            </span>
+            <span class="delta delta-up">+30.3</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/openhuman/">OpenHuman</a>
+              <span class="sub">36.9 &rarr; 65.8</span>
+            </span>
+            <span class="delta delta-up">+28.9</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/superpowers/">Superpowers</a>
+              <span class="sub">32.7 &rarr; 59.2</span>
+            </span>
+            <span class="delta delta-up">+26.5</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/pyod/">Pyod</a>
+              <span class="sub">39.3 &rarr; 61.7</span>
+            </span>
+            <span class="delta delta-up">+22.4</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/antigravity-cli/">Antigravity CLI</a>
+              <span class="sub">16.4 &rarr; 37.4</span>
+            </span>
+            <span class="delta delta-up">+21.0</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/ecc/">ECC</a>
+              <span class="sub">73.0 &rarr; 87.4</span>
+            </span>
+            <span class="delta delta-up">+14.4</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/agentlite/">AgentLite</a>
+              <span class="sub">35.0 &rarr; 48.1</span>
+            </span>
+            <span class="delta delta-up">+13.1</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/headroom/">Headroom</a>
+              <span class="sub">72.8 &rarr; 85.0</span>
+            </span>
+            <span class="delta delta-up">+12.2</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/hermes-agent/">Hermes Agent</a>
+              <span class="sub">74.5 &rarr; 86.0</span>
+            </span>
+            <span class="delta delta-up">+11.5</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/cli-anything/">CLI-Anything</a>
+              <span class="sub">70.9 &rarr; 80.0</span>
+            </span>
+            <span class="delta delta-up">+9.1</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/sotopia-agents/">Sotopia agents</a>
+              <span class="sub">43.5 &rarr; 51.9</span>
+            </span>
+            <span class="delta delta-up">+8.4</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/agency-swarm/">Agency Swarm</a>
+              <span class="sub">61.2 &rarr; 65.7</span>
+            </span>
+            <span class="delta delta-up">+4.5</span>
+          </div>
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/odysseus/">Odysseus</a>
+              <span class="sub">63.7 &rarr; 67.7</span>
+            </span>
+            <span class="delta delta-up">+4.0</span>
+          </div>
+          
+          
+        </div>
+      </article>
 
-    <h2>Provenance Gained (8)</h2>
-    <div class="section-panel">
-      
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/ecc/">ECC</a>
-          <span class="sub">Coding Agents</span>
-        </span>
-        <span class="delta delta-up">+prov</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/qwen-code/">Qwen Code</a>
-          <span class="sub">Coding Agents</span>
-        </span>
-        <span class="delta delta-up">+prov</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/hermes-agent/">Hermes Agent</a>
-          <span class="sub">Coding Agents</span>
-        </span>
-        <span class="delta delta-up">+prov</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/openclaw/">OpenClaw</a>
-          <span class="sub">Browser &amp; Computer Use</span>
-        </span>
-        <span class="delta delta-up">+prov</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/langwatch/">LangWatch</a>
-          <span class="sub">Observability &amp; Evaluation</span>
-        </span>
-        <span class="delta delta-up">+prov</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/wrenai/">WrenAI</a>
-          <span class="sub">Research &amp; Data</span>
-        </span>
-        <span class="delta delta-up">+prov</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/guardrails-ai/">Guardrails AI</a>
-          <span class="sub">Security &amp; Guardrails</span>
-        </span>
-        <span class="delta delta-up">+prov</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/bernstein/">Bernstein</a>
-          <span class="sub">Coding Agents</span>
-        </span>
-        <span class="delta delta-up">+prov</span>
-      </div>
-      
-      
-    </div>
+      <article class="changes-card">
+        <div class="card-head">
+          <div class="card-title-wrap">
+            <div class="card-kicker">Trust Movement</div>
+            <h2 class="card-title">Trust Score Down</h2>
+            <p class="card-subtitle">Projects with material negative movement.</p>
+          </div>
+          <div class="card-count">1 moves</div>
+        </div>
+        <div class="card-body">
+          
+          
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/trulens/">TruLens</a>
+              <span class="sub">42.0 &rarr; 38.9</span>
+            </span>
+            <span class="delta delta-down">-3.1</span>
+          </div>
+          
+          
+        </div>
+      </article>
 
-    <h2>MCP Support Gained (112)</h2>
-    <div class="section-panel">
-      
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/haystack/">Haystack</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/vercel-ai-sdk/">Vercel AI SDK</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/codex/">Codex</a>
-          <span class="sub">Coding Agents &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/n8n/">n8n</a>
-          <span class="sub">Workflow Platforms &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/cline/">Cline</a>
-          <span class="sub">Coding Agents &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/openai-agents-sdk/">OpenAI Agents SDK</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/pydanticai/">PydanticAI</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/livekit-agents/">LiveKit Agents</a>
-          <span class="sub">Voice &amp; Conversational &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/mlflow/">MLflow</a>
-          <span class="sub">Observability &amp; Evaluation &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/trigger-dev/">Trigger.dev</a>
-          <span class="sub">Workflow Platforms &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/strands-agents/">Strands Agents</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/skyvern/">Skyvern</a>
-          <span class="sub">Browser &amp; Computer Use &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/ecc/">ECC</a>
-          <span class="sub">Coding Agents &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/mem0/">Mem0</a>
-          <span class="sub">Memory &amp; Knowledge &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/qwen-code/">Qwen Code</a>
-          <span class="sub">Coding Agents &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/docling/">Docling</a>
-          <span class="sub">Research &amp; Data &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/stagehand/">Stagehand</a>
-          <span class="sub">Browser &amp; Computer Use &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/hermes-agent/">Hermes Agent</a>
-          <span class="sub">Coding Agents &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/headroom/">Headroom</a>
-          <span class="sub">LLM Gateways &amp; Infra &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/openclaw/">OpenClaw</a>
-          <span class="sub">Browser &amp; Computer Use &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/weights-biases-weave/">Weights &amp; Biases Weave</a>
-          <span class="sub">Observability &amp; Evaluation &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/langwatch/">LangWatch</a>
-          <span class="sub">Observability &amp; Evaluation &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/crewai/">CrewAI</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/vllm/">vLLM</a>
-          <span class="sub">LLM Gateways &amp; Infra &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/graphiti/">Graphiti</a>
-          <span class="sub">Memory &amp; Knowledge &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/autogen/">AutoGen</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/dify/">Dify</a>
-          <span class="sub">Workflow Platforms &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/langfuse/">Langfuse</a>
-          <span class="sub">Observability &amp; Evaluation &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/litellm/">LiteLLM</a>
-          <span class="sub">LLM Gateways &amp; Infra &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/promptfoo/">Promptfoo</a>
-          <span class="sub">Observability &amp; Evaluation &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/arize-phoenix/">Arize Phoenix</a>
-          <span class="sub">Observability &amp; Evaluation &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/weaviate/">Weaviate</a>
-          <span class="sub">Memory &amp; Knowledge &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/dspy/">DSPy</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/ragflow/">RAGFlow</a>
-          <span class="sub">Memory &amp; Knowledge &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/flowise/">Flowise</a>
-          <span class="sub">Workflow Platforms &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/gemini-cli/">Gemini CLI</a>
-          <span class="sub">Coding Agents &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/librechat/">LibreChat</a>
-          <span class="sub">UI &amp; App Builders &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/microsoft-agent-framework/">Microsoft Agent Framework</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/agno/">Agno</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/copilotkit/">CopilotKit</a>
-          <span class="sub">UI &amp; App Builders &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/goose/">Goose</a>
-          <span class="sub">Coding Agents &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/e2b/">E2B</a>
-          <span class="sub">Sandboxes &amp; Runtimes &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/langflow/">Langflow</a>
-          <span class="sub">Workflow Platforms &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/agent-governance-toolkit/">Agent Governance Toolkit</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/agentmemory/">agentmemory</a>
-          <span class="sub">Memory &amp; Knowledge &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/composio/">Composio</a>
-          <span class="sub">Protocols &amp; Tool Integration &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/deerflow/">DeerFlow</a>
-          <span class="sub">Research &amp; Data &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/semantic-kernel/">Semantic Kernel</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/google-adk-python/">Google ADK (Python)</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/google-genkit/">Google Genkit</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/smolagents/">smolagents</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/browser-use/">Browser Use</a>
-          <span class="sub">Browser &amp; Computer Use &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/camel/">CAMEL</a>
-          <span class="sub">Multi-Agent Systems &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/autogpt/">AutoGPT</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/gptme/">GPTMe</a>
-          <span class="sub">Coding Agents &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/codewhale/">CodeWhale</a>
-          <span class="sub">Coding Agents &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/odysseus/">Odysseus</a>
-          <span class="sub">UI &amp; App Builders &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/cognee/">Cognee</a>
-          <span class="sub">Memory &amp; Knowledge &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/1panel/">1Panel</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/neo/">Neo</a>
-          <span class="sub">UI &amp; App Builders &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/holmesgpt/">Holmesgpt</a>
-          <span class="sub">Observability &amp; Evaluation &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/deepeval/">DeepEval</a>
-          <span class="sub">Observability &amp; Evaluation &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/openhuman/">OpenHuman</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/agency-swarm/">Agency Swarm</a>
-          <span class="sub">Multi-Agent Systems &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/gpt-researcher/">GPT Researcher</a>
-          <span class="sub">Research &amp; Data &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/portkey-ai-gateway/">Portkey AI Gateway</a>
-          <span class="sub">LLM Gateways &amp; Infra &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/jan/">Jan</a>
-          <span class="sub">LLM Gateways &amp; Infra &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/crawl4ai/">Crawl4AI</a>
-          <span class="sub">Research &amp; Data &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/mcp-registry/">MCP Registry</a>
-          <span class="sub">Protocols &amp; Tool Integration &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/agency-agents/">Agency Agents</a>
-          <span class="sub">Multi-Agent Systems &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/airbyte/">Airbyte</a>
-          <span class="sub">Workflow Platforms &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/kilo-code/">Kilo Code</a>
-          <span class="sub">Coding Agents &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/cua/">Cua</a>
-          <span class="sub">Browser &amp; Computer Use &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/voltagent/">VoltAgent</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/bee-agent-framework/">Bee Agent Framework</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/marvin/">Marvin</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/model-context-protocol-mcp/">Model Context Protocol / MCP</a>
-          <span class="sub">Protocols &amp; Tool Integration &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/pyod/">Pyod</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/helicone/">Helicone</a>
-          <span class="sub">Observability &amp; Evaluation &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/spring-ai-alibaba/">Spring AI Alibaba</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/txtai/">txtai</a>
-          <span class="sub">Memory &amp; Knowledge &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/langroid/">Langroid</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/maxun/">Maxun</a>
-          <span class="sub">Research &amp; Data &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/ui-tars-desktop/">UI-TARS Desktop</a>
-          <span class="sub">Browser &amp; Computer Use &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/atomic-agents/">Atomic Agents</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/browsergym-agents/">BrowserGym agents</a>
-          <span class="sub">Browser &amp; Computer Use &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/github-copilot-cli/">GitHub Copilot CLI</a>
-          <span class="sub">Coding Agents &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/chatdev/">ChatDev</a>
-          <span class="sub">Multi-Agent Systems &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/ufo/">UFO</a>
-          <span class="sub">Browser &amp; Computer Use &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/letta/">Letta</a>
-          <span class="sub">Memory &amp; Knowledge &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/coze-studio/">Coze Studio</a>
-          <span class="sub">Workflow Platforms &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/qwen-agent/">Qwen Agent</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/bernstein/">Bernstein</a>
-          <span class="sub">Coding Agents &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/superagent/">Superagent</a>
-          <span class="sub">Workflow Platforms &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/crewai-tools/">CrewAI tools</a>
-          <span class="sub">Protocols &amp; Tool Integration &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/mastra/">Mastra</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/anythingllm/">AnythingLLM</a>
-          <span class="sub">Memory &amp; Knowledge &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/llamaindex/">LlamaIndex</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/opencode/">opencode</a>
-          <span class="sub">Coding Agents &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/opik/">Opik</a>
-          <span class="sub">Observability &amp; Evaluation &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/daytona/">Daytona</a>
-          <span class="sub">Sandboxes &amp; Runtimes &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/ra-aid/">RA.Aid</a>
-          <span class="sub">Coding Agents &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/activepieces/">Activepieces</a>
-          <span class="sub">Workflow Platforms &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/agenta/">Agenta</a>
-          <span class="sub">Observability &amp; Evaluation &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/trulens/">TruLens</a>
-          <span class="sub">Observability &amp; Evaluation &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/praisonai/">PraisonAI</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/eliza/">Eliza</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/localai/">LocalAI</a>
-          <span class="sub">LLM Gateways &amp; Infra &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/continue/">Continue</a>
-          <span class="sub">Coding Agents &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/agentops/">AgentOps</a>
-          <span class="sub">Observability &amp; Evaluation &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/ailice/">AIlice</a>
-          <span class="sub">Agent Frameworks &middot; implemented</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/openmanus/">OpenManus</a>
-          <span class="sub">Agent Frameworks &middot; declared</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      
-      
-    </div>
+      <article class="changes-card">
+        <div class="card-head">
+          <div class="card-title-wrap">
+            <div class="card-kicker">Identity</div>
+            <h2 class="card-title">Provenance Gained</h2>
+            <p class="card-subtitle">Projects that added stronger identity signals.</p>
+          </div>
+          <div class="card-count">0 updates</div>
+        </div>
+        <div class="card-body">
+          
+          <div class="empty">No provenance changes this period.</div>
+          
+        </div>
+      </article>
+
+      <article class="changes-card">
+        <div class="card-head">
+          <div class="card-title-wrap">
+            <div class="card-kicker">Capability</div>
+            <h2 class="card-title">MCP Support Gained</h2>
+            <p class="card-subtitle">Projects that added model-context-protocol support.</p>
+          </div>
+          <div class="card-count">0 updates</div>
+        </div>
+        <div class="card-body">
+          
+          <div class="empty">No MCP status changes this period.</div>
+          
+        </div>
+      </article>
+    </section>
 
     <footer>
       <a href="/changes/feed.xml">RSS Feed</a>
       <span class="footer-sep">&middot;</span>
-      <a href="/methodology">Methodology</a>
+      <a href="/methodology/">Methodology</a>
       <span class="footer-sep">&middot;</span>
       <a href="/data/">Data API</a>
       <span class="footer-sep">&middot;</span>
