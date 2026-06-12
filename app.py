@@ -146,6 +146,7 @@ _DYNAMIC_SLASH_PATHS = {
     "/submit",
     "/use-cases",
 }
+_HEALTHCHECK_PATHS = {"/healthz", "/healthz/"}
 
 
 def _external_scheme(request: Request) -> str:
@@ -206,12 +207,13 @@ def _canonical_redirect_target(request: Request) -> str | None:
 
 @app.middleware("http")
 async def _cache_headers(request, call_next):
-    redirect_target = _canonical_redirect_target(request)
-    if redirect_target is not None:
-        return RedirectResponse(redirect_target, status_code=301)
+    path = request.url.path
+    if path not in _HEALTHCHECK_PATHS:
+        redirect_target = _canonical_redirect_target(request)
+        if redirect_target is not None:
+            return RedirectResponse(redirect_target, status_code=301)
 
     response = await call_next(request)
-    path = request.url.path
 
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
@@ -439,6 +441,7 @@ def find_agent_by_slug(slug: str) -> dict | None:
 # ---- JSON API ------------------------------------------------------------
 
 @app.api_route("/healthz", methods=["GET", "HEAD"])
+@app.api_route("/healthz/", methods=["GET", "HEAD"])
 def healthz():
     d = load_data()
     source_fingerprint = _compute_render_fingerprint()
