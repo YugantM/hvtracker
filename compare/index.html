@@ -19,7 +19,7 @@
   </script>
   <script defer src="/analytics.js"></script>
   <script defer src="/static/site-status.js"></script>
-  <link rel="stylesheet" href="/static/site.css">
+  <link rel="stylesheet" href="/static/site.css?v=4cb10213">
   <style>
     :root {
       --bg:#f4f1eb;--surface:#eae6de;--border:#d4cfc5;
@@ -375,18 +375,6 @@
       font-size: 13px;
       line-height: 1.7;
     }
-    .grade-badge {
-      display: inline-flex;
-      width: fit-content;
-      padding: 4px 10px;
-      font-size: 12px;
-      font-weight: 700;
-      font-family: var(--mono);
-    }
-    .grade-A { color: var(--green); }
-    .grade-B { color: var(--accent); }
-    .grade-C { color: var(--amber); }
-    .grade-D { color: var(--muted); }
     .matrix-panel,
     .notes-panel {
       padding: 18px;
@@ -421,22 +409,41 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
+    .matrix-table thead th:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 3;
+      background: var(--surface);
+    }
     .matrix-table thead th:first-child,
     .matrix-table tbody th {
       text-align: left;
     }
     .matrix-table tbody th {
+      position: sticky;
+      left: 0;
+      z-index: 2;
       width: 240px;
       font-size: 12px;
       font-weight: 600;
       color: var(--text);
-      background: rgba(0,0,0,0.02);
+      background: color-mix(in srgb, var(--surface) 72%, white);
+      box-shadow: 1px 0 0 rgba(0,0,0,0.05);
     }
     .matrix-table td {
       text-align: center;
       font-size: 12px;
       font-family: var(--mono);
       color: var(--text);
+      background: var(--tile-bg, transparent);
+      box-shadow: inset 0 0 0 var(--tile-border-width, 0px) var(--tile-border, transparent);
+      transition: background-color 120ms ease, box-shadow 120ms ease;
+    }
+    .matrix-table tbody tr:hover td {
+      background-color: rgba(255,255,255,0.18);
+    }
+    .matrix-table tbody tr:hover th {
+      background: color-mix(in srgb, var(--surface) 84%, white);
     }
     .matrix-section th {
       background: var(--surface) !important;
@@ -461,6 +468,21 @@
       letter-spacing: normal;
       margin-bottom: 3px;
     }
+    .agent-col-head {
+      position: relative;
+      padding-top: 10px;
+      text-align: left;
+    }
+    .agent-col-head::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--agent-color, var(--border));
+      border-radius: 999px;
+    }
     .agent-col-head span {
       color: var(--muted);
       font-size: 10px;
@@ -474,14 +496,24 @@
       font-family: var(--mono);
       margin-top: 3px;
     }
+    .cell-stack {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .cell-value {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      transition: color 120ms ease;
+    }
     .cell-win {
       color: var(--green) !important;
       font-weight: 700;
     }
-    .cell-tie {
-      color: var(--amber) !important;
-      font-weight: 700;
-    }
+    .cell-tie { color: var(--text) !important; font-weight: 700; }
     .cell-muted { color: var(--muted) !important; }
     .cell-badge {
       display:inline-flex;
@@ -678,7 +710,7 @@
         <a href="/movers/">Movers</a>
         <a href="/changes/">Changes</a>
         <a href="/use-cases/">Use cases</a>
-        <a href="/methodology">Methodology</a>
+        <a href="/methodology/">Methodology</a>
         <a href="/score-lab/">Score lab</a>
         <a href="/compare/">Compare</a>
         <a href="/alerts/">Alerts</a>
@@ -744,7 +776,7 @@
     <section class="matrix-panel" id="matrixPanel">
       <div class="section-head">
         <h2>Comparison matrix</h2>
-        <p>Compact side-by-side scoring. Green cells indicate the current leader for that metric. For ranks and freshness, lower is better.</p>
+        <p>Compact side-by-side scoring. Winning cells use stronger background and border emphasis when the gap is more meaningful. For ranks and freshness, lower is better.</p>
       </div>
       <div class="matrix-wrap" id="matrixWrap"></div>
     </section>
@@ -771,7 +803,7 @@
     </div>
 
     <footer>
-      <a href="/methodology">Methodology</a>
+      <a href="/methodology/">Methodology</a>
       <span class="footer-sep">&middot;</span>
       <a href="/spec/">Specifications</a>
       <span class="footer-sep">&middot;</span>
@@ -809,6 +841,49 @@
     function agentColor(agent) {
       const index = selected.findIndex((entry) => entry.repo === agent.repo);
       return agentPalette[index] || "#6b6560";
+    }
+
+    function alphaColor(hex, alpha) {
+      if (typeof hex !== "string") return `rgba(107, 101, 96, ${alpha})`;
+      const value = hex.replace("#", "");
+      if (value.length !== 6) return `rgba(107, 101, 96, ${alpha})`;
+      const r = Number.parseInt(value.slice(0, 2), 16);
+      const g = Number.parseInt(value.slice(2, 4), 16);
+      const b = Number.parseInt(value.slice(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function highlightStrength(entries, winners, higherBetter, options = {}) {
+      if (!winners || winners.size !== 1) return new Map();
+      const strengthByRepo = new Map();
+
+      if (options.booleanMetric) {
+        winners.forEach((repo) => strengthByRepo.set(repo, 0.55));
+        return strengthByRepo;
+      }
+
+      const valid = entries
+        .filter((entry) => entry.value != null && Number.isFinite(Number(entry.value)))
+        .map((entry) => ({ ...entry, value: Number(entry.value) }));
+      if (!valid.length) return strengthByRepo;
+
+      const ordered = valid.slice().sort((a, b) => higherBetter ? b.value - a.value : a.value - b.value);
+      const best = ordered[0];
+      const runnerUp = ordered[1];
+      if (!best || !winners.has(best.agent.repo)) return strengthByRepo;
+      if (!runnerUp) {
+        strengthByRepo.set(best.agent.repo, 0.35);
+        return strengthByRepo;
+      }
+
+      const rawGap = higherBetter ? (best.value - runnerUp.value) : (runnerUp.value - best.value);
+      if (!(rawGap > 0)) return strengthByRepo;
+
+      const scale = Math.max(Math.abs(best.value), Math.abs(runnerUp.value), 1);
+      const relativeGap = rawGap / scale;
+      const strength = Math.max(0.12, Math.min(0.82, relativeGap * 3.8));
+      strengthByRepo.set(best.agent.repo, strength);
+      return strengthByRepo;
     }
 
     function loadWatchlist() {
@@ -1217,7 +1292,7 @@
       report.classList.add("visible");
     }
     function formatGrade(grade) {
-      return `<span class="grade-badge grade-${escapeHtml(grade || "D")}">Grade ${escapeHtml(grade || "D")}</span>`;
+      return `<span class="badge grade-${escapeHtml(grade || "D")}" title="Grade ${escapeHtml(grade || "D")}">Grade ${escapeHtml(grade || "D")}</span>`;
     }
 
     function renderCell(value, options = {}) {
@@ -1234,13 +1309,20 @@
       if (options.booleanMetric) winners = bestBoolean(entries);
       else if (options.customWinner) winners = options.customWinner(entries);
       else winners = bestNumeric(entries, higherBetter);
+      const strengths = highlightStrength(entries, winners, higherBetter, options);
       const tie = winners.size > 1;
       return `<tr>
         <th>${escapeHtml(label)}${help ? `<span class="metric-help">${escapeHtml(help)}</span>` : ""}</th>
         ${entries.map((entry) => {
           const won = winners.has(entry.agent.repo);
           const classes = [won ? (tie ? "cell-tie" : "cell-win") : "", entry.value == null ? "cell-muted" : ""].filter(Boolean).join(" ");
-          return `<td class="${classes}">${renderCell(formatter(entry.value, entry.agent), options)}</td>`;
+          const strength = strengths.get(entry.agent.repo) || 0;
+          const style = won && !tie
+            ? `--tile-bg:${alphaColor("#2f6846", 0.06 + (strength * 0.18))};--tile-border:${alphaColor("#2f6846", 0.24 + (strength * 0.38))};--tile-border-width:${1 + Math.round(strength * 2)}px;`
+            : tie
+              ? `--tile-bg:${alphaColor("#8b6914", 0.05)};--tile-border:${alphaColor("#8b6914", 0.22)};--tile-border-width:1px;`
+              : "";
+          return `<td class="${classes}" style="${style}"><div class="cell-stack"><span class="cell-value">${renderCell(formatter(entry.value, entry.agent), options)}</span></div></td>`;
         }).join("")}
       </tr>`;
     }
@@ -1293,7 +1375,7 @@
         <thead>
           <tr>
             <th>Feature</th>
-            ${selected.map((agent) => `<th><div class="agent-col-head"><strong><a href="/agents/${agent.slug}">${escapeHtml(agent.name)}</a></strong><span>${escapeHtml(agent.repo)}</span></div></th>`).join("")}
+            ${selected.map((agent) => `<th style="--agent-color:${agentColor(agent)}"><div class="agent-col-head"><strong><a href="/agents/${agent.slug}">${escapeHtml(agent.name)}</a></strong><span>${escapeHtml(agent.repo)}</span></div></th>`).join("")}
           </tr>
         </thead>
         <tbody>${rows.join("")}</tbody>
