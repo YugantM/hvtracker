@@ -26,23 +26,57 @@
     :root{--paper:#f4f1eb;--paper-2:#ece4d6;--ink:#1f1b17;--muted:#6f665d;--line:#d5cbbc;--line-strong:#b9aa96;--blue:#a7bfd9;--blue-strong:#7f9cbd;--blue-soft:rgba(167,191,217,.18);--lobster:#c67c6d;--lobster-soft:rgba(198,124,109,.14);--moss:#6f876e;--green:#2f6846;--red:#9b3c3c;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}
     body{min-height:100vh;background:var(--paper);background-image:url("/hex-bg.svg");background-size:2000px 2000px;color:var(--ink);font:15px/1.65 var(--font-sans)}
     a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}
-    .page{background:var(--paper);max-width:960px;margin:0 auto;padding:24px 24px 40px}
+    .page{background:var(--paper);max-width:1180px;margin:0 auto;padding:24px 24px 48px}
     .logo{font-family:var(--font-mono);font-weight:700;font-size:20px}.logo span{color:var(--lobster)}
-    .hero{padding:24px 0 16px;border-bottom:1px solid var(--line)}
-    h1{font-size:26px;font-weight:700;margin-bottom:6px}.hero p{color:var(--muted);font-size:14px;max-width:680px}
-    .meta{font:11px var(--font-mono);color:var(--muted);margin-top:10px}
-    h2{font-size:16px;font-weight:700;margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
-    .section-panel{background:var(--paper-2);border-top:2px solid var(--line-strong);padding:12px;margin-bottom:16px}
-    .change-item{display:grid;grid-template-columns:minmax(0,1fr) 80px;gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line)}
+    .hero{padding:26px 0 22px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);gap:18px;align-items:end}
+    h1{font-size:34px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px}.hero p{color:var(--muted);font-size:15px;max-width:720px}
+    .meta{font:11px var(--font-mono);color:var(--muted);margin-top:14px}
+    .hero-panel{background:linear-gradient(180deg,var(--paper-2),rgba(236,228,214,.55));border:1px solid var(--line);border-top:2px solid var(--line-strong);padding:16px 18px}
+    .hero-panel-title{font:11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+    .hero-panel-copy{font-size:14px;line-height:1.6;color:var(--ink)}
+    .hero-panel-copy strong{color:var(--green)}
+    .summary-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:22px 0 28px}
+    .summary-card{background:rgba(255,255,255,.28);border:1px solid var(--line);border-top:2px solid var(--line-strong);padding:14px 14px 12px;min-height:92px}
+    .summary-label{font:10px var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .summary-value{font-size:28px;line-height:1;font-weight:700;letter-spacing:-.04em;margin:10px 0 6px}
+    .summary-note{font:11px var(--font-mono);color:var(--muted)}
+    .summary-card.up .summary-value,.summary-card.prov .summary-value,.summary-card.mcp .summary-value{color:var(--green)}
+    .summary-card.down .summary-value{color:var(--lobster)}
+    .changes-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .changes-card{background:rgba(255,255,255,.24);border:1px solid var(--line);border-top:2px solid var(--line-strong);display:flex;flex-direction:column;min-height:100%}
+    .changes-card.span-2{grid-column:span 2}
+    .card-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:16px 18px 14px;border-bottom:1px solid var(--line)}
+    .card-title-wrap{display:grid;gap:4px}
+    .card-kicker{font:10px var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .card-title{font-size:18px;font-weight:700;line-height:1.1}
+    .card-subtitle{color:var(--muted);font-size:13px}
+    .card-count{font:600 12px var(--font-mono);padding:7px 10px;border:1px solid var(--line);background:var(--paper-2);color:var(--muted);white-space:nowrap}
+    .card-body{padding:6px 18px 10px}
+    .changes-card.span-2 .card-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px}
+    .change-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;padding:13px 0;border-bottom:1px solid rgba(185,170,150,.65)}
     .change-item:last-child{border-bottom:none}
-    .name{font-weight:600;font-size:13px}
-    .sub{display:block;color:var(--muted);font:11px var(--font-mono);margin-top:2px}
-    .delta{font:700 13px var(--font-mono);text-align:right}
+    .name{font-weight:600;font-size:14px;line-height:1.3}
+    .sub{display:block;color:var(--muted);font:11px var(--font-mono);margin-top:4px}
+    .delta{font:700 12px var(--font-mono);text-align:right;padding-top:2px}
     .delta-up{color:var(--green)}.delta-down{color:var(--lobster)}
-    .empty{color:var(--muted);font-style:italic;padding:12px 0}
+    .empty{color:var(--muted);font-style:italic;padding:14px 0 10px}
     footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font:11px var(--font-mono);color:var(--muted);text-align:center}
     footer a{color:var(--blue-strong)}
-    @media(max-width:760px){h1{font-size:18px}}
+    @media(max-width:960px){
+      .hero{grid-template-columns:1fr}
+      .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .changes-grid{grid-template-columns:1fr}
+      .changes-card.span-2{grid-column:auto}
+      .changes-card.span-2 .card-body{display:block}
+    }
+    @media(max-width:640px){
+      .page{padding:18px 16px 34px}
+      h1{font-size:24px}
+      .summary-grid{grid-template-columns:1fr}
+      .card-head{align-items:start;flex-direction:column}
+      .change-item{grid-template-columns:minmax(0,1fr)}
+      .delta{text-align:left}
+    }
   </style>
   <script type="application/ld+json">
   {
@@ -72,95 +106,179 @@
   <div class="page">
 
     <section class="hero">
-      <h1>Weekly Changes</h1>
-      <p>What moved in the HVTracker registry over the past week: new listings, trust-score shifts, provenance and MCP status changes.</p>
-      <div class="meta">{{ latest_date }} vs {{ baseline_date }} &middot; Updated {{ updated }}</div>
+      <div>
+        <h1>Weekly Changes</h1>
+        <p>What moved in the HVTracker registry over the past week: new listings, trust-score shifts, provenance and MCP status changes.</p>
+        <div class="meta">{{ latest_date }} vs {{ baseline_date }} &middot; Updated {{ updated }}</div>
+      </div>
+      <aside class="hero-panel">
+        <div class="hero-panel-title">Change Window</div>
+        <div class="hero-panel-copy">
+          This view highlights <strong>{{ newly_listed|length + trust_up|length + trust_down|length + provenance_gained|length + mcp_gained|length }}</strong>
+          notable registry updates across launches, trust movement, and capability signals.
+        </div>
+      </aside>
     </section>
 
-    <h2>Newly Listed Projects ({{ newly_listed|length }})</h2>
-    <div class="section-panel">
-      {% if newly_listed %}
-      {% for item in newly_listed %}
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
-          <span class="sub">{{ item.category }} &middot; HVTrust {{ item.trust_score }}</span>
-        </span>
-        <span class="delta">NEW</span>
+    <section class="summary-grid" aria-label="Weekly change summary">
+      <div class="summary-card">
+        <div class="summary-label">New Listings</div>
+        <div class="summary-value">{{ newly_listed|length }}</div>
+        <div class="summary-note">Fresh additions to the registry</div>
       </div>
-      {% endfor %}
-      {% else %}
-      <div class="empty">No new listings this period.</div>
-      {% endif %}
-    </div>
+      <div class="summary-card up">
+        <div class="summary-label">Trust Up</div>
+        <div class="summary-value">{{ trust_up|length }}</div>
+        <div class="summary-note">Score increases of 3+ points</div>
+      </div>
+      <div class="summary-card down">
+        <div class="summary-label">Trust Down</div>
+        <div class="summary-value">{{ trust_down|length }}</div>
+        <div class="summary-note">Score drops of 3+ points</div>
+      </div>
+      <div class="summary-card prov">
+        <div class="summary-label">Provenance Gained</div>
+        <div class="summary-value">{{ provenance_gained|length }}</div>
+        <div class="summary-note">Projects that added provenance</div>
+      </div>
+      <div class="summary-card mcp">
+        <div class="summary-label">MCP Gained</div>
+        <div class="summary-value">{{ mcp_gained|length }}</div>
+        <div class="summary-note">Projects that added MCP support</div>
+      </div>
+    </section>
 
-    <h2>Trust Score Up ({{ trust_up|length }})</h2>
-    <div class="section-panel">
-      {% if trust_up %}
-      {% for item in trust_up %}
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
-          <span class="sub">{{ item.old_score }} &rarr; {{ item.new_score }}</span>
-        </span>
-        <span class="delta delta-up">+{{ item.delta }}</span>
-      </div>
-      {% endfor %}
-      {% else %}
-      <div class="empty">No trust score increases &ge;3 this period.</div>
-      {% endif %}
-    </div>
+    <section class="changes-grid">
+      <article class="changes-card span-2">
+        <div class="card-head">
+          <div class="card-title-wrap">
+            <div class="card-kicker">Registry</div>
+            <h2 class="card-title">Newly Listed Projects</h2>
+            <p class="card-subtitle">Fresh entries added during this weekly comparison window.</p>
+          </div>
+          <div class="card-count">{{ newly_listed|length }} projects</div>
+        </div>
+        <div class="card-body">
+          {% if newly_listed %}
+          {% for item in newly_listed %}
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
+              <span class="sub">{{ item.category }} &middot; HVTrust {{ item.trust_score }}</span>
+            </span>
+            <span class="delta">NEW</span>
+          </div>
+          {% endfor %}
+          {% else %}
+          <div class="empty">No new listings this period.</div>
+          {% endif %}
+        </div>
+      </article>
 
-    <h2>Trust Score Down ({{ trust_down|length }})</h2>
-    <div class="section-panel">
-      {% if trust_down %}
-      {% for item in trust_down %}
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
-          <span class="sub">{{ item.old_score }} &rarr; {{ item.new_score }}</span>
-        </span>
-        <span class="delta delta-down">{{ item.delta }}</span>
-      </div>
-      {% endfor %}
-      {% else %}
-      <div class="empty">No trust score decreases &ge;3 this period.</div>
-      {% endif %}
-    </div>
+      <article class="changes-card">
+        <div class="card-head">
+          <div class="card-title-wrap">
+            <div class="card-kicker">Trust Movement</div>
+            <h2 class="card-title">Trust Score Up</h2>
+            <p class="card-subtitle">Projects with material positive movement.</p>
+          </div>
+          <div class="card-count">{{ trust_up|length }} moves</div>
+        </div>
+        <div class="card-body">
+          {% if trust_up %}
+          {% for item in trust_up %}
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
+              <span class="sub">{{ item.old_score }} &rarr; {{ item.new_score }}</span>
+            </span>
+            <span class="delta delta-up">+{{ item.delta }}</span>
+          </div>
+          {% endfor %}
+          {% else %}
+          <div class="empty">No trust score increases &ge;3 this period.</div>
+          {% endif %}
+        </div>
+      </article>
 
-    <h2>Provenance Gained ({{ provenance_gained|length }})</h2>
-    <div class="section-panel">
-      {% if provenance_gained %}
-      {% for item in provenance_gained %}
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
-          <span class="sub">{{ item.category }}</span>
-        </span>
-        <span class="delta delta-up">+prov</span>
-      </div>
-      {% endfor %}
-      {% else %}
-      <div class="empty">No provenance changes this period.</div>
-      {% endif %}
-    </div>
+      <article class="changes-card">
+        <div class="card-head">
+          <div class="card-title-wrap">
+            <div class="card-kicker">Trust Movement</div>
+            <h2 class="card-title">Trust Score Down</h2>
+            <p class="card-subtitle">Projects with material negative movement.</p>
+          </div>
+          <div class="card-count">{{ trust_down|length }} moves</div>
+        </div>
+        <div class="card-body">
+          {% if trust_down %}
+          {% for item in trust_down %}
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
+              <span class="sub">{{ item.old_score }} &rarr; {{ item.new_score }}</span>
+            </span>
+            <span class="delta delta-down">{{ item.delta }}</span>
+          </div>
+          {% endfor %}
+          {% else %}
+          <div class="empty">No trust score decreases &ge;3 this period.</div>
+          {% endif %}
+        </div>
+      </article>
 
-    <h2>MCP Support Gained ({{ mcp_gained|length }})</h2>
-    <div class="section-panel">
-      {% if mcp_gained %}
-      {% for item in mcp_gained %}
-      <div class="change-item">
-        <span>
-          <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
-          <span class="sub">{{ item.category }} &middot; {{ item.mcp_status }}</span>
-        </span>
-        <span class="delta delta-up">+mcp</span>
-      </div>
-      {% endfor %}
-      {% else %}
-      <div class="empty">No MCP status changes this period.</div>
-      {% endif %}
-    </div>
+      <article class="changes-card">
+        <div class="card-head">
+          <div class="card-title-wrap">
+            <div class="card-kicker">Identity</div>
+            <h2 class="card-title">Provenance Gained</h2>
+            <p class="card-subtitle">Projects that added stronger identity signals.</p>
+          </div>
+          <div class="card-count">{{ provenance_gained|length }} updates</div>
+        </div>
+        <div class="card-body">
+          {% if provenance_gained %}
+          {% for item in provenance_gained %}
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
+              <span class="sub">{{ item.category }}</span>
+            </span>
+            <span class="delta delta-up">+prov</span>
+          </div>
+          {% endfor %}
+          {% else %}
+          <div class="empty">No provenance changes this period.</div>
+          {% endif %}
+        </div>
+      </article>
+
+      <article class="changes-card">
+        <div class="card-head">
+          <div class="card-title-wrap">
+            <div class="card-kicker">Capability</div>
+            <h2 class="card-title">MCP Support Gained</h2>
+            <p class="card-subtitle">Projects that added model-context-protocol support.</p>
+          </div>
+          <div class="card-count">{{ mcp_gained|length }} updates</div>
+        </div>
+        <div class="card-body">
+          {% if mcp_gained %}
+          {% for item in mcp_gained %}
+          <div class="change-item">
+            <span>
+              <a class="name" href="/agents/{{ item.slug }}/">{{ item.name }}</a>
+              <span class="sub">{{ item.category }} &middot; {{ item.mcp_status }}</span>
+            </span>
+            <span class="delta delta-up">+mcp</span>
+          </div>
+          {% endfor %}
+          {% else %}
+          <div class="empty">No MCP status changes this period.</div>
+          {% endif %}
+        </div>
+      </article>
+    </section>
 
     <footer>
       <a href="/changes/feed.xml">RSS Feed</a>

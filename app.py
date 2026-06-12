@@ -17,7 +17,7 @@ from datetime import datetime, timezone, timedelta
 from html import escape
 
 from fastapi import FastAPI, Form, Request
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 import db
@@ -123,10 +123,93 @@ _CSP = (
     "script-src 'self' 'unsafe-inline'; "
     "img-src 'self' data:"
 )
+_CANONICAL_HOST = "hvtracker.net"
+_LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1"}
+_DYNAMIC_SLASH_PATHS = {
+    "/alerts",
+    "/badges",
+    "/blog",
+    "/changes",
+    "/changelog",
+    "/compare",
+    "/correct",
+    "/data",
+    "/data-api",
+    "/ecosystem",
+    "/movers",
+    "/methodology",
+    "/org",
+    "/roadmap",
+    "/score-lab",
+    "/spec",
+    "/sponsor",
+    "/submit",
+    "/use-cases",
+}
+
+
+def _external_scheme(request: Request) -> str:
+    cf_visitor = request.headers.get("cf-visitor")
+    if cf_visitor:
+        try:
+            scheme = json.loads(cf_visitor).get("scheme")
+            if scheme in {"http", "https"}:
+                return scheme
+        except (json.JSONDecodeError, TypeError, AttributeError):
+            pass
+    forwarded = request.headers.get("x-forwarded-proto", "")
+    if forwarded:
+        scheme = forwarded.split(",", 1)[0].strip().lower()
+        if scheme in {"http", "https"}:
+            return scheme
+    return request.url.scheme
+
+
+def _external_host(request: Request) -> str:
+    forwarded_host = request.headers.get("x-forwarded-host")
+    raw_host = forwarded_host.split(",", 1)[0].strip() if forwarded_host else request.headers.get("host", "")
+    return raw_host.split(":", 1)[0].lower()
+
+
+def _path_needs_trailing_slash(path: str) -> bool:
+    if path in ("", "/") or path.endswith("/"):
+        return False
+    if path.startswith("/spec/"):
+        parts = [part for part in path.split("/") if part]
+        if len(parts) >= 3:
+            return True
+    if "." in path.rsplit("/", 1)[-1]:
+        return False
+    if path in _DYNAMIC_SLASH_PATHS or path.startswith("/track/"):
+        return True
+    candidate = os.path.join(OUTPUT_DIR, path.lstrip("/"))
+    return os.path.isdir(candidate) and os.path.isfile(os.path.join(candidate, "index.html"))
+
+
+def _canonical_redirect_target(request: Request) -> str | None:
+    scheme = _external_scheme(request)
+    host = _external_host(request)
+    path = request.url.path or "/"
+    target_path = f"{path}/" if _path_needs_trailing_slash(path) else path
+    if host in _LOCAL_HOSTS:
+        if target_path == path:
+            return None
+        query = request.url.query
+        suffix = f"?{query}" if query else ""
+        return f"{request.url.scheme}://{request.headers.get('host', host)}{target_path}{suffix}"
+    if scheme == "https" and host == _CANONICAL_HOST and target_path == path:
+        return None
+    query = request.url.query
+    suffix = f"?{query}" if query else ""
+    return f"https://{_CANONICAL_HOST}{target_path}{suffix}"
 
 
 @app.middleware("http")
 async def _cache_headers(request, call_next):
+    redirect_target = _canonical_redirect_target(request)
+    if redirect_target is not None:
+        return RedirectResponse(redirect_target, status_code=301)
+
     response = await call_next(request)
     path = request.url.path
 
@@ -134,6 +217,8 @@ async def _cache_headers(request, call_next):
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
     response.headers["Content-Security-Policy-Report-Only"] = _CSP
+    if _external_scheme(request) == "https":
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
     if not path.startswith("/badge/"):
         response.headers["X-Frame-Options"] = "SAMEORIGIN"
 
@@ -502,6 +587,11 @@ def aipass_logo():
     return FileResponse(os.path.join(BASE_DIR, "aipass-logo.png"), media_type="image/png")
 
 
+@app.get("/composio-logo.svg")
+def composio_logo():
+    return FileResponse(os.path.join(BASE_DIR, "composio-logo.svg"), media_type="image/svg+xml")
+
+
 @app.get("/hex-bg.svg")
 def hex_bg():
     return FileResponse(os.path.join(BASE_DIR, "hex-bg.svg"), media_type="image/svg+xml")
@@ -757,6 +847,64 @@ def _interest_thanks(title: str, message: str, repo: str | None = None) -> HTMLR
             f"<div class='card'><p class='ok'>{escape(message)}</p><p>For now this is a human-reviewed queue, not an automated onboarding flow. That is intentional: it helps validate which alerts, exports, and sponsor offers are worth building first.</p></div><div class='actions'><a class='button' href='/'>Open leaderboard</a>{next_action}</div>",
             description=message,
         )
+    )
+
+
+def _queue_table_html(title: str, rows: list[dict], empty_copy: str) -> str:
+    if not rows:
+        return (
+            "<div class='card'>"
+            f"<h2>{escape(title)}</h2>"
+            f"<p>{escape(empty_copy)}</p>"
+            "</div>"
+        )
+    items: list[str] = []
+    for row in rows:
+        payload = row.get("payload") or {}
+        payload_html = escape(json.dumps(payload, indent=2, sort_keys=True))
+        created = row.get("created_at")
+        created_text = created.isoformat() if hasattr(created, "isoformat") else escape(str(created))
+        contact = escape(row.get("contact") or "—")
+        items.append(
+            "<div class='card'>"
+            f"<h2>{escape(title[:-1] if title.endswith('s') else title)} #{row.get('id', '—')}</h2>"
+            f"<p><strong>Repo:</strong> {escape(row.get('repo') or '—')}</p>"
+            f"<p><strong>Contact:</strong> {contact}</p>"
+            f"<p><strong>Status:</strong> {escape(row.get('status') or '—')}</p>"
+            f"<p><strong>Created:</strong> {created_text}</p>"
+            f"<pre style='white-space:pre-wrap;word-break:break-word;background:#f6f2e9;border:1px solid #d7d0c3;padding:12px;font-size:12px;line-height:1.5;overflow:auto'>{payload_html}</pre>"
+            "</div>"
+        )
+    return f"<h2>{escape(title)}</h2>" + "".join(items)
+
+
+@app.get("/admin", response_class=HTMLResponse)
+@app.get("/admin/", response_class=HTMLResponse, include_in_schema=False)
+def admin_panel():
+    submissions = db.list_queue("submissions", status="pending")
+    corrections = db.list_queue("corrections", status="pending")
+    queue_note = (
+        "<div class='card'><p>This is a lightweight local review screen for the moderation queue. "
+        "It is read-only for now: useful for opening the pending submissions and corrections that "
+        "are already stored through the public forms.</p></div>"
+    )
+    if not db.enabled():
+        queue_note = (
+            "<div class='card'><p>The moderation queue needs <code>DATABASE_URL</code> to show real data. "
+            "The route is now live, but this environment is running without the Postgres-backed queue.</p></div>"
+        )
+    body = (
+        queue_note
+        + _queue_table_html("Pending submissions", submissions, "No pending submissions.")
+        + _queue_table_html("Pending corrections", corrections, "No pending corrections.")
+    )
+    return _marketing_page(
+        "Admin queue — HVTracker",
+        "Admin queue",
+        "Review pending submissions and corrections.",
+        body,
+        description="HVTracker moderation queue for pending submissions and corrections.",
+        path="/admin/",
     )
 
 
