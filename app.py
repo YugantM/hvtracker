@@ -211,7 +211,8 @@ async def _cache_headers(request, call_next):
     if path not in _HEALTHCHECK_PATHS:
         redirect_target = _canonical_redirect_target(request)
         if redirect_target is not None:
-            return RedirectResponse(redirect_target, status_code=301)
+            status_code = 301 if request.method in {"GET", "HEAD"} else 308
+            return RedirectResponse(redirect_target, status_code=status_code)
 
     response = await call_next(request)
 
