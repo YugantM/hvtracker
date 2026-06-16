@@ -4399,12 +4399,30 @@ def main() -> None:
     rows.sort(key=lambda x: x.get("score", 0) or 0, reverse=True)
 
     eligibility_violations = run_eligibility_checks(rows)
+    # Curator-acknowledged warnings: a closed-source product tracked via an
+    # issue-only repo legitimately has no GitHub license, so §4.1.1 is moot.
+    # `suppress_warnings` in agents.json drops those specific criteria before
+    # registry-state decoration, so the listing isn't flagged "Needs review".
+    # Scoped per-repo; never touches trust score, rank, or deltas.
+    _suppress_warn_map = {
+        a["repo"].lower(): set(a.get("suppress_warnings", []))
+        for a in all_agents if a.get("suppress_warnings")
+    }
+    if _suppress_warn_map:
+        eligibility_violations = [
+            v for v in eligibility_violations
+            if v["criterion"] not in _suppress_warn_map.get(v["repo"].lower(), ())
+        ]
     decorate_registry_states(rows, legacy_rows, eligibility_violations)
 
     # Build lookups for overrides from agents.json config
     _override_map = {a["repo"].lower(): a.get("license_override", "") for a in all_agents if a.get("license_override")}
     _category_map = {a["repo"].lower(): a.get("category", "") for a in all_agents if a.get("category")}
     _lang_override_map = {a["repo"].lower(): a.get("language_override", "") for a in all_agents if a.get("language_override")}
+    # Display-only repo label (e.g. a repo that moved orgs) — keeps the original
+    # `repo` as the tracking/join key while showing the corrected slug.
+    _display_repo_map = {a["repo"].lower(): a.get("display_repo", "") for a in all_agents if a.get("display_repo")}
+    _source_note_map = {a["repo"].lower(): a.get("source_note", "") for a in all_agents if a.get("source_note")}
 
     # Add formatted download counts and slug/breakdown for template rendering
     for row in rows:
@@ -4422,6 +4440,12 @@ def main() -> None:
         language_override = _lang_override_map.get(repo_key)
         if language_override:
             row["language"] = language_override
+        display_repo_override = _display_repo_map.get(repo_key)
+        if display_repo_override:
+            row["display_repo"] = display_repo_override
+        source_note_override = _source_note_map.get(repo_key)
+        if source_note_override:
+            row["source_note"] = source_note_override
         row["license_type"] = normalize_license_type(row)
         # Always recompute freshness from the absolute last_push date so the
         # color coding (and the maintenance dimension) stay correct even when
@@ -4598,6 +4622,7 @@ def main() -> None:
             {
                 "name": r["name"],
                 "repo": r["repo"],
+                "display_repo": r.get("display_repo", ""),
                 "url": r["url"],
                 "rank": r["rank"],
                 "previous_rank": r["previous_rank"],
@@ -4629,6 +4654,7 @@ def main() -> None:
                 "scorecard_score": r.get("scorecard_score"),
                 "scorecard_checks": r.get("scorecard_checks", {}),
                 "slug": r.get("slug"),
+                "source_note": r.get("source_note", ""),
                 "public_actions": r.get("public_actions"),
                 "mcp_server_support": r.get("mcp_server_support", {"status": "none", "confidence": None, "evidence": []}),
                 "external_service_dependencies": r.get("external_service_dependencies", {"providers": [], "requires_api_keys": False, "confidence": None, "evidence": []}),

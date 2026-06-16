@@ -693,7 +693,7 @@
                 <a class="agent-name" href="/agents/{{ row.slug }}">{{ row.name }}</a>
                 <button class="watch-toggle" type="button" data-watch-slug="{{ row.slug }}" data-watch-name="{{ row.name }}" data-watch-repo="{{ row.repo }}" aria-label="Save {{ row.name }} to watchlist"></button>
               </div>
-              <a class="agent-repo" href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>
+              <a class="agent-repo" href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.display_repo or row.repo }}</a>
               {% if row.description %}<span class="agent-desc" title="{{ row.description }}">{{ row.description }}</span>{% endif %}
               <div class="agent-tags">
                 <span class="state-chip state-{{ row.display_listing_status }}">{{ row.display_status_label }}</span>

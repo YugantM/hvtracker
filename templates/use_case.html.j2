@@ -112,7 +112,7 @@
       <tbody>
         {% for agent in page.agents %}
         <tr>
-          <td><a class="agent" href="/agents/{{ agent.slug }}/">{{ agent.name }}</a><span class="repo">{{ agent.repo }}</span></td>
+          <td><a class="agent" href="/agents/{{ agent.slug }}/">{{ agent.name }}</a><span class="repo">{{ agent.display_repo or agent.repo }}</span></td>
           <td>{{ agent.category }}</td>
           <td><span class="grade">{{ agent.evidence_grade }}</span></td>
           <td class="num">#{{ agent.rank }}</td>
