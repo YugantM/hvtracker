@@ -271,13 +271,23 @@ def _catalog_agent_count() -> int:
 
 
 def _source_render_count() -> int:
+    catalog_count = 0
+    try:
+        with open(os.path.join(BASE_DIR, "agents.json"), encoding="utf-8") as f:
+            agents = json.load(f)
+        catalog_count = sum(
+            1 for agent in agents
+            if agent.get("status") != "legacy" and agent.get("listing_status") != "legacy"
+        )
+    except (OSError, json.JSONDecodeError, TypeError):
+        pass
     path = os.path.join(BASE_DIR, "data", "render_state.json")
     try:
         with open(path, encoding="utf-8") as f:
             payload = json.load(f)
-        return len(payload.get("rows") or [])
+        return max(catalog_count, len(payload.get("rows") or []))
     except (OSError, json.JSONDecodeError, TypeError):
-        return 0
+        return catalog_count
 
 
 def _normalize_github_repo(value: str | None) -> str | None:
@@ -1564,11 +1574,14 @@ def _seed_history_into_volume() -> int:
 
 def _sync_prebuilt_to_volume() -> bool:
     """Copy the build-time rendered site into the volume so fresh HTML is
-    served immediately on deploy.  Preserves volume-only files (history
-    snapshots, data.json from prior full builds) — only overwrites HTML,
-    static assets, and render metadata that the build produced."""
+    served immediately on first boot. Once a volume has live data, do not
+    copy prebuilt output over it; startup/render jobs will update generated
+    files without downgrading fresher leaderboard data."""
     import shutil
     if not os.path.isdir(PREBUILT_DIR) or PREBUILT_DIR == OUTPUT_DIR:
+        return False
+    if os.path.isfile(DATA_PATH):
+        print("[startup] existing volume data found — skipped prebuilt sync")
         return False
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     copied = 0
@@ -1577,6 +1590,8 @@ def _sync_prebuilt_to_volume() -> bool:
         dest = os.path.join(OUTPUT_DIR, rel)
         os.makedirs(dest, exist_ok=True)
         for f in files:
+            if f == ".agents_hash":
+                continue
             shutil.copy2(os.path.join(root, f), os.path.join(dest, f))
             copied += 1
     print(f"[startup] synced {copied} pre-rendered files from image → volume")
@@ -1625,7 +1640,8 @@ def startup():
             prev_hash = open(agents_hash_path).read().strip()
         except OSError:
             prev_hash = ""
-        if prev_hash != agents_hash:
+        db_agent_count = db.count_agents()
+        if prev_hash != agents_hash or db_agent_count != len(agents_seed):
             for a in agents_seed:
                 db.upsert_agent(a)
             # Remove agents from DB that were deleted from agents.json
@@ -1634,7 +1650,7 @@ def startup():
             with open(agents_hash_path, "w") as f:
                 f.write(agents_hash)
             agents_changed = True
-            print(f"[startup] agents.json changed → synced {len(agents_seed)} entries into DB, pruned {pruned}")
+            print(f"[startup] agents.json sync needed → synced {len(agents_seed)} entries into DB, pruned {pruned}")
         else:
             print(f"[startup] agents.json unchanged ({len(agents_seed)} entries) — DB sync skipped")
     # If the volume has no site yet, build one in the background so the service
