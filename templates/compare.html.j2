@@ -25,7 +25,7 @@
       {
         "@type": "Question",
         "name": "What is the difference between {{ a.name }} and {{ b.name }}?",
-        "acceptedAnswer": { "@type": "Answer", "text": "{{ a.name }} ({{ a.repo }}) has an HVTrust score of {{ a.trust_score }} (Grade {{ a.evidence_grade }}) with {{ a.stars_fmt }} GitHub stars; {{ b.name }} ({{ b.repo }}) scores {{ b.trust_score }} (Grade {{ b.evidence_grade }}) with {{ b.stars_fmt }} stars. Both are {{ a.category }}." }
+        "acceptedAnswer": { "@type": "Answer", "text": "{{ a.name }} ({{ a.display_repo or a.repo }}) has an HVTrust score of {{ a.trust_score }} (Grade {{ a.evidence_grade }}) with {{ a.stars_fmt }} GitHub stars; {{ b.name }} ({{ b.display_repo or b.repo }}) scores {{ b.trust_score }} (Grade {{ b.evidence_grade }}) with {{ b.stars_fmt }} stars. Both are {{ a.category }}." }
       }
     ]
   }

@@ -201,7 +201,7 @@
             <tbody>
               {% for row in top_up %}
               <tr>
-                <td class="name"><a href="/agents/{{ row.slug }}/">{{ row.name }}</a><div class="sub">{{ row.repo }}</div></td>
+                <td class="name"><a href="/agents/{{ row.slug }}/">{{ row.name }}</a><div class="sub">{{ row.display_repo or row.repo }}</div></td>
                 <td class="mono">#{{ row.rank }} → #{{ row.rank_v2 }}</td>
                 <td class="delta-up mono">+{{ row.rank_v2_delta }}</td>
               </tr>
@@ -217,7 +217,7 @@
             <tbody>
               {% for row in top_down %}
               <tr>
-                <td class="name"><a href="/agents/{{ row.slug }}/">{{ row.name }}</a><div class="sub">{{ row.repo }}</div></td>
+                <td class="name"><a href="/agents/{{ row.slug }}/">{{ row.name }}</a><div class="sub">{{ row.display_repo or row.repo }}</div></td>
                 <td class="mono">#{{ row.rank }} → #{{ row.rank_v2 }}</td>
                 <td class="delta-down mono">{{ row.rank_v2_delta }}</td>
               </tr>
@@ -247,7 +247,7 @@
             <tr>
               <td class="name">
                 <a href="/agents/{{ row.slug }}/">{{ row.name }}</a>
-                <div class="sub">{{ row.repo }}</div>
+                <div class="sub">{{ row.display_repo or row.repo }}</div>
               </td>
               <td class="mono">#{{ row.rank }}<div class="sub">{{ row.trust_score }}/100</div></td>
               <td class="mono">#{{ row.rank_v2 }}<div class="sub">{{ row.trust_score_v2 }}/100</div></td>

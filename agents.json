@@ -1441,6 +1441,7 @@
   },
   {
     "repo": "google/A2A",
+    "display_repo": "a2aproject/A2A",
     "name": "A2A / Agent2Agent Protocol",
     "category": "Protocols & Tool Integration",
     "hn_search_term": "agent2agent a2a",
@@ -1911,7 +1912,10 @@
     "name": "Antigravity CLI",
     "category": "Coding Agents",
     "listing_status": "listed",
-    "tracking_mode": "direct"
+    "tracking_mode": "direct",
+    "license_override": "proprietary",
+    "suppress_warnings": ["4.1.1"],
+    "source_note": "This GitHub repository is a public issue tracker for Antigravity, a closed-source product — it does not contain the product's source code. The OpenSSF Scorecard and license signals below describe that issue-tracker repo, not the shipped product."
   },
   {
     "repo": "nousresearch/hermes-agent",

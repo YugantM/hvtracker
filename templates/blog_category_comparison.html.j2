@@ -108,7 +108,7 @@
           <div class="rank">#{{ agent.rank }} overall &middot; #{{ agent.category_rank }} in {{ category }} &middot; Grade {{ agent.evidence_grade }}</div>
           <p class="note">{{ agent.description or "No repository description available." }}</p>
           <div class="facts">
-            <div class="fact"><span>Repository</span><span>{{ agent.repo }}</span></div>
+            <div class="fact"><span>Repository</span><span>{{ agent.display_repo or agent.repo }}</span></div>
             <div class="fact"><span>Stars</span><span>{{ agent.stars_fmt }}</span></div>
             <div class="fact"><span>Last push</span><span>{{ agent.last_push }}</span></div>
             <div class="fact"><span>Weekly commits</span><span>{{ agent.weekly_commits or 0 }}</span></div>

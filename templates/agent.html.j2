@@ -121,6 +121,9 @@
     .warning-banner strong { font-size:12px; }
     .warning-banner ul { list-style:none; padding:0; margin:4px 0 0; }
     .warning-banner li { font-size:11px; color:var(--muted); line-height:1.5; }
+    .source-note { margin-top:12px; padding:10px 12px; border-left:3px solid var(--accent); background:var(--surface); }
+    .source-note strong { font-size:12px; }
+    .source-note p { font-size:11px; color:var(--muted); line-height:1.5; margin:4px 0 0; }
 
     .rank-block { padding:16px 0; border-bottom:1px solid var(--border); display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:16px; align-items:end; }
     .rank-big { font-family:var(--font-mono); font-size:36px; font-weight:700; line-height:1; color:var(--text); }
@@ -348,7 +351,7 @@
     <section class="hero">
       <h1>{{ row.name }}</h1>
       <div class="repo">
-        {% if row.org_slug_or_none %}<a href="/org/{{ row.org_slug_or_none }}/">{{ row.repo.split('/')[0] }}</a>/<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo.split('/')[1] }}</a>{% else %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>{% endif %}
+        {% if row.display_repo %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.display_repo }}</a>{% elif row.org_slug_or_none %}<a href="/org/{{ row.org_slug_or_none }}/">{{ row.repo.split('/')[0] }}</a>/<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo.split('/')[1] }}</a>{% else %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>{% endif %}
       </div>
       {% if row.description %}<p class="desc">{{ row.description }}</p>{% endif %}
       <div class="badges">
@@ -398,6 +401,12 @@
           <li>[{{ warning.criterion }}] {{ warning.detail }}</li>
           {% endfor %}
         </ul>
+      </div>
+      {% endif %}
+      {% if row.source_note %}
+      <div class="source-note">
+        <strong>Tracking note</strong>
+        <p>{{ row.source_note }}</p>
       </div>
       {% endif %}
     </section>
