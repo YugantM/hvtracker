@@ -1608,6 +1608,16 @@ def _has_missing_commit_rows() -> bool:
         return False
 
 
+def _has_pending_signal_rows() -> bool:
+    """Detect provisional rows that still need their first signal refresh."""
+    try:
+        with open(DATA_PATH, encoding="utf-8") as f:
+            data = json.load(f)
+        return any(a.get("pending_signals") for a in data.get("agents", []))
+    except (OSError, json.JSONDecodeError, TypeError):
+        return False
+
+
 @app.on_event("startup")
 def startup():
     global _scheduler
@@ -1640,12 +1650,13 @@ def startup():
             prev_hash = open(agents_hash_path).read().strip()
         except OSError:
             prev_hash = ""
-        db_agent_count = db.count_agents()
-        if prev_hash != agents_hash or db_agent_count != len(agents_seed):
+        seed_repos = {a["repo"] for a in agents_seed}
+        db_repos = {a.get("repo") for a in db.load_agents()}
+        if prev_hash != agents_hash or db_repos != seed_repos:
             for a in agents_seed:
                 db.upsert_agent(a)
             # Remove agents from DB that were deleted from agents.json
-            valid_repos = [a["repo"] for a in agents_seed]
+            valid_repos = list(seed_repos)
             pruned = db.delete_agents_not_in(valid_repos)
             with open(agents_hash_path, "w") as f:
                 f.write(agents_hash)
@@ -1661,6 +1672,9 @@ def startup():
     elif _has_missing_commit_rows():
         threading.Thread(target=_refresh_and_record, args=("repair-commits", fingerprint, "startup"), daemon=True).start()
         print("[startup] detected rows with missing commit counts — kicked off targeted repair refresh")
+    elif os.environ.get("DISABLE_SCHEDULER") != "1" and _has_pending_signal_rows():
+        threading.Thread(target=_refresh_and_record, args=("pending", fingerprint, "startup"), daemon=True).start()
+        print("[startup] detected provisional rows — kicked off pending refresh")
     elif seeded > 0 or stored_fingerprint != fingerprint or agents_changed:
         # Re-render when:
         #   - we just dropped prior-day snapshots into a volume that already
