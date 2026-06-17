@@ -87,8 +87,11 @@ jobs:
           python merge_scorecard_shards.py base.json shards/scorecard-shard-*/scorecard-cache.json > merged.json
           cp merged.json /tmp/scorecard-cache.json
 
+          # Use -B <branch> <start-point> so "data" is unambiguously a branch
+          # name: the repo has a tracked data/ directory, so a bare
+          # `git checkout data` is ambiguous (path vs branch) and aborts.
           if git fetch origin data 2>/dev/null; then
-            git checkout data
+            git checkout -B data origin/data
           else
             git checkout --orphan data
             git rm -rf . 2>/dev/null || true
@@ -117,7 +120,9 @@ jobs:
         run: |
           run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           body="Scorecard scan run failed: ${run_url} ($(date -u '+%Y-%m-%d %H:%M UTC')). The data-branch cache may not have refreshed; site scores can go stale until this is fixed."
-          gh label create scan-failure --color B60205 --description "OSSF scorecard scan is failing" --force 2>/dev/null || true
+          # The alert job has no checkout, so gh can't infer the repo — pass
+          # --repo explicitly or the label create (and issue create) fail.
+          gh label create scan-failure --repo "$GITHUB_REPOSITORY" --color B60205 --description "OSSF scorecard scan is failing" 2>/dev/null || true
           existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label scan-failure --json number --jq '.[0].number')
           if [ -n "$existing" ]; then
             gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"
