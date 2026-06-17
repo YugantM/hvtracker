@@ -132,6 +132,7 @@
 
   function shouldShowAlertPopup() {
     var path = window.location.pathname || "/";
+    if (path.indexOf("/agents/") === 0) return false;
     if (path.indexOf("/alerts") === 0) return false;
     if (path.indexOf("/submit") === 0 || path.indexOf("/correct") === 0) return false;
 
