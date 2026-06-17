@@ -983,8 +983,8 @@
     <section class="provenance" id="embed-badge" style="margin-top:0;">
       <h2 class="section-title">Embed Badge <a href="/badges/" style="font-weight:400;color:var(--accent);font-size:11px;margin-left:8px;">Badge guide for maintainers →</a></h2>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-        <img src="/badge/{{ row.slug }}.svg" alt="HVTrust {{ row.trust_score }}" height="20">
-        <img src="/badge/{{ row.slug }}-grade.svg" alt="Grade {{ row.evidence_grade }}" height="20">
+        <img src="/badge/{{ row.slug }}.svg?v={{ row.trust_score }}" alt="HVTrust {{ row.trust_score }}" height="20">
+        <img src="/badge/{{ row.slug }}-grade.svg?v={{ row.evidence_grade }}" alt="Grade {{ row.evidence_grade }}" height="20">
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--muted);word-break:break-all;line-height:1.6;">
         {% set badge_markdown = '[![HVTrust](https://hvtracker.net/badge/' ~ row.slug ~ '.svg)](https://hvtracker.net/agents/' ~ row.slug ~ ')' %}

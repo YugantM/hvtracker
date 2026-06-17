@@ -649,7 +649,12 @@ def badge(owner: str, repo: str, kind: str):
         svg = _badge_svg("Grade", grade, color)
     else:
         return JSONResponse({"error": "unknown badge kind"}, status_code=404)
-    headers = {"Cache-Control": "no-cache, max-age=0, must-revalidate"}
+    headers = {
+        "Cache-Control": "no-store, no-cache, max-age=0, must-revalidate",
+        "CDN-Cache-Control": "no-store",
+        "Cloudflare-CDN-Cache-Control": "no-store",
+        "Surrogate-Control": "no-store",
+    }
     if not agent:
         headers["Cache-Control"] = "public, max-age=60"
     return Response(svg, media_type="image/svg+xml", headers=headers)

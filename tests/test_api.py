@@ -93,7 +93,10 @@ def test_dynamic_badges(client):
         r = client.get(f"/badge/{owner}/{name}/{kind}.svg")
         assert r.status_code == 200
         assert r.headers["content-type"].startswith("image/svg+xml")
-        assert r.headers["cache-control"] == "no-cache, max-age=0, must-revalidate"
+        assert r.headers["cache-control"] == "no-store, no-cache, max-age=0, must-revalidate"
+        assert r.headers["cdn-cache-control"] == "no-store"
+        assert r.headers["cloudflare-cdn-cache-control"] == "no-store"
+        assert r.headers["surrogate-control"] == "no-store"
         assert r.text.lstrip().startswith("<svg")
     assert client.get(f"/badge/{owner}/{name}/bogus.svg").status_code == 404
 

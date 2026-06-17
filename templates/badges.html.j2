@@ -115,8 +115,8 @@
         <p>Every tracked project has two badges at <code>/badge/&lt;slug&gt;.svg</code> (trust score) and <code>/badge/&lt;slug&gt;-grade.svg</code> (evidence grade). Find your project on the <a href="/">leaderboard</a>, open its page, and copy the snippet from the <em>Embed Badge</em> section — or use the pattern below, replacing <code>your-slug</code> with your project's slug.</p>
 
         <div class="badge-preview">
-          <img src="/badge/{{ sample.slug }}.svg" alt="HVTrust score badge example" height="20">
-          <img src="/badge/{{ sample.slug }}-grade.svg" alt="Evidence grade badge example" height="20">
+          <img src="/badge/{{ sample.slug }}.svg?v={{ sample.trust_score }}" alt="HVTrust score badge example" height="20">
+          <img src="/badge/{{ sample.slug }}-grade.svg?v={{ sample.evidence_grade }}" alt="Evidence grade badge example" height="20">
         </div>
 
         <div class="snippet-label">Markdown</div>
@@ -151,7 +151,7 @@
             <tr>
               <td class="rank">#{{ r.rank }}</td>
               <td class="name"><a href="/agents/{{ r.slug }}">{{ r.name }}</a></td>
-              <td><img src="/badge/{{ r.slug }}.svg" alt="HVTrust {{ r.trust_score }}" height="20"></td>
+              <td><img src="/badge/{{ r.slug }}.svg?v={{ r.trust_score }}" alt="HVTrust {{ r.trust_score }}" height="20"></td>
               <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/{{ r.slug }}.svg)](https://hvtracker.net/agents/{{ r.slug }})</code></td>
             </tr>
             {% endfor %}
