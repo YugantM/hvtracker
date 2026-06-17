@@ -60,12 +60,10 @@ linkedin_carousel.js
 # Keep render_state.json (seed for render-only tests/CI) but ignore other data/* artifacts
 /data/*
 !/data/render_state.json
-# Keep the committed history baseline (rank-delta seed + test fixture) but
-# route new daily snapshots to the Railway volume only. Already-tracked
-# baseline files stay tracked; new output/history/*.json are ignored.
-/output/*
-!/output/history/
-/output/history/*
+# All of output/ is generated at runtime into the Railway volume, never
+# tracked. The rank-delta seed baseline (+ test fixture) lives in /seed/history,
+# which is tracked so `railway up` uploads it into the image build context.
+/output/
 /agents/
 /badge/
 /badges/
