@@ -27,7 +27,7 @@ def client():
     graph_src = os.path.join(ROOT, "data", "graph.json")
     if os.path.isfile(graph_src):
         shutil.copy(graph_src, os.path.join(tmp, "data", "graph.json"))
-    for h in glob.glob(os.path.join(ROOT, "output", "history", "*.json")):
+    for h in glob.glob(os.path.join(ROOT, "seed", "history", "*.json")):
         shutil.copy(h, os.path.join(tmp, "output", "history", os.path.basename(h)))
 
     os.environ["OUTPUT_DIR"] = tmp
