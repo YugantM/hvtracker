@@ -26,8 +26,8 @@ COPY .nojekyll robots.txt analytics.js og-v2.png og-provenance.png favicon.svg h
 # via git push are synced to the volume on startup (see fetch_and_build.py).
 COPY data/render_state.json data/render_state.json
 # Seed history snapshots — copied into the volume on first startup if missing.
-# Needed so rank-deltas, sparklines, and movers have prior days to compare against.
-COPY output/history/ /app/seed/history/
+# Use the tracked prebuilt snapshot so Railway deploys do not depend on ignored output/.
+COPY prebuilt/data/history/ /app/seed/history/
 RUN test -n "$(find /app/seed/history -name '*.json' -print -quit)"
 
 # Ship the exact prebuilt site snapshot from the workspace. This keeps
