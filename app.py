@@ -85,6 +85,15 @@ COMPARE_TOOL_PATH = os.path.join(BASE_DIR, "compare", "index.html")
 RENDER_FINGERPRINT_PATH = os.path.join(OUTPUT_DIR, ".render_fingerprint")
 REFRESH_STATUS_PATH = os.path.join(OUTPUT_DIR, ".refresh_status.json")
 MAX_DATA_AGE = timedelta(hours=int(os.environ.get("MAX_DATA_AGE_HOURS", "6")))
+# OSSF scores are baked into the image from the `data` branch at build time
+# (see Dockerfile). Re-pull that file at runtime so live refreshes apply the
+# latest daily scan instead of the deploy-time snapshot, which otherwise ages
+# out to the unreliable deps.dev fallback after 48h.
+SCORECARD_CACHE_URL = os.environ.get(
+    "SCORECARD_CACHE_URL",
+    "https://raw.githubusercontent.com/YugantM/hvtracker/data/scorecard-cache.json",
+)
+SCORECARD_CACHE_PATH = os.path.join(BASE_DIR, "scorecard-cache.json")
 
 app = FastAPI(title="HVTracker", docs_url="/api/docs", openapi_url="/api/openapi.json")
 _scheduler = None
@@ -1446,10 +1455,40 @@ def data_api_post(request: Request, email: str = Form(...), company: str = Form(
 
 # ---- Scheduler + startup --------------------------------------------------
 
+def _pull_scorecard_cache() -> bool:
+    """Refresh the baked scorecard cache from the `data` branch so live
+    full/batch refreshes apply the latest OSSF scan rather than the image's
+    deploy-time snapshot. Best-effort: on any failure the existing cache is
+    left untouched. Returns True if the local cache was updated."""
+    import urllib.request
+    try:
+        with urllib.request.urlopen(SCORECARD_CACHE_URL, timeout=20) as resp:
+            raw = resp.read()
+        data = json.loads(raw)
+        agents = data.get("agents") if isinstance(data, dict) else None
+        if not isinstance(agents, dict) or not agents:
+            print("[scorecard] data-branch cache has no agents — keeping baked cache")
+            return False
+        tmp = SCORECARD_CACHE_PATH + ".tmp"
+        with open(tmp, "wb") as f:
+            f.write(raw)
+        os.replace(tmp, SCORECARD_CACHE_PATH)
+        print(f"[scorecard] pulled data-branch cache: {len(agents)} repos "
+              f"(scanned {data.get('scanned_at', 'unknown')})")
+        return True
+    except Exception as e:
+        print(f"[scorecard] data-branch cache pull failed ({e}) — keeping baked cache")
+        return False
+
+
 def _refresh(mode: str) -> bool:
     """Run a refresh cycle. Returns True on success, False on failure."""
     import fetch_and_build
     try:
+        # Render-only rebuilds read render_state.json, not the scorecard cache,
+        # so only re-pull for modes that actually apply scorecard scores.
+        if mode != "render":
+            _pull_scorecard_cache()
         fetch_and_build.run_refresh(mode)
         return True
     except Exception as e:  # never let a build error kill the scheduler thread
