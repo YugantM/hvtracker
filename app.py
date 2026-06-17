@@ -110,7 +110,7 @@ SITE_NAV_ITEMS = (
 # sensible defaults: HTML pages get 5 min browser / 15 min CDN cache (with
 # stale-while-revalidate so re-fetches feel instant), JSON data endpoints
 # get longer s-maxage since they're consumed by API users.  Routes that
-# already set Cache-Control (e.g. badge SVGs at app.py:172) win — we only
+# already set Cache-Control (e.g. badge SVGs below) win — we only
 # fill in the gaps.
 _HTML_CACHE = "public, max-age=300, s-maxage=900, stale-while-revalidate=86400"
 _JSON_CACHE = "public, max-age=600, s-maxage=1800, stale-while-revalidate=86400"
@@ -649,7 +649,7 @@ def badge(owner: str, repo: str, kind: str):
         svg = _badge_svg("Grade", grade, color)
     else:
         return JSONResponse({"error": "unknown badge kind"}, status_code=404)
-    headers = {"Cache-Control": "public, max-age=3600"}
+    headers = {"Cache-Control": "no-cache, max-age=0, must-revalidate"}
     if not agent:
         headers["Cache-Control"] = "public, max-age=60"
     return Response(svg, media_type="image/svg+xml", headers=headers)
