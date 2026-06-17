@@ -2,20 +2,29 @@ name: Scorecard scan
 
 on:
   schedule:
-    # Every other day at 04:00 UTC (Sun/Tue/Thu/Sat)
-    - cron: "0 4 * * 0,2,4,6"
+    # Daily at 04:00 UTC. Scores move ~1pt/week on active repos, so a daily
+    # cadence keeps the public site within a day of the real CLI result.
+    - cron: "0 4 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
+  issues: write
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   SCORECARD_VERSION: "v5.5.0"
 
 jobs:
+  # Split the full repo set across parallel shards. A single serial scan of
+  # ~228 repos runs ~2.5h and reliably gets the runner killed mid-scan
+  # ("hosted runner lost communication"); ~57 repos/shard finishes in ~40m.
   scan:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
 
     steps:
       - name: Checkout
@@ -33,19 +42,51 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run scorecard scan
+      - name: Run scorecard scan (shard ${{ matrix.shard }}/4)
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        run: python scan_scorecards.py
+        run: python scan_scorecards.py --shard ${{ matrix.shard }}/4
 
-      - name: Commit and push scorecard cache to data branch
+      - name: Upload shard cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: scorecard-shard-${{ matrix.shard }}
+          path: scorecard-cache.json
+          retention-days: 2
+
+  # Overlay the fresh shards onto the prior data-branch cache (freshest-wins),
+  # so a shard that failed this run keeps its last-known scores. Runs even if a
+  # shard failed, to publish the shards that succeeded.
+  merge:
+    needs: scan
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+
+      - name: Download shard caches
+        uses: actions/download-artifact@v4
+        with:
+          path: shards
+          pattern: scorecard-shard-*
+
+      - name: Merge shards and push to data branch
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          cp scorecard-cache.json /tmp/scorecard-cache.json
+          # Base = current data-branch cache (authoritative, via git not CDN).
+          if git fetch origin data 2>/dev/null && git cat-file -e origin/data:scorecard-cache.json 2>/dev/null; then
+            git show origin/data:scorecard-cache.json > base.json
+          else
+            echo '{"agents":{}}' > base.json
+          fi
 
-          # Switch to orphan data branch (create if missing)
+          python merge_scorecard_shards.py base.json shards/scorecard-shard-*/scorecard-cache.json > merged.json
+          cp merged.json /tmp/scorecard-cache.json
+
           if git fetch origin data 2>/dev/null; then
             git checkout data
           else
@@ -60,4 +101,26 @@ jobs:
           else
             git commit -m "chore: update scorecard cache $(date -u '+%Y-%m-%d')"
             git push origin data
+          fi
+
+  # Never let a broken scan go silent: open (or comment on) a tracking issue so
+  # a dead scan is noticed before users notice stale scores.
+  alert:
+    needs: [scan, merge]
+    if: failure()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Open or update failure issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          body="Scorecard scan run failed: ${run_url} ($(date -u '+%Y-%m-%d %H:%M UTC')). The data-branch cache may not have refreshed; site scores can go stale until this is fixed."
+          gh label create scan-failure --color B60205 --description "OSSF scorecard scan is failing" --force 2>/dev/null || true
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label scan-failure --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "Scorecard scan failing" --label scan-failure --body "$body"
           fi
