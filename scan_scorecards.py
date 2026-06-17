@@ -79,13 +79,30 @@ def main() -> None:
 
     # Optional: scan a single repo via --repo owner/name
     single_repo = None
+    # Optional: scan one shard of N via --shard K/N (1-based). Used by the
+    # matrix CI job to split the full set so no single runner runs long enough
+    # to be killed mid-scan. Shards are disjoint and cover every listed repo.
+    shard = None
     for arg in sys.argv[1:]:
         if arg.startswith("--repo="):
             single_repo = arg.split("=", 1)[1]
         elif arg == "--repo" and sys.argv.index(arg) + 1 < len(sys.argv):
             single_repo = sys.argv[sys.argv.index(arg) + 1]
+        elif arg.startswith("--shard="):
+            shard = arg.split("=", 1)[1]
+        elif arg == "--shard" and sys.argv.index(arg) + 1 < len(sys.argv):
+            shard = sys.argv[sys.argv.index(arg) + 1]
 
-    if single_repo:
+    if shard:
+        try:
+            k, n = (int(x) for x in shard.split("/", 1))
+        except ValueError:
+            sys.exit(f"ERROR: --shard expects K/N (e.g. 1/4), got '{shard}'")
+        if not (1 <= k <= n):
+            sys.exit(f"ERROR: --shard K/N requires 1 <= K <= N, got '{shard}'")
+        agents = [a for i, a in enumerate(agents) if i % n == (k - 1)]
+        print(f"Shard {k}/{n}: {len(agents)} repos")
+    elif single_repo:
         agents = [a for a in agents if a["repo"].lower() == single_repo.lower()]
         if not agents:
             sys.exit(f"ERROR: repo '{single_repo}' not found in agents.json")
@@ -124,7 +141,10 @@ def main() -> None:
         if i < total and not single_repo:
             time.sleep(SLEEP_BETWEEN)
 
-    merged = {**existing, **results}
+    # A shard writes only its freshly-scanned repos; the CI merge job overlays
+    # these onto the prior full cache (freshest-wins). Other modes merge into
+    # the on-disk cache so single-repo/full runs are self-contained.
+    merged = results if shard else {**existing, **results}
     cache = {"scanned_at": run_start, "agents": merged}
     with open(CACHE_PATH, "w") as f:
         json.dump(cache, f, indent=2)

@@ -1238,6 +1238,29 @@ def fetch_scorecard(owner_repo: str) -> dict | None:
     return None
 
 
+SCORECARD_STALE_DAYS = 14
+
+
+def set_scorecard_display(row: dict) -> None:
+    """Populate scorecard display fields (fmt, scanned date, stale flag) from
+    scorecard_score + scorecard_scanned_at. Keeps the score honest: a number we
+    can't date renders without a date, and an old scan is flagged stale."""
+    sc = row.get("scorecard_score")
+    row["scorecard_fmt"] = f"{sc:.1f}" if sc is not None else None
+    scanned_at = row.get("scorecard_scanned_at")
+    fmt = None
+    is_stale = False
+    if scanned_at:
+        try:
+            dt = datetime.fromisoformat(scanned_at.replace("Z", "+00:00"))
+            fmt = dt.strftime("%b %-d, %Y")
+            is_stale = (datetime.now(timezone.utc) - dt) > timedelta(days=SCORECARD_STALE_DAYS)
+        except ValueError:
+            pass
+    row["scorecard_scanned_fmt"] = fmt
+    row["scorecard_is_stale"] = is_stale
+
+
 @cache.cached("signed_ratio", ttl=86400)
 def fetch_signed_commit_ratio(owner_repo: str, sample: int = 100) -> float | None:
     """Sample recent commits and return fraction with verified signatures (0.0–1.0)."""
@@ -3299,6 +3322,7 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
             "name": a["name"],
             "scorecard_score": a.get("scorecard_score"),
             "scorecard_checks": a.get("scorecard_checks", {}),
+            "scorecard_scanned_at": a.get("scorecard_scanned_at"),
             "signed_commits_ratio": a.get("signed_commits_ratio"),
         }
         for a in data_output["agents"]
@@ -3668,6 +3692,9 @@ def provisional_agent_row(agent: dict) -> dict:
         "scorecard_score": None,
         "scorecard_checks": {},
         "scorecard_fmt": None,
+        "scorecard_scanned_at": None,
+        "scorecard_scanned_fmt": None,
+        "scorecard_is_stale": False,
         "has_provenance": False,
         "provenance_sources": [],
         "mcp_server_support": {"status": "none", "confidence": None, "evidence": []},
@@ -4326,20 +4353,25 @@ def main() -> None:
             if cached and cache_is_fresh:
                 row["scorecard_score"] = cached["score"]
                 row["scorecard_checks"] = cached["checks"]
+                row["scorecard_scanned_at"] = cached.get("scanned_at")
                 cache_hits += 1
             else:
                 sc = fetch_scorecard(repo_key)
                 if sc:
                     row["scorecard_score"] = sc["score"]
                     row["scorecard_checks"] = sc["checks"]
+                    # Live API hit — dated as of now.
+                    row["scorecard_scanned_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
                     api_hits += 1
                 elif cached:
                     row["scorecard_score"] = cached["score"]
                     row["scorecard_checks"] = cached["checks"]
+                    row["scorecard_scanned_at"] = cached.get("scanned_at")
                     cache_hits += 1
                 else:
                     row["scorecard_score"] = None
                     row["scorecard_checks"] = {}
+                    row["scorecard_scanned_at"] = None
         print(f"  Scorecard: {cache_hits} from cache, {api_hits} from API, "
               f"{len(rows)-cache_hits-api_hits} unavailable.")
 
@@ -4358,8 +4390,7 @@ def main() -> None:
                 prov_signals.append("pypi")
             row["provenance_sources"] = prov_signals
             row["has_provenance"] = len(prov_signals) > 0
-            sc = row.get("scorecard_score")
-            row["scorecard_fmt"] = f"{sc:.1f}" if sc is not None else None
+            set_scorecard_display(row)
             sr = row.get("signed_commits_ratio")
             row["signed_commits_pct"] = round(sr * 100) if sr is not None else None
         # Combine: fresh rows replace old, keep rest from prior build
@@ -4475,8 +4506,7 @@ def main() -> None:
             prov_signals.append("pypi")
         row["provenance_sources"] = prov_signals
         row["has_provenance"] = len(prov_signals) > 0
-        sc = row.get("scorecard_score")
-        row["scorecard_fmt"] = f"{sc:.1f}" if sc is not None else None
+        set_scorecard_display(row)
         sr = row.get("signed_commits_ratio")
         row["signed_commits_pct"] = round(sr * 100) if sr is not None else None
 
@@ -4653,6 +4683,7 @@ def main() -> None:
                 "signed_commits_ratio": r.get("signed_commits_ratio"),
                 "scorecard_score": r.get("scorecard_score"),
                 "scorecard_checks": r.get("scorecard_checks", {}),
+                "scorecard_scanned_at": r.get("scorecard_scanned_at"),
                 "slug": r.get("slug"),
                 "source_note": r.get("source_note", ""),
                 "public_actions": r.get("public_actions"),
@@ -4841,8 +4872,7 @@ def main() -> None:
             prov_signals.append("pypi")
         lr["provenance_sources"] = prov_signals
         lr["has_provenance"] = len(prov_signals) > 0
-        sc = lr.get("scorecard_score")
-        lr["scorecard_fmt"] = f"{sc:.1f}" if sc is not None else None
+        set_scorecard_display(lr)
         sr = lr.get("signed_commits_ratio")
         lr["signed_commits_pct"] = round(sr * 100) if sr is not None else None
         lr["rank_delta_display"] = "—"
