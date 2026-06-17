@@ -60,9 +60,12 @@ linkedin_carousel.js
 # Keep render_state.json (seed for render-only tests/CI) but ignore other data/* artifacts
 /data/*
 !/data/render_state.json
-# Keep daily history snapshots (rank-delta baseline + test fixture) but no other output/*
+# Keep the committed history baseline (rank-delta seed + test fixture) but
+# route new daily snapshots to the Railway volume only. Already-tracked
+# baseline files stay tracked; new output/history/*.json are ignored.
 /output/*
 !/output/history/
+/output/history/*
 /agents/
 /badge/
 /badges/
@@ -72,6 +75,19 @@ linkedin_carousel.js
 /blog/
 /spec/
 /roadmap/
+/ecosystem/
+/org/
+/use-cases/
+/changes/
+/movers/
+/score-lab/
+/sponsor/
+/alerts/
+/methodology/
+# Runtime state files written into the volume.
+/.render_fingerprint
+/.agents_hash
+/.refresh_status.json
 
 # Google Analytics credentials & tokens
 client_secret*.json
