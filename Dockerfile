@@ -17,6 +17,7 @@ RUN curl -sfL https://raw.githubusercontent.com/YugantM/hvtracker/data/scorecard
 COPY templates/ templates/
 COPY docs/import-candidates.json docs/import-candidates.json
 COPY compare/index.html compare/index.html
+COPY verify/index.html verify/index.html
 COPY static/ static/
 COPY blog_static/ blog_static/
 COPY changelog/ changelog/

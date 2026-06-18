@@ -82,6 +82,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)  # volume subdir may not exist on first b
 DATA_PATH = os.path.join(OUTPUT_DIR, "data.json")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 COMPARE_TOOL_PATH = os.path.join(BASE_DIR, "compare", "index.html")
+VERIFY_TOOL_PATH = os.path.join(BASE_DIR, "verify", "index.html")
 RENDER_FINGERPRINT_PATH = os.path.join(OUTPUT_DIR, ".render_fingerprint")
 REFRESH_STATUS_PATH = os.path.join(OUTPUT_DIR, ".refresh_status.json")
 MAX_DATA_AGE = timedelta(hours=int(os.environ.get("MAX_DATA_AGE_HOURS", "6")))
@@ -141,6 +142,7 @@ _DYNAMIC_SLASH_PATHS = {
     "/changes",
     "/changelog",
     "/compare",
+    "/verify",
     "/correct",
     "/data",
     "/data-api",
@@ -622,6 +624,15 @@ def compare_tool():
     if not os.path.isfile(COMPARE_TOOL_PATH):
         return HTMLResponse("<p>Compare tool is not available yet.</p>", status_code=503)
     with open(COMPARE_TOOL_PATH, encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+
+@app.api_route("/verify", methods=["GET", "HEAD"], response_class=HTMLResponse)
+@app.api_route("/verify/", methods=["GET", "HEAD"], response_class=HTMLResponse)
+def verify_tool():
+    if not os.path.isfile(VERIFY_TOOL_PATH):
+        return HTMLResponse("<p>Verify tool is not available yet.</p>", status_code=503)
+    with open(VERIFY_TOOL_PATH, encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 

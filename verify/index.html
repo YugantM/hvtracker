@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Verify an agent or MCP server — HVTracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Check whether an open-source AI agent or MCP server is trusted before you connect to it. Paste a repo, package, or MCP server URL for an evidence-backed, signed verdict.">
+  <link rel="canonical" href="https://hvtracker.net/verify/">
+  <link rel="stylesheet" href="/static/site.css">
+  <script defer src="/static/site-status.js"></script>
+  <script defer src="/analytics.js"></script>
+  <style>
+    .verify-hero { max-width: 760px; margin: 28px auto 18px; text-align: center; }
+    .verify-hero h1 { font-size: 30px; line-height: 1.12; letter-spacing: -.02em; margin-bottom: 10px; }
+    .verify-hero p { color: var(--muted); font-size: 15px; }
+    .verify-box { max-width: 760px; margin: 0 auto; }
+    .verify-form { display: flex; gap: 10px; flex-wrap: wrap; }
+    .verify-form input { flex: 1; min-width: 240px; padding: 13px 15px; border: 1px solid var(--line-strong); background: var(--bg); color: var(--text); font: 15px var(--font-sans); outline: none; border-radius: 8px; }
+    .verify-form input:focus { border-color: var(--accent); }
+    .verify-form button { padding: 13px 22px; border: 0; background: var(--accent); color: #fff; font: 700 14px var(--font-sans); cursor: pointer; border-radius: 8px; }
+    .verify-form button:hover { filter: brightness(1.08); }
+    .verify-eg { color: var(--muted); font-size: 12px; margin-top: 10px; }
+    .verify-eg a { color: var(--accent); cursor: pointer; }
+    .result { margin-top: 22px; }
+    .result-card { border: 1px solid var(--line); border-top: 3px solid var(--line-strong); background: var(--surface); border-radius: 8px; padding: 20px; }
+    .result-verdict { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .verdict-pill { font: 700 13px var(--font-mono); padding: 5px 12px; border-radius: 999px; letter-spacing: .02em; }
+    .v-trusted { background: var(--green); color: #fff; }
+    .v-caution { background: var(--amber); color: #fff; }
+    .v-unknown { background: var(--muted); color: #fff; }
+    .result-sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .result-reasons { margin: 16px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+    .result-reasons li { font-size: 13.5px; padding-left: 18px; position: relative; }
+    .result-reasons li::before { content: "\2013"; position: absolute; left: 0; color: var(--muted); }
+    .result-perms { margin-top: 14px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .perm-tag { font: 11px var(--font-mono); border: 1px solid var(--line-strong); color: var(--text); padding: 2px 8px; border-radius: 4px; background: var(--bg); }
+    .result-meta { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); font: 11px var(--font-mono); color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; }
+    .result-meta .signed { color: var(--green); }
+    .result-cta a { color: var(--accent); font-weight: 700; }
+    .result-loading, .result-error { color: var(--muted); font-size: 14px; margin-top: 22px; }
+    .result-error { color: var(--red); }
+  </style>
+</head>
+<body data-page-type="verify">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/methodology">Methodology</a><a href="/badges/">Badges</a><a href="/score-lab/">Score lab</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
+      </nav>
+      <div class="site-status"><span class="live-dot"></span>updated <span class="site-status-value"></span></div>
+    </div>
+  </header>
+
+  <div class="page">
+    <section class="verify-hero">
+      <h1>Should you trust this agent?</h1>
+      <p>Before you connect to an AI agent or MCP server, check it against independent, evidence-weighted trust signals — and get a signed verdict you can verify yourself.</p>
+    </section>
+
+    <div class="verify-box">
+      <form class="verify-form" id="verify-form" autocomplete="off">
+        <input id="verify-input" name="server" placeholder="owner/repo, npm/pypi package, or MCP server URL" aria-label="Agent or MCP server identifier" required>
+        <button type="submit">Verify</button>
+      </form>
+      <p class="verify-eg">Try:
+        <a data-eg="topoteretes/cognee">topoteretes/cognee</a> ·
+        <a data-eg="aider-chat">aider-chat</a> ·
+        <a data-eg="modelcontextprotocol/servers">modelcontextprotocol/servers</a>
+      </p>
+      <div class="result" id="result" hidden></div>
+    </div>
+  </div>
+
+  <footer>
+    <span>HVTracker — independent AI agent trust registry</span>
+    <span class="footer-sep">/</span>
+    <a href="/methodology">Methodology</a>
+    <span class="footer-sep">/</span>
+    <a href="/spec/mcp-server-trust/v0.1">MCP Trust spec</a>
+    <span class="footer-sep">/</span>
+    <a href="/data/">Data API</a>
+  </footer>
+
+  <script>
+    (function () {
+      var form = document.getElementById('verify-form');
+      var input = document.getElementById('verify-input');
+      var out = document.getElementById('result');
+
+      function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+
+      function render(d) {
+        var pill, label, sub;
+        if (!d.tracked) {
+          pill = 'v-unknown'; label = 'Not in the registry';
+          sub = 'No independent evidence yet — treat as unverified.';
+        } else if (d.trusted) {
+          pill = 'v-trusted'; label = 'Trusted';
+          sub = 'Meets the default trust policy (grade ≥ C, active, not flagged).';
+        } else {
+          pill = 'v-caution'; label = 'Not trusted yet';
+          sub = 'Tracked, but below the default trust threshold — review the reasons.';
+        }
+        var html = '<div class="result-card">';
+        html += '<div class="result-verdict"><span class="verdict-pill ' + pill + '">' + label + '</span>';
+        if (d.tracked) {
+          html += '<span class="badge grade-' + esc(d.grade) + '">' + esc(d.grade) + '</span>';
+          html += '<strong>' + esc(d.trust_score) + '</strong><span style="color:var(--muted)">/100 HVTrust</span>';
+        }
+        html += '</div><div class="result-sub">' + esc(sub) + '</div>';
+        if (d.reasons && d.reasons.length) {
+          html += '<ul class="result-reasons">';
+          d.reasons.forEach(function (r) { html += '<li>' + esc(r) + '</li>'; });
+          html += '</ul>';
+        }
+        if (d.tool_permissions && d.tool_permissions.length) {
+          html += '<div class="result-perms"><span style="color:var(--muted);font-size:12px">Tool surface:</span>';
+          d.tool_permissions.forEach(function (t) { html += '<span class="perm-tag">' + esc(t) + '</span>'; });
+          html += '</div>';
+        }
+        if (!d.tracked && d.submit_url) {
+          html += '<div class="result-meta result-cta">Maintainer? <a href="' + esc(d.submit_url) + '">Submit it for review →</a></div>';
+        } else if (d.tracked) {
+          var att = d.attestation || {};
+          html += '<div class="result-meta">';
+          html += '<span>' + (att.signature ? '<span class="signed">✔ signed attestation</span>' : 'unsigned (verify by reproduction)') + '</span>';
+          if (d.resolved) html += '<a href="/agents/' + esc((d.resolved.split('/')[1] || '').toLowerCase()) + '/">View full profile →</a>';
+          html += '</div>';
+        }
+        html += '</div>';
+        out.innerHTML = html;
+      }
+
+      function run(q) {
+        if (!q) return;
+        out.hidden = false;
+        out.innerHTML = '<div class="result-loading">Checking trust signals…</div>';
+        fetch('/api/v1/mcp/verify?server=' + encodeURIComponent(q))
+          .then(function (r) { return r.json(); })
+          .then(render)
+          .catch(function () { out.innerHTML = '<div class="result-error">Could not reach the trust API. Try again.</div>'; });
+      }
+
+      form.addEventListener('submit', function (e) { e.preventDefault(); run(input.value.trim()); });
+      document.querySelectorAll('[data-eg]').forEach(function (a) {
+        a.addEventListener('click', function () { input.value = a.getAttribute('data-eg'); run(input.value); });
+      });
+    })();
+  </script>
+</body>
+</html>
