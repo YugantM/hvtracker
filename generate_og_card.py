@@ -118,7 +118,10 @@ def wrap_text(draw: ImageDraw.ImageDraw, text: str, font, max_width: int, max_li
 
 def stat_box(draw, x, y, w, value, label, accent):
     rounded(draw, (x, y, x + w, y + 78), 14, fill=hex_rgb(SURFACE), outline=hex_rgb(BORDER))
-    draw.text((x + 16, y + 12), value, font=load_font(26, bold=True), fill=hex_rgb(TEXT))
+    # Shrink the value font to fit the box width (long categories like
+    # "Agent Frameworks" were overflowing the box at the fixed size 26).
+    value_font = fit_text(draw, str(value), w - 32, 26, 14, bold=True)
+    draw.text((x + 16, y + 12), str(value), font=value_font, fill=hex_rgb(TEXT))
     draw.text((x + 16, y + 46), label, font=load_font(14), fill=hex_rgb(accent))
 
 
@@ -159,8 +162,10 @@ def generate(agent_data: dict, output_path: str):
     # Header
     draw.text((left_x, top_y), "HV", font=load_font(20, bold=True, mono=True), fill=hex_rgb(TEXT))
     hv_w = draw.textbbox((0, 0), "HV", font=load_font(20, bold=True, mono=True))[2]
-    draw.text((left_x + hv_w, top_y), "Tracker", font=load_font(20, mono=True), fill=hex_rgb(ACCENT_WARM))
-    draw.text((left_x + hv_w + 80, top_y + 2), "AI Trust Registry", font=load_font(16), fill=hex_rgb(MUTED))
+    tracker_font = load_font(20, mono=True)
+    draw.text((left_x + hv_w, top_y), "Tracker", font=tracker_font, fill=hex_rgb(ACCENT_WARM))
+    tracker_w = draw.textbbox((0, 0), "Tracker", font=tracker_font)[2]
+    draw.text((left_x + hv_w + tracker_w + 18, top_y + 2), "AI Trust Registry", font=load_font(16), fill=hex_rgb(MUTED))
 
     # Grade pill
     grade = agent_data.get("evidence_grade", "D")

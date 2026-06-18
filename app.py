@@ -58,7 +58,7 @@ _OLOOKUP_WINDOW = 600
 _OLOOKUP_LIMIT = 20
 _olookup_log: dict[str, deque] = {}
 _olookup_cache: dict[str, tuple] = {}
-_OLOOKUP_TTL = 1800
+_OLOOKUP_TTL = 86400  # cache a repo's verdict for the day; a daily job can refresh it
 
 
 def _is_open_lookup_limited(request: Request) -> bool:
