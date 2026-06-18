@@ -78,7 +78,7 @@
   --surface: #eae6de;
   --border: #d4cfc5;
   --text: #1a1a1a;
-  --muted: #6b6560;
+  --muted: #57524c;
   --accent: #2c5282;
   --accent-warm: #b05a3a;
   --green: #2f6846;
@@ -163,3 +163,24 @@ footer a { color: var(--accent); }
   /* On mobile, open dropdowns stack inline instead of floating. */
   .nav-group:hover > .nav-panel, .nav-group:focus-within > .nav-panel { position: static; box-shadow: none; border: 0; padding: 2px 0 2px 12px; margin-top: 0; min-width: 0; }
 }
+
+/* ── UI/UX polish ──────────────────────────────────────────────
+   Additive craft layer: smooth transitions, accessible focus rings,
+   frosted sticky header, and subtle depth. Keeps the paper theme. */
+a, button, summary, .nav-trigger, .badge, .evidence-badge, .chip {
+  transition: color .15s ease, background-color .15s ease, border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+a:hover { text-underline-offset: 3px; text-decoration-thickness: 1px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+.nav-trigger:focus-visible, .nav-panel a:focus-visible { outline-offset: -1px; }
+/* Sticky header: frosted glass + soft depth as content scrolls under it */
+.site-header {
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: saturate(1.08) blur(7px);
+  -webkit-backdrop-filter: saturate(1.08) blur(7px);
+  box-shadow: 0 6px 18px -14px rgba(31, 27, 23, .6);
+}
+.logo { letter-spacing: -.01em; }
+.nav-panel { box-shadow: 0 12px 30px -12px rgba(31, 27, 23, .4); }
+.nav-panel a:hover { transform: translateX(2px); }
+.badge, .evidence-badge { box-shadow: 0 1px 2px rgba(31, 27, 23, .12); }
