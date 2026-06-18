@@ -2,10 +2,10 @@
   "authority": "hvtracker.net",
   "name": "HVTracker — AI Agent Trust Registry",
   "description": "Independent trust registry for open-source AI agents. Ranks agents by evidence-weighted trust (HVTrust), not popularity.",
-  "version": "0.1",
+  "version": "0.2",
   "methodology": "https://hvtracker.net/methodology",
   "specs": {
-    "trust_credential": "https://hvtracker.net/spec/trust-credential/v0.1",
+    "trust_credential": "https://hvtracker.net/spec/trust-credential/v0.2",
     "methodology": "https://hvtracker.net/spec/methodology",
     "data_schema": "https://hvtracker.net/spec/data-schema"
   },
@@ -16,10 +16,12 @@
   },
   "trust_credential": {
     "format": "json",
-    "signed": false,
-    "signature_algorithm": null,
-    "public_key": null,
-    "verification": "Until signed credentials (Phase C) are issued, a credential is verified by re-fetching the public signals and recomputing the score with the published methodology."
+    "signed": true,
+    "signature_algorithm": "Ed25519",
+    "public_key": "mEfivVkAEfx09O2Dm0oG8+Zbh3dEZ2UB8a6P/Fd9Tgo=",
+    "public_key_encoding": "base64-raw-32",
+    "canonicalization": "JSON with sorted keys, separators (\",\",\":\"), ensure_ascii=false, excluding the `signature` field",
+    "verification": "Verify the base64 detached Ed25519 `signature` over the canonical credential against `public_key` — no re-fetch required. Credentials also remain reproducible: recompute the score from public signals per the methodology to cross-check. A null signature means the issuing build had no signing key."
   },
   "contact": "https://github.com/YugantM/hvtracker/issues",
   "license": "CC BY 4.0"
