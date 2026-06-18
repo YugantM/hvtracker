@@ -133,6 +133,16 @@ a:hover { text-decoration: underline; }
 .site-nav { font-family: var(--font-mono); font-size: 10px; display: flex; gap: 2px; margin-left: 0; justify-self: center; min-width: 0; }
 .site-nav a { color: var(--muted); padding: 5px 8px; border: 1px solid transparent; white-space: nowrap; }
 .site-nav a:hover { color: var(--text); text-decoration: none; border-color: var(--border); background: var(--surface); }
+/* Grouped nav dropdowns (no-JS, accessible via <details>) */
+.nav-group { position: relative; }
+.nav-group > summary { list-style: none; cursor: pointer; color: var(--muted); padding: 5px 8px; border: 1px solid transparent; white-space: nowrap; }
+.nav-group > summary::-webkit-details-marker { display: none; }
+.nav-group > summary::after { content: " \25BE"; opacity: .55; font-size: 9px; }
+.nav-group > summary:hover { color: var(--text); border-color: var(--border); background: var(--surface); }
+.nav-group[open] > summary { color: var(--text); border-color: var(--border); background: var(--surface); }
+.nav-panel { position: absolute; top: 100%; left: 0; z-index: 200; margin-top: 4px; display: flex; flex-direction: column; min-width: 150px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 4px; box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+.nav-panel a { color: var(--muted); padding: 6px 10px; border-radius: 4px; border: 0; white-space: nowrap; }
+.nav-panel a:hover { color: var(--text); background: var(--surface); text-decoration: none; }
 .site-status { font: 11px var(--font-mono); color: var(--muted); margin-left: 0; white-space: nowrap; justify-self: end; }
 .live-dot { display: inline-block; width: 7px; height: 7px; border-radius: 999px; background: var(--green); margin-right: 6px; vertical-align: middle; box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 18%, transparent); }
 
@@ -151,4 +161,6 @@ footer a { color: var(--accent); }
   .site-header-inner { grid-template-columns: 1fr; gap: 4px; }
   .site-nav { justify-self: start; flex-wrap: wrap; }
   .site-status { justify-self: start; }
+  /* On mobile, open dropdowns stack inline instead of floating. */
+  .nav-panel { position: static; box-shadow: none; border: 0; padding: 2px 0 2px 12px; margin-top: 0; min-width: 0; }
 }
