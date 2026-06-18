@@ -52,6 +52,39 @@ def _is_rate_limited(request: Request) -> bool:
     return False
 
 
+# Open-lookup (P2): a more generous, read-only limit than the form limiter,
+# plus a short cache so repeat checks of the same repo don't re-hit GitHub.
+_OLOOKUP_WINDOW = 600
+_OLOOKUP_LIMIT = 20
+_olookup_log: dict[str, deque] = {}
+_olookup_cache: dict[str, tuple] = {}
+_OLOOKUP_TTL = 1800
+
+
+def _is_open_lookup_limited(request: Request) -> bool:
+    ip = _client_ip(request)
+    now = time.monotonic()
+    with _rate_lock:
+        q = _olookup_log.setdefault(ip, deque())
+        while q and q[0] < now - _OLOOKUP_WINDOW:
+            q.popleft()
+        if len(q) >= _OLOOKUP_LIMIT:
+            return True
+        q.append(now)
+    return False
+
+
+def _olookup_cache_get(repo: str):
+    hit = _olookup_cache.get(repo)
+    if hit and time.monotonic() - hit[0] < _OLOOKUP_TTL:
+        return hit[1]
+    return None
+
+
+def _olookup_cache_put(repo: str, verdict: dict) -> None:
+    _olookup_cache[repo] = (time.monotonic(), verdict)
+
+
 _EMAIL_RE = re.compile(r".+@.+\..+")
 
 _FIELD_LIMITS = {
@@ -584,21 +617,23 @@ def api_v1_agents():
 
 
 @app.get("/api/v1/mcp/verify")
-def api_v1_mcp_verify(server: str = ""):
-    """Pre-connect trust verdict for an MCP server (P3, "Safe Browsing for MCP").
+def api_v1_mcp_verify(request: Request, server: str = ""):
+    """Pre-connect trust verdict for an agent or MCP server.
 
-    `server` may be a GitHub repo (owner/name or URL) or an npm/pypi package name.
-    Returns {trusted, grade, trust_score, reasons[], attestation}. The attestation
-    is signed (signing.py) so the verdict is verifiable; verification stays free.
+    `server` may be a GitHub repo (owner/name or URL) or an npm/pypi package.
+    Curated agents return a full signed verdict. An unlisted GitHub repo falls
+    through to open lookup (P2): a free PROVISIONAL verdict if it is an AI
+    project with >= 1,000 stars, else it is routed to /submit. The attestation
+    is signed so the verdict is verifiable; verification is always free.
     """
     import mcp_trust
     server = (server or "").strip()
+    cors = {"Access-Control-Allow-Origin": _API_V1_CORS}
     if not server:
-        return JSONResponse(
-            {"error": "missing required query param: server"},
-            status_code=400,
-            headers={"Access-Control-Allow-Origin": _API_V1_CORS},
-        )
+        return JSONResponse({"error": "missing required query param: server"},
+                            status_code=400, headers=cors)
+
+    # 1) Curated registry (the gold "Verified" tier).
     agent = None
     repo = _normalize_github_repo(server)
     if repo:
@@ -610,12 +645,33 @@ def api_v1_mcp_verify(server: str = ""):
                (a.get("pypi_package") or "").lower() == key:
                 agent = a
                 break
-    verdict = mcp_trust.evaluate(agent, server)
-    verdict["attestation"] = mcp_trust.build_attestation(verdict)
-    return JSONResponse(verdict, headers={
-        "Cache-Control": _API_V1_CACHE,
-        "Access-Control-Allow-Origin": _API_V1_CORS,
-    })
+    if agent is not None:
+        verdict = mcp_trust.evaluate(agent, server)
+        verdict["attestation"] = mcp_trust.build_attestation(verdict)
+        return JSONResponse(verdict, headers={**cors, "Cache-Control": _API_V1_CACHE})
+
+    # 2) Unlisted and not a GitHub repo -> submit funnel (no scoring).
+    if not repo:
+        verdict = mcp_trust.evaluate(None, server)
+        verdict["attestation"] = mcp_trust.build_attestation(verdict)
+        return JSONResponse(verdict, headers=cors)
+
+    # 3) Unlisted GitHub repo -> open lookup (cached, rate-limited).
+    cached = _olookup_cache_get(repo)
+    if cached is not None:
+        return JSONResponse(cached, headers=cors)
+    if _is_open_lookup_limited(request):
+        return JSONResponse(
+            {"server": server, "tracked": False, "trusted": False,
+             "eligibility": "rate_limited", "submit_url": "https://hvtracker.net/submit",
+             "reasons": ["Too many instant checks from your IP — try again in a few minutes."]},
+            status_code=429, headers=cors)
+    import open_lookup
+    verdict = open_lookup.evaluate_open(server, repo, os.environ.get("GITHUB_TOKEN", ""))
+    if verdict.get("eligibility") == "ok":
+        verdict["attestation"] = mcp_trust.build_attestation(verdict)
+    _olookup_cache_put(repo, verdict)
+    return JSONResponse(verdict, headers=cors)
 
 
 @app.api_route("/compare", methods=["GET", "HEAD"], response_class=HTMLResponse)

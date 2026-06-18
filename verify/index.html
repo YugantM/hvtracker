@@ -94,25 +94,34 @@
 
       function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
 
-      function render(d) {
-        var pill, label, sub;
-        if (!d.tracked) {
-          pill = 'v-unknown'; label = 'Not in the registry';
-          sub = 'No independent evidence yet — treat as unverified.';
-        } else if (d.trusted) {
-          pill = 'v-trusted'; label = 'Trusted';
-          sub = 'Meets the default trust policy (grade ≥ C, active, not flagged).';
-        } else {
-          pill = 'v-caution'; label = 'Not trusted yet';
-          sub = 'Tracked, but below the default trust threshold — review the reasons.';
-        }
-        var html = '<div class="result-card">';
-        html += '<div class="result-verdict"><span class="verdict-pill ' + pill + '">' + label + '</span>';
+      function pillFor(d) {
         if (d.tracked) {
-          html += '<span class="badge grade-' + esc(d.grade) + '">' + esc(d.grade) + '</span>';
-          html += '<strong>' + esc(d.trust_score) + '</strong><span style="color:var(--muted)">/100 HVTrust</span>';
+          return d.trusted
+            ? ['v-trusted', 'Verified · Trusted', 'Meets the default trust policy (grade ≥ C, active, not flagged).']
+            : ['v-caution', 'Verified · Not trusted yet', 'Tracked, but below the default trust threshold — review the reasons.'];
         }
-        html += '</div><div class="result-sub">' + esc(sub) + '</div>';
+        if (d.provisional && d.eligibility === 'ok') {
+          return d.trusted
+            ? ['v-trusted', 'Provisional · Looks trustworthy', 'Eligible AI project (≥1k stars). Provisional — public GitHub signals only, not continuously tracked.']
+            : ['v-caution', 'Provisional · Caution', 'Eligible AI project, but inactive or unlicensed on basic checks. Provisional only.'];
+        }
+        return ({
+          not_ai:       ['v-unknown', 'Out of scope', 'Not an AI project — HVTracker only covers AI agents.'],
+          below_stars:  ['v-unknown', 'Below the bar', 'AI project, but under the 1,000-star threshold for a free instant check.'],
+          not_found:    ['v-unknown', 'Not found', 'No public GitHub repo found for that identifier.'],
+          archived:     ['v-unknown', 'Archived', 'This repository is archived — no longer maintained.'],
+          rate_limited: ['v-unknown', 'Rate limited', 'Too many instant checks — try again shortly.']
+        })[d.eligibility] || ['v-unknown', 'Not in the registry', 'No independent evidence yet — treat as unverified.'];
+      }
+
+      function render(d) {
+        var p = pillFor(d);
+        var html = '<div class="result-card">';
+        html += '<div class="result-verdict"><span class="verdict-pill ' + p[0] + '">' + esc(p[1]) + '</span>';
+        if (d.grade) html += '<span class="badge grade-' + esc(d.grade) + '">' + esc(d.grade) + '</span>';
+        if (d.tracked && d.trust_score != null) html += '<strong>' + esc(d.trust_score) + '</strong><span style="color:var(--muted)">/100 HVTrust</span>';
+        if (d.stars != null) html += '<span style="color:var(--muted);font:12px var(--font-mono)">★ ' + esc(Number(d.stars).toLocaleString()) + '</span>';
+        html += '</div><div class="result-sub">' + esc(p[2]) + '</div>';
         if (d.reasons && d.reasons.length) {
           html += '<ul class="result-reasons">';
           d.reasons.forEach(function (r) { html += '<li>' + esc(r) + '</li>'; });
@@ -123,15 +132,11 @@
           d.tool_permissions.forEach(function (t) { html += '<span class="perm-tag">' + esc(t) + '</span>'; });
           html += '</div>';
         }
-        if (!d.tracked && d.submit_url) {
-          html += '<div class="result-meta result-cta">Maintainer? <a href="' + esc(d.submit_url) + '">Submit it for review →</a></div>';
-        } else if (d.tracked) {
-          var att = d.attestation || {};
-          html += '<div class="result-meta">';
-          html += '<span>' + (att.signature ? '<span class="signed">✔ signed attestation</span>' : 'unsigned (verify by reproduction)') + '</span>';
-          if (d.resolved) html += '<a href="/agents/' + esc((d.resolved.split('/')[1] || '').toLowerCase()) + '/">View full profile →</a>';
-          html += '</div>';
-        }
+        var meta = [], att = d.attestation || {};
+        if (att.signature) meta.push('<span class="signed">✔ signed attestation</span>');
+        if (d.tracked && d.resolved) meta.push('<a href="/agents/' + esc((d.resolved.split('/')[1] || '').toLowerCase()) + '/">View full profile →</a>');
+        if (d.submit_url && !d.tracked) meta.push('<a href="' + esc(d.submit_url) + '">' + (d.provisional ? 'Get a fully-tracked Verified listing →' : 'Submit it for review →') + '</a>');
+        if (meta.length) html += '<div class="result-meta">' + meta.join('') + '</div>';
         html += '</div>';
         out.innerHTML = html;
       }
