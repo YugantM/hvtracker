@@ -30,7 +30,9 @@ def evaluate(agent: dict | None, server_id: str) -> dict:
             "trust_score": None,
             "confidence": 0.0,
             "reasons": ["Not in the HVTracker registry — no independent evidence. "
-                        "Treat as unverified; connect only if you trust the source directly."],
+                        "Submit it for review (eligibility applies); until then treat as "
+                        "unverified and connect only if you trust the source directly."],
+            "submit_url": "https://hvtracker.net/submit",
             "mcp_server_support": None,
             "tool_permissions": [],
         }

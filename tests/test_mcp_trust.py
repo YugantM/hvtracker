@@ -27,6 +27,7 @@ def test_untracked_server_not_trusted():
     assert v["tracked"] is False
     assert v["trusted"] is False
     assert any("registry" in r.lower() for r in v["reasons"])
+    assert v["submit_url"].endswith("/submit")  # dead-end becomes a submission funnel
 
 
 def test_trusted_good_agent():
