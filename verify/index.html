@@ -21,6 +21,18 @@
     .verify-form button:hover { filter: brightness(1.08); }
     .verify-eg { color: var(--muted); font-size: 12px; margin-top: 10px; }
     .verify-eg a { color: var(--accent); cursor: pointer; }
+    .verify-note { max-width: 760px; margin: 14px auto 0; color: var(--muted); font-size: 12px; border-top: 1px dashed var(--line); padding-top: 12px; }
+    .verify-note a { color: var(--accent); }
+    .recent { max-width: 760px; margin: 38px auto 0; }
+    .recent-title { font-size: 14px; color: var(--text); margin-bottom: 12px; display: flex; align-items: baseline; gap: 8px; }
+    .recent-title span { color: var(--muted); font: 11px var(--font-mono); font-weight: 400; }
+    .recent-list { display: grid; gap: 6px; }
+    .recent-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font-size: 13px; }
+    .recent-row .r-repo { font-family: var(--font-mono); color: var(--text); }
+    .recent-row .r-repo:hover { color: var(--accent); }
+    .recent-row .r-tag { font: 10px var(--font-mono); color: var(--muted); border: 1px solid var(--line-strong); border-radius: 3px; padding: 1px 5px; }
+    .recent-row .r-when { margin-left: auto; color: var(--muted); font: 11px var(--font-mono); white-space: nowrap; }
+    .recent-empty { color: var(--muted); font-size: 13px; }
     .result { margin-top: 22px; }
     .result-card { border: 1px solid var(--line); border-top: 3px solid var(--line-strong); background: var(--surface); border-radius: 8px; padding: 20px; }
     .result-verdict { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -73,7 +85,13 @@
         <a data-eg="modelcontextprotocol/servers">modelcontextprotocol/servers</a>
       </p>
       <div class="result" id="result" hidden></div>
+      <p class="verify-note">🔓 Checks are <strong>public</strong> — every successful check appears in the live feed below. Want it continuously tracked? <a href="/submit/">Submit it</a>. Private checks will require a paid plan.</p>
     </div>
+
+    <section class="recent" id="recent">
+      <h2 class="recent-title">Recently checked <span>· last 100 · public</span></h2>
+      <div class="recent-list" id="recent-list"><span class="recent-empty">Loading…</span></div>
+    </section>
   </div>
 
   <footer>
@@ -147,14 +165,40 @@
         out.innerHTML = '<div class="result-loading">Checking trust signals…</div>';
         fetch('/api/v1/mcp/verify?server=' + encodeURIComponent(q))
           .then(function (r) { return r.json(); })
-          .then(render)
+          .then(function (d) { render(d); if (d.tracked || d.eligibility === 'ok') setTimeout(loadRecent, 400); })
           .catch(function () { out.innerHTML = '<div class="result-error">Could not reach the trust API. Try again.</div>'; });
+      }
+
+      function timeAgo(iso) {
+        var s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+        if (s < 60) return 'just now';
+        if (s < 3600) return Math.floor(s / 60) + 'm ago';
+        if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+        return Math.floor(s / 86400) + 'd ago';
+      }
+      function renderRecent(items) {
+        var el = document.getElementById('recent-list');
+        if (!items || !items.length) { el.innerHTML = '<span class="recent-empty">No checks yet — be the first.</span>'; return; }
+        el.innerHTML = items.map(function (c) {
+          var g = c.grade ? '<span class="badge grade-' + esc(c.grade) + '">' + esc(c.grade) + '</span>' : '';
+          var tag = c.provisional ? 'provisional' : 'verified';
+          return '<div class="recent-row">' + g +
+            '<a class="r-repo" href="https://github.com/' + esc(c.repo) + '" target="_blank" rel="noopener nofollow">' + esc(c.repo) + '</a>' +
+            '<span class="r-tag">' + tag + '</span>' +
+            '<span class="r-when">' + esc(timeAgo(c.checked_at)) + '</span></div>';
+        }).join('');
+      }
+      function loadRecent() {
+        fetch('/api/v1/verify/recent').then(function (r) { return r.json(); })
+          .then(function (d) { renderRecent(d.checks || []); })
+          .catch(function () {});
       }
 
       form.addEventListener('submit', function (e) { e.preventDefault(); run(input.value.trim()); });
       document.querySelectorAll('[data-eg]').forEach(function (a) {
         a.addEventListener('click', function () { input.value = a.getAttribute('data-eg'); run(input.value); });
       });
+      loadRecent();
     })();
   </script>
 </body>

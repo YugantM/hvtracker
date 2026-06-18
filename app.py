@@ -21,6 +21,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Redirect
 from fastapi.staticfiles import StaticFiles
 
 import db
+import verify_log
 
 
 # ---- anti-spam helpers -----------------------------------------------------
@@ -117,6 +118,7 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 COMPARE_TOOL_PATH = os.path.join(BASE_DIR, "compare", "index.html")
 VERIFY_TOOL_PATH = os.path.join(BASE_DIR, "verify", "index.html")
 RENDER_FINGERPRINT_PATH = os.path.join(OUTPUT_DIR, ".render_fingerprint")
+verify_log.init(OUTPUT_DIR)  # public "recently checked" feed (transparency)
 REFRESH_STATUS_PATH = os.path.join(OUTPUT_DIR, ".refresh_status.json")
 MAX_DATA_AGE = timedelta(hours=int(os.environ.get("MAX_DATA_AGE_HOURS", "6")))
 # OSSF scores are baked into the image from the `data` branch at build time
@@ -648,6 +650,8 @@ def api_v1_mcp_verify(request: Request, server: str = ""):
     if agent is not None:
         verdict = mcp_trust.evaluate(agent, server)
         verdict["attestation"] = mcp_trust.build_attestation(verdict)
+        verify_log.record(verdict.get("resolved") or repo or server, agent.get("name"),
+                          verdict.get("grade"), verdict.get("trusted"), False, agent.get("stars"))
         return JSONResponse(verdict, headers={**cors, "Cache-Control": _API_V1_CACHE})
 
     # 2) Unlisted and not a GitHub repo -> submit funnel (no scoring).
@@ -670,8 +674,23 @@ def api_v1_mcp_verify(request: Request, server: str = ""):
     verdict = open_lookup.evaluate_open(server, repo, os.environ.get("GITHUB_TOKEN", ""))
     if verdict.get("eligibility") == "ok":
         verdict["attestation"] = mcp_trust.build_attestation(verdict)
+        verify_log.record(verdict.get("resolved") or repo, None, verdict.get("grade"),
+                          verdict.get("trusted"), True, verdict.get("stars"))
     _olookup_cache_put(repo, verdict)
     return JSONResponse(verdict, headers=cors)
+
+
+@app.get("/api/v1/verify/recent")
+def api_v1_verify_recent():
+    """Public feed: the last successfully checked projects (transparency).
+
+    Every free check is public by default and appears here. Private checks will
+    require the paid tier or a public submission.
+    """
+    return JSONResponse({"checks": verify_log.recent()}, headers={
+        "Cache-Control": "public, max-age=30, s-maxage=60",
+        "Access-Control-Allow-Origin": _API_V1_CORS,
+    })
 
 
 @app.api_route("/compare", methods=["GET", "HEAD"], response_class=HTMLResponse)
