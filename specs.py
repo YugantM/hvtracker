@@ -1201,5 +1201,60 @@ TRUST_CREDENTIAL_V01 = {
 """,
 }
 
+MCP_SERVER_TRUST_V01 = {
+    "title": "HVTracker MCP Server Trust Specification",
+    "slug": "mcp-server-trust",
+    "version": "v0.1",
+    "status": "Draft",
+    "date": "2026-06-18",
+    "authors": ["HVTracker"],
+    "abstract": (
+        "This document defines a pre-connect trust verdict for Model Context "
+        "Protocol (MCP) servers. An MCP client queries HVTracker before "
+        "connecting to a server and receives a signed verdict — trusted or not, "
+        "with an evidence grade and reasons — so it can decide whether to "
+        "establish the session. It is a reputation layer: it rides on the "
+        "identity the MCP transport already provides and does not issue identity."
+    ),
+    "sections": [
+        {"id": "s1", "num": "1.", "title": "Abstract"},
+        {"id": "s2", "num": "2.", "title": "Lookup"},
+        {"id": "s3", "num": "3.", "title": "Verdict Format"},
+        {"id": "s4", "num": "4.", "title": "Policy"},
+        {"id": "s5", "num": "5.", "title": "Verification"},
+    ],
+    "body": """
+<h2 id="s1"><span class="sec-num">1.</span> Abstract</h2>
+<p>This document defines a <strong>pre-connect trust verdict</strong> for Model Context Protocol (MCP) servers. A client <span class="should">SHOULD</span> query the verdict before connecting and use it to decide whether to proceed. The verdict is a reputation signal layered on the server's existing identity (URL + TLS, package, or repository); HVTracker does not issue identity.</p>
+
+<h2 id="s2"><span class="sec-num">2.</span> Lookup</h2>
+<p>Query <code>GET /api/v1/mcp/verify?server=&lt;id&gt;</code> where <code>id</code> is a GitHub repository (<code>owner/name</code> or URL) or an npm/PyPI package name. The server is resolved to its HVTracker trust record; an unresolved server returns <code>tracked:false</code> and <span class="must">MUST</span> be treated as unverified.</p>
+
+<h2 id="s3"><span class="sec-num">3.</span> Verdict Format</h2>
+<pre>
+{
+  "server": "owner/name",
+  "resolved": "owner/name",
+  "tracked": true,
+  "trusted": true,
+  "grade": "A|B|C|D",
+  "trust_score": 0-100,
+  "confidence": 0.0-1.0,
+  "reasons": [ "..." ],
+  "mcp_server_support": "declared|verified|...",
+  "tool_permissions": [ "search", "code", ... ],
+  "attestation": { ...signed Trust Credential, subject = the MCP server... }
+}
+</pre>
+<p>A consumer <span class="should">SHOULD</span> surface <code>tool_permissions</code> to the user before granting access, and <span class="must">MUST</span> treat <code>confidence</code> as first-class.</p>
+
+<h2 id="s4"><span class="sec-num">4.</span> Policy</h2>
+<p>The default verdict is <code>trusted = true</code> when the server's listing is not <code>delisted</code>, <code>warning</code>, or <code>legacy</code>; its evidence grade is <code>A</code>, <code>B</code>, or <code>C</code>; and its trust score is at least 40. A consumer <span class="may">MAY</span> apply a stricter policy (e.g. require build provenance, or grade ≥ B) using the fields in the verdict.</p>
+
+<h2 id="s5"><span class="sec-num">5.</span> Verification</h2>
+<p>The <code>attestation</code> is an Ed25519-signed credential (see <a href="/spec/trust-credential/v0.2">Trust Credential v0.2</a>) whose <code>subject</code> is the MCP server. It is verified <strong>offline</strong> against the issuer key in <code>/.well-known/hvtracker.json</code>, exactly as for agent credentials.</p>
+""",
+}
+
 # All published specs, in display order (newest first)
-ALL_SPECS = [TRUST_CREDENTIAL_V01, LISTING_V01, BUILD_REPORT_V01, DATA_SCHEMA_V01, ELIGIBILITY_V1, PROVENANCE_V01, METHODOLOGY_V2]
+ALL_SPECS = [MCP_SERVER_TRUST_V01, TRUST_CREDENTIAL_V01, LISTING_V01, BUILD_REPORT_V01, DATA_SCHEMA_V01, ELIGIBILITY_V1, PROVENANCE_V01, METHODOLOGY_V2]
