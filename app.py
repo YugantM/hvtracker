@@ -581,6 +581,41 @@ def api_v1_agents():
     })
 
 
+@app.get("/api/v1/mcp/verify")
+def api_v1_mcp_verify(server: str = ""):
+    """Pre-connect trust verdict for an MCP server (P3, "Safe Browsing for MCP").
+
+    `server` may be a GitHub repo (owner/name or URL) or an npm/pypi package name.
+    Returns {trusted, grade, trust_score, reasons[], attestation}. The attestation
+    is signed (signing.py) so the verdict is verifiable; verification stays free.
+    """
+    import mcp_trust
+    server = (server or "").strip()
+    if not server:
+        return JSONResponse(
+            {"error": "missing required query param: server"},
+            status_code=400,
+            headers={"Access-Control-Allow-Origin": _API_V1_CORS},
+        )
+    agent = None
+    repo = _normalize_github_repo(server)
+    if repo:
+        agent = find_agent(repo)
+    if agent is None:
+        key = server.lower()
+        for a in load_data().get("agents", []):
+            if (a.get("npm_package") or "").lower() == key or \
+               (a.get("pypi_package") or "").lower() == key:
+                agent = a
+                break
+    verdict = mcp_trust.evaluate(agent, server)
+    verdict["attestation"] = mcp_trust.build_attestation(verdict)
+    return JSONResponse(verdict, headers={
+        "Cache-Control": _API_V1_CACHE,
+        "Access-Control-Allow-Origin": _API_V1_CORS,
+    })
+
+
 @app.api_route("/compare", methods=["GET", "HEAD"], response_class=HTMLResponse)
 @app.api_route("/compare/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 def compare_tool():

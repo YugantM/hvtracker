@@ -6,12 +6,14 @@
   "methodology": "https://hvtracker.net/methodology",
   "specs": {
     "trust_credential": "https://hvtracker.net/spec/trust-credential/v0.2",
+    "mcp_server_trust": "https://hvtracker.net/spec/mcp-server-trust/v0.1",
     "methodology": "https://hvtracker.net/spec/methodology",
     "data_schema": "https://hvtracker.net/spec/data-schema"
   },
   "endpoints": {
     "registry": "https://hvtracker.net/data/latest.json",
     "agent_lookup": "https://hvtracker.net/data/agents/{slug}.json",
+    "mcp_verify": "https://hvtracker.net/api/v1/mcp/verify?server={id}",
     "build_report": "https://hvtracker.net/data/build_report.json"
   },
   "trust_credential": {
