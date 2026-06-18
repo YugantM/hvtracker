@@ -20,6 +20,7 @@ from jinja2 import Environment, FileSystemLoader
 
 import cache
 import db
+import signing
 import storage
 
 load_dotenv()
@@ -3293,22 +3294,25 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
         recent_changes = [e for e in agent_events if e["date"] >= (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%d")]
         # Machine-readable trust credential — the self-contained, versioned
         # payload an A2A client consumes to decide whether to trust this agent.
-        # `signature` is reserved for Phase C (Ed25519 signing in CI); until
-        # then the credential is unsigned and verified by re-fetch + recompute.
+        # Signed with Ed25519 (see signing.py) when HVT_SIGNING_KEY is set, so
+        # consumers can verify OFFLINE against the published issuer key; falls
+        # back to an unsigned credential (signature=null) when no key is present.
         trust_credential = {
-            "spec": "https://hvtracker.net/spec/trust-credential/v0.1",
-            "version": "0.1",
+            "spec": "https://hvtracker.net/spec/trust-credential/v0.2",
+            "version": "0.2",
             "issuer": "hvtracker.net",
             "subject": {"repo": agent["repo"], "slug": slug, "agent_url": f"https://hvtracker.net/agents/{slug}"},
             "methodology_version": meta["methodology_version"],
             "issued_at": meta["generated_at"],
+            "expires_at": (datetime.now(timezone.utc) + timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "trust_score": agent.get("trust_score"),
             "confidence": agent.get("trust_confidence"),
             "evidence_grade": agent.get("evidence_grade"),
             "dimensions": agent.get("trust_breakdown", {}),
             "listing_status": agent.get("listing_status"),
-            "signature": None,
         }
+        trust_credential["evidence_hash"] = signing.evidence_hash(trust_credential)
+        trust_credential["signature"] = signing.sign_credential(trust_credential)
         agent_doc = {**meta, **agent, "trust_credential": trust_credential,
                      "history": history_points, "events": agent_events,
                      "recent_changes": recent_changes}

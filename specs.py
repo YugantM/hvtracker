@@ -1126,9 +1126,9 @@ LISTING_V01 = {
 TRUST_CREDENTIAL_V01 = {
     "title": "HVTracker Trust Credential Specification",
     "slug": "trust-credential",
-    "version": "v0.1",
-    "status": "Draft",
-    "date": "2026-05-28",
+    "version": "v0.2",
+    "status": "Published",
+    "date": "2026-06-18",
     "authors": ["HVTracker"],
     "abstract": (
         "This document defines the Trust Credential: a machine-readable, "
@@ -1145,7 +1145,7 @@ TRUST_CREDENTIAL_V01 = {
         {"id": "s4", "num": "4.", "title": "Credential Format"},
         {"id": "s5", "num": "5.", "title": "Verification"},
         {"id": "s6", "num": "6.", "title": "Revocation and Freshness"},
-        {"id": "s7", "num": "7.", "title": "Signing (Future)"},
+        {"id": "s7", "num": "7.", "title": "Signing"},
         {"id": "s8", "num": "8.", "title": "Versioning"},
     ],
     "body": """
@@ -1168,31 +1168,33 @@ TRUST_CREDENTIAL_V01 = {
 <p>A Trust Credential is a JSON object with the following members:</p>
 <pre>
 {
-  "spec": "https://hvtracker.net/spec/trust-credential/v0.1",
-  "version": "0.1",
+  "spec": "https://hvtracker.net/spec/trust-credential/v0.2",
+  "version": "0.2",
   "issuer": "hvtracker.net",
   "subject": { "repo": "owner/name", "slug": "name", "agent_url": "https://hvtracker.net/agents/name" },
-  "methodology_version": "v3.0",
-  "issued_at": "2026-05-28 12:00 UTC",
+  "methodology_version": "v3.2",
+  "issued_at": "2026-06-18T00:00:00Z",
+  "expires_at": "2026-06-25T00:00:00Z",
   "trust_score": 0-100,
   "confidence": 0.0-1.0,
   "evidence_grade": "A|B|C|D",
   "dimensions": { "safety": n, "identity": n, "transparency": n, "maintenance": n, "adoption": n },
   "listing_status": "listed|legacy|delisted|...",
-  "signature": null
+  "evidence_hash": "&lt;sha256-hex&gt;",
+  "signature": "&lt;base64-ed25519, or null if the build had no key&gt;"
 }
 </pre>
 <p>A consumer <span class="must">MUST</span> treat <code>confidence</code> as a first-class factor: a high <code>trust_score</code> with low <code>confidence</code> reflects thin evidence and <span class="should">SHOULD NOT</span> be relied upon for high-stakes interactions.</p>
 
 <h2 id="s5"><span class="sec-num">5.</span> Verification</h2>
-<p>Until signed credentials are issued (Section 7), a credential is verified by <strong>reproduction</strong>: the consumer re-fetches the public signals named in the methodology and recomputes the score. An implementation conforming to the methodology specification <span class="must">MUST</span> produce a score within 0.1 points of the credential given identical inputs.</p>
-<p>A consumer <span class="should">SHOULD</span> reject a credential whose <code>methodology_version</code> it does not recognize.</p>
+<p>A credential is signed with Ed25519 and verified <strong>offline</strong>: remove the <code>signature</code> member, serialize the remainder as JSON with <strong>sorted keys</strong>, separators <code>(",",":")</code>, and <code>ensure_ascii=false</code>, then verify the base64 <code>signature</code> against the issuer public key published at <code>/.well-known/hvtracker.json</code>. A consumer <span class="must">MUST</span> reject a credential whose signature does not verify, and <span class="should">SHOULD</span> reject one whose <code>methodology_version</code> it does not recognize.</p>
+<p>The <code>evidence_hash</code> is a SHA-256 over the canonical score-bearing fields, binding the score to its evidence snapshot. A consumer <span class="must">MUST</span> treat <code>confidence</code> as first-class, and <span class="may">MAY</span> additionally <strong>reproduce</strong> the score from public signals per the methodology (an implementation conforming to the methodology <span class="must">MUST</span> land within 0.1 points). A <code>null</code> signature means the issuing build had no signing key; such a credential <span class="should">SHOULD</span> be verified by reproduction only.</p>
 
 <h2 id="s6"><span class="sec-num">6.</span> Revocation and Freshness</h2>
-<p>Credentials are regenerated each build cycle; <code>issued_at</code> records issuance time. A consumer <span class="should">SHOULD</span> treat a credential older than one full refresh cycle (24 hours) as stale. A <code>listing_status</code> of <code>delisted</code> <span class="must">MUST</span> be treated as revocation regardless of score.</p>
+<p>Each credential carries <code>issued_at</code> and <code>expires_at</code>. A consumer <span class="must">MUST</span> reject a credential after its <code>expires_at</code> and <span class="should">SHOULD</span> prefer the freshest available. A <code>listing_status</code> of <code>delisted</code> <span class="must">MUST</span> be treated as revocation regardless of score.</p>
 
-<h2 id="s7"><span class="sec-num">7.</span> Signing (Future)</h2>
-<p>The <code>signature</code> member is reserved. A future revision will publish an issuer public key at <code>/.well-known/hvtracker.json</code> and populate <code>signature</code> with a detached signature over the canonicalized credential, enabling offline verification without re-fetching public signals.</p>
+<h2 id="s7"><span class="sec-num">7.</span> Signing</h2>
+<p>Credentials are signed with <strong>Ed25519</strong>. The issuer public key (base64, raw 32 bytes) is published at <code>/.well-known/hvtracker.json</code> under <code>trust_credential.public_key</code>; the <code>signature</code> is a detached signature over the canonical credential (Section 5). Key rotation re-publishes the public key, so a consumer <span class="should">SHOULD</span> fetch the current key from the authority descriptor rather than pinning it.</p>
 
 <h2 id="s8"><span class="sec-num">8.</span> Versioning</h2>
 <p>This specification uses <code>vMAJOR.MINOR</code> versioning. Published versions remain accessible at their versioned URLs and <span class="must">MUST NOT</span> be modified after publication.</p>
