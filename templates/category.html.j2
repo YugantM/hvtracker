@@ -6,12 +6,12 @@
   <meta name="google-site-verification" content="s2YUWbGP7cJsI6HUCKRX9YCtbVJVyA1Q1_jsNWj1RHc">
   <title>Best {{ category }} — Ranked by Trust Score | HVTracker</title>
   <meta name="description" content="Compare {{ agents|length }} {{ category|lower }} ranked by independent trust scores. Open-source-first, with limited public GitHub comparators where relevant. {{ top3_names }}. Updated daily with security, activity, and adoption signals.">
-  <link rel="canonical" href="https://hvtracker.net/categories/{{ slug }}">
+  <link rel="canonical" href="https://hvtracker.net/categories/{{ slug }}/">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="Best {{ category }} — Ranked by Trust Score | HVTracker">
   <meta property="og:description" content="Compare {{ agents|length }} {{ category|lower }} ranked by trust score. Open-source-first, with limited public GitHub comparators where relevant.">
-  <meta property="og:url" content="https://hvtracker.net/categories/{{ slug }}">
+  <meta property="og:url" content="https://hvtracker.net/categories/{{ slug }}/">
   <meta property="og:image" content="https://hvtracker.net/og-v2.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Best {{ category }} — Ranked by Trust Score | HVTracker">
@@ -24,7 +24,7 @@
     "@type": "CollectionPage",
     "name": "Best {{ category }}",
     "description": "{{ agents|length }} {{ category|lower }} ranked by independent trust scores on HVTracker. Open-source-first, with limited public GitHub comparators where relevant.",
-    "url": "https://hvtracker.net/categories/{{ slug }}",
+    "url": "https://hvtracker.net/categories/{{ slug }}/",
     "isPartOf": {
       "@type": "WebSite",
       "name": "HVTracker",
@@ -39,7 +39,7 @@
           "@type": "ListItem",
           "position": {{ loop.index }},
           "name": "{{ a.name }}",
-          "url": "https://hvtracker.net/agents/{{ a.slug }}"
+          "url": "https://hvtracker.net/agents/{{ a.slug }}/"
         }{% if not loop.last %},{% endif %}
         {% endfor %}
       ]
@@ -115,16 +115,6 @@
       .name-cell .desc { max-width:180px; }
     }
   </style>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
-      { "@type": "ListItem", "position": 2, "name": "{{ category }}", "item": "https://hvtracker.net/categories/{{ slug }}/" }
-    ]
-  }
-  </script>
   <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
   <script>
     (function(){var host=window.location.hostname||"";if(/^(localhost|127(?:\.\d{1,3}){3}|0(?:\.\d{1,3}){3}|::1)$/i.test(host)){window["ga-disable-G-TZ8921LR0K"]=true;return}try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
@@ -196,7 +186,7 @@
         <tr>
           <td class="rank-cell">{{ a.category_rank }}</td>
           <td class="name-cell">
-            <a href="/agents/{{ a.slug }}">{{ a.name }}</a>
+            <a href="/agents/{{ a.slug }}/">{{ a.name }}</a>
             <span class="grade grade-{{ a.evidence_grade }}">{{ a.evidence_grade }}</span>
             <span class="state-chip state-{{ a.display_listing_status }}">{{ a.display_status_label }}</span>
             {% if a.description %}<span class="desc">{{ a.description }}</span>{% endif %}
@@ -224,13 +214,13 @@
       <h2>All Categories</h2>
       <div class="cat-pills">
         {% for c in all_categories %}
-        <a href="/categories/{{ c.slug }}" class="cat-pill {% if c.name == category %}active{% endif %}">{{ c.name }} ({{ c.count }})</a>
+        <a href="/categories/{{ c.slug }}/" class="cat-pill {% if c.name == category %}active{% endif %}">{{ c.name }} ({{ c.count }})</a>
         {% endfor %}
       </div>
     </nav>
 
     <footer>
-      <a href="/methodology">Methodology</a>
+      <a href="/methodology/">Methodology</a>
       <span class="footer-sep">&middot;</span>
       <a href="/spec/">Specifications</a>
       <span class="footer-sep">&middot;</span>

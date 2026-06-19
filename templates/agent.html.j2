@@ -6,12 +6,12 @@
   <meta name="google-site-verification" content="s2YUWbGP7cJsI6HUCKRX9YCtbVJVyA1Q1_jsNWj1RHc">
   <title>{{ row.name }} Review — Trust Score & Safety Profile | HVTracker</title>
   <meta name="description" content="Is {{ row.name }} trustworthy? Independent trust score {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}). Ranked #{{ row.rank }} of {{ total }} tracked AI agent projects. {{ row.stars_fmt }} GitHub stars, {{ row.category }}. Safety, transparency, maintenance, and provenance signals reviewed.">
-  <link rel="canonical" href="https://hvtracker.net/agents/{{ row.slug }}">
+  <link rel="canonical" href="https://hvtracker.net/agents/{{ row.slug }}/">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="{{ row.name }} — Trust Score {{ row.trust_score }}/100 | HVTracker">
   <meta property="og:description" content="Grade {{ row.evidence_grade }} · HVTrust {{ row.trust_score }}/100 · {{ row.stars_fmt }} stars · {{ row.category }}. Independent trust signals for tracked AI agent projects.">
-  <meta property="og:url" content="https://hvtracker.net/agents/{{ row.slug }}">
+  <meta property="og:url" content="https://hvtracker.net/agents/{{ row.slug }}/">
   <meta property="og:image" content="https://hvtracker.net/agents/{{ row.slug }}/og.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
@@ -57,17 +57,6 @@
       },
       "reviewBody": "{{ row.name }} receives a trust score of {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}) based on independent analysis of activity, adoption, transparency, safety, and identity signals."
     }
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
-      { "@type": "ListItem", "position": 2, "name": "{{ row.category }}", "item": "https://hvtracker.net/categories/{{ row.category | lower | replace(' ', '-') | replace('/', '-') | replace('&', '') }}" },
-      { "@type": "ListItem", "position": 3, "name": "{{ row.name }}" }
-    ]
   }
   </script>
   <script type="application/ld+json">
@@ -355,7 +344,7 @@
       </div>
       {% if row.description %}<p class="desc">{{ row.description }}</p>{% endif %}
       <div class="badges">
-        {% if row.category %}<a href="/categories/{{ row.category_slug }}" class="badge cat" style="text-decoration:none">{{ row.category }}</a>{% endif %}
+        {% if row.category %}<a href="/categories/{{ row.category_slug }}/" class="badge cat" style="text-decoration:none">{{ row.category }}</a>{% endif %}
         {% if row.language %}<span class="badge lang">{{ row.language }}</span>{% endif %}
         {% if row.evidence_grade %}<span class="badge grade-{{ row.evidence_grade }}" title="Grade {{ row.evidence_grade }}">Grade {{ row.evidence_grade }}</span>{% endif %}
         {% if row.display_listing_status %}<span class="badge state-{{ row.display_listing_status }}">{{ row.display_status_label }}</span>{% endif %}
@@ -484,7 +473,7 @@
         <a class="compare-link" href="/compare/?a={{ row.slug }}">Compare with another agent</a>
 {% endif %}
         <a class="secondary-link" href="/track/{{ row.slug }}">Track {{ row.name }}</a>
-        {% if row.category %}<a class="secondary-link" href="/categories/{{ row.category_slug }}">View {{ row.category }}</a>{% endif %}
+        {% if row.category %}<a class="secondary-link" href="/categories/{{ row.category_slug }}/">View {{ row.category }}</a>{% endif %}
         <a class="secondary-link" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Report missing data</a>
       </div>
     </section>
@@ -507,13 +496,13 @@
       {% if row.category_rank and row.category %}
       <div>
         <div class="rank-big" style="color:var(--amber)">#{{ row.category_rank }}</div>
-        <div class="rank-label">In <a href="/categories/{{ row.category_slug }}">{{ row.category }}</a></div>
+        <div class="rank-label">In <a href="/categories/{{ row.category_slug }}/">{{ row.category }}</a></div>
       </div>
       {% endif %}
     </section>
 
     <p class="how-to-read">
-      <strong>How to read this:</strong> HVTrust (0–100) weighs supply-chain signals (provenance, OSSF Scorecard, signed commits, open license) alongside real-world adoption. <strong>Grade {{ row.evidence_grade }}</strong> reflects the trust score band: A ≥ 80, B ≥ 65, C ≥ 50, D &lt; 50. <a href="/methodology">Full methodology →</a>
+      <strong>How to read this:</strong> HVTrust (0–100) weighs supply-chain signals (provenance, OSSF Scorecard, signed commits, open license) alongside real-world adoption. <strong>Grade {{ row.evidence_grade }}</strong> reflects the trust score band: A ≥ 80, B ≥ 65, C ≥ 50, D &lt; 50. <a href="/methodology/">Full methodology →</a>
     </p>
 
     {% set is_stale = row.days_ago is not none and row.days_ago > 180 %}
@@ -947,7 +936,7 @@
       <p style="font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5">
         Action counts reflect activity on public repos where this agent left detectable fingerprints.
         Private repo usage is invisible. Counts are approximate (GitHub Search API caps at 1,000 results per query).
-        Methodology described in the <a href="/spec/provenance/v0.1">Provenance Profile spec</a>.
+        Methodology described in the <a href="/spec/provenance/v0.1/">Provenance Profile spec</a>.
       </p>
     </section>
     {% endif %}
@@ -1038,7 +1027,7 @@
       <ul>
         {% for s in row.siblings %}
         <li>
-          <a href="/agents/{{ s.slug }}">
+          <a href="/agents/{{ s.slug }}/">
             <span class="sib-rank">#{{ s.rank }}</span>
             <span class="sib-name">{{ s.name }}</span>
             <span class="sib-score">{{ s.score }}</span>
@@ -1068,11 +1057,11 @@
     <section class="terminal-note" style="padding:18px 20px;font-size:11px;color:var(--muted);line-height:1.7;">
       <strong style="color:var(--text);font-size:12px;">Data sources</strong><br>
       GitHub REST API (repo, commits, stars, forks, license){% if row.npm_package %} · npm Registry (downloads, provenance){% endif %}{% if row.pypi_package %} · PyPI / pypistats (downloads, provenance){% endif %}{% if row.crate_package %} · crates.io (downloads){% endif %}{% if row.scorecard_score is not none %} · OpenSSF Scorecard CLI{% endif %}{% if row.hn_mentions_30d is not none %} · Algolia HN Search API{% endif %}{% if row.public_actions %} · GitHub Search API (fingerprint actions){% endif %}
-      <br>Each agent's signals refresh once daily across 6 staggered batches. <a href="/methodology" style="color:var(--accent);">Methodology {{ methodology_version }}</a> · <a href="/data/agents/{{ row.slug }}.json" style="color:var(--accent);">Raw JSON</a>
+      <br>Each agent's signals refresh once daily across 6 staggered batches. <a href="/methodology/" style="color:var(--accent);">Methodology {{ methodology_version }}</a> · <a href="/data/agents/{{ row.slug }}.json" style="color:var(--accent);">Raw JSON</a>
     </section>
 
     <footer>
-      <a href="/methodology">Methodology</a>
+      <a href="/methodology/">Methodology</a>
       <span class="footer-sep">·</span>
       <a href="/spec/">Specifications</a>
       <span class="footer-sep">·</span>
