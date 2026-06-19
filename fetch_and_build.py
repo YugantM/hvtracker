@@ -5419,7 +5419,7 @@ def main() -> None:
     from specs import ALL_SPECS as _ALL_SPECS
     sitemap_urls = [
         ("https://hvtracker.net/", "1.0", "daily"),
-        ("https://hvtracker.net/methodology", "0.5", "monthly"),
+        ("https://hvtracker.net/methodology/", "0.5", "monthly"),
         ("https://hvtracker.net/movers/", "0.8", "daily"),
         ("https://hvtracker.net/changes/", "0.8", "weekly"),
         ("https://hvtracker.net/use-cases/", "0.8", "daily"),
@@ -5430,11 +5430,11 @@ def main() -> None:
     ]
     for spec in _ALL_SPECS:
         sitemap_urls.append((
-            f"https://hvtracker.net/spec/{spec['slug']}/{spec['version']}",
+            f"https://hvtracker.net/spec/{spec['slug']}/{spec['version']}/",
             "0.4", "monthly"
         ))
     for cat_m in all_cat_meta:
-        sitemap_urls.append((f"https://hvtracker.net/categories/{cat_m['slug']}", "0.7", "daily"))
+        sitemap_urls.append((f"https://hvtracker.net/categories/{cat_m['slug']}/", "0.7", "daily"))
     for page in use_case_pages:
         sitemap_urls.append((f"https://hvtracker.net/use-cases/{page['slug']}/", "0.8", "daily"))
     sitemap_urls.append(("https://hvtracker.net/ecosystem/", "0.8", "daily"))
@@ -5444,20 +5444,21 @@ def main() -> None:
     for org in org_pages:
         sitemap_urls.append((f"https://hvtracker.net/org/{org['slug']}/", "0.7", "daily"))
     sitemap_urls.append(("https://hvtracker.net/blog/", "0.6", "weekly"))
-    sitemap_urls.append(("https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety", "0.8", "monthly"))
-    sitemap_urls.append(("https://hvtracker.net/blog/most-starred-ai-agents-no-provenance", "0.9", "weekly"))
-    sitemap_urls.append(("https://hvtracker.net/blog/coding-agents-trust-rankings", "0.9", "weekly"))
-    sitemap_urls.append(("https://hvtracker.net/blog/ai-agent-frameworks-ranked-by-trust", "0.9", "weekly"))
-    sitemap_urls.append(("https://hvtracker.net/blog/github-stars-dont-predict-ai-agent-trust", "0.9", "weekly"))
-    sitemap_urls.append(("https://hvtracker.net/blog/codex-vs-claude-code", "0.9", "weekly"))
-    sitemap_urls.append(("https://hvtracker.net/blog/runtime-trust-is-live", "0.9", "weekly"))
-    sitemap_urls.append(("https://hvtracker.net/blog/you-are-not-installing-what-you-think", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety/", "0.8", "monthly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/most-starred-ai-agents-no-provenance/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/coding-agents-trust-rankings/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/ai-agent-frameworks-ranked-by-trust/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/github-stars-dont-predict-ai-agent-trust/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/codex-vs-claude-code/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/runtime-trust-is-live/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/you-are-not-installing-what-you-think/", "0.9", "weekly"))
     for article in blog_articles:
-        sitemap_urls.append((f"https://hvtracker.net/blog/{article['slug']}", "0.8", "weekly"))
+        sitemap_urls.append((f"https://hvtracker.net/blog/{article['slug']}/", "0.8", "weekly"))
     for row in rows:
-        sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}", "0.8", "daily"))
-    for row in legacy_rows:
-        sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}", "0.4", "monthly"))
+        sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}/", "0.8", "daily"))
+    # Legacy entries have their public /agents/<slug>/ page deleted
+    # (remove_legacy_public_artifacts); they MUST NOT appear in the sitemap or
+    # Google crawls them as 404s.
     for _a, _b, _cs in compare_pairs:
         sitemap_urls.append((f"https://hvtracker.net/compare/{_a['slug']}-vs-{_b['slug']}/", "0.7", "weekly"))
     sitemap_urls += [

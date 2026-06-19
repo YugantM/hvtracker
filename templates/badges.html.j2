@@ -105,7 +105,7 @@
           </div>
           <div class="why-card">
             <div class="why-title">Independent methodology</div>
-            <p>Scored by a third party using a <a href="/methodology">published, versioned methodology</a>. No vendor claims, no pay-to-rank, no submission required.</p>
+            <p>Scored by a third party using a <a href="/methodology/">published, versioned methodology</a>. No vendor claims, no pay-to-rank, no submission required.</p>
           </div>
         </div>
       </section>
@@ -120,10 +120,10 @@
         </div>
 
         <div class="snippet-label">Markdown</div>
-        <div class="snippet">[![HVTrust](https://hvtracker.net/badge/your-slug.svg)](https://hvtracker.net/agents/your-slug)</div>
+        <div class="snippet">[![HVTrust](https://hvtracker.net/badge/your-slug.svg)](https://hvtracker.net/agents/your-slug/)</div>
 
         <div class="snippet-label">HTML</div>
-        <div class="snippet">&lt;a href="https://hvtracker.net/agents/your-slug"&gt;&lt;img src="https://hvtracker.net/badge/your-slug.svg" alt="HVTrust"&gt;&lt;/a&gt;</div>
+        <div class="snippet">&lt;a href="https://hvtracker.net/agents/your-slug/"&gt;&lt;img src="https://hvtracker.net/badge/your-slug.svg" alt="HVTrust"&gt;&lt;/a&gt;</div>
 
         <p class="note">Badges are plain SVGs served from this site, so they always show your project's current score and grade — there is nothing to update once the badge is in place.</p>
       </section>
@@ -150,7 +150,7 @@
             {% for r in top_repos %}
             <tr>
               <td class="rank">#{{ r.rank }}</td>
-              <td class="name"><a href="/agents/{{ r.slug }}">{{ r.name }}</a></td>
+              <td class="name"><a href="/agents/{{ r.slug }}/">{{ r.name }}</a></td>
               <td><img src="/badge/{{ r.slug }}.svg" alt="HVTrust {{ r.trust_score }}" height="20"></td>
               <td class="snippet-cell"><code>[![HVTrust](https://hvtracker.net/badge/{{ r.slug }}.svg)](https://hvtracker.net/agents/{{ r.slug }})</code></td>
             </tr>
@@ -162,7 +162,7 @@
     </article>
 
     <footer>
-      <a href="/methodology">Methodology</a>
+      <a href="/methodology/">Methodology</a>
       <span class="footer-sep">&middot;</span>
       <a href="/spec/">Specifications</a>
       <span class="footer-sep">&middot;</span>
