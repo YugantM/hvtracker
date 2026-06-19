@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Verify an agent or MCP server — HVTracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Check whether an open-source AI agent or MCP server is trusted before you connect to it. Paste a repo, package, or MCP server URL for an evidence-backed, signed verdict.">
+  <link rel="canonical" href="https://hvtracker.net/verify/">
+  <meta property="og:title" content="Verify an AI agent or MCP server — HVTracker">
+  <meta property="og:description" content="Check whether an AI agent or MCP server is trusted before you connect — an evidence-backed, signed verdict.">
+  <meta property="og:image" content="https://hvtracker.net/og-verify.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://hvtracker.net/verify/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hvtracker.net/og-verify.png">
+  <link rel="stylesheet" href="/static/site.css">
+  <script defer src="/static/site-status.js"></script>
+  <script defer src="/analytics.js"></script>
+  <style>
+    .verify-hero { max-width: 760px; margin: 28px auto 18px; text-align: center; }
+    .verify-hero h1 { font-size: 30px; line-height: 1.12; letter-spacing: -.02em; margin-bottom: 10px; }
+    .verify-hero p { color: var(--muted); font-size: 15px; }
+    .verify-box { max-width: 760px; margin: 0 auto; }
+    .verify-form { display: flex; gap: 10px; flex-wrap: wrap; }
+    .verify-form input { flex: 1; min-width: 240px; padding: 13px 15px; border: 1px solid var(--line-strong); background: var(--bg); color: var(--text); font: 15px var(--font-sans); outline: none; border-radius: 8px; }
+    .verify-form input:focus { border-color: var(--accent); }
+    .verify-form button { padding: 13px 22px; border: 0; background: var(--accent); color: #fff; font: 700 14px var(--font-sans); cursor: pointer; border-radius: 8px; }
+    .verify-form button:hover { filter: brightness(1.08); }
+    .verify-eg { color: var(--muted); font-size: 12px; margin-top: 10px; }
+    .verify-eg a { color: var(--accent); cursor: pointer; }
+    .verify-note { max-width: 760px; margin: 14px auto 0; color: var(--muted); font-size: 12px; border-top: 1px dashed var(--line); padding-top: 12px; }
+    .verify-note a { color: var(--accent); }
+    .recent { max-width: 760px; margin: 38px auto 0; }
+    .recent-title { font-size: 14px; color: var(--text); margin-bottom: 12px; display: flex; align-items: baseline; gap: 8px; }
+    .recent-title span { color: var(--muted); font: 11px var(--font-mono); font-weight: 400; }
+    .recent-list { display: grid; gap: 6px; }
+    .recent-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font-size: 13px; }
+    .recent-row .r-repo { font-family: var(--font-mono); color: var(--text); }
+    .recent-row .r-repo:hover { color: var(--accent); }
+    .recent-row .r-tag { font: 10px var(--font-mono); color: var(--muted); border: 1px solid var(--line-strong); border-radius: 3px; padding: 1px 5px; }
+    .recent-row .r-when { margin-left: auto; color: var(--muted); font: 11px var(--font-mono); white-space: nowrap; }
+    .recent-empty { color: var(--muted); font-size: 13px; }
+    .result { margin-top: 22px; }
+    .result-card { border: 1px solid var(--line); border-top: 3px solid var(--line-strong); background: var(--surface); border-radius: 8px; padding: 20px; }
+    .result-verdict { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .verdict-pill { font: 700 13px var(--font-mono); padding: 5px 12px; border-radius: 999px; letter-spacing: .02em; }
+    .v-trusted { background: var(--green); color: #fff; }
+    .v-caution { background: var(--amber); color: #fff; }
+    .v-unknown { background: var(--muted); color: #fff; }
+    .result-sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .result-reasons { margin: 16px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+    .result-reasons li { font-size: 13.5px; padding-left: 18px; position: relative; }
+    .result-reasons li::before { content: "\2013"; position: absolute; left: 0; color: var(--muted); }
+    .result-perms { margin-top: 14px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .perm-tag { font: 11px var(--font-mono); border: 1px solid var(--line-strong); color: var(--text); padding: 2px 8px; border-radius: 4px; background: var(--bg); }
+    .result-meta { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); font: 11px var(--font-mono); color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; }
+    .result-meta .signed { color: var(--green); }
+    .result-cta a { color: var(--accent); font-weight: 700; }
+    .result-loading, .result-error { color: var(--muted); font-size: 14px; margin-top: 22px; }
+    .result-error { color: var(--red); }
+  </style>
+</head>
+<body data-page-type="verify">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/methodology">Methodology</a><a href="/badges/">Badges</a><a href="/score-lab/">Score lab</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
+      </nav>
+      <div class="site-status"><span class="live-dot"></span>updated <span class="site-status-value"></span></div>
+    </div>
+  </header>
+
+  <div class="page">
+    <section class="verify-hero">
+      <h1>Should you trust this agent?</h1>
+      <p>Before you connect to an AI agent or MCP server, check it against independent, evidence-weighted trust signals — and get a signed verdict you can verify yourself.</p>
+    </section>
+
+    <div class="verify-box">
+      <form class="verify-form" id="verify-form" autocomplete="off">
+        <input id="verify-input" name="server" placeholder="owner/repo, npm/pypi package, or MCP server URL" aria-label="Agent or MCP server identifier" required>
+        <button type="submit">Verify</button>
+      </form>
+      <p class="verify-eg">Try:
+        <a data-eg="topoteretes/cognee">topoteretes/cognee</a> ·
+        <a data-eg="aider-chat">aider-chat</a> ·
+        <a data-eg="modelcontextprotocol/servers">modelcontextprotocol/servers</a>
+      </p>
+      <div class="result" id="result" hidden></div>
+      <p class="verify-note">🔓 Checks are <strong>public</strong> — every successful check appears in the live feed below. Want it continuously tracked? <a href="/submit/">Submit it</a>. Private checks will require a paid plan.</p>
+    </div>
+
+    <section class="recent" id="recent">
+      <h2 class="recent-title">Recently checked <span>· last 100 · public</span></h2>
+      <div class="recent-list" id="recent-list"><span class="recent-empty">Loading…</span></div>
+    </section>
+  </div>
+
+  <footer>
+    <span>HVTracker — independent AI agent trust registry</span>
+    <span class="footer-sep">/</span>
+    <a href="/methodology">Methodology</a>
+    <span class="footer-sep">/</span>
+    <a href="/spec/mcp-server-trust/v0.1">MCP Trust spec</a>
+    <span class="footer-sep">/</span>
+    <a href="/data/">Data API</a>
+  </footer>
+
+  <script>
+    (function () {
+      var form = document.getElementById('verify-form');
+      var input = document.getElementById('verify-input');
+      var out = document.getElementById('result');
+
+      function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+
+      function pillFor(d) {
+        if (d.tracked) {
+          return d.trusted
+            ? ['v-trusted', 'Verified · Trusted', 'Meets the default trust policy (grade ≥ C, active, not flagged).']
+            : ['v-caution', 'Verified · Not trusted yet', 'Tracked, but below the default trust threshold — review the reasons.'];
+        }
+        if (d.provisional && d.eligibility === 'ok') {
+          return d.trusted
+            ? ['v-trusted', 'Provisional · Looks trustworthy', 'Eligible AI project (≥1k stars). Provisional — public GitHub signals only, not continuously tracked.']
+            : ['v-caution', 'Provisional · Caution', 'Eligible AI project, but inactive or unlicensed on basic checks. Provisional only.'];
+        }
+        return ({
+          not_ai:       ['v-unknown', 'Out of scope', 'Not an AI project — HVTracker only covers AI agents.'],
+          below_stars:  ['v-unknown', 'Below the bar', 'AI project, but under the 1,000-star threshold for a free instant check.'],
+          not_found:    ['v-unknown', 'Not found', 'No public GitHub repo found for that identifier.'],
+          archived:     ['v-unknown', 'Archived', 'This repository is archived — no longer maintained.'],
+          rate_limited: ['v-unknown', 'Rate limited', 'Too many instant checks — try again shortly.']
+        })[d.eligibility] || ['v-unknown', 'Not in the registry', 'No independent evidence yet — treat as unverified.'];
+      }
+
+      function render(d) {
+        var p = pillFor(d);
+        var html = '<div class="result-card">';
+        html += '<div class="result-verdict"><span class="verdict-pill ' + p[0] + '">' + esc(p[1]) + '</span>';
+        if (d.grade) html += '<span class="badge grade-' + esc(d.grade) + '">' + esc(d.grade) + '</span>';
+        if (d.tracked && d.trust_score != null) html += '<strong>' + esc(d.trust_score) + '</strong><span style="color:var(--muted)">/100 HVTrust</span>';
+        if (d.stars != null) html += '<span style="color:var(--muted);font:12px var(--font-mono)">★ ' + esc(Number(d.stars).toLocaleString()) + '</span>';
+        html += '</div><div class="result-sub">' + esc(p[2]) + '</div>';
+        if (d.reasons && d.reasons.length) {
+          html += '<ul class="result-reasons">';
+          d.reasons.forEach(function (r) { html += '<li>' + esc(r) + '</li>'; });
+          html += '</ul>';
+        }
+        if (d.tool_permissions && d.tool_permissions.length) {
+          html += '<div class="result-perms"><span style="color:var(--muted);font-size:12px">Tool surface:</span>';
+          d.tool_permissions.forEach(function (t) { html += '<span class="perm-tag">' + esc(t) + '</span>'; });
+          html += '</div>';
+        }
+        var meta = [], att = d.attestation || {};
+        if (att.signature) meta.push('<span class="signed">✔ signed attestation</span>');
+        if (d.tracked && d.resolved) meta.push('<a href="/agents/' + esc((d.resolved.split('/')[1] || '').toLowerCase()) + '/">View full profile →</a>');
+        if (d.submit_url && !d.tracked) meta.push('<a href="' + esc(d.submit_url) + '">' + (d.provisional ? 'Get a fully-tracked Verified listing →' : 'Submit it for review →') + '</a>');
+        if (meta.length) html += '<div class="result-meta">' + meta.join('') + '</div>';
+        html += '</div>';
+        out.innerHTML = html;
+      }
+
+      function run(q) {
+        if (!q) return;
+        out.hidden = false;
+        out.innerHTML = '<div class="result-loading">Checking trust signals…</div>';
+        fetch('/api/v1/mcp/verify?server=' + encodeURIComponent(q))
+          .then(function (r) { return r.json(); })
+          .then(function (d) { render(d); if (d.tracked || d.eligibility === 'ok') setTimeout(loadRecent, 400); })
+          .catch(function () { out.innerHTML = '<div class="result-error">Could not reach the trust API. Try again.</div>'; });
+      }
+
+      function timeAgo(iso) {
+        var s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+        if (s < 60) return 'just now';
+        if (s < 3600) return Math.floor(s / 60) + 'm ago';
+        if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+        return Math.floor(s / 86400) + 'd ago';
+      }
+      function renderRecent(items) {
+        var el = document.getElementById('recent-list');
+        if (!items || !items.length) { el.innerHTML = '<span class="recent-empty">No checks yet — be the first.</span>'; return; }
+        el.innerHTML = items.map(function (c) {
+          var g = c.grade ? '<span class="badge grade-' + esc(c.grade) + '">' + esc(c.grade) + '</span>' : '';
+          var tag = c.provisional ? 'provisional' : 'verified';
+          return '<div class="recent-row">' + g +
+            '<a class="r-repo" href="https://github.com/' + esc(c.repo) + '" target="_blank" rel="noopener nofollow">' + esc(c.repo) + '</a>' +
+            '<span class="r-tag">' + tag + '</span>' +
+            '<span class="r-when">' + esc(timeAgo(c.checked_at)) + '</span></div>';
+        }).join('');
+      }
+      function loadRecent() {
+        fetch('/api/v1/verify/recent').then(function (r) { return r.json(); })
+          .then(function (d) { renderRecent(d.checks || []); })
+          .catch(function () {});
+      }
+
+      form.addEventListener('submit', function (e) { e.preventDefault(); run(input.value.trim()); });
+      document.querySelectorAll('[data-eg]').forEach(function (a) {
+        a.addEventListener('click', function () { input.value = a.getAttribute('data-eg'); run(input.value); });
+      });
+      loadRecent();
+    })();
+  </script>
+</body>
+</html>

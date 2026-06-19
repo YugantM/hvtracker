@@ -477,16 +477,11 @@
     <div class="site-header-inner">
       <h1 class="logo"><a href="/" style="color:inherit;text-decoration:none">HV<span>Tracker</span></a></h1>
       <nav class="site-nav" aria-label="Site">
-        <a href="/">Leaderboard</a>
-        <a href="/movers/">Movers</a>
-        <a href="/changes/">Changes</a>
-        <a href="/use-cases/">Use cases</a>
-        <a href="/methodology">Methodology</a>
-        <a href="/score-lab/">Score lab</a>
-        <a href="/compare/">Compare</a>
-        <a href="/alerts/">Alerts</a>
-        <a href="/data/">Data API</a>
-        <a href="/sponsor/">Sponsor</a>
+        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/methodology">Methodology</a><a href="/badges/">Badges</a><a href="/score-lab/">Score lab</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
       </nav>
       <div class="site-status">
         <span class="live-dot"></span>updated {{ updated }}
@@ -499,6 +494,10 @@
       <h2 id="intro-title">AI Trust Registry for open-source AI agent projects.</h2>
       <p>Independent trust scores for {{ total }} open-source AI agent projects, based on public, checkable signals across activity, adoption, transparency, safety, and provenance.</p>
       <p>Runtime-trust discovery is now live on agent profiles. For an experimental view of how those fields could change the ranking, open <a href="/score-lab/" style="color:var(--accent);">Score Lab →</a></p>
+      <a href="/verify/" class="home-verify-cta" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:18px 0;padding:16px 20px;border:1px solid var(--line-strong);border-left:3px solid var(--accent);border-radius:8px;background:var(--surface);color:inherit;text-decoration:none">
+        <span><strong style="font-size:15px;color:var(--text)">Check your own agent or MCP server &rarr;</strong><br><span style="color:var(--muted);font-size:13px">Paste a repo, package, or MCP server URL and get a signed trust verdict before you connect.</span></span>
+        <span style="background:var(--accent);color:#fff;font-weight:700;font-size:13px;padding:9px 16px;border-radius:6px;white-space:nowrap">Verify now</span>
+      </a>
       <div class="stats-bar" aria-label="Registry snapshot">
         <div class="stat-cell">
           <div class="stat-val accent">{{ registry_summary.active_count }}</div>

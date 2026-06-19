@@ -21,6 +21,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Redirect
 from fastapi.staticfiles import StaticFiles
 
 import db
+import verify_log
 
 
 # ---- anti-spam helpers -----------------------------------------------------
@@ -50,6 +51,39 @@ def _is_rate_limited(request: Request) -> bool:
             return True
         q.append(now)
     return False
+
+
+# Open-lookup (P2): a more generous, read-only limit than the form limiter,
+# plus a short cache so repeat checks of the same repo don't re-hit GitHub.
+_OLOOKUP_WINDOW = 600
+_OLOOKUP_LIMIT = 20
+_olookup_log: dict[str, deque] = {}
+_olookup_cache: dict[str, tuple] = {}
+_OLOOKUP_TTL = 86400  # cache a repo's verdict for the day; a daily job can refresh it
+
+
+def _is_open_lookup_limited(request: Request) -> bool:
+    ip = _client_ip(request)
+    now = time.monotonic()
+    with _rate_lock:
+        q = _olookup_log.setdefault(ip, deque())
+        while q and q[0] < now - _OLOOKUP_WINDOW:
+            q.popleft()
+        if len(q) >= _OLOOKUP_LIMIT:
+            return True
+        q.append(now)
+    return False
+
+
+def _olookup_cache_get(repo: str):
+    hit = _olookup_cache.get(repo)
+    if hit and time.monotonic() - hit[0] < _OLOOKUP_TTL:
+        return hit[1]
+    return None
+
+
+def _olookup_cache_put(repo: str, verdict: dict) -> None:
+    _olookup_cache[repo] = (time.monotonic(), verdict)
 
 
 _EMAIL_RE = re.compile(r".+@.+\..+")
@@ -82,7 +116,9 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)  # volume subdir may not exist on first b
 DATA_PATH = os.path.join(OUTPUT_DIR, "data.json")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 COMPARE_TOOL_PATH = os.path.join(BASE_DIR, "compare", "index.html")
+VERIFY_TOOL_PATH = os.path.join(BASE_DIR, "verify", "index.html")
 RENDER_FINGERPRINT_PATH = os.path.join(OUTPUT_DIR, ".render_fingerprint")
+verify_log.init(OUTPUT_DIR)  # public "recently checked" feed (transparency)
 REFRESH_STATUS_PATH = os.path.join(OUTPUT_DIR, ".refresh_status.json")
 MAX_DATA_AGE = timedelta(hours=int(os.environ.get("MAX_DATA_AGE_HOURS", "6")))
 # OSSF scores are baked into the image from the `data` branch at build time
@@ -141,6 +177,7 @@ _DYNAMIC_SLASH_PATHS = {
     "/changes",
     "/changelog",
     "/compare",
+    "/verify",
     "/correct",
     "/data",
     "/data-api",
@@ -582,21 +619,23 @@ def api_v1_agents():
 
 
 @app.get("/api/v1/mcp/verify")
-def api_v1_mcp_verify(server: str = ""):
-    """Pre-connect trust verdict for an MCP server (P3, "Safe Browsing for MCP").
+def api_v1_mcp_verify(request: Request, server: str = ""):
+    """Pre-connect trust verdict for an agent or MCP server.
 
-    `server` may be a GitHub repo (owner/name or URL) or an npm/pypi package name.
-    Returns {trusted, grade, trust_score, reasons[], attestation}. The attestation
-    is signed (signing.py) so the verdict is verifiable; verification stays free.
+    `server` may be a GitHub repo (owner/name or URL) or an npm/pypi package.
+    Curated agents return a full signed verdict. An unlisted GitHub repo falls
+    through to open lookup (P2): a free PROVISIONAL verdict if it is an AI
+    project with >= 1,000 stars, else it is routed to /submit. The attestation
+    is signed so the verdict is verifiable; verification is always free.
     """
     import mcp_trust
     server = (server or "").strip()
+    cors = {"Access-Control-Allow-Origin": _API_V1_CORS}
     if not server:
-        return JSONResponse(
-            {"error": "missing required query param: server"},
-            status_code=400,
-            headers={"Access-Control-Allow-Origin": _API_V1_CORS},
-        )
+        return JSONResponse({"error": "missing required query param: server"},
+                            status_code=400, headers=cors)
+
+    # 1) Curated registry (the gold "Verified" tier).
     agent = None
     repo = _normalize_github_repo(server)
     if repo:
@@ -608,10 +647,48 @@ def api_v1_mcp_verify(server: str = ""):
                (a.get("pypi_package") or "").lower() == key:
                 agent = a
                 break
-    verdict = mcp_trust.evaluate(agent, server)
-    verdict["attestation"] = mcp_trust.build_attestation(verdict)
-    return JSONResponse(verdict, headers={
-        "Cache-Control": _API_V1_CACHE,
+    if agent is not None:
+        verdict = mcp_trust.evaluate(agent, server)
+        verdict["attestation"] = mcp_trust.build_attestation(verdict)
+        verify_log.record(verdict.get("resolved") or repo or server, agent.get("name"),
+                          verdict.get("grade"), verdict.get("trusted"), False, agent.get("stars"))
+        return JSONResponse(verdict, headers={**cors, "Cache-Control": _API_V1_CACHE})
+
+    # 2) Unlisted and not a GitHub repo -> submit funnel (no scoring).
+    if not repo:
+        verdict = mcp_trust.evaluate(None, server)
+        verdict["attestation"] = mcp_trust.build_attestation(verdict)
+        return JSONResponse(verdict, headers=cors)
+
+    # 3) Unlisted GitHub repo -> open lookup (cached, rate-limited).
+    cached = _olookup_cache_get(repo)
+    if cached is not None:
+        return JSONResponse(cached, headers=cors)
+    if _is_open_lookup_limited(request):
+        return JSONResponse(
+            {"server": server, "tracked": False, "trusted": False,
+             "eligibility": "rate_limited", "submit_url": "https://hvtracker.net/submit",
+             "reasons": ["Too many instant checks from your IP — try again in a few minutes."]},
+            status_code=429, headers=cors)
+    import open_lookup
+    verdict = open_lookup.evaluate_open(server, repo, os.environ.get("GITHUB_TOKEN", ""))
+    if verdict.get("eligibility") == "ok":
+        verdict["attestation"] = mcp_trust.build_attestation(verdict)
+        verify_log.record(verdict.get("resolved") or repo, None, verdict.get("grade"),
+                          verdict.get("trusted"), True, verdict.get("stars"))
+    _olookup_cache_put(repo, verdict)
+    return JSONResponse(verdict, headers=cors)
+
+
+@app.get("/api/v1/verify/recent")
+def api_v1_verify_recent():
+    """Public feed: the last successfully checked projects (transparency).
+
+    Every free check is public by default and appears here. Private checks will
+    require the paid tier or a public submission.
+    """
+    return JSONResponse({"checks": verify_log.recent()}, headers={
+        "Cache-Control": "public, max-age=30, s-maxage=60",
         "Access-Control-Allow-Origin": _API_V1_CORS,
     })
 
@@ -625,9 +702,23 @@ def compare_tool():
         return HTMLResponse(f.read())
 
 
+@app.api_route("/verify", methods=["GET", "HEAD"], response_class=HTMLResponse)
+@app.api_route("/verify/", methods=["GET", "HEAD"], response_class=HTMLResponse)
+def verify_tool():
+    if not os.path.isfile(VERIFY_TOOL_PATH):
+        return HTMLResponse("<p>Verify tool is not available yet.</p>", status_code=503)
+    with open(VERIFY_TOOL_PATH, encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+
 @app.get("/og-v2.png")
 def og_v2():
     return FileResponse(os.path.join(BASE_DIR, "og-v2.png"), media_type="image/png")
+
+
+@app.get("/og-verify.png")
+def og_verify():
+    return FileResponse(os.path.join(BASE_DIR, "og-verify.png"), media_type="image/png")
 
 
 @app.get("/favicon.svg")
@@ -1692,6 +1783,30 @@ def _has_pending_signal_rows() -> bool:
         return False
 
 
+def _refresh_verify_feed():
+    """Daily: re-verify the provisional (open-lookup) repos in the public feed
+    so their verdicts stay fresh. Curated repos are refreshed by the main cron;
+    only the open-lookup ones need this. Gentle on the GitHub budget."""
+    if not db.enabled():
+        return
+    import open_lookup
+    token = os.environ.get("GITHUB_TOKEN", "")
+    refreshed = 0
+    for repo in db.verify_check_targets(limit=200):
+        try:
+            v = open_lookup.evaluate_open(repo, repo, token)
+            if v.get("eligibility") == "ok":
+                verify_log.record(v.get("resolved") or repo, None, v.get("grade"),
+                                  v.get("trusted"), True, v.get("stars"))
+                refreshed += 1
+        except Exception:
+            pass
+        time.sleep(0.6)  # ~100/min, well within the authenticated GitHub budget
+        if refreshed >= 150:
+            break
+    print(f"[scheduler] verify feed refresh complete: {refreshed} repo(s)")
+
+
 @app.on_event("startup")
 def startup():
     global _scheduler
@@ -1772,6 +1887,14 @@ def startup():
                 "cron",
                 hour="*/2",
                 id="refresh",
+                max_instances=1,
+                coalesce=True,
+            )
+            _scheduler.add_job(
+                _refresh_verify_feed,
+                "cron",
+                hour=4,
+                id="verify-feed-refresh",
                 max_instances=1,
                 coalesce=True,
             )
