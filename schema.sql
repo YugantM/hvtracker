@@ -46,6 +46,21 @@ CREATE TABLE IF NOT EXISTS interest_signups (
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Public "recently checked" feed for /verify. One row per repo (newest check
+-- wins); `checks` counts how many times it's been verified. Public by default.
+CREATE TABLE IF NOT EXISTS verify_checks (
+    repo           TEXT PRIMARY KEY,
+    name           TEXT,
+    grade          TEXT,
+    trusted        BOOLEAN,
+    provisional    BOOLEAN,
+    stars          INTEGER,
+    checks         INTEGER NOT NULL DEFAULT 1,
+    first_checked  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    checked_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS verify_checks_checked_at_idx ON verify_checks (checked_at DESC);
 CREATE INDEX IF NOT EXISTS submissions_status_idx ON submissions (status);
 CREATE INDEX IF NOT EXISTS corrections_status_idx ON corrections (status);
 CREATE INDEX IF NOT EXISTS interest_signups_kind_idx ON interest_signups (kind);

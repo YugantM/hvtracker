@@ -63,6 +63,9 @@ Recommended boundary:
 | 90-day public history | Yes, if affordable | Extended history |
 | Raw third-party API responses | No | No, store internally if allowed |
 | Watchlists and alerts | No | Yes |
+| Verify a repo/MCP server (verdict) | Yes, free | — (verdict is never gated) |
+| Privacy of a verify check | Public by default | **Private check = paid** |
+| Continuous tracking of an unlisted repo | No (provisional only) | Yes (or via public submission) |
 | Bulk exports | Limited | Yes |
 | Commercial/closed-source agents | Limited or none | Yes |
 | Manual review notes | Summaries only | Full notes |

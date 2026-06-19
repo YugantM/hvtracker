@@ -14,6 +14,8 @@ import threading
 from collections import deque
 from datetime import datetime, timezone
 
+import db
+
 MAX_ENTRIES = 100
 
 _lock = threading.Lock()
@@ -39,7 +41,17 @@ def init(output_dir: str) -> None:
 
 def record(repo: str, name: str | None, grade: str | None, trusted: bool,
            provisional: bool, stars: int | None) -> None:
-    """Append a successful check (deduped by repo, newest wins)."""
+    """Append a successful check (deduped by repo, newest wins).
+
+    Persists to Postgres when configured (Railway); otherwise falls back to the
+    on-disk JSON ring-buffer (local/dev).
+    """
+    if db.enabled():
+        try:
+            db.record_verify_check(repo, name, grade, trusted, provisional, stars)
+            return
+        except Exception:
+            pass  # fall through to the JSON buffer if the DB write fails
     if _log is None:
         return
     entry = {
@@ -66,6 +78,13 @@ def record(repo: str, name: str | None, grade: str | None, trusted: bool,
 
 def recent(limit: int = MAX_ENTRIES) -> list[dict]:
     """Most-recent-first list of the last successful checks."""
+    if db.enabled():
+        try:
+            rows = db.recent_verify_checks(limit)
+            if rows is not None:
+                return rows
+        except Exception:
+            pass
     if _log is None:
         return []
     with _lock:

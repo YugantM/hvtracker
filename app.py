@@ -716,6 +716,11 @@ def og_v2():
     return FileResponse(os.path.join(BASE_DIR, "og-v2.png"), media_type="image/png")
 
 
+@app.get("/og-verify.png")
+def og_verify():
+    return FileResponse(os.path.join(BASE_DIR, "og-verify.png"), media_type="image/png")
+
+
 @app.get("/favicon.svg")
 def favicon_svg():
     return FileResponse(os.path.join(BASE_DIR, "favicon.svg"), media_type="image/svg+xml")
@@ -1778,6 +1783,30 @@ def _has_pending_signal_rows() -> bool:
         return False
 
 
+def _refresh_verify_feed():
+    """Daily: re-verify the provisional (open-lookup) repos in the public feed
+    so their verdicts stay fresh. Curated repos are refreshed by the main cron;
+    only the open-lookup ones need this. Gentle on the GitHub budget."""
+    if not db.enabled():
+        return
+    import open_lookup
+    token = os.environ.get("GITHUB_TOKEN", "")
+    refreshed = 0
+    for repo in db.verify_check_targets(limit=200):
+        try:
+            v = open_lookup.evaluate_open(repo, repo, token)
+            if v.get("eligibility") == "ok":
+                verify_log.record(v.get("resolved") or repo, None, v.get("grade"),
+                                  v.get("trusted"), True, v.get("stars"))
+                refreshed += 1
+        except Exception:
+            pass
+        time.sleep(0.6)  # ~100/min, well within the authenticated GitHub budget
+        if refreshed >= 150:
+            break
+    print(f"[scheduler] verify feed refresh complete: {refreshed} repo(s)")
+
+
 @app.on_event("startup")
 def startup():
     global _scheduler
@@ -1858,6 +1887,14 @@ def startup():
                 "cron",
                 hour="*/2",
                 id="refresh",
+                max_instances=1,
+                coalesce=True,
+            )
+            _scheduler.add_job(
+                _refresh_verify_feed,
+                "cron",
+                hour=4,
+                id="verify-feed-refresh",
                 max_instances=1,
                 coalesce=True,
             )

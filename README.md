@@ -125,6 +125,8 @@ The public dataset is licensed under [CC BY 4.0](https://creativecommons.org/lic
 | [`/data/signals/scorecard.json`](https://hvtracker.net/data/signals/scorecard.json) | OSSF Scorecard signal cache |
 | [`/data/signals/provenance.json`](https://hvtracker.net/data/signals/provenance.json) | Package provenance signal cache |
 | [`/feed.json`](https://hvtracker.net/feed.json) | JSON Feed with agents and comparison guides |
+| [`/api/v1/mcp/verify?server=<id>`](https://hvtracker.net/api/v1/mcp/verify?server=topoteretes/cognee) | Pre-connect, signed trust verdict for an agent or MCP server. Curated agents return a full verdict; an unlisted **AI repo with ≥1,000 stars** gets a free provisional verdict; others route to `/submit`. |
+| [`/api/v1/verify/recent`](https://hvtracker.net/api/v1/verify/recent) | Public feed of the last 100 checked projects (checks are public by default). |
 | [`/llms.txt`](https://hvtracker.net/llms.txt) | LLM-readable project summary and key links |
 
 ---

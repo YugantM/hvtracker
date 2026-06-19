@@ -164,3 +164,46 @@ def list_queue(table: str, status: str = "pending") -> list[dict]:
         )
         cols = ["id", "repo", "payload", "contact", "status", "created_at"]
         return [dict(zip(cols, row)) for row in cur.fetchall()]
+
+
+def record_verify_check(repo: str, name: str | None, grade: str | None,
+                        trusted: bool, provisional: bool, stars: int | None) -> None:
+    """Upsert a public verify check (one row per repo, newest wins, count++)."""
+    if not enabled():
+        return
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO verify_checks (repo, name, grade, trusted, provisional, stars) "
+            "VALUES (%s, %s, %s, %s, %s, %s) "
+            "ON CONFLICT (repo) DO UPDATE SET "
+            "name = EXCLUDED.name, grade = EXCLUDED.grade, trusted = EXCLUDED.trusted, "
+            "provisional = EXCLUDED.provisional, stars = EXCLUDED.stars, "
+            "checks = verify_checks.checks + 1, checked_at = now()",
+            (repo, name, grade, trusted, provisional, stars),
+        )
+        conn.commit()
+
+
+def recent_verify_checks(limit: int = 100) -> list[dict] | None:
+    """Public feed rows, newest first. Returns None when the DB is disabled."""
+    if not enabled():
+        return None
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT repo, name, grade, trusted, provisional, stars, checks, "
+            "to_char(checked_at, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') "
+            "FROM verify_checks ORDER BY checked_at DESC LIMIT %s",
+            (limit,),
+        )
+        cols = ["repo", "name", "grade", "trusted", "provisional", "stars", "checks", "checked_at"]
+        return [dict(zip(cols, row)) for row in cur.fetchall()]
+
+
+def verify_check_targets(limit: int = 200) -> list[str]:
+    """Repos in the public feed, for the daily refresh job (oldest-checked first)."""
+    if not enabled():
+        return []
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute("SELECT repo FROM verify_checks WHERE provisional = true "
+                    "ORDER BY checked_at ASC LIMIT %s", (limit,))
+        return [row[0] for row in cur.fetchall()]
