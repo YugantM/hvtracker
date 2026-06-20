@@ -19,6 +19,7 @@ from html import escape
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
+from jinja2 import Environment, FileSystemLoader
 
 import db
 import verify_log
@@ -702,6 +703,67 @@ def compare_tool():
         return HTMLResponse(f.read())
 
 
+# Jinja env for runtime-rendered /compare/<a>-vs-<b>/ pages. Reuses the same
+# templates the build uses so dynamic pairs render identically to prebuilt ones.
+_compare_env = Environment(
+    loader=FileSystemLoader([os.path.join(BASE_DIR, "templates"), BASE_DIR]),
+    autoescape=True,
+)
+try:
+    with open(os.path.join(BASE_DIR, "static", "site.css"), "rb") as _css_f:
+        _compare_env.globals["css_hash"] = hashlib.sha256(_css_f.read()).hexdigest()[:8]
+except OSError:
+    _compare_env.globals["css_hash"] = ""
+
+
+def _slugify(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+@app.api_route("/compare/{pair}", methods=["GET", "HEAD"], include_in_schema=False)
+def compare_pair_noslash(pair: str):
+    return RedirectResponse(f"/compare/{pair}/", status_code=301)
+
+
+@app.api_route("/compare/{pair}/", methods=["GET", "HEAD"], response_class=HTMLResponse)
+def compare_pair(pair: str):
+    # The build pre-renders the top-3-per-category pairs (and reverse-redirect
+    # stubs). Serve those verbatim; render any other valid pair on the fly so
+    # /compare/<a>-vs-<b>/ never 404s for two tracked agents.
+    prebuilt = os.path.join(OUTPUT_DIR, "compare", pair, "index.html")
+    if os.path.isfile(prebuilt):
+        return FileResponse(prebuilt, media_type="text/html")
+
+    parts = pair.split("-vs-")
+    if len(parts) != 2 or not parts[0] or not parts[1]:
+        return JSONResponse({"detail": "Not Found"}, status_code=404)
+    slug_a, slug_b = parts
+
+    agents = {r["slug"]: r for r in load_data().get("agents", [])}
+    a, b = agents.get(slug_a), agents.get(slug_b)
+    if not a or not b:
+        return JSONResponse({"detail": "Not Found"}, status_code=404)
+
+    # One canonical URL per non-curated pair: alphabetical by slug.
+    if slug_a > slug_b:
+        return RedirectResponse(f"/compare/{slug_b}-vs-{slug_a}/", status_code=301)
+
+    a, b = dict(a), dict(b)
+    for row in (a, b):
+        wd = row.get("weekly_downloads")
+        row["downloads_fmt"] = f"{wd:,}" if isinstance(wd, (int, float)) else None
+        sc = row.get("scorecard_score")
+        row["scorecard_fmt"] = f"{sc:.1f}" if isinstance(sc, (int, float)) else None
+    winner, loser = (a, b) if (a.get("trust_score") or 0) >= (b.get("trust_score") or 0) else (b, a)
+
+    html = _compare_env.get_template("compare.html.j2").render(
+        a=a, b=b, winner=winner, loser=loser,
+        category_slug=_slugify(a.get("category", "")),
+        updated=load_data().get("updated", ""),
+    )
+    return HTMLResponse(html)
+
+
 @app.api_route("/verify", methods=["GET", "HEAD"], response_class=HTMLResponse)
 @app.api_route("/verify/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 def verify_tool():
@@ -724,6 +786,15 @@ def og_verify():
 @app.get("/favicon.svg")
 def favicon_svg():
     return FileResponse(os.path.join(BASE_DIR, "favicon.svg"), media_type="image/svg+xml")
+
+
+# Browsers auto-request these regardless of <link> tags; point them at the SVG
+# so they stop 404ing.
+@app.get("/favicon.ico")
+@app.get("/apple-touch-icon.png")
+@app.get("/apple-touch-icon-precomposed.png")
+def favicon_compat():
+    return RedirectResponse("/favicon.svg", status_code=301)
 
 
 @app.get("/haystack-logo.png")
