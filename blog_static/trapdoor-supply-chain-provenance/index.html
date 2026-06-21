@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrapDoor Hit npm, PyPI, and Crates at Once. Provenance Is the Signal That Catches It. | HVTracker</title>
+  <meta name="description" content="The 2026 TrapDoor campaign weaponized npm, PyPI, and Crates.io simultaneously — and planted hidden instructions in CLAUDE.md to hijack AI coding assistants. Build provenance is the one signal that detects registry injection, and 83% of open-source AI agents don't publish it.">
+  <link rel="canonical" href="https://hvtracker.net/blog/trapdoor-supply-chain-provenance">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="TrapDoor Hit npm, PyPI, and Crates at Once. Provenance Is the Signal That Catches It.">
+  <meta property="og:description" content="Build provenance detects registry injection like TrapDoor — and 83% of open-source AI agents don't publish it.">
+  <meta property="og:url" content="https://hvtracker.net/blog/trapdoor-supply-chain-provenance">
+  <meta property="og:image" content="https://hvtracker.net/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="TrapDoor Hit npm, PyPI, and Crates at Once. Provenance Is the Signal That Catches It.">
+  <meta name="twitter:description" content="Build provenance detects registry injection — and 83% of open-source AI agents don't publish it.">
+  <meta name="twitter:image" content="https://hvtracker.net/og.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "TrapDoor Hit npm, PyPI, and Crates at Once. Provenance Is the Signal That Catches It.",
+    "description": "The 2026 TrapDoor and TanStack/Mistral supply-chain attacks show why build provenance matters — and 83% of open-source AI agents don't publish it.",
+    "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "publisher": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "datePublished": "2026-06-21",
+    "dateModified": "2026-06-21",
+    "mainEntityOfPage": "https://hvtracker.net/blog/trapdoor-supply-chain-provenance"
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#f4f1eb; --surface:#eae6de; --surface-2:#e2ded6; --border:#d4cfc5;
+      --text:#1a1a1a; --muted:#6b6560;
+      --accent:#2c5282; --accent-lt:rgba(44,82,130,0.08); --accent-dim:#5677aa;
+      --mocha:#8b6914; --mocha-lt:rgba(139,105,20,0.10);
+      --fresh:#2f6846; --stale:#737f91;
+      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color:var(--text); font-family:var(--font-sans); font-size:16px; line-height:1.7; min-height:100vh; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:720px; margin:0 auto; padding:0 20px; background:#f4f1eb; min-height:100vh; }
+
+    .site-header { position:sticky; top:0; z-index:100; background:var(--bg); border-bottom:1px solid var(--border); }
+    .site-header-inner { max-width:1200px; margin:0 auto; padding:14px 20px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; letter-spacing:-0.5px; color:var(--text); }
+    .logo span { color:var(--accent); }
+    .site-nav { margin-left:24px; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; } .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--text); border-color:var(--border); background:var(--surface); text-decoration:none; }
+    .site-status { font:11px var(--font-mono); color:var(--muted); margin-left:auto; white-space:nowrap; }
+    .live-dot { display:inline-block; width:7px; height:7px; border-radius:999px; background:var(--green, var(--fresh)); margin-right:6px; vertical-align:middle; box-shadow:0 0 0 3px color-mix(in srgb, var(--green, var(--fresh)) 18%, transparent); }
+
+    article { padding:36px 0 48px; }
+    h1 { font-size:32px; font-weight:700; letter-spacing:-0.5px; line-height:1.2; margin-bottom:12px; }
+    .meta { font-size:13px; color:var(--muted); margin-bottom:32px; font-family:var(--font-mono); }
+    h2 { font-size:22px; font-weight:700; margin-top:36px; margin-bottom:12px; letter-spacing:-0.3px; }
+    p { margin-bottom:16px; color:var(--text); }
+
+    .callout { background:var(--accent-lt); border-left:3px solid var(--accent); padding:16px 20px; margin:24px 0; border-radius:0 6px 6px 0; font-size:14px; }
+    .callout strong { color:var(--accent); }
+
+    .stat-row { display:flex; gap:14px; margin:24px 0; flex-wrap:wrap; }
+    .stat { flex:1; min-width:150px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:18px; text-align:center; }
+    .stat .n { font-family:var(--font-mono); font-size:30px; font-weight:700; color:var(--accent); line-height:1; }
+    .stat .l { font-size:12px; color:var(--muted); margin-top:8px; }
+
+    table { width:100%; border-collapse:collapse; margin:24px 0; font-size:14px; }
+    th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
+    td.name a { font-weight:600; color:var(--text); }
+
+    .cta-box { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:24px; margin:36px 0; text-align:center; }
+    .cta-box h3 { color:var(--text); margin-top:0; font-size:18px; margin-bottom:8px; }
+    .cta-box p { font-size:14px; color:var(--muted); margin-bottom:16px; }
+    .cta-btn { display:inline-block; background:var(--accent); color:#fff; padding:10px 24px; border-radius:5px; font-weight:600; font-size:14px; text-decoration:none; }
+    .cta-btn:hover { opacity:0.9; text-decoration:none; }
+
+    footer { padding:28px 0; border-top:1px solid var(--border); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--accent); }
+    @media (max-width:600px) { h1 { font-size:24px; } table { font-size:12px; } th,td { padding:8px 6px; } }
+  </style>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TZ8921LR0K');</script>
+  <script defer src="/analytics.js"></script>
+  <script defer src="/static/site-status.js"></script>
+<style>
+.nav-group{position:relative}
+.nav-trigger{font:inherit;cursor:pointer;color:var(--muted);padding:5px 8px;border:1px solid transparent;background:none;white-space:nowrap}
+.nav-trigger::after{content:" \25BE";opacity:.55;font-size:9px}
+.nav-group:hover>.nav-trigger,.nav-group:focus-within>.nav-trigger{color:var(--text);border-color:var(--border);background:var(--surface)}
+.nav-panel{display:none;position:absolute;top:100%;left:0;z-index:200;margin-top:4px;flex-direction:column;min-width:150px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.nav-group:hover>.nav-panel,.nav-group:focus-within>.nav-panel{display:flex}
+.nav-panel a{color:var(--muted);padding:6px 10px;border-radius:4px;border:0;white-space:nowrap}
+.nav-panel a:hover{color:var(--text);background:var(--surface);text-decoration:none}
+@media(max-width:900px){.nav-group:hover>.nav-panel,.nav-group:focus-within>.nav-panel{position:static;box-shadow:none;border:0;padding:2px 0 2px 12px;margin-top:0;min-width:0}}
+</style>
+</head>
+<body data-page-type="blog">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/methodology">Methodology</a><a href="/badges/">Badges</a><a href="/score-lab/">Score lab</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
+      </nav>
+      <div class="site-status" data-updated="">
+        <span class="live-dot"></span>updated <span class="site-status-value"></span>
+      </div>
+    </div>
+  </header>
+  <div class="page">
+
+    <article>
+      <h1>TrapDoor Hit npm, PyPI, and Crates at Once. Provenance Is the Signal That Catches It.</h1>
+      <div class="meta">June 21, 2026 &middot; 6 min read &middot; HVTracker Research</div>
+
+      <p>In May 2026, a campaign researchers named <strong>TrapDoor</strong> became the first confirmed supply-chain attack to weaponize npm, PyPI, and Crates.io <em>simultaneously</em> — more than 34 packages across 384 versions, each with an execution path tailored to its registry: <code>postinstall</code> hooks on npm, import-time remote fetch on PyPI, malicious <code>build.rs</code> scripts on Crates.io.</p>
+
+      <p>The detail that should worry anyone using AI coding tools: some TrapDoor packages shipped poisoned <code>CLAUDE.md</code> and <code>.cursorrules</code> files containing zero-width Unicode instructions. Open the project in an AI assistant, and it silently reads those files and runs a "security scan" that exfiltrates your local secrets. Weeks earlier, a separate mass campaign pushed hundreds of malicious versions of legitimate packages including TanStack and Mistral AI, harvesting GitHub tokens, CI/CD secrets, and cloud credentials.</p>
+
+      <p>These attacks share one mechanic: <strong>the package you download no longer matches the source you reviewed.</strong> The repo on GitHub looks clean. The artifact on the registry is not. And from the outside, you have no way to tell — unless the project publishes build provenance.</p>
+
+      <h2>What provenance actually does</h2>
+
+      <p>Build provenance is a cryptographic attestation — via <a href="https://slsa.dev" target="_blank" rel="noopener">SLSA</a> on npm or <a href="https://peps.python.org/pep-0740/" target="_blank" rel="noopener">PEP 740</a> on PyPI — that binds a published package to the exact commit, build system, and CI workflow that produced it. It doesn't stop an attacker from trying. It makes a swapped or tampered artifact <em>fail verification</em>, because the malicious build can't reproduce a signed attestation from the real project's pipeline.</p>
+
+      <div class="callout">
+        <strong>Provenance is detection, not prevention.</strong> It won't stop a maintainer account from being phished. What it gives you is the ability to check — automatically, at install time — that the bytes you're running came from the workflow you trust. Without it, "the GitHub source is clean" and "the package is clean" are two different claims, and you can only verify one.
+      </div>
+
+      <h2>How ready are open-source AI agents? Not very.</h2>
+
+      <p>We track build and package provenance across 272 open-source AI agents. Here's where the ecosystem stands going into the second half of 2026:</p>
+
+      <div class="stat-row">
+        <div class="stat"><div class="n">83%</div><div class="l">ship no build provenance attestation</div></div>
+        <div class="stat"><div class="n">72%</div><div class="l">of the 170 published to a registry have no package provenance</div></div>
+        <div class="stat"><div class="n">20%</div><div class="l">have zero signed commits</div></div>
+      </div>
+
+      <p>In other words, for roughly four out of five AI agents, a TrapDoor-style registry injection would be undetectable by the one mechanism designed to detect it. These are the same tools being wired into CI pipelines and handed cloud credentials — the exact blast radius TrapDoor was built to reach.</p>
+
+      <h2>The agents that would have caught it</h2>
+
+      <p>A minority do publish provenance, and they are disproportionately the projects at the top of our trust rankings. Provenance rarely travels alone: teams that attest builds also tend to sign commits and run OSSF Scorecard.</p>
+
+      <table>
+        <thead>
+          <tr><th>Agent</th><th>Package provenance</th><th>Signed commits</th><th>HVTrust Rank</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="name"><a href="/agents/langgraph">LangGraph</a></td><td>Verified</td><td>Yes</td><td>#2</td></tr>
+          <tr><td class="name"><a href="/agents/codex">Codex</a></td><td>Verified</td><td>Yes</td><td>#4</td></tr>
+          <tr><td class="name"><a href="/agents/vercel-ai-sdk">Vercel AI SDK</a></td><td>Verified</td><td>Yes</td><td>#5</td></tr>
+          <tr><td class="name"><a href="/agents/pydanticai">PydanticAI</a></td><td>Verified</td><td>Yes</td><td>#8</td></tr>
+        </tbody>
+      </table>
+
+      <h2>What to do about it</h2>
+
+      <p><strong>If you maintain an agent:</strong> turn on provenance. On npm it's a single <code>--provenance</code> flag in a GitHub Actions release. On PyPI, trusted publishing with PEP 740 attestations is built in. It is one of the highest-leverage, lowest-effort security upgrades available to you right now.</p>
+
+      <p><strong>If you depend on one:</strong> check whether the package you install carries an attestation before you wire it into anything with secrets. You can look up any agent's provenance, signed-commit ratio, and OSSF Scorecard on its HVTracker profile.</p>
+
+      <div class="cta-box">
+        <h3>See which agents publish provenance</h3>
+        <p>HVTracker grades 270+ open-source AI agents on build provenance, package provenance, signed commits, and OSSF Scorecard — refreshed throughout the day.</p>
+        <a class="cta-btn" href="/">Browse the trust registry</a>
+      </div>
+
+      <p style="font-size:13px;color:var(--muted);">Provenance and signing data from HVTracker signals as of June 21, 2026. Attack details summarized from public reporting on the TrapDoor campaign (<a href="https://thehackernews.com/2026/05/trapdoor-supply-chain-attack-spreads.html" target="_blank" rel="noopener">The Hacker News</a>) and the npm/PyPI TanStack &amp; Mistral campaign (<a href="https://safedep.io/mass-npm-supply-chain-attack-tanstack-mistral/" target="_blank" rel="noopener">SafeDep</a>). <a href="/methodology">Full methodology</a>. Related: <a href="/blog/ai-agents-mcp-servers-trust/">the MCP servers you can't verify</a>.</p>
+    </article>
+
+    <footer>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>
