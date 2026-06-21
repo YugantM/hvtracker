@@ -1682,10 +1682,11 @@ def _refresh(mode: str) -> bool:
     """Run a refresh cycle. Returns True on success, False on failure."""
     import fetch_and_build
     try:
-        # Render-only rebuilds read render_state.json, not the scorecard cache,
-        # so only re-pull for modes that actually apply scorecard scores.
-        if mode != "render":
-            _pull_scorecard_cache()
+        # Pull the latest OSSF scan from the data branch before every refresh —
+        # including render-only, which now re-applies the cache to all agents so
+        # fresh scores reach the live site on each deploy/restart, not just on a
+        # GitHub-signal refresh cycle.
+        _pull_scorecard_cache()
         fetch_and_build.run_refresh(mode)
         return True
     except Exception as e:  # never let a build error kill the scheduler thread
