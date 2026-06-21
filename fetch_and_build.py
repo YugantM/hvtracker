@@ -5511,6 +5511,7 @@ def main() -> None:
     sitemap_urls.append(("https://hvtracker.net/blog/state-of-ai-agent-supply-chain-trust-2026/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/ai-agents-mcp-servers-trust/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/trapdoor-supply-chain-provenance/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/mcp-server-launch/", "0.9", "weekly"))
     for article in blog_articles:
         sitemap_urls.append((f"https://hvtracker.net/blog/{article['slug']}/", "0.8", "weekly"))
     for row in rows:
@@ -5615,6 +5616,14 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
     # feed.json — JSON Feed 1.1 spec (jsonfeed.org). One item per agent.
     now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     blog_feed_items = [
+        {
+            "id": "https://hvtracker.net/blog/mcp-server-launch",
+            "url": "https://hvtracker.net/blog/mcp-server-launch",
+            "title": "HVTracker Is Now an MCP Server: Trust Checks Before Your Agent Connects",
+            "content_text": "HVTracker's public trust registry is now an MCP server at hvtracker.net/mcp. Coding agents can verify any MCP server, package, or agent before they connect, using three read-only tools over Streamable HTTP — no auth, open verdict.",
+            "date_modified": now_iso,
+            "tags": ["MCP", "Product launch", "Supply chain trust"],
+        },
         {
             "id": "https://hvtracker.net/blog/state-of-ai-agent-supply-chain-trust-2026",
             "url": "https://hvtracker.net/blog/state-of-ai-agent-supply-chain-trust-2026",

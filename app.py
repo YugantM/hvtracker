@@ -88,6 +88,38 @@ def _olookup_cache_put(repo: str, verdict: dict) -> None:
     _olookup_cache[repo] = (time.monotonic(), verdict)
 
 
+# MCP endpoint limiter: the trust tools are read-only in-memory lookups with no
+# external calls, so this is deliberately generous — it only exists to stop a
+# flood that bypasses the CDN and hits the origin directly. A real multi-check
+# agent session stays well under it.
+_MCP_WINDOW = 60
+_MCP_LIMIT = 60
+_mcp_log: dict[str, deque] = {}
+
+
+def _is_mcp_rate_limited(request: Request) -> bool:
+    ip = _client_ip(request)
+    now = time.monotonic()
+    with _rate_lock:
+        q = _mcp_log.setdefault(ip, deque())
+        while q and q[0] < now - _MCP_WINDOW:
+            q.popleft()
+        if len(q) >= _MCP_LIMIT:
+            return True
+        q.append(now)
+    return False
+
+
+def _mcp_enabled() -> bool:
+    """Budget kill switch for the MCP endpoint.
+
+    Set MCP_ENABLED=0 (Railway variable) to pause only the /mcp server — the
+    website, badges, and the /api/v1/mcp/verify HTTP API keep serving. Use this
+    if MCP traffic ever pushes usage toward the workspace spend cap.
+    """
+    return os.environ.get("MCP_ENABLED", "1").strip().lower() not in {"0", "false", "off", "no"}
+
+
 _EMAIL_RE = re.compile(r".+@.+\..+")
 
 _FIELD_LIMITS = {
@@ -275,6 +307,23 @@ async def _cache_headers(request, call_next):
         if redirect_target is not None:
             status_code = 301 if request.method in {"GET", "HEAD"} else 308
             return RedirectResponse(redirect_target, status_code=status_code)
+
+    if path == "/mcp" and request.method == "POST":
+        if not _mcp_enabled():
+            return JSONResponse(
+                {"jsonrpc": "2.0", "id": None, "error": {"code": -32000,
+                 "message": "HVTracker MCP is temporarily paused to stay within budget. "
+                            "The website and the HTTP API at /api/v1/mcp/verify remain available."}},
+                status_code=503,
+                headers={"Retry-After": "3600"},
+            )
+        if _is_mcp_rate_limited(request):
+            return JSONResponse(
+                {"jsonrpc": "2.0", "id": None, "error": {"code": -32029,
+                 "message": "Rate limit exceeded — too many MCP requests from your IP. Retry in a minute."}},
+                status_code=429,
+                headers={"Retry-After": "60"},
+            )
 
     response = await call_next(request)
 
@@ -775,6 +824,11 @@ def og_v2():
 @app.get("/og-verify.png")
 def og_verify():
     return FileResponse(os.path.join(BASE_DIR, "og-verify.png"), media_type="image/png")
+
+
+@app.get("/og-mcp.png")
+def og_mcp():
+    return FileResponse(os.path.join(BASE_DIR, "og-mcp.png"), media_type="image/png")
 
 
 @app.get("/favicon.svg")
