@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Application code
 COPY app.py fetch_and_build.py generate_og_card.py specs.py db.py cache.py storage.py schema.sql ./
-COPY signing.py mcp_trust.py open_lookup.py verify_log.py ./
+COPY signing.py mcp_trust.py open_lookup.py verify_log.py mcp_server.py ./
 # Generator inputs: curated seed, scorecard cache, and templates/assets
 COPY agents.json scorecard-cache.json template.html ./
 # Try fetching the latest scorecard cache from the data branch (falls back to COPY'd seed)
