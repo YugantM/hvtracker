@@ -132,6 +132,13 @@ def test_smithery_server_card_endpoint(monkeypatch):
     assert body["serverInfo"]["homepage"] == "https://hvtracker.net"
     assert body["homepage"] == "https://hvtracker.net"
     assert body["authentication"]["required"] is False
+    card_tools = {tool["name"]: tool for tool in body["tools"]}
+    check_schema = card_tools["check_agent_trust"]["outputSchema"]["properties"]
+    assert check_schema["profile_url"]["type"] == ["string", "null"]
+    assert check_schema["message"]["type"] == ["string", "null"]
+    assert check_schema["submit_url"]["type"] == ["string", "null"]
+    verify_schema = card_tools["verify_mcp_server"]["outputSchema"]["properties"]
+    assert verify_schema["submit_url"]["type"] == ["string", "null"]
     for tool in body["tools"]:
         assert tool["outputSchema"]["type"] == "object"
         assert tool["annotations"]["readOnlyHint"] is True
