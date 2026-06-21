@@ -365,15 +365,88 @@ def generate_verify_card(output_path: str):
     print(f"Generated verify OG card: {output_path} ({W}x{H})")
 
 
+def generate_mcp_card(output_path: str):
+    """Shareable OG card for the MCP server launch (LinkedIn / X)."""
+    img = Image.new("RGB", (W, H), hex_rgb(BG))
+    draw = ImageDraw.Draw(img)
+    draw.rectangle((0, 0, W, 6), fill=hex_rgb(ACCENT_WARM))
+
+    left_x = 64
+
+    # Header
+    draw.text((left_x, 44), "HV", font=load_font(20, bold=True, mono=True), fill=hex_rgb(TEXT))
+    hv_w = draw.textbbox((0, 0), "HV", font=load_font(20, bold=True, mono=True))[2]
+    tf = load_font(20, mono=True)
+    draw.text((left_x + hv_w, 44), "Tracker", font=tf, fill=hex_rgb(ACCENT_WARM))
+    tw = draw.textbbox((0, 0), "Tracker", font=tf)[2]
+    draw.text((left_x + hv_w + tw + 18, 46), "AI Trust Registry", font=load_font(16), fill=hex_rgb(MUTED))
+
+    # "NEW" pill, top-right
+    pill_text = "NEW · MCP SERVER"
+    pill_font = load_font(15, bold=True)
+    pb = draw.textbbox((0, 0), pill_text, font=pill_font)
+    pill_w = (pb[2] - pb[0]) + 32
+    rounded(draw, (W - 64 - pill_w, 38, W - 64, 38 + 36), 10,
+            fill=hex_rgb("#e3ecf6"), outline=hex_rgb(ACCENT))
+    draw.text((W - 64 - pill_w + 16, 47), pill_text, font=pill_font, fill=hex_rgb(ACCENT))
+
+    # Headline
+    draw.text((left_x, 132), "Safe Browsing", font=load_font(64, bold=True), fill=hex_rgb(TEXT))
+    draw.text((left_x, 204), "for MCP servers", font=load_font(64, bold=True), fill=hex_rgb(TEXT))
+
+    # Subtitle
+    draw.text((left_x, 300), "HVTracker's trust registry is now an MCP server. Verify any",
+              font=load_font(23), fill=hex_rgb(MUTED))
+    draw.text((left_x, 332), "agent, package, or MCP server before your agent connects.",
+              font=load_font(23), fill=hex_rgb(MUTED))
+
+    # Endpoint chip
+    cy = 388
+    chip_font = load_font(22, mono=True)
+    url = "https://hvtracker.net/mcp"
+    ub = draw.textbbox((0, 0), url, font=chip_font)
+    chip_w = (ub[2] - ub[0]) + 96
+    rounded(draw, (left_x, cy, left_x + chip_w, cy + 56), 12,
+            fill=hex_rgb(SURFACE), outline=hex_rgb(BORDER))
+    draw.ellipse((left_x + 22, cy + 22, left_x + 34, cy + 34), fill=hex_rgb(GREEN))
+    draw.text((left_x + 50, cy + 15), url, font=chip_font, fill=hex_rgb(ACCENT))
+
+    # Tool pills
+    ty = 470
+    px = left_x
+    pf = load_font(18, mono=True)
+    for tool in ("verify_mcp_server", "check_agent_trust", "search_agents"):
+        tb = draw.textbbox((0, 0), tool, font=pf)
+        tpw = (tb[2] - tb[0]) + 36
+        rounded(draw, (px, ty, px + tpw, ty + 44), 22,
+                fill=hex_rgb(BG), outline=hex_rgb(BORDER))
+        draw.text((px + 18, ty + 11), tool, font=pf, fill=hex_rgb(TEXT))
+        px += tpw + 16
+
+    # Footer
+    draw.line((left_x, 552, W - 64, 552), fill=hex_rgb(BORDER), width=1)
+    draw.text((left_x, 572), "hvtracker.net/mcp", font=load_font(22, mono=True), fill=hex_rgb(ACCENT))
+    tag = "Streamable HTTP · no auth · open verdict"
+    tgb = draw.textbbox((0, 0), tag, font=load_font(18))
+    draw.text((W - 64 - (tgb[2] - tgb[0]), 574), tag, font=load_font(18), fill=hex_rgb(MUTED))
+
+    img.save(output_path, "PNG", optimize=True)
+    print(f"Generated MCP OG card: {output_path} ({W}x{H})")
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python generate_og_card.py <slug> [output_path]")
         print("       python generate_og_card.py --site [output_path]")
+        print("       python generate_og_card.py --mcp [output_path]")
         sys.exit(1)
 
     if sys.argv[1] == "--site":
         out = sys.argv[2] if len(sys.argv) > 2 else "og-v2.png"
         generate_site_card(out)
+    elif sys.argv[1] == "--mcp":
+        out = sys.argv[2] if len(sys.argv) > 2 else "og-mcp.png"
+        generate_mcp_card(out)
     else:
         slug = sys.argv[1]
         out = sys.argv[2] if len(sys.argv) > 2 else f"agents/{slug}/og.png"
