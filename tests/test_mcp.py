@@ -71,6 +71,12 @@ def test_tools_registered_with_input_schemas():
     assert set(tools) == {"check_agent_trust", "verify_mcp_server", "search_agents"}
     assert "name_or_repo" in tools["check_agent_trust"].inputSchema["properties"]
     assert "server" in tools["verify_mcp_server"].inputSchema["properties"]
+    check_schema = tools["check_agent_trust"].outputSchema["properties"]
+    assert {"type": "null"} in check_schema["profile_url"]["anyOf"]
+    assert {"type": "null"} in check_schema["message"]["anyOf"]
+    assert {"type": "null"} in check_schema["submit_url"]["anyOf"]
+    verify_schema = tools["verify_mcp_server"].outputSchema["properties"]
+    assert {"type": "null"} in verify_schema["submit_url"]["anyOf"]
     for tool in tools.values():
         assert tool.outputSchema
         assert tool.outputSchema["type"] == "object"
