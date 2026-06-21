@@ -4717,7 +4717,6 @@ def main() -> None:
     # and category pages can link to them — internal linking turns the
     # /compare/ pages from orphans into ranking pages.
     import itertools
-    compare_pairs = []          # (a_row, b_row, cat_slug) — used to render pages
     compare_by_slug = {}        # agent slug -> [{name, url}] for agent pages
     compare_by_cat = {}         # cat slug   -> [{a, b, url}] for category pages
     for _cm in categories:
@@ -4727,7 +4726,6 @@ def main() -> None:
         )[:3]
         for _a, _b in itertools.combinations(_top, 2):
             _url = f"/compare/{_a['slug']}-vs-{_b['slug']}/"
-            compare_pairs.append((_a, _b, _cm["slug"]))
             compare_by_slug.setdefault(_a["slug"], []).append({"name": _b["name"], "url": _url})
             compare_by_slug.setdefault(_b["slug"], []).append({"name": _a["name"], "url": _url})
             compare_by_cat.setdefault(_cm["slug"], []).append({"a": _a["name"], "b": _b["name"], "url": _url})
@@ -5297,46 +5295,19 @@ def main() -> None:
             f.write(org_tmpl.render(org=org, orgs=org_pages, is_index=False, updated=now_str))
     print(f"Built {len(org_pages)} org pages under org/.")
 
-    # Comparison pages — /compare/<a>-vs-<b>/ from the precomputed pairs
-    # (top 3 per category). High-intent "X vs Y" search + LLM-citable.
-    cmp_tmpl = env.get_template("compare.html.j2")
+    # /compare/<a>-vs-<b>/ is served by the interactive compare tool (app.py
+    # serves the tool preselected with both agents), so no static pages are
+    # written here. Remove any previously-rendered -vs- dirs so the volume stops
+    # serving stale ones; the /compare/ interactive tool itself stays.
     compare_dir = os.path.join(script_dir, "compare")
     os.makedirs(compare_dir, exist_ok=True)
-    reverse_redirect = """<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0; url={target}">
-  <link rel="canonical" href="https://hvtracker.net{target}">
-  <script>window.location.replace({target_json});</script>
-  <title>Redirecting...</title>
-</head>
-<body>
-  <p>Redirecting to <a href="{target}">{target}</a>...</p>
-</body>
-</html>
-"""
-    # Remove stale comparison dirs (top-3 membership shifts as ranks change) so
-    # we don't serve orphaned pages. Leaves the /compare/ interactive tool.
+    removed_pairs = 0
     for _d in os.listdir(compare_dir):
         if "-vs-" in _d and os.path.isdir(os.path.join(compare_dir, _d)):
             shutil.rmtree(os.path.join(compare_dir, _d), ignore_errors=True)
-    for a, b, cat_slug in compare_pairs:
-        winner, loser = (a, b) if (a.get("trust_score") or 0) >= (b.get("trust_score") or 0) else (b, a)
-        pair_dir = os.path.join(compare_dir, f"{a['slug']}-vs-{b['slug']}")
-        os.makedirs(pair_dir, exist_ok=True)
-        with open(os.path.join(pair_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(cmp_tmpl.render(a=a, b=b, winner=winner, loser=loser,
-                                    category_slug=cat_slug, updated=now_str))
-        reverse_dir = os.path.join(compare_dir, f"{b['slug']}-vs-{a['slug']}")
-        os.makedirs(reverse_dir, exist_ok=True)
-        reverse_target = f"/compare/{a['slug']}-vs-{b['slug']}/"
-        with open(os.path.join(reverse_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(reverse_redirect.format(
-                target=reverse_target,
-                target_json=json.dumps(reverse_target),
-            ))
-    print(f"Built {len(compare_pairs)} comparison pages under compare/.")
+            removed_pairs += 1
+    if removed_pairs:
+        print(f"Removed {removed_pairs} stale static comparison dirs under compare/.")
 
     # Blog comparison articles — one SEO article per category using the top two
     # contenders. These are narrative, crawlable entry points that link to the
@@ -5547,8 +5518,8 @@ def main() -> None:
     # Legacy entries have their public /agents/<slug>/ page deleted
     # (remove_legacy_public_artifacts); they MUST NOT appear in the sitemap or
     # Google crawls them as 404s.
-    for _a, _b, _cs in compare_pairs:
-        sitemap_urls.append((f"https://hvtracker.net/compare/{_a['slug']}-vs-{_b['slug']}/", "0.7", "weekly"))
+    # /compare/<a>-vs-<b>/ pairs are not listed: they now serve the interactive
+    # tool (canonical /compare/), so only the tool URL belongs in the sitemap.
     sitemap_urls += [
         ("https://hvtracker.net/compare/", "0.7", "daily"),
         ("https://hvtracker.net/changelog/", "0.6", "weekly"),
