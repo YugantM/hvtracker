@@ -85,7 +85,7 @@
 
     <div class="verify-box">
       <form class="verify-form" id="verify-form" autocomplete="off">
-        <input id="verify-input" name="server" placeholder="owner/repo, npm/pypi package, or MCP server URL" aria-label="Agent or MCP server identifier" required>
+        <input id="verify-input" name="server" placeholder="agent name, owner/repo, npm/pypi package, or MCP server URL" aria-label="Agent or MCP server identifier" required>
         <button type="submit">Verify</button>
       </form>
       <p class="verify-eg">Try:
@@ -161,7 +161,7 @@
         }
         var meta = [], att = d.attestation || {};
         if (att.signature) meta.push('<span class="signed">✔ signed attestation</span>');
-        if (d.tracked && d.resolved) meta.push('<a href="/agents/' + esc((d.resolved.split('/')[1] || '').toLowerCase()) + '/">View full profile →</a>');
+        if (d.tracked && d.resolved) meta.push('<a href="/agents/' + esc(d.slug || (d.resolved.split('/')[1] || '').toLowerCase()) + '/">View full profile →</a>');
         if (d.submit_url && !d.tracked) meta.push('<a href="' + esc(d.submit_url) + '">' + (d.provisional ? 'Get a fully-tracked Verified listing →' : 'Submit it for review →') + '</a>');
         if (meta.length) html += '<div class="result-meta">' + meta.join('') + '</div>';
         html += '</div>';

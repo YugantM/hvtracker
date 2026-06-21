@@ -69,6 +69,7 @@ def evaluate(agent: dict | None, server_id: str) -> dict:
     return {
         "server": server_id,
         "resolved": agent.get("repo"),
+        "slug": agent.get("slug"),
         "tracked": True,
         "trusted": trusted,
         "grade": grade,
