@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hundreds of AI Agents Now Ship MCP Servers. How Many Can You Actually Trust? | HVTracker</title>
+  <meta name="description" content="45% of the open-source AI agents we track now implement or declare an MCP server. 76% of them ship no build provenance. As MCP tool-poisoning becomes the top 2026 attack, here's who you can verify and who you can't.">
+  <link rel="canonical" href="https://hvtracker.net/blog/ai-agents-mcp-servers-trust">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Hundreds of AI Agents Now Ship MCP Servers. How Many Can You Actually Trust?">
+  <meta property="og:description" content="45% of tracked AI agents now expose an MCP server — and 76% of them ship no build provenance. We checked.">
+  <meta property="og:url" content="https://hvtracker.net/blog/ai-agents-mcp-servers-trust">
+  <meta property="og:image" content="https://hvtracker.net/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Hundreds of AI Agents Now Ship MCP Servers. How Many Can You Actually Trust?">
+  <meta name="twitter:description" content="45% of tracked AI agents now expose an MCP server — and 76% ship no build provenance.">
+  <meta name="twitter:image" content="https://hvtracker.net/og.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Hundreds of AI Agents Now Ship MCP Servers. How Many Can You Actually Trust?",
+    "description": "45% of tracked open-source AI agents now implement or declare an MCP server, but 76% ship no build provenance.",
+    "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "publisher": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "datePublished": "2026-06-21",
+    "dateModified": "2026-06-21",
+    "mainEntityOfPage": "https://hvtracker.net/blog/ai-agents-mcp-servers-trust"
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#f4f1eb; --surface:#eae6de; --surface-2:#e2ded6; --border:#d4cfc5;
+      --text:#1a1a1a; --muted:#6b6560;
+      --accent:#2c5282; --accent-lt:rgba(44,82,130,0.08); --accent-dim:#5677aa;
+      --mocha:#8b6914; --mocha-lt:rgba(139,105,20,0.10);
+      --fresh:#2f6846; --stale:#737f91;
+      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg); background-image:url("/hex-bg.svg");background-size:2000px 2000px; color:var(--text); font-family:var(--font-sans); font-size:16px; line-height:1.7; min-height:100vh; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:720px; margin:0 auto; padding:0 20px; background:#f4f1eb; min-height:100vh; }
+
+    .site-header { position:sticky; top:0; z-index:100; background:var(--bg); border-bottom:1px solid var(--border); }
+    .site-header-inner { max-width:1200px; margin:0 auto; padding:14px 20px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; letter-spacing:-0.5px; color:var(--text); }
+    .logo span { color:var(--accent); }
+    .site-nav { margin-left:24px; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; } .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--text); border-color:var(--border); background:var(--surface); text-decoration:none; }
+    .site-status { font:11px var(--font-mono); color:var(--muted); margin-left:auto; white-space:nowrap; }
+    .live-dot { display:inline-block; width:7px; height:7px; border-radius:999px; background:var(--green, var(--fresh)); margin-right:6px; vertical-align:middle; box-shadow:0 0 0 3px color-mix(in srgb, var(--green, var(--fresh)) 18%, transparent); }
+
+    article { padding:36px 0 48px; }
+    h1 { font-size:32px; font-weight:700; letter-spacing:-0.5px; line-height:1.2; margin-bottom:12px; }
+    .meta { font-size:13px; color:var(--muted); margin-bottom:32px; font-family:var(--font-mono); }
+    h2 { font-size:22px; font-weight:700; margin-top:36px; margin-bottom:12px; letter-spacing:-0.3px; }
+    p { margin-bottom:16px; color:var(--text); }
+
+    .callout { background:var(--accent-lt); border-left:3px solid var(--accent); padding:16px 20px; margin:24px 0; border-radius:0 6px 6px 0; font-size:14px; }
+    .callout strong { color:var(--accent); }
+
+    table { width:100%; border-collapse:collapse; margin:24px 0; font-size:14px; }
+    th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
+    td.name a { font-weight:600; color:var(--text); }
+    td.name a:hover { color:var(--accent); }
+    td.prov-yes { color:var(--fresh); font-weight:600; }
+    td.prov-no { color:var(--stale); }
+    td.stars { font-family:var(--font-mono); color:var(--muted); }
+    td.rank { font-family:var(--font-mono); }
+
+    .cta-box { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:24px; margin:36px 0; text-align:center; }
+    .cta-box h3 { color:var(--text); margin-top:0; font-size:18px; margin-bottom:8px; }
+    .cta-box p { font-size:14px; color:var(--muted); margin-bottom:16px; }
+    .cta-btn { display:inline-block; background:var(--accent); color:#fff; padding:10px 24px; border-radius:5px; font-weight:600; font-size:14px; text-decoration:none; }
+    .cta-btn:hover { opacity:0.9; text-decoration:none; }
+
+    footer { padding:28px 0; border-top:1px solid var(--border); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--accent); }
+    @media (max-width:600px) { h1 { font-size:24px; } table { font-size:12px; } th,td { padding:8px 6px; } }
+  </style>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TZ8921LR0K');</script>
+  <script defer src="/analytics.js"></script>
+  <script defer src="/static/site-status.js"></script>
+<style>
+.nav-group{position:relative}
+.nav-trigger{font:inherit;cursor:pointer;color:var(--muted);padding:5px 8px;border:1px solid transparent;background:none;white-space:nowrap}
+.nav-trigger::after{content:" \25BE";opacity:.55;font-size:9px}
+.nav-group:hover>.nav-trigger,.nav-group:focus-within>.nav-trigger{color:var(--text);border-color:var(--border);background:var(--surface)}
+.nav-panel{display:none;position:absolute;top:100%;left:0;z-index:200;margin-top:4px;flex-direction:column;min-width:150px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.nav-group:hover>.nav-panel,.nav-group:focus-within>.nav-panel{display:flex}
+.nav-panel a{color:var(--muted);padding:6px 10px;border-radius:4px;border:0;white-space:nowrap}
+.nav-panel a:hover{color:var(--text);background:var(--surface);text-decoration:none}
+@media(max-width:900px){.nav-group:hover>.nav-panel,.nav-group:focus-within>.nav-panel{position:static;box-shadow:none;border:0;padding:2px 0 2px 12px;margin-top:0;min-width:0}}
+</style>
+</head>
+<body data-page-type="blog">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/methodology">Methodology</a><a href="/badges/">Badges</a><a href="/score-lab/">Score lab</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
+      </nav>
+      <div class="site-status" data-updated="">
+        <span class="live-dot"></span>updated <span class="site-status-value"></span>
+      </div>
+    </div>
+  </header>
+  <div class="page">
+
+    <article>
+      <h1>Hundreds of AI Agents Now Ship MCP Servers. How Many Can You Actually Trust?</h1>
+      <div class="meta">June 21, 2026 &middot; 6 min read &middot; HVTracker Research</div>
+
+      <p>The Model Context Protocol went from a niche idea to table stakes in under a year. Agents that ship an MCP server can plug into your files, your databases, your cloud, and each other. That same reach is exactly why MCP became the headline AI security story of 2026: Trend Micro found <strong>492 MCP servers exposed to the public internet with no authentication at all</strong>, and a single command-injection bug in one popular MCP utility (CVE-2026-0755, CVSS 9.8) let unauthenticated attackers run arbitrary code.</p>
+
+      <p>Most of that coverage is about <em>runtime</em> security — prompt injection, tool poisoning, over-permissioned connectors. Those matter. But there's a more basic question that comes first, and almost nobody is asking it:</p>
+
+      <div class="callout">
+        <strong>Can you even verify that the MCP server you installed was built from the source you read?</strong> If the published package has no build provenance, the honest answer is no. You're trusting the maintainer's CI pipeline and registry credentials on faith — before the agent has executed a single tool call.
+      </div>
+
+      <h2>How many agents ship MCP servers now</h2>
+
+      <p>We scan every agent we track for MCP server code and documentation. As of this week, <strong>122 of the 272 agents (45%) implement or declare an MCP server</strong>, and 72 of them (26%) have a confirmed implementation in the codebase. A year ago this number was a rounding error.</p>
+
+      <p>Here's the uncomfortable part. Of those 122 MCP-shipping agents, <strong>93 (76%) publish no build provenance.</strong> The median OSSF Scorecard among them is 5.5/10. So the components most likely to be handed broad system access are, as a group, no more verifiable than the rest of the ecosystem — arguably less, because the most-installed ones skew worst.</p>
+
+      <h2>Popular MCP-shipping agents with no provenance</h2>
+
+      <table>
+        <thead>
+          <tr><th>Agent</th><th>Stars</th><th>Provenance</th><th>HVTrust Rank</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="name"><a href="/agents/autogpt">AutoGPT</a></td><td class="stars">185k</td><td class="prov-no">None</td><td class="rank">#80</td></tr>
+          <tr><td class="name"><a href="/agents/opencode">opencode</a></td><td class="stars">170k</td><td class="prov-no">None</td><td class="rank">#169</td></tr>
+          <tr><td class="name"><a href="/agents/langflow">Langflow</a></td><td class="stars">149k</td><td class="prov-no">None</td><td class="rank">#66</td></tr>
+          <tr><td class="name"><a href="/agents/dify">Dify</a></td><td class="stars">144k</td><td class="prov-no">None</td><td class="rank">#42</td></tr>
+          <tr><td class="name"><a href="/agents/gemini-cli">Gemini CLI</a></td><td class="stars">105k</td><td class="prov-no">None</td><td class="rank">#55</td></tr>
+          <tr><td class="name"><a href="/agents/browser-use">Browser Use</a></td><td class="stars">98k</td><td class="prov-no">None</td><td class="rank">#79</td></tr>
+        </tbody>
+      </table>
+
+      <p>None of this means these projects are compromised or unsafe. It means an independent observer can't cryptographically confirm the published artifact matches the public repo — and for software you're about to hand tool access, that gap is worth knowing about.</p>
+
+      <h2>The ones doing it right</h2>
+
+      <p>A handful of MCP-shipping agents do publish provenance, and they cluster at the top of the trust rankings — not because we reward MCP, but because teams that ship attestations also tend to sign commits, run OSSF Scorecard, and maintain disclosure policies. Trust signals travel together.</p>
+
+      <table>
+        <thead>
+          <tr><th>Agent</th><th>Provenance</th><th>OSSF</th><th>HVTrust Rank</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="name"><a href="/agents/haystack">Haystack</a></td><td class="prov-yes">Verified</td><td class="stars">8.4</td><td class="rank">#1</td></tr>
+          <tr><td class="name"><a href="/agents/n8n">n8n</a></td><td class="prov-yes">Verified</td><td class="stars">6.6</td><td class="rank">#3</td></tr>
+          <tr><td class="name"><a href="/agents/codex">Codex</a></td><td class="prov-yes">Verified</td><td class="stars">6.6</td><td class="rank">#4</td></tr>
+          <tr><td class="name"><a href="/agents/vercel-ai-sdk">Vercel AI SDK</a></td><td class="prov-yes">Verified</td><td class="stars">6.4</td><td class="rank">#5</td></tr>
+          <tr><td class="name"><a href="/agents/cline">Cline</a></td><td class="prov-yes">Verified</td><td class="stars">6.0</td><td class="rank">#6</td></tr>
+          <tr><td class="name"><a href="/agents/openai-agents-sdk">OpenAI Agents SDK</a></td><td class="prov-yes">Verified</td><td class="stars">6.3</td><td class="rank">#7</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Why MCP raises the stakes</h2>
+
+      <p>A poisoned build of a logging library exfiltrates data. A poisoned build of an MCP server inherits <em>every credential and tool the server brokers</em> — which is frequently your databases, your cloud, and your file system at once. MCP servers are credential concentrators by design, which is what makes the missing-provenance gap more consequential here than almost anywhere else in the dependency tree.</p>
+
+      <p>Provenance won't stop a maintainer account from being compromised. What it does is make tampering <em>detectable</em>: the published artifact carries a signed link to the exact commit, build system, and workflow that produced it. Without that link, a swapped package and a legitimate one look identical from the outside.</p>
+
+      <div class="cta-box">
+        <h3>Check the MCP agent you're about to install</h3>
+        <p>HVTracker tracks MCP support, build provenance, signed commits, and OSSF Scorecard across 270+ open-source AI agents. Every score links back to its source.</p>
+        <a class="cta-btn" href="/">Browse the trust registry</a>
+      </div>
+
+      <p style="font-size:13px;color:var(--muted);">Data from HVTracker signals as of June 21, 2026. MCP detection is based on server code and documentation found in each repository. Provenance is checked via npm registry attestations and PyPI PEP 740 metadata. <a href="/methodology">Full methodology</a>. Related: <a href="/blog/trapdoor-supply-chain-provenance/">why provenance catches the 2026 registry attacks</a>.</p>
+    </article>
+
+    <footer>
+      <a href="/methodology">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/">Specifications</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/badges/">Badges</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changelog/">Changelog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>

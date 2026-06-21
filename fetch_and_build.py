@@ -5537,6 +5537,9 @@ def main() -> None:
     sitemap_urls.append(("https://hvtracker.net/blog/codex-vs-claude-code/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/runtime-trust-is-live/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/you-are-not-installing-what-you-think/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/state-of-ai-agent-supply-chain-trust-2026/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/ai-agents-mcp-servers-trust/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/trapdoor-supply-chain-provenance/", "0.9", "weekly"))
     for article in blog_articles:
         sitemap_urls.append((f"https://hvtracker.net/blog/{article['slug']}/", "0.8", "weekly"))
     for row in rows:
@@ -5638,6 +5641,30 @@ HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Ma
     # feed.json — JSON Feed 1.1 spec (jsonfeed.org). One item per agent.
     now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     blog_feed_items = [
+        {
+            "id": "https://hvtracker.net/blog/state-of-ai-agent-supply-chain-trust-2026",
+            "url": "https://hvtracker.net/blog/state-of-ai-agent-supply-chain-trust-2026",
+            "title": "The State of AI Agent Supply-Chain Trust (2026): 272 Agents, Graded",
+            "content_text": "We graded 272 open-source AI agents on supply-chain trust. Only 13% earn an A; 43% land at D. 17% publish build provenance and the median OSSF Scorecard is 5.3/10.",
+            "date_modified": now_iso,
+            "tags": ["Supply chain trust", "State of the ecosystem"],
+        },
+        {
+            "id": "https://hvtracker.net/blog/ai-agents-mcp-servers-trust",
+            "url": "https://hvtracker.net/blog/ai-agents-mcp-servers-trust",
+            "title": "Hundreds of AI Agents Now Ship MCP Servers. How Many Can You Actually Trust?",
+            "content_text": "45% of the AI agents we track now implement or declare an MCP server, and 76% of them ship no build provenance. Here's who you can verify and who you can't.",
+            "date_modified": now_iso,
+            "tags": ["MCP", "Supply chain trust"],
+        },
+        {
+            "id": "https://hvtracker.net/blog/trapdoor-supply-chain-provenance",
+            "url": "https://hvtracker.net/blog/trapdoor-supply-chain-provenance",
+            "title": "TrapDoor Hit npm, PyPI, and Crates at Once. Provenance Is the Signal That Catches It.",
+            "content_text": "The 2026 TrapDoor campaign weaponized npm, PyPI, and Crates simultaneously. Build provenance detects registry injection, and 83% of open-source AI agents don't publish it.",
+            "date_modified": now_iso,
+            "tags": ["Provenance", "Supply chain trust"],
+        },
         {
             "id": "https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety",
             "url": "https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety",
