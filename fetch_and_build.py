@@ -3036,12 +3036,25 @@ def make_agent_event(date: str, event_type: str, detail: str, *, reason_code: st
     }
 
 
+RECENT_CHANGE_WINDOW_DAYS = 7
+
+
 def summarize_recent_events(events: list[dict]) -> dict | None:
-    """Return a compact homepage-friendly summary of recent changes."""
+    """Return a compact homepage-friendly summary of recent changes.
+
+    Only surfaces genuinely-recent changes (within RECENT_CHANGE_WINDOW_DAYS).
+    A stable agent whose last notable event is older than the window shows no
+    chip rather than headlining a weeks-old event as its "recent change". The
+    full event history is still exposed via /data — this only governs the
+    leaderboard chip. Recomputed on every render, so the window stays accurate.
+    """
     if not events:
         return None
-    recent = sorted(events, key=lambda e: e["date"])
-    latest = recent[-1]
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=RECENT_CHANGE_WINDOW_DAYS)).strftime("%Y-%m-%d")
+    fresh = sorted((e for e in events if e.get("date", "") >= cutoff), key=lambda e: e["date"])
+    if not fresh:
+        return None
+    latest = fresh[-1]
     detail = latest.get("detail", "")
     event_date = latest.get("date", "")
     return {
@@ -3050,7 +3063,7 @@ def summarize_recent_events(events: list[dict]) -> dict | None:
         "short_label": latest.get("short_label") or latest.get("type", "").replace("_", " ").title(),
         "tone": latest.get("tone", "neutral"),
         "detail": f"{event_date}: {detail}" if event_date and detail else detail,
-        "count": len(recent),
+        "count": len(fresh),
     }
 
 
@@ -3592,6 +3605,62 @@ def select_batch(agents: list[dict], batch_num: int, total_batches: int) -> list
     return sorted_agents[start:start + batch_size]
 
 
+def load_signals_staleness(data_path: str) -> dict[str, str]:
+    """Map repo → when its GitHub signals were last fetched (ISO ``signals_fetched_at``).
+
+    Agents missing from data.json (newly added) or lacking the stamp map to an
+    empty string, which sorts first → treated as the most stale.
+    """
+    try:
+        with open(data_path, encoding="utf-8") as f:
+            existing = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+    return {
+        a["repo"].lower(): a.get("signals_fetched_at") or ""
+        for a in existing.get("agents", [])
+        if a.get("repo")
+    }
+
+
+def select_stale_batch(agents: list[dict], data_path: str, total_batches: int) -> list[dict]:
+    """Select the stalest 1/total_batches of agents by last-fetch time.
+
+    Smarter than the fixed hour-based slice: each cycle refreshes whichever
+    agents have gone longest without a signal fetch, so nothing rots and a
+    failed cycle's agents stay first in line for the next one (self-healing).
+    Stable secondary sort by repo keeps selection deterministic within a tier.
+    """
+    batch_size = math.ceil(len(agents) / total_batches)
+    staleness = load_signals_staleness(data_path)
+    ranked = sorted(
+        agents,
+        key=lambda a: (staleness.get(a["repo"].lower(), ""), a["repo"].lower()),
+    )
+    return ranked[:batch_size]
+
+
+def apply_cached_scorecards(rows: list[dict], scorecard_cache: dict, skip_repos: set[str]) -> int:
+    """Overlay the latest OSSF scan scores onto carried-forward rows.
+
+    Keeps every agent's OSSF score fresh on each cycle (from the data-branch
+    cache, no API calls) instead of only the slice that was re-fetched. Skips
+    rows fetched this run (already scored, possibly via API fallback) and never
+    clobbers an existing value with a cache miss.
+    """
+    applied = 0
+    for row in rows:
+        if row.get("repo", "").lower() in skip_repos:
+            continue
+        cached = scorecard_cache.get(row.get("repo", ""))
+        if cached and cached.get("score") is not None:
+            row["scorecard_score"] = cached["score"]
+            row["scorecard_checks"] = cached.get("checks", {})
+            row["scorecard_scanned_at"] = cached.get("scanned_at")
+            applied += 1
+    return applied
+
+
 def merge_batch_into_data(data_path: str, fresh_rows: list[dict]) -> list[dict]:
     """Merge freshly-fetched rows into existing data.json, replacing stale entries.
 
@@ -4021,7 +4090,10 @@ def main() -> None:
         legacy_agents = []
         print(f"Repair-commits: refreshing {len(agents)} agent(s) with missing commit counts")
     elif batch:
-        batch_agents = select_batch(all_agents, batch_num, total_batches)
+        # Staleness-priority: refresh the agents that have gone longest without
+        # a fetch, not a fixed hour-based slice. batch_num is retained only for
+        # logging/cadence; selection is driven by last-fetch time.
+        batch_agents = select_stale_batch(all_agents, data_path, total_batches)
         existing_data_repos = load_existing_data_repos(data_path)
         missing_agents = [
             a for a in all_agents
@@ -4034,7 +4106,7 @@ def main() -> None:
         ]
         agents = batch_agents + extra_agents
         print(
-            f"Batch {batch_num}/{total_batches}: fetching {len(batch_agents)} scheduled"
+            f"Batch {batch_num}/{total_batches} (staleness-priority): fetching {len(batch_agents)} stalest"
             f" + {len(extra_agents)} newly-added missing agents"
             f" ({len(agents)} of {len(all_agents)} active agents)"
         )
@@ -4171,6 +4243,7 @@ def main() -> None:
             "name": name,
             "category": category,
             "repo": repo_id,
+            "signals_fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "url": repo["html_url"],
             "stars": repo["stargazers_count"],
             "stars_fmt": fmt_num(repo["stargazers_count"]),
@@ -4210,6 +4283,9 @@ def main() -> None:
             "listing_status": agent.get("listing_status", "listed"),
         }
 
+    # Repos whose GitHub signals were re-fetched this run. Carried-forward rows
+    # (everything else) get their OSSF score refreshed from the cache below.
+    freshly_fetched_repos: set[str] = set()
     if render_only or runtime_only:
         # Load fully-decorated rows from the render cache — no API calls.
         with open(render_state_path, encoding="utf-8") as _f:
@@ -4247,6 +4323,7 @@ def main() -> None:
                 result = future.result()
                 if result:
                     rows.append(result)
+        freshly_fetched_repos = {r.get("repo", "").lower() for r in rows}
 
         legacy_rows = []
         if legacy_agents:
@@ -4458,6 +4535,14 @@ def main() -> None:
     # `repo` as the tracking/join key while showing the corrected slug.
     _display_repo_map = {a["repo"].lower(): a.get("display_repo", "") for a in all_agents if a.get("display_repo")}
     _source_note_map = {a["repo"].lower(): a.get("source_note", "") for a in all_agents if a.get("source_note")}
+
+    # Re-apply the latest OSSF scan to every carried-forward agent (cache-only,
+    # no API) so scores stay fresh each cycle instead of only the slice that was
+    # re-fetched. Runs before the trust recompute below, so fresh scorecard
+    # scores flow into HVTrust, evidence grade, and rank in every mode.
+    refreshed_sc = apply_cached_scorecards(rows, scorecard_cache, freshly_fetched_repos)
+    if refreshed_sc:
+        print(f"Re-applied OSSF cache to {refreshed_sc} carried-forward agent(s).")
 
     # Add formatted download counts and slug/breakdown for template rendering
     for row in rows:
