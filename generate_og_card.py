@@ -20,6 +20,15 @@ GREEN = "#2f6846"
 RED = "#9b3c3c"
 AMBER = "#8b6914"
 
+# Website brand accents (match static/site.css). The shareable hero cards
+# (site / verify / mcp) lead with these so they read warm-forward like the live
+# site instead of blue-forward. ACCENT (blue) is left untouched for the
+# per-agent cards' trust bars.
+LOBSTER = "#c67c6d"
+LOBSTER_TINT = "#f1e0db"
+MOSS = "#6f876e"
+INK = "#1f1b17"
+
 GRADE_COLORS = {
     "A": ("#e8f5e9", GREEN, GREEN),
     "B": ("#e3ecf6", ACCENT, ACCENT),
@@ -267,15 +276,15 @@ def generate_site_card(output_path: str, total: int = 196, categories: int = 15)
     draw = ImageDraw.Draw(img)
 
     # Top accent bar
-    draw.rectangle((0, 0, W, 6), fill=hex_rgb(ACCENT_WARM))
+    draw.rectangle((0, 0, W, 6), fill=hex_rgb(LOBSTER))
 
     left_x = 60
     top_y = 40
 
     # Logo
-    draw.text((left_x, top_y), "HV", font=load_font(28, bold=True, mono=True), fill=hex_rgb(TEXT))
+    draw.text((left_x, top_y), "HV", font=load_font(28, bold=True, mono=True), fill=hex_rgb(INK))
     hv_w = draw.textbbox((0, 0), "HV", font=load_font(28, bold=True, mono=True))[2]
-    draw.text((left_x + hv_w, top_y), "Tracker", font=load_font(28, mono=True), fill=hex_rgb(ACCENT_WARM))
+    draw.text((left_x + hv_w, top_y), "Tracker", font=load_font(28, mono=True), fill=hex_rgb(LOBSTER))
 
     # Separator
     draw.line((left_x, 86, W - 60, 86), fill=hex_rgb(BORDER), width=1)
@@ -301,8 +310,8 @@ def generate_site_card(output_path: str, total: int = 196, categories: int = 15)
     gap = 24
 
     stats = [
-        (str(total), "active projects", GREEN),
-        (str(categories), "categories", ACCENT),
+        (str(total), "active projects", MOSS),
+        (str(categories), "categories", LOBSTER),
         ("2h", "refresh cycle", ACCENT_WARM),
         ("v3", "methodology", AMBER),
     ]
@@ -335,13 +344,13 @@ def generate_verify_card(output_path: str):
     """Shareable OG card for the /verify front door."""
     img = Image.new("RGB", (W, H), hex_rgb(BG))
     draw = ImageDraw.Draw(img)
-    draw.rectangle((0, 0, W, 6), fill=hex_rgb(ACCENT_WARM))
+    draw.rectangle((0, 0, W, 6), fill=hex_rgb(LOBSTER))
 
     left_x = 64
-    draw.text((left_x, 44), "HV", font=load_font(20, bold=True, mono=True), fill=hex_rgb(TEXT))
+    draw.text((left_x, 44), "HV", font=load_font(20, bold=True, mono=True), fill=hex_rgb(INK))
     hv_w = draw.textbbox((0, 0), "HV", font=load_font(20, bold=True, mono=True))[2]
     tf = load_font(20, mono=True)
-    draw.text((left_x + hv_w, 44), "Tracker", font=tf, fill=hex_rgb(ACCENT_WARM))
+    draw.text((left_x + hv_w, 44), "Tracker", font=tf, fill=hex_rgb(LOBSTER))
     tw = draw.textbbox((0, 0), "Tracker", font=tf)[2]
     draw.text((left_x + hv_w + tw + 18, 46), "AI Trust Registry", font=load_font(16), fill=hex_rgb(MUTED))
 
@@ -360,7 +369,7 @@ def generate_verify_card(output_path: str):
               font=load_font(22, bold=True), fill=hex_rgb(TEXT))
 
     draw.line((left_x, 540, W - 64, 540), fill=hex_rgb(BORDER), width=1)
-    draw.text((left_x, 560), "hvtracker.net/verify", font=load_font(22, mono=True), fill=hex_rgb(ACCENT))
+    draw.text((left_x, 560), "hvtracker.net/verify", font=load_font(22, mono=True), fill=hex_rgb(LOBSTER))
     img.save(output_path, "PNG", optimize=True)
     print(f"Generated verify OG card: {output_path} ({W}x{H})")
 
@@ -369,15 +378,15 @@ def generate_mcp_card(output_path: str):
     """Shareable OG card for the MCP server launch (LinkedIn / X)."""
     img = Image.new("RGB", (W, H), hex_rgb(BG))
     draw = ImageDraw.Draw(img)
-    draw.rectangle((0, 0, W, 6), fill=hex_rgb(ACCENT_WARM))
+    draw.rectangle((0, 0, W, 6), fill=hex_rgb(LOBSTER))
 
     left_x = 64
 
     # Header
-    draw.text((left_x, 44), "HV", font=load_font(20, bold=True, mono=True), fill=hex_rgb(TEXT))
+    draw.text((left_x, 44), "HV", font=load_font(20, bold=True, mono=True), fill=hex_rgb(INK))
     hv_w = draw.textbbox((0, 0), "HV", font=load_font(20, bold=True, mono=True))[2]
     tf = load_font(20, mono=True)
-    draw.text((left_x + hv_w, 44), "Tracker", font=tf, fill=hex_rgb(ACCENT_WARM))
+    draw.text((left_x + hv_w, 44), "Tracker", font=tf, fill=hex_rgb(LOBSTER))
     tw = draw.textbbox((0, 0), "Tracker", font=tf)[2]
     draw.text((left_x + hv_w + tw + 18, 46), "AI Trust Registry", font=load_font(16), fill=hex_rgb(MUTED))
 
@@ -387,12 +396,12 @@ def generate_mcp_card(output_path: str):
     pb = draw.textbbox((0, 0), pill_text, font=pill_font)
     pill_w = (pb[2] - pb[0]) + 32
     rounded(draw, (W - 64 - pill_w, 38, W - 64, 38 + 36), 10,
-            fill=hex_rgb("#e3ecf6"), outline=hex_rgb(ACCENT))
-    draw.text((W - 64 - pill_w + 16, 47), pill_text, font=pill_font, fill=hex_rgb(ACCENT))
+            fill=hex_rgb(LOBSTER_TINT), outline=hex_rgb(LOBSTER))
+    draw.text((W - 64 - pill_w + 16, 47), pill_text, font=pill_font, fill=hex_rgb(LOBSTER))
 
     # Headline
-    draw.text((left_x, 132), "Safe Browsing", font=load_font(64, bold=True), fill=hex_rgb(TEXT))
-    draw.text((left_x, 204), "for MCP servers", font=load_font(64, bold=True), fill=hex_rgb(TEXT))
+    draw.text((left_x, 132), "Safe Browsing", font=load_font(64, bold=True), fill=hex_rgb(INK))
+    draw.text((left_x, 204), "for MCP servers", font=load_font(64, bold=True), fill=hex_rgb(INK))
 
     # Subtitle
     draw.text((left_x, 300), "HVTracker's trust registry is now an MCP server. Verify any",
@@ -408,8 +417,8 @@ def generate_mcp_card(output_path: str):
     chip_w = (ub[2] - ub[0]) + 96
     rounded(draw, (left_x, cy, left_x + chip_w, cy + 56), 12,
             fill=hex_rgb(SURFACE), outline=hex_rgb(BORDER))
-    draw.ellipse((left_x + 22, cy + 22, left_x + 34, cy + 34), fill=hex_rgb(GREEN))
-    draw.text((left_x + 50, cy + 15), url, font=chip_font, fill=hex_rgb(ACCENT))
+    draw.ellipse((left_x + 22, cy + 22, left_x + 34, cy + 34), fill=hex_rgb(MOSS))
+    draw.text((left_x + 50, cy + 15), url, font=chip_font, fill=hex_rgb(INK))
 
     # Tool pills
     ty = 470
@@ -420,12 +429,12 @@ def generate_mcp_card(output_path: str):
         tpw = (tb[2] - tb[0]) + 36
         rounded(draw, (px, ty, px + tpw, ty + 44), 22,
                 fill=hex_rgb(BG), outline=hex_rgb(BORDER))
-        draw.text((px + 18, ty + 11), tool, font=pf, fill=hex_rgb(TEXT))
+        draw.text((px + 18, ty + 11), tool, font=pf, fill=hex_rgb(INK))
         px += tpw + 16
 
     # Footer
     draw.line((left_x, 552, W - 64, 552), fill=hex_rgb(BORDER), width=1)
-    draw.text((left_x, 572), "hvtracker.net/mcp", font=load_font(22, mono=True), fill=hex_rgb(ACCENT))
+    draw.text((left_x, 572), "hvtracker.net/mcp", font=load_font(22, mono=True), fill=hex_rgb(LOBSTER))
     tag = "Streamable HTTP · no auth · open verdict"
     tgb = draw.textbbox((0, 0), tag, font=load_font(18))
     draw.text((W - 64 - (tgb[2] - tgb[0]), 574), tag, font=load_font(18), fill=hex_rgb(MUTED))
