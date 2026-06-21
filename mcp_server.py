@@ -16,9 +16,93 @@ from mcp.server.transport_security import TransportSecuritySettings
 
 import mcp_trust
 
+
+def server_card() -> dict:
+    """Static metadata for directories that cannot scan the MCP endpoint."""
+    return {
+        "serverInfo": {
+            "name": "HVTracker MCP",
+            "version": "0.1.2",
+        },
+        "authentication": {
+            "required": False,
+        },
+        "tools": [
+            {
+                "name": "verify_mcp_server",
+                "description": (
+                    "Pre-connect trust verdict for an MCP server, package, "
+                    "GitHub repo, or agent name before connecting an AI agent to it."
+                ),
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "server": {
+                            "type": "string",
+                            "description": "MCP server URL, package name, or GitHub owner/repo.",
+                        },
+                    },
+                    "required": ["server"],
+                },
+            },
+            {
+                "name": "check_agent_trust",
+                "description": (
+                    "Get the HVTracker supply-chain trust profile for a tracked "
+                    "AI agent or framework."
+                ),
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "name_or_repo": {
+                            "type": "string",
+                            "description": (
+                                "Agent name, slug, GitHub repo/URL, npm package, "
+                                "or PyPI package."
+                            ),
+                        },
+                    },
+                    "required": ["name_or_repo"],
+                },
+            },
+            {
+                "name": "search_agents",
+                "description": (
+                    "Search tracked AI agents and frameworks by name, repo, "
+                    "description, or category, ranked by trust score."
+                ),
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "default": "",
+                            "description": "Optional name, repo, or description search text.",
+                        },
+                        "category": {
+                            "type": "string",
+                            "default": "",
+                            "description": "Optional exact category filter.",
+                        },
+                        "limit": {
+                            "type": "integer",
+                            "default": 10,
+                            "minimum": 1,
+                            "maximum": 50,
+                            "description": "Maximum number of results to return.",
+                        },
+                    },
+                },
+            },
+        ],
+        "resources": [],
+        "prompts": [],
+    }
+
+
 # Stateless + JSON responses: no per-session state to keep, simplest to mount
-# behind the existing app's middleware. streamable_http_path="/" puts the handler
-# at the mount root so app.mount("/mcp", ...) serves it exactly at /mcp.
+# behind the existing app's middleware. app.py registers the SDK route directly
+# so POST /mcp is handled without a redirect to /mcp/.
 # session_manager is run by app.py's lifespan.
 #
 # DNS-rebinding protection guards *localhost* MCP servers from malicious web
@@ -26,9 +110,19 @@ import mcp_trust
 # host, so it's disabled for this read-only public API.
 mcp = FastMCP(
     "hvtracker", stateless_http=True, json_response=True,
-    streamable_http_path="/",
+    streamable_http_path="/mcp",
     transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False),
 )
+
+
+def fresh_streamable_http_app():
+    """Build a Streamable HTTP app with a fresh SDK session manager."""
+    # The MCP SDK's StreamableHTTPSessionManager is intentionally single-use.
+    # FastAPI test clients and reload-style processes can start lifespan more
+    # than once in the same interpreter, so app.py reinstalls this route on
+    # startup with a fresh manager.
+    mcp._session_manager = None
+    return mcp.streamable_http_app()
 
 
 def _resolve_agent(query: str) -> dict | None:

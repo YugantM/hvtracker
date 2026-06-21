@@ -39,6 +39,14 @@ def test_trusted_good_agent():
     assert any("provenance present" in r.lower() for r in v["reasons"])
 
 
+def test_implemented_mcp_support_is_explained():
+    v = mcp_trust.evaluate(
+        dict(GOOD, mcp_server_support={"status": "implemented"}),
+        "owner/good",
+    )
+    assert any("mcp server support: implemented" in r.lower() for r in v["reasons"])
+
+
 def test_delisted_not_trusted():
     v = mcp_trust.evaluate(dict(GOOD, listing_status="delisted"), "owner/good")
     assert v["trusted"] is False

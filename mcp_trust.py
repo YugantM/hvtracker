@@ -15,6 +15,7 @@ import signing
 # Policy (documented in the MCP Server Trust spec). A consumer MAY override.
 TRUSTED_GRADES = {"A", "B", "C"}
 BLOCKED_STATUS = {"delisted", "warning", "legacy"}
+MCP_SUPPORT_STATUS = {"declared", "implemented", "verified", "supported"}
 MIN_SCORE = 40.0
 
 
@@ -54,7 +55,7 @@ def evaluate(agent: dict | None, server_id: str) -> dict:
     sc = agent.get("scorecard_score")
     if sc is not None:
         reasons.append(f"OSSF Scorecard {sc}/10.")
-    if mcp.get("status") in ("declared", "verified", "supported"):
+    if mcp.get("status") in MCP_SUPPORT_STATUS:
         reasons.append(f"MCP server support: {mcp.get('status')}.")
     if tags:
         reasons.append(f"Declared tool surface: {', '.join(tags)} — review these permissions "

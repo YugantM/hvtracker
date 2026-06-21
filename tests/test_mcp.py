@@ -71,3 +71,54 @@ def test_tools_registered_with_input_schemas():
     assert set(tools) == {"check_agent_trust", "verify_mcp_server", "search_agents"}
     assert "name_or_repo" in tools["check_agent_trust"].inputSchema["properties"]
     assert "server" in tools["verify_mcp_server"].inputSchema["properties"]
+
+
+def test_streamable_http_serves_mcp_exact_path_without_redirect(monkeypatch):
+    from fastapi.testclient import TestClient
+
+    monkeypatch.setattr(app, "startup", lambda: None)
+    monkeypatch.setattr(app, "shutdown", lambda: None)
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "initialize",
+        "params": {
+            "protocolVersion": "2025-06-18",
+            "capabilities": {},
+            "clientInfo": {"name": "test-client", "version": "0.1.0"},
+        },
+    }
+    headers = {
+        "accept": "application/json, text/event-stream",
+        "content-type": "application/json",
+    }
+    with TestClient(app.app, base_url="https://hvtracker.net",
+                    follow_redirects=False) as client:
+        response = client.post("/mcp", headers=headers, json=payload)
+
+    assert response.status_code == 200
+    assert response.headers.get("location") is None
+    body = response.json()
+    assert body["result"]["serverInfo"]["name"] == "hvtracker"
+
+
+def test_smithery_server_card_endpoint(monkeypatch):
+    from fastapi.testclient import TestClient
+
+    monkeypatch.setattr(app, "startup", lambda: None)
+    monkeypatch.setattr(app, "shutdown", lambda: None)
+    with TestClient(app.app, base_url="https://hvtracker.net",
+                    follow_redirects=False) as client:
+        response = client.get("/.well-known/mcp/server-card.json")
+
+    assert response.status_code == 200
+    assert response.headers.get("location") is None
+    assert response.headers["content-type"].startswith("application/json")
+    body = response.json()
+    assert body["serverInfo"]["name"] == "HVTracker MCP"
+    assert body["authentication"]["required"] is False
+    assert {tool["name"] for tool in body["tools"]} == {
+        "check_agent_trust",
+        "verify_mcp_server",
+        "search_agents",
+    }

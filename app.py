@@ -137,12 +137,13 @@ SCORECARD_CACHE_PATH = os.path.join(BASE_DIR, "scorecard-cache.json")
 async def _lifespan(_app):
     # Run the MCP Streamable-HTTP session manager (required by the SDK even in
     # stateless mode) for the lifetime of the app, then the existing startup work.
+    _install_mcp_route()
     async with mcp_server.mcp.session_manager.run():
-        _startup()
+        startup()
         try:
             yield
         finally:
-            _shutdown()
+            shutdown()
 
 
 app = FastAPI(title="HVTracker", docs_url="/api/docs", openapi_url="/api/openapi.json",
@@ -197,7 +198,6 @@ _DYNAMIC_SLASH_PATHS = {
     "/data",
     "/data-api",
     "/ecosystem",
-    "/mcp",
     "/movers",
     "/methodology",
     "/org",
@@ -512,6 +512,15 @@ def find_agent_by_slug(slug: str) -> dict | None:
 
 
 # ---- JSON API ------------------------------------------------------------
+
+@app.api_route(
+    "/.well-known/mcp/server-card.json",
+    methods=["GET", "HEAD"],
+    include_in_schema=False,
+)
+def smithery_mcp_server_card():
+    return JSONResponse(mcp_server.server_card(), headers={"Cache-Control": _JSON_CACHE})
+
 
 @app.api_route("/healthz", methods=["GET", "HEAD"])
 @app.api_route("/healthz/", methods=["GET", "HEAD"])
@@ -1956,14 +1965,15 @@ def _startup():
                 max_instances=1,
                 coalesce=True,
             )
-            _scheduler.add_job(
-                _refresh_verify_feed,
-                "cron",
-                hour=4,
-                id="verify-feed-refresh",
-                max_instances=1,
-                coalesce=True,
-            )
+            if db.enabled():
+                _scheduler.add_job(
+                    _refresh_verify_feed,
+                    "cron",
+                    hour=4,
+                    id="verify-feed-refresh",
+                    max_instances=1,
+                    coalesce=True,
+                )
             _scheduler.start()
         print("[startup] scheduler started (refresh every 2h)")
 
@@ -1975,10 +1985,29 @@ def _shutdown():
         _scheduler = None
 
 
-# Trust-layer MCP server (Streamable HTTP) — before the static catch-all so
-# POSTs to /mcp reach the MCP app, not StaticFiles. session_manager runs in
-# _lifespan above.
-app.mount("/mcp", mcp_server.mcp.streamable_http_app())
+def startup():
+    _startup()
+
+
+def shutdown():
+    _shutdown()
+
+
+def _install_mcp_route():
+    route = mcp_server.fresh_streamable_http_app().routes[0]
+    routes = app.router.routes
+    routes[:] = [r for r in routes if getattr(r, "path", None) != "/mcp"]
+    insert_at = next(
+        (i for i, r in enumerate(routes) if getattr(r, "name", None) == "site"),
+        len(routes),
+    )
+    routes.insert(insert_at, route)
+
+
+# Trust-layer MCP server (Streamable HTTP) — register the SDK route directly
+# before the static catch-all so POST /mcp is handled without a slash redirect.
+# session_manager runs in _lifespan above.
+_install_mcp_route()
 
 # Static site LAST so /api, /badge, /submit, /correct take precedence.
 app.mount("/", StaticFiles(directory=OUTPUT_DIR, html=True), name="site")
