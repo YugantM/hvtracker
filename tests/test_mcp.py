@@ -71,6 +71,12 @@ def test_tools_registered_with_input_schemas():
     assert set(tools) == {"check_agent_trust", "verify_mcp_server", "search_agents"}
     assert "name_or_repo" in tools["check_agent_trust"].inputSchema["properties"]
     assert "server" in tools["verify_mcp_server"].inputSchema["properties"]
+    for tool in tools.values():
+        assert tool.outputSchema
+        assert tool.outputSchema["type"] == "object"
+        assert tool.annotations.readOnlyHint is True
+        assert tool.annotations.destructiveHint is False
+        assert tool.annotations.idempotentHint is True
 
 
 def test_streamable_http_serves_mcp_exact_path_without_redirect(monkeypatch):
@@ -116,7 +122,14 @@ def test_smithery_server_card_endpoint(monkeypatch):
     assert response.headers["content-type"].startswith("application/json")
     body = response.json()
     assert body["serverInfo"]["name"] == "HVTracker MCP"
+    assert body["serverInfo"]["description"]
+    assert body["serverInfo"]["homepage"] == "https://hvtracker.net"
+    assert body["homepage"] == "https://hvtracker.net"
     assert body["authentication"]["required"] is False
+    for tool in body["tools"]:
+        assert tool["outputSchema"]["type"] == "object"
+        assert tool["annotations"]["readOnlyHint"] is True
+        assert tool["annotations"]["destructiveHint"] is False
     assert {tool["name"] for tool in body["tools"]} == {
         "check_agent_trust",
         "verify_mcp_server",
