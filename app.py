@@ -13,6 +13,7 @@ import threading
 import hashlib
 import time
 from collections import deque
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
 from html import escape
 
@@ -21,6 +22,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Redirect
 from fastapi.staticfiles import StaticFiles
 
 import db
+import mcp_server
 import verify_log
 
 
@@ -131,7 +133,20 @@ SCORECARD_CACHE_URL = os.environ.get(
 )
 SCORECARD_CACHE_PATH = os.path.join(BASE_DIR, "scorecard-cache.json")
 
-app = FastAPI(title="HVTracker", docs_url="/api/docs", openapi_url="/api/openapi.json")
+@asynccontextmanager
+async def _lifespan(_app):
+    # Run the MCP Streamable-HTTP session manager (required by the SDK even in
+    # stateless mode) for the lifetime of the app, then the existing startup work.
+    async with mcp_server.mcp.session_manager.run():
+        _startup()
+        try:
+            yield
+        finally:
+            _shutdown()
+
+
+app = FastAPI(title="HVTracker", docs_url="/api/docs", openapi_url="/api/openapi.json",
+              lifespan=_lifespan)
 _scheduler = None
 _refresh_lock = threading.Lock()
 SITE_NAV_ITEMS = (
@@ -182,6 +197,7 @@ _DYNAMIC_SLASH_PATHS = {
     "/data",
     "/data-api",
     "/ecosystem",
+    "/mcp",
     "/movers",
     "/methodology",
     "/org",
@@ -1539,6 +1555,16 @@ def data_api_page():
       <p style='margin-top:12px;color:var(--muted);font-size:13px'>Auth and rate quotas for a paid tier are intentionally out of scope for now.</p>
     </div>
     <div class='card'>
+      <h2>MCP server — trust layer for agents</h2>
+      <p>Add HVTracker as a <a href='https://modelcontextprotocol.io'>Model Context Protocol</a> server so a coding agent can check supply-chain trust <em>before</em> installing a dependency or connecting to an MCP server. Streamable HTTP, no auth, no install.</p>
+      <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>{
+  "mcpServers": {
+    "hvtracker": { "url": "https://hvtracker.net/mcp" }
+  }
+}</code></pre>
+      <p style='margin-top:12px;color:var(--muted);font-size:13px'>Tools: <code>verify_mcp_server</code> (pre-connect "Safe Browsing for MCP" verdict), <code>check_agent_trust</code>, <code>search_agents</code>.</p>
+    </div>
+    <div class='card'>
       <h2>Early pricing stub</h2>
       <div class='grid'>
         <div class='card'>
@@ -1848,8 +1874,7 @@ def _refresh_verify_feed():
     print(f"[scheduler] verify feed refresh complete: {refreshed} repo(s)")
 
 
-@app.on_event("startup")
-def startup():
+def _startup():
     global _scheduler
     _sync_prebuilt_to_volume()
     seeded = _seed_history_into_volume()
@@ -1943,13 +1968,17 @@ def startup():
         print("[startup] scheduler started (refresh every 2h)")
 
 
-@app.on_event("shutdown")
-def shutdown():
+def _shutdown():
     global _scheduler
     if _scheduler is not None:
         _scheduler.shutdown(wait=False)
         _scheduler = None
 
+
+# Trust-layer MCP server (Streamable HTTP) — before the static catch-all so
+# POSTs to /mcp reach the MCP app, not StaticFiles. session_manager runs in
+# _lifespan above.
+app.mount("/mcp", mcp_server.mcp.streamable_http_app())
 
 # Static site LAST so /api, /badge, /submit, /correct take precedence.
 app.mount("/", StaticFiles(directory=OUTPUT_DIR, html=True), name="site")

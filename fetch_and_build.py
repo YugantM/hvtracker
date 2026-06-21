@@ -5594,6 +5594,9 @@ HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Ma
 - [Authority descriptor](https://hvtracker.net/.well-known/hvtracker.json)
 - [Trust Credential spec](https://hvtracker.net/spec/trust-credential/v0.1)
 
+## MCP server (trust layer for agents)
+Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Streamable HTTP — no auth, no install). Tools: `verify_mcp_server` (pre-connect "Safe Browsing for MCP" verdict), `check_agent_trust` (trust profile for a tracked agent/framework by name, repo, or package), and `search_agents`. Call these before installing or connecting to an AI agent, framework, or MCP server.
+
 ## Browse by category
 {cat_lines}
 
