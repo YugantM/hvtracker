@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HVTracker Is Now an MCP Server: Trust Checks Before Your Agent Connects | HVTracker</title>
+  <meta name="description" content="HVTracker's trust registry is now an MCP server. Your coding agent can verify any MCP server, package, or agent before it connects — three read-only tools, no auth, open verdict.">
+  <link rel="canonical" href="https://hvtracker.net/blog/mcp-server-launch">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="HVTracker Is Now an MCP Server: Trust Checks Before Your Agent Connects">
+  <meta property="og:description" content="Safe Browsing for MCP. Verify any MCP server, package, or agent before your agent connects — three read-only tools over Streamable HTTP, no auth, open verdict.">
+  <meta property="og:url" content="https://hvtracker.net/blog/mcp-server-launch">
+  <meta property="og:image" content="https://hvtracker.net/og-mcp.png">
+  <meta property="og:image:secure_url" content="https://hvtracker.net/og-mcp.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Safe Browsing for MCP servers — the HVTracker MCP server at hvtracker.net/mcp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="HVTracker Is Now an MCP Server: Trust Checks Before Your Agent Connects">
+  <meta name="twitter:description" content="Safe Browsing for MCP. Verify any MCP server, package, or agent before your agent connects — three read-only tools, no auth, open verdict.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-mcp.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "HVTracker Is Now an MCP Server: Trust Checks Before Your Agent Connects",
+    "description": "HVTracker's public trust registry is now exposed as an MCP server over Streamable HTTP. Coding agents can verify any MCP server, package, or agent before they connect, using three read-only tools.",
+    "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "publisher": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "datePublished": "2026-06-21",
+    "dateModified": "2026-06-21",
+    "mainEntityOfPage": "https://hvtracker.net/blog/mcp-server-launch"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://hvtracker.net/blog/" },
+      { "@type": "ListItem", "position": 3, "name": "HVTracker Is Now an MCP Server" }
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#f4f1eb; --surface:#eae6de; --border:#d4cfc5; --text:#1a1a1a; --muted:#6b6560;
+      --accent:#2c5282; --green:#2f6846; --red:#9b3c3c; --amber:#8b6914;
+      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg); background-image:url("/hex-bg.svg"); background-size:2000px 2000px; color:var(--text); font-family:var(--font-sans); font-size:16px; line-height:1.7; min-height:100vh; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:760px; margin:0 auto; padding:0 20px; background:var(--bg); min-height:100vh; }
+    .site-header { position:sticky; top:0; z-index:100; background:var(--bg); border-bottom:1px solid var(--border); }
+    .site-header-inner { max-width:1200px; margin:0 auto; padding:14px 20px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; color:var(--text); }
+    .logo span { color:var(--accent); }
+    .site-nav { margin-left:24px; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; }
+    .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--text); border-color:var(--border); background:var(--surface); text-decoration:none; }
+    .site-status { font:11px var(--font-mono); color:var(--muted); margin-left:auto; white-space:nowrap; }
+    .live-dot { display:inline-block; width:7px; height:7px; border-radius:999px; background:var(--green, var(--fresh)); margin-right:6px; vertical-align:middle; box-shadow:0 0 0 3px color-mix(in srgb, var(--green, var(--fresh)) 18%, transparent); }
+    article { padding:36px 0 48px; }
+    h1 { font-size:34px; font-weight:700; line-height:1.15; margin-bottom:12px; }
+    .meta { font-size:13px; color:var(--muted); margin-bottom:32px; font-family:var(--font-mono); }
+    h2 { font-size:22px; font-weight:700; margin-top:36px; margin-bottom:12px; }
+    p { margin-bottom:16px; }
+    code { font-family:var(--font-mono); font-size:14px; background:var(--surface); padding:2px 6px; border-radius:3px; }
+    pre { font-family:var(--font-mono); font-size:13px; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:16px 18px; margin:20px 0; overflow-x:auto; line-height:1.55; }
+    pre code { background:none; padding:0; font-size:inherit; }
+    .callout { background:rgba(44,82,130,0.08); border-left:3px solid var(--accent); padding:16px 20px; margin:24px 0; border-radius:0 6px 6px 0; font-size:14px; }
+    .callout strong { color:var(--accent); }
+    .big-stat { text-align:center; padding:32px 0; margin:24px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+    .big-stat .number { font:700 44px var(--font-mono); color:var(--accent); }
+    .big-stat .label { font-size:14px; color:var(--muted); margin-top:4px; }
+    table { width:100%; border-collapse:collapse; margin:24px 0; font-size:14px; }
+    th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:top; }
+    th { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
+    td.name a { font-weight:600; color:var(--text); }
+    td.name a:hover { color:var(--accent); }
+    td.tool { font-family:var(--font-mono); font-weight:600; color:var(--text); white-space:nowrap; }
+    .cta-box { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:24px; margin:36px 0; text-align:center; }
+    .cta-box h3 { margin-bottom:8px; font-size:18px; }
+    .cta-box p { font-size:14px; color:var(--muted); margin-bottom:16px; }
+    .cta-btn { display:inline-block; background:var(--accent); color:#fff; padding:10px 24px; border-radius:5px; font-weight:600; font-size:14px; text-decoration:none; }
+    .cta-btn:hover { opacity:0.9; text-decoration:none; }
+    footer { padding:28px 0; border-top:1px solid var(--border); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--accent); }
+    @media (max-width:600px) { h1 { font-size:26px; } table { font-size:12px; } th,td { padding:8px 6px; } }
+  </style>
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TZ8921LR0K');</script>
+  <script defer src="/analytics.js"></script>
+  <script defer src="/static/site-status.js"></script>
+<style>
+.nav-group{position:relative}
+.nav-trigger{font:inherit;cursor:pointer;color:var(--muted);padding:5px 8px;border:1px solid transparent;background:none;white-space:nowrap}
+.nav-trigger::after{content:" \25BE";opacity:.55;font-size:9px}
+.nav-group:hover>.nav-trigger,.nav-group:focus-within>.nav-trigger{color:var(--text);border-color:var(--border);background:var(--surface)}
+.nav-panel{display:none;position:absolute;top:100%;left:0;z-index:200;margin-top:4px;flex-direction:column;min-width:150px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.nav-group:hover>.nav-panel,.nav-group:focus-within>.nav-panel{display:flex}
+.nav-panel a{color:var(--muted);padding:6px 10px;border-radius:4px;border:0;white-space:nowrap}
+.nav-panel a:hover{color:var(--text);background:var(--surface);text-decoration:none}
+@media(max-width:900px){.nav-group:hover>.nav-panel,.nav-group:focus-within>.nav-panel{position:static;box-shadow:none;border:0;padding:2px 0 2px 12px;margin-top:0;min-width:0}}
+</style>
+</head>
+<body data-page-type="blog_article">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/methodology">Methodology</a><a href="/badges/">Badges</a><a href="/score-lab/">Score lab</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
+      </nav>
+      <div class="site-status" data-updated="">
+        <span class="live-dot"></span>updated <span class="site-status-value"></span>
+      </div>
+    </div>
+  </header>
+  <div class="page">
+    <article>
+      <h1>HVTracker Is Now an MCP Server: Trust Checks Before Your Agent Connects</h1>
+      <div class="meta">June 21, 2026 &middot; 5 min read &middot; HVTracker Research</div>
+
+      <p>Your coding agent will happily connect to an MCP server it has never seen, install a package nobody has audited, and run a tool it cannot vouch for. The decision to trust happens silently, in milliseconds, with no evidence on the table.</p>
+
+      <p>So we put the evidence on the table — at the exact moment the agent makes that call. <strong>HVTracker's public trust registry is now an MCP server.</strong> Point any MCP client at <code>https://hvtracker.net/mcp</code> and your agent can ask, before it connects: <em>is this thing tracked, and is there any independent reason to trust it?</em></p>
+
+      <div class="callout">
+        <strong>Think of it as Safe Browsing for MCP.</strong> The same evidence-weighted trust scores behind every <a href="/">leaderboard</a> profile, now callable as three read-only tools over Streamable HTTP — no auth, no signup, and the verdict stays open.
+      </div>
+
+      <h2>The three tools</h2>
+
+      <p>The server exposes exactly three tools. All are read-only, idempotent, and safe to call at decision time — they never write anything and never touch your code.</p>
+
+      <table>
+        <thead>
+          <tr><th>Tool</th><th>What it answers</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="tool">verify_mcp_server</td><td>Pre-connect trust verdict for an MCP server, package, or repo. <em>"Should my agent connect to this?"</em> Returns trusted/untracked, grade, score, and reasons.</td></tr>
+          <tr><td class="tool">check_agent_trust</td><td>Full supply-chain profile for a tracked agent or framework — trust score, evidence grade, rank, provenance, and OpenSSF Scorecard.</td></tr>
+          <tr><td class="tool">search_agents</td><td>Search tracked agents and frameworks by name, repo, or category, ranked by trust score.</td></tr>
+        </tbody>
+      </table>
+
+      <h2>A real call</h2>
+
+      <p>Here is an actual response from the live endpoint — <code>check_agent_trust</code> for LangGraph, pulled straight from the registry:</p>
+
+      <pre><code>{
+  "query": "LangGraph",
+  "tracked": true,
+  "name": "LangGraph",
+  "repo": "langchain-ai/langgraph",
+  "trust_score": 92.8,
+  "evidence_grade": "A",
+  "rank": 3,
+  "category": "Agent Frameworks",
+  "has_provenance": true,
+  "scorecard_score": 6.8,
+  "profile_url": "https://hvtracker.net/agents/langgraph/"
+}</code></pre>
+
+      <p>An untracked server is honest about it: <code>tracked: false</code> with a note that there is no independent evidence — <em>not</em> a guarantee of harm, just the absence of a reason to trust. That distinction is the whole point.</p>
+
+      <h2>Add it in 30 seconds</h2>
+
+      <p>The fastest path is the one-click install on Smithery. Or point any MCP client at the endpoint directly:</p>
+
+      <pre><code>{
+  "mcpServers": {
+    "hvtracker": {
+      "url": "https://hvtracker.net/mcp"
+    }
+  }
+}</code></pre>
+
+      <p>That's it — no API key, no account. The transport is stateless Streamable HTTP, so it works with any MCP-aware client (Claude, Cursor, and friends). Prefer plain HTTP? The same verdict is available at <code>GET /api/v1/mcp/verify?server=&lt;name&gt;</code>.</p>
+
+      <ul style="margin:0 0 16px 24px; line-height:2;">
+        <li><strong>Endpoint:</strong> <code>https://hvtracker.net/mcp</code> (Streamable HTTP)</li>
+        <li><strong>One-click install:</strong> <a href="https://smithery.ai/servers/hvtracker/hvtracker-mcp" target="_blank" rel="noopener">smithery.ai/servers/hvtracker/hvtracker-mcp</a></li>
+        <li><strong>Source &amp; docs:</strong> <a href="https://github.com/YugantM/hvtracker-mcp" target="_blank" rel="noopener">github.com/YugantM/hvtracker-mcp</a></li>
+        <li><strong>Browser front door:</strong> <a href="/verify/">hvtracker.net/verify</a> — paste any agent or MCP server</li>
+        <li><strong>HTTP API:</strong> <a href="/data/">hvtracker.net/data</a></li>
+      </ul>
+
+      <h2>Open verdict, by design</h2>
+
+      <p>The MCP server is a thin adapter over the same trust engine that powers the site — there is no separate scoring logic, so the tools and the public profiles always agree. The scores and the data stay open under CC BY 4.0; only operations and scale are ever gated. Every grade traces back to public, checkable signals you can audit yourself on the <a href="/methodology">methodology page</a>.</p>
+
+      <div class="callout">
+        <strong>Why this matters now:</strong> 45% of the agents we track already ship or declare an MCP server, and most publish no build provenance. As tool-poisoning becomes a top 2026 attack, a trust check <em>before</em> the connection is the cheapest defense there is. We covered the data in <a href="/blog/ai-agents-mcp-servers-trust/">Hundreds of AI Agents Now Ship MCP Servers</a>.
+      </div>
+
+      <div class="cta-box">
+        <h3>Give your agent a trust check</h3>
+        <p>Add the HVTracker MCP server in one click, or verify any agent or MCP server right now in your browser.</p>
+        <a class="cta-btn" href="https://smithery.ai/servers/hvtracker/hvtracker-mcp" target="_blank" rel="noopener">Install on Smithery</a>
+      </div>
+
+      <p>An agent that can check trust before it connects is a safer agent. The registry was always open — now it's where your agent already is.</p>
+    </article>
+
+    <footer>
+      <a href="/methodology">Methodology</a> &middot;
+      <a href="/verify/">Verify</a> &middot;
+      <a href="/data/">Data &amp; API</a> &middot;
+      <a href="/blog/">Blog</a>
+    </footer>
+  </div>
+</body>
+</html>
