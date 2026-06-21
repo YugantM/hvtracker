@@ -133,9 +133,9 @@ class CheckAgentTrustResult(TypedDict):
     category: NotRequired[str | None]
     has_provenance: NotRequired[bool | None]
     scorecard_score: NotRequired[float | None]
-    profile_url: NotRequired[str]
-    message: NotRequired[str]
-    submit_url: NotRequired[str]
+    profile_url: NotRequired[str | None]
+    message: NotRequired[str | None]
+    submit_url: NotRequired[str | None]
 
 
 class VerifyMcpServerResult(TypedDict):
@@ -148,7 +148,7 @@ class VerifyMcpServerResult(TypedDict):
     trust_score: float | None
     confidence: float | None
     reasons: list[str]
-    submit_url: NotRequired[str]
+    submit_url: NotRequired[str | None]
     mcp_server_support: str | None
     tool_permissions: list[str]
 
