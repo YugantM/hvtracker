@@ -909,6 +909,11 @@
           params.get("b"),
           params.get("c"),
         ].filter(Boolean);
+        // Preselect from a /compare/<a>-vs-<b>/ path when no query params are given.
+        if (!names.length) {
+          const pair = location.pathname.replace(/^\/compare\//, "").replace(/\/$/, "").split("-vs-");
+          if (pair.length === 2 && pair[0] && pair[1]) names.push(pair[0], pair[1]);
+        }
         names.forEach((name) => {
           const agent = allAgents.find((a) => a.slug === name || a.name.toLowerCase() === name.toLowerCase());
           if (agent && selected.length < 3) selected.push(agent);
