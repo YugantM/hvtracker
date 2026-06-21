@@ -642,10 +642,15 @@ def api_v1_mcp_verify(request: Request, server: str = ""):
     if repo:
         agent = find_agent(repo)
     if agent is None:
+        # Resolve by package id, or by the agent's slug / display name — users
+        # naturally type the name they see on the leaderboard ("headroom")
+        # rather than the owner/repo or package id. Names and slugs are unique.
         key = server.lower()
         for a in load_data().get("agents", []):
             if (a.get("npm_package") or "").lower() == key or \
-               (a.get("pypi_package") or "").lower() == key:
+               (a.get("pypi_package") or "").lower() == key or \
+               (a.get("slug") or "").lower() == key or \
+               (a.get("name") or "").strip().lower() == key:
                 agent = a
                 break
     if agent is not None:
