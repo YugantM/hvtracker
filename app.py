@@ -151,6 +151,7 @@ DATA_PATH = os.path.join(OUTPUT_DIR, "data.json")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 COMPARE_TOOL_PATH = os.path.join(BASE_DIR, "compare", "index.html")
 VERIFY_TOOL_PATH = os.path.join(BASE_DIR, "verify", "index.html")
+SCAN_TOOL_PATH = os.path.join(BASE_DIR, "scan", "index.html")
 RENDER_FINGERPRINT_PATH = os.path.join(OUTPUT_DIR, ".render_fingerprint")
 verify_log.init(OUTPUT_DIR)  # public "recently checked" feed (transparency)
 REFRESH_STATUS_PATH = os.path.join(OUTPUT_DIR, ".refresh_status.json")
@@ -560,6 +561,72 @@ def find_agent_by_slug(slug: str) -> dict | None:
     return None
 
 
+def _resolve_registry_agent(identifier: str) -> dict | None:
+    """Resolve an identifier to a tracked agent: GitHub repo/URL first, then by
+    npm/pypi package, slug, or display name. Mirrors the resolution used by
+    /api/v1/mcp/verify and the MCP server so all three agree on what a string maps to."""
+    identifier = (identifier or "").strip()
+    if not identifier:
+        return None
+    repo = _normalize_github_repo(identifier)
+    agent = find_agent(repo) if repo else None
+    if agent is None:
+        key = identifier.lower()
+        for a in load_data().get("agents", []):
+            if (a.get("npm_package") or "").lower() == key or \
+               (a.get("pypi_package") or "").lower() == key or \
+               (a.get("slug") or "").lower() == key or \
+               (a.get("name") or "").strip().lower() == key:
+                agent = a
+                break
+    return agent
+
+
+_SCAN_MAX_ITEMS = 60
+
+
+def _parse_scan_input(text: str) -> list[str]:
+    """Extract candidate identifiers from pasted requirements.txt, package.json,
+    an MCP client config, or a plain (newline/comma) list. Best-effort and
+    tolerant — unknown shapes fall back to line parsing."""
+    text = (text or "").strip()
+    if not text:
+        return []
+    ids: list[str] = []
+    try:
+        obj = json.loads(text)
+    except (json.JSONDecodeError, ValueError):
+        obj = None
+    if isinstance(obj, dict):
+        for key in ("dependencies", "devDependencies", "peerDependencies", "optionalDependencies"):
+            dep = obj.get(key)
+            if isinstance(dep, dict):
+                ids.extend(dep.keys())
+        servers = obj.get("mcpServers")
+        if isinstance(servers, dict):
+            for name, cfg in servers.items():
+                ids.append(name)
+                if isinstance(cfg, dict) and isinstance(cfg.get("url"), str):
+                    ids.append(cfg["url"])
+    if not ids:
+        # requirements.txt / plain list: strip version specifiers, extras, markers, comments.
+        for raw in re.split(r"[\n,]", text):
+            line = raw.strip()
+            if not line or line.startswith("#") or line.startswith("-"):
+                continue
+            token = re.split(r"[<>=!~;\[ @]", line, maxsplit=1)[0].strip()
+            if token:
+                ids.append(token)
+    seen, out = set(), []
+    for i in ids:
+        i = i.strip()
+        k = i.lower()
+        if i and k not in seen:
+            seen.add(k)
+            out.append(i)
+    return out[:_SCAN_MAX_ITEMS]
+
+
 # ---- JSON API ------------------------------------------------------------
 
 @app.api_route(
@@ -772,6 +839,67 @@ def api_v1_verify_recent():
     })
 
 
+@app.post("/api/v1/scan")
+async def api_v1_scan(request: Request):
+    """Bulk pre-connect trust check for a whole dependency set.
+
+    POST JSON {"input": "<requirements.txt | package.json | MCP config | list>"}.
+    Each identifier is resolved against the curated registry and returned with a
+    per-item verdict plus a summary. Registry-only (no GitHub open lookup) so it
+    stays cheap and fast — the same engine that backs /api/v1/mcp/verify."""
+    import mcp_trust
+    cors = {"Access-Control-Allow-Origin": _API_V1_CORS}
+    if _is_mcp_rate_limited(request):
+        return JSONResponse({"error": "rate limited — slow down and retry shortly"},
+                            status_code=429, headers=cors)
+    try:
+        payload = await request.json()
+    except Exception:
+        payload = None
+    text = payload.get("input") if isinstance(payload, dict) else None
+    if not isinstance(text, str) or not text.strip():
+        return JSONResponse(
+            {"error": 'POST JSON {"input": "<requirements.txt / package.json / mcp config / list>"}'},
+            status_code=400, headers=cors)
+    if len(text) > 20000:
+        return JSONResponse({"error": "input too large (max 20000 chars)"},
+                            status_code=400, headers=cors)
+    identifiers = _parse_scan_input(text)
+    results = []
+    summary = {"total": 0, "tracked": 0, "untracked": 0, "trusted": 0, "avg_trust": None}
+    scores = []
+    for ident in identifiers:
+        v = mcp_trust.evaluate(_resolve_registry_agent(ident), ident)
+        results.append({
+            "input": ident,
+            "tracked": v["tracked"],
+            "trusted": v["trusted"],
+            "grade": v["grade"],
+            "trust_score": v["trust_score"],
+            "resolved": v.get("resolved"),
+            "slug": v.get("slug"),
+        })
+        summary["total"] += 1
+        summary["tracked" if v["tracked"] else "untracked"] += 1
+        if v["trusted"]:
+            summary["trusted"] += 1
+        if v["trust_score"] is not None:
+            scores.append(v["trust_score"])
+    # Average HVTrust across the tracked (scored) items in the stack.
+    if scores:
+        summary["avg_trust"] = round(sum(scores) / len(scores), 1)
+    return JSONResponse({"summary": summary, "results": results}, headers=cors)
+
+
+@app.api_route("/scan", methods=["GET", "HEAD"], response_class=HTMLResponse)
+@app.api_route("/scan/", methods=["GET", "HEAD"], response_class=HTMLResponse)
+def scan_tool():
+    if not os.path.isfile(SCAN_TOOL_PATH):
+        return HTMLResponse("<p>Scan tool is not available yet.</p>", status_code=503)
+    with open(SCAN_TOOL_PATH, encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+
 @app.api_route("/compare", methods=["GET", "HEAD"], response_class=HTMLResponse)
 @app.api_route("/compare/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 def compare_tool():
@@ -829,6 +957,11 @@ def og_verify():
 @app.get("/og-mcp.png")
 def og_mcp():
     return FileResponse(os.path.join(BASE_DIR, "og-mcp.png"), media_type="image/png")
+
+
+@app.get("/og-scan.png")
+def og_scan():
+    return FileResponse(os.path.join(BASE_DIR, "og-scan.png"), media_type="image/png")
 
 
 @app.get("/favicon.svg")
@@ -1615,6 +1748,12 @@ def data_api_page():
         <p>Dependency and ecosystem graph data for all tracked agents.</p>
         <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>curl -s https://hvtracker.net/api/v1/graph | python -m json.tool | head</code></pre>
       </div>
+      <div class='card' style='margin-top:12px'>
+        <h2 style='font-family:var(--font-mono);font-size:13px'><code>POST /api/v1/scan</code></h2>
+        <p>Bulk trust check for a whole dependency set — paste a requirements.txt, package.json, or MCP config and get a verdict per item. Powers the <a href='/scan/'>Scan your stack</a> tool.</p>
+        <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>curl -s https://hvtracker.net/api/v1/scan -H 'Content-Type: application/json' \
+  -d '{"input": "langchain\ncrewai\nautogen"}' | python -m json.tool</code></pre>
+      </div>
       <p style='margin-top:12px;color:var(--muted);font-size:13px'>Auth and rate quotas for a paid tier are intentionally out of scope for now.</p>
     </div>
     <div class='card'>
@@ -2019,6 +2158,20 @@ def _startup():
                 max_instances=1,
                 coalesce=True,
             )
+            # Fast, frequent GitHub-signal refresh (stars/forks/commits → HVTrust
+            # /rank) for the whole registry. Cheap via GraphQL, so it can run
+            # often without exhausting rate limits — this is what keeps the
+            # leaderboard dynamic. The 2h "auto" batch still handles the heavier
+            # PyPI/discovery/OSSF signals. Tunable via SIGNALS_REFRESH_MIN.
+            signals_min = max(5, int(os.environ.get("SIGNALS_REFRESH_MIN", "30")))
+            _scheduler.add_job(
+                lambda: _refresh_and_record("signals", _compute_render_fingerprint(), "scheduler"),
+                "cron",
+                minute=f"*/{signals_min}",
+                id="signals-refresh",
+                max_instances=1,
+                coalesce=True,
+            )
             if db.enabled():
                 _scheduler.add_job(
                     _refresh_verify_feed,
@@ -2029,7 +2182,7 @@ def _startup():
                     coalesce=True,
                 )
             _scheduler.start()
-        print("[startup] scheduler started (refresh every 2h)")
+        print(f"[startup] scheduler started (signals every {signals_min}m, full batch every 2h)")
 
 
 def _shutdown():

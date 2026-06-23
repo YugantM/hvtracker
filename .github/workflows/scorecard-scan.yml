@@ -23,6 +23,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      # Cap concurrency: 4 shards hitting GitHub at once exhausted even the PAT's
+      # 5k/hr (403/429 -> ~40% of repos timed out and carried stale values). Two
+      # at a time keeps API pressure under the limit; combined with the 300s
+      # per-repo timeout, far fewer repos get skipped.
+      max-parallel: 2
       matrix:
         shard: [1, 2, 3, 4]
 

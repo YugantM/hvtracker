@@ -109,8 +109,158 @@ def _github_get(
     raise RuntimeError(f"GitHub request failed without response: {url}")
 
 
+# --- GitHub GraphQL batch prefetch ----------------------------------------
+# Per-repo REST (get_repo + commit-activity + recent-commits = ~3-4 calls/repo
+# at concurrency 10) trips GitHub's *secondary* rate limit as the registry
+# grows. The GraphQL API fetches the same core signals for ~50 repos in ONE
+# request, on a separate 5,000-points/hr budget at ~0.02 points/repo, so a few
+# thousand repos stay well within limits. graphql_prefetch_repos() warms the
+# cache below; get_repo / get_commit_activity / fetch_recent_commits read it
+# first and fall back to per-repo REST for anything GraphQL could not resolve.
+GITHUB_GRAPHQL = "https://api.github.com/graphql"
+GQL_ENABLED = bool(TOKEN) and os.environ.get("HVT_GQL_FETCH", "1") != "0"
+# Metadata queries are light → big batches. The signed-commit query walks 100
+# commits/repo and GitHub verifies each signature server-side, which is heavy
+# and 504s above ~15 repos/query, so signatures use a much smaller batch.
+GQL_BATCH = int(os.environ.get("HVT_GQL_BATCH", "50"))
+GQL_SIG_BATCH = int(os.environ.get("HVT_GQL_SIG_BATCH", "10"))
+_gql_repo_cache: dict[str, dict] = {}
+
+_GQL_BASE_FIELDS = """
+  nameWithOwner
+  url
+  stargazerCount
+  forkCount
+  isArchived
+  pushedAt
+  description
+  primaryLanguage { name }
+  licenseInfo { spdxId }
+  issues(states: OPEN) { totalCount }"""
+
+# Signed-commit ratio over the most recent 100 commits — same window the REST
+# path used (/commits?per_page=100) and GraphQL's single-page max. Only fetched
+# in full builds; the 2h runtime batch does not refresh signed_commits_ratio.
+_GQL_SIGNATURES = """
+      recent: history(first: 100) { nodes { signature { isValid } } }"""
+
+
+def _gql_fragment(with_signatures: bool) -> str:
+    return (
+        "fragment R on Repository {" + _GQL_BASE_FIELDS + """
+  defaultBranchRef {
+    name
+    target { ... on Commit {
+      c30: history(since: $since30) { totalCount }""" + (_GQL_SIGNATURES if with_signatures else "") + """
+    } }
+  }
+}
+"""
+    )
+
+
+def _gql_normalize(node: dict, with_signatures: bool = True) -> dict:
+    """Map a GraphQL Repository node to the REST /repos shape that fetch_one and
+    refresh_runtime_signals consume, plus private `_commits_30d` / `_signed_ratio`."""
+    tgt = (node.get("defaultBranchRef") or {}).get("target") or {}
+    result = {
+        "html_url": node.get("url"),
+        "stargazers_count": node.get("stargazerCount") or 0,
+        "forks_count": node.get("forkCount") or 0,
+        "pushed_at": node.get("pushedAt"),
+        "description": node.get("description"),
+        "language": (node.get("primaryLanguage") or {}).get("name"),
+        "open_issues_count": (node.get("issues") or {}).get("totalCount", 0),
+        "archived": bool(node.get("isArchived")),
+        "license": {"spdx_id": (node.get("licenseInfo") or {}).get("spdxId")},
+        "default_branch": (node.get("defaultBranchRef") or {}).get("name") or "HEAD",
+        "_commits_30d": (tgt.get("c30") or {}).get("totalCount"),
+        "_source": "graphql",
+    }
+    if with_signatures:
+        # signature.isValid is the GraphQL equivalent of REST verification.verified.
+        nodes = (tgt.get("recent") or {}).get("nodes") or []
+        result["_signed_ratio"] = (
+            round(sum(1 for c in nodes if (c.get("signature") or {}).get("isValid")) / len(nodes), 3)
+            if nodes else None
+        )
+    return result
+
+
+def _gql_post(query: str, variables: dict, headers: dict, attempts: int = 3) -> dict | None:
+    """POST a GraphQL query with bounded retries for transient gateway errors
+    (429/5xx/timeout/partial body). Returns the `data` dict, or None on failure."""
+    for attempt in range(attempts):
+        try:
+            resp = requests.post(GITHUB_GRAPHQL, headers=headers,
+                                 json={"query": query, "variables": variables}, timeout=90)
+            if resp.status_code == 200:
+                return (resp.json() or {}).get("data") or {}
+            if resp.status_code in {429, 500, 502, 503, 504} and attempt < attempts - 1:
+                time.sleep(2 * (attempt + 1))
+                continue
+            print(f"GraphQL HTTP {resp.status_code} — giving up on this batch", file=sys.stderr)
+            return None
+        except Exception as e:
+            if attempt < attempts - 1:
+                time.sleep(2 * (attempt + 1))
+                continue
+            print(f"GraphQL request error: {e}", file=sys.stderr)
+            return None
+    return None
+
+
+def graphql_prefetch_repos(repo_ids: list[str], with_signatures: bool = True) -> int:
+    """Batch-fetch core repo signals via GitHub GraphQL into `_gql_repo_cache`.
+
+    `with_signatures` adds the signed-commit ratio (heavy; full builds only) and
+    uses a smaller batch. Returns repos resolved. No-op (0) when disabled or
+    unauthenticated; callers then fall back to per-repo REST automatically.
+    """
+    if not GQL_ENABLED:
+        return 0
+    ids, seen = [], set()
+    for r in repo_ids:
+        k = (r or "").strip().lower()
+        if k and "/" in k and k not in seen:
+            seen.add(k)
+            ids.append(r.strip())
+    if not ids:
+        return 0
+    since30 = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    headers = {"Authorization": f"Bearer {TOKEN}"}
+    fragment = _gql_fragment(with_signatures)
+    batch_size = GQL_SIG_BATCH if with_signatures else GQL_BATCH
+    resolved = requests_made = failed = 0
+    for start in range(0, len(ids), batch_size):
+        batch = ids[start:start + batch_size]
+        aliases = []
+        for i, rid in enumerate(batch):
+            owner, _, name = rid.partition("/")
+            oo, nn = owner.replace('"', '\\"'), name.replace('"', '\\"')
+            aliases.append(f'r{i}: repository(owner: "{oo}", name: "{nn}") {{ ...R }}')
+        query = "query($since30: GitTimestamp!) {\n" + "\n".join(aliases) + "\n}\n" + fragment
+        requests_made += 1
+        data = _gql_post(query, {"since30": since30}, headers)
+        if data is None:
+            failed += len(batch)
+            continue
+        for i, rid in enumerate(batch):
+            node = data.get(f"r{i}")
+            if node:
+                _gql_repo_cache[rid.lower()] = _gql_normalize(node, with_signatures)
+                resolved += 1
+    tail = f", {failed} fell back to REST" if failed else ""
+    print(f"[graphql] prefetched {resolved}/{len(ids)} repos in {requests_made} request(s) "
+          f"(batch {batch_size}, signatures={with_signatures}{tail})", file=sys.stderr)
+    return resolved
+
+
 @cache.cached("repo", ttl=5400)
 def get_repo(owner_repo: str) -> dict:
+    cached = _gql_repo_cache.get(owner_repo.lower())
+    if cached is not None:
+        return cached
     url = f"{GITHUB_API}/repos/{owner_repo}"
     r = _github_get(url, timeout=15)
     return r.json()
@@ -118,7 +268,12 @@ def get_repo(owner_repo: str) -> dict:
 
 @cache.cached("commit_activity", ttl=5400)
 def get_commit_activity(owner_repo: str) -> list:
-    """Return list of weekly commit-count dicts for the last 52 weeks."""
+    """Return list of weekly commit-count dicts for the last 52 weeks.
+
+    When GraphQL prefetched this repo, return [] so callers fall through to
+    fetch_recent_commits, which serves the GraphQL 30-day commit count."""
+    if owner_repo.lower() in _gql_repo_cache:
+        return []
     url = f"{GITHUB_API}/repos/{owner_repo}/stats/commit_activity"
     try:
         r = _github_get(url, timeout=30, attempts=4, allow_202=True)
@@ -142,6 +297,10 @@ def _parse_link_last_page(link_header: str) -> tuple[int | None, str | None]:
 
 def fetch_recent_commits(owner_repo: str, days: int = 30) -> int | None:
     """Count commits on the default branch in the last `days` days."""
+    if days == 30:
+        cached = _gql_repo_cache.get(owner_repo.lower())
+        if cached is not None and cached.get("_commits_30d") is not None:
+            return cached["_commits_30d"]
     since = datetime.now(timezone.utc) - timedelta(days=days)
     since_iso = since.strftime("%Y-%m-%dT%H:%M:%SZ")
     url = f"{GITHUB_API}/repos/{owner_repo}/commits"
@@ -1265,6 +1424,9 @@ def set_scorecard_display(row: dict) -> None:
 @cache.cached("signed_ratio", ttl=86400)
 def fetch_signed_commit_ratio(owner_repo: str, sample: int = 100) -> float | None:
     """Sample recent commits and return fraction with verified signatures (0.0–1.0)."""
+    cached = _gql_repo_cache.get(owner_repo.lower())
+    if cached is not None and "_signed_ratio" in cached:
+        return cached["_signed_ratio"]
     url = f"{GITHUB_API}/repos/{owner_repo}/commits"
     params = {"per_page": min(sample, 100)}
     try:
@@ -3793,6 +3955,48 @@ def add_provisional_missing_agents(rows: list[dict], agents: list[dict]) -> int:
     return added
 
 
+def refresh_github_signals(rows: list[dict], label: str = "SIGNALS") -> int:
+    """Fast refresh of the GitHub *display* signals (stars/forks/commits/freshness)
+    for cached rows via the cheap GraphQL metadata path — no PyPI/discovery/signed
+    passes. Recomputes the health score; the render phase recomputes HVTrust/rank
+    from these fields. This is the hot path for a frequent, dynamic leaderboard:
+    GraphQL makes it ~1 request per 50 repos, so it can run often without hitting
+    rate limits."""
+    repos = [r["repo"] for r in rows if r.get("repo")]
+    if not repos:
+        return 0
+    graphql_prefetch_repos(repos, with_signatures=False)
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    updated = 0
+    for row in rows:
+        d = _gql_repo_cache.get((row.get("repo") or "").lower())
+        if not d:
+            continue
+        days = days_ago(d["pushed_at"]) if d.get("pushed_at") else row.get("days_ago", 999)
+        commits = d.get("_commits_30d")
+        if commits is None:
+            commits = row.get("weekly_commits")
+        row["stars"] = d["stargazers_count"]
+        row["stars_fmt"] = fmt_num(d["stargazers_count"])
+        row["forks"] = d["forks_count"]
+        row["forks_fmt"] = fmt_num(d["forks_count"])
+        if d.get("pushed_at"):
+            row["last_push"] = fmt_date(d["pushed_at"])
+        row["days_ago"] = days
+        row["freshness_class"] = freshness_class(days)
+        row["weekly_commits"] = commits
+        row["score"] = health_score(d["stargazers_count"], days, commits or 0, d["forks_count"])
+        row["score_class"] = score_class(row["score"])
+        if d.get("language"):
+            row["language"] = d["language"]
+        row["open_issues"] = d.get("open_issues_count", row.get("open_issues", 0))
+        row["archived"] = d.get("archived", row.get("archived", False))
+        row["signals_fetched_at"] = now
+        updated += 1
+    print(f"{label}: refreshed GitHub signals on {updated}/{len(rows)} rows via GraphQL", file=sys.stderr)
+    return updated
+
+
 def refresh_runtime_signals(rows: list[dict], agent_configs: list[dict], label: str = "RUNTIME-ONLY") -> int:
     """Refresh runtime-trust discovery fields on cached rows."""
     row_map = {r.get("repo", "").lower(): r for r in rows if r.get("repo")}
@@ -3801,6 +4005,7 @@ def refresh_runtime_signals(rows: list[dict], agent_configs: list[dict], label: 
         for a in agent_configs
         if a["repo"].lower() in row_map
     ]
+    graphql_prefetch_repos([a["repo"] for _, a in targets], with_signatures=False)
 
     def _fetch_runtime(target: tuple[dict, dict]) -> tuple[str, dict, dict, dict, dict, str | None]:
         row, agent = target
@@ -4005,6 +4210,7 @@ def main() -> None:
     batch = parse_batch_arg()
     render_only = "--render-only" in sys.argv
     runtime_only = "--runtime-only" in sys.argv
+    signals_only = "--signals-only" in sys.argv
     pending_only = "--pending-only" in sys.argv
     repair_commits = "--repair-commits" in sys.argv
     render_state_path = os.path.join(script_dir, "data", "render_state.json")
@@ -4019,6 +4225,13 @@ def main() -> None:
             print("Seeded render_state.json from image → volume")
     if render_only:
         print("\n=== RENDER-ONLY MODE: no API calls, rebuilding pages from cache ===\n")
+        batch = None
+        runtime_only = False
+        signals_only = False
+        pending_only = False
+        repair_commits = False
+    elif signals_only:
+        print("\n=== SIGNALS-ONLY MODE: fast GitHub-signal refresh (stars/forks/commits) via GraphQL — no PyPI/discovery, no OG regen ===\n")
         batch = None
         runtime_only = False
         pending_only = False
@@ -4286,7 +4499,7 @@ def main() -> None:
     # Repos whose GitHub signals were re-fetched this run. Carried-forward rows
     # (everything else) get their OSSF score refreshed from the cache below.
     freshly_fetched_repos: set[str] = set()
-    if render_only or runtime_only:
+    if render_only or runtime_only or signals_only:
         # Load fully-decorated rows from the render cache — no API calls.
         with open(render_state_path, encoding="utf-8") as _f:
             _state = json.load(_f)
@@ -4307,15 +4520,20 @@ def main() -> None:
         if moved:
             print(f"RENDER-ONLY: reclassified {moved} row(s) as legacy from agents.json")
         provisional_count = add_provisional_missing_agents(rows, all_agents)
-        mode_label = "RUNTIME-ONLY" if runtime_only else "RENDER-ONLY"
+        mode_label = "SIGNALS-ONLY" if signals_only else ("RUNTIME-ONLY" if runtime_only else "RENDER-ONLY")
         print(f"{mode_label}: loaded {len(rows)} active + {len(legacy_rows)} legacy rows from render_state.json")
         if provisional_count:
             print(f"{mode_label}: added {provisional_count} provisional agent listing(s) pending signal refresh")
+        if signals_only:
+            active_refreshed = refresh_github_signals(rows, "SIGNALS")
+            legacy_refreshed = refresh_github_signals(legacy_rows, "SIGNALS-LEGACY") if legacy_rows else 0
+            print(f"SIGNALS-ONLY: refreshed {active_refreshed} active + {legacy_refreshed} legacy rows")
         if runtime_only:
             active_refreshed = refresh_runtime_signals(rows, all_agents, "RUNTIME")
             legacy_refreshed = refresh_runtime_signals(legacy_rows, legacy_agents, "RUNTIME-LEGACY") if legacy_rows and legacy_agents else 0
             print(f"RUNTIME-ONLY: refreshed {active_refreshed} active + {legacy_refreshed} legacy runtime rows")
     else:
+        graphql_prefetch_repos([a["repo"] for a in agents] + [a["repo"] for a in legacy_agents])
         rows = []
         with ThreadPoolExecutor(max_workers=10) as pool:
             futures = {pool.submit(fetch_one, a): a for a in agents}
@@ -5116,29 +5334,34 @@ def main() -> None:
 
     print(f"Built {len(rows)} active agent profile pages under agents/.")
 
-    # Generate OG cards (1200x630 PNG)
-    try:
-        from generate_og_card import generate as generate_og, generate_site_card
-        og_count = 0
-        for row in rows:
-            slug_dir = os.path.join(agents_dir, row["slug"])
-            og_path = os.path.join(slug_dir, "og.png")
-            try:
-                generate_og(row, og_path)
-                og_count += 1
-            except Exception as e:
-                print(f"  WARN: OG card failed for {row['slug']}: {e}")
+    # Generate OG cards (1200x630 PNG). Skipped on the frequent signals-only
+    # refresh — share cards don't need per-cycle freshness and 300 PNGs would
+    # dominate the cost of a fast leaderboard update.
+    if signals_only:
+        print("SIGNALS-ONLY: skipping OG card regeneration.")
+    else:
         try:
-            generate_site_card(
-                os.path.join(script_dir, "og-v2.png"),
-                total=len(rows),
-                categories=len(categories),
-            )
-        except Exception as e:
-            print(f"  WARN: Site OG card failed: {e}")
-        print(f"Generated {og_count} agent OG cards.")
-    except ImportError:
-        print("WARN: generate_og_card not available — skipping OG cards.")
+            from generate_og_card import generate as generate_og, generate_site_card
+            og_count = 0
+            for row in rows:
+                slug_dir = os.path.join(agents_dir, row["slug"])
+                og_path = os.path.join(slug_dir, "og.png")
+                try:
+                    generate_og(row, og_path)
+                    og_count += 1
+                except Exception as e:
+                    print(f"  WARN: OG card failed for {row['slug']}: {e}")
+            try:
+                generate_site_card(
+                    os.path.join(script_dir, "og-v2.png"),
+                    total=len(rows),
+                    categories=len(categories),
+                )
+            except Exception as e:
+                print(f"  WARN: Site OG card failed: {e}")
+            print(f"Generated {og_count} agent OG cards.")
+        except ImportError:
+            print("WARN: generate_og_card not available — skipping OG cards.")
 
     # ── Category landing pages — /categories/<slug>/index.html ───────────
     cat_tmpl = env.get_template("category.html.j2")
@@ -5476,6 +5699,8 @@ def main() -> None:
     sitemap_urls = [
         ("https://hvtracker.net/", "1.0", "daily"),
         ("https://hvtracker.net/methodology/", "0.5", "monthly"),
+        ("https://hvtracker.net/verify/", "0.8", "weekly"),
+        ("https://hvtracker.net/scan/", "0.7", "weekly"),
         ("https://hvtracker.net/movers/", "0.8", "daily"),
         ("https://hvtracker.net/changes/", "0.8", "weekly"),
         ("https://hvtracker.net/use-cases/", "0.8", "daily"),
@@ -5512,6 +5737,7 @@ def main() -> None:
     sitemap_urls.append(("https://hvtracker.net/blog/ai-agents-mcp-servers-trust/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/trapdoor-supply-chain-provenance/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/mcp-server-launch/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/scan-your-stack/", "0.9", "weekly"))
     for article in blog_articles:
         sitemap_urls.append((f"https://hvtracker.net/blog/{article['slug']}/", "0.8", "weekly"))
     for row in rows:
@@ -5616,6 +5842,14 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
     # feed.json — JSON Feed 1.1 spec (jsonfeed.org). One item per agent.
     now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     blog_feed_items = [
+        {
+            "id": "https://hvtracker.net/blog/scan-your-stack",
+            "url": "https://hvtracker.net/blog/scan-your-stack",
+            "title": "Scan Your Stack: Verify, Now for Every Dependency at Once",
+            "content_text": "Verify checks one project deep; Scan runs the same trust engine over your whole requirements.txt, package.json, or MCP config — a trust verdict for every agent, framework, and server in one pass, plus your stack's average HVTrust.",
+            "date_modified": now_iso,
+            "tags": ["Product launch", "Supply chain trust", "Stack scan"],
+        },
         {
             "id": "https://hvtracker.net/blog/mcp-server-launch",
             "url": "https://hvtracker.net/blog/mcp-server-launch",
@@ -5812,6 +6046,8 @@ def run_refresh(mode: str = "auto") -> None:
       auto   — full build if no data.json yet on the volume, else a batch slice
       full   — full refresh of all agents
       render — rebuild pages from cached render_state (no API calls)
+      signals — fast GitHub-signal refresh (stars/forks/commits) for all agents
+                via GraphQL; recomputes HVTrust/rank; skips PyPI/discovery/OG
       runtime — refresh only runtime-trust discovery fields from cached rows
       pending— refresh only newly-listed agents
       repair-commits — refresh only rows whose commit count is currently missing
@@ -5826,6 +6062,8 @@ def run_refresh(mode: str = "auto") -> None:
         # else: no data yet → full build (no flags)
     elif mode == "render":
         argv.append("--render-only")
+    elif mode == "signals":
+        argv.append("--signals-only")
     elif mode == "runtime":
         argv.append("--runtime-only")
     elif mode == "pending":

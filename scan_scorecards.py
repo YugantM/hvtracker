@@ -44,6 +44,9 @@ def find_scorecard_bin() -> str:
     sys.exit("ERROR: scorecard binary not found. Place it in the repo root or add to PATH.")
 
 
+SCAN_TIMEOUT = int(os.environ.get("SCORECARD_TIMEOUT", "300"))
+
+
 def scan_repo(bin_path: str, owner_repo: str) -> dict | None:
     """Run scorecard against one repo. Returns {score, checks} or None on failure."""
     try:
@@ -51,7 +54,7 @@ def scan_repo(bin_path: str, owner_repo: str) -> dict | None:
             [bin_path, f"--repo=github.com/{owner_repo}", "--format=json"],
             capture_output=True,
             text=True,
-            timeout=120,
+            timeout=SCAN_TIMEOUT,
         )
         if result.returncode != 0:
             print(f"  WARN: non-zero exit for {owner_repo}: {result.stderr[:120].strip()}")

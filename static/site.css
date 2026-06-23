@@ -138,8 +138,8 @@ a:hover { text-decoration: underline; }
 .nav-trigger { font: inherit; cursor: pointer; color: var(--muted); padding: 5px 8px; border: 1px solid transparent; background: none; white-space: nowrap; }
 .nav-trigger::after { content: " \25BE"; opacity: .55; font-size: 11px; }
 .nav-group:hover > .nav-trigger, .nav-group:focus-within > .nav-trigger { color: var(--text); border-color: var(--border); background: var(--surface); }
-.nav-panel { display: none; position: absolute; top: 100%; left: 0; z-index: 200; margin-top: 4px; flex-direction: column; min-width: 150px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 4px; box-shadow: 0 6px 20px rgba(0,0,0,.12); }
-.nav-group:hover > .nav-panel, .nav-group:focus-within > .nav-panel { display: flex; }
+.nav-panel { display: flex; opacity: 0; visibility: hidden; transition: opacity .15s ease .25s, visibility 0s linear .4s; position: absolute; top: 100%; left: 0; z-index: 200; margin-top: 4px; flex-direction: column; min-width: 150px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 4px; box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+.nav-group:hover > .nav-panel, .nav-group:focus-within > .nav-panel { opacity: 1; visibility: visible; transition-delay: 0s; }
 .nav-panel a { color: var(--muted); padding: 6px 10px; border-radius: 4px; border: 0; white-space: nowrap; }
 .nav-panel a:hover { color: var(--text); background: var(--surface); text-decoration: none; }
 .site-status { font: 12px var(--font-mono); color: var(--muted); margin-left: 0; white-space: nowrap; justify-self: end; }
@@ -160,8 +160,10 @@ footer a { color: var(--accent); }
   .site-header-inner { grid-template-columns: 1fr; gap: 4px; }
   .site-nav { justify-self: start; flex-wrap: wrap; }
   .site-status { justify-self: start; }
-  /* On mobile, open dropdowns stack inline instead of floating. */
-  .nav-group:hover > .nav-panel, .nav-group:focus-within > .nav-panel { position: static; box-shadow: none; border: 0; padding: 2px 0 2px 12px; margin-top: 0; min-width: 0; }
+  /* On mobile, revert to a plain display toggle (no hover-intent delay) so a
+     hidden panel never reserves vertical space, and open dropdowns stack inline. */
+  .nav-panel { display: none; opacity: 1; visibility: visible; transition: none; }
+  .nav-group:hover > .nav-panel, .nav-group:focus-within > .nav-panel { display: flex; position: static; box-shadow: none; border: 0; padding: 2px 0 2px 12px; margin-top: 0; min-width: 0; }
 }
 
 /* ── UI/UX polish ──────────────────────────────────────────────

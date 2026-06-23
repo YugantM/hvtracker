@@ -443,11 +443,76 @@ def generate_mcp_card(output_path: str):
     print(f"Generated MCP OG card: {output_path} ({W}x{H})")
 
 
+def generate_scan_card(output_path: str):
+    """Shareable OG card for the /scan stack-scan launch (extends Verify)."""
+    img = Image.new("RGB", (W, H), hex_rgb(BG))
+    draw = ImageDraw.Draw(img)
+    draw.rectangle((0, 0, W, 6), fill=hex_rgb(LOBSTER))
+
+    left_x = 64
+
+    # Header
+    draw.text((left_x, 44), "HV", font=load_font(20, bold=True, mono=True), fill=hex_rgb(INK))
+    hv_w = draw.textbbox((0, 0), "HV", font=load_font(20, bold=True, mono=True))[2]
+    tf = load_font(20, mono=True)
+    draw.text((left_x + hv_w, 44), "Tracker", font=tf, fill=hex_rgb(LOBSTER))
+    tw = draw.textbbox((0, 0), "Tracker", font=tf)[2]
+    draw.text((left_x + hv_w + tw + 18, 46), "AI Trust Registry", font=load_font(16), fill=hex_rgb(MUTED))
+
+    # "NEW" pill, top-right
+    pill_text = "NEW · STACK SCAN"
+    pill_font = load_font(15, bold=True)
+    pb = draw.textbbox((0, 0), pill_text, font=pill_font)
+    pill_w = (pb[2] - pb[0]) + 32
+    rounded(draw, (W - 64 - pill_w, 38, W - 64, 38 + 36), 10,
+            fill=hex_rgb(LOBSTER_TINT), outline=hex_rgb(LOBSTER))
+    draw.text((W - 64 - pill_w + 16, 47), pill_text, font=pill_font, fill=hex_rgb(LOBSTER))
+
+    # Headline
+    draw.text((left_x, 134), "Scan your whole stack", font=load_font(58, bold=True), fill=hex_rgb(INK))
+    draw.text((left_x, 206), "for agent trust", font=load_font(58, bold=True), fill=hex_rgb(INK))
+
+    # Subtitle
+    draw.text((left_x, 300), "Paste a requirements.txt, package.json, or MCP config —",
+              font=load_font(23), fill=hex_rgb(MUTED))
+    draw.text((left_x, 332), "one trust verdict for every agent, framework, and server.",
+              font=load_font(23), fill=hex_rgb(MUTED))
+
+    # avg-HVTrust stat box + verdict pills, one row
+    row_y = 400
+    rounded(draw, (left_x, row_y, left_x + 196, row_y + 74), 12,
+            fill=hex_rgb(SURFACE), outline=hex_rgb(BORDER))
+    draw.text((left_x + 22, row_y + 12), "73.1", font=load_font(36, bold=True), fill=hex_rgb(INK))
+    draw.text((left_x + 22, row_y + 54), "avg HVTrust", font=load_font(14), fill=hex_rgb(MUTED))
+
+    ty = row_y + 16
+    px = left_x + 228
+    pf = load_font(17, bold=True)
+    for label, color in (("Trusted", GREEN), ("Not trusted yet", AMBER), ("Not tracked", MUTED)):
+        tb = draw.textbbox((0, 0), label, font=pf)
+        tpw = (tb[2] - tb[0]) + 50
+        rounded(draw, (px, ty, px + tpw, ty + 42), 21, fill=hex_rgb(BG), outline=hex_rgb(color))
+        draw.ellipse((px + 18, ty + 15, px + 30, ty + 27), fill=hex_rgb(color))
+        draw.text((px + 40, ty + 10), label, font=pf, fill=hex_rgb(INK))
+        px += tpw + 14
+
+    # Footer
+    draw.line((left_x, 552, W - 64, 552), fill=hex_rgb(BORDER), width=1)
+    draw.text((left_x, 572), "hvtracker.net/scan", font=load_font(22, mono=True), fill=hex_rgb(LOBSTER))
+    tag = "registry check · one pass · nothing stored"
+    tgb = draw.textbbox((0, 0), tag, font=load_font(18))
+    draw.text((W - 64 - (tgb[2] - tgb[0]), 574), tag, font=load_font(18), fill=hex_rgb(MUTED))
+
+    img.save(output_path, "PNG", optimize=True)
+    print(f"Generated scan OG card: {output_path} ({W}x{H})")
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python generate_og_card.py <slug> [output_path]")
         print("       python generate_og_card.py --site [output_path]")
         print("       python generate_og_card.py --mcp [output_path]")
+        print("       python generate_og_card.py --scan [output_path]")
         sys.exit(1)
 
     if sys.argv[1] == "--site":
@@ -456,6 +521,9 @@ if __name__ == "__main__":
     elif sys.argv[1] == "--mcp":
         out = sys.argv[2] if len(sys.argv) > 2 else "og-mcp.png"
         generate_mcp_card(out)
+    elif sys.argv[1] == "--scan":
+        out = sys.argv[2] if len(sys.argv) > 2 else "og-scan.png"
+        generate_scan_card(out)
     else:
         slug = sys.argv[1]
         out = sys.argv[2] if len(sys.argv) > 2 else f"agents/{slug}/og.png"
