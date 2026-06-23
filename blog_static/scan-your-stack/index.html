@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scan Your Stack: Verify, Now for Every Dependency at Once | HVTracker</title>
+  <meta name="description" content="Verify checks one project deep. Scan runs the same trust engine over your whole requirements.txt, package.json, or MCP config — one verdict for every agent, framework, and server, plus your stack's average HVTrust.">
+  <link rel="canonical" href="https://hvtracker.net/blog/scan-your-stack">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Scan Your Stack: Verify, Now for Every Dependency at Once">
+  <meta property="og:description" content="Verify answers it for one project. Scan answers it for your whole stack — paste a requirements.txt, package.json, or MCP config and get a trust verdict for every dependency in one pass.">
+  <meta property="og:url" content="https://hvtracker.net/blog/scan-your-stack">
+  <meta property="og:image" content="https://hvtracker.net/og-scan.png">
+  <meta property="og:image:secure_url" content="https://hvtracker.net/og-scan.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Scan your whole stack for agent trust — the HVTracker stack scanner at hvtracker.net/scan">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Scan Your Stack: Verify, Now for Every Dependency at Once">
+  <meta name="twitter:description" content="Paste a requirements.txt, package.json, or MCP config and get a trust verdict for every agent, framework, and server in one pass — plus your stack's average HVTrust.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-scan.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Scan Your Stack: Verify, Now for Every Dependency at Once",
+    "description": "HVTracker's Verify front door checks one project at a time. Scan runs the same trust engine over a whole dependency manifest — requirements.txt, package.json, or MCP config — returning a per-item verdict and the stack's average HVTrust in one pass.",
+    "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "publisher": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "datePublished": "2026-06-23",
+    "dateModified": "2026-06-23",
+    "mainEntityOfPage": "https://hvtracker.net/blog/scan-your-stack"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://hvtracker.net/blog/" },
+      { "@type": "ListItem", "position": 3, "name": "Scan Your Stack" }
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#f4f1eb; --surface:#eae6de; --border:#d4cfc5; --text:#1a1a1a; --muted:#6b6560;
+      --accent:#2c5282; --green:#2f6846; --red:#9b3c3c; --amber:#8b6914;
+      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg); background-image:url("/hex-bg.svg"); background-size:2000px 2000px; color:var(--text); font-family:var(--font-sans); font-size:16px; line-height:1.7; min-height:100vh; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:760px; margin:0 auto; padding:0 20px; background:var(--bg); min-height:100vh; }
+    .site-header { position:sticky; top:0; z-index:100; background:var(--bg); border-bottom:1px solid var(--border); }
+    .site-header-inner { max-width:1200px; margin:0 auto; padding:14px 20px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; color:var(--text); }
+    .logo span { color:var(--accent); }
+    .site-nav { margin-left:24px; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; }
+    .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--text); border-color:var(--border); background:var(--surface); text-decoration:none; }
+    .site-status { font:11px var(--font-mono); color:var(--muted); margin-left:auto; white-space:nowrap; }
+    .live-dot { display:inline-block; width:7px; height:7px; border-radius:999px; background:var(--green, var(--fresh)); margin-right:6px; vertical-align:middle; box-shadow:0 0 0 3px color-mix(in srgb, var(--green, var(--fresh)) 18%, transparent); }
+    article { padding:36px 0 48px; }
+    h1 { font-size:34px; font-weight:700; line-height:1.15; margin-bottom:12px; }
+    .meta { font-size:13px; color:var(--muted); margin-bottom:32px; font-family:var(--font-mono); }
+    h2 { font-size:22px; font-weight:700; margin-top:36px; margin-bottom:12px; }
+    p { margin-bottom:16px; }
+    code { font-family:var(--font-mono); font-size:14px; background:var(--surface); padding:2px 6px; border-radius:3px; }
+    pre { font-family:var(--font-mono); font-size:13px; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:16px 18px; margin:20px 0; overflow-x:auto; line-height:1.55; }
+    pre code { background:none; padding:0; font-size:inherit; }
+    .callout { background:rgba(44,82,130,0.08); border-left:3px solid var(--accent); padding:16px 20px; margin:24px 0; border-radius:0 6px 6px 0; font-size:14px; }
+    .callout strong { color:var(--accent); }
+    .big-stat { text-align:center; padding:32px 0; margin:24px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+    .big-stat .number { font:700 44px var(--font-mono); color:var(--accent); }
+    .big-stat .label { font-size:14px; color:var(--muted); margin-top:4px; }
+    table { width:100%; border-collapse:collapse; margin:24px 0; font-size:14px; }
+    th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:top; }
+    th { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
+    td.name a { font-weight:600; color:var(--text); }
+    td.name a:hover { color:var(--accent); }
+    td.tool { font-family:var(--font-mono); font-weight:600; color:var(--text); white-space:nowrap; }
+    .pill { display:inline-block; font:600 12px var(--font-mono); padding:2px 9px; border-radius:999px; border:1px solid var(--border); white-space:nowrap; }
+    .pill-trusted { color:var(--green); border-color:var(--green); }
+    .pill-caution { color:var(--amber); border-color:var(--amber); }
+    .pill-unknown { color:var(--muted); }
+    .cta-box { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:24px; margin:36px 0; text-align:center; }
+    .cta-box h3 { margin-bottom:8px; font-size:18px; }
+    .cta-box p { font-size:14px; color:var(--muted); margin-bottom:16px; }
+    .cta-btn { display:inline-block; background:var(--accent); color:#fff; padding:10px 24px; border-radius:5px; font-weight:600; font-size:14px; text-decoration:none; }
+    .cta-btn:hover { opacity:0.9; text-decoration:none; }
+    footer { padding:28px 0; border-top:1px solid var(--border); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--accent); }
+    @media (max-width:600px) { h1 { font-size:26px; } table { font-size:12px; } th,td { padding:8px 6px; } }
+  </style>
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TZ8921LR0K');</script>
+  <script defer src="/analytics.js"></script>
+  <script defer src="/static/site-status.js"></script>
+<style>
+.nav-group{position:relative}
+.nav-trigger{font:inherit;cursor:pointer;color:var(--muted);padding:5px 8px;border:1px solid transparent;background:none;white-space:nowrap}
+.nav-trigger::after{content:" \25BE";opacity:.55;font-size:9px}
+.nav-group:hover>.nav-trigger,.nav-group:focus-within>.nav-trigger{color:var(--text);border-color:var(--border);background:var(--surface)}
+.nav-panel{display:none;position:absolute;top:100%;left:0;z-index:200;margin-top:4px;flex-direction:column;min-width:150px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.nav-group:hover>.nav-panel,.nav-group:focus-within>.nav-panel{display:flex}
+.nav-panel a{color:var(--muted);padding:6px 10px;border-radius:4px;border:0;white-space:nowrap}
+.nav-panel a:hover{color:var(--text);background:var(--surface);text-decoration:none}
+@media(max-width:900px){.nav-group:hover>.nav-panel,.nav-group:focus-within>.nav-panel{position:static;box-shadow:none;border:0;padding:2px 0 2px 12px;margin-top:0;min-width:0}}
+</style>
+</head>
+<body data-page-type="blog_article">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/scan/">Scan stack</a><a href="/methodology">Methodology</a><a href="/badges/">Badges</a><a href="/score-lab/">Score lab</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
+      </nav>
+      <div class="site-status" data-updated="">
+        <span class="live-dot"></span>updated <span class="site-status-value"></span>
+      </div>
+    </div>
+  </header>
+  <div class="page">
+    <article>
+      <h1>Scan Your Stack: Verify, Now for Every Dependency at Once</h1>
+      <div class="meta">June 23, 2026 &middot; 4 min read &middot; HVTracker Research</div>
+
+      <p><a href="/verify/">Verify</a> does one thing well: you paste a single repo, package, or MCP server URL, and you get back an evidence-weighted, signed trust verdict — grade, score, and the reasons behind it. It answers the question <em>"should I trust <strong>this</strong> one thing before I connect to it?"</em></p>
+
+      <p>But nobody ships one dependency. A real agent stack is a <code>requirements.txt</code> with a dozen frameworks, a <code>package.json</code> full of SDKs, an MCP client config wiring up half a dozen servers. Verifying them one at a time — copy, paste, read, repeat — doesn't scale to the thing you actually have in front of you.</p>
+
+      <p>So we took the engine behind Verify and pointed it at the whole list. <strong>Scan is Verify for your entire stack</strong>, in a single pass.</p>
+
+      <div class="callout">
+        <strong>Same engine, wider lens.</strong> Scan, Verify, every <a href="/">leaderboard</a> profile, and the <a href="/blog/mcp-server-launch/">MCP server</a> all share one trust engine — there is no separate scoring path. A verdict in your scan matches that project's profile exactly.
+      </div>
+
+      <h2>Paste your manifest, get a verdict for everything</h2>
+
+      <p>Drop in a <code>requirements.txt</code>, a <code>package.json</code>, an MCP server config, or just a plain list of names. Scan pulls out every identifier it recognizes — agent names, <code>owner/repo</code>, npm and PyPI packages, GitHub URLs — resolves each against the curated registry, and returns a verdict per item:</p>
+
+      <table>
+        <thead>
+          <tr><th>Dependency</th><th>Verdict</th><th>Grade</th><th>HVTrust</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="name"><a href="/agents/langgraph/">langgraph</a></td><td><span class="pill pill-trusted">Trusted</span></td><td>A</td><td>92.9</td></tr>
+          <tr><td class="name"><a href="/agents/crewai/">crewai</a></td><td><span class="pill pill-trusted">Trusted</span></td><td>A</td><td>81.1</td></tr>
+          <tr><td class="name"><a href="/agents/autogen/">autogen</a></td><td><span class="pill pill-trusted">Trusted</span></td><td>B</td><td>77.4</td></tr>
+          <tr><td class="name">llama-index</td><td><span class="pill pill-caution">Not trusted yet</span></td><td>D</td><td>46.1</td></tr>
+          <tr><td class="name">not-an-agent-pkg</td><td><span class="pill pill-unknown">Not tracked</span></td><td>&mdash;</td><td>&mdash;</td></tr>
+        </tbody>
+      </table>
+
+      <p>Results sort risk-first — anything untracked or not-yet-trusted floats to the top, so the things worth a second look are the first things you see. And the three verdicts mean exactly what they say. <strong>Trusted</strong>: meets the default policy. <strong>Not trusted yet</strong>: tracked, but the evidence isn't there. <strong>Not tracked</strong>: we have no independent signal on it — <em>not</em> a verdict of harm, just the absence of a reason to trust.</p>
+
+      <h2>One number for your whole stack</h2>
+
+      <p>Every scan leads with the metric you actually want: the <strong>average HVTrust</strong> across the tracked projects in your stack. It's the fastest read on your overall posture — a stack averaging 80+ is in good shape; a stack dragged down to the 50s is telling you where to look.</p>
+
+      <div class="big-stat">
+        <div class="number">73.1</div>
+        <div class="label">avg HVTrust &middot; 4 trusted &middot; 1 not trusted yet &middot; 1 not tracked</div>
+      </div>
+
+      <h2>How it relates to Verify</h2>
+
+      <p>Think of it as breadth versus depth. <strong>Scan</strong> is the wide pass — registry-only, so it's fast, free, and nothing you paste is stored. It's the right tool for triaging a whole dependency list before you install or wire anything up.</p>
+
+      <p><strong>Verify</strong> is the deep dive on a single project: it returns a signed, verifiable attestation, and for an untracked GitHub repo it can fall through to an instant provisional verdict via open lookup. When a scan surfaces something you want to dig into, the project name links straight to its full profile, and a single check belongs on <a href="/verify/">Verify</a>.</p>
+
+      <div class="callout">
+        <strong>Why a one-pass check matters.</strong> Most of the supply-chain risk in an agent stack hides in the dependencies you never looked at twice. We've written about <a href="/blog/you-are-not-installing-what-you-think/">what you're actually installing</a> and why <a href="/blog/github-stars-dont-predict-ai-agent-trust/">stars don't predict trust</a>. Scanning the whole manifest is how you catch the weak link before it's in your runtime.
+      </div>
+
+      <h2>Use it from your browser or your pipeline</h2>
+
+      <p>The fastest path is the browser front door — paste, scan, done:</p>
+
+      <ul style="margin:0 0 16px 24px; line-height:2;">
+        <li><strong>Browser:</strong> <a href="/scan/">hvtracker.net/scan</a> — paste a manifest or list</li>
+        <li><strong>Single project:</strong> <a href="/verify/">hvtracker.net/verify</a> — deep verdict, signed</li>
+        <li><strong>HTTP API:</strong> <code>POST /api/v1/scan</code> with <code>{"input": "&lt;your manifest&gt;"}</code></li>
+      </ul>
+
+      <p>The API returns the same per-item results plus the stack summary, so you can drop it into CI and fail a build when your average HVTrust slips or an untracked server sneaks in:</p>
+
+      <pre><code>curl -s https://hvtracker.net/api/v1/scan \
+  -H 'Content-Type: application/json' \
+  -d '{"input": "langgraph\ncrewai\nllama-index"}'</code></pre>
+
+      <div class="cta-box">
+        <h3>Scan your stack</h3>
+        <p>Paste your <code>requirements.txt</code>, <code>package.json</code>, or MCP config and get a trust verdict for every dependency in one pass.</p>
+        <a class="cta-btn" href="/scan/">Scan your stack &rarr;</a>
+      </div>
+
+      <p>Verify was the magnifying glass for one project. Scan is the same lens, held over everything you depend on — because trust is a property of the whole stack, not just the one package you happened to look up.</p>
+    </article>
+
+    <footer>
+      <a href="/scan/">Scan</a> &middot;
+      <a href="/verify/">Verify</a> &middot;
+      <a href="/methodology">Methodology</a> &middot;
+      <a href="/blog/">Blog</a>
+    </footer>
+  </div>
+</body>
+</html>

@@ -23,6 +23,7 @@ SAMPLES = [
     "agents/odysseus/index.html",
     "categories/coding-agents/index.html",
     "compare/index.html",
+    "scan/index.html",
     "methodology/index.html",
     "blog/index.html",
     "roadmap/index.html",

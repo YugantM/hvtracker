@@ -19,11 +19,12 @@ COPY templates/ templates/
 COPY docs/import-candidates.json docs/import-candidates.json
 COPY compare/index.html compare/index.html
 COPY verify/index.html verify/index.html
+COPY scan/index.html scan/index.html
 COPY static/ static/
 COPY blog_static/ blog_static/
 COPY changelog/ changelog/
 COPY .well-known/ .well-known/
-COPY .nojekyll robots.txt analytics.js og-v2.png og-verify.png og-provenance.png og-mcp.png favicon.svg hex-bg.svg haystack-logo.png aipass-logo.png composio-logo.svg ./
+COPY .nojekyll robots.txt analytics.js og-v2.png og-verify.png og-provenance.png og-mcp.png og-scan.png favicon.svg hex-bg.svg haystack-logo.png aipass-logo.png composio-logo.svg ./
 # render_state.json — baked into the image so that newly-listed agents added
 # via git push are synced to the volume on startup (see fetch_and_build.py).
 COPY data/render_state.json data/render_state.json

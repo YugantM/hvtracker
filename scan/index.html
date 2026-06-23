@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Scan your stack for agent trust — HVTracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Paste your requirements.txt, package.json, or MCP client config and get an evidence-backed trust verdict for every AI agent, framework, and MCP server you depend on — at once.">
+  <link rel="canonical" href="https://hvtracker.net/scan/">
+  <meta property="og:title" content="Scan your stack for agent trust — HVTracker">
+  <meta property="og:description" content="Trust-check every AI agent and MCP server in your dependencies at once. Paste requirements.txt, package.json, or an MCP config.">
+  <meta property="og:image" content="https://hvtracker.net/og-verify.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://hvtracker.net/scan/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hvtracker.net/og-verify.png">
+  <link rel="stylesheet" href="/static/site.css">
+  <script defer src="/static/site-status.js"></script>
+  <script defer src="/analytics.js"></script>
+  <style>
+    .verify-hero { max-width: 820px; margin: 28px auto 18px; text-align: center; }
+    .verify-hero h1 { font-size: 30px; line-height: 1.12; letter-spacing: -.02em; margin-bottom: 10px; }
+    .verify-hero p { color: var(--muted); font-size: 16px; }
+    .scan-box { max-width: 820px; margin: 0 auto; }
+    .scan-form textarea { width: 100%; min-height: 150px; padding: 13px 15px; border: 1px solid var(--line-strong); background: var(--bg); color: var(--text); font: 13px var(--font-mono); outline: none; border-radius: 8px; resize: vertical; box-sizing: border-box; }
+    .scan-form textarea:focus { border-color: var(--accent); }
+    .scan-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+    .scan-form button { padding: 12px 22px; border: 0; background: var(--accent); color: #fff; font: 700 15px var(--font-sans); cursor: pointer; border-radius: 8px; }
+    .scan-form button:hover { filter: brightness(1.08); }
+    .verify-eg { color: var(--muted); font-size: 12px; }
+    .verify-eg a { color: var(--accent); cursor: pointer; }
+    .scan-summary { display: flex; gap: 18px; flex-wrap: wrap; margin: 22px 0 12px; padding: 14px 16px; border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 8px; background: var(--surface); }
+    .scan-summary .s-cell strong { display: block; font: 700 22px var(--font-mono); color: var(--text); }
+    .scan-summary .s-cell span { font-size: 12px; color: var(--muted); }
+    .scan-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    .scan-table th { text-align: left; font: 11px var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line-strong); }
+    .scan-table td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    .scan-table .c-input { font-family: var(--font-mono); color: var(--text); word-break: break-all; }
+    .scan-table .c-input a { color: inherit; text-decoration: none; }
+    .scan-table .c-input a:hover { color: var(--accent); }
+    .verdict-pill { display: inline-block; font: 700 11px var(--font-mono); padding: 3px 9px; border-radius: 999px; letter-spacing: .02em; white-space: nowrap; }
+    .v-trusted { background: var(--green); color: #fff; }
+    .v-caution { background: var(--amber); color: #fff; }
+    .v-unknown { background: var(--muted); color: #fff; }
+    .c-score { font-family: var(--font-mono); color: var(--muted); }
+    .verify-note { max-width: 820px; margin: 16px auto 0; color: var(--muted); font-size: 12px; border-top: 1px dashed var(--line); padding-top: 12px; }
+    .verify-note a { color: var(--accent); }
+    .result-loading, .result-error { color: var(--muted); font-size: 15px; margin-top: 22px; }
+    .result-error { color: var(--red); }
+  </style>
+</head>
+<body data-page-type="scan">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/scan/">Scan stack</a><a href="/methodology">Methodology</a><a href="/badges/">Badges</a><a href="/score-lab/">Score lab</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
+      </nav>
+      <div class="site-status"><span class="live-dot"></span>updated <span class="site-status-value"></span></div>
+    </div>
+  </header>
+
+  <div class="page">
+    <section class="verify-hero">
+      <h1>Scan your stack</h1>
+      <p>Paste a <code>requirements.txt</code>, <code>package.json</code>, an MCP client config, or a plain list. Get a trust verdict for every AI agent, framework, and MCP server you depend on — in one pass.</p>
+    </section>
+
+    <div class="scan-box">
+      <form class="scan-form" id="scan-form" autocomplete="off">
+        <textarea id="scan-input" name="input" placeholder="langchain==0.2.1&#10;crewai&#10;https://github.com/topoteretes/cognee&#10;&#10;…or paste a whole package.json / requirements.txt / MCP config" aria-label="Dependencies to scan" required></textarea>
+        <div class="scan-actions">
+          <button type="submit">Scan stack</button>
+          <span class="verify-eg">Try:
+            <a data-eg="requirements">requirements.txt</a> ·
+            <a data-eg="mcp">MCP config</a>
+          </span>
+        </div>
+      </form>
+      <div id="result"></div>
+      <p class="verify-note">Registry-only check — matches each item against the curated HVTracker registry; nothing is stored. Need one project in depth, or an untracked repo? Use <a href="/verify/">Verify</a>. Want something tracked continuously? <a href="/submit/">Submit it</a>.</p>
+    </div>
+  </div>
+
+  <footer>
+    <span>HVTracker — independent AI agent trust registry</span>
+    <span class="footer-sep">/</span>
+    <a href="/verify/">Verify a single project</a>
+    <span class="footer-sep">/</span>
+    <a href="/methodology">Methodology</a>
+    <span class="footer-sep">/</span>
+    <a href="/data/">Data API</a>
+  </footer>
+
+  <script>
+    (function () {
+      var form = document.getElementById('scan-form');
+      var input = document.getElementById('scan-input');
+      var out = document.getElementById('result');
+
+      var EXAMPLES = {
+        requirements: 'langchain==0.2.1\ncrewai>=0.5\nllama-index\nautogen\nhttps://github.com/topoteretes/cognee\nnot-an-agent-pkg',
+        mcp: '{\n  "mcpServers": {\n    "cognee": { "url": "https://github.com/topoteretes/cognee" },\n    "filesystem": { "command": "npx", "args": ["@modelcontextprotocol/server-filesystem"] }\n  }\n}'
+      };
+
+      function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+
+      function pill(r) {
+        if (r.tracked) return r.trusted
+          ? ['v-trusted', 'Trusted']
+          : ['v-caution', 'Not trusted yet'];
+        return ['v-unknown', 'Not tracked'];
+      }
+
+      function rank(r) { return r.tracked ? (r.trusted ? 2 : 1) : 0; } // untrusted/unknown first
+
+      function render(d) {
+        var s = d.summary || { total: 0, tracked: 0, untracked: 0, trusted: 0, avg_trust: null };
+        if (!s.total) {
+          out.innerHTML = '<p class="result-error">No recognizable dependencies found in that input.</p>';
+          return;
+        }
+        var rows = (d.results || []).slice().sort(function (a, b) { return rank(a) - rank(b); });
+        var html = '<div class="scan-summary">' +
+          (s.avg_trust != null ? '<div class="s-cell"><strong>' + s.avg_trust + '</strong><span>avg HVTrust</span></div>' : '') +
+          '<div class="s-cell"><strong>' + s.total + '</strong><span>checked</span></div>' +
+          '<div class="s-cell"><strong style="color:var(--green)">' + s.trusted + '</strong><span>trusted</span></div>' +
+          '<div class="s-cell"><strong style="color:var(--amber)">' + (s.tracked - s.trusted) + '</strong><span>tracked, not trusted</span></div>' +
+          '<div class="s-cell"><strong style="color:var(--muted)">' + s.untracked + '</strong><span>not tracked</span></div>' +
+          '</div>';
+        html += '<table class="scan-table"><thead><tr><th>Dependency</th><th>Verdict</th><th>Grade</th><th>HVTrust</th></tr></thead><tbody>';
+        rows.forEach(function (r) {
+          var p = pill(r);
+          var name = r.tracked && r.slug
+            ? '<a href="/agents/' + esc(r.slug) + '/">' + esc(r.input) + '</a>'
+            : esc(r.input);
+          var grade = r.grade ? '<span class="badge grade-' + esc(r.grade) + '">' + esc(r.grade) + '</span>' : '<span class="c-score">—</span>';
+          var score = r.trust_score != null ? esc(r.trust_score) : '—';
+          html += '<tr>' +
+            '<td class="c-input">' + name + '</td>' +
+            '<td><span class="verdict-pill ' + p[0] + '">' + p[1] + '</span></td>' +
+            '<td>' + grade + '</td>' +
+            '<td class="c-score">' + score + '</td></tr>';
+        });
+        html += '</tbody></table>';
+        out.innerHTML = html;
+      }
+
+      function run() {
+        var text = input.value.trim();
+        if (!text) return;
+        out.innerHTML = '<div class="result-loading">Checking trust signals…</div>';
+        fetch('/api/v1/scan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ input: text })
+        })
+          .then(function (r) { return r.json(); })
+          .then(render)
+          .catch(function () { out.innerHTML = '<div class="result-error">Could not reach the trust API. Try again.</div>'; });
+      }
+
+      form.addEventListener('submit', function (e) { e.preventDefault(); run(); });
+      document.querySelectorAll('[data-eg]').forEach(function (a) {
+        a.addEventListener('click', function () { input.value = EXAMPLES[a.getAttribute('data-eg')] || ''; run(); });
+      });
+    })();
+  </script>
+</body>
+</html>

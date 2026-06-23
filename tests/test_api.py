@@ -278,11 +278,12 @@ def test_startup_keeps_scheduler_alive(monkeypatch):
             self.started = False
             self.shutdown_called = False
 
-        def add_job(self, func, trigger, hour, id, **kwargs):
+        def add_job(self, func, trigger, id, hour=None, minute=None, **kwargs):
             self.jobs.append({
                 "func": func,
                 "trigger": trigger,
                 "hour": hour,
+                "minute": minute,
                 "id": id,
                 **kwargs,
             })
@@ -317,12 +318,12 @@ def test_startup_keeps_scheduler_alive(monkeypatch):
 
     assert app._scheduler is not None
     assert app._scheduler.started is True
-    assert len(app._scheduler.jobs) == 1
-    job = app._scheduler.jobs[0]
-    assert callable(job["func"])
-    assert job["trigger"] == "cron"
-    assert job["hour"] == "*/2"
-    assert job["id"] == "refresh"
+    jobs = {j["id"]: j for j in app._scheduler.jobs}
+    # The 2h full batch and the frequent GitHub-signal refresh.
+    assert "refresh" in jobs and "signals-refresh" in jobs
+    assert all(callable(j["func"]) and j["trigger"] == "cron" for j in jobs.values())
+    assert jobs["refresh"]["hour"] == "*/2"
+    assert jobs["signals-refresh"]["minute"] is not None
 
     app.shutdown()
     assert app._scheduler is None
