@@ -299,7 +299,20 @@
       });
     });
 
-    window.setTimeout(showPopup, 18000);
+    // Exit-intent instead of a timed interruption. The old 18s auto-popup drew
+    // 950 views for 5 submits (~0.5%) while 727 users dismissed it. Now it shows
+    // at most once, only when a desktop user moves to leave the page. Mobile has
+    // no reliable exit-intent, so the inline "Track this agent" CTA covers it.
+    // The frequency cap from shouldShowAlertPopup() above still applies.
+    if (!("ontouchstart" in window)) {
+      var exitArmed = true;
+      document.addEventListener("mouseout", function (event) {
+        if (!exitArmed || dismissed) return;
+        if (event.clientY > 0 || event.relatedTarget) return; // only top-edge exits
+        exitArmed = false;
+        showPopup();
+      });
+    }
   }
 
   captureAttribution();
