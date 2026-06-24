@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Application code
 COPY app.py fetch_and_build.py generate_og_card.py specs.py db.py cache.py storage.py schema.sql ./
-COPY signing.py mcp_trust.py open_lookup.py verify_log.py mcp_server.py ./
+COPY signing.py mcp_trust.py open_lookup.py verify_log.py mcp_server.py auth.py ./
 # Generator inputs: curated seed, scorecard cache, and templates/assets
 COPY agents.json scorecard-cache.json template.html ./
 # Try fetching the latest scorecard cache from the data branch (falls back to COPY'd seed)
@@ -24,7 +24,7 @@ COPY static/ static/
 COPY blog_static/ blog_static/
 COPY changelog/ changelog/
 COPY .well-known/ .well-known/
-COPY .nojekyll robots.txt analytics.js og-v2.png og-verify.png og-provenance.png og-mcp.png og-scan.png favicon.svg hex-bg.svg haystack-logo.png aipass-logo.png composio-logo.svg lightrag-logo.png ./
+COPY .nojekyll robots.txt analytics.js auth.js og-v2.png og-verify.png og-provenance.png og-mcp.png og-scan.png favicon.svg hex-bg.svg haystack-logo.png aipass-logo.png composio-logo.svg lightrag-logo.png ./
 # render_state.json — baked into the image so that newly-listed agents added
 # via git push are synced to the volume on startup (see fetch_and_build.py).
 COPY data/render_state.json data/render_state.json

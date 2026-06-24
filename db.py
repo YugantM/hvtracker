@@ -207,3 +207,124 @@ def verify_check_targets(limit: int = 200) -> list[str]:
         cur.execute("SELECT repo FROM verify_checks WHERE provisional = true "
                     "ORDER BY checked_at ASC LIMIT %s", (limit,))
         return [row[0] for row in cur.fetchall()]
+
+
+# ---- accounts / watchlist / claims (auth.py) ------------------------------
+
+_USER_COLS = ["id", "provider", "provider_id", "login", "name", "email", "avatar_url"]
+
+
+def upsert_user(provider: str, provider_id: str, login: str | None,
+                name: str | None, email: str | None, avatar_url: str | None) -> dict | None:
+    """Insert or update a user by (provider, provider_id); return the row."""
+    if not enabled():
+        return None
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO users (provider, provider_id, login, name, email, avatar_url) "
+            "VALUES (%s, %s, %s, %s, %s, %s) "
+            "ON CONFLICT (provider, provider_id) DO UPDATE SET "
+            "login = EXCLUDED.login, name = EXCLUDED.name, email = EXCLUDED.email, "
+            "avatar_url = EXCLUDED.avatar_url, last_login = now() "
+            f"RETURNING {', '.join(_USER_COLS)}",
+            (provider, str(provider_id), login, name, email, avatar_url),
+        )
+        row = cur.fetchone()
+        conn.commit()
+        return dict(zip(_USER_COLS, row)) if row else None
+
+
+def get_user(user_id: int) -> dict | None:
+    if not enabled():
+        return None
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(f"SELECT {', '.join(_USER_COLS)} FROM users WHERE id = %s", (user_id,))
+        row = cur.fetchone()
+        return dict(zip(_USER_COLS, row)) if row else None
+
+
+def list_watch(user_id: int) -> list[str]:
+    if not enabled():
+        return []
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute("SELECT agent_slug FROM watchlist WHERE user_id = %s ORDER BY created_at", (user_id,))
+        return [r[0] for r in cur.fetchall()]
+
+
+def add_watch(user_id: int, slug: str) -> None:
+    if not enabled():
+        return
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute("INSERT INTO watchlist (user_id, agent_slug) VALUES (%s, %s) "
+                    "ON CONFLICT DO NOTHING", (user_id, slug))
+        conn.commit()
+
+
+def remove_watch(user_id: int, slug: str) -> None:
+    if not enabled():
+        return
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute("DELETE FROM watchlist WHERE user_id = %s AND agent_slug = %s", (user_id, slug))
+        conn.commit()
+
+
+def create_claim(user_id: int, slug: str, repo: str, status: str, method: str) -> dict | None:
+    if not enabled():
+        return None
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO claims (user_id, agent_slug, repo, status, method) "
+            "VALUES (%s, %s, %s, %s, %s) "
+            "ON CONFLICT (user_id, agent_slug) DO UPDATE SET "
+            "status = EXCLUDED.status, method = EXCLUDED.method "
+            "RETURNING status, method",
+            (user_id, slug, repo, status, method),
+        )
+        row = cur.fetchone()
+        conn.commit()
+        return {"status": row[0], "method": row[1]} if row else None
+
+
+def get_user_claim(user_id: int, slug: str) -> dict | None:
+    if not enabled():
+        return None
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute("SELECT status, method FROM claims WHERE user_id = %s AND agent_slug = %s",
+                    (user_id, slug))
+        row = cur.fetchone()
+        return {"status": row[0], "method": row[1]} if row else None
+
+
+def agent_claim_status(slug: str) -> dict:
+    """Public claim status for an agent: is it claimed+verified, and by whom."""
+    if not enabled():
+        return {"claimed": False, "verified": False, "by": None}
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT u.login, c.status FROM claims c JOIN users u ON u.id = c.user_id "
+            "WHERE c.agent_slug = %s ORDER BY (c.status='verified') DESC, c.created_at ASC LIMIT 1",
+            (slug,),
+        )
+        row = cur.fetchone()
+        if not row:
+            return {"claimed": False, "verified": False, "by": None}
+        return {"claimed": True, "verified": row[1] == "verified", "by": row[0]}
+
+
+def get_last_read(user_id: int) -> str | None:
+    if not enabled():
+        return None
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute("SELECT to_char(last_read_at, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') "
+                    "FROM notification_reads WHERE user_id = %s", (user_id,))
+        row = cur.fetchone()
+        return row[0] if row else None
+
+
+def set_last_read(user_id: int) -> None:
+    if not enabled():
+        return
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute("INSERT INTO notification_reads (user_id, last_read_at) VALUES (%s, now()) "
+                    "ON CONFLICT (user_id) DO UPDATE SET last_read_at = now()", (user_id,))
+        conn.commit()

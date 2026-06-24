@@ -65,3 +65,44 @@ CREATE INDEX IF NOT EXISTS submissions_status_idx ON submissions (status);
 CREATE INDEX IF NOT EXISTS corrections_status_idx ON corrections (status);
 CREATE INDEX IF NOT EXISTS interest_signups_kind_idx ON interest_signups (kind);
 CREATE INDEX IF NOT EXISTS interest_signups_repo_idx ON interest_signups (repo);
+
+-- ---- Accounts (GitHub/Google OAuth) + per-user features -------------------
+CREATE TABLE IF NOT EXISTS users (
+    id           BIGSERIAL PRIMARY KEY,
+    provider     TEXT NOT NULL,                 -- github | google | dev
+    provider_id  TEXT NOT NULL,                 -- stable provider account id
+    login        TEXT,                          -- handle (e.g. github login)
+    name         TEXT,
+    email        TEXT,
+    avatar_url   TEXT,
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    last_login   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (provider, provider_id)
+);
+
+CREATE TABLE IF NOT EXISTS watchlist (
+    user_id      BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    agent_slug   TEXT NOT NULL,
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, agent_slug)
+);
+
+CREATE TABLE IF NOT EXISTS claims (
+    id           BIGSERIAL PRIMARY KEY,
+    user_id      BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    agent_slug   TEXT NOT NULL,
+    repo         TEXT NOT NULL,
+    status       TEXT NOT NULL DEFAULT 'pending', -- pending | verified | rejected
+    method       TEXT,                            -- owner-match | org-public-member | manual
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (user_id, agent_slug)
+);
+
+CREATE TABLE IF NOT EXISTS notification_reads (
+    user_id      BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    last_read_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS watchlist_user_idx ON watchlist (user_id);
+CREATE INDEX IF NOT EXISTS claims_agent_idx ON claims (agent_slug);
+CREATE INDEX IF NOT EXISTS claims_status_idx ON claims (status);

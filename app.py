@@ -181,6 +181,12 @@ async def _lifespan(_app):
 
 app = FastAPI(title="HVTracker", docs_url="/api/docs", openapi_url="/api/openapi.json",
               lifespan=_lifespan)
+
+# Accounts: GitHub/Google OAuth + watchlist/claim/notifications. Registered
+# before the catch-all StaticFiles mount so its /auth/* and /api/* routes win.
+import auth as _auth  # noqa: E402
+app.include_router(_auth.router)
+
 _scheduler = None
 _refresh_lock = threading.Lock()
 SITE_NAV_ITEMS = (
