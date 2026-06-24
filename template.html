@@ -388,7 +388,7 @@
       gap: 8px;
       padding: 8px 14px;
       border: 1px solid var(--border);
-      background: var(--surface);
+      background: #fff;
       font-family: var(--font-mono);
       font-size: 12px;
       color: var(--text);
@@ -426,6 +426,13 @@
       height: 30px;
       object-fit: contain;
       object-position: center;
+    }
+    /* Icon variant for square logos without a wordmark (e.g. LightRAG). */
+    .featured-repo--icon img {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+      border-radius: 6px;
     }
     .movers { padding: 10px 0; border-bottom: 1px solid var(--border); }
     .movers-title { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -752,6 +759,10 @@
         </a>
         <a class="featured-repo featured-repo--center featured-repo--wordmark" href="https://github.com/ComposioHQ/composio" target="_blank" rel="noopener noreferrer">
           <img src="/composio-logo.svg?v=20260612b" alt="Composio logo" loading="lazy" decoding="async">
+        </a>
+        <a class="featured-repo featured-repo--icon" href="https://github.com/HKUDS/LightRAG" target="_blank" rel="noopener noreferrer">
+          <img src="/lightrag-logo.png?v=20260624" alt="LightRAG logo" loading="lazy" decoding="async">
+          LightRAG
         </a>
       </div>
     </section>
