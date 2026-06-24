@@ -34,28 +34,6 @@
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "USD"
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "{{ row.trust_score }}",
-      "bestRating": "100",
-      "worstRating": "0",
-      "ratingCount": "{{ row.stars }}"
-    },
-    "review": {
-      "@type": "Review",
-      "author": {
-        "@type": "Organization",
-        "name": "HVTracker",
-        "url": "https://hvtracker.net"
-      },
-      "reviewRating": {
-        "@type": "Rating",
-        "ratingValue": "{{ row.trust_score }}",
-        "bestRating": "100",
-        "worstRating": "0"
-      },
-      "reviewBody": "{{ row.name }} receives a trust score of {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}) based on independent analysis of activity, adoption, transparency, safety, and identity signals."
     }
   }
   </script>
