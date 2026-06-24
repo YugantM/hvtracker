@@ -4194,7 +4194,7 @@ def main() -> None:
     # When writing to a separate output root (the volume), copy the static
     # assets the site references but that aren't generated (OG images, etc.).
     if script_dir != base_dir:
-        for asset in (".nojekyll", "robots.txt", "analytics.js",
+        for asset in (".nojekyll", "robots.txt", "analytics.js", "auth.js",
                       "og-v2.png", "og-provenance.png", "linkedin_carousel.js"):
             src = os.path.join(base_dir, asset)
             if os.path.isfile(src):

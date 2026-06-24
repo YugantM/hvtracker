@@ -7,6 +7,8 @@
   <title>Is {{ row.name }} Safe? Trust Score &amp; Safety Signals | HVTracker</title>
   <meta name="description" content="Is {{ row.name }} safe to use? An independent trust score for {{ row.name }} based on supply-chain provenance, safety, maintenance, and adoption signals.">
   <link rel="canonical" href="https://hvtracker.net/agents/{{ row.slug }}/">
+  <meta name="hvt-agent-slug" content="{{ row.slug }}">
+  <meta name="hvt-agent-repo" content="{{ row.repo }}">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="{{ row.name }} — Trust Score {{ row.trust_score }}/100 | HVTracker">
