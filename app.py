@@ -17,6 +17,13 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
 from html import escape
 
+from dotenv import load_dotenv
+
+# Load local secrets/config from a gitignored .env (OAuth client ids/secrets,
+# HVT_SESSION_SECRET, HVT_DEV_AUTH). No-op in production where env vars are set
+# directly. Must run before `import auth`, which reads these at module load.
+load_dotenv()
+
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
