@@ -334,7 +334,6 @@
       <div class="hero-actions">
         <a class="compare-link" href="/compare/?a={{ row.slug }}">Compare</a>
         <button class="secondary-link watch-button" id="watchToggle" type="button" data-watch-slug="{{ row.slug }}" data-watch-name="{{ row.name }}" data-watch-repo="{{ row.repo }}">Save to watchlist</button>
-        <a class="secondary-link" id="watchlistCompareLink" href="/compare/">Compare saved agents</a>
         <a class="secondary-link" href="/track/{{ row.slug }}">Track this agent</a>
         <a class="secondary-link" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Suggest correction</a>
       </div>
@@ -1065,8 +1064,7 @@
     (function () {
       const WATCHLIST_KEY = "hvtracker_watchlist_v1";
       const btn = document.getElementById("watchToggle");
-      const compareLink = document.getElementById("watchlistCompareLink");
-      if (!btn || !compareLink) return;
+      if (!btn) return;
 
       function loadWatchlist() {
         try {
@@ -1087,8 +1085,6 @@
         const saved = items.some((item) => item.slug === btn.dataset.watchSlug);
         btn.classList.toggle("is-saved", saved);
         btn.textContent = saved ? "Saved to watchlist" : "Save to watchlist";
-        compareLink.href = items.length ? "/compare/?watchlist=1" : "/compare/";
-        compareLink.textContent = items.length ? `Compare saved agents (${items.length})` : "Compare saved agents";
       }
 
       btn.addEventListener("click", () => {

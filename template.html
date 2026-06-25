@@ -544,11 +544,11 @@
     <section class="watch-panel" aria-label="Watchlist tools">
       <div class="watch-panel-head">
         <div class="watch-panel-copy">
-          <strong>Save projects to a local watchlist.</strong>
-          <p>Keep shortlists in this browser, then open compare with the saved set already loaded.</p>
+          <strong>Watchlist — agents you're tracking.</strong>
+          <p>Save agents to monitor their trust signals. Sign in to sync your watchlist across devices and get notified when a watched agent's score, grade, or rank changes.</p>
         </div>
         <div class="watch-panel-actions">
-          <a class="watch-link primary" id="watchlistCompareLink" href="/compare/">Compare saved agents</a>
+          <a class="watch-link primary" href="/account/">View in account</a>
           <a class="watch-link" id="watchlistClearLink" href="#">Clear watchlist</a>
         </div>
       </div>
@@ -1118,11 +1118,8 @@
       function renderWatchlistPreview() {
         const items = loadWatchlist();
         const preview = document.getElementById("watchlistPreview");
-        const compareLink = document.getElementById("watchlistCompareLink");
         const clearLink = document.getElementById("watchlistClearLink");
         clearLink.style.visibility = items.length ? "visible" : "hidden";
-        compareLink.href = items.length ? "/compare/?watchlist=1" : "/compare/";
-        compareLink.textContent = items.length ? `Compare saved agents (${items.length})` : "Compare saved agents";
         if (!items.length) {
           preview.innerHTML = '<span class="watch-empty">Your watchlist is empty. Use the + buttons in the table to save agents.</span>';
           updateWatchButtons();
