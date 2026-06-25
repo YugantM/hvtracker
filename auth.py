@@ -21,6 +21,7 @@ import os
 import secrets
 import time
 import urllib.parse
+from html import escape
 
 import requests
 from fastapi import APIRouter, Form, Request, Response
@@ -260,10 +261,98 @@ def dev_login(request: Request, login: str = "devuser", next: str = "/"):
 
 
 @router.post("/auth/logout")
-def logout():
-    resp = JSONResponse({"ok": True})
+def logout(next: str = Form("/")):
+    # 303 so a form POST (account page) and a fetch (header menu) both end on a GET.
+    resp = RedirectResponse(_safe_next(next), status_code=303)
     resp.delete_cookie(SESSION_COOKIE, path="/")
     return resp
+
+
+# ----------------------------------------------------------- auth pages ----
+
+def _provider_buttons(next_path: str) -> str:
+    nxt = urllib.parse.quote(_safe_next(next_path))
+    out = []
+    if GITHUB_CLIENT_ID:
+        out.append(f'<a class="auth-btn auth-btn--github" href="/auth/github/login?next={nxt}">Continue with GitHub</a>')
+    if GOOGLE_CLIENT_ID:
+        out.append(f'<a class="auth-btn auth-btn--google" href="/auth/google/login?next={nxt}">Continue with Google</a>')
+    if DEV_AUTH:
+        out.append(f'<a class="auth-btn auth-btn--dev" href="/auth/dev-login?next={nxt}">Dev login (local)</a>')
+    if not out:
+        return '<p class="auth-note">Sign-in isn\'t configured on this instance yet.</p>'
+    return '<div class="auth-providers">' + "".join(out) + "</div>"
+
+
+@router.get("/login", response_class=HTMLResponse)
+@router.get("/login/", response_class=HTMLResponse, include_in_schema=False)
+def login_page(request: Request, next: str = "/"):
+    from app import _marketing_page  # lazy: avoids circular import at module load
+    if current_user(request):
+        return RedirectResponse(_safe_next(next) if next != "/" else "/account/", status_code=302)
+    body = (
+        '<div class="auth-card">'
+        '<p class="auth-lede">Create a free account to save agents to a watchlist, get notified '
+        'when their trust signals move, and claim your own project.</p>'
+        + _provider_buttons(next) +
+        '<p class="auth-fineprint">We request only your public profile and email — never repo access. '
+        'The registry stays free and fully public either way.</p>'
+        "</div>"
+    )
+    return HTMLResponse(_marketing_page(
+        "Sign in — HVTracker", "Account", "Sign in or create an account", body,
+        description="Sign in to HVTracker to watch agents, get trust-change alerts, and claim your project.",
+        path="/login/"))
+
+
+@router.get("/account", response_class=HTMLResponse)
+@router.get("/account/", response_class=HTMLResponse, include_in_schema=False)
+def account_page(request: Request):
+    from app import _marketing_page
+    user = current_user(request)
+    if not user:
+        return RedirectResponse("/login?next=/account/", status_code=302)
+    index = _agents_index()
+
+    def agent_link(slug: str) -> str:
+        name = (index.get(slug) or {}).get("name", slug)
+        return f'<a href="/agents/{escape(slug)}/">{escape(name)}</a>'
+
+    watch = db.list_watch(user["id"])
+    watch_html = ("<ul class='account-list'>" + "".join(f"<li>{agent_link(s)}</li>" for s in watch) + "</ul>") \
+        if watch else "<p class='auth-note'>No agents yet — open any agent and choose <em>Save to watchlist</em>.</p>"
+
+    claims = db.list_user_claims(user["id"])
+    if claims:
+        rows = "".join(
+            f"<li>{agent_link(c['agent_slug'])} <span class='claim-pill claim-{escape(c['status'])}'>{escape(c['status'])}</span>"
+            f" <span class='account-muted'>{escape(c.get('repo',''))}</span></li>" for c in claims)
+        claims_html = f"<ul class='account-list'>{rows}</ul>"
+    else:
+        claims_html = "<p class='auth-note'>No claims yet — open your project's page and choose <em>Claim this project</em>.</p>"
+
+    avatar = f'<img class="account-avatar" src="{escape(user.get("avatar_url") or "")}" alt="">' if user.get("avatar_url") else ""
+    ident = escape(user.get("name") or user.get("login") or "Account")
+    sub = " · ".join(filter(None, [
+        ("@" + user["login"]) if user.get("login") else None,
+        user.get("email"),
+        f"via {escape(user.get('provider',''))}" if user.get("provider") else None,
+    ]))
+    body = (
+        '<div class="account">'
+        f'<div class="account-head">{avatar}<div class="account-id"><strong>{ident}</strong>'
+        f'<span class="account-muted">{escape(sub)}</span></div>'
+        '<form method="post" action="/auth/logout" class="account-signout">'
+        '<input type="hidden" name="next" value="/"><button class="auth-btn auth-btn--ghost" type="submit">Sign out</button></form>'
+        "</div>"
+        f'<h3 id="watchlist">Watchlist <span class="account-count">{len(watch)}</span></h3>{watch_html}'
+        f'<h3>Claimed projects <span class="account-count">{len(claims)}</span></h3>{claims_html}'
+        "</div>"
+    )
+    return HTMLResponse(_marketing_page(
+        "Your account — HVTracker", "Account", "Your account", body,
+        description="Your HVTracker account: watchlist, claimed projects, and settings.",
+        path="/account/"))
 
 
 # ------------------------------------------------------------------- api ---

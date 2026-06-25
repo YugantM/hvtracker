@@ -35,14 +35,11 @@
   function renderLoggedOut(me) {
     if (!slot) return;
     var providers = (me && me.providers) || [];
-    var items = "";
-    if (providers.indexOf("github") >= 0) items += '<a class="hvt-auth-item" href="' + loginUrl("github") + '">Continue with GitHub</a>';
-    if (providers.indexOf("google") >= 0) items += '<a class="hvt-auth-item" href="' + loginUrl("google") + '">Continue with Google</a>';
-    if (me && me.dev_login) items += '<a class="hvt-auth-item" href="/auth/dev-login?next=' + encodeURIComponent(location.pathname) + '">Dev login (local)</a>';
-    if (!items) { slot.innerHTML = ""; return; }  // no sign-in method available -> show nothing publicly
-    slot.innerHTML = '<div class="hvt-auth"><button class="hvt-auth-btn" id="hvtSignin">Sign in</button>' +
-      '<div class="hvt-auth-pop" id="hvtSigninPop" hidden>' + items + "</div></div>";
-    document.getElementById("hvtSignin").addEventListener("click", function () { toggle("hvtSigninPop"); });
+    var canSignIn = providers.length || (me && me.dev_login);
+    if (!canSignIn) { slot.innerHTML = ""; return; }  // no sign-in method -> show nothing publicly
+    // Link to the real /login page rather than a cramped dropdown.
+    slot.innerHTML = '<a class="hvt-auth-btn hvt-auth-signin" href="/login?next=' +
+      encodeURIComponent(location.pathname + location.search) + '">Sign in</a>';
   }
 
   // ---- header: signed in ----
@@ -54,7 +51,8 @@
         '<span class="hvt-bell-count" id="hvtBellCount" hidden>0</span></button>' +
       '<button class="hvt-auth-btn" id="hvtAcct">' + avatar + "<span>" + esc(user.login || user.name || "Account") + "</span></button>" +
       '<div class="hvt-auth-pop" id="hvtAcctPop" hidden>' +
-        '<a class="hvt-auth-item" href="/compare/?watchlist=1">My watchlist</a>' +
+        '<a class="hvt-auth-item" href="/account/">Your account</a>' +
+        '<a class="hvt-auth-item" href="/account/#watchlist">Watchlist</a>' +
         '<button class="hvt-auth-item" id="hvtLogout">Sign out</button></div>' +
       '<div class="hvt-auth-pop hvt-notif" id="hvtNotifPop" hidden>' +
         '<div class="hvt-notif-head">Trust activity on your watchlist</div>' +
@@ -67,7 +65,14 @@
     loadNotifications();
   }
 
-  function logout() { postJSON("/auth/logout").finally(function () { location.reload(); }); }
+  function logout() {
+    // Real form POST -> server clears the cookie and 303-redirects home.
+    var f = document.createElement("form");
+    f.method = "post"; f.action = "/auth/logout";
+    var n = document.createElement("input");
+    n.type = "hidden"; n.name = "next"; n.value = "/";
+    f.appendChild(n); document.body.appendChild(f); f.submit();
+  }
 
   // ---- watchlist: merge the anonymous localStorage list into the account once ----
   function syncWatchlist() {
@@ -161,6 +166,7 @@
       ".hvt-bell{position:relative;padding:5px 8px}" +
       ".hvt-bell-count{position:absolute;top:-6px;right:-6px;background:var(--accent-warm,#c67c6d);color:#fff;border-radius:9px;padding:0 5px;font-size:10px;line-height:16px;min-width:16px;text-align:center}" +
       ".hvt-auth-pop{position:absolute;top:calc(100% + 6px);right:0;min-width:220px;background:#fff;border:1px solid var(--border,#d5cbbc);box-shadow:0 18px 50px rgba(34,28,22,.16);z-index:1100;display:flex;flex-direction:column}" +
+      ".hvt-auth-pop[hidden]{display:none}" +
       ".hvt-auth-item{display:block;padding:10px 12px;color:var(--text,#1f1b17);text-decoration:none;border:0;background:none;text-align:left;cursor:pointer;font:inherit;border-bottom:1px solid var(--border,#eee)}" +
       ".hvt-auth-item:last-child{border-bottom:0}.hvt-auth-item:hover{background:#f4f1eb;color:var(--accent-warm,#c67c6d)}" +
       ".hvt-auth-muted{color:#9a9189;cursor:default}" +

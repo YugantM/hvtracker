@@ -311,6 +311,16 @@ def agent_claim_status(slug: str) -> dict:
         return {"claimed": True, "verified": row[1] == "verified", "by": row[0]}
 
 
+def list_user_claims(user_id: int) -> list[dict]:
+    if not enabled():
+        return []
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute("SELECT agent_slug, repo, status, method FROM claims "
+                    "WHERE user_id = %s ORDER BY created_at DESC", (user_id,))
+        cols = ["agent_slug", "repo", "status", "method"]
+        return [dict(zip(cols, row)) for row in cur.fetchall()]
+
+
 def get_last_read(user_id: int) -> str | None:
     if not enabled():
         return None

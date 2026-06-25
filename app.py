@@ -484,11 +484,15 @@ def _site_header_html(updated: str) -> str:
       <nav class="site-nav" aria-label="Site">
         {nav_links}
       </nav>
-      <div class="site-status" data-updated="{updated}">
-        <span class="live-dot"></span>updated <span class="site-status-value">{updated}</span>
+      <div class="site-header-right">
+        <div class="site-status" data-updated="{updated}">
+          <span class="live-dot"></span>updated <span class="site-status-value">{updated}</span>
+        </div>
+        <div id="hvt-auth-slot" class="hvt-auth-slot"></div>
       </div>
     </div>
-  </header>"""
+  </header>
+  <script defer src="/auth.js"></script>"""
 
 
 def _runtime_git_sha() -> str | None:

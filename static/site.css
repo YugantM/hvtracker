@@ -188,3 +188,36 @@ a:hover { text-underline-offset: 3px; text-decoration-thickness: 1px; }
 .nav-panel { box-shadow: 0 12px 30px -12px rgba(31, 27, 23, .4); }
 .nav-panel a:hover { transform: translateX(2px); }
 .badge, .evidence-badge { box-shadow: 0 1px 2px rgba(31, 27, 23, .12); }
+
+/* ---- Auth pages (/login, /account) + header sign-in button ---- */
+.hvt-auth-signin { text-decoration: none; }
+.hvt-auth-signin:hover { text-decoration: none; }
+.auth-card { max-width: 460px; }
+.auth-lede { color: var(--muted); margin-bottom: 18px; }
+.auth-providers { display: grid; gap: 10px; margin: 18px 0; }
+.auth-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px 16px; border: 1px solid var(--line); background: #fff; color: var(--ink);
+  font: 600 14px var(--font-sans); cursor: pointer; text-decoration: none; }
+.auth-btn:hover { text-decoration: none; border-color: var(--lobster); }
+.auth-btn--github { background: #1f2328; color: #fff; border-color: #1f2328; }
+.auth-btn--github:hover { background: #000; border-color: #000; }
+.auth-btn--google { background: #fff; }
+.auth-btn--dev { background: var(--paper-2); font-family: var(--font-mono); font-weight: 400; }
+.auth-btn--ghost { background: none; padding: 7px 12px; font-size: 13px; font-weight: 400; }
+.auth-fineprint { color: var(--muted); font-size: 13px; margin-top: 10px; }
+.auth-note { color: var(--muted); font-size: 14px; }
+.account-head { display: flex; align-items: center; gap: 14px; padding: 4px 0 18px;
+  border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+.account-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+.account-id { display: flex; flex-direction: column; gap: 2px; }
+.account-id strong { font-size: 18px; }
+.account-muted { color: var(--muted); font-size: 13px; font-family: var(--font-mono); }
+.account-signout { margin-left: auto; }
+.account h3 { margin: 22px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.account-count { color: var(--lobster); }
+.account-list { list-style: none; padding: 0; display: grid; gap: 6px; }
+.account-list li { padding: 8px 10px; border: 1px solid var(--line); background: #fff; display: flex; align-items: center; gap: 8px; }
+.claim-pill { font-family: var(--font-mono); font-size: 11px; padding: 1px 7px; border-radius: 3px; text-transform: uppercase; }
+.claim-verified { background: #eef5ef; color: #2f6846; border: 1px solid #2f6846; }
+.claim-pending { background: #fbf6ee; color: #8a6d3b; border: 1px solid #d9c08a; }
+.claim-rejected { background: #f7eceb; color: #9b3c3c; border: 1px solid #d9aaaa; }
