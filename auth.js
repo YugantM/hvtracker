@@ -31,6 +31,25 @@
     initAgentPage(me);
   }).catch(function () { /* auth disabled — leave the public UI untouched */ });
 
+  initAccountPage();
+
+  // ---- /account page: remove-from-watchlist buttons ----
+  function initAccountPage() {
+    var btns = document.querySelectorAll(".account-remove");
+    if (!btns.length) return;
+    [].forEach.call(btns, function (btn) {
+      btn.addEventListener("click", function () {
+        var slug = btn.getAttribute("data-remove-slug");
+        btn.disabled = true; btn.textContent = "Removing…";
+        postJSON("/api/watchlist", { action: "remove", slug: slug }).then(function () {
+          var li = btn.closest("li"); if (li && li.parentNode) li.parentNode.removeChild(li);
+          var cnt = document.querySelector("#watchlist .account-count");
+          if (cnt) cnt.textContent = Math.max(0, (parseInt(cnt.textContent, 10) || 1) - 1);
+        }).catch(function () { btn.disabled = false; btn.textContent = "Remove"; });
+      });
+    });
+  }
+
   // ---- header: signed out ----
   function renderLoggedOut(me) {
     if (!slot) return;

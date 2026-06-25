@@ -153,6 +153,18 @@ HONEYPOT_HTML = '<div style="position:absolute;left:-9999px;top:-9999px" aria-hi
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.environ.get("OUTPUT_DIR", BASE_DIR)
 PREBUILT_DIR = os.path.join(BASE_DIR, "prebuilt")
+
+
+def _asset_ver(name: str) -> str:
+    """Short content hash for cache-busting unhashed static JS (auth.js etc.)."""
+    try:
+        with open(os.path.join(BASE_DIR, name), "rb") as f:
+            return hashlib.sha256(f.read()).hexdigest()[:8]
+    except OSError:
+        return "0"
+
+
+_AUTH_JS_VER = _asset_ver("auth.js")
 os.makedirs(OUTPUT_DIR, exist_ok=True)  # volume subdir may not exist on first boot
 DATA_PATH = os.path.join(OUTPUT_DIR, "data.json")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
@@ -196,18 +208,6 @@ app.include_router(_auth.router)
 
 _scheduler = None
 _refresh_lock = threading.Lock()
-SITE_NAV_ITEMS = (
-    ("Leaderboard", "/"),
-    ("Movers", "/movers/"),
-    ("Changes", "/changes/"),
-    ("Use cases", "/use-cases/"),
-    ("Methodology", "/methodology"),
-    ("Score lab", "/score-lab/"),
-    ("Compare", "/compare/"),
-    ("Alerts", "/alerts/"),
-    ("Data API", "/data/"),
-    ("Sponsor", "/sponsor/"),
-)
 
 
 # ---- cache headers -------------------------------------------------------
@@ -481,15 +481,17 @@ def load_manual_candidates() -> list[dict]:
 
 
 def _site_header_html(updated: str) -> str:
-    nav_links = "".join(
-        f'<a href="{href}">{escape(label)}</a>'
-        for label, href in SITE_NAV_ITEMS
-    )
+    # Same grouped-dropdown nav as templates/_site_header.html.j2 and the
+    # homepage, so the header is identical on marketing/account/login pages too.
     return f"""<header class="site-header">
     <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
       <nav class="site-nav" aria-label="Site">
-        {nav_links}
+        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/scan/">Scan stack</a><a href="/methodology/">Methodology</a><a href="/badges/">Badges</a><a href="/score-lab/">Score lab</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
       </nav>
       <div class="site-header-right">
         <div class="site-status" data-updated="{updated}">
@@ -499,7 +501,7 @@ def _site_header_html(updated: str) -> str:
       </div>
     </div>
   </header>
-  <script defer src="/auth.js"></script>"""
+  <script defer src="/auth.js?v={_AUTH_JS_VER}"></script>"""
 
 
 def _runtime_git_sha() -> str | None:

@@ -5152,6 +5152,14 @@ def main() -> None:
         css_hash = ""
     env.globals["css_hash"] = css_hash
 
+    # Cache-bust the unhashed auth.js so widget/UI updates always reach browsers.
+    auth_js_path = os.path.join(base_dir, "auth.js")
+    if os.path.isfile(auth_js_path):
+        with open(auth_js_path, "rb") as f:
+            env.globals["auth_js_hash"] = hashlib.sha256(f.read()).hexdigest()[:8]
+    else:
+        env.globals["auth_js_hash"] = ""
+
     movers = compute_movers(history, {r["repo"].lower(): r["slug"] for r in rows}, rows=rows)
     movers_page = compute_movers_page_data(rows, history)
     newly_added = compute_newly_added(rows, history)
