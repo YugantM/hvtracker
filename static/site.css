@@ -229,15 +229,9 @@ a:hover { text-underline-offset: 3px; text-decoration-thickness: 1px; }
 .account-signout { margin-left: auto; }
 .account h3 { margin: 22px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); display: flex; align-items: center; gap: 8px; }
 .account-count { color: var(--lobster); }
-.account-compare { margin-left: auto; text-transform: none; letter-spacing: 0; font-family: var(--font-mono); font-size: 12px; color: var(--accent); border: 1px solid var(--line); padding: 4px 10px; }
-.account-compare:hover { border-color: var(--lobster); color: var(--lobster); text-decoration: none; }
 .account-list { list-style: none; padding: 0; display: grid; gap: 6px; }
 .account-list li { padding: 9px 12px; border: 1px solid var(--line); background: #fff; display: flex; align-items: center; gap: 10px; }
 .account-item-name { font-weight: 600; }
 .account-remove { margin-left: auto; background: none; border: 1px solid var(--line); color: var(--muted);
   font: 12px var(--font-mono); padding: 4px 10px; cursor: pointer; }
 .account-remove:hover { border-color: var(--lobster); color: var(--lobster); }
-.claim-pill { font-family: var(--font-mono); font-size: 11px; padding: 1px 7px; border-radius: 3px; text-transform: uppercase; }
-.claim-verified { background: #eef5ef; color: #2f6846; border: 1px solid #2f6846; }
-.claim-pending { background: #fbf6ee; color: #8a6d3b; border: 1px solid #d9c08a; }
-.claim-rejected { background: #f7eceb; color: #9b3c3c; border: 1px solid #d9aaaa; }

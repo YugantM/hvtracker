@@ -90,22 +90,11 @@ CREATE TABLE IF NOT EXISTS watchlist (
     PRIMARY KEY (user_id, agent_slug)
 );
 
-CREATE TABLE IF NOT EXISTS claims (
-    id           BIGSERIAL PRIMARY KEY,
-    user_id      BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    agent_slug   TEXT NOT NULL,
-    repo         TEXT NOT NULL,
-    status       TEXT NOT NULL DEFAULT 'pending', -- pending | verified | rejected
-    method       TEXT,                            -- owner-match | org-public-member | manual
-    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
-    UNIQUE (user_id, agent_slug)
-);
-
 CREATE TABLE IF NOT EXISTS notification_reads (
     user_id      BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     last_read_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS watchlist_user_idx ON watchlist (user_id);
-CREATE INDEX IF NOT EXISTS claims_agent_idx ON claims (agent_slug);
-CREATE INDEX IF NOT EXISTS claims_status_idx ON claims (status);
+-- The "claim your project" feature was removed; its table is no longer created.
+DROP TABLE IF EXISTS claims;

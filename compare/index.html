@@ -128,6 +128,10 @@
       background: var(--bg);
       border: 1px solid var(--border);
     }
+    .chip { cursor: grab; user-select: none; }
+    .chip.dragging { opacity: .45; cursor: grabbing; }
+    .chip.drop-target { outline: 2px dashed var(--accent); outline-offset: 2px; }
+    .chip-grip { color: var(--muted); cursor: grab; letter-spacing: -2px; }
     .chip .remove {
       color: var(--muted);
       cursor: pointer;
@@ -816,9 +820,11 @@
           const pair = location.pathname.replace(/^\/compare\//, "").replace(/\/$/, "").split("-vs-");
           if (pair.length === 2 && pair[0] && pair[1]) names.push(pair[0], pair[1]);
         }
+        // Otherwise, fall back to the saved compare list (built via "Add to compare").
+        if (!names.length) names.push(...loadCompareList());
         names.forEach((name) => {
           const agent = allAgents.find((a) => a.slug === name || a.name.toLowerCase() === name.toLowerCase());
-          if (agent && selected.length < 3) selected.push(agent);
+          if (agent && selected.length < 3 && !selected.find((s) => s.repo === agent.repo)) selected.push(agent);
         });
         render();
       })
@@ -898,9 +904,23 @@
       }
     }
 
+    const COMPARE_KEY = "hvtracker_compare_v1";
+
     function updateURL() {
       const slugs = selected.map((a) => a.slug).join(",");
       history.replaceState(null, "", slugs ? `?a=${slugs}` : location.pathname);
+      // Keep the shared compare list in sync so other pages reflect the set.
+      try {
+        localStorage.setItem(COMPARE_KEY,
+          JSON.stringify(selected.map((a) => ({ slug: a.slug, name: a.name, repo: a.repo }))));
+      } catch (_) {}
+    }
+
+    function loadCompareList() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(COMPARE_KEY) || "[]");
+        return Array.isArray(raw) ? raw.map((i) => i.slug || i).filter(Boolean) : [];
+      } catch (_) { return []; }
     }
 
     function escapeHtml(value) {
@@ -1346,13 +1366,44 @@
         : "";
     }
 
+    let dragRepo = null;
+    function wireChipDrag() {
+      document.querySelectorAll("#chips .chip").forEach((chip) => {
+        chip.addEventListener("dragstart", (e) => {
+          dragRepo = chip.getAttribute("data-repo");
+          chip.classList.add("dragging");
+          e.dataTransfer.effectAllowed = "move";
+          try { e.dataTransfer.setData("text/plain", dragRepo); } catch (_) {}
+        });
+        chip.addEventListener("dragend", () => { chip.classList.remove("dragging"); dragRepo = null; });
+        chip.addEventListener("dragover", (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; chip.classList.add("drop-target"); });
+        chip.addEventListener("dragleave", () => chip.classList.remove("drop-target"));
+        chip.addEventListener("drop", (e) => {
+          e.preventDefault();
+          chip.classList.remove("drop-target");
+          const from = dragRepo || (e.dataTransfer && e.dataTransfer.getData("text/plain"));
+          const to = chip.getAttribute("data-repo");
+          if (!from || from === to) return;
+          const fi = selected.findIndex((a) => a.repo === from);
+          const ti = selected.findIndex((a) => a.repo === to);
+          if (fi < 0 || ti < 0) return;
+          const [moved] = selected.splice(fi, 1);
+          selected.splice(ti, 0, moved);
+          updateURL();
+          render();
+          if (typeof window.hvtTrack === "function") window.hvtTrack("compare_reorder", { compared_count: selected.length });
+        });
+      });
+    }
+
     function render() {
       const chips = document.getElementById("chips");
       const empty = document.getElementById("emptyState");
 
       chips.innerHTML = selected.map((agent) => (
-        `<span class="chip">${escapeHtml(agent.name)} <span class="remove" onclick="removeAgent('${agent.repo}')">&times;</span></span>`
+        `<span class="chip" draggable="true" data-repo="${escapeHtml(agent.repo)}" title="Drag to reorder"><span class="chip-grip" aria-hidden="true">⠿</span>${escapeHtml(agent.name)} <span class="remove" onclick="removeAgent('${agent.repo}')">&times;</span></span>`
       )).join("");
+      wireChipDrag();
 
       if (selected.length === 0) {
         empty.style.display = "";

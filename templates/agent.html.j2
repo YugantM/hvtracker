@@ -7,8 +7,6 @@
   <title>Is {{ row.name }} Safe? Trust Score &amp; Safety Signals | HVTracker</title>
   <meta name="description" content="Is {{ row.name }} safe to use? An independent trust score for {{ row.name }} based on supply-chain provenance, safety, maintenance, and adoption signals.">
   <link rel="canonical" href="https://hvtracker.net/agents/{{ row.slug }}/">
-  <meta name="hvt-agent-slug" content="{{ row.slug }}">
-  <meta name="hvt-agent-repo" content="{{ row.repo }}">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="{{ row.name }} — Trust Score {{ row.trust_score }}/100 | HVTracker">
@@ -161,9 +159,10 @@
     .links { padding:6px 0; display:flex; gap:8px; flex-wrap:wrap; font-family:var(--font-mono); font-size:12px; }
     .links a { padding:4px 10px; border:1px solid var(--border); color:var(--muted); }
     .links a:hover { color:var(--accent); border-color:var(--accent); text-decoration:none; }
-    .compare-link { font-family:var(--font-mono); font-size:12px; padding:6px 12px; border:1px solid var(--accent); color:var(--accent); font-weight:600; }
+    .compare-link { font-family:var(--font-mono); font-size:12px; padding:6px 12px; border:1px solid var(--accent); color:var(--accent); font-weight:600; background:none; cursor:pointer; }
     .compare-link:hover { color:var(--text); text-decoration:none; }
-    .secondary-link { font-family:var(--font-mono); font-size:12px; padding:6px 12px; border:1px solid var(--border); color:var(--muted); }
+    .compare-link.is-saved { color:#fff; background:var(--accent); }
+    .secondary-link { font-family:var(--font-mono); font-size:12px; padding:6px 12px; border:1px solid var(--border); color:var(--muted); background:none; cursor:pointer; }
     .secondary-link:hover { color:var(--text); border-color:var(--text); text-decoration:none; }
     .watch-button.is-saved { color:var(--green); border-color:var(--green); }
 
@@ -332,9 +331,9 @@
         {% if row.license_type and row.license_type != 'open' %}<span class="badge" style="color:{% if row.license_type == 'proprietary' %}var(--red){% elif row.license_type == 'source-available' %}var(--amber){% else %}var(--muted){% endif %}">{{ row.license_type | capitalize }}</span>{% endif %}
       </div>
       <div class="hero-actions">
-        <a class="compare-link" href="/compare/?a={{ row.slug }}">Compare</a>
-        <button class="secondary-link watch-button" id="watchToggle" type="button" data-watch-slug="{{ row.slug }}" data-watch-name="{{ row.name }}" data-watch-repo="{{ row.repo }}">Save to watchlist</button>
-        <a class="secondary-link" href="/track/{{ row.slug }}">Track this agent</a>
+        <button class="compare-link" id="compareToggle" type="button" data-cmp-slug="{{ row.slug }}" data-cmp-name="{{ row.name }}" data-cmp-repo="{{ row.repo }}">Add to compare</button>
+        <a class="secondary-link" id="compareOpen" href="/compare/?a={{ row.slug }}">Compare &rarr;</a>
+        <button class="secondary-link watch-button" id="watchToggle" type="button" data-watch-slug="{{ row.slug }}" data-watch-name="{{ row.name }}" data-watch-repo="{{ row.repo }}">Track</button>
         <a class="secondary-link" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Suggest correction</a>
       </div>
       <div class="hero-summary-grid">
@@ -1064,7 +1063,6 @@
     (function () {
       const WATCHLIST_KEY = "hvtracker_watchlist_v1";
       const btn = document.getElementById("watchToggle");
-      if (!btn) return;
 
       function loadWatchlist() {
         try {
@@ -1075,37 +1073,57 @@
           return [];
         }
       }
-
       function saveWatchlist(items) {
         localStorage.setItem(WATCHLIST_KEY, JSON.stringify(items.slice(0, 12)));
       }
 
-      function render() {
-        const items = loadWatchlist();
-        const saved = items.some((item) => item.slug === btn.dataset.watchSlug);
-        btn.classList.toggle("is-saved", saved);
-        btn.textContent = saved ? "Saved to watchlist" : "Save to watchlist";
+      // Tracked projects (drives notifications + account)
+      if (btn) {
+        const renderTrack = () => {
+          const saved = loadWatchlist().some((item) => item.slug === btn.dataset.watchSlug);
+          btn.classList.toggle("is-saved", saved);
+          btn.textContent = saved ? "Tracking ✓" : "Track";
+        };
+        btn.addEventListener("click", () => {
+          const items = loadWatchlist();
+          const slug = btn.dataset.watchSlug;
+          const existing = items.find((item) => item.slug === slug);
+          const next = existing
+            ? items.filter((item) => item.slug !== slug)
+            : items.concat([{ slug, name: btn.dataset.watchName, repo: btn.dataset.watchRepo }]).slice(0, 12);
+          saveWatchlist(next);
+          renderTrack();
+          if (window.hvtSyncWatch) window.hvtSyncWatch(existing ? "remove" : "add", slug);
+          if (typeof hvtTrack === "function") hvtTrack(existing ? "watchlist_remove" : "watchlist_add", { slug, watchlist_size: next.length });
+        });
+        renderTrack();
       }
 
-      btn.addEventListener("click", () => {
-        const items = loadWatchlist();
-        const slug = btn.dataset.watchSlug;
-        const existing = items.find((item) => item.slug === slug);
-        const next = existing
-          ? items.filter((item) => item.slug !== slug)
-          : items.concat([{ slug, name: btn.dataset.watchName, repo: btn.dataset.watchRepo }]).slice(0, 12);
-        saveWatchlist(next);
-        render();
-        if (window.hvtSyncWatch) window.hvtSyncWatch(existing ? "remove" : "add", slug);
-        if (typeof hvtTrack === "function") {
-          hvtTrack(existing ? "watchlist_remove" : "watchlist_add", {
-            slug,
-            watchlist_size: next.length
-          });
-        }
-      });
-
-      render();
+      // Compare list — a separate list from tracked projects
+      const cbtn = document.getElementById("compareToggle");
+      const copen = document.getElementById("compareOpen");
+      if (cbtn) {
+        const item = { slug: cbtn.dataset.cmpSlug, name: cbtn.dataset.cmpName, repo: cbtn.dataset.cmpRepo };
+        const renderCmp = () => {
+          if (!window.hvtCompare) return;  // hvtCompare (auth.js) loads deferred
+          const inList = window.hvtCompare.has(item.slug);
+          cbtn.classList.toggle("is-saved", inList);
+          cbtn.textContent = inList ? "In compare ✓" : "Add to compare";
+          if (copen) {
+            const n = window.hvtCompare.slugs().length;
+            copen.href = n ? window.hvtCompare.url() : ("/compare/?a=" + item.slug);
+            copen.textContent = n ? ("Compare (" + n + ") →") : "Compare →";
+          }
+        };
+        cbtn.addEventListener("click", () => {
+          if (!window.hvtCompare) return;
+          window.hvtCompare.toggle(item);
+          renderCmp();
+          if (typeof hvtTrack === "function") hvtTrack("compare_add", { slug: item.slug });
+        });
+        document.addEventListener("DOMContentLoaded", renderCmp);  // after auth.js runs
+        renderCmp();
+      }
     })();
   </script>
 </body>

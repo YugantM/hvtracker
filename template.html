@@ -317,10 +317,19 @@
       background: none; color: var(--muted); font-size: 0; cursor: pointer; flex-shrink: 0;
       transition: color .15s, border-color .15s;
     }
-    .watch-toggle::before { content: "+"; font-size: 15px; font-family: var(--font-mono); line-height: 1; }
+    .watch-toggle::before { content: "★"; font-size: 12px; font-family: var(--font-mono); line-height: 1; }
     .watch-toggle:hover { color: var(--text); border-color: var(--text); }
     .watch-toggle.is-saved { color: var(--green); border-color: var(--green); }
-    .watch-toggle.is-saved::before { content: "✓"; font-size: 12px; }
+    .watch-toggle.is-saved::before { content: "★"; font-size: 12px; }
+    .compare-toggle {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; padding: 0; border: 1px solid var(--border);
+      background: none; color: var(--muted); font-size: 0; cursor: pointer; flex-shrink: 0;
+      transition: color .15s, border-color .15s;
+    }
+    .compare-toggle::before { content: "⇄"; font-size: 12px; font-family: var(--font-mono); line-height: 1; }
+    .compare-toggle:hover { color: var(--text); border-color: var(--text); }
+    .compare-toggle.is-saved { color: #fff; background: var(--accent); border-color: var(--accent); }
 
     .review-panel { padding: 14px 0; border-bottom: 1px solid var(--border); display: grid; gap: 10px; }
     .review-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
@@ -541,20 +550,19 @@
       </div>
     </section>
 
-    <section class="watch-panel" aria-label="Watchlist tools">
+    <section class="watch-panel" aria-label="Tracked projects">
       <div class="watch-panel-head">
         <div class="watch-panel-copy">
-          <strong>Watchlist — agents you're tracking.</strong>
-          <p>Save agents to monitor their trust signals. Sign in to sync your watchlist across devices and get notified when a watched agent's score, grade, or rank changes.</p>
+          <strong>Tracked projects.</strong>
+          <p>Track agents (★) to monitor their trust signals. Sign in to sync across devices and get notified when a tracked agent's score, grade, or rank changes. To compare agents side by side, use the ⇄ button instead.</p>
         </div>
         <div class="watch-panel-actions">
-          <a class="watch-link primary" id="watchlistCompareLink" href="/compare/">Compare these</a>
-          <a class="watch-link" href="/account/">View in account</a>
-          <a class="watch-link" id="watchlistClearLink" href="#">Clear watchlist</a>
+          <a class="watch-link primary" href="/account/">View in account</a>
+          <a class="watch-link" id="watchlistClearLink" href="#">Clear tracked</a>
         </div>
       </div>
       <div class="watch-list" id="watchlistPreview">
-        <span class="watch-empty">Your watchlist is empty. Use the + buttons in the table to save agents.</span>
+        <span class="watch-empty">No tracked projects yet. Use the ★ buttons in the table to track agents.</span>
       </div>
     </section>
 
@@ -706,7 +714,8 @@
             <td class="agent-cell">
               <div class="agent-head">
                 <a class="agent-name" href="/agents/{{ row.slug }}/">{{ row.name }}</a>
-                <button class="watch-toggle" type="button" data-watch-slug="{{ row.slug }}" data-watch-name="{{ row.name }}" data-watch-repo="{{ row.repo }}" aria-label="Save {{ row.name }} to watchlist"></button>
+                <button class="watch-toggle" type="button" data-watch-slug="{{ row.slug }}" data-watch-name="{{ row.name }}" data-watch-repo="{{ row.repo }}" title="Track {{ row.name }}" aria-label="Track {{ row.name }}"></button>
+                <button class="compare-toggle" type="button" data-cmp-slug="{{ row.slug }}" data-cmp-name="{{ row.name }}" data-cmp-repo="{{ row.repo }}" title="Add {{ row.name }} to compare" aria-label="Add {{ row.name }} to compare"></button>
               </div>
               <a class="agent-repo" href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.display_repo or row.repo }}</a>
               {% if row.description %}<span class="agent-desc" title="{{ row.description }}">{{ row.description }}</span>{% endif %}
@@ -1111,8 +1120,15 @@
           const saved = items.some((item) => item.slug === btn.dataset.watchSlug);
           btn.classList.toggle("is-saved", saved);
           btn.setAttribute("aria-label", saved
-            ? `Remove ${btn.dataset.watchName} from watchlist`
-            : `Save ${btn.dataset.watchName} to watchlist`);
+            ? `Untrack ${btn.dataset.watchName}`
+            : `Track ${btn.dataset.watchName}`);
+        });
+      }
+
+      function updateCompareButtons() {
+        if (!window.hvtCompare) return;
+        document.querySelectorAll(".compare-toggle").forEach((btn) => {
+          btn.classList.toggle("is-saved", window.hvtCompare.has(btn.dataset.cmpSlug));
         });
       }
 
@@ -1121,15 +1137,8 @@
         const preview = document.getElementById("watchlistPreview");
         const clearLink = document.getElementById("watchlistClearLink");
         clearLink.style.visibility = items.length ? "visible" : "hidden";
-        const compareLink = document.getElementById("watchlistCompareLink");
-        if (compareLink) {
-          const picks = items.slice(0, 3).map((i) => i.slug).filter(Boolean);
-          compareLink.href = picks.length ? "/compare/?a=" + picks.join(",") : "/compare/";
-          compareLink.textContent = picks.length ? `Compare these (${picks.length})` : "Compare these";
-          compareLink.style.visibility = items.length ? "visible" : "hidden";
-        }
         if (!items.length) {
-          preview.innerHTML = '<span class="watch-empty">Your watchlist is empty. Use the + buttons in the table to save agents.</span>';
+          preview.innerHTML = '<span class="watch-empty">No tracked projects yet. Use the ★ buttons in the table to track agents.</span>';
           updateWatchButtons();
           return;
         }
@@ -1261,6 +1270,16 @@
         });
       });
 
+      // Compare list (★ tracks; ⇄ adds to a separate compare list)
+      document.querySelectorAll(".compare-toggle").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (!window.hvtCompare) return;
+          window.hvtCompare.toggle({ slug: btn.dataset.cmpSlug, name: btn.dataset.cmpName, repo: btn.dataset.cmpRepo });
+          updateCompareButtons();
+          hvtTrack("compare_add", { slug: btn.dataset.cmpSlug });
+        });
+      });
+
       document.getElementById("watchlistClearLink").addEventListener("click", (e) => {
         e.preventDefault();
         const cleared = loadWatchlist().map((item) => item.slug);
@@ -1313,6 +1332,8 @@
       syncTrustUI();
       syncUI(false);
       renderWatchlistPreview();
+      updateCompareButtons();
+      document.addEventListener("DOMContentLoaded", updateCompareButtons);  // re-run after auth.js (deferred) defines hvtCompare
       renderPage();
 
       // ⌘K / Ctrl+K → focus search

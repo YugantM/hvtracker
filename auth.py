@@ -1,5 +1,5 @@
 """Accounts for HVTracker: GitHub/Google OAuth + signed-cookie sessions,
-server-side watchlist, "claim your project", and in-app notifications.
+a server-side tracked-projects list, and in-app notifications.
 
 Self-contained APIRouter; app.py does `import auth; app.include_router(auth.router)`.
 Design notes:
@@ -387,8 +387,8 @@ def login_page(request: Request, next: str = "/", error: str = ""):
     )
     body = (
         '<div class="auth-card">'
-        '<p class="auth-lede">Create a free account to save agents to a watchlist, get notified '
-        'when their trust signals move, and claim your own project.</p>'
+        '<p class="auth-lede">Create a free account to track agents and get notified '
+        'when their trust signals move.</p>'
         + err_html
         + _provider_buttons(next)
         + email_form +
@@ -398,7 +398,7 @@ def login_page(request: Request, next: str = "/", error: str = ""):
     )
     return HTMLResponse(_marketing_page(
         "Sign in — HVTracker", "Account", "Sign in or create an account", body,
-        description="Sign in to HVTracker to watch agents, get trust-change alerts, and claim your project.",
+        description="Sign in to HVTracker to track agents and get trust-change alerts.",
         path="/login/"))
 
 
@@ -410,10 +410,6 @@ def account_page(request: Request):
     if not user:
         return RedirectResponse("/login?next=/account/", status_code=302)
     index = _agents_index()
-
-    def agent_link(slug: str) -> str:
-        name = (index.get(slug) or {}).get("name", slug)
-        return f'<a href="/agents/{escape(slug)}/">{escape(name)}</a>'
 
     watch = db.list_watch(user["id"])
 
@@ -429,18 +425,7 @@ def account_page(request: Request):
                 f'<button type="button" class="account-remove" data-remove-slug="{escape(slug)}">Remove</button></li>')
 
     watch_html = ("<ul class='account-list'>" + "".join(watch_item(s) for s in watch) + "</ul>") \
-        if watch else "<p class='auth-note'>No agents yet — open any agent and choose <em>Save to watchlist</em>.</p>"
-    compare_btn = (f'<a class="account-compare" href="/compare/?a={",".join(escape(s) for s in watch[:3])}">Compare these &rarr;</a>'
-                   if watch else "")
-
-    claims = db.list_user_claims(user["id"])
-    if claims:
-        rows = "".join(
-            f"<li>{agent_link(c['agent_slug'])} <span class='claim-pill claim-{escape(c['status'])}'>{escape(c['status'])}</span>"
-            f" <span class='account-muted'>{escape(c.get('repo',''))}</span></li>" for c in claims)
-        claims_html = f"<ul class='account-list'>{rows}</ul>"
-    else:
-        claims_html = "<p class='auth-note'>No claims yet — open your project's page and choose <em>Claim this project</em>.</p>"
+        if watch else "<p class='auth-note'>No projects yet — open any agent and choose <em>Track</em>.</p>"
 
     avatar = f'<img class="account-avatar" src="{escape(user.get("avatar_url") or "")}" alt="">' if user.get("avatar_url") else ""
     ident = escape(user.get("name") or user.get("login") or "Account")
@@ -456,13 +441,12 @@ def account_page(request: Request):
         '<form method="post" action="/auth/logout" class="account-signout">'
         '<input type="hidden" name="next" value="/"><button class="auth-btn auth-btn--ghost" type="submit">Sign out</button></form>'
         "</div>"
-        f'<h3 id="watchlist">Watchlist <span class="account-count">{len(watch)}</span>{compare_btn}</h3>{watch_html}'
-        f'<h3>Claimed projects <span class="account-count">{len(claims)}</span></h3>{claims_html}'
+        f'<h3 id="watchlist">Tracked projects <span class="account-count">{len(watch)}</span></h3>{watch_html}'
         "</div>"
     )
     return HTMLResponse(_marketing_page(
         "Your account — HVTracker", "Account", "Your account", body,
-        description="Your HVTracker account: watchlist, claimed projects, and settings.",
+        description="Your HVTracker account: tracked projects and settings.",
         path="/account/"))
 
 
@@ -508,54 +492,12 @@ async def api_watchlist_post(request: Request):
     return JSONResponse({"slugs": db.list_watch(user["id"])})
 
 
-@router.get("/api/agents/{slug}/status")
-def api_agent_status(slug: str):
-    """Public: is this agent claimed by a verified maintainer?"""
-    return JSONResponse(db.agent_claim_status(slug))
-
-
-@router.post("/api/agents/{slug}/claim")
-def api_agent_claim(slug: str, request: Request):
-    user = current_user(request)
-    if not user:
-        return JSONResponse({"error": "auth_required"}, status_code=401)
-    row = _agents_index().get(slug)
-    if not row:
-        return JSONResponse({"error": "unknown_agent"}, status_code=404)
-    repo = row.get("repo", "")
-    owner = repo.split("/")[0] if "/" in repo else ""
-    login = (user.get("login") or "")
-    status, method = "pending", "manual"
-    # Verifiable for GitHub accounts: own the owner handle, or be a public org member.
-    if user.get("provider") == "github" and owner:
-        if login.lower() == owner.lower():
-            status, method = "verified", "owner-match"
-        elif _is_public_org_member(owner, login):
-            status, method = "verified", "org-public-member"
-    saved = db.create_claim(user["id"], slug, repo, status, method)
-    return JSONResponse({"slug": slug, "repo": repo, **(saved or {"status": status, "method": method})})
-
-
-def _is_public_org_member(org: str, login: str) -> bool:
-    if not (org and login and GITHUB_TOKEN):
-        return False
-    try:
-        r = requests.get(
-            f"https://api.github.com/orgs/{org}/public_members/{login}",
-            headers={"Authorization": f"Bearer {GITHUB_TOKEN}",
-                     "Accept": "application/vnd.github+json"}, timeout=10)
-        return r.status_code == 204
-    except Exception:
-        return False
-
-
 @router.get("/api/notifications")
 def api_notifications(request: Request):
     user = current_user(request)
     if not user:
         return JSONResponse({"error": "auth_required"}, status_code=401)
     slugs = set(db.list_watch(user["id"]))
-    claim = db.get_user_claim  # noqa: F841 (kept for readability)
     index = _agents_index()
     last_read = db.get_last_read(user["id"]) or "0000-00-00"
     items, unread = [], 0

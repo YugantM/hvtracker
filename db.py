@@ -209,7 +209,7 @@ def verify_check_targets(limit: int = 200) -> list[str]:
         return [row[0] for row in cur.fetchall()]
 
 
-# ---- accounts / watchlist / claims (auth.py) ------------------------------
+# ---- accounts / watchlist (auth.py) ---------------------------------------
 
 _USER_COLS = ["id", "provider", "provider_id", "login", "name", "email", "avatar_url"]
 
@@ -299,59 +299,6 @@ def remove_watch(user_id: int, slug: str) -> None:
     with _connect() as conn, conn.cursor() as cur:
         cur.execute("DELETE FROM watchlist WHERE user_id = %s AND agent_slug = %s", (user_id, slug))
         conn.commit()
-
-
-def create_claim(user_id: int, slug: str, repo: str, status: str, method: str) -> dict | None:
-    if not enabled():
-        return None
-    with _connect() as conn, conn.cursor() as cur:
-        cur.execute(
-            "INSERT INTO claims (user_id, agent_slug, repo, status, method) "
-            "VALUES (%s, %s, %s, %s, %s) "
-            "ON CONFLICT (user_id, agent_slug) DO UPDATE SET "
-            "status = EXCLUDED.status, method = EXCLUDED.method "
-            "RETURNING status, method",
-            (user_id, slug, repo, status, method),
-        )
-        row = cur.fetchone()
-        conn.commit()
-        return {"status": row[0], "method": row[1]} if row else None
-
-
-def get_user_claim(user_id: int, slug: str) -> dict | None:
-    if not enabled():
-        return None
-    with _connect() as conn, conn.cursor() as cur:
-        cur.execute("SELECT status, method FROM claims WHERE user_id = %s AND agent_slug = %s",
-                    (user_id, slug))
-        row = cur.fetchone()
-        return {"status": row[0], "method": row[1]} if row else None
-
-
-def agent_claim_status(slug: str) -> dict:
-    """Public claim status for an agent: is it claimed+verified, and by whom."""
-    if not enabled():
-        return {"claimed": False, "verified": False, "by": None}
-    with _connect() as conn, conn.cursor() as cur:
-        cur.execute(
-            "SELECT u.login, c.status FROM claims c JOIN users u ON u.id = c.user_id "
-            "WHERE c.agent_slug = %s ORDER BY (c.status='verified') DESC, c.created_at ASC LIMIT 1",
-            (slug,),
-        )
-        row = cur.fetchone()
-        if not row:
-            return {"claimed": False, "verified": False, "by": None}
-        return {"claimed": True, "verified": row[1] == "verified", "by": row[0]}
-
-
-def list_user_claims(user_id: int) -> list[dict]:
-    if not enabled():
-        return []
-    with _connect() as conn, conn.cursor() as cur:
-        cur.execute("SELECT agent_slug, repo, status, method FROM claims "
-                    "WHERE user_id = %s ORDER BY created_at DESC", (user_id,))
-        cols = ["agent_slug", "repo", "status", "method"]
-        return [dict(zip(cols, row)) for row in cur.fetchall()]
 
 
 def get_last_read(user_id: int) -> str | None:

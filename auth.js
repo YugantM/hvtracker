@@ -1,5 +1,5 @@
 /* HVTracker accounts widget: sign-in / account menu, notifications bell, and
-   "claim your project". Progressive enhancement — if the API is unavailable
+   tracked-projects sync. Progressive enhancement — if the API is unavailable
    (e.g. no DB locally) it silently no-ops and the public site is unaffected. */
 (function () {
   "use strict";
@@ -14,12 +14,49 @@
       body: JSON.stringify(body || {}) });
   }
 
-  // Exposed so the inline watchlist toggles (homepage + agent pages) can sync
-  // add/remove to the signed-in account. Harmless when logged out (server 401).
+  // Exposed so the inline tracked-projects toggles (homepage + agent pages) can
+  // sync add/remove to the signed-in account. Harmless when logged out (401).
   window.hvtSyncWatch = function (action, slug) {
     if (!action || !slug) return;
     postJSON("/api/watchlist", { action: action, slug: slug }).catch(function () {});
   };
+
+  // Compare list — a SEPARATE local list (max 3) from the tracked-projects list.
+  // Used by the "Add to compare" buttons and read by the compare tool.
+  window.hvtCompare = {
+    KEY: "hvtracker_compare_v1",
+    MAX: 3,
+    get: function () { try { return JSON.parse(localStorage.getItem(this.KEY) || "[]") || []; } catch (e) { return []; } },
+    set: function (list) { localStorage.setItem(this.KEY, JSON.stringify(list.slice(0, this.MAX))); },
+    slugs: function () { return this.get().map(function (i) { return i.slug || i; }); },
+    has: function (slug) { return this.slugs().indexOf(slug) >= 0; },
+    full: function () { return this.get().length >= this.MAX; },
+    toggle: function (item) {
+      var list = this.get(), s = item.slug;
+      if (this.has(s)) list = list.filter(function (i) { return (i.slug || i) !== s; });
+      else if (list.length < this.MAX) list = list.concat([{ slug: s, name: item.name, repo: item.repo }]);
+      this.set(list);
+      renderCompareTray();
+      return this.get();
+    },
+    url: function () { var s = this.slugs(); return s.length ? "/compare/?a=" + s.join(",") : "/compare/"; }
+  };
+
+  // Floating "Compare (N)" tray — appears on any page (except the compare tool
+  // itself) whenever the compare list is non-empty.
+  function renderCompareTray() {
+    if (/^\/compare\//.test(location.pathname)) return;
+    var n = window.hvtCompare.slugs().length;
+    var tray = document.getElementById("hvt-compare-tray");
+    if (!tray) {
+      tray = document.createElement("a");
+      tray.id = "hvt-compare-tray";
+      document.body.appendChild(tray);
+    }
+    tray.href = window.hvtCompare.url();
+    tray.innerHTML = "⇄ Compare <strong>" + n + "</strong> →";
+    tray.hidden = n === 0;
+  }
   function loginUrl(provider) {
     return "/auth/" + provider + "/login?next=" + encodeURIComponent(location.pathname + location.search);
   }
@@ -35,10 +72,10 @@
 
   api("/api/me").then(function (me) {
     if (me.logged_in) renderLoggedIn(me.user); else renderLoggedOut(me);
-    initAgentPage(me);
   }).catch(function () { /* auth disabled — leave the public UI untouched */ });
 
   initAccountPage();
+  renderCompareTray();
 
   // ---- /account page: remove-from-watchlist buttons ----
   function initAccountPage() {
@@ -78,10 +115,10 @@
       '<button class="hvt-auth-btn" id="hvtAcct">' + avatar + "<span>" + esc(user.login || user.name || "Account") + "</span></button>" +
       '<div class="hvt-auth-pop" id="hvtAcctPop" hidden>' +
         '<a class="hvt-auth-item" href="/account/">Your account</a>' +
-        '<a class="hvt-auth-item" href="/account/#watchlist">Watchlist</a>' +
+        '<a class="hvt-auth-item" href="/account/#watchlist">Tracked projects</a>' +
         '<button class="hvt-auth-item" id="hvtLogout">Sign out</button></div>' +
       '<div class="hvt-auth-pop hvt-notif" id="hvtNotifPop" hidden>' +
-        '<div class="hvt-notif-head">Trust activity on your watchlist</div>' +
+        '<div class="hvt-notif-head">Trust activity on your tracked projects</div>' +
         '<div id="hvtNotifList" class="hvt-notif-list"><div class="hvt-notif-empty">Loading…</div></div></div>' +
       "</div>";
     document.getElementById("hvtAcct").addEventListener("click", function () { toggle("hvtAcctPop"); });
@@ -122,7 +159,7 @@
       if (!data.items || !data.items.length) {
         list.innerHTML = '<div class="hvt-notif-empty">' +
           (data.watching ? "No recent changes on your watched agents." :
-           'Save agents to your watchlist to get trust-change alerts here.') + "</div>";
+           'Track agents to get trust-change alerts here.') + "</div>";
         return;
       }
       list.innerHTML = data.items.map(function (n) {
@@ -139,45 +176,6 @@
     }).catch(function () {});
   }
 
-  // ---- agent page: claim button + "claimed by maintainer" badge ----
-  function initAgentPage(me) {
-    var meta = document.querySelector('meta[name="hvt-agent-slug"]');
-    if (!meta) return;
-    var slug = meta.getAttribute("content");
-    if (!slug) return;
-    api("/api/agents/" + encodeURIComponent(slug) + "/status").then(function (st) {
-      if (st.verified) showClaimedBadge(st.by);
-      if (me.logged_in && !(st.verified)) showClaimButton(slug);
-    }).catch(function () {});
-  }
-  function ctaRow() {
-    var btn = document.getElementById("watchToggle");
-    return btn ? btn.parentElement : null;
-  }
-  function showClaimButton(slug) {
-    var row = ctaRow();
-    if (!row || document.getElementById("hvtClaimBtn")) return;
-    var b = document.createElement("button");
-    b.id = "hvtClaimBtn"; b.type = "button"; b.className = "secondary-link"; b.textContent = "Claim this project";
-    b.addEventListener("click", function () {
-      b.disabled = true; b.textContent = "Verifying…";
-      postJSON("/api/agents/" + encodeURIComponent(slug) + "/claim").then(function (res) {
-        if (res.status === "verified") { b.textContent = "✓ Claimed"; showClaimedBadge(null); }
-        else { b.textContent = "Claim submitted (pending review)"; }
-      }).catch(function () { b.disabled = false; b.textContent = "Claim this project"; });
-    });
-    row.appendChild(b);
-  }
-  function showClaimedBadge(by) {
-    if (document.getElementById("hvtClaimedBadge")) return;
-    var anchor = document.querySelector("h1") || document.body;
-    var badge = document.createElement("span");
-    badge.id = "hvtClaimedBadge"; badge.className = "hvt-claimed";
-    badge.textContent = by ? "✓ Claimed by maintainer @" + by : "✓ Claimed by maintainer";
-    badge.title = "A maintainer of this repository verified ownership via GitHub.";
-    anchor.insertAdjacentElement("afterend", badge);
-  }
-
   // ---- styles (scoped, theme-matched) ----
   function injectStyles() {
     if (document.getElementById("hvt-auth-style")) return;
@@ -185,6 +183,8 @@
     s.id = "hvt-auth-style";
     s.textContent =
       ".hvt-auth-slot{display:inline-flex;align-items:center}.hvt-auth-slot:empty{display:none}" +
+      "#hvt-compare-tray{position:fixed;bottom:18px;right:18px;z-index:1200;background:var(--accent,#2c5282);color:#fff;border:1px solid var(--accent,#2c5282);padding:10px 16px;font-family:var(--font-mono,ui-monospace,Menlo,monospace);font-size:13px;box-shadow:0 10px 30px rgba(34,28,22,.25);text-decoration:none}" +
+      "#hvt-compare-tray[hidden]{display:none}#hvt-compare-tray:hover{filter:brightness(1.08);text-decoration:none}#hvt-compare-tray strong{font-weight:700}" +
       ".hvt-auth{position:relative;display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono,ui-monospace,Menlo,monospace);font-size:12px}" +
       ".hvt-auth-btn,.hvt-bell{display:inline-flex;align-items:center;gap:6px;cursor:pointer;background:#fff;border:1px solid var(--border,#d5cbbc);color:var(--text,#1f1b17);padding:5px 10px;border-radius:0;font:inherit}" +
       ".hvt-auth-btn:hover,.hvt-bell:hover{border-color:var(--accent-warm,#c67c6d);color:var(--accent-warm,#c67c6d)}" +
@@ -203,7 +203,7 @@
       ".hvt-notif-item{display:grid;gap:2px;padding:10px 12px;border-bottom:1px solid var(--border,#eee);text-decoration:none;color:var(--text,#1f1b17)}" +
       ".hvt-notif-item:hover{background:#f4f1eb}.hvt-notif-item.is-unread{background:#fbf6ee}" +
       ".hvt-notif-name{font-weight:700}.hvt-notif-detail{color:#4a443d}.hvt-notif-date{color:#9a9189;font-size:10px}" +
-      ".hvt-claimed{display:inline-block;margin:6px 0;padding:3px 8px;border:1px solid #2f6846;color:#2f6846;background:#eef5ef;font-family:var(--font-mono,ui-monospace,Menlo,monospace);font-size:11px}";
+      "";
     document.head.appendChild(s);
   }
 })();
