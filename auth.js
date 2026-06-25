@@ -39,7 +39,7 @@
     if (providers.indexOf("github") >= 0) items += '<a class="hvt-auth-item" href="' + loginUrl("github") + '">Continue with GitHub</a>';
     if (providers.indexOf("google") >= 0) items += '<a class="hvt-auth-item" href="' + loginUrl("google") + '">Continue with Google</a>';
     if (me && me.dev_login) items += '<a class="hvt-auth-item" href="/auth/dev-login?next=' + encodeURIComponent(location.pathname) + '">Dev login (local)</a>';
-    if (!items) items = '<span class="hvt-auth-item hvt-auth-muted">Sign-in not configured</span>';
+    if (!items) { slot.innerHTML = ""; return; }  // no sign-in method available -> show nothing publicly
     slot.innerHTML = '<div class="hvt-auth"><button class="hvt-auth-btn" id="hvtSignin">Sign in</button>' +
       '<div class="hvt-auth-pop" id="hvtSigninPop" hidden>' + items + "</div></div>";
     document.getElementById("hvtSignin").addEventListener("click", function () { toggle("hvtSigninPop"); });
@@ -153,7 +153,7 @@
     var s = document.createElement("style");
     s.id = "hvt-auth-style";
     s.textContent =
-      ".hvt-auth-slot{margin-left:auto;display:inline-flex;align-items:center}" +
+      ".hvt-auth-slot{display:inline-flex;align-items:center}.hvt-auth-slot:empty{display:none}" +
       ".hvt-auth{position:relative;display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono,ui-monospace,Menlo,monospace);font-size:12px}" +
       ".hvt-auth-btn,.hvt-bell{display:inline-flex;align-items:center;gap:6px;cursor:pointer;background:#fff;border:1px solid var(--border,#d5cbbc);color:var(--text,#1f1b17);padding:5px 10px;border-radius:0;font:inherit}" +
       ".hvt-auth-btn:hover,.hvt-bell:hover{border-color:var(--accent-warm,#c67c6d);color:var(--accent-warm,#c67c6d)}" +
