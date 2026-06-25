@@ -350,6 +350,8 @@ def account_page(request: Request):
 
     watch_html = ("<ul class='account-list'>" + "".join(watch_item(s) for s in watch) + "</ul>") \
         if watch else "<p class='auth-note'>No agents yet — open any agent and choose <em>Save to watchlist</em>.</p>"
+    compare_btn = (f'<a class="account-compare" href="/compare/?a={",".join(escape(s) for s in watch[:3])}">Compare these &rarr;</a>'
+                   if watch else "")
 
     claims = db.list_user_claims(user["id"])
     if claims:
@@ -374,7 +376,7 @@ def account_page(request: Request):
         '<form method="post" action="/auth/logout" class="account-signout">'
         '<input type="hidden" name="next" value="/"><button class="auth-btn auth-btn--ghost" type="submit">Sign out</button></form>'
         "</div>"
-        f'<h3 id="watchlist">Watchlist <span class="account-count">{len(watch)}</span></h3>{watch_html}'
+        f'<h3 id="watchlist">Watchlist <span class="account-count">{len(watch)}</span>{compare_btn}</h3>{watch_html}'
         f'<h3>Claimed projects <span class="account-count">{len(claims)}</span></h3>{claims_html}'
         "</div>"
     )

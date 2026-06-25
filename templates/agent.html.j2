@@ -1096,6 +1096,7 @@
           : items.concat([{ slug, name: btn.dataset.watchName, repo: btn.dataset.watchRepo }]).slice(0, 12);
         saveWatchlist(next);
         render();
+        if (window.hvtSyncWatch) window.hvtSyncWatch(existing ? "remove" : "add", slug);
         if (typeof hvtTrack === "function") {
           hvtTrack(existing ? "watchlist_remove" : "watchlist_add", {
             slug,

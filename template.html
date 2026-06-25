@@ -548,7 +548,8 @@
           <p>Save agents to monitor their trust signals. Sign in to sync your watchlist across devices and get notified when a watched agent's score, grade, or rank changes.</p>
         </div>
         <div class="watch-panel-actions">
-          <a class="watch-link primary" href="/account/">View in account</a>
+          <a class="watch-link primary" id="watchlistCompareLink" href="/compare/">Compare these</a>
+          <a class="watch-link" href="/account/">View in account</a>
           <a class="watch-link" id="watchlistClearLink" href="#">Clear watchlist</a>
         </div>
       </div>
@@ -1120,6 +1121,13 @@
         const preview = document.getElementById("watchlistPreview");
         const clearLink = document.getElementById("watchlistClearLink");
         clearLink.style.visibility = items.length ? "visible" : "hidden";
+        const compareLink = document.getElementById("watchlistCompareLink");
+        if (compareLink) {
+          const picks = items.slice(0, 3).map((i) => i.slug).filter(Boolean);
+          compareLink.href = picks.length ? "/compare/?a=" + picks.join(",") : "/compare/";
+          compareLink.textContent = picks.length ? `Compare these (${picks.length})` : "Compare these";
+          compareLink.style.visibility = items.length ? "visible" : "hidden";
+        }
         if (!items.length) {
           preview.innerHTML = '<span class="watch-empty">Your watchlist is empty. Use the + buttons in the table to save agents.</span>';
           updateWatchButtons();
@@ -1245,6 +1253,7 @@
             : items.concat([{ slug, name: btn.dataset.watchName, repo: btn.dataset.watchRepo }]).slice(0, 12);
           saveWatchlist(next);
           renderWatchlistPreview();
+          if (window.hvtSyncWatch) window.hvtSyncWatch(existing ? "remove" : "add", slug);
           hvtTrack(existing ? "watchlist_remove" : "watchlist_add", {
             slug,
             watchlist_size: next.length
@@ -1254,8 +1263,10 @@
 
       document.getElementById("watchlistClearLink").addEventListener("click", (e) => {
         e.preventDefault();
+        const cleared = loadWatchlist().map((item) => item.slug);
         saveWatchlist([]);
         renderWatchlistPreview();
+        if (window.hvtSyncWatch) cleared.forEach((slug) => window.hvtSyncWatch("remove", slug));
         hvtTrack("watchlist_clear", {});
       });
 

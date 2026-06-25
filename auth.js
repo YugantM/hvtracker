@@ -13,6 +13,13 @@
     return api(path, { method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body || {}) });
   }
+
+  // Exposed so the inline watchlist toggles (homepage + agent pages) can sync
+  // add/remove to the signed-in account. Harmless when logged out (server 401).
+  window.hvtSyncWatch = function (action, slug) {
+    if (!action || !slug) return;
+    postJSON("/api/watchlist", { action: action, slug: slug }).catch(function () {});
+  };
   function loginUrl(provider) {
     return "/auth/" + provider + "/login?next=" + encodeURIComponent(location.pathname + location.search);
   }
