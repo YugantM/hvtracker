@@ -207,6 +207,17 @@ a:hover { text-underline-offset: 3px; text-decoration-thickness: 1px; }
 .auth-btn--google { background: #fff; }
 .auth-btn--dev { background: var(--paper-2); font-family: var(--font-mono); font-weight: 400; }
 .auth-btn--ghost { background: none; padding: 7px 12px; font-size: 13px; font-weight: 400; }
+.auth-btn--primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.auth-btn--primary:hover { filter: brightness(1.08); border-color: var(--accent); }
+.auth-divider { display: flex; align-items: center; gap: 10px; margin: 18px 0 14px; color: var(--muted); font-size: 12px; }
+.auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.auth-form { display: grid; gap: 12px; }
+.auth-field { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+.auth-field input { padding: 10px 12px; border: 1px solid var(--line); background: #fff; font: 14px var(--font-sans); color: var(--ink); }
+.auth-field input:focus { outline: none; border-color: var(--lobster); }
+.auth-form-actions { display: flex; gap: 10px; margin-top: 4px; }
+.auth-form-actions .auth-btn { flex: 1; }
+.auth-error { color: #9b3c3c; background: #f7eceb; border: 1px solid #d9aaaa; padding: 9px 12px; font-size: 13px; margin: 0 0 14px; }
 .auth-fineprint { color: var(--muted); font-size: 13px; margin-top: 10px; }
 .auth-note { color: var(--muted); font-size: 14px; }
 .account-head { display: flex; align-items: center; gap: 14px; padding: 4px 0 18px;

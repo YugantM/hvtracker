@@ -18,6 +18,7 @@ import hashlib
 import hmac
 import json
 import os
+import re
 import secrets
 import time
 import urllib.parse
@@ -108,6 +109,35 @@ def _safe_next(raw: str | None) -> str:
     if raw and raw.startswith("/") and not raw.startswith("//"):
         return raw
     return "/"
+
+
+# --------------------------------------------------- email/password auth ----
+
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+_LOGIN_ERRORS = {
+    "email": "Enter a valid email address.",
+    "weak": "Password must be at least 8 characters.",
+    "exists": "An account with that email already exists — try signing in.",
+    "badcreds": "Email or password is incorrect.",
+    "unavailable": "Accounts aren't available right now.",
+}
+
+
+def _hash_password(pw: str) -> str:
+    salt = secrets.token_bytes(16)
+    dk = hashlib.pbkdf2_hmac("sha256", pw.encode(), salt, 200_000)
+    return "pbkdf2$200000$" + base64.b64encode(salt).decode() + "$" + base64.b64encode(dk).decode()
+
+
+def _verify_password(pw: str, stored: str) -> bool:
+    try:
+        algo, iters, salt_b64, hash_b64 = (stored or "").split("$")
+        if algo != "pbkdf2":
+            return False
+        dk = hashlib.pbkdf2_hmac("sha256", pw.encode(), base64.b64decode(salt_b64), int(iters))
+        return hmac.compare_digest(dk, base64.b64decode(hash_b64))
+    except Exception:
+        return False
 
 
 # -------------------------------------------------------- agents index -----
@@ -268,6 +298,38 @@ def logout(next: str = Form("/")):
     return resp
 
 
+@router.post("/auth/signup")
+def signup(email: str = Form(""), password: str = Form(""), next: str = Form("/")):
+    if not db.enabled():
+        return RedirectResponse("/login?error=unavailable", status_code=303)
+    email = (email or "").strip().lower()
+    if not _EMAIL_RE.match(email):
+        return RedirectResponse(f"/login?error=email&next={urllib.parse.quote(_safe_next(next))}", status_code=303)
+    if len(password) < 8:
+        return RedirectResponse(f"/login?error=weak&next={urllib.parse.quote(_safe_next(next))}", status_code=303)
+    if db.get_password_user(email):
+        return RedirectResponse(f"/login?error=exists&next={urllib.parse.quote(_safe_next(next))}", status_code=303)
+    user = db.create_password_user(email, _hash_password(password))
+    if not user:
+        return RedirectResponse("/login?error=exists", status_code=303)
+    resp = RedirectResponse(_safe_next(next), status_code=303)
+    _set_session(resp, user["id"])
+    return resp
+
+
+@router.post("/auth/login")
+def password_login(email: str = Form(""), password: str = Form(""), next: str = Form("/")):
+    if not db.enabled():
+        return RedirectResponse("/login?error=unavailable", status_code=303)
+    email = (email or "").strip().lower()
+    user = db.get_password_user(email)
+    if not user or not _verify_password(password, user.get("password_hash") or ""):
+        return RedirectResponse(f"/login?error=badcreds&next={urllib.parse.quote(_safe_next(next))}", status_code=303)
+    resp = RedirectResponse(_safe_next(next), status_code=303)
+    _set_session(resp, user["id"])
+    return resp
+
+
 # ----------------------------------------------------------- auth pages ----
 
 _GH_ICON = ('<svg class="auth-ic" width="18" height="18" viewBox="0 0 16 16" fill="currentColor" '
@@ -303,17 +365,35 @@ def _provider_buttons(next_path: str) -> str:
 
 @router.get("/login", response_class=HTMLResponse)
 @router.get("/login/", response_class=HTMLResponse, include_in_schema=False)
-def login_page(request: Request, next: str = "/"):
+def login_page(request: Request, next: str = "/", error: str = ""):
     from app import _marketing_page  # lazy: avoids circular import at module load
     if current_user(request):
         return RedirectResponse(_safe_next(next) if next != "/" else "/account/", status_code=302)
+    nxt = escape(_safe_next(next))
+    err_html = (f'<p class="auth-error">{escape(_LOGIN_ERRORS[error])}</p>'
+                if error in _LOGIN_ERRORS else "")
+    email_form = (
+        '<div class="auth-divider"><span>or with email</span></div>'
+        '<form class="auth-form" method="post" action="/auth/login">'
+        f'<input type="hidden" name="next" value="{nxt}">'
+        '<label class="auth-field">Email'
+        '<input type="email" name="email" required autocomplete="email" placeholder="you@example.com"></label>'
+        '<label class="auth-field">Password'
+        '<input type="password" name="password" required minlength="8" autocomplete="current-password" placeholder="at least 8 characters"></label>'
+        '<div class="auth-form-actions">'
+        '<button class="auth-btn auth-btn--primary" type="submit" formaction="/auth/login">Sign in</button>'
+        '<button class="auth-btn auth-btn--ghost" type="submit" formaction="/auth/signup">Create account</button>'
+        '</div></form>'
+    )
     body = (
         '<div class="auth-card">'
         '<p class="auth-lede">Create a free account to save agents to a watchlist, get notified '
         'when their trust signals move, and claim your own project.</p>'
-        + _provider_buttons(next) +
-        '<p class="auth-fineprint">We request only your public profile and email — never repo access. '
-        'The registry stays free and fully public either way.</p>'
+        + err_html
+        + _provider_buttons(next)
+        + email_form +
+        '<p class="auth-fineprint">We only use your email to sign you in and (if you opt in) send '
+        'trust alerts. The registry stays free and fully public either way.</p>'
         "</div>"
     )
     return HTMLResponse(_marketing_page(

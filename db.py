@@ -243,6 +243,39 @@ def get_user(user_id: int) -> dict | None:
         return dict(zip(_USER_COLS, row)) if row else None
 
 
+def get_password_user(email: str) -> dict | None:
+    """Look up an email/password account (includes password_hash for verify)."""
+    if not enabled():
+        return None
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(f"SELECT {', '.join(_USER_COLS)}, password_hash FROM users "
+                    "WHERE provider = 'password' AND provider_id = %s", (email,))
+        row = cur.fetchone()
+        if not row:
+            return None
+        rec = dict(zip(_USER_COLS, row[:len(_USER_COLS)]))
+        rec["password_hash"] = row[-1]
+        return rec
+
+
+def create_password_user(email: str, password_hash: str) -> dict | None:
+    """Create an email/password account. Returns None if the email already exists."""
+    if not enabled():
+        return None
+    handle = email.split("@")[0] or email
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO users (provider, provider_id, login, name, email, password_hash) "
+            "VALUES ('password', %s, %s, %s, %s, %s) "
+            "ON CONFLICT (provider, provider_id) DO NOTHING "
+            f"RETURNING {', '.join(_USER_COLS)}",
+            (email, handle, handle, email, password_hash),
+        )
+        row = cur.fetchone()
+        conn.commit()
+        return dict(zip(_USER_COLS, row)) if row else None
+
+
 def list_watch(user_id: int) -> list[str]:
     if not enabled():
         return []

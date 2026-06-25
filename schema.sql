@@ -68,17 +68,20 @@ CREATE INDEX IF NOT EXISTS interest_signups_repo_idx ON interest_signups (repo);
 
 -- ---- Accounts (GitHub/Google OAuth) + per-user features -------------------
 CREATE TABLE IF NOT EXISTS users (
-    id           BIGSERIAL PRIMARY KEY,
-    provider     TEXT NOT NULL,                 -- github | google | dev
-    provider_id  TEXT NOT NULL,                 -- stable provider account id
-    login        TEXT,                          -- handle (e.g. github login)
-    name         TEXT,
-    email        TEXT,
-    avatar_url   TEXT,
-    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
-    last_login   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    id            BIGSERIAL PRIMARY KEY,
+    provider      TEXT NOT NULL,                 -- github | google | password | dev
+    provider_id   TEXT NOT NULL,                 -- stable provider id (email for password)
+    login         TEXT,                          -- handle (e.g. github login)
+    name          TEXT,
+    email         TEXT,
+    avatar_url    TEXT,
+    password_hash TEXT,                          -- only for provider='password'
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    last_login    TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE (provider, provider_id)
 );
+-- For DBs created before password auth existed:
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT;
 
 CREATE TABLE IF NOT EXISTS watchlist (
     user_id      BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,

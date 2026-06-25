@@ -352,6 +352,12 @@ async def _cache_headers(request, call_next):
 
     if response.status_code != 200 or "cache-control" in {k.lower() for k in response.headers}:
         return response
+    # User-specific / auth / API responses must never be cached (or shared by a
+    # CDN): /account shows the signed-in user's data, /login varies by auth state.
+    if (path in {"/account", "/account/", "/login", "/login/"}
+            or path.startswith("/api/") or path.startswith("/auth/")):
+        response.headers["Cache-Control"] = "no-store"
+        return response
     if path.startswith("/data/") and path.endswith(".json"):
         response.headers["Cache-Control"] = _JSON_CACHE
     elif path.endswith("/") or path.endswith(".html"):
