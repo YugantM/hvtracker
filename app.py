@@ -1139,8 +1139,6 @@ def _marketing_page(
     body {{
       min-height:100vh; color:var(--ink); font:15px/1.65 var(--font-sans);
       background:var(--paper);
-      background-image:url("/hex-bg.svg");
-      background-size:2000px 2000px;
     }}
     a {{ color:inherit; text-decoration:none; }}
     a:hover {{ text-decoration:underline; }}

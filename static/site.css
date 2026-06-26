@@ -79,7 +79,7 @@
   --border: #d4cfc5;
   --text: #1a1a1a;
   --muted: #57524c;
-  --accent: #2c5282;
+  --accent: #26405e;
   --accent-warm: #b05a3a;
   --green: #2f6846;
   --red: #9b3c3c;
@@ -105,8 +105,6 @@
 
 body {
   background: var(--bg);
-  background-image: url("/hex-bg.svg");
-  background-size: 2000px 2000px;
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 16px;
@@ -129,8 +127,8 @@ a:hover { text-decoration: underline; }
   display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 16px;
 }
 .logo { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text); }
-.logo span { color: var(--accent-warm); }
-.site-nav { font-family: var(--font-mono); font-size: 11px; display: flex; gap: 2px; margin-left: 0; justify-self: center; min-width: 0; }
+.logo span { color: var(--accent); }
+.site-nav { font-family: var(--font-sans); font-size: 13px; font-weight: 500; display: flex; gap: 2px; margin-left: 0; justify-self: center; min-width: 0; }
 .site-nav a { color: var(--muted); padding: 5px 8px; border: 1px solid transparent; white-space: nowrap; }
 .site-nav a:hover { color: var(--text); text-decoration: none; border-color: var(--border); background: var(--surface); }
 /* Grouped nav dropdowns — open on hover or keyboard focus (no JS) */
@@ -149,7 +147,7 @@ a:hover { text-decoration: underline; }
 .evidence-badge { display: inline-block; font-family: var(--font-mono); font-size: 11px; font-weight: 700; width: 20px; text-align: center; padding: 1px 0; border-radius: 3px; letter-spacing: .02em; }
 .badge { display: inline-block; font-family: var(--font-mono); font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 4px; letter-spacing: .02em; }
 .grade-A { color: #fff; background: var(--green); }
-.grade-B { color: #fff; background: var(--accent); }
+.grade-B { color: #fff; background: #2c5282; }
 .grade-C { color: #fff; background: var(--amber); }
 .grade-D { color: #fff; background: var(--muted); }
 

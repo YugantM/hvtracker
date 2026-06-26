@@ -3556,8 +3556,8 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
   <link rel="stylesheet" href="/static/site.css?v={css_hash}">
   <style>
     *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
-    :root{{--bg:#f4f1eb;--surface:#eae6de;--border:#d4cfc5;--text:#1a1a1a;--muted:#6b6560;--accent:#2c5282;--accent-warm:#b05a3a;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}}
-    body{{background:var(--bg);background-image:url("/hex-bg.svg");background-size:2000px 2000px;color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.6;min-height:100vh}}
+    :root{{--bg:#f4f1eb;--surface:#eae6de;--border:#d4cfc5;--text:#1a1a1a;--muted:#6b6560;--accent:#26405e;--accent-warm:#b05a3a;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}}
+    body{{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.6;min-height:100vh}}
     a{{color:var(--accent);text-decoration:none}}a:hover{{text-decoration:underline}}
     .page{{max-width:800px;margin:0 auto;padding:24px 24px 48px;background:#f4f1eb;min-height:100vh}}
     .logo{{font-family:var(--font-mono);font-size:20px;font-weight:700}}.logo span{{color:var(--accent-warm)}}
