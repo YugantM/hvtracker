@@ -5567,8 +5567,11 @@ def main() -> None:
     for _cm in categories:
         _top = sorted([r for r in rows if r.get("category") == _cm["name"]],
                       key=lambda x: x.get("category_rank") or 9999)[:3]
-        for _a, _b in _it.combinations(_top, 2):
-            _key = tuple(sorted((_a["slug"], _b["slug"])))
+        for _x, _y in _it.combinations(_top, 2):
+            # Canonical (alphabetical) slug order so the dir/URL/canonical match
+            # app.py's /compare/<a>-vs-<b>/ routing (which 301s to alpha order).
+            _a, _b = sorted((_x, _y), key=lambda r: r["slug"])
+            _key = (_a["slug"], _b["slug"])
             if _key in _cmp_seen:
                 continue
             _cmp_seen.add(_key)
