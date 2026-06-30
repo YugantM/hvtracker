@@ -3556,8 +3556,8 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
   <link rel="stylesheet" href="/static/site.css?v={css_hash}">
   <style>
     *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
-    :root{{--bg:#f4f1eb;--surface:#eae6de;--border:#d4cfc5;--text:#1a1a1a;--muted:#6b6560;--accent:#2c5282;--accent-warm:#b05a3a;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}}
-    body{{background:var(--bg);background-image:url("/hex-bg.svg");background-size:2000px 2000px;color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.6;min-height:100vh}}
+    :root{{--bg:#f4f1eb;--surface:#eae6de;--border:#d4cfc5;--text:#1a1a1a;--muted:#6b6560;--accent:#26405e;--accent-warm:#b05a3a;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}}
+    body{{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.6;min-height:100vh}}
     a{{color:var(--accent);text-decoration:none}}a:hover{{text-decoration:underline}}
     .page{{max-width:800px;margin:0 auto;padding:24px 24px 48px;background:#f4f1eb;min-height:100vh}}
     .logo{{font-family:var(--font-mono);font-size:20px;font-weight:700}}.logo span{{color:var(--accent-warm)}}
@@ -4194,7 +4194,7 @@ def main() -> None:
     # When writing to a separate output root (the volume), copy the static
     # assets the site references but that aren't generated (OG images, etc.).
     if script_dir != base_dir:
-        for asset in (".nojekyll", "robots.txt", "analytics.js",
+        for asset in (".nojekyll", "robots.txt", "analytics.js", "auth.js",
                       "og-v2.png", "og-provenance.png", "linkedin_carousel.js"):
             src = os.path.join(base_dir, asset)
             if os.path.isfile(src):
@@ -5152,6 +5152,14 @@ def main() -> None:
         css_hash = ""
     env.globals["css_hash"] = css_hash
 
+    # Cache-bust the unhashed auth.js so widget/UI updates always reach browsers.
+    auth_js_path = os.path.join(base_dir, "auth.js")
+    if os.path.isfile(auth_js_path):
+        with open(auth_js_path, "rb") as f:
+            env.globals["auth_js_hash"] = hashlib.sha256(f.read()).hexdigest()[:8]
+    else:
+        env.globals["auth_js_hash"] = ""
+
     movers = compute_movers(history, {r["repo"].lower(): r["slug"] for r in rows}, rows=rows)
     movers_page = compute_movers_page_data(rows, history)
     newly_added = compute_newly_added(rows, history)
@@ -5518,19 +5526,96 @@ def main() -> None:
             f.write(org_tmpl.render(org=org, orgs=org_pages, is_index=False, updated=now_str))
     print(f"Built {len(org_pages)} org pages under org/.")
 
-    # /compare/<a>-vs-<b>/ is served by the interactive compare tool (app.py
-    # serves the tool preselected with both agents), so no static pages are
-    # written here. Remove any previously-rendered -vs- dirs so the volume stops
-    # serving stale ones; the /compare/ interactive tool itself stays.
+    # /compare/<a>-vs-<b>/ — STATIC pre-rendered comparison pages (SEO).
+    # Previously these URLs were served by the interactive (client-rendered)
+    # compare tool with no crawlable content; now each precomputed
+    # top-3-per-category pair gets a static page with real side-by-side trust
+    # data. The interactive /compare/ tool stays for ad-hoc comparisons.
+    import itertools as _it
+    compare_pair_tmpl = env.get_template("compare_pair.html.j2")
     compare_dir = os.path.join(script_dir, "compare")
     os.makedirs(compare_dir, exist_ok=True)
-    removed_pairs = 0
-    for _d in os.listdir(compare_dir):
+    for _d in os.listdir(compare_dir):  # clear stale pairs (ranks move)
         if "-vs-" in _d and os.path.isdir(os.path.join(compare_dir, _d)):
             shutil.rmtree(os.path.join(compare_dir, _d), ignore_errors=True)
-            removed_pairs += 1
-    if removed_pairs:
-        print(f"Removed {removed_pairs} stale static comparison dirs under compare/.")
+
+    def _cmp_lead(av, bv, higher=True):
+        if av is None and bv is None:
+            return "none"
+        if av is None:
+            return "b"
+        if bv is None:
+            return "a"
+        if av == bv:
+            return "none"
+        if higher:
+            return "a" if av > bv else "b"
+        return "a" if av < bv else "b"
+    def _cmp_fresh(r):
+        d = r.get("days_ago")
+        if d is None:
+            return "—"
+        return "today" if d == 0 else f"{d}d ago"
+    def _cmp_sc(r):
+        v = r.get("scorecard_score")
+        return f"{v:.1f} / 10" if v is not None else "—"
+    def _cmp_dl(r):
+        v = r.get("weekly_downloads")
+        if not v:
+            return "—"
+        if v >= 1_000_000:
+            return f"{v/1_000_000:.1f}M/wk"
+        if v >= 1000:
+            return f"{v/1000:.0f}k/wk"
+        return f"{v}/wk"
+    def _cmp_r1(v):
+        return f"{v:.1f}" if isinstance(v, (int, float)) else "—"
+
+    compare_pair_urls = []
+    _cmp_seen = set()
+    for _cm in categories:
+        _top = sorted([r for r in rows if r.get("category") == _cm["name"]],
+                      key=lambda x: x.get("category_rank") or 9999)[:3]
+        for _x, _y in _it.combinations(_top, 2):
+            # Canonical (alphabetical) slug order so the dir/URL/canonical match
+            # app.py's /compare/<a>-vs-<b>/ routing (which 301s to alpha order).
+            _a, _b = sorted((_x, _y), key=lambda r: r["slug"])
+            _key = (_a["slug"], _b["slug"])
+            if _key in _cmp_seen:
+                continue
+            _cmp_seen.add(_key)
+            _sl = _cmp_lead(_a.get("trust_score"), _b.get("trust_score"))
+            _metrics = [
+                {"label": "HVTrust score", "a": _cmp_r1(_a.get("trust_score")), "b": _cmp_r1(_b.get("trust_score")), "lead": _sl},
+                {"label": "Evidence grade", "grade": True, "lead": _sl},
+                {"label": "Overall rank", "a": f"#{_a.get('rank')}", "b": f"#{_b.get('rank')}", "lead": _cmp_lead(_a.get("rank"), _b.get("rank"), higher=False)},
+                {"label": f"Rank in {_cm['name']}", "a": f"#{_a.get('category_rank')}", "b": f"#{_b.get('category_rank')}", "lead": _cmp_lead(_a.get("category_rank"), _b.get("category_rank"), higher=False)},
+                {"label": "GitHub stars", "a": _a.get("stars_fmt") or "—", "b": _b.get("stars_fmt") or "—", "lead": _cmp_lead(_a.get("stars"), _b.get("stars"))},
+                {"label": "Last updated", "a": _cmp_fresh(_a), "b": _cmp_fresh(_b), "lead": _cmp_lead(_a.get("days_ago"), _b.get("days_ago"), higher=False)},
+                {"label": "Build provenance", "a": "Yes" if _a.get("has_provenance") else "No", "b": "Yes" if _b.get("has_provenance") else "No", "lead": _cmp_lead(1 if _a.get("has_provenance") else 0, 1 if _b.get("has_provenance") else 0)},
+                {"label": "OSSF Scorecard", "a": _cmp_sc(_a), "b": _cmp_sc(_b), "lead": _cmp_lead(_a.get("scorecard_score"), _b.get("scorecard_score"))},
+                {"label": "License", "a": _a.get("license_spdx") or "—", "b": _b.get("license_spdx") or "—", "lead": "none"},
+                {"label": "Downloads", "a": _cmp_dl(_a), "b": _cmp_dl(_b), "lead": _cmp_lead(_a.get("weekly_downloads"), _b.get("weekly_downloads"))},
+            ]
+            _abk = _a.get("trust_breakdown") or {}
+            _bbk = _b.get("trust_breakdown") or {}
+            _dims = [{"label": lbl, "max": mx, "a": _cmp_r1(_abk.get(k)), "b": _cmp_r1(_bbk.get(k)), "lead": _cmp_lead(_abk.get(k), _bbk.get(k))}
+                     for lbl, k, mx in (("Safety / integrity", "safety", 25), ("Identity & provenance", "identity", 20),
+                                        ("Transparency", "transparency", 17), ("Maintenance", "maintenance", 20), ("Adoption", "adoption", 20))]
+            _ctx = {"a": _a, "b": _b, "category": _cm, "metrics": _metrics, "dims": _dims,
+                    "updated": now_str, "methodology_version": METHODOLOGY_VERSION,
+                    "lead_name": None, "lead_score": None, "lead_grade": None, "trail_score": None, "trail_grade": None, "gap": None}
+            _as, _bs = _a.get("trust_score"), _b.get("trust_score")
+            if _as is not None and _bs is not None and _as != _bs:
+                _hi, _lo = (_a, _b) if _as > _bs else (_b, _a)
+                _ctx.update(lead_name=_hi["name"], lead_score=_cmp_r1(_hi.get("trust_score")), lead_grade=_hi.get("evidence_grade"),
+                            trail_score=_cmp_r1(_lo.get("trust_score")), trail_grade=_lo.get("evidence_grade"), gap=_cmp_r1(abs(_as - _bs)))
+            _pdir = os.path.join(compare_dir, f"{_a['slug']}-vs-{_b['slug']}")
+            os.makedirs(_pdir, exist_ok=True)
+            with open(os.path.join(_pdir, "index.html"), "w", encoding="utf-8") as f:
+                f.write(compare_pair_tmpl.render(**_ctx))
+            compare_pair_urls.append(f"https://hvtracker.net/compare/{_a['slug']}-vs-{_b['slug']}/")
+    print(f"Built {len(compare_pair_urls)} static comparison pages under compare/.")
 
     # Blog comparison articles — one SEO article per category using the top two
     # contenders. These are narrative, crawlable entry points that link to the
@@ -5745,8 +5830,10 @@ def main() -> None:
     # Legacy entries have their public /agents/<slug>/ page deleted
     # (remove_legacy_public_artifacts); they MUST NOT appear in the sitemap or
     # Google crawls them as 404s.
-    # /compare/<a>-vs-<b>/ pairs are not listed: they now serve the interactive
-    # tool (canonical /compare/), so only the tool URL belongs in the sitemap.
+    # Static comparison pages /compare/<a>-vs-<b>/ now serve crawlable content
+    # (generated above), so each pair belongs in the sitemap alongside the tool.
+    for _cu in compare_pair_urls:
+        sitemap_urls.append((_cu, "0.7", "weekly"))
     sitemap_urls += [
         ("https://hvtracker.net/compare/", "0.7", "daily"),
         ("https://hvtracker.net/changelog/", "0.6", "weekly"),

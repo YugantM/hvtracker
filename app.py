@@ -17,6 +17,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
 from html import escape
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -24,6 +25,11 @@ from fastapi.staticfiles import StaticFiles
 import db
 import mcp_server
 import verify_log
+
+# Load local secrets/config from a gitignored .env (OAuth client ids/secrets,
+# HVT_SESSION_SECRET, HVT_DEV_AUTH). No-op in production where env vars are set
+# directly. Must run before `import auth` (~line 206), which reads these at load.
+load_dotenv()
 
 
 # ---- anti-spam helpers -----------------------------------------------------
@@ -146,6 +152,18 @@ HONEYPOT_HTML = '<div style="position:absolute;left:-9999px;top:-9999px" aria-hi
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.environ.get("OUTPUT_DIR", BASE_DIR)
 PREBUILT_DIR = os.path.join(BASE_DIR, "prebuilt")
+
+
+def _asset_ver(name: str) -> str:
+    """Short content hash for cache-busting unhashed static JS (auth.js etc.)."""
+    try:
+        with open(os.path.join(BASE_DIR, name), "rb") as f:
+            return hashlib.sha256(f.read()).hexdigest()[:8]
+    except OSError:
+        return "0"
+
+
+_AUTH_JS_VER = _asset_ver("auth.js")
 os.makedirs(OUTPUT_DIR, exist_ok=True)  # volume subdir may not exist on first boot
 DATA_PATH = os.path.join(OUTPUT_DIR, "data.json")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
@@ -181,20 +199,14 @@ async def _lifespan(_app):
 
 app = FastAPI(title="HVTracker", docs_url="/api/docs", openapi_url="/api/openapi.json",
               lifespan=_lifespan)
+
+# Accounts: GitHub/Google OAuth + watchlist/claim/notifications. Registered
+# before the catch-all StaticFiles mount so its /auth/* and /api/* routes win.
+import auth as _auth  # noqa: E402
+app.include_router(_auth.router)
+
 _scheduler = None
 _refresh_lock = threading.Lock()
-SITE_NAV_ITEMS = (
-    ("Leaderboard", "/"),
-    ("Movers", "/movers/"),
-    ("Changes", "/changes/"),
-    ("Use cases", "/use-cases/"),
-    ("Methodology", "/methodology"),
-    ("Score lab", "/score-lab/"),
-    ("Compare", "/compare/"),
-    ("Alerts", "/alerts/"),
-    ("Data API", "/data/"),
-    ("Sponsor", "/sponsor/"),
-)
 
 
 # ---- cache headers -------------------------------------------------------
@@ -339,6 +351,12 @@ async def _cache_headers(request, call_next):
 
     if response.status_code != 200 or "cache-control" in {k.lower() for k in response.headers}:
         return response
+    # User-specific / auth / API responses must never be cached (or shared by a
+    # CDN): /account shows the signed-in user's data, /login varies by auth state.
+    if (path in {"/account", "/account/", "/login", "/login/"}
+            or path.startswith("/api/") or path.startswith("/auth/")):
+        response.headers["Cache-Control"] = "no-store"
+        return response
     if path.startswith("/data/") and path.endswith(".json"):
         response.headers["Cache-Control"] = _JSON_CACHE
     elif path.endswith("/") or path.endswith(".html"):
@@ -468,21 +486,27 @@ def load_manual_candidates() -> list[dict]:
 
 
 def _site_header_html(updated: str) -> str:
-    nav_links = "".join(
-        f'<a href="{href}">{escape(label)}</a>'
-        for label, href in SITE_NAV_ITEMS
-    )
+    # Same grouped-dropdown nav as templates/_site_header.html.j2 and the
+    # homepage, so the header is identical on marketing/account/login pages too.
     return f"""<header class="site-header">
     <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
       <nav class="site-nav" aria-label="Site">
-        {nav_links}
+        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/scan/">Scan stack</a><a href="/methodology/">Methodology</a><a href="/badges/">Badges</a><a href="/score-lab/">Score lab</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
       </nav>
-      <div class="site-status" data-updated="{updated}">
-        <span class="live-dot"></span>updated <span class="site-status-value">{updated}</span>
+      <div class="site-header-right">
+        <div class="site-status" data-updated="{updated}">
+          <span class="live-dot"></span>updated <span class="site-status-value">{updated}</span>
+        </div>
+        <div id="hvt-auth-slot" class="hvt-auth-slot"></div>
       </div>
     </div>
-  </header>"""
+  </header>
+  <script defer src="/auth.js?v={_AUTH_JS_VER}"></script>"""
 
 
 def _runtime_git_sha() -> str | None:
@@ -916,10 +940,10 @@ def compare_pair_noslash(pair: str):
 
 @app.api_route("/compare/{pair}/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 def compare_pair(pair: str):
-    # /compare/<a>-vs-<b>/ serves the interactive compare tool with both agents
-    # preselected (the tool reads the slugs from the path). Validate the pair and
-    # keep one canonical URL per pair — alphabetical by slug — so it never 404s or
-    # splits for two tracked agents.
+    # /compare/<a>-vs-<b>/ serves the static pre-rendered comparison page when
+    # one exists (see below), else the interactive tool with both agents
+    # preselected. Validate the pair and keep one canonical URL per pair —
+    # alphabetical by slug — so it never 404s or splits for two tracked agents.
     parts = pair.split("-vs-")
     if len(parts) != 2 or not parts[0] or not parts[1]:
         return JSONResponse({"detail": "Not Found"}, status_code=404)
@@ -932,6 +956,13 @@ def compare_pair(pair: str):
     if slug_a > slug_b:
         return RedirectResponse(f"/compare/{slug_b}-vs-{slug_a}/", status_code=301)
 
+    # Serve the static pre-rendered comparison page when it exists (crawlable
+    # SEO content with the full header/auth widget); fall back to the
+    # interactive tool for ad-hoc pairs that have no generated page.
+    static_pair = os.path.join(OUTPUT_DIR, "compare", f"{slug_a}-vs-{slug_b}", "index.html")
+    if os.path.isfile(static_pair):
+        with open(static_pair, encoding="utf-8") as f:
+            return HTMLResponse(f.read())
     return compare_tool()
 
 
@@ -1114,8 +1145,6 @@ def _marketing_page(
     body {{
       min-height:100vh; color:var(--ink); font:15px/1.65 var(--font-sans);
       background:var(--paper);
-      background-image:url("/hex-bg.svg");
-      background-size:2000px 2000px;
     }}
     a {{ color:inherit; text-decoration:none; }}
     a:hover {{ text-decoration:underline; }}

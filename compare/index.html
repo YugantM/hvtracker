@@ -23,7 +23,7 @@
   <style>
     :root {
       --bg:#f4f1eb;--surface:#eae6de;--border:#d4cfc5;
-      --text:#1a1a1a;--muted:#6b6560;--accent:#2c5282;--accent-warm:#b05a3a;
+      --text:#1a1a1a;--muted:#6b6560;--accent:#26405e;--accent-warm:#b05a3a;
       --green:#2f6846;--amber:#8b6914;--red:#9b3c3c;
       --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
       --sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
@@ -36,8 +36,6 @@
       font-size: 16px;
       line-height: 1.6;
       background: var(--bg);
-      background-image: url("/hex-bg.svg");
-      background-size: 2000px 2000px;
       }
     a { color: inherit; text-decoration: none; }
     a:hover { text-decoration: underline; }
@@ -58,7 +56,7 @@
       font-size: 15px;
       line-height: 1.65;
     }
-    .logo span { color:var(--accent-warm); }
+    .logo span { color:var(--accent); }
     .site-nav a:hover,
     .site-nav a.active {
       color: var(--text);
@@ -128,6 +126,10 @@
       background: var(--bg);
       border: 1px solid var(--border);
     }
+    .chip { cursor: grab; user-select: none; }
+    .chip.dragging { opacity: .45; cursor: grabbing; }
+    .chip.drop-target { outline: 2px dashed var(--accent); outline-offset: 2px; }
+    .chip-grip { color: var(--muted); cursor: grab; letter-spacing: -2px; }
     .chip .remove {
       color: var(--muted);
       cursor: pointer;
@@ -161,76 +163,6 @@
     .suggest-chip:hover { border-style: solid; border-color: var(--accent); background: rgba(0,0,0,0.02); }
     .suggest-chip .plus { color: var(--accent); font-weight: 700; }
     .suggest-chip .sg-score { color: var(--muted); font-family: var(--mono); font-size: 12px; }
-    .watchlist-strip {
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-      display:grid;
-      gap:10px;
-    }
-    .watchlist-head {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-    .watchlist-head strong {
-      font-size:13px;
-      color:var(--text);
-    }
-    .watchlist-head span {
-      color:var(--muted);
-      font-size:12px;
-    }
-    .watchlist-actions {
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-    .watchlist-actions button {
-      padding:8px 12px;
-      border:1px solid var(--border);
-      background:var(--bg);
-      color:var(--muted);
-      font-size:12px;
-      font-family:var(--mono);
-      cursor:pointer;
-    }
-    .watchlist-actions button:hover {
-      color:var(--text);
-      border-color:var(--accent);
-    }
-    .watchlist-saved {
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-    .saved-chip {
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:6px 11px;
-      border:1px solid var(--border);
-      background:var(--bg);
-      color:var(--text);
-      font-size:12px;
-      font-family:var(--mono);
-    }
-    .saved-chip button {
-      border:none;
-      background:none;
-      color:var(--muted);
-      cursor:pointer;
-      font:inherit;
-      padding:0;
-    }
-    .saved-chip button:hover { color: var(--red); }
-    .saved-empty {
-      color:var(--muted);
-      font-size:12px;
-      font-family:var(--mono);
-    }
 
     .suggestions {
       position: absolute;
@@ -736,19 +668,6 @@
       </div>
       <div class="chips" id="chips"></div>
       <div class="suggest" id="suggestRow"></div>
-      <div class="watchlist-strip">
-        <div class="watchlist-head">
-          <div>
-            <strong>Saved watchlist</strong>
-            <span>Keep up to 12 agents saved in this browser and preload up to 3 into compare.</span>
-          </div>
-          <div class="watchlist-actions">
-            <button type="button" id="loadWatchlistBtn">Load saved into compare</button>
-            <button type="button" id="clearWatchlistBtn">Clear saved list</button>
-          </div>
-        </div>
-        <div class="watchlist-saved" id="watchlistSaved"></div>
-      </div>
     </section>
 
     <section class="report" id="reportSection">
@@ -819,7 +738,6 @@
   </div>
 
   <script>
-    const WATCHLIST_KEY = "hvtracker_watchlist_v1";
     let allAgents = [];
     let selected = [];
 
@@ -881,20 +799,6 @@
       return strengthByRepo;
     }
 
-    function loadWatchlist() {
-      try {
-        const raw = localStorage.getItem(WATCHLIST_KEY);
-        const items = raw ? JSON.parse(raw) : [];
-        return Array.isArray(items) ? items : [];
-      } catch (_) {
-        return [];
-      }
-    }
-
-    function saveWatchlist(items) {
-      localStorage.setItem(WATCHLIST_KEY, JSON.stringify(items.slice(0, 12)));
-    }
-
     fetch("/data/latest.json")
       .then((r) => r.json())
       .then((data) => {
@@ -914,13 +818,12 @@
           const pair = location.pathname.replace(/^\/compare\//, "").replace(/\/$/, "").split("-vs-");
           if (pair.length === 2 && pair[0] && pair[1]) names.push(pair[0], pair[1]);
         }
+        // Otherwise, fall back to the saved compare list (built via "Add to compare").
+        if (!names.length) names.push(...loadCompareList());
         names.forEach((name) => {
           const agent = allAgents.find((a) => a.slug === name || a.name.toLowerCase() === name.toLowerCase());
-          if (agent && selected.length < 3) selected.push(agent);
+          if (agent && selected.length < 3 && !selected.find((s) => s.repo === agent.repo)) selected.push(agent);
         });
-        if (!selected.length && params.get("watchlist") === "1") {
-          loadSavedIntoCompare();
-        }
         render();
       })
       .catch(() => {
@@ -999,46 +902,23 @@
       }
     }
 
-    function removeSaved(slug) {
-      saveWatchlist(loadWatchlist().filter((item) => item.slug !== slug));
-      renderSavedWatchlist();
-    }
-
-    function renderSavedWatchlist() {
-      const saved = loadWatchlist();
-      const box = document.getElementById("watchlistSaved");
-      if (!saved.length) {
-        box.innerHTML = '<span class="saved-empty">No saved agents yet. Save them from the leaderboard or an agent profile.</span>';
-        return;
-      }
-      box.innerHTML = saved.map((item) => (
-        `<span class="saved-chip">${escapeHtml(item.name)}<button type="button" onclick="removeSaved('${item.slug}')">×</button></span>`
-      )).join("");
-    }
-
-    function loadSavedIntoCompare() {
-      const saved = loadWatchlist();
-      const picks = [];
-      saved.forEach((item) => {
-        const agent = allAgents.find((a) => a.slug === item.slug || a.repo === item.repo);
-        if (agent && !picks.find((entry) => entry.repo === agent.repo) && picks.length < 3) {
-          picks.push(agent);
-        }
-      });
-      selected = picks;
-      updateURL();
-      render();
-      if (typeof window.hvtTrack === "function") {
-        window.hvtTrack("compare_watchlist_load", {
-          compared_count: selected.length,
-          watchlist_size: saved.length
-        });
-      }
-    }
+    const COMPARE_KEY = "hvtracker_compare_v1";
 
     function updateURL() {
       const slugs = selected.map((a) => a.slug).join(",");
       history.replaceState(null, "", slugs ? `?a=${slugs}` : location.pathname);
+      // Keep the shared compare list in sync so other pages reflect the set.
+      try {
+        localStorage.setItem(COMPARE_KEY,
+          JSON.stringify(selected.map((a) => ({ slug: a.slug, name: a.name, repo: a.repo }))));
+      } catch (_) {}
+    }
+
+    function loadCompareList() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(COMPARE_KEY) || "[]");
+        return Array.isArray(raw) ? raw.map((i) => i.slug || i).filter(Boolean) : [];
+      } catch (_) { return []; }
     }
 
     function escapeHtml(value) {
@@ -1484,13 +1364,44 @@
         : "";
     }
 
+    let dragRepo = null;
+    function wireChipDrag() {
+      document.querySelectorAll("#chips .chip").forEach((chip) => {
+        chip.addEventListener("dragstart", (e) => {
+          dragRepo = chip.getAttribute("data-repo");
+          chip.classList.add("dragging");
+          e.dataTransfer.effectAllowed = "move";
+          try { e.dataTransfer.setData("text/plain", dragRepo); } catch (_) {}
+        });
+        chip.addEventListener("dragend", () => { chip.classList.remove("dragging"); dragRepo = null; });
+        chip.addEventListener("dragover", (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; chip.classList.add("drop-target"); });
+        chip.addEventListener("dragleave", () => chip.classList.remove("drop-target"));
+        chip.addEventListener("drop", (e) => {
+          e.preventDefault();
+          chip.classList.remove("drop-target");
+          const from = dragRepo || (e.dataTransfer && e.dataTransfer.getData("text/plain"));
+          const to = chip.getAttribute("data-repo");
+          if (!from || from === to) return;
+          const fi = selected.findIndex((a) => a.repo === from);
+          const ti = selected.findIndex((a) => a.repo === to);
+          if (fi < 0 || ti < 0) return;
+          const [moved] = selected.splice(fi, 1);
+          selected.splice(ti, 0, moved);
+          updateURL();
+          render();
+          if (typeof window.hvtTrack === "function") window.hvtTrack("compare_reorder", { compared_count: selected.length });
+        });
+      });
+    }
+
     function render() {
       const chips = document.getElementById("chips");
       const empty = document.getElementById("emptyState");
 
       chips.innerHTML = selected.map((agent) => (
-        `<span class="chip">${escapeHtml(agent.name)} <span class="remove" onclick="removeAgent('${agent.repo}')">&times;</span></span>`
+        `<span class="chip" draggable="true" data-repo="${escapeHtml(agent.repo)}" title="Drag to reorder"><span class="chip-grip" aria-hidden="true">⠿</span>${escapeHtml(agent.name)} <span class="remove" onclick="removeAgent('${agent.repo}')">&times;</span></span>`
       )).join("");
+      wireChipDrag();
 
       if (selected.length === 0) {
         empty.style.display = "";
@@ -1510,7 +1421,6 @@
       renderMatrix();
       renderNotes();
       renderCards();
-      renderSavedWatchlist();
       if (selected.length >= 2 && typeof window.hvtTrack === "function") {
         const compareKey = selected.map((agent) => agent.slug).join(",");
         if (render.lastCompareKey !== compareKey) {
@@ -1525,12 +1435,6 @@
       }
     }
 
-    window.removeSaved = removeSaved;
-    document.getElementById("loadWatchlistBtn").addEventListener("click", loadSavedIntoCompare);
-    document.getElementById("clearWatchlistBtn").addEventListener("click", () => {
-      saveWatchlist([]);
-      renderSavedWatchlist();
-    });
   </script>
 </body>
 </html>

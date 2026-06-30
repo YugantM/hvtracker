@@ -65,3 +65,36 @@ CREATE INDEX IF NOT EXISTS submissions_status_idx ON submissions (status);
 CREATE INDEX IF NOT EXISTS corrections_status_idx ON corrections (status);
 CREATE INDEX IF NOT EXISTS interest_signups_kind_idx ON interest_signups (kind);
 CREATE INDEX IF NOT EXISTS interest_signups_repo_idx ON interest_signups (repo);
+
+-- ---- Accounts (GitHub/Google OAuth) + per-user features -------------------
+CREATE TABLE IF NOT EXISTS users (
+    id            BIGSERIAL PRIMARY KEY,
+    provider      TEXT NOT NULL,                 -- github | google | password | dev
+    provider_id   TEXT NOT NULL,                 -- stable provider id (email for password)
+    login         TEXT,                          -- handle (e.g. github login)
+    name          TEXT,
+    email         TEXT,
+    avatar_url    TEXT,
+    password_hash TEXT,                          -- only for provider='password'
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    last_login    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (provider, provider_id)
+);
+-- For DBs created before password auth existed:
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT;
+
+CREATE TABLE IF NOT EXISTS watchlist (
+    user_id      BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    agent_slug   TEXT NOT NULL,
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, agent_slug)
+);
+
+CREATE TABLE IF NOT EXISTS notification_reads (
+    user_id      BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    last_read_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS watchlist_user_idx ON watchlist (user_id);
+-- The "claim your project" feature was removed; its table is no longer created.
+DROP TABLE IF EXISTS claims;

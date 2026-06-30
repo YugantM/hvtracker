@@ -79,7 +79,7 @@
   --border: #d4cfc5;
   --text: #1a1a1a;
   --muted: #57524c;
-  --accent: #2c5282;
+  --accent: #26405e;
   --accent-warm: #b05a3a;
   --green: #2f6846;
   --red: #9b3c3c;
@@ -105,8 +105,6 @@
 
 body {
   background: var(--bg);
-  background-image: url("/hex-bg.svg");
-  background-size: 2000px 2000px;
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 16px;
@@ -129,8 +127,8 @@ a:hover { text-decoration: underline; }
   display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 16px;
 }
 .logo { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text); }
-.logo span { color: var(--accent-warm); }
-.site-nav { font-family: var(--font-mono); font-size: 11px; display: flex; gap: 2px; margin-left: 0; justify-self: center; min-width: 0; }
+.logo span { color: var(--accent); }
+.site-nav { font-family: var(--font-sans); font-size: 13px; font-weight: 500; display: flex; gap: 2px; margin-left: 0; justify-self: center; min-width: 0; }
 .site-nav a { color: var(--muted); padding: 5px 8px; border: 1px solid transparent; white-space: nowrap; }
 .site-nav a:hover { color: var(--text); text-decoration: none; border-color: var(--border); background: var(--surface); }
 /* Grouped nav dropdowns — open on hover or keyboard focus (no JS) */
@@ -143,12 +141,13 @@ a:hover { text-decoration: underline; }
 .nav-panel a { color: var(--muted); padding: 6px 10px; border-radius: 4px; border: 0; white-space: nowrap; }
 .nav-panel a:hover { color: var(--text); background: var(--surface); text-decoration: none; }
 .site-status { font: 12px var(--font-mono); color: var(--muted); margin-left: 0; white-space: nowrap; justify-self: end; }
+.site-header-right { display: flex; align-items: center; gap: 12px; justify-self: end; min-width: 0; }
 .live-dot { display: inline-block; width: 7px; height: 7px; border-radius: 999px; background: var(--green); margin-right: 6px; vertical-align: middle; box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 18%, transparent); }
 
 .evidence-badge { display: inline-block; font-family: var(--font-mono); font-size: 11px; font-weight: 700; width: 20px; text-align: center; padding: 1px 0; border-radius: 3px; letter-spacing: .02em; }
 .badge { display: inline-block; font-family: var(--font-mono); font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 4px; letter-spacing: .02em; }
 .grade-A { color: #fff; background: var(--green); }
-.grade-B { color: #fff; background: var(--accent); }
+.grade-B { color: #fff; background: #2c5282; }
 .grade-C { color: #fff; background: var(--amber); }
 .grade-D { color: #fff; background: var(--muted); }
 
@@ -160,6 +159,7 @@ footer a { color: var(--accent); }
   .site-header-inner { grid-template-columns: 1fr; gap: 4px; }
   .site-nav { justify-self: start; flex-wrap: wrap; }
   .site-status { justify-self: start; }
+  .site-header-right { justify-self: start; }
   /* On mobile, revert to a plain display toggle (no hover-intent delay) so a
      hidden panel never reserves vertical space, and open dropdowns stack inline. */
   .nav-panel { display: none; opacity: 1; visibility: visible; transition: none; }
@@ -186,3 +186,50 @@ a:hover { text-underline-offset: 3px; text-decoration-thickness: 1px; }
 .nav-panel { box-shadow: 0 12px 30px -12px rgba(31, 27, 23, .4); }
 .nav-panel a:hover { transform: translateX(2px); }
 .badge, .evidence-badge { box-shadow: 0 1px 2px rgba(31, 27, 23, .12); }
+
+/* ---- Auth pages (/login, /account) + header sign-in button ---- */
+.hvt-auth-signin { text-decoration: none; }
+.hvt-auth-signin:hover { text-decoration: none; }
+.auth-card { max-width: 420px; margin: 8px auto 0; padding: 28px 26px; border: 1px solid var(--line);
+  background: #fff; box-shadow: 0 18px 50px -28px rgba(31, 27, 23, .35); }
+.auth-lede { color: var(--muted); margin-bottom: 18px; }
+.auth-providers { display: grid; gap: 10px; margin: 18px 0; }
+.auth-ic { flex-shrink: 0; }
+.auth-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 12px 16px; border: 1px solid var(--line); background: #fff; color: var(--ink);
+  font: 600 14px var(--font-sans); cursor: pointer; text-decoration: none; transition: border-color .12s, transform .04s; }
+.auth-btn:active { transform: translateY(1px); }
+.auth-btn:hover { text-decoration: none; border-color: var(--lobster); }
+.auth-btn--github { background: #1f2328; color: #fff; border-color: #1f2328; }
+.auth-btn--github:hover { background: #000; border-color: #000; }
+.auth-btn--google { background: #fff; }
+.auth-btn--dev { background: var(--paper-2); font-family: var(--font-mono); font-weight: 400; }
+.auth-btn--ghost { background: none; padding: 7px 12px; font-size: 13px; font-weight: 400; }
+.auth-btn--primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.auth-btn--primary:hover { filter: brightness(1.08); border-color: var(--accent); }
+.auth-divider { display: flex; align-items: center; gap: 10px; margin: 18px 0 14px; color: var(--muted); font-size: 12px; }
+.auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.auth-form { display: grid; gap: 12px; }
+.auth-field { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+.auth-field input { padding: 10px 12px; border: 1px solid var(--line); background: #fff; font: 14px var(--font-sans); color: var(--ink); }
+.auth-field input:focus { outline: none; border-color: var(--lobster); }
+.auth-form-actions { display: flex; gap: 10px; margin-top: 4px; }
+.auth-form-actions .auth-btn { flex: 1; }
+.auth-error { color: #9b3c3c; background: #f7eceb; border: 1px solid #d9aaaa; padding: 9px 12px; font-size: 13px; margin: 0 0 14px; }
+.auth-fineprint { color: var(--muted); font-size: 13px; margin-top: 10px; }
+.auth-note { color: var(--muted); font-size: 14px; }
+.account-head { display: flex; align-items: center; gap: 14px; padding: 4px 0 18px;
+  border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+.account-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+.account-id { display: flex; flex-direction: column; gap: 2px; }
+.account-id strong { font-size: 18px; }
+.account-muted { color: var(--muted); font-size: 13px; font-family: var(--font-mono); }
+.account-signout { margin-left: auto; }
+.account h3 { margin: 22px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.account-count { color: var(--lobster); }
+.account-list { list-style: none; padding: 0; display: grid; gap: 6px; }
+.account-list li { padding: 9px 12px; border: 1px solid var(--line); background: #fff; display: flex; align-items: center; gap: 10px; }
+.account-item-name { font-weight: 600; }
+.account-remove { margin-left: auto; background: none; border: 1px solid var(--line); color: var(--muted);
+  font: 12px var(--font-mono); padding: 4px 10px; cursor: pointer; }
+.account-remove:hover { border-color: var(--lobster); color: var(--lobster); }
