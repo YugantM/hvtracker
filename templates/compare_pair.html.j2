@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="s2YUWbGP7cJsI6HUCKRX9YCtbVJVyA1Q1_jsNWj1RHc">
+  <title>{{ a.name }} vs {{ b.name }}: AI agent trust comparison | HVTracker</title>
+  <meta name="description" content="{{ a.name }} vs {{ b.name }}: an independent, evidence-based trust comparison — HVTrust score, grade, supply-chain provenance, OSSF Scorecard, and the five trust dimensions, side by side.">
+  <link rel="canonical" href="https://hvtracker.net/compare/{{ a.slug }}-vs-{{ b.slug }}/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ a.name }} vs {{ b.name }} — AI agent trust comparison">
+  <meta property="og:description" content="Side-by-side trust signals for {{ a.name }} and {{ b.name }}: HVTrust score, grade, provenance, and maintenance — from public, checkable data.">
+  <meta property="og:url" content="https://hvtracker.net/compare/{{ a.slug }}-vs-{{ b.slug }}/">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ a.name }} vs {{ b.name }} — AI agent trust comparison">
+  <meta name="twitter:description" content="Side-by-side trust signals for {{ a.name }} and {{ b.name }} on HVTracker.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
+  <style>
+    .page { max-width: 900px; padding: 0 24px 52px; }
+    .cmp-crumb { font-family: var(--font-mono); font-size: 12px; color: var(--muted); padding: 16px 0 0; }
+    .cmp-crumb a { color: var(--muted); }
+    .cmp-crumb a:hover { color: var(--accent); }
+    .cmp-hero { padding: 14px 0 18px; border-bottom: 1px solid var(--border); }
+    .cmp-hero h1 { font-size: 30px; line-height: 1.15; letter-spacing: -.5px; }
+    .cmp-hero p { color: var(--muted); font-size: 16px; line-height: 1.6; margin-top: 10px; max-width: 680px; }
+    .cmp-verdict { margin: 20px 0; padding: 14px 16px; border: 1px solid var(--border); border-left: 3px solid var(--accent); background: var(--surface); font-size: 15px; line-height: 1.55; }
+    .cmp-verdict strong { color: var(--accent); }
+    table.cmp { width: 100%; border-collapse: collapse; margin: 8px 0 4px; font-size: 15px; border-top: 2px solid var(--text); }
+    table.cmp th, table.cmp td { padding: 11px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: middle; }
+    table.cmp thead th { font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+    table.cmp thead th.col-agent a { font-weight: 600; color: var(--text); font-size: 15px; text-transform: none; letter-spacing: 0; }
+    table.cmp thead th.col-agent a:hover { color: var(--accent); }
+    table.cmp thead th .repo { display: block; font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+    table.cmp td.metric { color: var(--muted); font-size: 13px; }
+    table.cmp td.val { font-family: var(--font-mono); }
+    table.cmp td.lead { font-weight: 700; color: var(--accent); }
+    table.cmp td.lead::after { content: " \2713"; font-size: 11px; }
+    .dim-head td { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); padding-top: 18px; border-bottom: none; }
+    .cmp-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 22px 0; }
+    .cmp-actions a { font-family: var(--font-mono); font-size: 13px; padding: 9px 14px; border: 1px solid var(--border); color: var(--text); }
+    .cmp-actions a.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .cmp-actions a:hover { border-color: var(--accent); text-decoration: none; }
+    .cmp-note { font-size: 13px; color: var(--muted); line-height: 1.6; padding: 14px 0; border-top: 1px solid var(--border); }
+    @media (max-width: 640px) { .cmp-hero h1 { font-size: 23px; } table.cmp { font-size: 13px; } }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Compare", "item": "https://hvtracker.net/compare/" },
+      { "@type": "ListItem", "position": 3, "name": "{{ a.name }} vs {{ b.name }}" }
+    ]
+  }
+  </script>
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
+  <script defer src="/static/site-status.js"></script>
+</head>
+<body data-page-type="compare_pair">
+  {% include "_site_header.html.j2" %}
+  <div class="page">
+    <div class="cmp-crumb"><a href="/">Registry</a> &rsaquo; <a href="/compare/">Compare</a> &rsaquo; {{ a.name }} vs {{ b.name }}</div>
+    <div class="cmp-hero">
+      <h1>{{ a.name }} vs {{ b.name }}</h1>
+      <p>An independent, evidence-based trust comparison of {{ a.name }} and {{ b.name }}, two {{ category.name }} projects in the HVTracker registry. Scores come from public, checkable signals — supply-chain provenance, OSSF Scorecard, maintenance, and adoption — not popularity.</p>
+    </div>
+
+    <div class="cmp-verdict">
+      {% if lead_name %}<strong>{{ lead_name }}</strong> leads on trust — {{ lead_score }}/100 (Grade {{ lead_grade }}) vs {{ trail_score }}/100 (Grade {{ trail_grade }}), a {{ gap }}-point gap.{% else %}{{ a.name }} and {{ b.name }} are tied on HVTrust at {{ a.trust_score }}/100.{% endif %} Full breakdown below.
+    </div>
+
+    <table class="cmp">
+      <thead>
+        <tr>
+          <th>Signal</th>
+          <th class="col-agent"><a href="/agents/{{ a.slug }}/">{{ a.name }}</a><span class="repo">{{ a.repo }}</span></th>
+          <th class="col-agent"><a href="/agents/{{ b.slug }}/">{{ b.name }}</a><span class="repo">{{ b.repo }}</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in metrics %}
+        <tr>
+          <td class="metric">{{ m.label }}</td>
+          {% if m.grade %}
+          <td class="val{% if m.lead == 'a' %} lead{% endif %}"><span class="badge grade-{{ a.evidence_grade }}">{{ a.evidence_grade }}</span></td>
+          <td class="val{% if m.lead == 'b' %} lead{% endif %}"><span class="badge grade-{{ b.evidence_grade }}">{{ b.evidence_grade }}</span></td>
+          {% else %}
+          <td class="val{% if m.lead == 'a' %} lead{% endif %}">{{ m.a }}</td>
+          <td class="val{% if m.lead == 'b' %} lead{% endif %}">{{ m.b }}</td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+        <tr class="dim-head"><td colspan="3">Trust dimensions (points earned)</td></tr>
+        {% for d in dims %}
+        <tr>
+          <td class="metric">{{ d.label }} <span style="color:var(--muted);font-family:var(--font-mono);font-size:11px">/ {{ d.max }}</span></td>
+          <td class="val{% if d.lead == 'a' %} lead{% endif %}">{{ d.a }}</td>
+          <td class="val{% if d.lead == 'b' %} lead{% endif %}">{{ d.b }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="cmp-actions">
+      <a class="primary" href="/compare/?a={{ a.slug }},{{ b.slug }}">Open in the live compare tool &rarr;</a>
+      <a href="/agents/{{ a.slug }}/">{{ a.name }} profile</a>
+      <a href="/agents/{{ b.slug }}/">{{ b.name }} profile</a>
+      <a href="/?cat={{ category.slug }}">More {{ category.name }} &rarr;</a>
+    </div>
+
+    <p class="cmp-note">How to read this: HVTrust (0–100) weighs supply-chain signals (provenance, OSSF Scorecard, signed commits, open license) alongside real-world adoption, scaled by an evidence-confidence factor. Grade bands: A ≥ 80, B ≥ 65, C ≥ 50, D &lt; 50. Signals refresh daily. <a href="/methodology/" style="color:var(--accent)">Full methodology {{ methodology_version }} &rarr;</a></p>
+
+    <footer>
+      <a href="/">Registry</a> · <a href="/compare/">Compare</a> · <a href="/methodology/">Methodology</a> · Updated {{ updated }}
+    </footer>
+  </div>
+</body>
+</html>

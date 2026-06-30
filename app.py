@@ -941,10 +941,10 @@ def compare_pair_noslash(pair: str):
 
 @app.api_route("/compare/{pair}/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 def compare_pair(pair: str):
-    # /compare/<a>-vs-<b>/ serves the interactive compare tool with both agents
-    # preselected (the tool reads the slugs from the path). Validate the pair and
-    # keep one canonical URL per pair — alphabetical by slug — so it never 404s or
-    # splits for two tracked agents.
+    # /compare/<a>-vs-<b>/ serves the static pre-rendered comparison page when
+    # one exists (see below), else the interactive tool with both agents
+    # preselected. Validate the pair and keep one canonical URL per pair —
+    # alphabetical by slug — so it never 404s or splits for two tracked agents.
     parts = pair.split("-vs-")
     if len(parts) != 2 or not parts[0] or not parts[1]:
         return JSONResponse({"detail": "Not Found"}, status_code=404)
@@ -957,6 +957,13 @@ def compare_pair(pair: str):
     if slug_a > slug_b:
         return RedirectResponse(f"/compare/{slug_b}-vs-{slug_a}/", status_code=301)
 
+    # Serve the static pre-rendered comparison page when it exists (crawlable
+    # SEO content with the full header/auth widget); fall back to the
+    # interactive tool for ad-hoc pairs that have no generated page.
+    static_pair = os.path.join(OUTPUT_DIR, "compare", f"{slug_a}-vs-{slug_b}", "index.html")
+    if os.path.isfile(static_pair):
+        with open(static_pair, encoding="utf-8") as f:
+            return HTMLResponse(f.read())
     return compare_tool()
 
 
