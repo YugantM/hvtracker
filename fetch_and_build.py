@@ -5540,24 +5540,33 @@ def main() -> None:
             shutil.rmtree(os.path.join(compare_dir, _d), ignore_errors=True)
 
     def _cmp_lead(av, bv, higher=True):
-        if av is None and bv is None: return "none"
-        if av is None: return "b"
-        if bv is None: return "a"
-        if av == bv: return "none"
-        if higher: return "a" if av > bv else "b"
+        if av is None and bv is None:
+            return "none"
+        if av is None:
+            return "b"
+        if bv is None:
+            return "a"
+        if av == bv:
+            return "none"
+        if higher:
+            return "a" if av > bv else "b"
         return "a" if av < bv else "b"
     def _cmp_fresh(r):
         d = r.get("days_ago")
-        if d is None: return "—"
+        if d is None:
+            return "—"
         return "today" if d == 0 else f"{d}d ago"
     def _cmp_sc(r):
         v = r.get("scorecard_score")
         return f"{v:.1f} / 10" if v is not None else "—"
     def _cmp_dl(r):
         v = r.get("weekly_downloads")
-        if not v: return "—"
-        if v >= 1_000_000: return f"{v/1_000_000:.1f}M/wk"
-        if v >= 1000: return f"{v/1000:.0f}k/wk"
+        if not v:
+            return "—"
+        if v >= 1_000_000:
+            return f"{v/1_000_000:.1f}M/wk"
+        if v >= 1000:
+            return f"{v/1000:.0f}k/wk"
         return f"{v}/wk"
     def _cmp_r1(v):
         return f"{v:.1f}" if isinstance(v, (int, float)) else "—"
