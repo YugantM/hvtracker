@@ -12,9 +12,9 @@ The core question is simple:
 
 ---
 
-## Version 3.2
+## Version 3.1
 
-HVTracker v3.2 ships public runtime-trust discovery fields on agent profiles, a local score-lab preview for experimental ranking calibration, corrected multi-source package coverage, and refreshed methodology/roadmap documentation.
+HVTracker v3.1 adds real accounts and sign-in (GitHub / Google OAuth), separates your watchlist from the side-by-side compare tray (with drag-to-reorder), refreshes the whole site with an ink-navy theme, and expands crawlable static comparison pages at `/compare/<a>-vs-<b>/`.
 
 ---
 
