@@ -2237,6 +2237,40 @@ def compute_weekly_changes(history: list[dict]) -> dict:
     }
 
 
+def build_changes_rss(sections: list[tuple[str, list[dict]]], base: str, pub_date: str) -> str:
+    """Render the /changes/ RSS 2.0 feed from weekly-change sections.
+
+    Text drawn from agent data (project names) is XML-escaped so a name
+    containing ``&``/``<``/``>`` (e.g. "Weights & Biases Weave") produces a
+    valid feed instead of malformed XML. Sections with no items are omitted.
+    """
+    items_xml = []
+    for title, items in sections:
+        if not items:
+            continue
+        names = ", ".join(i["name"] for i in items[:10])
+        items_xml.append(
+            "    <item>\n"
+            f"      <title>{escape(f'{title} ({len(items)}) — {pub_date}')}</title>\n"
+            f"      <link>{escape(base)}</link>\n"
+            f"      <description>{escape(names)}</description>\n"
+            f"      <pubDate>{escape(pub_date)}</pubDate>\n"
+            "    </item>"
+        )
+    body = ("\n".join(items_xml) + "\n") if items_xml else ""
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<rss version="2.0">\n'
+        "  <channel>\n"
+        "    <title>HVTracker Weekly Changes</title>\n"
+        f"    <link>{escape(base)}</link>\n"
+        "    <description>Weekly diff of the HVTracker AI agent registry.</description>\n"
+        + body
+        + "  </channel>\n"
+        "</rss>\n"
+    )
+
+
 def compute_sparklines(history: list[dict]) -> dict[str, list[dict]]:
     """Build per-agent rank history for sparkline rendering.
     Returns {repo_lower: [{date, rank, score}, ...]}."""
@@ -5428,9 +5462,7 @@ def main() -> None:
     with open(os.path.join(changes_dir, "index.html"), "w", encoding="utf-8") as f:
         f.write(changes_tmpl.render(updated=now_str, **weekly))
 
-    rss_items = []
     base = "https://hvtracker.net/changes/"
-    pub_date = weekly["latest_date"]
     sections = [
         ("Newly Listed Projects", weekly["newly_listed"]),
         ("Trust Score Up", weekly["trust_up"]),
@@ -5438,28 +5470,7 @@ def main() -> None:
         ("Provenance Gained", weekly["provenance_gained"]),
         ("MCP Support Gained", weekly["mcp_gained"]),
     ]
-    for title, items in sections:
-        if items:
-            names = ", ".join(i["name"] for i in items[:10])
-            rss_items.append(
-                f"    <item>\n"
-                f"      <title>{title} ({len(items)}) — {pub_date}</title>\n"
-                f"      <link>{base}</link>\n"
-                f"      <description>{names}</description>\n"
-                f"      <pubDate>{pub_date}</pubDate>\n"
-                f"    </item>"
-            )
-    rss_xml = (
-        '<?xml version="1.0" encoding="UTF-8"?>\n'
-        '<rss version="2.0">\n'
-        '  <channel>\n'
-        '    <title>HVTracker Weekly Changes</title>\n'
-        f'    <link>{base}</link>\n'
-        '    <description>Weekly diff of the HVTracker AI agent registry.</description>\n'
-        + "\n".join(rss_items) + "\n"
-        '  </channel>\n'
-        '</rss>\n'
-    )
+    rss_xml = build_changes_rss(sections, base, weekly["latest_date"])
     with open(os.path.join(changes_dir, "feed.xml"), "w", encoding="utf-8") as f:
         f.write(rss_xml)
     print("Built changes page and RSS feed under changes/.")
