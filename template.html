@@ -443,16 +443,23 @@
       object-fit: contain;
       border-radius: 6px;
     }
-    .movers { padding: 10px 0; border-bottom: 1px solid var(--border); }
-    .movers-title { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .movers-row { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 12px; }
-    .mover { display: flex; align-items: center; gap: 4px; color: var(--text); }
+    .movers { display: flex; align-items: center; gap: 14px; padding: 9px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; }
+    .movers-title { flex: none; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .movers-viewport { flex: 1; min-width: 0; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); }
+    .movers-row { display: flex; gap: 22px; width: max-content; font-family: var(--font-mono); font-size: 12px; animation: ticker-scroll 70s linear infinite; }
+    .movers:hover .movers-row { animation-play-state: paused; }
+    .mover { display: flex; align-items: center; gap: 5px; color: var(--text); white-space: nowrap; }
     .mover:hover { text-decoration: none; color: var(--accent); }
     .mover-arrow { font-weight: 700; }
     .mover-up .mover-arrow { color: var(--green); }
     .mover-down .mover-arrow { color: var(--red); }
-    .mover-name { }
     .mover-rank { color: var(--muted); font-size: 11px; }
+    @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) {
+      .movers-viewport { -webkit-mask-image: none; mask-image: none; }
+      .movers-row { animation: none; flex-wrap: wrap; width: auto; }
+      .mover-dup { display: none; }
+    }
 
     .formula { font-size: 12px; color: var(--muted); padding: 6px 0; font-family: var(--font-mono); }
     .formula strong { color: var(--text); }
@@ -627,23 +634,27 @@
     </div>
 
     {% if movers and (movers.up or movers.down) %}
-    <div class="movers">
+    <div class="movers" aria-label="Daily rank movers vs. yesterday">
       <span class="movers-title">Daily movers</span>
-      <div class="movers-row">
-        {% for m in movers.up %}
-        <a href="/agents/{{ m.slug }}/" class="mover mover-up">
-          <span class="mover-arrow">▲{{ m.delta }}</span>
-          <span class="mover-name">{{ m.name }}</span>
-          <span class="mover-rank">#{{ m.rank }}</span>
-        </a>
-        {% endfor %}
-        {% for m in movers.down %}
-        <a href="/agents/{{ m.slug }}/" class="mover mover-down">
-          <span class="mover-arrow">▼{{ m.delta|abs }}</span>
-          <span class="mover-name">{{ m.name }}</span>
-          <span class="mover-rank">#{{ m.rank }}</span>
-        </a>
-        {% endfor %}
+      <div class="movers-viewport">
+        <div class="movers-row">
+          {% for pass in [1, 2] %}
+          {% for m in movers.up %}
+          <a href="/agents/{{ m.slug }}/" class="mover mover-up{% if pass == 2 %} mover-dup{% endif %}"{% if pass == 2 %} aria-hidden="true" tabindex="-1"{% endif %}>
+            <span class="mover-arrow">▲{{ m.delta }}</span>
+            <span class="mover-name">{{ m.name }}</span>
+            <span class="mover-rank">#{{ m.rank }}</span>
+          </a>
+          {% endfor %}
+          {% for m in movers.down %}
+          <a href="/agents/{{ m.slug }}/" class="mover mover-down{% if pass == 2 %} mover-dup{% endif %}"{% if pass == 2 %} aria-hidden="true" tabindex="-1"{% endif %}>
+            <span class="mover-arrow">▼{{ m.delta|abs }}</span>
+            <span class="mover-name">{{ m.name }}</span>
+            <span class="mover-rank">#{{ m.rank }}</span>
+          </a>
+          {% endfor %}
+          {% endfor %}
+        </div>
       </div>
     </div>
     {% endif %}
