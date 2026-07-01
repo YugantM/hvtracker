@@ -444,9 +444,13 @@
       border-radius: 6px;
     }
     .movers { display: flex; align-items: center; gap: 14px; padding: 9px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; }
-    .movers-title { flex: none; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .movers + .movers { border-top: 0; }
+    .movers-title { flex: none; min-width: 96px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .movers-gainers .movers-title { color: var(--green); }
+    .movers-losers .movers-title { color: var(--red); }
     .movers-viewport { flex: 1; min-width: 0; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); }
     .movers-row { display: flex; gap: 22px; width: max-content; font-family: var(--font-mono); font-size: 12px; animation: ticker-scroll 70s linear infinite; }
+    .movers-losers .movers-row { animation-direction: reverse; }
     .movers:hover .movers-row { animation-play-state: paused; }
     .mover { display: flex; align-items: center; gap: 5px; color: var(--text); white-space: nowrap; }
     .mover:hover { text-decoration: none; color: var(--accent); }
@@ -633,9 +637,9 @@
       <span class="cat-clear" id="catClear">✕ Clear filters</span>
     </div>
 
-    {% if movers and (movers.up or movers.down) %}
-    <div class="movers" aria-label="Daily rank movers vs. yesterday">
-      <span class="movers-title">Daily movers</span>
+    {% if movers and movers.up %}
+    <div class="movers movers-gainers" aria-label="Daily gainers vs. yesterday">
+      <span class="movers-title">Daily gainers</span>
       <div class="movers-viewport">
         <div class="movers-row">
           {% for pass in [1, 2] %}
@@ -646,6 +650,17 @@
             <span class="mover-rank">#{{ m.rank }}</span>
           </a>
           {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% if movers and movers.down %}
+    <div class="movers movers-losers" aria-label="Daily losers vs. yesterday">
+      <span class="movers-title">Daily losers</span>
+      <div class="movers-viewport">
+        <div class="movers-row">
+          {% for pass in [1, 2] %}
           {% for m in movers.down %}
           <a href="/agents/{{ m.slug }}/" class="mover mover-down{% if pass == 2 %} mover-dup{% endif %}"{% if pass == 2 %} aria-hidden="true" tabindex="-1"{% endif %}>
             <span class="mover-arrow">▼{{ m.delta|abs }}</span>
