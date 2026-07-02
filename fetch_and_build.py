@@ -1124,6 +1124,7 @@ def detect_package_provenance_drift(
         normalized = _normalize_github_repo_url(repo_value)
         checks.append(("crates.io", crate_package, normalized, repo_value))
 
+    expected_owner = expected.split("/", 1)[0]
     evidence: list[str] = []
     match_count = 0
     mismatch_count = 0
@@ -1135,6 +1136,12 @@ def detect_package_provenance_drift(
         elif normalized == expected:
             match_count += 1
             evidence.append(f"{source} package '{package_name}' points to the tracked repo")
+        elif normalized and normalized.split("/", 1)[0] == expected_owner:
+            # Same GitHub owner/org, different repo name — a JS/Python split, a
+            # rename, or a monorepo carve-out, not evidence the package was
+            # hijacked. Score as inconclusive, not as a red flag.
+            unknown_count += 1
+            evidence.append(f"{source} package '{package_name}' points to {normalized} (same owner as {expected}, not treated as drift)")
         elif normalized:
             mismatch_count += 1
             evidence.append(f"{source} package '{package_name}' points to {normalized}, not {expected}")

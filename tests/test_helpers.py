@@ -291,6 +291,43 @@ def test_detect_package_provenance_drift_match_and_warning():
     assert warning["confidence"] == "high"
 
 
+def test_detect_package_provenance_drift_same_owner_is_not_a_warning():
+    """A same-owner/different-repo package (JS split, rename, monorepo carve-out)
+    is not evidence of hijack — it should not carry the -5.0 warning penalty.
+    Regression for the T3.1 false-positive fix (langchain-ai/langgraphjs case)."""
+    # Only a same-owner variant, no other check -> inconclusive, not a warning.
+    same_owner_only = fb.detect_package_provenance_drift(
+        "langchain-ai/langgraph",
+        npm_package="@langchain/langgraph",
+        npm_metadata={"repository": {"url": "https://github.com/langchain-ai/langgraphjs"}},
+    )
+    assert same_owner_only["status"] == "unknown"
+    assert "same owner" in same_owner_only["evidence"][0]
+
+    # Same-owner variant on one check, tracked-repo match on another -> partial,
+    # not warning (the ECC-adjacent, LangGraph-shaped case).
+    mixed = fb.detect_package_provenance_drift(
+        "langchain-ai/langgraph",
+        npm_package="@langchain/langgraph",
+        npm_metadata={"repository": {"url": "https://github.com/langchain-ai/langgraphjs"}},
+        pypi_package="langgraph",
+        pypi_metadata={"info": {"project_urls": {"Source": "https://github.com/langchain-ai/langgraph"}}},
+    )
+    assert mixed["status"] == "partial"
+
+    # A genuine different-owner mismatch must still warn even when a same-owner
+    # variant is also present elsewhere -- one real red flag should not be
+    # diluted by an unrelated inconclusive check.
+    still_warns = fb.detect_package_provenance_drift(
+        "strands-agents/sdk-python",
+        npm_package="strands",
+        npm_metadata={"repository": {"url": "https://github.com/mulesoft-labs/node-strands"}},
+        pypi_package="strands-agents",
+        pypi_metadata={"info": {"project_urls": {"Source": "https://github.com/strands-agents/sdk-python"}}},
+    )
+    assert still_warns["status"] == "warning"
+
+
 def test_normalize_github_repo_url_variants():
     assert fb._normalize_github_repo_url("git+https://github.com/OpenAI/Codex.git") == "openai/codex"
     assert fb._normalize_github_repo_url("git@github.com:OpenAI/Codex.git") == "openai/codex"
