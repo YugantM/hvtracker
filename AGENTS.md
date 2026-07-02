@@ -63,6 +63,7 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
 
 ## Now / next (update as milestones ship)
 - Plan: `docs/product-plan-2026-h2.md`. v3.2 (Retention & Freshness) underway:
-  T2.1 ✅ #81 · T2.2 ✅ #82 · ticker ✅ #83 (merged, NOT yet deployed).
-- Next: T2.3 deterministic weekly trust-snapshot post (no LLM v1); Cloudflare
-  HTML/JSON edge-cache rule (user's dashboard task); GSC page-2 metadata pass.
+  T2.1 ✅ #81 · T2.2 ✅ #82 · ticker ✅ #83 · T2.3 ✅ (weekly snapshot posts,
+  deterministic, render-derived — no cron needed). Merged, NOT yet deployed.
+- Next: Cloudflare HTML/JSON edge-cache rule (user's dashboard task); GSC
+  page-2 metadata pass (needs user's Search Console export).
