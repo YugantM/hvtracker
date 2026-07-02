@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ post.title }} | HVTracker</title>
+  <meta name="description" content="{{ post.excerpt }}">
+  <link rel="canonical" href="https://hvtracker.net/blog/{{ post.slug }}/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ post.title }}">
+  <meta property="og:description" content="{{ post.excerpt }}">
+  <meta property="og:url" content="https://hvtracker.net/blog/{{ post.slug }}/">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ post.title }}">
+  <meta name="twitter:description" content="{{ post.excerpt }}">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": {{ post.title | tojson }},
+    "description": {{ post.excerpt | tojson }},
+    "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "publisher": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "datePublished": "{{ post.date_iso }}",
+    "dateModified": "{{ post.date_iso }}",
+    "mainEntityOfPage": "https://hvtracker.net/blog/{{ post.slug }}/"
+  }
+  </script>
+  <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--paper:#f4f1eb;--ink:#1f1b17;--muted:#6f665d;--line:#d5cbbc;--lobster:#c67c6d;--green:#2f6846;--red:#9b3c3c;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}
+    body{background:var(--paper);color:var(--ink);font:17px/1.7 var(--font-sans)}
+    a{color:inherit}
+    .page{max-width:760px;margin:0 auto;padding:24px 24px 56px}
+    .logo{font-family:var(--font-mono);font-weight:700;font-size:20px;text-decoration:none}.logo span{color:var(--lobster)}
+    .crumb{font:12px var(--font-mono);color:var(--muted);margin:18px 0 26px}
+    h1{font-size:32px;line-height:1.15;letter-spacing:-.02em;margin-bottom:10px}
+    .meta{font:13px var(--font-mono);color:var(--muted);margin-bottom:26px}
+    h2{font-size:21px;margin:34px 0 12px}
+    p{margin:0 0 16px}
+    table{width:100%;border-collapse:collapse;font-size:14px;margin:0 0 10px}
+    th{font:11px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:6px 10px 6px 0;border-bottom:1px solid var(--line)}
+    td{padding:7px 10px 7px 0;border-bottom:1px solid var(--line)}
+    .up{color:var(--green);font-family:var(--font-mono);font-weight:600}
+    .down{color:var(--red);font-family:var(--font-mono);font-weight:600}
+    .foot{margin-top:38px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+  </style>
+</head>
+<body>
+<div class="page">
+  <a class="logo" href="/">HV<span>Tracker</span></a>
+  <div class="crumb"><a href="/blog/">Blog</a> / Weekly trust snapshot</div>
+  <article>
+    <h1>{{ post.title }}</h1>
+    <div class="meta">{{ post.date_display }} · registry snapshot {{ post.baseline_date }} → {{ post.date_iso }} · {{ post.total_agents }} agents tracked</div>
+
+    <p>Every week HVTracker diffs its registry snapshots and publishes what actually
+    changed: trust-score moves of 3+ points, new listings, and gained provenance or
+    MCP support. This edition compares the {{ post.baseline_date }} and
+    {{ post.date_iso }} snapshots — {{ post.counts.trust_up }} gains,
+    {{ post.counts.trust_down }} declines, {{ post.counts.newly_listed }} new
+    listings, {{ post.counts.provenance_gained }} provenance and
+    {{ post.counts.mcp_gained }} MCP additions. Every figure below is generated
+    directly from those snapshots.</p>
+
+    {% if post.trust_up %}
+    <h2>Trust score up ({{ post.counts.trust_up }})</h2>
+    <table><tr><th>Agent</th><th>HVTrust</th><th>Change</th></tr>
+    {% for i in post.trust_up %}
+    <tr><td><a href="/agents/{{ i.slug }}/">{{ i.name }}</a></td>
+        <td>{{ i.old_score }} → {{ i.new_score }}</td>
+        <td class="up">+{{ i.delta }}</td></tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+
+    {% if post.trust_down %}
+    <h2>Trust score down ({{ post.counts.trust_down }})</h2>
+    <table><tr><th>Agent</th><th>HVTrust</th><th>Change</th></tr>
+    {% for i in post.trust_down %}
+    <tr><td><a href="/agents/{{ i.slug }}/">{{ i.name }}</a></td>
+        <td>{{ i.old_score }} → {{ i.new_score }}</td>
+        <td class="down">{{ i.delta }}</td></tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+
+    {% if post.newly_listed %}
+    <h2>Newly listed ({{ post.counts.newly_listed }})</h2>
+    <table><tr><th>Agent</th><th>Category</th><th>HVTrust</th></tr>
+    {% for i in post.newly_listed %}
+    <tr><td><a href="/agents/{{ i.slug }}/">{{ i.name }}</a></td>
+        <td>{{ i.category }}</td><td>{{ i.trust_score }}</td></tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+
+    {% if post.provenance_gained %}
+    <h2>Provenance gained ({{ post.counts.provenance_gained }})</h2>
+    <table><tr><th>Agent</th><th>Category</th></tr>
+    {% for i in post.provenance_gained %}
+    <tr><td><a href="/agents/{{ i.slug }}/">{{ i.name }}</a></td><td>{{ i.category }}</td></tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+
+    {% if post.mcp_gained %}
+    <h2>MCP support gained ({{ post.counts.mcp_gained }})</h2>
+    <table><tr><th>Agent</th><th>Category</th><th>Status</th></tr>
+    {% for i in post.mcp_gained %}
+    <tr><td><a href="/agents/{{ i.slug }}/">{{ i.name }}</a></td>
+        <td>{{ i.category }}</td><td>{{ i.mcp_status }}</td></tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+
+    <div class="foot">
+      Generated automatically from the {{ post.baseline_date }} and {{ post.date_iso }}
+      registry snapshots — no numbers in this post are estimated or written by hand.
+      Method: <a href="/methodology/">HVTrust methodology</a> ·
+      live diff: <a href="/changes/">what changed this week</a> ·
+      feed: <a href="/changes/feed.xml">RSS</a>.
+    </div>
+  </article>
+</div>
+</body>
+</html>

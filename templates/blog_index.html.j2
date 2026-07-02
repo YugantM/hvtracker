@@ -94,6 +94,20 @@
       </article>
     </div>
 
+    {% if snapshot_posts %}
+    <div class="section-title">Weekly Trust Snapshots</div>
+    <div class="post-grid">
+      {% for p in snapshot_posts %}
+      <article class="post-card">
+        <h2><a href="/blog/{{ p.slug }}/">{{ p.title }}</a></h2>
+        <div class="post-meta">{{ p.date_display }} &middot; auto-generated from registry snapshots</div>
+        <p class="post-excerpt">{{ p.excerpt }}</p>
+        <a href="/blog/{{ p.slug }}/" class="read-more">Read snapshot &rarr;</a>
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+
     <div class="section-title">Trend Reports</div>
     <div class="post-grid">
       <article class="post-card">

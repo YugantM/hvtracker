@@ -2181,7 +2181,14 @@ def compute_weekly_changes(history: list[dict]) -> dict:
                 datetime.strptime(snap["_date"], "%Y-%m-%d")).days >= 7:
             target_idx = i
     baseline = history[target_idx]
+    sections = diff_snapshots(baseline, latest)
+    sections["latest_date"] = latest["_date"]
+    sections["baseline_date"] = baseline["_date"]
+    return sections
 
+
+def diff_snapshots(baseline: dict, latest: dict) -> dict:
+    """Diff two history snapshots into the weekly-changes sections."""
     old_by_repo = {a["repo"].lower(): a for a in baseline.get("agents", [])}
     new_by_repo = {a["repo"].lower(): a for a in latest.get("agents", [])}
 
@@ -2227,14 +2234,66 @@ def compute_weekly_changes(history: list[dict]) -> dict:
     newly_listed.sort(key=lambda x: x.get("trust_score", 0), reverse=True)
 
     return {
-        "latest_date": latest["_date"],
-        "baseline_date": baseline["_date"],
         "newly_listed": newly_listed,
         "trust_up": trust_up,
         "trust_down": trust_down,
         "provenance_gained": provenance_gained,
         "mcp_gained": mcp_gained,
     }
+
+
+def compute_snapshot_posts(history: list[dict]) -> list[dict]:
+    """Build weekly trust-snapshot blog posts from completed ISO weeks.
+
+    Fully deterministic: every figure comes from the two history snapshots it
+    names, so posts regenerate byte-identically on every render and new ones
+    appear automatically once a week completes (no separate cron needed).
+    Weeks with no changes are skipped. Newest first.
+    """
+    current_week = datetime.now(timezone.utc).date().isocalendar()[:2]
+    by_week: dict[tuple[int, int], dict] = {}
+    for snap in history:
+        try:
+            d = datetime.strptime(snap["_date"], "%Y-%m-%d").date()
+        except (KeyError, ValueError):
+            continue
+        wk = d.isocalendar()[:2]
+        if wk >= current_week:
+            continue  # week still in progress — publish only completed weeks
+        prev = by_week.get(wk)
+        if prev is None or snap["_date"] > prev["_date"]:
+            by_week[wk] = snap  # keep the last snapshot of each week
+
+    posts = []
+    weeks = sorted(by_week)
+    for prev_wk, wk in zip(weeks, weeks[1:]):
+        baseline, latest = by_week[prev_wk], by_week[wk]
+        sections = diff_snapshots(baseline, latest)
+        counts = {k: len(v) for k, v in sections.items()}
+        if sum(counts.values()) == 0:
+            continue
+        year, week = wk
+        end_dt = datetime.strptime(latest["_date"], "%Y-%m-%d")
+        posts.append({
+            "slug": f"trust-snapshot-{year}-w{week:02d}",
+            "title": f"AI Agent Trust Snapshot — Week {week}, {year}",
+            "week": week,
+            "year": year,
+            "date_iso": latest["_date"],
+            "date_display": end_dt.strftime("%B %-d, %Y"),
+            "baseline_date": baseline["_date"],
+            "total_agents": len(latest.get("agents", [])),
+            "counts": counts,
+            "excerpt": (
+                f"Week {week}: {counts['trust_up']} trust-score gains, "
+                f"{counts['trust_down']} declines, {counts['newly_listed']} new listings, "
+                f"{counts['provenance_gained']} provenance and {counts['mcp_gained']} MCP "
+                f"additions across {len(latest.get('agents', []))} tracked agents."
+            ),
+            **sections,
+        })
+    posts.reverse()
+    return posts
 
 
 def build_changes_rss(sections: list[tuple[str, list[dict]]], base: str, pub_date: str) -> str:
@@ -5777,8 +5836,21 @@ def main() -> None:
             for a in blog_articles[:12]
         ],
     }
+    # Automated weekly trust-snapshot posts — deterministic, derived from
+    # history snapshots at render time (T2.3). One page per completed ISO week.
+    snapshot_posts = compute_snapshot_posts(history)
+    snapshot_tmpl = env.get_template("blog_snapshot.html.j2")
+    for post in snapshot_posts:
+        post_dir = os.path.join(blog_dir, post["slug"])
+        os.makedirs(post_dir, exist_ok=True)
+        with open(os.path.join(post_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(snapshot_tmpl.render(post=post))
+    if snapshot_posts:
+        print(f"Built {len(snapshot_posts)} weekly trust-snapshot posts under blog/.")
+
     blog_index_html = env.get_template("blog_index.html.j2").render(
         articles=blog_articles,
+        snapshot_posts=snapshot_posts,
         categories=categories,
         total=len(rows),
         top_agent=rows[0],
@@ -5830,6 +5902,8 @@ def main() -> None:
     sitemap_urls.append(("https://hvtracker.net/blog/runtime-trust-is-live/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/you-are-not-installing-what-you-think/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/state-of-ai-agent-supply-chain-trust-2026/", "0.9", "weekly"))
+    for _p in snapshot_posts:
+        sitemap_urls.append((f"https://hvtracker.net/blog/{_p['slug']}/", "0.7", "monthly"))
     sitemap_urls.append(("https://hvtracker.net/blog/ai-agents-mcp-servers-trust/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/trapdoor-supply-chain-provenance/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/mcp-server-launch/", "0.9", "weekly"))
@@ -5940,6 +6014,16 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
     # feed.json — JSON Feed 1.1 spec (jsonfeed.org). One item per agent.
     now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     blog_feed_items = [
+        {
+            "id": f"https://hvtracker.net/blog/{_p['slug']}",
+            "url": f"https://hvtracker.net/blog/{_p['slug']}",
+            "title": _p["title"],
+            "content_text": _p["excerpt"],
+            "date_modified": f"{_p['date_iso']}T00:00:00Z",
+            "tags": ["Weekly snapshot", "Supply chain trust"],
+        }
+        for _p in snapshot_posts
+    ] + [
         {
             "id": "https://hvtracker.net/blog/scan-your-stack",
             "url": "https://hvtracker.net/blog/scan-your-stack",
