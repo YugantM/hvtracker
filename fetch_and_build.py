@@ -1116,9 +1116,19 @@ def detect_package_provenance_drift(
     pypi_metadata: dict | None = None,
     crate_package: str = "",
     crate_metadata: dict | None = None,
+    tracked_repo_canonical: str | None = None,
 ) -> dict:
-    """Compare published package source metadata to the tracked GitHub repo."""
+    """Compare published package source metadata to the tracked GitHub repo.
+
+    `tracked_repo_canonical` is the tracked repo's *current* GitHub full_name
+    (from a live `get_repo()` call, which transparently follows renames/org
+    transfers). When a package's source points there instead of the possibly
+    stale `owner_repo` we have on file, that confirms a legitimate rename, not
+    drift -- e.g. a project transferred from an individual's account to a
+    company org still resolves through the same GitHub redirect.
+    """
     expected = owner_repo.lower()
+    canonical = (tracked_repo_canonical or "").lower() or None
     checks = []
 
     if npm_package:
@@ -1174,6 +1184,12 @@ def detect_package_provenance_drift(
             # hijacked. Score as inconclusive, not as a red flag.
             unknown_count += 1
             evidence.append(f"{source} package '{package_name}' points to {normalized} (same owner as {expected}, not treated as drift)")
+        elif normalized and canonical and normalized == canonical:
+            # The package points to the tracked repo's *current* GitHub name,
+            # not our possibly-stale one -- a legitimate rename/org transfer,
+            # confirmed by GitHub's own redirect, not evidence of hijack.
+            unknown_count += 1
+            evidence.append(f"{source} package '{package_name}' points to {normalized}, the tracked repo's current name after a rename/transfer (not treated as drift)")
         elif normalized:
             mismatch_count += 1
             evidence.append(f"{source} package '{package_name}' points to {normalized}, not {expected}")
@@ -1216,6 +1232,7 @@ def fetch_package_provenance_drift(
     npm_package: str = "",
     pypi_package: str = "",
     crate_package: str = "",
+    tracked_repo_canonical: str | None = None,
 ) -> dict:
     """Fetch package metadata and compare published source references to the tracked repo."""
     npm_metadata = fetch_npm_package_metadata(npm_package) if npm_package else None
@@ -1229,6 +1246,7 @@ def fetch_package_provenance_drift(
         pypi_metadata=pypi_metadata,
         crate_package=crate_package,
         crate_metadata=crate_metadata,
+        tracked_repo_canonical=tracked_repo_canonical,
     )
 
 
@@ -4145,10 +4163,12 @@ def refresh_runtime_signals(rows: list[dict], agent_configs: list[dict], label: 
         fallback_desc = row.get("description") or ""
         repo_desc = fallback_desc
         ref = "HEAD"
+        repo_full_name = None
         try:
             repo = get_repo(repo_id)
             ref = repo.get("default_branch") or "HEAD"
             repo_desc = (repo.get("description") or fallback_desc)[:120]
+            repo_full_name = repo.get("full_name")
         except Exception:
             pass
         mcp = fetch_mcp_server_support(repo_id, ref, repo_desc)
@@ -4159,6 +4179,7 @@ def refresh_runtime_signals(rows: list[dict], agent_configs: list[dict], label: 
             npm_package=agent.get("npm_package", ""),
             pypi_package=agent.get("pypi_package", ""),
             crate_package=agent.get("crate_package", ""),
+            tracked_repo_canonical=repo_full_name,
         )
         return repo_id, mcp, ext, tooling, drift, repo_desc or None
 
@@ -4580,6 +4601,7 @@ def main() -> None:
             npm_package=npm_pkg,
             pypi_package=pypi_pkg,
             crate_package=crate_pkg,
+            tracked_repo_canonical=repo.get("full_name"),
         )
         fallback_note = " [cached commits]" if used_cached_commit_count else ""
         print(f"OK  {repo_id:<45} score={score:5.1f}{fallback_note}")
