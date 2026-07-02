@@ -1,20 +1,46 @@
+# ---- builder: python deps + freshest scorecard cache -----------------------
+# Deps install into a venv that is copied wholesale into the runtime stage;
+# curl lives only here (python:slim has none — the old single-stage fetch
+# silently fell back to the seed on every build).
+FROM python:3.12-slim AS builder
+
+WORKDIR /build
+
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt ./
+# pip/setuptools are build-time only — prune them from the venv the runtime
+# stage inherits.
+RUN python -m venv /opt/venv && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt \
+    && /opt/venv/bin/pip uninstall -y pip setuptools wheel 2>/dev/null; true
+
+# Try fetching the latest scorecard cache from the data branch (falls back to COPY'd seed)
+COPY scorecard-cache.json ./scorecard-cache.json
+RUN curl -sfL https://raw.githubusercontent.com/YugantM/hvtracker/data/scorecard-cache.json -o /tmp/sc.json \
+    && mv /tmp/sc.json scorecard-cache.json \
+    || echo "Using seed scorecard-cache.json (data branch fetch failed)"
+
+# ---- runtime ----------------------------------------------------------------
 FROM python:3.12-slim
 
 WORKDIR /app
+ENV PATH="/opt/venv/bin:$PATH"
 
-COPY requirements.txt requirements-dev.txt ./
-RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends fonts-dejavu-core && rm -rf /var/lib/apt/lists/*
-RUN pip install --no-cache-dir -r requirements.txt
+# Non-root user for runtime — gosu lets the entrypoint chown the volume
+# (which may have root-owned files from a prior image) then drop to hvt.
+# fonts-dejavu-core is a runtime dep (OG-card text rendering via Pillow).
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends fonts-dejavu-core gosu && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r hvt && useradd -r -g hvt -d /app -s /sbin/nologin hvt \
+    && mkdir -p /data/site
+
+COPY --from=builder /opt/venv /opt/venv
 
 # Application code
 COPY app.py fetch_and_build.py generate_og_card.py specs.py db.py cache.py storage.py schema.sql ./
 COPY signing.py mcp_trust.py open_lookup.py verify_log.py mcp_server.py auth.py ./
 # Generator inputs: curated seed, scorecard cache, and templates/assets
-COPY agents.json scorecard-cache.json template.html ./
-# Try fetching the latest scorecard cache from the data branch (falls back to COPY'd seed)
-RUN curl -sfL https://raw.githubusercontent.com/YugantM/hvtracker/data/scorecard-cache.json -o /tmp/sc.json \
-    && mv /tmp/sc.json scorecard-cache.json \
-    || echo "Using seed scorecard-cache.json (data branch fetch failed)"
+COPY agents.json template.html ./
+COPY --from=builder /build/scorecard-cache.json ./scorecard-cache.json
 COPY templates/ templates/
 COPY docs/import-candidates.json docs/import-candidates.json
 COPY compare/index.html compare/index.html
@@ -39,12 +65,7 @@ RUN test -n "$(find /app/seed/history -name '*.json' -print -quit)"
 # emergency hotfix deploys aligned with the verified local container state.
 COPY prebuilt/ /app/prebuilt/
 
-# Non-root user for runtime — gosu lets the entrypoint chown the volume
-# (which may have root-owned files from a prior image) then drop to hvt.
-RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends gosu && rm -rf /var/lib/apt/lists/* \
-    && groupadd -r hvt && useradd -r -g hvt -d /app -s /sbin/nologin hvt \
-    && mkdir -p /data/site \
-    && chown -R hvt:hvt /app /data
+RUN chown -R hvt:hvt /app /data
 
 COPY entrypoint.sh /app/entrypoint.sh
 
