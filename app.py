@@ -359,6 +359,11 @@ async def _cache_headers(request, call_next):
         return response
     if path.startswith("/data/") and path.endswith(".json"):
         response.headers["Cache-Control"] = _JSON_CACHE
+    elif path in ("/sitemap.xml", "/feed.json") or path.endswith("/feed.xml"):
+        # Feeds + sitemap regenerate at most once per render; without a header
+        # Cloudflare's cache rule marks them BYPASS and every crawler poll hits
+        # the origin.
+        response.headers["Cache-Control"] = _JSON_CACHE
     elif path.endswith("/") or path.endswith(".html"):
         response.headers["Cache-Control"] = _HTML_CACHE
     elif path in ("",) or path == "/":

@@ -219,6 +219,13 @@ def test_api_v1_agents(client):
     assert "agents" in data
 
 
+def test_sitemap_and_feeds_get_cache_headers(client):
+    for path in ("/sitemap.xml", "/feed.json", "/changes/feed.xml"):
+        r = client.get(path)
+        assert r.status_code == 200, path
+        assert "s-maxage=1800" in r.headers.get("cache-control", ""), path
+
+
 def test_api_v1_graph(client):
     r = client.get("/api/v1/graph")
     assert r.status_code == 200
