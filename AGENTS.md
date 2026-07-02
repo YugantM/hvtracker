@@ -85,15 +85,38 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   Churn 19%→13%; root-caused the remainder to leaderboard density (median
   0.1pt gap between adjacent ranks), not remaining signal noise — see
   docs/t3.1-upset-review-2026-07-02.md addenda 1-4 for the full trail.
-- T3.4 shipped 2026-07-02 (owner: "keep v2 as default, toggle for old
-  scores"): homepage leaderboard's default interactive view is now the
-  runtime-calibrated ranking (rank_v2), with a "Show classic Trust Score"
-  toggle/link back to v1, both fully labelled + linked to Score Lab and the
-  spec. `?rank=v1` is the explicit opt-out, shareable/linkable. Every row
-  shows a "why" (v2_why_summary — non-zero dimensions only, e.g. "provenance
-  +4.0 · MCP +2.0"). Server-rendered HTML order (crawlers/SEO/sitemap/API)
-  is UNCHANGED — still v1; only the client-side default view flips. Merged,
-  NOT yet deployed.
+- T3.4 initial ship 2026-07-02: homepage default view flipped to the
+  runtime-calibrated ranking with a toggle back to v1; server-rendered
+  HTML/API/badges/signing stayed on v1. **Superseded same day** by an
+  explicit owner decision to promote runtime calibration to the actual core
+  ("switch to new scoring to the core... this being a legit profound change
+  of the platform") — see the entry below.
+- **T3.4 core swap 2026-07-02 (owner-confirmed, no heads-up to badge
+  adopters):** `trust_score`/`rank`/`evidence_grade` ARE now runtime-
+  calibrated everywhere — homepage, agent/category/org pages, `/data` API,
+  sitemap, badge SVGs (`app.py` badge()), and signed credentials
+  (`signing.py`, since it just reads `row["trust_score"]`). The old base
+  score is preserved as `trust_score_historical_v1`/`rank_historical_v1`
+  (comparison only, no longer live anywhere); `trust_score_v2`/`rank_v2` are
+  now aliases of `trust_score`/`rank` for backward compat. The homepage
+  toggle from the initial ship was repurposed: default view is just "the
+  score" (no banner), with an opt-in "Compare to pre-calibration" view
+  (`?compare=historical`) showing the old baseline. Score Lab's framing
+  flipped from "hypothetical v2 preview" to "what changed at the cutover."
+  `METHODOLOGY_VERSION` bumped v3.2→v4.0, which (a) resets every agent's
+  rank-trend sparkline at this exact point (PR #100's mechanism) and (b)
+  suppresses the day's trust_score/rank notification-bell events across the
+  cutover (`derive_agent_events` methodology_by_date param) so the swap
+  doesn't spam every watchlist with false-alarm deltas.
+  **Concrete, confirmed consequence:** 27 agents flip letter grade (17
+  downgrade) at the moment this deploys, including well-known projects that
+  may have self-served a badge independently of any outreach — Google
+  Genkit, Semantic Kernel, AutoGPT, Ollama, ECC, Hermes Agent, OpenClaw among
+  them. Explicitly no announcement/changelog was made per owner instruction.
+  Verified live end-to-end (full app, not just static render): homepage
+  default, agent pages, Score Lab, `/badge/*.svg`, and `/api/v1/agents` all
+  consistently return the new calibrated numbers; no server errors.
+  Merged, NOT yet deployed.
 - Next: T3.3 capability-surface page; internal-linking SEO pass (parked);
   consider fixing tool_plugin_surface's "search"/"code" pattern-mention
   breadth if it resurfaces in a future audit (currently gated behind real

@@ -34,7 +34,7 @@ HEADERS = {
 if TOKEN:
     HEADERS["Authorization"] = f"Bearer {TOKEN}"
 
-METHODOLOGY_VERSION = "v3.2"
+METHODOLOGY_VERSION = "v4.0"  # T3.4: trust_score_v2 (runtime-calibrated) promoted to production
 DATA_SCHEMA_VERSION = "v0.1"
 
 
@@ -3419,17 +3419,25 @@ def summarize_recent_events(events: list[dict]) -> dict | None:
     }
 
 
-def derive_agent_events(history_by_date: dict[str, dict[str, dict]], today_agents: dict[str, dict]) -> dict[str, list[dict]]:
+def derive_agent_events(history_by_date: dict[str, dict[str, dict]], today_agents: dict[str, dict],
+                        methodology_by_date: dict[str, str | None] | None = None) -> dict[str, list[dict]]:
     """Derive reputation events per agent by comparing daily snapshots.
 
     Args:
         history_by_date: {date_str: {repo_lower: agent_dict}} — past snapshots
         today_agents: {repo_lower: agent_dict} — today's build output
+        methodology_by_date: {date_str: methodology_version} — when the two
+            snapshots either side of a day span different methodology
+            versions, a trust_score/rank swing reflects the new scoring
+            definition, not a real change; those two events are skipped for
+            that one day so a recalibration doesn't spam every watcher's
+            notification bell with false-alarm-looking deltas.
 
     Returns:
         {repo_lower: [event_dict, ...]} sorted chronologically
     """
     all_dates = sorted(history_by_date.keys())
+    methodology_by_date = methodology_by_date or {}
     events: dict[str, list[dict]] = {}
 
     # Walk consecutive date pairs to detect changes
@@ -3438,6 +3446,7 @@ def derive_agent_events(history_by_date: dict[str, dict[str, dict]], today_agent
         prev_snap = history_by_date[prev_date]
         curr_snap = history_by_date[curr_date]
         all_repos = set(prev_snap.keys()) | set(curr_snap.keys())
+        same_methodology = methodology_by_date.get(prev_date) == methodology_by_date.get(curr_date)
 
         for repo in all_repos:
             prev = prev_snap.get(repo)
@@ -3465,23 +3474,26 @@ def derive_agent_events(history_by_date: dict[str, dict[str, dict]], today_agent
                 direction = "up" if delta_score > 0 else "down"
                 repo_events.append(make_agent_event(curr_date, "score_changed", f"Activity score {direction} {abs(delta_score):.0f}pts ({ps:.0f} → {cs:.0f})", reason_code=f"activity_score_{direction}"))
 
-            # Trust score change ≥ 3 points
-            prev_trust = prev.get("trust_score")
-            curr_trust = curr.get("trust_score")
-            if prev_trust is not None and curr_trust is not None:
-                delta_trust = round(curr_trust - prev_trust, 1)
-                if abs(delta_trust) >= 3:
-                    direction = "up" if delta_trust > 0 else "down"
-                    repo_events.append(make_agent_event(curr_date, "trust_score_changed", f"HVTrust {direction} {abs(delta_trust):.1f}pts ({prev_trust:.1f} → {curr_trust:.1f})", reason_code=f"trust_score_{direction}"))
+            # Trust score change ≥ 3 points (skipped across a methodology
+            # change -- the swing reflects a new scoring definition, not a
+            # real move, so it isn't a "trust_score_changed" event)
+            if same_methodology:
+                prev_trust = prev.get("trust_score")
+                curr_trust = curr.get("trust_score")
+                if prev_trust is not None and curr_trust is not None:
+                    delta_trust = round(curr_trust - prev_trust, 1)
+                    if abs(delta_trust) >= 3:
+                        direction = "up" if delta_trust > 0 else "down"
+                        repo_events.append(make_agent_event(curr_date, "trust_score_changed", f"HVTrust {direction} {abs(delta_trust):.1f}pts ({prev_trust:.1f} → {curr_trust:.1f})", reason_code=f"trust_score_{direction}"))
 
-            # Rank change ≥ 10 positions
-            max_rank = len(today_agents) or 999
-            pr, cr = prev.get("rank", 0) or 0, curr.get("rank", 0) or 0
-            pr, cr = min(pr, max_rank), min(cr, max_rank)  # clamp to current roster size
-            delta_rank = pr - cr  # positive = improved
-            if abs(delta_rank) >= 10:
-                direction = "rose" if delta_rank > 0 else "dropped"
-                repo_events.append(make_agent_event(curr_date, "rank_changed", f"Rank {direction} {abs(delta_rank)} spots (#{pr} → #{cr})", reason_code=f"rank_{'up' if delta_rank > 0 else 'down'}"))
+                # Rank change ≥ 10 positions (same reasoning as above)
+                max_rank = len(today_agents) or 999
+                pr, cr = prev.get("rank", 0) or 0, curr.get("rank", 0) or 0
+                pr, cr = min(pr, max_rank), min(cr, max_rank)  # clamp to current roster size
+                delta_rank = pr - cr  # positive = improved
+                if abs(delta_rank) >= 10:
+                    direction = "rose" if delta_rank > 0 else "dropped"
+                    repo_events.append(make_agent_event(curr_date, "rank_changed", f"Rank {direction} {abs(delta_rank)} spots (#{pr} → #{cr})", reason_code=f"rank_{'up' if delta_rank > 0 else 'down'}"))
 
             # Listing status changed
             prev_status = prev.get("listing_status")
@@ -3617,6 +3629,7 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
 
     # Load last 90 days of history for per-agent files
     history_by_date: dict[str, dict] = {}
+    methodology_by_date: dict[str, str | None] = {}
     cutoff = (datetime.now(timezone.utc) - timedelta(days=90)).strftime("%Y-%m-%d")
     for fname in sorted(os.listdir(history_dir)):
         if not fname.endswith(".json"):
@@ -3628,15 +3641,17 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
             with open(os.path.join(history_dir, fname), encoding="utf-8") as f:
                 snap = json.load(f)
             history_by_date[date_str] = {a["repo"].lower(): a for a in snap.get("agents", [])}
+            methodology_by_date[date_str] = snap.get("methodology_version")
         except Exception:
             pass
 
     # Add today's data to history for event derivation
     today_agents = {a["repo"].lower(): a for a in data_output["agents"]}
     history_by_date[today_utc] = today_agents
+    methodology_by_date[today_utc] = data_output.get("methodology_version")
 
     # Derive reputation events from history diffs
-    all_events = derive_agent_events(history_by_date, today_agents)
+    all_events = derive_agent_events(history_by_date, today_agents, methodology_by_date)
 
     # /data/agents/<slug>.json — per-agent with 90d history + events
     slug_map = {r["repo"].lower(): r["slug"] for r in rows}
@@ -5023,15 +5038,27 @@ def main() -> None:
             signal_types += 1
         row["signal_coverage"] = round(signal_types / 5, 2)
 
-        # HVTrust composite score
+        # HVTrust composite score. compute_trust_score_v2 layers a bounded,
+        # evidence-audited runtime-trust adjustment (MCP support, external
+        # dependencies, tool/plugin surface, package-provenance drift) on top
+        # of the base 5-dimension score. As of METHODOLOGY_VERSION this
+        # combined score IS production trust_score/rank/evidence_grade
+        # everywhere (leaderboard, agent/category/org pages, /data API,
+        # badges, signed credentials). The pre-calibration base score is
+        # preserved as trust_score_historical_v1/rank_historical_v1 for
+        # comparison (Score Lab) — it is no longer live/authoritative
+        # anywhere. trust_score_v2/rank_v2 stay as aliases of the (now
+        # current) trust_score/rank for compatibility with any caller still
+        # naming the v2 fields explicitly.
         trust = compute_trust_score(row)
-        row["trust_score"] = trust["trust_score"]
+        row["trust_score_historical_v1"] = trust["trust_score"]
         row["trust_confidence"] = trust["trust_confidence"]
         row["trust_breakdown"] = trust["trust_breakdown"]
         trust_v2 = compute_trust_score_v2(row)
-        row["trust_score_v2"] = trust_v2["trust_score_v2"]
+        row["trust_score"] = trust_v2["trust_score_v2"]
         row["trust_v2_adjustment"] = trust_v2["trust_v2_adjustment"]
         row["trust_v2_breakdown"] = trust_v2["trust_v2_breakdown"]
+        row["v2_why"] = v2_why_summary(row["trust_v2_breakdown"])
 
         # Evidence grade — based on trust score band so grade agrees with rank
         ts = row["trust_score"]
@@ -5044,27 +5071,30 @@ def main() -> None:
         else:
             row["evidence_grade"] = "D"
 
-    # Rank by HVTrust (trust-first). Tie-break on momentum score, then stars,
-    # so the leaderboard order and the evidence grade tell the same story.
+    # Rank by HVTrust (trust-first, runtime-calibrated). Tie-break on
+    # momentum score, then stars, so the leaderboard order and the evidence
+    # grade tell the same story.
     rows.sort(
         key=lambda x: (x.get("trust_score", 0) or 0, x.get("score", 0) or 0, x.get("stars", 0) or 0),
         reverse=True,
     )
     for i, row in enumerate(rows, 1):
         row["rank"] = i
+        row["rank_v2"] = i
+        row["trust_score_v2"] = row["trust_score"]
 
-    v2_sorted = sorted(
+    # Pre-calibration baseline rank, preserved for comparison (Score Lab) —
+    # no longer live/authoritative anywhere.
+    v1_sorted = sorted(
         rows,
-        key=lambda x: (x.get("trust_score_v2", 0) or 0, x.get("trust_score", 0) or 0, x.get("stars", 0) or 0),
+        key=lambda x: (x.get("trust_score_historical_v1", 0) or 0, x.get("score", 0) or 0, x.get("stars", 0) or 0),
         reverse=True,
     )
-    for i, row in enumerate(v2_sorted, 1):
-        row["rank_v2"] = i
-        old_rank = row.get("rank") or i
-        row["rank_v2_delta"] = old_rank - i
+    for i, row in enumerate(v1_sorted, 1):
+        row["rank_historical_v1"] = i
+        row["rank_v2_delta"] = i - (row.get("rank") or i)
         row["rank_v2_delta_display"] = rank_delta_display(row["rank_v2_delta"], False)
         row["rank_v2_delta_class"] = rank_delta_class(row["rank_v2_delta"], False)
-        row["v2_why"] = v2_why_summary(row.get("trust_v2_breakdown") or {})
 
     # Compute category ranks (within each category, sorted by trust)
     cat_groups: dict[str, list[dict]] = {}
@@ -5348,6 +5378,7 @@ def main() -> None:
     else:
         css_hash = ""
     env.globals["css_hash"] = css_hash
+    env.globals["methodology_version"] = METHODOLOGY_VERSION
 
     # Cache-bust the unhashed auth.js so widget/UI updates always reach browsers.
     auth_js_path = os.path.join(base_dir, "auth.js")
@@ -5493,6 +5524,7 @@ def main() -> None:
             stats=score_lab_stats,
             top_up=top_up,
             top_down=top_down,
+            methodology_version=METHODOLOGY_VERSION,
         ))
     print(f"Built score-lab/index.html with {len(score_lab_rows)} agents.")
 
