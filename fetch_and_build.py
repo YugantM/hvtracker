@@ -829,6 +829,25 @@ def fetch_mcp_server_support(owner_repo: str, ref: str, description: str = "") -
     )
 
 
+def _manifest_has_dep_marker(lower_text: str, marker: str) -> bool:
+    """Whether `marker` appears as a package-name token in manifest text.
+
+    A naive substring check (`marker in lower_text`) lets short markers like
+    "pg" or "pty" match inside unrelated words (e.g. a hypothetical package
+    containing "pg" mid-string) — false-positive risk that grows as markers
+    shrink. Tokenize on typical manifest separators (whitespace/quotes/commas/
+    version operators/brackets — not `.`/`_`/`-`, which are legal in package
+    names) and require the marker to *start* a token, so "psycopg2-binary"
+    still matches marker "psycopg" and "pgvector" still matches "pg", but "pg"
+    can no longer match inside an unrelated longer word.
+    """
+    marker = marker.lower()
+    for token in re.split(r"[^a-z0-9._-]+", lower_text):
+        if token.startswith(marker):
+            return True
+    return False
+
+
 def detect_external_service_dependencies(
     *,
     description: str = "",
@@ -838,12 +857,16 @@ def detect_external_service_dependencies(
     """Detect publicly declared external service dependencies.
 
     Conservative first pass:
-    - only report providers with explicit doc/dependency/env-var evidence
+    - only count a provider toward the risk signal when there is dependency-
+      manifest or credential-marker evidence of an actual runtime dependency;
+      a README mentioning a provider (e.g. "supports OpenAI, Anthropic, or
+      Bedrock") documents an *optional integration*, not a hard dependency,
+      and inflated flexible/mature multi-provider frameworks' provider counts
+      when treated the same as real evidence (still logged for transparency
+      when a real hit exists elsewhere for the same provider)
     - only use already-public repository text
     """
     manifest_text_by_path = manifest_text_by_path or {}
-    readme_lower = (readme_text or "").lower()
-    desc_lower = (description or "").lower()
     manifest_items = [(path, text, text.lower()) for path, text in manifest_text_by_path.items()]
 
     providers: list[str] = []
@@ -863,7 +886,7 @@ def detect_external_service_dependencies(
 
         for path, _text, lower in manifest_items:
             for marker in rule["dep_markers"]:
-                if marker.lower() in lower:
+                if _manifest_has_dep_marker(lower, marker):
                     dep_hit = (path, marker)
                     break
             if dep_hit:
@@ -880,17 +903,17 @@ def detect_external_service_dependencies(
             if env_hit:
                 break
 
-        if not (pattern_hit or dep_hit or env_hit):
-            continue
+        if not (dep_hit or env_hit):
+            continue  # a docs-only mention is not evidence of a runtime dependency
 
         providers.append(label)
-        if pattern_hit:
-            evidence.append(f"README/docs mention {label}")
         if dep_hit:
             evidence.append(f"Found {label} dependency '{dep_hit[1]}' in {dep_hit[0]}")
         if env_hit:
             evidence.append(f"Found {label} credential/config marker '{env_hit}'")
             requires_api_keys = True
+        if pattern_hit:
+            evidence.append(f"README/docs also mention {label}")
 
     if not requires_api_keys:
         combined_text = "\n".join([description or "", readme_text or "", *manifest_text_by_path.values()])
@@ -974,26 +997,35 @@ def detect_tool_plugin_surface(
             if plugin_system != "none":
                 break
 
+    # tool_tags require dependency-manifest evidence, not a README mention
+    # alone -- "search" and "code" patterns in particular (bare "search",
+    # "github", "repository") are common enough that most project READMEs
+    # would match regardless of whether the project genuinely ships that
+    # tool surface. A doc mention is still logged when a real hit exists.
     manifest_items = [(path, text.lower()) for path, text in manifest_text_by_path.items()]
     for rule in _TOOL_PLUGIN_RULES:
-        hit = False
-        for pattern in rule["patterns"]:
-            if re.search(pattern, readme_text or "", re.IGNORECASE) or re.search(pattern, description or "", re.IGNORECASE):
-                tags.append(rule["tag"])
-                evidence.append(f"README/docs mention {rule['tag']} capabilities")
-                hit = True
-                break
-        if hit:
-            continue
+        dep_hit: tuple[str, str] | None = None
         for path, lower in manifest_items:
             for marker in rule["dep_markers"]:
-                if marker.lower() in lower:
-                    tags.append(rule["tag"])
-                    evidence.append(f"Found {rule['tag']} dependency '{marker}' in {path}")
-                    hit = True
+                if _manifest_has_dep_marker(lower, marker):
+                    dep_hit = (path, marker)
                     break
-            if hit:
+            if dep_hit:
                 break
+
+        pattern_hit = False
+        for pattern in rule["patterns"]:
+            if re.search(pattern, readme_text or "", re.IGNORECASE) or re.search(pattern, description or "", re.IGNORECASE):
+                pattern_hit = True
+                break
+
+        if not dep_hit:
+            continue
+
+        tags.append(rule["tag"])
+        evidence.append(f"Found {rule['tag']} dependency '{dep_hit[1]}' in {dep_hit[0]}")
+        if pattern_hit:
+            evidence.append(f"README/docs also mention {rule['tag']} capabilities")
 
     deduped_tags = sorted(set(tags))
     deduped_evidence: list[str] = []
