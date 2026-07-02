@@ -31,7 +31,9 @@
   <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--paper:#f4f1eb;--ink:#1f1b17;--muted:#6f665d;--line:#d5cbbc;--lobster:#c67c6d;--green:#2f6846;--red:#9b3c3c;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}
+    /* Theme vars come from static/site.css :root; only --muted diverges here
+       (lighter than the site-wide #57524c). */
+    :root{--muted:#6f665d}
     body{background:var(--paper);color:var(--ink);font:17px/1.7 var(--font-sans)}
     a{color:inherit}
     .page{max-width:760px;margin:0 auto;padding:24px 24px 56px}
