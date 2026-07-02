@@ -78,5 +78,23 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   GSC pass done narrowly (#94 — category titles; agent metadata already good).
 - T3.2 ✅ /spec/runtime-trust v0.1 published (spec-matches-code test locks the
   §4 adjustment table to compute_trust_score_v2).
-- Next: T3.1 criteria sign-off (owner) → recalibration or T3.4 documentation;
-  T3.3 capability-surface page; internal-linking SEO pass (parked).
+- T3.1 follow-up 2026-07-02: same-owner + repo-transfer drift false positives
+  fixed (#96, #99), external_dependencies/tool_plugin_surface README-mention
+  over-counting fixed (#98). Every one of the ~26 originally-flagged drift
+  warnings traced to a false positive — zero real supply-chain risks found.
+  Churn 19%→13%; root-caused the remainder to leaderboard density (median
+  0.1pt gap between adjacent ranks), not remaining signal noise — see
+  docs/t3.1-upset-review-2026-07-02.md addenda 1-4 for the full trail.
+- T3.4 shipped 2026-07-02 (owner: "keep v2 as default, toggle for old
+  scores"): homepage leaderboard's default interactive view is now the
+  runtime-calibrated ranking (rank_v2), with a "Show classic Trust Score"
+  toggle/link back to v1, both fully labelled + linked to Score Lab and the
+  spec. `?rank=v1` is the explicit opt-out, shareable/linkable. Every row
+  shows a "why" (v2_why_summary — non-zero dimensions only, e.g. "provenance
+  +4.0 · MCP +2.0"). Server-rendered HTML order (crawlers/SEO/sitemap/API)
+  is UNCHANGED — still v1; only the client-side default view flips. Merged,
+  NOT yet deployed.
+- Next: T3.3 capability-surface page; internal-linking SEO pass (parked);
+  consider fixing tool_plugin_surface's "search"/"code" pattern-mention
+  breadth if it resurfaces in a future audit (currently gated behind real
+  dependency evidence, so low-risk today).
