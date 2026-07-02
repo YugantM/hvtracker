@@ -2389,9 +2389,28 @@ def build_changes_rss(sections: list[tuple[str, list[dict]]], base: str, pub_dat
 
 def compute_sparklines(history: list[dict]) -> dict[str, list[dict]]:
     """Build per-agent rank history for sparkline rendering.
+
+    Restarts from the most recent methodology_version change rather than
+    connecting ranks across it: a scoring-methodology change is not a real
+    rank movement, so plotting it continuously would render as a misleading
+    "bump" (and would stretch the whole chart's y-scale around a jump that
+    isn't comparable data). Trimming to the current methodology's run makes
+    the trend start fresh at the cutover instead, and the per-agent min/max
+    normalization in render_sparkline_svg then only ever scales to
+    like-for-like ranks.
+
     Returns {repo_lower: [{date, rank, score}, ...]}."""
+    if not history:
+        return {}
+    current_version = history[-1].get("methodology_version")
+    reset_idx = 0
+    for i, snap in enumerate(history):
+        if snap.get("methodology_version") != current_version:
+            reset_idx = i + 1
+    relevant_history = history[reset_idx:]
+
     sparklines: dict[str, list[dict]] = {}
-    for snap in history:
+    for snap in relevant_history:
         date = snap.get("_date", "")
         for a in snap.get("agents", []):
             key = a["repo"].lower()
