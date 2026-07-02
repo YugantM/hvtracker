@@ -616,3 +616,42 @@ def test_history_writer_never_deletes_existing_snapshots(tmp_path):
 
     remaining = sorted(f.name for f in history_dir.glob("*.json"))
     assert remaining == ["2026-05-01.json", "2026-05-02.json", f"{today}.json"]
+
+
+def _snap(date, version, agents):
+    return {"_date": date, "methodology_version": version, "agents": agents}
+
+
+def _a(repo, rank, score=50):
+    return {"repo": repo, "rank": rank, "score": score}
+
+
+def test_sparklines_reset_at_methodology_version_change():
+    """A methodology-version change is not a real rank movement -- the
+    sparkline should start fresh from the change, not connect across it."""
+    history = [
+        _snap("2026-05-23", None, [_a("o/agent", 10)]),
+        _snap("2026-05-24", "v2.0", [_a("o/agent", 40)]),
+        _snap("2026-05-28", "v3.0", [_a("o/agent", 20)]),
+        _snap("2026-06-05", "v3.2", [_a("o/agent", 5)]),
+        _snap("2026-06-06", "v3.2", [_a("o/agent", 7)]),
+        _snap("2026-06-07", "v3.2", [_a("o/agent", 6)]),
+    ]
+    points = fb.compute_sparklines(history)["o/agent"]
+    assert [p["date"] for p in points] == ["2026-06-05", "2026-06-06", "2026-06-07"]
+    assert [p["rank"] for p in points] == [5, 7, 6]
+
+
+def test_sparklines_no_reset_when_version_stable():
+    history = [
+        _snap("2026-06-01", "v3.2", [_a("o/agent", 10)]),
+        _snap("2026-06-02", "v3.2", [_a("o/agent", 8)]),
+        _snap("2026-06-03", "v3.2", [_a("o/agent", 9)]),
+    ]
+    points = fb.compute_sparklines(history)["o/agent"]
+    assert len(points) == 3
+    assert points[0]["date"] == "2026-06-01"
+
+
+def test_sparklines_empty_history():
+    assert fb.compute_sparklines([]) == {}
