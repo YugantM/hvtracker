@@ -66,11 +66,13 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   T2.1 ✅ #81 · T2.2 ✅ #82 · ticker ✅ #83 · T2.3 ✅ (weekly snapshot posts,
   deterministic, render-derived — no cron needed). Merged to `main`, NOT yet
   deployed (`railway up` pending).
-- Cloudflare HTML/JSON edge-cache rule ✅ live in prod 2026-07-02 — dashboard
-  Cache Rule, "use cache-control header if present, bypass if not" (both Edge +
-  Browser TTL); confirmed TTFB 1.16s→~0.15s on HIT; `/account`,`/api/*`,
-  `/auth/*`,`/healthz` verified still uncached. Independent of code deploys.
-  Known gap (non-blocking): `/sitemap.xml`,`/feed.json` send no Cache-Control
-  from origin so they never edge-cache — one-line fix available in the same
-  `app.py:360` middleware block whenever it's worth doing.
-- Next: GSC page-2 metadata pass (needs user's Search Console export).
+- Cloudflare HTML/JSON edge-cache rule ✅ live in prod 2026-07-02 (dashboard,
+  respects origin headers; TTFB 1.16s→~0.15s; auth/api/healthz stay uncached).
+- 2026-07-02 batch (merged, awaiting the same pending deploy): #88 sitemap/feed
+  Cache-Control · #89 runtime-drift snapshot-fields lock (T3.5 plumbing) ·
+  #90 :root dedupe into site.css (only `--muted` stays as page override) ·
+  #91 multi-stage Dockerfile (591MB; scorecard fetch now actually works —
+  first deploy after this fetches fresh cache at build) · #92 T3.1 upset-review
+  report → verdict NO-GO, T3.4 stays gated (drift dimension dominates).
+- Next: GSC page-2 metadata pass (needs user's Search Console export);
+  T3.2 /spec/runtime-trust (prerequisite for any T3.4 re-review).
