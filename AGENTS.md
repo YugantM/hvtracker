@@ -64,6 +64,13 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
 ## Now / next (update as milestones ship)
 - Plan: `docs/product-plan-2026-h2.md`. v3.2 (Retention & Freshness) underway:
   T2.1 ✅ #81 · T2.2 ✅ #82 · ticker ✅ #83 · T2.3 ✅ (weekly snapshot posts,
-  deterministic, render-derived — no cron needed). Merged, NOT yet deployed.
-- Next: Cloudflare HTML/JSON edge-cache rule (user's dashboard task); GSC
-  page-2 metadata pass (needs user's Search Console export).
+  deterministic, render-derived — no cron needed). Merged to `main`, NOT yet
+  deployed (`railway up` pending).
+- Cloudflare HTML/JSON edge-cache rule ✅ live in prod 2026-07-02 — dashboard
+  Cache Rule, "use cache-control header if present, bypass if not" (both Edge +
+  Browser TTL); confirmed TTFB 1.16s→~0.15s on HIT; `/account`,`/api/*`,
+  `/auth/*`,`/healthz` verified still uncached. Independent of code deploys.
+  Known gap (non-blocking): `/sitemap.xml`,`/feed.json` send no Cache-Control
+  from origin so they never edge-cache — one-line fix available in the same
+  `app.py:360` middleware block whenever it's worth doing.
+- Next: GSC page-2 metadata pass (needs user's Search Console export).
