@@ -2095,7 +2095,7 @@ def select_daily_pair(history: list[dict]) -> tuple[dict | None, dict | None]:
     return completed[-1], completed[-2]
 
 
-def compute_movers(history: list[dict], slug_map: dict[str, str] | None = None, rows: list[dict] | None = None) -> dict:
+def compute_movers(history: list[dict], slug_map: dict[str, str] | None = None, rows: list[dict] | None = None, limit: int = 3) -> dict:
     """Compare the two most recent completed daily snapshots. Returns {up: [...], down: [...]}."""
     latest, baseline = select_daily_pair(history)
     if not latest or not baseline:
@@ -2119,8 +2119,8 @@ def compute_movers(history: list[dict], slug_map: dict[str, str] | None = None, 
                            "evidence_grade": current.get("evidence_grade", ""),
                            "language": current.get("language", "")})
     movers.sort(key=lambda m: m["delta"], reverse=True)
-    up = [m for m in movers if m["delta"] > 0][:3]
-    down = [m for m in movers if m["delta"] < 0][-3:]
+    up = [m for m in movers if m["delta"] > 0][:limit]
+    down = [m for m in movers if m["delta"] < 0][-limit:]
     down.sort(key=lambda m: m["delta"])  # most negative first
     return {"up": up, "down": down}
 
@@ -5194,7 +5194,7 @@ def main() -> None:
     else:
         env.globals["auth_js_hash"] = ""
 
-    movers = compute_movers(history, {r["repo"].lower(): r["slug"] for r in rows}, rows=rows)
+    movers = compute_movers(history, {r["repo"].lower(): r["slug"] for r in rows}, rows=rows, limit=12)
     movers_page = compute_movers_page_data(rows, history)
     newly_added = compute_newly_added(rows, history)
     use_case_pages = build_use_case_pages(rows)
