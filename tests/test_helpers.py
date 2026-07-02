@@ -273,6 +273,48 @@ def test_detect_tool_plugin_surface_from_extensions_and_browser_deps():
     assert result["confidence"] == "high"
 
 
+def test_manifest_dep_marker_does_not_match_inside_unrelated_words():
+    """Regression for the T3.1 runtime-signal audit: a short marker like "pg"
+    must not match as a substring inside an unrelated token (e.g. a package
+    named "debugging-tools"), only as the start of an actual token."""
+    assert fb._manifest_has_dep_marker("debugging-tools==1.0", "pg") is False
+    assert fb._manifest_has_dep_marker("psycopg2-binary==2.9.9", "psycopg") is True
+    assert fb._manifest_has_dep_marker("pgvector==0.2", "pg") is True
+    assert fb._manifest_has_dep_marker('"asyncpg": "^1"', "asyncpg") is True
+
+
+def test_external_service_dependencies_readme_mention_alone_is_not_a_provider():
+    """A README documenting an optional integration ("supports OpenAI,
+    Anthropic, or Bedrock") is not evidence of a hard runtime dependency --
+    only a manifest dependency or credential/env marker counts."""
+    result = fb.detect_external_service_dependencies(
+        readme_text="This framework supports OpenAI, Anthropic, or Amazon Bedrock as pluggable LLM backends.",
+    )
+    assert result["providers"] == []
+    assert result["confidence"] is None
+
+
+def test_external_service_dependencies_mixed_real_and_docs_only():
+    """A provider with real manifest evidence still counts (and logs the docs
+    mention too); a provider mentioned only in docs does not count at all."""
+    result = fb.detect_external_service_dependencies(
+        readme_text="Supports OpenAI (see docs) and can optionally integrate with Anthropic.",
+        manifest_text_by_path={"pyproject.toml": "openai = \"^1.0\""},
+    )
+    assert result["providers"] == ["OpenAI"]
+    assert "Anthropic" not in result["providers"]
+
+
+def test_tool_plugin_surface_readme_mention_alone_is_not_a_tag():
+    """"search"/"code" patterns (bare "search", "github", "repository") are
+    common enough to false-positive on nearly any README; require manifest
+    dependency evidence, not a doc mention, to count toward the score."""
+    result = fb.detect_tool_plugin_surface(
+        readme_text="See our GitHub repository for search and retrieval examples.",
+    )
+    assert result["tool_tags"] == []
+
+
 def test_detect_package_provenance_drift_match_and_warning():
     match = fb.detect_package_provenance_drift(
         "openai/codex",
