@@ -668,3 +668,57 @@ def test_v2_why_summary_orders_by_magnitude_and_skips_zero():
 def test_v2_why_summary_all_zero():
     assert fb.v2_why_summary({}) == "No runtime-trust adjustment"
     assert fb.v2_why_summary({"mcp": 0.0}) == "No runtime-trust adjustment"
+
+
+# ---- methodology-boundary event suppression (T3.4 core swap) -------------
+
+def _mk_agent(repo, trust, rank):
+    return {"repo": repo, "trust_score": trust, "rank": rank, "score": 50,
+            "listing_status": "listed"}
+
+
+def test_derive_agent_events_skips_trust_and_rank_deltas_across_methodology_change():
+    """A recalibration swing (e.g. the T3.4 core swap) is not a real trust or
+    rank move -- across the one day methodology_version changes, those two
+    event types must not fire, or a cutover would spam every watcher's bell."""
+    history_by_date = {
+        "2026-07-01": {"o/agent": _mk_agent("o/agent", 70.0, 10)},
+        "2026-07-02": {"o/agent": _mk_agent("o/agent", 92.0, 1)},  # huge swing
+    }
+    methodology_by_date = {"2026-07-01": "v3.2", "2026-07-02": "v4.0"}
+    today_agents = history_by_date["2026-07-02"]
+
+    events = fb.derive_agent_events(history_by_date, today_agents, methodology_by_date)
+    kinds = {e["type"] for e in events.get("o/agent", [])}
+    assert "trust_score_changed" not in kinds
+    assert "rank_changed" not in kinds
+
+
+def test_derive_agent_events_still_fires_within_same_methodology():
+    # A 20-agent roster so the "clamp rank to current roster size" logic
+    # doesn't collapse the test's rank values (max_rank = len(today_agents)).
+    padding = {f"o/pad{i}": _mk_agent(f"o/pad{i}", 50.0, i + 2) for i in range(18)}
+    history_by_date = {
+        "2026-07-01": {"o/agent": _mk_agent("o/agent", 70.0, 15), **padding},
+        "2026-07-02": {"o/agent": _mk_agent("o/agent", 80.0, 1), **padding},
+    }
+    methodology_by_date = {"2026-07-01": "v4.0", "2026-07-02": "v4.0"}
+    today_agents = history_by_date["2026-07-02"]
+
+    events = fb.derive_agent_events(history_by_date, today_agents, methodology_by_date)
+    kinds = {e["type"] for e in events.get("o/agent", [])}
+    assert "trust_score_changed" in kinds
+    assert "rank_changed" in kinds
+
+
+def test_derive_agent_events_defaults_to_firing_without_methodology_map():
+    """Backward compatible: a caller that doesn't pass methodology_by_date
+    gets the original (always-fire) behaviour."""
+    history_by_date = {
+        "2026-07-01": {"o/agent": _mk_agent("o/agent", 70.0, 10)},
+        "2026-07-02": {"o/agent": _mk_agent("o/agent", 80.0, 1)},
+    }
+    today_agents = history_by_date["2026-07-02"]
+    events = fb.derive_agent_events(history_by_date, today_agents)
+    kinds = {e["type"] for e in events.get("o/agent", [])}
+    assert "trust_score_changed" in kinds

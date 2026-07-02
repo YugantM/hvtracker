@@ -161,11 +161,11 @@
 
     <section class="intro">
       <div>
-        <h1>Leaderboard change preview</h1>
-        <p>This page compares the current public HVTrust ranking with a local-only <span class="mono">trust_score_v2</span> that lightly folds in runtime-trust signals. The main leaderboard is unchanged. This is just our sandbox for checking whether the new formula causes any major upsets.</p>
+        <h1>Runtime-trust calibration: what changed</h1>
+        <p>The public HVTrust ranking now folds in runtime-trust signals (methodology {{ methodology_version }}). This page compares today's calibrated ranking against the pre-calibration baseline that was live before the cutover, so anyone can see exactly what moved and why — per the public per-field explanations on every row.</p>
       </div>
       <aside class="intro-note">
-        <strong>What changed in v2</strong>
+        <strong>What the calibration adds</strong>
         <div>Small MCP boost, mild dependency and tool-surface complexity penalties, and the biggest adjustment comes from package provenance drift.</div>
       </aside>
     </section>
@@ -181,11 +181,11 @@
       </div>
       <div class="stat">
         <div class="value">{{ stats.improved }}</div>
-        <div class="label">Moved up in v2</div>
+        <div class="label">Moved up in calibration</div>
       </div>
       <div class="stat">
         <div class="value">{{ stats.dropped }}</div>
-        <div class="label">Moved down in v2</div>
+        <div class="label">Moved down in calibration</div>
       </div>
     </section>
 
@@ -201,7 +201,7 @@
               {% for row in top_up %}
               <tr>
                 <td class="name"><a href="/agents/{{ row.slug }}/">{{ row.name }}</a><div class="sub">{{ row.display_repo or row.repo }}</div></td>
-                <td class="mono">#{{ row.rank }} → #{{ row.rank_v2 }}</td>
+                <td class="mono">#{{ row.rank_historical_v1 }} → #{{ row.rank }}</td>
                 <td class="delta-up mono">+{{ row.rank_v2_delta }}</td>
               </tr>
               {% endfor %}
@@ -217,7 +217,7 @@
               {% for row in top_down %}
               <tr>
                 <td class="name"><a href="/agents/{{ row.slug }}/">{{ row.name }}</a><div class="sub">{{ row.display_repo or row.repo }}</div></td>
-                <td class="mono">#{{ row.rank }} → #{{ row.rank_v2 }}</td>
+                <td class="mono">#{{ row.rank_historical_v1 }} → #{{ row.rank }}</td>
                 <td class="delta-down mono">{{ row.rank_v2_delta }}</td>
               </tr>
               {% endfor %}
@@ -234,8 +234,8 @@
           <thead>
             <tr>
               <th>Agent</th>
+              <th>Before</th>
               <th>Current</th>
-              <th>V2</th>
               <th>Delta</th>
               <th>Score change</th>
               <th>Runtime summary</th>
@@ -248,16 +248,16 @@
                 <a href="/agents/{{ row.slug }}/">{{ row.name }}</a>
                 <div class="sub">{{ row.display_repo or row.repo }}</div>
               </td>
+              <td class="mono">#{{ row.rank_historical_v1 }}<div class="sub">{{ row.trust_score_historical_v1 }}/100</div></td>
               <td class="mono">#{{ row.rank }}<div class="sub">{{ row.trust_score }}/100</div></td>
-              <td class="mono">#{{ row.rank_v2 }}<div class="sub">{{ row.trust_score_v2 }}/100</div></td>
               <td class="mono {% if row.rank_v2_delta > 0 %}delta-up{% elif row.rank_v2_delta < 0 %}delta-down{% else %}delta-flat{% endif %}">
                 {% if row.rank_v2_delta > 0 %}+{% endif %}{{ row.rank_v2_delta }}
               </td>
               <td>
                 <div class="score-pair mono">
-                  <span class="old">{{ row.trust_score }}</span>
+                  <span class="old">{{ row.trust_score_historical_v1 }}</span>
                   <span>→</span>
-                  <span class="new">{{ row.trust_score_v2 }}</span>
+                  <span class="new">{{ row.trust_score }}</span>
                 </div>
                 <div class="sub">adj {{ "%+.1f"|format(row.trust_v2_adjustment or 0) }}</div>
               </td>
