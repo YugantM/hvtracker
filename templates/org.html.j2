@@ -22,19 +22,9 @@
   <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --paper:#f4f1eb;
-      --paper-2:#ece4d6;
-      --ink:#1f1b17;
-      --muted:#6f665d;
-      --line:#d5cbbc;
-      --blue:#a7bfd9;
-      --blue-strong:#7f9cbd;
-      --lobster:#c67c6d;
-      --moss:#6f876e;
-      --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
-      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif
-    }
+    /* Theme vars come from static/site.css :root; only --muted diverges here
+       (lighter than the site-wide #57524c). */
+    :root{--muted:#6f665d}
     body{min-height:100vh;background:var(--paper); color:var(--ink);font:16px/1.7 var(--font-sans)}
     a{color:inherit;text-decoration:none}
     a:hover{text-decoration:underline}
