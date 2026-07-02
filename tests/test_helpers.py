@@ -370,6 +370,41 @@ def test_detect_package_provenance_drift_same_owner_is_not_a_warning():
     assert still_warns["status"] == "warning"
 
 
+def test_detect_package_provenance_drift_repo_transfer_is_not_a_warning():
+    """A package pointing to the tracked repo's *current* GitHub name (after a
+    rename/org transfer, confirmed via a live get_repo() full_name, which
+    transparently follows GitHub redirects) is not evidence of hijack.
+    Regression for the T3.1 audit (Garak: leondz/garak -> nvidia/garak;
+    Ragas: explodinggradients/ragas -> vibrantlabsai/ragas)."""
+    transferred = fb.detect_package_provenance_drift(
+        "leondz/garak",
+        pypi_package="garak",
+        pypi_metadata={"info": {"project_urls": {"Homepage": "https://github.com/NVIDIA/garak"}}},
+        tracked_repo_canonical="NVIDIA/garak",
+    )
+    assert transferred["status"] == "unknown"
+    assert "current name after a rename/transfer" in transferred["evidence"][0]
+
+    # Without the canonical hint (e.g. get_repo() failed), the same mismatch
+    # correctly still warns -- we only trust a confirmed GitHub redirect.
+    no_hint = fb.detect_package_provenance_drift(
+        "leondz/garak",
+        pypi_package="garak",
+        pypi_metadata={"info": {"project_urls": {"Homepage": "https://github.com/NVIDIA/garak"}}},
+    )
+    assert no_hint["status"] == "warning"
+
+    # A mismatch to some OTHER repo entirely (not the canonical name) still
+    # warns even when a canonical hint is present for a different target.
+    unrelated_mismatch = fb.detect_package_provenance_drift(
+        "leondz/garak",
+        pypi_package="garak",
+        pypi_metadata={"info": {"project_urls": {"Homepage": "https://github.com/someone-else/unrelated"}}},
+        tracked_repo_canonical="NVIDIA/garak",
+    )
+    assert unrelated_mismatch["status"] == "warning"
+
+
 def test_normalize_github_repo_url_variants():
     assert fb._normalize_github_repo_url("git+https://github.com/OpenAI/Codex.git") == "openai/codex"
     assert fb._normalize_github_repo_url("git@github.com:OpenAI/Codex.git") == "openai/codex"
