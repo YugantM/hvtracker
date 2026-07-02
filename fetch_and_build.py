@@ -1663,6 +1663,27 @@ def compute_trust_score_v2(row: dict) -> dict:
     }
 
 
+_V2_DIMENSION_LABELS = {
+    "mcp": "MCP",
+    "external_dependencies": "external deps",
+    "tool_plugin_surface": "tool surface",
+    "package_provenance_drift": "provenance",
+}
+
+
+def v2_why_summary(breakdown: dict) -> str:
+    """One-line, human-readable explanation of a runtime-calibrated adjustment,
+    e.g. "provenance +4.0 · MCP +2.0". Only non-zero dimensions are shown, in
+    order of contribution size, so the leaderboard's v2 toggle can always
+    answer "why did this move" per plan constraint #4 (public per-field
+    explanations, never a silent reweight)."""
+    terms = [(label, breakdown.get(key) or 0.0) for key, label in _V2_DIMENSION_LABELS.items()]
+    nonzero = sorted((t for t in terms if t[1] != 0), key=lambda t: -abs(t[1]))
+    if not nonzero:
+        return "No runtime-trust adjustment"
+    return " · ".join(f"{label} {value:+.1f}" for label, value in nonzero)
+
+
 def score_components(stars: int, days_since: int, recent_commits: int, forks: int) -> dict:
     """Compute the four score components. Reused by the leaderboard and profile pages."""
     stars_score = min(30, math.log1p(stars) / math.log1p(100_000) * 30)
@@ -5041,6 +5062,9 @@ def main() -> None:
         row["rank_v2"] = i
         old_rank = row.get("rank") or i
         row["rank_v2_delta"] = old_rank - i
+        row["rank_v2_delta_display"] = rank_delta_display(row["rank_v2_delta"], False)
+        row["rank_v2_delta_class"] = rank_delta_class(row["rank_v2_delta"], False)
+        row["v2_why"] = v2_why_summary(row.get("trust_v2_breakdown") or {})
 
     # Compute category ranks (within each category, sorted by trust)
     cat_groups: dict[str, list[dict]] = {}

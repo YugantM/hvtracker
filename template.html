@@ -169,6 +169,25 @@
     .cat-toggle.has-selection { color: var(--accent); }
     .cat-toggle .arrow { font-size: 11px; }
     .cat-dropdown.open .cat-toggle .arrow { transform: rotate(180deg); }
+
+    .v2-toggle {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: var(--font-mono); font-size: 12px; padding: 7px 10px;
+      border: 1px solid var(--border); background: #fff; color: var(--muted); cursor: pointer; user-select: none;
+    }
+    .v2-toggle:hover { color: var(--text); }
+    .v2-toggle.active { color: #fff; background: var(--accent-warm); border-color: var(--accent-warm); }
+    .v2-toggle .beta-tag { font-size: 10px; opacity: 0.8; }
+    .v2-banner {
+      display: none; align-items: center; gap: 8px; margin: 8px 0 0;
+      padding: 8px 10px; font-family: var(--font-mono); font-size: 11.5px;
+      color: var(--text); background: rgba(176, 90, 58, 0.08); border-left: 3px solid var(--accent-warm);
+    }
+    .v2-banner.visible { display: flex; }
+    .v2-banner a { color: var(--accent-warm); text-decoration: underline; }
+    .v2-why, .v2-score-inline { display: none; }
+    #leaderboard.v2-active .v2-why { display: block; font-size: 11px; color: var(--accent-warm); margin-top: 2px; }
+    #leaderboard.v2-active .v2-score-inline { display: inline; font-size: 11px; color: var(--accent-warm); margin-left: 4px; }
     .cat-panel {
       display: none; position: absolute; top: calc(100% + 2px); left: 0; z-index: 100;
       min-width: 220px; max-height: 340px; overflow-y: auto;
@@ -634,7 +653,18 @@
           </label>
         </div>
       </div>
+      <button type="button" class="v2-toggle active" id="v2Toggle" aria-pressed="true">
+        Runtime-Calibrated <span class="beta-tag">(beta)</span>
+      </button>
       <span class="cat-clear" id="catClear">✕ Clear filters</span>
+    </div>
+    <div class="v2-banner visible" id="v2Banner">
+      <span id="v2BannerText">Sorted by the experimental runtime-trust calibration — MCP support, external
+      dependencies, tool/plugin surface, and package-provenance drift, layered on
+      the trust score.</span>
+      <a href="/score-lab/">Full comparison</a> ·
+      <a href="/spec/runtime-trust/v0.1/">Methodology</a> ·
+      <a href="#" id="v2Revert">Show classic Trust Score</a>
     </div>
 
     {% if movers and movers.up %}
@@ -713,6 +743,12 @@
           <tr{% if row.rank <= 3 %} class="top-row"{% endif %}
             data-rank="{{ row.rank }}"
             data-rank_delta="{{ row.rank_delta_sort }}"
+            data-rank_delta_display="{{ row.rank_delta_display }}"
+            data-rank_delta_class="{{ row.rank_delta_class }}"
+            data-rank_v2="{{ row.rank_v2 }}"
+            data-rank_v2_delta_display="{{ row.rank_v2_delta_display }}"
+            data-rank_v2_delta_class="{{ row.rank_v2_delta_class }}"
+            data-trust_score_v2="{{ row.trust_score_v2 }}"
             data-name="{{ row.name }}"
             data-repo="{{ row.repo }}"
             data-stars="{{ row.stars }}"
@@ -757,6 +793,7 @@
                 <span class="agent-change-text">{{ row.recent_change_summary.detail }}</span>
               </div>
               {% endif %}
+              <span class="v2-why">{{ row.v2_why }}</span>
             </td>
             <td class="c">
               <span class="evidence-badge grade-{{ row.evidence_grade }}" title="Evidence grade {{ row.evidence_grade }}">{{ row.evidence_grade }}</span>
@@ -771,6 +808,7 @@
             <td class="c num">{% if row.weekly_commits is not none %}{{ row.weekly_commits }}{% else %}&mdash;{% endif %}{% if row.commits_low_confidence %}<span title="Recent push detected; GitHub's commit stats cache may be stale, so this 4-week count could be temporarily under-reported." style="color:var(--aging);font-size:11px;margin-left:2px;cursor:help;">?</span>{% endif %}</td>
             <td class="c">
               <span class="trust-pill {% if row.trust_score >= 55 %}trust-high{% elif row.trust_score >= 30 %}trust-mid{% else %}trust-low{% endif %}" title="Safety {{ row.trust_breakdown.safety }} · Identity {{ row.trust_breakdown.identity }} · Transparency {{ row.trust_breakdown.transparency }} · Maintenance {{ row.trust_breakdown.maintenance }} · Adoption {{ row.trust_breakdown.adoption }}{% if row.trust_confidence %} · {{ (row.trust_confidence * 100) | round }}% confidence{% endif %}">{{ row.trust_score }}</span>
+              <span class="v2-score-inline" title="{{ row.v2_why }}">→ {{ row.trust_score_v2 }}</span>
               {% if row.trust_trend_7d is not none and row.trust_trend_7d != 0 %}
               <span class="trust-trend {% if row.trust_trend_7d > 0 %}trust-trend-up{% else %}trust-trend-down{% endif %}">{{ "▲" if row.trust_trend_7d > 0 else "▼" }}{{ row.trust_trend_7d|abs }}</span>
               {% elif row.trust_trend_7d == 0 %}
@@ -873,6 +911,11 @@
       const pgInfo = document.getElementById("pgInfo");
       let sortCol = "rank";
       let sortAsc = true;
+
+      // ── Runtime-Calibrated (v2) toggle state ──
+      const v2Toggle = document.getElementById("v2Toggle");
+      const v2Banner = document.getElementById("v2Banner");
+      let rankMode = "v2"; // default view is the runtime-calibrated ranking
 
       // ── Category multi-select state ──
       const dropdown = document.getElementById("catDropdown");
@@ -978,7 +1021,9 @@
         const rows = getFilteredRows();
         rows.sort((a, b) => {
           let col = sortCol;
-          if (col === "rank" && selectedCats.size === 1) {
+          if (col === "rank" && rankMode === "v2") col = "rank_v2";
+          else if (col === "trust_score" && rankMode === "v2") col = "trust_score_v2";
+          else if (col === "rank" && selectedCats.size === 1) {
             let av = parseFloat(a.dataset.category_rank) || 0;
             let bv = parseFloat(b.dataset.category_rank) || 0;
             if (av < bv) return sortAsc ? -1 : 1;
@@ -1010,13 +1055,26 @@
           if (arrow) arrow.textContent = sortAsc ? "↑" : "↓";
         }
         const singleCat = selectedCats.size === 1;
+        const v2 = rankMode === "v2";
         rows.forEach(row => {
           const rankCell = row.querySelector(".rank");
-          const catRank = row.dataset.category_rank || "";
           const globalRank = row.dataset.rank || "";
-          rankCell.innerHTML = singleCat
-            ? '<span class="rank-num">' + catRank + '</span> <span class="rank-global-muted">#' + globalRank + '</span>'
-            : '<span class="rank-num">' + globalRank + '</span>';
+          if (v2) {
+            const v2Rank = row.dataset.rank_v2 || "";
+            rankCell.innerHTML = '<span class="rank-num">' + v2Rank + '</span> <span class="rank-global-muted">was #' + globalRank + '</span>';
+          } else {
+            const catRank = row.dataset.category_rank || "";
+            rankCell.innerHTML = singleCat
+              ? '<span class="rank-num">' + catRank + '</span> <span class="rank-global-muted">#' + globalRank + '</span>'
+              : '<span class="rank-num">' + globalRank + '</span>';
+          }
+          const deltaCell = row.querySelector(".delta");
+          if (deltaCell) {
+            const display = v2 ? row.dataset.rank_v2_delta_display : row.dataset.rank_delta_display;
+            const cls = v2 ? row.dataset.rank_v2_delta_class : row.dataset.rank_delta_class;
+            deltaCell.className = "delta " + (cls || "");
+            deltaCell.textContent = display || "";
+          }
         });
       }
 
@@ -1050,12 +1108,14 @@
         selectedSpecialTab = "__new__";
         selectedCats = new Set(catCbs.map(cb => cb.value));
       }
+      if (urlParams.get("rank") === "v1") rankMode = "v1";
 
       function updateFilterUrl() {
         const params = new URLSearchParams();
         if (searchTerm) params.set("q", searchTerm);
         if (selectedCats.size > 0 && selectedCats.size < totalCats) params.set("cat", [...selectedCats].join(","));
         if (selectedLicense !== "all") params.set("lic", selectedLicense);
+        if (rankMode === "v1") params.set("rank", "v1");
         if (selectedTrust.size) params.set("trust", [...selectedTrust].join(","));
         if (selectedSpecialTab === "__new__") params.set("tab", "new");
         const next = params.toString() ? "?" + params.toString() : location.pathname;
@@ -1125,6 +1185,37 @@
         updateRankDisplay();
         sortRows();
       }
+
+      function applyRankMode() {
+        const v2 = rankMode === "v2";
+        table.classList.toggle("v2-active", v2);
+        v2Toggle.classList.toggle("active", v2);
+        v2Toggle.setAttribute("aria-pressed", v2 ? "true" : "false");
+        v2Banner.classList.toggle("visible", v2);
+        document.getElementById("v2BannerText").textContent = v2
+          ? "Sorted by the experimental runtime-trust calibration — MCP support, external dependencies, tool/plugin surface, and package-provenance drift, layered on the trust score."
+          : "Showing the classic Trust Score.";
+        const revertLink = document.getElementById("v2Revert");
+        revertLink.textContent = v2 ? "Show classic Trust Score" : "Back to Runtime-Calibrated";
+        sortCol = "rank";
+        sortAsc = true;
+        headers.forEach(h => { h.classList.remove("sorted"); const a = h.querySelector(".sort-arrow"); if (a) a.textContent = ""; });
+        rankHeader.classList.add("sorted");
+        currentPage = 0;
+        updateRankDisplay();
+        sortRows();
+      }
+      function toggleRankMode() {
+        rankMode = rankMode === "v2" ? "v1" : "v2";
+        applyRankMode();
+        updateFilterUrl();
+        hvtTrack("rank_mode_toggle", { mode: rankMode });
+      }
+      v2Toggle.addEventListener("click", toggleRankMode);
+      document.getElementById("v2Revert").addEventListener("click", (e) => {
+        e.preventDefault();
+        toggleRankMode();
+      });
 
       function loadWatchlist() {
         try {
@@ -1355,6 +1446,7 @@
       });
 
       // Initial render
+      applyRankMode();
       syncTrustUI();
       syncUI(false);
       renderWatchlistPreview();

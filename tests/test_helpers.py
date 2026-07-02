@@ -655,3 +655,16 @@ def test_sparklines_no_reset_when_version_stable():
 
 def test_sparklines_empty_history():
     assert fb.compute_sparklines([]) == {}
+
+
+def test_v2_why_summary_orders_by_magnitude_and_skips_zero():
+    summary = fb.v2_why_summary({
+        "mcp": 1.0, "external_dependencies": -3.0,
+        "tool_plugin_surface": 0.0, "package_provenance_drift": 4.0,
+    })
+    assert summary == "provenance +4.0 · external deps -3.0 · MCP +1.0"
+
+
+def test_v2_why_summary_all_zero():
+    assert fb.v2_why_summary({}) == "No runtime-trust adjustment"
+    assert fb.v2_why_summary({"mcp": 0.0}) == "No runtime-trust adjustment"
