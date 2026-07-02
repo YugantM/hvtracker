@@ -74,5 +74,9 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   #91 multi-stage Dockerfile (591MB; scorecard fetch now actually works —
   first deploy after this fetches fresh cache at build) · #92 T3.1 upset-review
   report → verdict NO-GO, T3.4 stays gated (drift dimension dominates).
-- Next: GSC page-2 metadata pass (needs user's Search Console export);
-  T3.2 /spec/runtime-trust (prerequisite for any T3.4 re-review).
+- Deployed 2026-07-02: v3.2 batch (#81-#94) live + verified; branches pruned.
+  GSC pass done narrowly (#94 — category titles; agent metadata already good).
+- T3.2 ✅ /spec/runtime-trust v0.1 published (spec-matches-code test locks the
+  §4 adjustment table to compute_trust_score_v2).
+- Next: T3.1 criteria sign-off (owner) → recalibration or T3.4 documentation;
+  T3.3 capability-surface page; internal-linking SEO pass (parked).
