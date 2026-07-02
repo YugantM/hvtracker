@@ -219,6 +219,22 @@ def test_api_v1_agents(client):
     assert "agents" in data
 
 
+def test_history_snapshot_keeps_runtime_drift_fields(client):
+    """History snapshots are the only source for runtime-drift trends (T3.5);
+    they can't be backfilled, so losing these fields is silent data loss."""
+    import datetime
+    today = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
+    path = os.path.join(os.environ["OUTPUT_DIR"], "output", "history", f"{today}.json")
+    with open(path) as f:
+        snap = json.load(f)
+    agent = snap["agents"][0]
+    for key in ("mcp_server_support", "external_service_dependencies",
+                "tool_plugin_surface", "package_provenance_drift",
+                "has_provenance", "trust_score", "rank"):
+        assert key in agent, f"runtime-drift field {key!r} missing from history snapshot"
+    assert "graph_summary" in snap
+
+
 def test_sitemap_and_feeds_get_cache_headers(client):
     for path in ("/sitemap.xml", "/feed.json", "/changes/feed.xml"):
         r = client.get(path)
