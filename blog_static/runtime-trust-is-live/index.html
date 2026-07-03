@@ -121,7 +121,7 @@
       <a href="/" class="logo">HV<span>Tracker</span></a>
       <nav class="site-nav" aria-label="Site">
         <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a></div></div>
-        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/methodology">Methodology</a><a href="/badges/">Badges</a><a href="/score-lab/">Score lab</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/methodology">Methodology</a><a href="/badges/">Badges</a></div></div>
         <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
         <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
         <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
@@ -142,7 +142,7 @@
       <p><strong>MCP server support</strong>, <strong>external service dependencies</strong>, <strong>tool / plugin surface</strong>, and <strong>package provenance drift</strong>.</p>
 
       <div class="callout">
-        <strong>Important:</strong> these runtime fields are live on agent pages now, but they do <strong>not</strong> affect the production leaderboard yet. We are calibrating them separately in an experimental <a href="/score-lab/">Score Lab</a> so we can study upsets before changing the live rank.
+        <strong>Important:</strong> these runtime fields are live on agent pages now, but they do <strong>not</strong> affect the production leaderboard yet. We are calibrating them separately in an experimental Score Lab (since retired — the calibration is now <a href="/methodology/#runtime-calibration">part of the production score</a>) so we can study upsets before changing the live rank.
       </div>
 
       <h2>What actually shipped</h2>
@@ -211,7 +211,7 @@
       <div class="cta-box">
         <h3>See the experimental ranking preview</h3>
         <p>Open the Score Lab to inspect the raw current-vs-v2 changes, biggest movers, and the full comparison table.</p>
-        <a class="cta-btn" href="/score-lab/">Open Score Lab</a>
+        <a class="cta-btn" href="/methodology/#runtime-calibration">See the calibration methodology</a>
       </div>
 
       <p>If there is a better product pattern here, it is probably this: <strong>keep raw discovery public, keep score changes conservative, and let people inspect the “what if” ranking before we touch the main leaderboard.</strong> That gives us more trust, not less.</p>
@@ -220,7 +220,7 @@
     <footer>
       <a href="/methodology">Methodology</a> &middot;
       <a href="/roadmap/">Roadmap</a> &middot;
-      <a href="/score-lab/">Score Lab</a> &middot;
+      <a href="/methodology/#runtime-calibration">Runtime calibration</a> &middot;
       <a href="/blog/">Blog</a>
     </footer>
   </div>

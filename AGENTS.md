@@ -12,7 +12,7 @@ bootstrap: trust it instead of re-discovering the repo; verify only what you cha
 - Never hand-edit generated output (`agents/`, `ecosystem/`, `org/`, `data/`,
   `sitemap.xml`, `index.html`, `blog/`, `compare/*-vs-*/`, `changes/`) — change
   the generator + re-render.
-- Never change production rank without an evidence gate (Score Lab upset review);
+- Never change production rank without an evidence gate (upset review);
   scoring changes ship as separate visible slices, never silent reweights.
 - Monetization on hold (visa): no billing/paid-tier code.
 - `output/history/*.json` daily snapshots are irreplaceable IP — never delete.
@@ -34,7 +34,8 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   `build_changes_rss`), `compute_movers` (daily gainers/losers ticker, `limit`
   param), `derive_agent_events` (threshold events → `recent_events` → bell
   notifications), `_load_prior_snapshot` (rank Δ vs yesterday's history
-  snapshot), `compute_trust_score_v2` (Score Lab calibration, not in prod rank).
+  snapshot), `compute_trust_score_v2` (runtime calibration — IS the production
+  trust_score/rank/grade since methodology v4.0).
 - `app.py` — FastAPI serving, /healthz, 30-min signals-refresh scheduler.
 - `auth.py` — OAuth/password accounts, watchlist, `/api/notifications`
   (derive-on-read from `recent_events` in `data/latest.json`; needs DB for
@@ -117,6 +118,18 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   default, agent pages, Score Lab, `/badge/*.svg`, and `/api/v1/agents` all
   consistently return the new calibrated numbers; no server errors.
   Merged, NOT yet deployed.
+- Post-swap cleanup 2026-07-03 (owner): per-row red "why" adjustment text
+  removed from the leaderboard; Score Lab page RETIRED (template deleted,
+  renderer actively removes score-lab/ from the output root, sitemap/nav/blog
+  links cleaned incl. all 13 hand-written blog_static headers). The
+  methodology page is now the canonical score-change reference — new
+  "Runtime-Trust Calibration" section (#runtime-calibration) documents every
+  adjustment value, and the formerly stale "descriptive only / do not affect
+  rank" copy on methodology/agent/roadmap pages was corrected to match the
+  v4.0 reality. Stale local artifacts deleted (bee-agent-framework agent
+  page, i-am-bee org page, recently-active use-case) — the prod VOLUME may
+  hold its own stale generated pages with dead /score-lab/ links; check at
+  deploy.
 - Next: T3.3 capability-surface page; internal-linking SEO pass (parked);
   consider fixing tool_plugin_surface's "search"/"code" pattern-mention
   breadth if it resurfaces in a future audit (currently gated behind real

@@ -1663,27 +1663,6 @@ def compute_trust_score_v2(row: dict) -> dict:
     }
 
 
-_V2_DIMENSION_LABELS = {
-    "mcp": "MCP",
-    "external_dependencies": "external deps",
-    "tool_plugin_surface": "tool surface",
-    "package_provenance_drift": "provenance",
-}
-
-
-def v2_why_summary(breakdown: dict) -> str:
-    """One-line, human-readable explanation of a runtime-calibrated adjustment,
-    e.g. "provenance +4.0 · MCP +2.0". Only non-zero dimensions are shown, in
-    order of contribution size, so the leaderboard's v2 toggle can always
-    answer "why did this move" per plan constraint #4 (public per-field
-    explanations, never a silent reweight)."""
-    terms = [(label, breakdown.get(key) or 0.0) for key, label in _V2_DIMENSION_LABELS.items()]
-    nonzero = sorted((t for t in terms if t[1] != 0), key=lambda t: -abs(t[1]))
-    if not nonzero:
-        return "No runtime-trust adjustment"
-    return " · ".join(f"{label} {value:+.1f}" for label, value in nonzero)
-
-
 def score_components(stars: int, days_since: int, recent_commits: int, forks: int) -> dict:
     """Compute the four score components. Reused by the leaderboard and profile pages."""
     stars_score = min(30, math.log1p(stars) / math.log1p(100_000) * 30)
@@ -3788,7 +3767,6 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
         <a href="/changes/">Changes</a>
         <a href="/use-cases/">Use cases</a>
         <a href="/methodology">Methodology</a>
-        <a href="/score-lab/">Score lab</a>
         <a href="/compare/">Compare</a>
         <a href="/alerts/">Alerts</a>
         <a href="/data/">Data API</a>
@@ -5045,11 +5023,11 @@ def main() -> None:
         # combined score IS production trust_score/rank/evidence_grade
         # everywhere (leaderboard, agent/category/org pages, /data API,
         # badges, signed credentials). The pre-calibration base score is
-        # preserved as trust_score_historical_v1/rank_historical_v1 for
-        # comparison (Score Lab) — it is no longer live/authoritative
-        # anywhere. trust_score_v2/rank_v2 stay as aliases of the (now
-        # current) trust_score/rank for compatibility with any caller still
-        # naming the v2 fields explicitly.
+        # preserved as trust_score_historical_v1/rank_historical_v1 for the
+        # leaderboard's compare-to-pre-calibration view — it is no longer
+        # live/authoritative anywhere. trust_score_v2/rank_v2 stay as aliases
+        # of the (now current) trust_score/rank for compatibility with any
+        # caller still naming the v2 fields explicitly.
         trust = compute_trust_score(row)
         row["trust_score_historical_v1"] = trust["trust_score"]
         row["trust_confidence"] = trust["trust_confidence"]
@@ -5058,7 +5036,6 @@ def main() -> None:
         row["trust_score"] = trust_v2["trust_score_v2"]
         row["trust_v2_adjustment"] = trust_v2["trust_v2_adjustment"]
         row["trust_v2_breakdown"] = trust_v2["trust_v2_breakdown"]
-        row["v2_why"] = v2_why_summary(row["trust_v2_breakdown"])
 
         # Evidence grade — based on trust score band so grade agrees with rank
         ts = row["trust_score"]
@@ -5083,8 +5060,8 @@ def main() -> None:
         row["rank_v2"] = i
         row["trust_score_v2"] = row["trust_score"]
 
-    # Pre-calibration baseline rank, preserved for comparison (Score Lab) —
-    # no longer live/authoritative anywhere.
+    # Pre-calibration baseline rank, preserved for the leaderboard's
+    # compare-to-pre-calibration view — no longer live/authoritative anywhere.
     v1_sorted = sorted(
         rows,
         key=lambda x: (x.get("trust_score_historical_v1", 0) or 0, x.get("score", 0) or 0, x.get("stars", 0) or 0),
@@ -5471,62 +5448,14 @@ def main() -> None:
         f.write(html)
     print(f"Built index.html with {len(rows)} agents.")
 
-    def _score_lab_summary(row: dict) -> str:
-        mcp_status = ((row.get("mcp_server_support") or {}).get("status") or "none").replace("_", " ")
-        dep_count = len((row.get("external_service_dependencies") or {}).get("providers") or [])
-        plugin_system = ((row.get("tool_plugin_surface") or {}).get("plugin_system") or "none").replace("-", " ")
-        provenance_status = ((row.get("package_provenance_drift") or {}).get("status") or "not_applicable").replace("_", " ")
-        return f"MCP {mcp_status}; {dep_count} external provider{'s' if dep_count != 1 else ''}; tool surface {plugin_system}; provenance {provenance_status}."
-
-    def _score_lab_chips(row: dict) -> list[str]:
-        chips = []
-        mcp_status = ((row.get("mcp_server_support") or {}).get("status") or "none").replace("_", " ").title()
-        chips.append(f"MCP: {mcp_status}")
-        providers = (row.get("external_service_dependencies") or {}).get("providers") or []
-        if providers:
-            chips.append(f"Deps: {len(providers)}")
-        tool_tags = (row.get("tool_plugin_surface") or {}).get("tool_tags") or []
-        if tool_tags:
-            chips.append(f"Tools: {len(tool_tags)}")
-        provenance_status = ((row.get("package_provenance_drift") or {}).get("status") or "not_applicable").replace("_", " ").title()
-        chips.append(f"Provenance: {provenance_status}")
-        return chips
-
-    score_lab_rows = []
-    for row in rows:
-        score_lab_row = dict(row)
-        score_lab_row["score_lab_summary"] = _score_lab_summary(row)
-        score_lab_row["score_lab_chips"] = _score_lab_chips(row)
-        score_lab_rows.append(score_lab_row)
-    top_up = sorted(
-        [r for r in score_lab_rows if (r.get("rank_v2_delta") or 0) > 0],
-        key=lambda r: (r.get("rank_v2_delta") or 0, -(r.get("rank") or 9999)),
-        reverse=True,
-    )[:12]
-    top_down = sorted(
-        [r for r in score_lab_rows if (r.get("rank_v2_delta") or 0) < 0],
-        key=lambda r: (r.get("rank_v2_delta") or 0, r.get("rank") or 9999),
-    )[:12]
-    avg_adjustment = round(sum((r.get("trust_v2_adjustment") or 0) for r in score_lab_rows) / max(len(score_lab_rows), 1), 1)
-    score_lab_stats = {
-        "avg_adjustment": f"{avg_adjustment:+.1f}",
-        "upsets": sum(1 for r in score_lab_rows if abs(r.get("rank_v2_delta") or 0) >= 10),
-        "improved": sum(1 for r in score_lab_rows if (r.get("rank_v2_delta") or 0) > 0),
-        "dropped": sum(1 for r in score_lab_rows if (r.get("rank_v2_delta") or 0) < 0),
-    }
-    score_lab_tmpl = env.get_template("score_lab.html.j2")
+    # Score Lab was retired when the runtime calibration it previewed became
+    # the production score (methodology v4.0) — the per-field adjustment rules
+    # now live on /methodology/#runtime-calibration and /spec/runtime-trust.
+    # Actively remove the generated page so the volume drops it on deploy.
     score_lab_dir = os.path.join(script_dir, "score-lab")
-    os.makedirs(score_lab_dir, exist_ok=True)
-    with open(os.path.join(score_lab_dir, "index.html"), "w", encoding="utf-8") as f:
-        f.write(score_lab_tmpl.render(
-            rows=score_lab_rows,
-            updated=now_str,
-            stats=score_lab_stats,
-            top_up=top_up,
-            top_down=top_down,
-            methodology_version=METHODOLOGY_VERSION,
-        ))
-    print(f"Built score-lab/index.html with {len(score_lab_rows)} agents.")
+    if os.path.isdir(score_lab_dir):
+        shutil.rmtree(score_lab_dir, ignore_errors=True)
+        print("Removed retired score-lab/ page.")
 
     # Compute sibling links per agent (top-5 in same category, excluding self)
     by_cat: dict[str, list[dict]] = {}
@@ -6010,7 +5939,6 @@ def main() -> None:
         ("https://hvtracker.net/use-cases/", "0.8", "daily"),
         ("https://hvtracker.net/badges/", "0.6", "weekly"),
         ("https://hvtracker.net/roadmap/", "0.5", "weekly"),
-        ("https://hvtracker.net/score-lab/", "0.4", "weekly"),
         ("https://hvtracker.net/spec/", "0.4", "monthly"),
     ]
     for spec in _ALL_SPECS:
