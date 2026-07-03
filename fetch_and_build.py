@@ -2114,6 +2114,32 @@ def seed_history_into_output_root(base_dir: str, script_dir: str) -> int:
     return copied
 
 
+def prune_stale_page_dirs(parent_dir: str, keep_slugs: set[str], label: str) -> int:
+    """Remove generated page subdirectories the current render did not produce.
+
+    Fully-regenerated page families (org/, use-cases/, ecosystem/, categories/;
+    compare/ has its own inline equivalent) rebuild every page on every render
+    but never deleted pages that dropped out of the set — e.g. an org slug that
+    changed with a repo rename, or a data-driven use-case page whose filter
+    currently matches zero agents. On the persistent deploy volume those
+    leftovers get served forever with permanently stale content. Only removes
+    subdirectories, never files (index.html at the parent level is untouched).
+    """
+    removed = 0
+    try:
+        entries = os.listdir(parent_dir)
+    except OSError:
+        return 0
+    for entry in entries:
+        path = os.path.join(parent_dir, entry)
+        if os.path.isdir(path) and entry not in keep_slugs:
+            shutil.rmtree(path, ignore_errors=True)
+            removed += 1
+    if removed:
+        print(f"Pruned {removed} stale page dir(s) under {label}/.")
+    return removed
+
+
 def select_completed_history_window(history: list[dict], window: int = 7) -> tuple[dict | None, dict | None]:
     """Return the latest completed daily snapshot and its baseline snapshot.
 
@@ -5565,6 +5591,7 @@ def main() -> None:
                 comparisons=compare_by_cat.get(cat_slug, []),
             ))
     print(f"Built {len(all_cat_meta)} category pages under categories/.")
+    prune_stale_page_dirs(categories_dir, {c["slug"] for c in all_cat_meta}, "categories")
 
     # Movers page — /movers/ is refreshed from history snapshots on every build.
     movers_tmpl = env.get_template("movers.html.j2")
@@ -5627,6 +5654,7 @@ def main() -> None:
         with open(os.path.join(page_dir, "index.html"), "w", encoding="utf-8") as f:
             f.write(use_case_tmpl.render(page=page, pages=use_case_pages, updated=now_str, is_index=False))
     print(f"Built {len(use_case_pages)} use-case pages under use-cases/.")
+    prune_stale_page_dirs(use_cases_dir, {p["slug"] for p in use_case_pages}, "use-cases")
 
     # Ecosystem pages — /ecosystem/ and /ecosystem/<slug>/.
     eco_tmpl = env.get_template("ecosystem.html.j2")
@@ -5648,6 +5676,7 @@ def main() -> None:
         with open(os.path.join(page_dir, "index.html"), "w", encoding="utf-8") as f:
             f.write(eco_tmpl.render(page=page, pages=ecosystem_pages, updated=now_str, is_index=False))
     print(f"Built {len(ecosystem_pages)} ecosystem pages under ecosystem/.")
+    prune_stale_page_dirs(eco_dir, {p["slug"] for p in ecosystem_pages}, "ecosystem")
     # Organization pages — /org/ and /org/<owner>/
     org_tmpl = env.get_template("org.html.j2")
     org_dir = os.path.join(script_dir, "org")
@@ -5660,6 +5689,7 @@ def main() -> None:
         with open(os.path.join(page_dir, "index.html"), "w", encoding="utf-8") as f:
             f.write(org_tmpl.render(org=org, orgs=org_pages, is_index=False, updated=now_str))
     print(f"Built {len(org_pages)} org pages under org/.")
+    prune_stale_page_dirs(org_dir, {o["slug"] for o in org_pages}, "org")
 
     # /compare/<a>-vs-<b>/ — STATIC pre-rendered comparison pages (SEO).
     # Previously these URLs were served by the interactive (client-rendered)

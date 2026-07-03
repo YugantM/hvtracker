@@ -709,3 +709,22 @@ def test_derive_agent_events_defaults_to_firing_without_methodology_map():
     events = fb.derive_agent_events(history_by_date, today_agents)
     kinds = {e["type"] for e in events.get("o/agent", [])}
     assert "trust_score_changed" in kinds
+
+
+def test_prune_stale_page_dirs(tmp_path):
+    """Fully-regenerated page families must drop dirs the render didn't
+    produce (stale volume artifacts) while never touching files or kept dirs."""
+    (tmp_path / "kept-a").mkdir()
+    (tmp_path / "kept-a" / "index.html").write_text("a")
+    (tmp_path / "stale-b").mkdir()
+    (tmp_path / "stale-b" / "index.html").write_text("b")
+    (tmp_path / "index.html").write_text("parent index")
+
+    removed = fb.prune_stale_page_dirs(str(tmp_path), {"kept-a"}, "test")
+    assert removed == 1
+    assert (tmp_path / "kept-a" / "index.html").exists()
+    assert not (tmp_path / "stale-b").exists()
+    assert (tmp_path / "index.html").exists()  # parent-level files untouched
+
+    # Missing parent dir is a no-op, not an error
+    assert fb.prune_stale_page_dirs(str(tmp_path / "nope"), set(), "test") == 0
