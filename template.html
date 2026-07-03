@@ -466,21 +466,23 @@
     .movers-title { flex: none; min-width: 96px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
     .movers-gainers .movers-title { color: var(--green); }
     .movers-losers .movers-title { color: var(--red); }
-    .movers-viewport { flex: 1; min-width: 0; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); }
-    .movers-row { display: flex; gap: 22px; width: max-content; font-family: var(--font-mono); font-size: 12px; animation: ticker-scroll 70s linear infinite; }
-    .movers-losers .movers-row { animation-direction: reverse; }
-    .movers:hover .movers-row { animation-play-state: paused; }
+    .movers-viewport {
+      flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; cursor: grab;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+      scrollbar-width: none; -ms-overflow-style: none;
+    }
+    .movers-viewport::-webkit-scrollbar { display: none; }
+    .movers-viewport:active { cursor: grabbing; }
+    .movers-row { display: flex; gap: 22px; width: max-content; font-family: var(--font-mono); font-size: 12px; }
     .mover { display: flex; align-items: center; gap: 5px; color: var(--text); white-space: nowrap; }
     .mover:hover { text-decoration: none; color: var(--accent); }
     .mover-arrow { font-weight: 700; }
     .mover-up .mover-arrow { color: var(--green); }
     .mover-down .mover-arrow { color: var(--red); }
     .mover-rank { color: var(--muted); font-size: 11px; }
-    @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
     @media (prefers-reduced-motion: reduce) {
       .movers-viewport { -webkit-mask-image: none; mask-image: none; }
-      .movers-row { animation: none; flex-wrap: wrap; width: auto; }
-      .mover-dup { display: none; }
     }
 
     .formula { font-size: 12px; color: var(--muted); padding: 6px 0; font-family: var(--font-mono); }
@@ -669,14 +671,12 @@
       <span class="movers-title">Daily gainers</span>
       <div class="movers-viewport">
         <div class="movers-row">
-          {% for pass in [1, 2] %}
           {% for m in movers.up %}
-          <a href="/agents/{{ m.slug }}/" class="mover mover-up{% if pass == 2 %} mover-dup{% endif %}"{% if pass == 2 %} aria-hidden="true" tabindex="-1"{% endif %}>
+          <a href="/agents/{{ m.slug }}/" class="mover mover-up">
             <span class="mover-arrow">▲{{ m.delta }}</span>
             <span class="mover-name">{{ m.name }}</span>
             <span class="mover-rank">#{{ m.rank }}</span>
           </a>
-          {% endfor %}
           {% endfor %}
         </div>
       </div>
@@ -687,14 +687,12 @@
       <span class="movers-title">Daily losers</span>
       <div class="movers-viewport">
         <div class="movers-row">
-          {% for pass in [1, 2] %}
           {% for m in movers.down %}
-          <a href="/agents/{{ m.slug }}/" class="mover mover-down{% if pass == 2 %} mover-dup{% endif %}"{% if pass == 2 %} aria-hidden="true" tabindex="-1"{% endif %}>
+          <a href="/agents/{{ m.slug }}/" class="mover mover-down">
             <span class="mover-arrow">▼{{ m.delta|abs }}</span>
             <span class="mover-name">{{ m.name }}</span>
             <span class="mover-rank">#{{ m.rank }}</span>
           </a>
-          {% endfor %}
           {% endfor %}
         </div>
       </div>
@@ -1461,6 +1459,41 @@
           si.select();
         }
       });
+
+      // ── Daily movers ticker: auto-scroll, pauses on hover/touch so the
+      // user can then scroll left/right themselves (native scroll, not a
+      // CSS animation, so nothing fights their gesture). Bounces at each
+      // end rather than looping, so pausing mid-scroll never snaps.
+      function initMoversTicker(viewport, reverse) {
+        if (!viewport) return;
+        const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduceMotion) return; // stays natively scrollable; just no autoplay
+        let dir = reverse ? -1 : 1;
+        let paused = false;
+        let resumeTimer = null;
+        function step() {
+          if (!paused) {
+            const max = viewport.scrollWidth - viewport.clientWidth;
+            if (max > 0) {
+              let next = viewport.scrollLeft + dir * 0.5;
+              if (next >= max) { next = max; dir = -1; }
+              else if (next <= 0) { next = 0; dir = 1; }
+              viewport.scrollLeft = next;
+            }
+          }
+          requestAnimationFrame(step);
+        }
+        if (reverse) viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
+        requestAnimationFrame(step);
+        viewport.addEventListener("mouseenter", () => { paused = true; clearTimeout(resumeTimer); });
+        viewport.addEventListener("mouseleave", () => { paused = false; });
+        viewport.addEventListener("touchstart", () => { paused = true; clearTimeout(resumeTimer); }, { passive: true });
+        viewport.addEventListener("touchend", () => {
+          resumeTimer = setTimeout(() => { paused = false; }, 3000);
+        }, { passive: true });
+      }
+      initMoversTicker(document.querySelector(".movers-gainers .movers-viewport"), false);
+      initMoversTicker(document.querySelector(".movers-losers .movers-viewport"), true);
     })();
   </script>
 </body>
