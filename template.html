@@ -184,7 +184,6 @@
     }
     .v2-banner.visible { display: flex; }
     .v2-banner a { color: var(--accent-warm); text-decoration: underline; }
-    .v2-why { display: block; font-size: 11px; color: var(--accent-warm); margin-top: 2px; }
     .v2-score-inline { display: none; }
     #leaderboard.v2-active .v2-score-inline { display: inline; font-size: 11px; color: var(--muted); margin-left: 4px; }
     .cat-panel {
@@ -525,7 +524,7 @@
       <h1 class="logo"><a href="/" style="color:inherit;text-decoration:none">HV<span>Tracker</span></a></h1>
       <nav class="site-nav" aria-label="Site">
         <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a></div></div>
-        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/scan/">Scan stack</a><a href="/methodology/">Methodology</a><a href="/badges/">Badges</a><a href="/score-lab/">Score lab</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/scan/">Scan stack</a><a href="/methodology/">Methodology</a><a href="/badges/">Badges</a></div></div>
         <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
         <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
         <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
@@ -544,7 +543,7 @@
     <section class="intro" aria-labelledby="intro-title">
       <h2 id="intro-title">AI Trust Registry for open-source AI agent projects.</h2>
       <p>Independent trust scores for {{ total }} open-source AI agent projects, based on public, checkable signals across activity, adoption, transparency, safety, and provenance.</p>
-      <p>HVTrust now folds in runtime-trust signals — MCP support, external dependencies, tool/plugin surface, and package-provenance drift — alongside the base score. Every row shows why. See what changed vs. the pre-calibration baseline in <a href="/score-lab/" style="color:var(--accent);">Score Lab →</a></p>
+      <p>HVTrust folds runtime-trust signals — MCP support, external dependencies, tool/plugin surface, and package-provenance drift — into the score alongside supply-chain evidence. How every point is earned is documented in the <a href="/methodology/" style="color:var(--accent);">methodology →</a></p>
       <a href="/verify/" class="home-verify-cta" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:18px 0;padding:16px 20px;border:1px solid var(--line-strong);border-left:3px solid var(--accent);border-radius:8px;background:var(--surface);color:inherit;text-decoration:none">
         <span><strong style="font-size:16px;color:var(--text)">Check your own agent or MCP server &rarr;</strong><br><span style="color:var(--muted);font-size:13px">Paste a repo, package, or MCP server URL and get a signed trust verdict before you connect.</span></span>
         <span style="background:var(--accent);color:#fff;font-weight:700;font-size:13px;padding:9px 16px;border-radius:6px;white-space:nowrap">Verify now</span>
@@ -661,8 +660,7 @@
     </div>
     <div class="v2-banner" id="v2Banner">
       <span id="v2BannerText">Showing the pre-calibration baseline (methodology {{ methodology_version }} superseded this). This is no longer the live ranking.</span>
-      <a href="/score-lab/">Full comparison</a> ·
-      <a href="/spec/runtime-trust/v0.1/">Methodology</a> ·
+      <a href="/methodology/">Methodology</a> ·
       <a href="#" id="v2Revert">Back to current ranking</a>
     </div>
 
@@ -788,7 +786,6 @@
                 <span class="agent-change-text">{{ row.recent_change_summary.detail }}</span>
               </div>
               {% endif %}
-              <span class="v2-why">{{ row.v2_why }}</span>
             </td>
             <td class="c">
               <span class="evidence-badge grade-{{ row.evidence_grade }}" title="Evidence grade {{ row.evidence_grade }}">{{ row.evidence_grade }}</span>

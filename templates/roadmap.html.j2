@@ -130,15 +130,14 @@
 
         <div class="stage">
           <div class="stage-header">
-            <span class="stage-tag building">In progress</span>
-            <span class="stage-title">Runtime trust — score calibration</span>
+            <span class="stage-tag shipped">Live</span>
+            <span class="stage-title">Runtime trust — in the production score</span>
           </div>
-          <p>We are now testing how runtime-trust signals should affect ranking without destabilising the leaderboard. The current calibration work happens in an experimental score preview rather than the production rank.</p>
+          <p>Runtime-trust signals are now part of the production HVTrust score and rank. The promotion was evidence-gated: an upset review plus several rounds of detector auditing (same-owner package variants, repo transfers, and docs-only mentions are excluded from scoring) preceded the cutover.</p>
           <ul>
-            <li><strong>Score Lab</strong> — preview old rank vs experimental <code>trust_score_v2</code></li>
-            <li><strong>Upset review</strong> — identify large rank swings before changing production scoring</li>
-            <li><strong>Weight tuning</strong> — keep provenance drift meaningful without over-penalising rich ecosystems</li>
-            <li><strong>Public explanations</strong> — make it easy to see why a runtime field helped or hurt a project</li>
+            <li><strong>Calibrated scoring</strong> — MCP support, external dependencies, tool/plugin surface, and package-provenance drift adjust the base score within published bounds</li>
+            <li><strong>Public methodology</strong> — every adjustment value is documented in the <a href="/methodology/#runtime-calibration">methodology</a> and the <a href="/spec/runtime-trust/v0.1/">runtime-trust spec</a></li>
+            <li><strong>Comparable baseline</strong> — the pre-calibration ranking stays available on the leaderboard for comparison</li>
           </ul>
         </div>
       </section>

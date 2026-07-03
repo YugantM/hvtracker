@@ -1057,7 +1057,7 @@ RUNTIME_TRUST_V01 = {
   <li><code>GET /data/latest.json</code> — all agents, including runtime fields and v2 scores</li>
   <li><code>GET /data/agents/{slug}.json</code> — per-agent record</li>
   <li><code>GET /data/history/YYYY-MM-DD.json</code> — daily snapshots (runtime-drift time series)</li>
-  <li><a href="/score-lab/">Score Lab</a> — interactive v1 vs v2 comparison</li>
+  <li><a href="/methodology/#runtime-calibration">Methodology — Runtime-Trust Calibration</a> — the human-readable adjustment reference</li>
 </ul>
 
 <h2 id="s6">6. Calibration and Promotion Criteria</h2>

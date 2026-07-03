@@ -719,12 +719,12 @@
     <section class="runtime-soon">
       <h2 class="section-title">AI agent surface</h2>
       <div class="rt-card">
-        <div class="runtime-kicker">Profile context only</div>
+        <div class="runtime-kicker">Scored in HVTrust</div>
         {% set mcp = row.mcp_server_support or {"status": "none", "confidence": none, "evidence": []} %}
         {% set ext = row.external_service_dependencies or {"providers": [], "requires_api_keys": false, "confidence": none, "evidence": []} %}
         {% set tooling = row.tool_plugin_surface or {"plugin_system": "none", "tool_tags": [], "confidence": none, "evidence": []} %}
         {% set drift = row.package_provenance_drift or {"status": "not_applicable", "confidence": none, "summary": "No package source configured", "evidence": []} %}
-        <p class="runtime-intro">HVTrust currently ranks <strong>supply-chain and project-integrity trust only</strong>. This public view shows a compact AI-agent surface snapshot from repo docs and manifests. These fields are descriptive context and do not affect the production HVTrust rank. An experimental local preview remains available in <a href="/score-lab/" style="color:var(--accent);">Score Lab →</a>, and the policy boundary is tracked on the <a href="/roadmap/" style="color:var(--accent);">roadmap →</a></p>
+        <p class="runtime-intro">These runtime-trust fields — detected from public repo docs and manifests — <strong>contribute a bounded adjustment to this project's HVTrust score</strong> alongside supply-chain evidence. The exact values each field can add or subtract are documented in the <a href="/methodology/#runtime-calibration" style="color:var(--accent);">methodology →</a></p>
 
         <div class="runtime-grid">
           <div class="runtime-panel">
