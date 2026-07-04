@@ -6315,10 +6315,9 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
     print(f"Built spec index with {len(ALL_SPECS)} spec(s).")
 
 
-def run_refresh(mode: str = "auto") -> None:
-    """Programmatic entrypoint for the web service scheduler.
+def refresh_argv(mode: str = "auto") -> list[str]:
+    """Translate a refresh mode into the CLI flags main() expects.
 
-    Translates a mode into the CLI flags main() expects, then runs a build.
       auto   — full build if no data.json yet on the volume, else a batch slice
       full   — full refresh of all agents
       render — rebuild pages from cached render_state (no API calls)
@@ -6329,30 +6328,41 @@ def run_refresh(mode: str = "auto") -> None:
       repair-commits — refresh only rows whose commit count is currently missing
     """
     out_dir = os.environ.get("OUTPUT_DIR", os.path.dirname(os.path.abspath(__file__)))
-    argv = ["fetch_and_build.py"]
+    flags: list[str] = []
     if mode == "auto":
         if os.path.isfile(os.path.join(out_dir, "data.json")):
             hour = datetime.now(timezone.utc).hour
             batch_num = ((hour // 2) % 6) + 1
-            argv += ["--batch", f"{batch_num}/6"]
+            flags += ["--batch", f"{batch_num}/6"]
         # else: no data yet → full build (no flags)
     elif mode == "render":
-        argv.append("--render-only")
+        flags.append("--render-only")
     elif mode == "signals":
-        argv.append("--signals-only")
+        flags.append("--signals-only")
     elif mode == "runtime":
-        argv.append("--runtime-only")
+        flags.append("--runtime-only")
     elif mode == "pending":
-        argv.append("--pending-only")
+        flags.append("--pending-only")
     elif mode == "repair-commits":
-        argv.append("--repair-commits")
+        flags.append("--repair-commits")
     elif mode == "full":
         pass
     else:
         raise ValueError(f"unknown mode: {mode}")
+    return flags
 
+
+def run_refresh(mode: str = "auto") -> None:
+    """In-process refresh entrypoint (tests / CLI-less callers).
+
+    The production web service runs refreshes in a SUBPROCESS instead
+    (app.py _refresh) so the render's working set — history snapshots, graph
+    build, page rendering, OG images — is returned to the OS when the child
+    exits, rather than ratcheting the long-lived server's heap up to
+    near-peak forever (which billed ~0.5GB RAM 24/7 on Railway).
+    """
     prev_argv = sys.argv
-    sys.argv = argv
+    sys.argv = ["fetch_and_build.py", *refresh_argv(mode)]
     try:
         main()
     finally:

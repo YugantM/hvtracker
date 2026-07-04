@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import threading
 import hashlib
 import time
@@ -1914,7 +1915,17 @@ def _pull_scorecard_cache() -> bool:
 
 
 def _refresh(mode: str) -> bool:
-    """Run a refresh cycle. Returns True on success, False on failure."""
+    """Run a refresh cycle. Returns True on success, False on failure.
+
+    Runs fetch_and_build as a SUBPROCESS rather than in-process: the render's
+    working set (history snapshots, graph build, ~500 rendered pages, Pillow
+    OG images) is freed back to the OS when the child exits. In-process, that
+    heap never shrank, ratcheting the always-on server to ~0.5GB average RAM
+    — the dominant Railway cost. Child inherits env (OUTPUT_DIR, tokens) and
+    stdout/stderr, so volume paths and Railway logs behave exactly as before.
+    """
+    import subprocess
+
     import fetch_and_build
     try:
         # Pull the latest OSSF scan from the data branch before every refresh —
@@ -1922,7 +1933,16 @@ def _refresh(mode: str) -> bool:
         # fresh scores reach the live site on each deploy/restart, not just on a
         # GitHub-signal refresh cycle.
         _pull_scorecard_cache()
-        fetch_and_build.run_refresh(mode)
+        subprocess.run(
+            [sys.executable, os.path.join(BASE_DIR, "fetch_and_build.py"),
+             *fetch_and_build.refresh_argv(mode)],
+            check=True,
+            cwd=BASE_DIR,
+            # Stream the child's render logs live into the service log (piped
+            # stdout is otherwise fully buffered until exit — useless for
+            # watching a deploy's first render on Railway).
+            env={**os.environ, "PYTHONUNBUFFERED": "1"},
+        )
         return True
     except Exception as e:  # never let a build error kill the scheduler thread
         import traceback
