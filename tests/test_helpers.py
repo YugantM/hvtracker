@@ -728,3 +728,24 @@ def test_prune_stale_page_dirs(tmp_path):
 
     # Missing parent dir is a no-op, not an error
     assert fb.prune_stale_page_dirs(str(tmp_path / "nope"), set(), "test") == 0
+
+
+def test_refresh_argv_modes(tmp_path, monkeypatch):
+    """The subprocess refresh (app.py _refresh) and the in-process run_refresh
+    must agree on mode → CLI flags; lock the mapping."""
+    monkeypatch.setenv("OUTPUT_DIR", str(tmp_path))
+    assert fb.refresh_argv("render") == ["--render-only"]
+    assert fb.refresh_argv("signals") == ["--signals-only"]
+    assert fb.refresh_argv("runtime") == ["--runtime-only"]
+    assert fb.refresh_argv("pending") == ["--pending-only"]
+    assert fb.refresh_argv("repair-commits") == ["--repair-commits"]
+    assert fb.refresh_argv("full") == []
+    # auto: no data.json yet -> full build (no flags)
+    assert fb.refresh_argv("auto") == []
+    # auto: data.json present -> a batch slice
+    (tmp_path / "data.json").write_text("{}")
+    flags = fb.refresh_argv("auto")
+    assert flags[0] == "--batch" and flags[1].endswith("/6")
+    import pytest as _pytest
+    with _pytest.raises(ValueError):
+        fb.refresh_argv("nope")
