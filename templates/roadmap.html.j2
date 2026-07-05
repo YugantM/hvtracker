@@ -115,7 +115,7 @@
             <span class="stage-tag shipped">Live</span>
             <span class="stage-title">Runtime trust — public discovery</span>
           </div>
-          <p>Agent profiles now show a compact runtime snapshot sourced from public docs, manifests, and registry metadata. These fields are visible now, but they are <strong>not yet folded into the production HVTrust rank</strong>.</p>
+          <p>Agent profiles show a compact runtime snapshot sourced from public docs, manifests, and registry metadata. As of methodology v4.0 these fields are <strong>folded into the production HVTrust rank</strong> as a bounded calibration (see below).</p>
           <ul>
             <li><strong>MCP server support</strong> — declared vs implemented server signals</li>
             <li><strong>External service dependencies</strong> — model providers, storage, and third-party services</li>
@@ -136,7 +136,7 @@
           <p>Runtime-trust signals are now part of the production HVTrust score and rank. The promotion was evidence-gated: an upset review plus several rounds of detector auditing (same-owner package variants, repo transfers, and docs-only mentions are excluded from scoring) preceded the cutover.</p>
           <ul>
             <li><strong>Calibrated scoring</strong> — MCP support, external dependencies, tool/plugin surface, and package-provenance drift adjust the base score within published bounds</li>
-            <li><strong>Public methodology</strong> — every adjustment value is documented in the <a href="/methodology/#runtime-calibration">methodology</a> and the <a href="/spec/runtime-trust/v0.1/">runtime-trust spec</a></li>
+            <li><strong>Public methodology</strong> — every adjustment value is documented in the <a href="/methodology/#runtime-calibration">methodology</a> and the <a href="/spec/runtime-trust/v0.2/">runtime-trust spec</a></li>
             <li><strong>Comparable baseline</strong> — the pre-calibration ranking stays available on the leaderboard for comparison</li>
           </ul>
         </div>

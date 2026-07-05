@@ -34,7 +34,7 @@ HEADERS = {
 if TOKEN:
     HEADERS["Authorization"] = f"Bearer {TOKEN}"
 
-METHODOLOGY_VERSION = "v4.0"  # T3.4: trust_score_v2 (runtime-calibrated) promoted to production
+METHODOLOGY_VERSION = "v4.1"  # soft ceiling (headroom-scaled bonuses) + evidence-first tie-break
 DATA_SCHEMA_VERSION = "v0.1"
 
 
@@ -1616,15 +1616,32 @@ def compute_trust_score(row: dict) -> dict:
     }
 
 
+def _headroom_factor(base: float) -> float:
+    """Scale positive runtime bonuses down as the base score nears the 100
+    ceiling: full effect at/below 80, phasing linearly to zero at 100.
+
+    Without this, positive bonuses stacked on already-high base scores pile
+    multiple agents onto a hard-clamped 100.0 — indistinguishable values with
+    different ranks, which reads as arbitrary. Penalties are NOT scaled (bad
+    news always lands in full), so this only softens the top, never the risk
+    signals.
+    """
+    return min(1.0, max(0.0, (100.0 - base) / 20.0))
+
+
 def compute_trust_score_v2(row: dict) -> dict:
-    """Experimental local-only score that lightly incorporates runtime signals."""
+    """Production runtime-trust calibration: base score + a bounded runtime
+    adjustment (headroom-scaled positives, absolute penalties). This IS the
+    live trust_score/rank/evidence_grade since methodology v4.0."""
     base = float(row.get("trust_score") or 0)
     mcp = (row.get("mcp_server_support") or {}).get("status", "none")
     ext = row.get("external_service_dependencies") or {}
     tooling = row.get("tool_plugin_surface") or {}
     drift = (row.get("package_provenance_drift") or {}).get("status", "not_applicable")
 
-    mcp_adj = 2.0 if mcp == "implemented" else 1.0 if mcp == "declared" else 0.0
+    # MCP: only an *implemented* server (manifest/path evidence) earns a bonus.
+    # "declared" (a README sentence) is too cheap to game, so it earns nothing.
+    mcp_adj = 2.0 if mcp == "implemented" else 0.0
 
     provider_count = len(ext.get("providers", []) or [])
     deps_adj = -min(3.0, max(0, provider_count - 1) * 0.5)
@@ -1649,18 +1666,44 @@ def compute_trust_score_v2(row: dict) -> dict:
         "warning": -5.0,
     }.get(drift, 0.0)
 
-    total_adjustment = round(mcp_adj + deps_adj + tool_adj + drift_adj, 1)
-    score_v2 = max(0.0, min(100.0, round(base + total_adjustment, 1)))
+    breakdown = {
+        "mcp": round(mcp_adj, 1),
+        "external_dependencies": round(deps_adj, 1),
+        "tool_plugin_surface": round(tool_adj, 1),
+        "package_provenance_drift": round(drift_adj, 1),
+    }
+    # Split by sign, not by dimension: a provenance MATCH bonus (+4) phases out
+    # near the ceiling, a provenance WARNING penalty (-5) always applies fully.
+    positive = sum(v for v in breakdown.values() if v > 0)
+    negative = sum(v for v in breakdown.values() if v < 0)
+    factor = _headroom_factor(base)
+    effective_adjustment = round(positive * factor + negative, 1)
+    score_v2 = max(0.0, min(100.0, round(base + effective_adjustment, 1)))
     return {
         "trust_score_v2": score_v2,
-        "trust_v2_adjustment": total_adjustment,
-        "trust_v2_breakdown": {
-            "mcp": round(mcp_adj, 1),
-            "external_dependencies": round(deps_adj, 1),
-            "tool_plugin_surface": round(tool_adj, 1),
-            "package_provenance_drift": round(drift_adj, 1),
-        },
+        "trust_v2_adjustment": effective_adjustment,
+        "trust_v2_headroom_factor": round(factor, 2),
+        "trust_v2_breakdown": breakdown,
     }
+
+
+def _rank_sort_key(row: dict) -> tuple:
+    """Evidence-first ranking comparator (use with reverse=True).
+
+    trust_score first, then hardest-to-fake evidence before popularity, so a
+    tie among equal scores is decided by audit posture rather than stars:
+      trust_score → trust_confidence → OSSF Scorecard → signed-commit ratio
+      → momentum (activity) → stars → slug (final deterministic fallback).
+    """
+    return (
+        row.get("trust_score", 0) or 0,
+        row.get("trust_confidence", 0) or 0,
+        row.get("scorecard_score") if row.get("scorecard_score") is not None else -1.0,
+        row.get("signed_commits_ratio") or 0,
+        row.get("score", 0) or 0,
+        row.get("stars", 0) or 0,
+        row.get("slug", ""),
+    )
 
 
 def score_components(stars: int, days_since: int, recent_commits: int, forks: int) -> dict:
@@ -5074,17 +5117,31 @@ def main() -> None:
         else:
             row["evidence_grade"] = "D"
 
-    # Rank by HVTrust (trust-first, runtime-calibrated). Tie-break on
-    # momentum score, then stars, so the leaderboard order and the evidence
-    # grade tell the same story.
-    rows.sort(
-        key=lambda x: (x.get("trust_score", 0) or 0, x.get("score", 0) or 0, x.get("stars", 0) or 0),
-        reverse=True,
-    )
+    # Rank by HVTrust (trust-first, runtime-calibrated), then break ties with
+    # hard-to-fake evidence BEFORE popularity: confidence → OSSF Scorecard →
+    # signed-commit ratio → momentum → stars → slug. Popularity is retained
+    # (it still separates equal-evidence ties) but reaching #1 among tied
+    # scores now requires real audit posture, not a star farm.
+    rows.sort(key=_rank_sort_key, reverse=True)
     for i, row in enumerate(rows, 1):
         row["rank"] = i
         row["rank_v2"] = i
         row["trust_score_v2"] = row["trust_score"]
+
+    # Shared display rank for agents whose live trust_score is exactly equal:
+    # they legitimately tie, so the leaderboard shows the same "=N" for each
+    # rather than manufacturing a rank difference the score doesn't support.
+    # The strict `rank` above is unchanged (deltas/movers/sparklines rely on it).
+    tie_start = 0
+    for i, row in enumerate(rows):
+        if i == 0 or row["trust_score"] != rows[i - 1]["trust_score"]:
+            tie_start = i + 1
+        row["display_rank"] = tie_start
+    tie_counts: dict[int, int] = {}
+    for row in rows:
+        tie_counts[row["display_rank"]] = tie_counts.get(row["display_rank"], 0) + 1
+    for row in rows:
+        row["is_tied"] = tie_counts[row["display_rank"]] > 1
 
     # Pre-calibration baseline rank, preserved for the leaderboard's
     # compare-to-pre-calibration view — no longer live/authoritative anywhere.
@@ -5106,7 +5163,7 @@ def main() -> None:
         if cat:
             cat_groups.setdefault(cat, []).append(row)
     for cat_agents in cat_groups.values():
-        cat_agents.sort(key=lambda x: x.get("trust_score", 0) or 0, reverse=True)
+        cat_agents.sort(key=_rank_sort_key, reverse=True)
         for j, row in enumerate(cat_agents, 1):
             row["category_rank"] = j
 
