@@ -188,6 +188,44 @@ def test_compute_trust_score_treats_all_download_sources_as_applicable():
     assert score["trust_confidence"] == 0.4
 
 
+def test_runtime_calibration_does_not_compound_across_renders():
+    """Regression (methodology v4.2): the build loop must seed row["trust_score"]
+    with the fresh base BEFORE compute_trust_score_v2 reads it. Rows are loaded
+    from the prior snapshot already carrying a calibrated trust_score; without
+    the seed the calibration reads that prior final and re-applies the bounded
+    adjustment on top of it every render, ratcheting scores to the 0/100 rails.
+    This mirrors the compose step in fetch_and_build's build loop.
+    """
+    def render_once(row):
+        base = fb.compute_trust_score(row)
+        row["trust_score"] = base["trust_score"]          # seed base — the fix
+        v2 = fb.compute_trust_score_v2(row)
+        row["trust_score"] = v2["trust_score_v2"]
+
+    signals = {
+        "stars": 5000, "weekly_downloads": None, "scorecard_score": 4.0,
+        "has_provenance": False, "signed_commits_ratio": 0.5,
+        "listing_status": "listed", "days_ago": 20, "weekly_commits": 3,
+        "commits_low_confidence": False, "license_spdx": "MIT",
+        "mcp_server_support": {"status": "implemented"},
+    }
+    base = fb.compute_trust_score(signals)["trust_score"]
+    assert base < 60  # modest evidence -> mid-band base, nowhere near 100
+
+    # A row loaded from a prior snapshot already carries an inflated score.
+    row = {**signals, "trust_score": 99.0}
+    render_once(row)
+    # It must snap back to base + the bounded (+2.0 MCP) adjustment, not stay
+    # pinned near the inflated 99.0.
+    assert row["trust_score"] == pytest.approx(base + 2.0, abs=0.1)
+    assert row["trust_score"] < 60
+
+    # A second render is idempotent — no further drift.
+    first = row["trust_score"]
+    render_once(row)
+    assert row["trust_score"] == first
+
+
 # ---- runtime trust -------------------------------------------------------
 
 def test_detect_mcp_server_support_marks_implemented_from_server_readme():
