@@ -1472,25 +1472,33 @@
         let dir = reverse ? -1 : 1;
         let paused = false;
         let resumeTimer = null;
+        // Track position in a float we own. Reading viewport.scrollLeft back
+        // each frame breaks the animation: many browsers snap scrollLeft to an
+        // integer, so a +0.5 step truncates straight back and the ticker sticks
+        // at 0 (or at max, reversed). We accumulate here and only WRITE scrollLeft.
+        let pos = 0;
         function step() {
-          if (!paused) {
-            const max = viewport.scrollWidth - viewport.clientWidth;
-            if (max > 0) {
-              let next = viewport.scrollLeft + dir * 0.5;
-              if (next >= max) { next = max; dir = -1; }
-              else if (next <= 0) { next = 0; dir = 1; }
-              viewport.scrollLeft = next;
-            }
+          const max = viewport.scrollWidth - viewport.clientWidth;
+          if (!paused && max > 1) {
+            pos += dir * 0.5;
+            if (pos >= max) { pos = max; dir = -1; }
+            else if (pos <= 0) { pos = 0; dir = 1; }
+            viewport.scrollLeft = pos;
           }
           requestAnimationFrame(step);
         }
-        if (reverse) viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
-        requestAnimationFrame(step);
+        // Wait one frame so layout (and scrollWidth) is settled before the
+        // reversed strip jumps to its far end.
+        requestAnimationFrame(() => {
+          if (reverse) { pos = viewport.scrollWidth - viewport.clientWidth; viewport.scrollLeft = pos; }
+          requestAnimationFrame(step);
+        });
         viewport.addEventListener("mouseenter", () => { paused = true; clearTimeout(resumeTimer); });
-        viewport.addEventListener("mouseleave", () => { paused = false; });
+        // Adopt the user's position on resume so a manual scroll isn't yanked back.
+        viewport.addEventListener("mouseleave", () => { pos = viewport.scrollLeft; paused = false; });
         viewport.addEventListener("touchstart", () => { paused = true; clearTimeout(resumeTimer); }, { passive: true });
         viewport.addEventListener("touchend", () => {
-          resumeTimer = setTimeout(() => { paused = false; }, 3000);
+          resumeTimer = setTimeout(() => { pos = viewport.scrollLeft; paused = false; }, 3000);
         }, { passive: true });
       }
       initMoversTicker(document.querySelector(".movers-gainers .movers-viewport"), false);
