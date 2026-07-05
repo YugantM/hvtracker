@@ -1616,6 +1616,27 @@ def compute_trust_score(row: dict) -> dict:
     }
 
 
+def coverage_grade(signal_types: int) -> str:
+    """Evidence-coverage grade (A–D) — how many INDEPENDENT public signal types
+    verify an agent, distinct from the HVTrust score band.
+
+    The score band (evidence_grade) answers "how trustworthy does the evidence
+    say this is"; coverage answers "how much independent evidence is there at
+    all". A thin GitHub-only project can score well on what little is checkable
+    yet still deserve a low coverage grade. Signal types counted upstream:
+    GitHub repo data (always), package downloads, supply-chain (OSSF Scorecard
+    or build provenance), behavioural (public actions), discussion (HN
+    mentions) — max 5.
+    """
+    if signal_types >= 4:
+        return "A"  # broad independent coverage
+    if signal_types == 3:
+        return "B"  # strong, with gaps
+    if signal_types == 2:
+        return "C"  # basic
+    return "D"      # mostly GitHub-only / thin
+
+
 def _headroom_factor(base: float) -> float:
     """Scale positive runtime bonuses down as the base score nears the 100
     ceiling: full effect at/below 80, phasing linearly to zero at 100.
@@ -5084,6 +5105,11 @@ def main() -> None:
         if row.get("hn_mentions_30d") is not None:
             signal_types += 1
         row["signal_coverage"] = round(signal_types / 5, 2)
+        row["signal_types"] = signal_types
+        # Evidence-coverage grade: independent-signal breadth, NOT the trust
+        # band. Reported alongside evidence_grade so a high score on thin
+        # evidence is visibly distinguishable from broadly-verified trust.
+        row["coverage_grade"] = coverage_grade(signal_types)
 
         # HVTrust composite score. compute_trust_score_v2 layers a bounded,
         # evidence-audited runtime-trust adjustment (MCP support, external
@@ -5291,6 +5317,9 @@ def main() -> None:
                 "tool_plugin_surface": r.get("tool_plugin_surface", {"plugin_system": "none", "tool_tags": [], "confidence": None, "evidence": []}),
                 "package_provenance_drift": r.get("package_provenance_drift", {"status": "not_applicable", "confidence": None, "summary": "No package source configured", "evidence": []}),
                 "evidence_grade": r.get("evidence_grade", "D"),
+                "coverage_grade": r.get("coverage_grade", "D"),
+                "signal_coverage": r.get("signal_coverage"),
+                "signal_types": r.get("signal_types"),
                 "listing_status": r.get("listing_status", "listed"),
                 "display_listing_status": r.get("display_listing_status", r.get("listing_status", "listed")),
                 "display_status_label": r.get("display_status_label", r.get("display_listing_status", r.get("listing_status", "listed")).replace("_", " ").title()),
