@@ -168,10 +168,24 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   0.660→0.228 GB (−65%) after #106 subprocess refresh; flat baseline, spikes
   release. Est. memory cost $6.60→$2.28/mo. Re-check 2026-07-12; next lever
   is consolidating the two Postgres services.
-- Next: see `docs/plan-2026-07-06-post-v4.2.md` (ACTIVE PLAN) — P0 content-
-  truth pass (README still says v3.1/172 agents; GitHub About says 172+;
-  methodology FAQ says "every 2 hours" vs 30-min reality), prod-volume orphan
-  check at next deploy, bill re-check 07-12; then T3.3 capability-surface
-  page, internal-linking SEO pass, badge-adopter audit; later T3.5 drift
-  monitoring, Postgres consolidation. Open owner decisions: v4.2 announcement
-  (changelog-only vs blog), evidence-grade semantics (band vs coverage).
+- Evidence-coverage grade SHIPPED 2026-07-06 (#112, T3.3 slice, owner: "create
+  a real coverage grade"): `coverage_grade(signal_types)` A≥4/B3/C2/D1 counts
+  INDEPENDENT public signal types (GitHub always, downloads, supply-chain,
+  behavioural, HN) — separate from `evidence_grade` (score band). Live dist
+  A/B/C/D=108/68/52/91 (vs evidence_grade 32/58/58/171). On agent pages (hero
+  + how-to-read) and public API (`coverage_grade`/`signal_types`/`signal_coverage`).
+  No change to trust_score/rank/evidence_grade.
+- Content-truth pass + v4.2 announcement SHIPPED 2026-07-06 (owner chose blog
+  + real coverage grade over changelog-only/reword): README v3.1→v4 section,
+  base+calibration formula, two-grades table, categories→live link, cadence
+  2h→~30min, live-count 172→300+; methodology FAQ/updates cadence fixed;
+  GitHub About still to update via `gh repo edit` (see below). New blog post
+  `blog_static/calibration-fix-and-coverage-grade/` announces the v4.2
+  compounding fix + coverage grade, wired to all 4 surfaces (post/index
+  card/sitemap/feed).
+- Next: `docs/plan-2026-07-06-post-v4.2.md` remaining — GitHub About text
+  (`gh repo edit`, still "172+"), prod-volume orphan check at next deploy,
+  bill re-check 07-12; then T3.3 capability-surface PAGE (grade shipped, page
+  pending), internal-linking SEO pass, badge-adopter audit; later T3.5 drift
+  monitoring, Postgres consolidation. These content + coverage changes are
+  MERGED, NOT yet deployed (need `railway up` to go live).

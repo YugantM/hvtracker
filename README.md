@@ -12,9 +12,11 @@ The core question is simple:
 
 ---
 
-## Version 3.1
+## Version 4
 
-HVTracker v3.1 adds real accounts and sign-in (GitHub / Google OAuth), separates your watchlist from the side-by-side compare tray (with drag-to-reorder), refreshes the whole site with an ink-navy theme, and expands crawlable static comparison pages at `/compare/<a>-vs-<b>/`.
+The production HVTrust score is **runtime-trust calibrated**: the supply-chain base score plus a bounded adjustment for MCP support, external service dependencies, tool/plugin surface, and package-provenance drift (methodology v4.0). A soft ceiling and evidence-first tie-break keep strong agents from piling onto an identical 100 (v4.1), and a v4.2 correction re-derives the score from the base on every build so the bounded adjustment can't compound. Every agent also carries a separate **Evidence Coverage** grade (A–D) showing how many independent signal types back its score. See the [methodology changelog](https://hvtracker.net/methodology/#changelog) and [runtime-trust spec](https://hvtracker.net/spec/runtime-trust/v0.2/).
+
+Accounts and sign-in (GitHub / Google OAuth), watchlist, the side-by-side compare tray, and crawlable static comparison pages at `/compare/<a>-vs-<b>/` shipped in v3.1 and remain live.
 
 ---
 
@@ -37,12 +39,12 @@ HVTracker v3.1 adds real accounts and sign-in (GitHub / Google OAuth), separates
 
 ## Current Snapshot
 
-- Active open-source AI agent projects (see [live count](https://hvtracker.net))
+- 300+ active open-source AI agent projects (see [live count](https://hvtracker.net))
 - Curated categories spanning coding agents, frameworks, infra, security, and more
-- **2h** Railway refresh cadence
+- **~30-min** signal refresh cadence (tunable via `SIGNALS_REFRESH_MIN`)
 - **~24h** expected full data sweep across sources
 - **90-day** per-agent history where available
-- **184** JSON feed items across agents and comparison guides
+- JSON feed of agents and articles at [`/feed.json`](https://hvtracker.net/feed.json)
 - Railway-hosted site with a small FastAPI edge and generated public pages/data
 
 Newly submitted agents are listed quickly using a pending-only refresh path, then normal cron jobs keep signals fresh.
@@ -56,10 +58,17 @@ Most AI agent directories are either manual lists or popularity rankings. Stars 
 HVTracker combines curation with independently checkable public evidence. The default rank is **HVTrust**, a 0-100 score designed to reward verifiable trust signals and penalize thin evidence.
 
 ```text
-HVTrust = gate(
+base = gate(
   confidence x [ Safety(25) + Identity(18) + Transparency(17)
                  + Maintenance(20) + Adoption(20) ]
   - penalties
+)
+
+HVTrust = clamp(
+  base
+  + RuntimeBonuses x min(1, (100 - base) / 20)   # soft ceiling
+  - RuntimePenalties,                            # absolute
+  0..100
 )
 ```
 
@@ -71,22 +80,35 @@ HVTrust = gate(
 | Maintenance | 20 | Freshness and recent commit activity |
 | Adoption | 20 | Log-scaled, capped stars and package downloads |
 
-Confidence is based on present vs applicable signal types. Thin evidence limits how high an agent can rank, even if it is popular.
+The base score is then runtime-trust calibrated (v4.0+): a bounded adjustment for MCP support, external service dependencies, tool/plugin surface, and package-provenance drift, re-derived from the base on every build. Confidence is based on present vs applicable signal types. Thin evidence limits how high an agent can rank, even if it is popular.
 
 Read the full methodology: [hvtracker.net/methodology](https://hvtracker.net/methodology)
 
 ---
 
-## Evidence Grades
+## Two grades: Evidence Grade and Evidence Coverage
 
-Each agent also receives an evidence grade so readers can separate score from evidence depth.
+Each agent carries two independent A–D grades so the score and the depth of evidence behind it are never conflated.
 
-| Grade | Meaning |
+**Evidence Grade** is the trust-score band — how trustworthy the evidence says the project is:
+
+| Grade | Trust score |
 |---|---|
-| A | Broad independent signal coverage |
-| B | Strong public evidence with some gaps |
-| C | Basic public evidence |
-| D | Mostly GitHub-only or thin evidence |
+| A | ≥ 80 |
+| B | ≥ 65 |
+| C | ≥ 50 |
+| D | < 50 |
+
+**Evidence Coverage** is separate — how many *independent* public signal types back that score (GitHub, package downloads, supply-chain, behavioural, discussion; five possible):
+
+| Coverage | Meaning |
+|---|---|
+| A | Broad independent signal coverage (≥ 4 of 5 types) |
+| B | Strong public evidence with some gaps (3) |
+| C | Basic public evidence (2) |
+| D | Mostly GitHub-only or thin evidence (1) |
+
+A high score built on thin evidence keeps a low coverage grade, so breadth stays visible. Both are on every agent page and in the public API (`evidence_grade`, `coverage_grade`, `signal_types`).
 
 HVTracker is not a security certification. Missing provenance, Scorecard, or signature data can mean a signal is unavailable, not that a project is unsafe.
 
@@ -94,22 +116,7 @@ HVTracker is not a security certification. Missing provenance, Scorecard, or sig
 
 ## Categories
 
-| Category | Count |
-|---|---:|
-| Agent Frameworks | 58 |
-| Coding Agents | 26 |
-| Memory & Knowledge | 20 |
-| Browser & Computer Use | 15 |
-| Workflow Platforms | 13 |
-| Observability & Evaluation | 12 |
-| Research & Data | 8 |
-| Security & Guardrails | 6 |
-| LLM Gateways & Infra | 4 |
-| Protocols & Tool Integration | 4 |
-| Multi-Agent Systems | 3 |
-| Robotics & Embodied | 1 |
-| Voice & Conversational | 1 |
-| Sandboxes & Runtimes | 1 |
+Agents are curated across coding agents, agent frameworks, workflow platforms, browser & computer use, memory & knowledge, research & data, observability & evaluation, security & guardrails, protocols & tool integration, and more. Live per-category counts (they move as the registry grows) are on the site: [hvtracker.net/categories](https://hvtracker.net/categories/).
 
 ---
 
