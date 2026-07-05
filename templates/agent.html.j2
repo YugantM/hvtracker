@@ -345,6 +345,12 @@
           <div class="hero-summary-label">HVTrust</div>
           <div class="hero-summary-value">{{ row.trust_score }}/100 · Grade {{ row.evidence_grade }}</div>
         </div>
+        {% if row.coverage_grade %}
+        <div class="hero-summary-item">
+          <div class="hero-summary-label">Evidence coverage</div>
+          <div class="hero-summary-value" title="How many independent public signal types verify this agent — distinct from the trust-score grade">Grade {{ row.coverage_grade }} · {{ row.signal_types }}/5 signals</div>
+        </div>
+        {% endif %}
         <div class="hero-summary-item">
           <div class="hero-summary-label">Last push</div>
           <div class="hero-summary-value">{{ row.last_push }}{% if row.days_ago is not none %} · {{ row.days_ago }}d ago{% endif %}</div>
@@ -480,7 +486,7 @@
     </section>
 
     <p class="how-to-read">
-      <strong>How to read this:</strong> HVTrust (0–100) weighs supply-chain signals (provenance, OSSF Scorecard, signed commits, open license) alongside real-world adoption. <strong>Grade {{ row.evidence_grade }}</strong> reflects the trust score band: A ≥ 80, B ≥ 65, C ≥ 50, D &lt; 50. <a href="/methodology/">Full methodology →</a>
+      <strong>How to read this:</strong> HVTrust (0–100) weighs supply-chain signals (provenance, OSSF Scorecard, signed commits, open license) alongside real-world adoption. <strong>Grade {{ row.evidence_grade }}</strong> reflects the trust score band: A ≥ 80, B ≥ 65, C ≥ 50, D &lt; 50.{% if row.coverage_grade %} <strong>Evidence coverage {{ row.coverage_grade }}</strong> is separate — it grades how many independent signal types back the score ({{ row.signal_types }} of 5), so a high score on thin evidence stays visible.{% endif %} <a href="/methodology/">Full methodology →</a>
     </p>
 
     {% set is_stale = row.days_ago is not none and row.days_ago > 180 %}

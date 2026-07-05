@@ -188,6 +188,20 @@ def test_compute_trust_score_treats_all_download_sources_as_applicable():
     assert score["trust_confidence"] == 0.4
 
 
+@pytest.mark.parametrize("signal_types,expected", [
+    (5, "A"), (4, "A"), (3, "B"), (2, "C"), (1, "D"), (0, "D"),
+])
+def test_coverage_grade_maps_signal_breadth(signal_types, expected):
+    assert fb.coverage_grade(signal_types) == expected
+
+
+def test_coverage_grade_is_independent_of_trust_score():
+    """A thin GitHub-only project can score decently but must grade D on
+    coverage; a broadly-verified project grades A regardless of its band."""
+    assert fb.coverage_grade(1) == "D"   # GitHub-only, whatever the score
+    assert fb.coverage_grade(4) == "A"   # broad independent evidence
+
+
 def test_runtime_calibration_does_not_compound_across_renders():
     """Regression (methodology v4.2): the build loop must seed row["trust_score"]
     with the fresh base BEFORE compute_trust_score_v2 reads it. Rows are loaded
