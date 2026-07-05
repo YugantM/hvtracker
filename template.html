@@ -735,6 +735,8 @@
           {% for row in rows %}
           <tr{% if row.rank <= 3 %} class="top-row"{% endif %}
             data-rank="{{ row.rank }}"
+            data-display_rank="{{ row.display_rank }}"
+            data-is_tied="{% if row.is_tied %}1{% else %}0{% endif %}"
             data-rank_delta="{{ row.rank_delta_sort }}"
             data-rank_delta_display="{{ row.rank_delta_display }}"
             data-rank_delta_class="{{ row.rank_delta_class }}"
@@ -762,8 +764,8 @@
             data-license_type="{{ row.license_type or 'unlicensed' }}"
             data-newly-added="{% if newly_added and row.repo in newly_added|map(attribute='repo')|list %}1{% else %}0{% endif %}"
           >
-            <td class="rank r">
-              <span class="rank-num">{{ row.rank }}</span>
+            <td class="rank r"{% if row.is_tied %} title="Tied at {{ row.trust_score }} — ties ranked by evidence confidence, then OSSF Scorecard, then popularity"{% endif %}>
+              <span class="rank-num">{% if row.is_tied %}={{ row.display_rank }}{% else %}{{ row.rank }}{% endif %}</span>
             </td>
             <td class="delta {{ row.rank_delta_class }}">{{ row.rank_delta_display }}</td>
             <td class="agent-cell">
@@ -1055,11 +1057,13 @@
           if (historical) {
             const historicalRank = row.dataset.rank_v2 || "";
             rankCell.innerHTML = '<span class="rank-num">' + historicalRank + '</span> <span class="rank-global-muted">now #' + globalRank + '</span>';
-          } else {
+          } else if (singleCat) {
             const catRank = row.dataset.category_rank || "";
-            rankCell.innerHTML = singleCat
-              ? '<span class="rank-num">' + catRank + '</span> <span class="rank-global-muted">#' + globalRank + '</span>'
-              : '<span class="rank-num">' + globalRank + '</span>';
+            rankCell.innerHTML = '<span class="rank-num">' + catRank + '</span> <span class="rank-global-muted">#' + globalRank + '</span>';
+          } else if (row.dataset.is_tied === "1") {
+            rankCell.innerHTML = '<span class="rank-num">=' + (row.dataset.display_rank || globalRank) + '</span>';
+          } else {
+            rankCell.innerHTML = '<span class="rank-num">' + globalRank + '</span>';
           }
           const deltaCell = row.querySelector(".delta");
           if (deltaCell) {

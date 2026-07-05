@@ -130,6 +130,22 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   page, i-am-bee org page, recently-active use-case) — the prod VOLUME may
   hold its own stale generated pages with dead /score-lab/ links; check at
   deploy.
+- Scoring v4.1 2026-07-05 (owner: fix the "three 100s, different ranks looks
+  rigged" report): `compute_trust_score_v2` now applies a SOFT CEILING —
+  positive bonuses scaled by `min(1,(100-base)/20)` (full ≤80, zero at 100),
+  penalties absolute — so bonuses can't clamp strong agents onto an identical
+  100.0. Ties break EVIDENCE-FIRST via `_rank_sort_key` (trust_score →
+  confidence → scorecard → signed-commits → momentum → stars → slug; popularity
+  RETAINED but below audit signals, per owner) and display at a shared `=N`
+  rank (`display_rank`/`is_tied` on rows, wired in template + the JS
+  updateRankDisplay global branch). Hardening: MCP `declared` bonus +1.0→0
+  (only `implemented` scores). METHODOLOGY_VERSION v4.0→v4.1 (sparkline reset +
+  cutover notification suppression). Spec bumped v0.1→v0.2 (Active), well-known
+  + methodology + roadmap links updated; the old /spec/runtime-trust/v0.1/ is a
+  stale volume orphan at deploy (like score-lab). Evidence gate (isolated
+  OLD-vs-NEW on identical bases): 0 agents move >10 ranks, 4 grade flips (all
+  downward corrections from removing MCP-declared inflation). Merged, NOT yet
+  deployed (prod still shows the clamped-100 v4.0 behavior until `railway up`).
 - Next: T3.3 capability-surface page; internal-linking SEO pass (parked);
   consider fixing tool_plugin_surface's "search"/"code" pattern-mention
   breadth if it resurfaces in a future audit (currently gated behind real

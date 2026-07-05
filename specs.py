@@ -993,22 +993,22 @@ BUILD_REPORT_V01 = {
 RUNTIME_TRUST_V01 = {
     "title": "Runtime Trust Signals",
     "slug": "runtime-trust",
-    "version": "v0.1",
-    "date": "2026-07-02",
-    "status": "Draft",
+    "version": "v0.2",
+    "date": "2026-07-05",
+    "status": "Active",
     "authors": ["HVTracker"],
     "abstract": (
         "How HVTracker discovers runtime-trust signals — MCP server support, "
         "external service dependencies, tool/plugin surface, and package "
-        "provenance drift — and how the experimental v2 score incorporates "
-        "them. Published before any of these signals affect production rank: "
-        "the verdict stays open."
+        "provenance drift — and how they calibrate the production trust score: "
+        "a headroom-scaled bonus with absolute penalties, and an evidence-first "
+        "tie-break. Live in the production rank since methodology v4.0."
     ),
     "sections": [
         {"id": "s1", "num": "1", "title": "Purpose"},
-        {"id": "s2", "num": "2", "title": "Status: Not in the Production Rank"},
+        {"id": "s2", "num": "2", "title": "Status: Live in the Production Rank"},
         {"id": "s3", "num": "3", "title": "Runtime Discovery Fields"},
-        {"id": "s4", "num": "4", "title": "Experimental v2 Scoring"},
+        {"id": "s4", "num": "4", "title": "Production Scoring"},
         {"id": "s5", "num": "5", "title": "Data Access"},
         {"id": "s6", "num": "6", "title": "Calibration and Promotion Criteria"},
         {"id": "s7", "num": "7", "title": "Versioning"},
@@ -1018,9 +1018,9 @@ RUNTIME_TRUST_V01 = {
 <p>Supply-chain trust tells you whether an agent's <em>code and packages</em> are what they claim. Runtime trust asks a different question: <em>what can this agent reach once it runs?</em> An agent that ships an MCP server, calls many external providers, or exposes a plugin marketplace has a materially different risk surface than a self-contained library — regardless of how clean its build provenance is.</p>
 <p>This spec documents the four runtime-trust signals HVTracker discovers for every tracked agent, and the experimental scoring that incorporates them. It exists so the methodology is public <strong>before</strong> any of it affects the production ranking.</p>
 
-<h2 id="s2">2. Status: Not in the Production Rank</h2>
-<p>As of this version, runtime signals are <strong>discovery-only</strong>. The production leaderboard rank is computed exclusively from the published <a href="/spec/methodology/v2.0/">Methodology v2.0</a> dimensions. The experimental v2 score (&sect;4) is computed and published alongside every agent for transparency and calibration, but does not order the leaderboard.</p>
-<p>Promotion of runtime signals into the production rank is gated on calibration evidence (&sect;6) and will ship, if at all, as a separately labelled scoring slice with per-field explanations — never as a silent reweight.</p>
+<h2 id="s2">2. Status: Live in the Production Rank</h2>
+<p>Since methodology v4.0 (2026-07-02), the runtime-calibrated score in &sect;4 <strong>is</strong> the production <code>trust_score</code>/<code>rank</code>/<code>evidence_grade</code> — on the leaderboard, agent pages, the <code>/data</code> API, badges, and signed credentials. Promotion followed the evidence gate in &sect;6 (an upset review); the pre-calibration baseline stays visible on the leaderboard for comparison.</p>
+<p>v4.1 (2026-07-05) added a soft ceiling and an evidence-first tie-break (&sect;4). No change ships as a silent reweight: every adjustment is documented here and in the <a href="/methodology/#runtime-calibration">methodology</a>.</p>
 
 <h2 id="s3">3. Runtime Discovery Fields</h2>
 <p>Each tracked agent carries four runtime fields, discovered by static analysis of the repository and its published package metadata. Every field reports a <code>status</code>, a <code>confidence</code> (<code>high</code> / <code>medium</code> / <code>low</code>), and an <code>evidence</code> array of human-readable findings, so any consumer can audit why a value was assigned.</p>
@@ -1037,20 +1037,22 @@ RUNTIME_TRUST_V01 = {
 </table>
 <p>These fields are recorded in every daily history snapshot, building an append-only time series of runtime-surface drift per agent.</p>
 
-<h2 id="s4">4. Experimental v2 Scoring</h2>
-<p>The v2 score is the production trust score plus a bounded runtime adjustment, clamped to [0,&nbsp;100]. Reference implementation: <code>compute_trust_score_v2</code> in <code>fetch_and_build.py</code>. The adjustments are:</p>
+<h2 id="s4">4. Production Scoring</h2>
+<p>The runtime-calibrated score is the base trust score plus a bounded runtime adjustment, clamped to [0,&nbsp;100]. Since methodology v4.0 this IS the production <code>trust_score</code>/<code>rank</code>/<code>evidence_grade</code>. Reference implementation: <code>compute_trust_score_v2</code> in <code>fetch_and_build.py</code>. The per-dimension adjustments are:</p>
 <table>
   <thead>
     <tr><th>Dimension</th><th>Adjustment</th></tr>
   </thead>
   <tbody>
-    <tr><td>MCP server support</td><td><code>implemented</code> +2.0 &middot; <code>declared</code> +1.0 &middot; <code>none</code> 0</td></tr>
+    <tr><td>MCP server support</td><td><code>implemented</code> +2.0 &middot; <code>declared</code> 0 &middot; <code>none</code> 0</td></tr>
     <tr><td>External dependencies</td><td>&minus;0.5 per provider beyond the first, capped at &minus;3.0; additional &minus;1.0 if API keys are required</td></tr>
     <tr><td>Tool/plugin surface</td><td>&minus;0.3 per tool tag, capped at &minus;1.5; plus <code>marketplace</code> &minus;1.0, <code>extension-based</code> &minus;0.6, <code>declared</code> &minus;0.3</td></tr>
     <tr><td>Provenance drift</td><td><code>match</code> +4.0 &middot; <code>partial</code> +2.0 &middot; <code>unknown</code>/<code>not_applicable</code> 0 &middot; <code>warning</code> &minus;5.0</td></tr>
   </tbody>
 </table>
-<p>Each agent publishes <code>trust_score_v2</code>, the net <code>trust_v2_adjustment</code>, and a per-dimension <code>trust_v2_breakdown</code>, so every point of difference from the production score is attributable.</p>
+<p><strong>Soft ceiling (v4.1).</strong> The <em>positive</em> terms above are scaled by remaining headroom — <code>factor = min(1, (100 &minus; base) / 20)</code>, i.e. full effect at base &le; 80, phasing to zero at base 100 — before being added. <em>Penalties are not scaled.</em> This prevents bonuses from clamping multiple strong agents onto an identical 100.0.</p>
+<p><strong>Tie-break (v4.1).</strong> Agents with an exactly equal score are ordered by hardest-to-fake evidence first: <code>trust_confidence</code> &rarr; OSSF <code>scorecard_score</code> &rarr; <code>signed_commits_ratio</code> &rarr; activity/momentum &rarr; stars &rarr; slug. They share a rank (<code>=N</code>) on the leaderboard.</p>
+<p>Each agent publishes <code>trust_score</code>, the net <code>trust_v2_adjustment</code>, the applied <code>trust_v2_headroom_factor</code>, and a per-dimension <code>trust_v2_breakdown</code>, so every point of difference from the base score is attributable.</p>
 
 <h2 id="s5">5. Data Access</h2>
 <ul>
@@ -1061,7 +1063,7 @@ RUNTIME_TRUST_V01 = {
 </ul>
 
 <h2 id="s6">6. Calibration and Promotion Criteria</h2>
-<p>Runtime signals move into the production rank only after an upset review demonstrates the change is evidence-backed, with published criteria covering: maximum acceptable rank churn, protection of high-grade agents from unexplained drops, no single dimension dominating the adjustment, and this spec being published first. Until those criteria pass, v2 remains a labelled experiment. The review is repeated after any recalibration.</p>
+<p>Runtime signals moved into the production rank only after an upset review demonstrated the change was evidence-backed, against published criteria: maximum acceptable rank churn, protection of high-grade agents from unexplained drops, no single dimension dominating the adjustment, and this spec being published first. The review is re-run after any recalibration — including the v4.1 soft-ceiling and tie-break change, whose near-zero churn (no grade flips) cleared the gate.</p>
 
 <h2 id="s7">7. Versioning</h2>
 <p>This spec versions independently of the scoring methodology. Any change to the adjustment table (&sect;4) requires a version bump and a changelog entry; promotion into production rank requires a new major section documenting the cutover and the evidence that gated it.</p>

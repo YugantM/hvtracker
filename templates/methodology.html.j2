@@ -34,7 +34,7 @@
       {
         "@type": "Question",
         "name": "What signals does HVTracker use?",
-        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker's live rank uses public supply-chain and maintenance signals including adoption, transparency, safety, identity, provenance, and evidence quality. It also displays separate AI-agent surface fields such as MCP support, external dependencies, tool surface, and package provenance drift, but those fields do not affect the production HVTrust score." }
+        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker's rank uses public supply-chain and maintenance signals (adoption, transparency, safety, identity, provenance, evidence quality) plus a bounded runtime-trust calibration: MCP support, external dependencies, tool surface, and package provenance drift adjust the score within published limits. Positive bonuses are headroom-scaled and ties break on evidence before popularity." }
       },
       {
         "@type": "Question",
@@ -261,7 +261,8 @@
           <li><strong>Proprietary tools are scored honestly.</strong> A lower score for a proprietary tool reflects fewer <em>public</em> supply-chain artifacts, not a security finding. The leaderboard includes a license filter to compare like with like.</li>
         </ul>
         <div class="formula-block">
-          HVTrust = clamp( gate( confidence × [ Safety(25) + Identity(18) + Transparency(17) + Maintenance(20) + Adoption(20) ] − penalties ) + RuntimeCalibration, 0–100 )
+          base = gate( confidence × [ Safety(25) + Identity(18) + Transparency(17) + Maintenance(20) + Adoption(20) ] − penalties )<br>
+          HVTrust = clamp( base + RuntimeBonuses × min(1, (100 − base) / 20) − RuntimePenalties, 0–100 )
         </div>
         <ul class="weights">
           <li><strong>Safety / Integrity · 25</strong> — OSSF Scorecard, build provenance, and signed-commit ratio. The hardest signals to fake.</li>
@@ -346,12 +347,12 @@
 
       <section id="runtime-calibration">
         <h2>Runtime-Trust Calibration</h2>
-        <p>Runtime-trust fields answer a different question from supply-chain trust: what can this agent reach, depend on, or expose when it runs? As of {{ methodology_version }}, these fields contribute a <strong>bounded adjustment on top of the base score</strong> — they are part of the production HVTrust rank, not a separate preview. Each field's evidence is public on the agent's profile page, and the full detection rules are specified in <a href="/spec/runtime-trust/v0.1/">the runtime-trust spec</a>.</p>
+        <p>Runtime-trust fields answer a different question from supply-chain trust: what can this agent reach, depend on, or expose when it runs? As of {{ methodology_version }}, these fields contribute a <strong>bounded adjustment on top of the base score</strong> — they are part of the production HVTrust rank, not a separate preview. Each field's evidence is public on the agent's profile page, and the full detection rules are specified in <a href="/spec/runtime-trust/v0.2/">the runtime-trust spec</a>.</p>
 
         <dl class="sources">
           <div>
             <dt>MCP server support · up to +2.0</dt>
-            <dd>Public evidence that a project implements (+2.0) or declares (+1.0) an MCP server, based on docs, manifests, and repository paths. A structured, inspectable tool-use protocol earns a small trust reward over opaque custom integration.</dd>
+            <dd>Public evidence that a project <em>implements</em> an MCP server (+2.0), based on manifests and repository paths. A structured, inspectable tool-use protocol earns a small trust reward over opaque custom integration. A merely <em>declared</em> intention (a README sentence) earns nothing — too cheap to be a trust signal.</dd>
           </div>
           <div>
             <dt>External service dependencies · down to −4.0</dt>
@@ -367,13 +368,16 @@
             <dd class="limitation">This is a conservative metadata check, not a full cryptographic proof of package-to-source lineage.</dd>
           </div>
         </dl>
+        <p class="note"><strong>Soft ceiling.</strong> Positive adjustments are scaled by remaining headroom — full effect at or below a base of 80, phasing linearly to zero at 100 — so a bonus can never push an already-near-perfect score into a hard-clamped tie with another. Penalties are never scaled: a risk signal always lands in full. A perfect 100 is asymptotically earnable, not manufactured by stacking bonuses.</p>
+        <p class="note"><strong>Ranking ties.</strong> When two agents reach the exact same HVTrust score, the leaderboard shows them at a shared rank (<code>=N</code>) and orders them by hardest-to-fake evidence first — verification confidence, then OSSF Scorecard, then signed-commit ratio — before popularity (activity, then stars). Reaching the top among equal scores requires real audit posture, not stars alone.</p>
         <p class="note">The pre-calibration baseline remains visible for comparison on the leaderboard ("Compare to pre-calibration"), and every agent's per-field adjustment breakdown is published in the <a href="/data/">Data API</a>.</p>
       </section>
 
       <section id="policy-log">
         <h2>Trust Policy Decision Log</h2>
         <ul class="changelog">
-          <li><span class="ver">2026-07-02</span> — Promoted runtime-trust calibration into the production rank ({{ methodology_version }}): MCP support became trust-positive; external service dependencies and tool/plugin surface became trust-negative; package provenance drift gained a positive side (verified match). Detection rules were audited first — same-owner variants, repo transfers, and docs-only mentions are excluded. See <a href="/spec/runtime-trust/v0.1/">the runtime-trust spec</a>.</li>
+          <li><span class="ver">2026-07-05</span> — Runtime calibration {{ methodology_version }}: positive bonuses are now headroom-scaled (a soft ceiling, so strong agents no longer pile onto a hard-clamped 100); exact-score ties break on evidence (confidence → Scorecard → signed commits) before popularity, and display at a shared rank; a merely <em>declared</em> MCP intention no longer earns a bonus (only an implemented server does). Penalties remain absolute.</li>
+          <li><span class="ver">2026-07-02</span> — Promoted runtime-trust calibration into the production rank (v4.0): MCP support became trust-positive; external service dependencies and tool/plugin surface became trust-negative; package provenance drift gained a positive side (verified match). Detection rules were audited first — same-owner variants, repo transfers, and docs-only mentions are excluded. See <a href="/spec/runtime-trust/v0.2/">the runtime-trust spec</a>.</li>
           <li><span class="ver">2026-06-06</span> — Published the public trust-signal boundary: provenance, signed commits, scorecard posture, and maintenance remain trust-native; package provenance drift remains trust-negative; MCP support, external dependencies, and tool/plugin surface remain descriptive only.</li>
           <li><span class="ver">2026-06-05</span> — Split HVTrust from the broader AI-agent evaluation track so the default leaderboard stays trust-first rather than blending capability breadth into rank.</li>
         </ul>
@@ -412,7 +416,8 @@
       <section id="changelog">
         <h2>Changelog</h2>
         <ul class="changelog">
-          <li><span class="ver">v4.0</span> (current) — Runtime-trust calibration is now part of the production HVTrust score and rank: MCP support (up to +2.0), external service dependencies (down to −4.0), tool/plugin surface (down to −2.5), and package provenance drift (+4.0 to −5.0) adjust the base score, clamped to 0–100. Rank-trend charts restart at this version; the pre-calibration baseline stays available for comparison.</li>
+          <li><span class="ver">v4.1</span> (current) — Soft ceiling: positive runtime bonuses are headroom-scaled so they phase out near 100 instead of clamping strong agents into identical scores. Exact-score ties now break on evidence (confidence → OSSF Scorecard → signed commits) before popularity, and are shown at a shared rank. A declared-only MCP intention no longer earns a bonus.</li>
+          <li><span class="ver">v4.0</span> — Runtime-trust calibration became part of the production HVTrust score and rank: MCP support (up to +2.0), external service dependencies (down to −4.0), tool/plugin surface (down to −2.5), and package provenance drift (+4.0 to −5.0) adjust the base score, clamped to 0–100. Rank-trend charts restart at this version; the pre-calibration baseline stays available for comparison.</li>
           <li><span class="ver">v3.2</span> — AI-agent surface fields became public on agent pages: MCP server support, external service dependencies, tool/plugin surface, and package provenance drift — at that time visible but not yet affecting the production HVTrust rank.</li>
           <li><span class="ver">v3.1</span> — HVTrust now uses the live v3.1 weighting: Safety/Integrity 25, Identity/Provenance 18, Transparency 17, Maintenance 20, and Adoption 20. Adoption includes stars and package downloads, while supply-chain and provenance signals remain the strongest verifiability inputs.</li>
           <li><span class="ver">v3.0</span> — The leaderboard began ranking by HVTrust instead of the popularity-based health score. HVTrust is gated and confidence-scaled: missing evidence lowers the score via a confidence multiplier, staleness incurs a penalty, and deprecated or unverified listings are capped below the verified tier.</li>
