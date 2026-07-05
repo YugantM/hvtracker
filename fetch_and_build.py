@@ -6089,6 +6089,7 @@ def main() -> None:
     sitemap_urls.append(("https://hvtracker.net/blog/runtime-trust-is-live/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/you-are-not-installing-what-you-think/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/state-of-ai-agent-supply-chain-trust-2026/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/calibration-fix-and-coverage-grade/", "0.9", "weekly"))
     for _p in snapshot_posts:
         sitemap_urls.append((f"https://hvtracker.net/blog/{_p['slug']}/", "0.7", "monthly"))
     sitemap_urls.append(("https://hvtracker.net/blog/ai-agents-mcp-servers-trust/", "0.9", "weekly"))
@@ -6211,6 +6212,14 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
         }
         for _p in snapshot_posts
     ] + [
+        {
+            "id": "https://hvtracker.net/blog/calibration-fix-and-coverage-grade",
+            "url": "https://hvtracker.net/blog/calibration-fix-and-coverage-grade",
+            "title": "Correcting HVTrust: A Calibration Fix and a New Coverage Grade",
+            "content_text": "We found and fixed a build-loop bug that let the bounded runtime-trust adjustment compound across builds and inflate HVTrust scores. Here's what happened, the v4.2 fix that de-inflated the leaderboard, and a new evidence-coverage grade that keeps thin evidence visible next to every score.",
+            "date_modified": now_iso,
+            "tags": ["Methodology", "Transparency", "Supply chain trust"],
+        },
         {
             "id": "https://hvtracker.net/blog/scan-your-stack",
             "url": "https://hvtracker.net/blog/scan-your-stack",

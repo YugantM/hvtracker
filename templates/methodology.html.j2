@@ -39,7 +39,7 @@
       {
         "@type": "Question",
         "name": "How often is HVTracker data updated?",
-        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker data is refreshed automatically throughout the day. The Railway production job currently runs every 2 hours and rebuilds the leaderboard, agent profiles, public JSON endpoints, and historical snapshots." }
+        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker data is refreshed automatically throughout the day. The Railway production job currently runs about every 30 minutes and rebuilds the leaderboard, agent profiles, public JSON endpoints, and historical snapshots." }
       }
     ]
   }
@@ -387,7 +387,7 @@
 
       <section id="updates">
         <h2>How Often Data Updates</h2>
-        <p>HVTracker is currently refreshed on Railway every 2 hours. Each successful run regenerates the leaderboard, agent pages, public JSON endpoints, <code>feed.json</code>, <code>sitemap.xml</code>, and a dated history snapshot. Some upstream APIs refresh more slowly than the site itself, so not every signal moves on every run.</p>
+        <p>HVTracker is currently refreshed on Railway about every 30 minutes. Each successful run regenerates the leaderboard, agent pages, public JSON endpoints, <code>feed.json</code>, <code>sitemap.xml</code>, and a dated history snapshot. Some upstream APIs refresh more slowly than the site itself, so not every signal moves on every run.</p>
       </section>
 
       <section id="limitations">

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Correcting HVTrust: A Calibration Fix and a New Coverage Grade | HVTracker</title>
+  <meta name="description" content="We found and fixed a bug that let the runtime-trust adjustment compound across builds and inflate HVTrust scores. Here is what happened, the v4.2 fix, and the new evidence-coverage grade that keeps thin evidence visible.">
+  <link rel="canonical" href="https://hvtracker.net/blog/calibration-fix-and-coverage-grade">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Correcting HVTrust: A Calibration Fix and a New Coverage Grade">
+  <meta property="og:description" content="A bounded runtime adjustment was compounding across builds and inflating scores. Here is the v4.2 fix and the new evidence-coverage grade.">
+  <meta property="og:url" content="https://hvtracker.net/blog/calibration-fix-and-coverage-grade">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Correcting HVTrust: A Calibration Fix and a New Coverage Grade">
+  <meta name="twitter:description" content="A bounded runtime adjustment was compounding across builds and inflating scores. Here is the v4.2 fix and the new evidence-coverage grade.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Correcting HVTrust: A Calibration Fix and a New Coverage Grade",
+    "description": "We found and fixed a build-loop bug that let the bounded runtime-trust adjustment compound across builds and inflate HVTrust scores. The article covers what happened, the v4.2 fix, and a new evidence-coverage grade.",
+    "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "publisher": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "datePublished": "2026-07-06",
+    "dateModified": "2026-07-06",
+    "mainEntityOfPage": "https://hvtracker.net/blog/calibration-fix-and-coverage-grade"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://hvtracker.net/blog/" },
+      { "@type": "ListItem", "position": 3, "name": "Correcting HVTrust" }
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#f4f1eb; --surface:#eae6de; --border:#d4cfc5; --text:#1a1a1a; --muted:#6b6560;
+      --accent:#26405e; --green:#2f6846; --red:#9b3c3c; --amber:#8b6914;
+      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg);  color:var(--text); font-family:var(--font-sans); font-size:16px; line-height:1.7; min-height:100vh; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:760px; margin:0 auto; padding:0 20px; background:var(--bg); min-height:100vh; }
+    .site-header { position:sticky; top:0; z-index:100; background:var(--bg); border-bottom:1px solid var(--border); }
+    .site-header-inner { max-width:1200px; margin:0 auto; padding:14px 20px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; color:var(--text); }
+    .logo span { color:var(--accent); }
+    .site-nav { margin-left:24px; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; }
+    .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
+    .site-nav a:hover { color:var(--text); border-color:var(--border); background:var(--surface); text-decoration:none; }
+    .site-status { font:11px var(--font-mono); color:var(--muted); margin-left:auto; white-space:nowrap; }
+    .live-dot { display:inline-block; width:7px; height:7px; border-radius:999px; background:var(--green, var(--fresh)); margin-right:6px; vertical-align:middle; box-shadow:0 0 0 3px color-mix(in srgb, var(--green, var(--fresh)) 18%, transparent); }
+    article { padding:36px 0 48px; }
+    h1 { font-size:34px; font-weight:700; line-height:1.15; margin-bottom:12px; }
+    .meta { font-size:13px; color:var(--muted); margin-bottom:32px; font-family:var(--font-mono); }
+    h2 { font-size:22px; font-weight:700; margin-top:36px; margin-bottom:12px; }
+    p { margin-bottom:16px; }
+    code { font-family:var(--font-mono); font-size:14px; background:var(--surface); padding:2px 6px; border-radius:3px; }
+    .callout { background:rgba(44,82,130,0.08); border-left:3px solid var(--accent); padding:16px 20px; margin:24px 0; border-radius:0 6px 6px 0; font-size:14px; }
+    .callout strong { color:var(--accent); }
+    .big-stat { text-align:center; padding:32px 0; margin:24px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+    .big-stat .number { font:700 44px var(--font-mono); color:var(--accent); }
+    .big-stat .label { font-size:14px; color:var(--muted); margin-top:4px; }
+    table { width:100%; border-collapse:collapse; margin:24px 0; font-size:14px; }
+    th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:top; }
+    th { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
+    td.name a { font-weight:600; color:var(--text); }
+    td.name a:hover { color:var(--accent); }
+    td.rank, td.score { font-family:var(--font-mono); }
+    .up { color:var(--green); font-weight:700; font-family:var(--font-mono); }
+    .down { color:var(--red); font-weight:700; font-family:var(--font-mono); }
+    .neutral { color:var(--muted); font-family:var(--font-mono); }
+    .cta-box { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:24px; margin:36px 0; text-align:center; }
+    .cta-box h3 { margin-bottom:8px; font-size:18px; }
+    .cta-box p { font-size:14px; color:var(--muted); margin-bottom:16px; }
+    .cta-btn { display:inline-block; background:var(--accent); color:#fff; padding:10px 24px; border-radius:5px; font-weight:600; font-size:14px; text-decoration:none; }
+    .cta-btn:hover { opacity:0.9; text-decoration:none; }
+    footer { padding:28px 0; border-top:1px solid var(--border); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--accent); }
+    @media (max-width:600px) { h1 { font-size:26px; } table { font-size:12px; } th,td { padding:8px 6px; } }
+  </style>
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TZ8921LR0K');</script>
+  <script defer src="/analytics.js"></script>
+  <script defer src="/static/site-status.js"></script>
+<style>
+.nav-group{position:relative}
+.nav-trigger{font:inherit;cursor:pointer;color:var(--muted);padding:5px 8px;border:1px solid transparent;background:none;white-space:nowrap}
+.nav-trigger::after{content:" \25BE";opacity:.55;font-size:9px}
+.nav-group:hover>.nav-trigger,.nav-group:focus-within>.nav-trigger{color:var(--text);border-color:var(--border);background:var(--surface)}
+.nav-panel{display:none;position:absolute;top:100%;left:0;z-index:200;margin-top:4px;flex-direction:column;min-width:150px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.nav-group:hover>.nav-panel,.nav-group:focus-within>.nav-panel{display:flex}
+.nav-panel a{color:var(--muted);padding:6px 10px;border-radius:4px;border:0;white-space:nowrap}
+.nav-panel a:hover{color:var(--text);background:var(--surface);text-decoration:none}
+@media(max-width:900px){.nav-group:hover>.nav-panel,.nav-group:focus-within>.nav-panel{position:static;box-shadow:none;border:0;padding:2px 0 2px 12px;margin-top:0;min-width:0}}
+</style>
+</head>
+<body data-page-type="blog_article">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/methodology">Methodology</a><a href="/badges/">Badges</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
+      </nav>
+      <div class="site-status" data-updated="">
+        <span class="live-dot"></span>updated <span class="site-status-value"></span>
+      </div>
+    </div>
+  </header>
+  <div class="page">
+    <article>
+      <h1>Correcting HVTrust: A Calibration Fix and a New Coverage Grade</h1>
+      <div class="meta">July 6, 2026 &middot; 5 min read &middot; HVTracker Research</div>
+
+      <p>Trust infrastructure only works if it holds itself to the same standard it asks of everyone else. So here is a correction, in the open: we found and fixed a bug that had been quietly inflating HVTrust scores, and we shipped a new grade that makes the depth of evidence behind every score impossible to hide.</p>
+
+      <h2>What went wrong</h2>
+
+      <p>Since methodology v4.0, the production score has been the supply-chain base score plus a small, <strong>bounded</strong> runtime-trust adjustment — at most a few points up or down for things like MCP support, external dependencies, and package-provenance drift. That adjustment was never meant to move a score by more than about five points.</p>
+
+      <p>A defect in the build loop broke that promise. Each build is supposed to compute the adjustment on top of the <em>base</em> score. Instead, it computed the adjustment on top of the <em>previous build's already-adjusted</em> score. The small nudge stacked on itself every build — and with a rebuild every 30 minutes, it compounded relentlessly toward the ceiling.</p>
+
+      <div class="callout">
+        <strong>In plain terms:</strong> a "+2" that should have applied once was re-applying on every rebuild. Over enough builds, an agent whose real base score was in the low 50s could drift all the way to a perfect 100 — and once there, it stuck.
+      </div>
+
+      <div class="big-stat">
+        <div class="number">56 &rarr; 0</div>
+        <div class="label">agents pinned at a hard-clamped 100.0 before the fix, versus after it</div>
+      </div>
+
+      <h2>The fix (methodology v4.2)</h2>
+
+      <p>The correction is one line of intent: every build now re-derives the score from the base and applies the runtime adjustment exactly once. Builds are idempotent again — run the same inputs twice and you get the same score, not a higher one. A regression test now fails if that property ever breaks.</p>
+
+      <p>With the compounding gone, the leaderboard de-inflated to what the evidence actually supports. No wall of hundreds; the top of the board is a spread of distinct, defensible scores:</p>
+
+      <table>
+        <thead>
+          <tr><th>Rank</th><th>Agent</th><th>HVTrust</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="rank">#1</td><td class="name"><a href="/agents/vercel-ai-sdk/">Vercel AI SDK</a></td><td class="score">95.6</td></tr>
+          <tr><td class="rank">#2</td><td class="name"><a href="/agents/codex/">Codex</a></td><td class="score">94.3</td></tr>
+          <tr><td class="rank">#3</td><td class="name"><a href="/agents/haystack/">Haystack</a></td><td class="score">94.2</td></tr>
+          <tr><td class="rank">#4</td><td class="name"><a href="/agents/n8n/">n8n</a></td><td class="score">91.5</td></tr>
+          <tr><td class="rank">#5</td><td class="name"><a href="/agents/qwen-code/">Qwen Code</a></td><td class="score">90.8</td></tr>
+        </tbody>
+      </table>
+
+      <p>Because this is a methodology change, rank-trend sparklines restart at v4.2, and we suppressed the one-time notification deltas across the cutover so watchlists were not spammed with a correction they did not cause. The full record lives in the <a href="/methodology/#changelog">methodology changelog</a> and trust policy log.</p>
+
+      <h2>A new grade: Evidence Coverage</h2>
+
+      <p>A score-inflation bug is exactly the kind of thing a trust registry should be most paranoid about — so we also shipped something that makes scores harder to over-read in the first place.</p>
+
+      <p>Every agent now carries a second, separate <strong>Evidence Coverage</strong> grade (A&ndash;D). It does not measure how high the score is. It measures how many <em>independent</em> public signal types back that score: GitHub repo data, package downloads, supply-chain evidence (OSSF Scorecard or build provenance), behavioural signals, and public discussion — five possible types.</p>
+
+      <div class="callout">
+        A well-licensed but GitHub-only project can still earn a respectable score on the little that is checkable — but it will now carry a <strong>coverage grade of D</strong>, right next to the number. Breadth of evidence is no longer something you have to dig for.
+      </div>
+
+      <p>You will find it on every agent page and in the public API (<code>coverage_grade</code>, <code>signal_types</code>). The HVTrust score answers "how trustworthy does the evidence say this is?" Coverage answers "how much independent evidence is there at all?" Both matter, and now both are visible.</p>
+
+      <h2>Why we published this</h2>
+
+      <p>We could have shipped the fix silently — the numbers simply corrected themselves on the next build. We are writing it up because the entire premise of HVTracker is that verification and methodology stay public, including when the methodology was wrong. A trust score you cannot audit is just another opinion.</p>
+
+      <div class="cta-box">
+        <h3>Read the full methodology</h3>
+        <p>Every runtime adjustment value, the soft ceiling, the tie-break order, and both grades are documented — with the v4.2 correction in the changelog.</p>
+        <a class="cta-btn" href="/methodology/#runtime-calibration">See the calibration methodology</a>
+      </div>
+
+      <p>If you maintain a project we track and think its score or coverage grade is wrong, the evidence is public and every agent page has a "Suggest correction" link. That is the point: <strong>the verdict stays open.</strong></p>
+    </article>
+
+    <footer>
+      <a href="/methodology">Methodology</a> &middot;
+      <a href="/roadmap/">Roadmap</a> &middot;
+      <a href="/methodology/#runtime-calibration">Runtime calibration</a> &middot;
+      <a href="/blog/">Blog</a>
+    </footer>
+  </div>
+</body>
+</html>
