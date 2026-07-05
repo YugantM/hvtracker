@@ -164,7 +164,14 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   (vercel-ai-sdk/codex/haystack/n8n/pydanticai); mean |Δrank| ~61, 215/319
   grade flips — huge because the LIVE board was wrong, not the corrected one.
   Methodology changelog + policy-log updated. Deployed 2026-07-05 per owner.
-- Next: T3.3 capability-surface page; internal-linking SEO pass (parked);
-  consider fixing tool_plugin_surface's "search"/"code" pattern-mention
-  breadth if it resurfaces in a future audit (currently gated behind real
-  dependency evidence, so low-risk today).
+- Bill fix VERIFIED 2026-07-06 (Railway metrics API): web-service RAM avg
+  0.660→0.228 GB (−65%) after #106 subprocess refresh; flat baseline, spikes
+  release. Est. memory cost $6.60→$2.28/mo. Re-check 2026-07-12; next lever
+  is consolidating the two Postgres services.
+- Next: see `docs/plan-2026-07-06-post-v4.2.md` (ACTIVE PLAN) — P0 content-
+  truth pass (README still says v3.1/172 agents; GitHub About says 172+;
+  methodology FAQ says "every 2 hours" vs 30-min reality), prod-volume orphan
+  check at next deploy, bill re-check 07-12; then T3.3 capability-surface
+  page, internal-linking SEO pass, badge-adopter audit; later T3.5 drift
+  monitoring, Postgres consolidation. Open owner decisions: v4.2 announcement
+  (changelog-only vs blog), evidence-grade semantics (band vs coverage).
