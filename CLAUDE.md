@@ -144,8 +144,26 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   + methodology + roadmap links updated; the old /spec/runtime-trust/v0.1/ is a
   stale volume orphan at deploy (like score-lab). Evidence gate (isolated
   OLD-vs-NEW on identical bases): 0 agents move >10 ranks, 4 grade flips (all
-  downward corrections from removing MCP-declared inflation). Merged, NOT yet
-  deployed (prod still shows the clamped-100 v4.0 behavior until `railway up`).
+  downward corrections from removing MCP-declared inflation). Deployed
+  2026-07-05 (#107 + ticker-scroll fix #108) — but a worse, pre-existing
+  compounding bug surfaced immediately after; see v4.2.
+- Scoring v4.2 2026-07-05 (owner: "leaderboard too different" investigation):
+  root-caused the inflated live board to a COMPOUNDING bug — the build loop
+  never seeded `row["trust_score"]` with the freshly-computed base before
+  `compute_trust_score_v2` read it, so the bounded ±adjustment layered on the
+  PRIOR build's already-calibrated score and ratcheted every render toward the
+  0/100 rails (humanlayer: real base 50.9 → prod 100.0, reported adj 0.0;
+  ratchet sim 50.9→70.9→88.7→98.6→99.6). v4.1's soft ceiling only froze the
+  drift near the top, it never undid it — that's why the board looked "too
+  different." Fix is one line: seed the base into `row["trust_score"]` before
+  the v2 call (`fetch_and_build.py` ~5100) so each build is idempotent;
+  regression test `test_runtime_calibration_does_not_compound_across_renders`
+  locks non-compounding + idempotency. METHODOLOGY_VERSION v4.1→v4.2 (sparkline
+  reset + cutover notification suppression). Evidence gate (recompute the whole
+  board correctly): max de-inflates to ~92.8, 0 pinned ≥99.5, sensible top
+  (vercel-ai-sdk/codex/haystack/n8n/pydanticai); mean |Δrank| ~61, 215/319
+  grade flips — huge because the LIVE board was wrong, not the corrected one.
+  Methodology changelog + policy-log updated. Deployed 2026-07-05 per owner.
 - Next: T3.3 capability-surface page; internal-linking SEO pass (parked);
   consider fixing tool_plugin_surface's "search"/"code" pattern-mention
   breadth if it resurfaces in a future audit (currently gated behind real

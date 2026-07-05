@@ -34,7 +34,7 @@ HEADERS = {
 if TOKEN:
     HEADERS["Authorization"] = f"Bearer {TOKEN}"
 
-METHODOLOGY_VERSION = "v4.1"  # soft ceiling (headroom-scaled bonuses) + evidence-first tie-break
+METHODOLOGY_VERSION = "v4.2"  # fix: runtime calibration reads the base, not the prior final (no compounding)
 DATA_SCHEMA_VERSION = "v0.1"
 
 
@@ -5101,6 +5101,13 @@ def main() -> None:
         row["trust_score_historical_v1"] = trust["trust_score"]
         row["trust_confidence"] = trust["trust_confidence"]
         row["trust_breakdown"] = trust["trust_breakdown"]
+        # Seed the freshly-computed base BEFORE the runtime calibration reads it.
+        # compute_trust_score_v2 takes its base from row["trust_score"]; if we
+        # skip this, it reads the PRIOR render's already-calibrated score off the
+        # loaded snapshot and re-applies the bounded adjustment on top of it, so
+        # the "±5" adjustment compounds every render and ratchets scores to the
+        # 0/100 rails over time. Seeding the base makes each render idempotent.
+        row["trust_score"] = trust["trust_score"]
         trust_v2 = compute_trust_score_v2(row)
         row["trust_score"] = trust_v2["trust_score_v2"]
         row["trust_v2_adjustment"] = trust_v2["trust_v2_adjustment"]
