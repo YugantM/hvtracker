@@ -255,6 +255,61 @@ _DYNAMIC_SLASH_PATHS = {
 }
 _HEALTHCHECK_PATHS = {"/healthz", "/healthz/"}
 
+# Retired sections that still attract crawlers (GSC "Not found (404)" cleanup).
+# 301 preserves link equity and fires before the static mount, so stale
+# generated pages left on the prod volume can never shadow these.
+_RETIRED_REDIRECTS = {
+    "/score-lab/": "/methodology/#runtime-calibration",
+    "/spec/runtime-trust/v0.1/": "/spec/runtime-trust/v0.2/",
+    "/org/i-am-bee/": "/org/",
+    "/use-cases/recently-active/": "/use-cases/",
+}
+# Agents hard-deleted from agents.json (never in data/retired.json, which only
+# carries `legacy` rows the renderer delisted).
+_HARD_RETIRED_AGENT_SLUGS = frozenset({"bee-agent-framework"})
+_retired_cache = {"mtime": None, "slugs": _HARD_RETIRED_AGENT_SLUGS}
+
+
+def _retired_slugs() -> frozenset:
+    """Slugs whose /agents/<slug>/ page is gone for good → 410 (cached by mtime)."""
+    path = os.path.join(OUTPUT_DIR, "data", "retired.json")
+    try:
+        mtime = os.path.getmtime(path)
+    except OSError:
+        return _HARD_RETIRED_AGENT_SLUGS
+    if _retired_cache["mtime"] != mtime:
+        try:
+            with open(path, encoding="utf-8") as f:
+                slugs = json.load(f).get("agents", [])
+        except (OSError, json.JSONDecodeError, AttributeError):
+            return _HARD_RETIRED_AGENT_SLUGS
+        _retired_cache["slugs"] = frozenset(slugs) | _HARD_RETIRED_AGENT_SLUGS
+        _retired_cache["mtime"] = mtime
+    return _retired_cache["slugs"]
+
+
+def _retired_response(path: str) -> Response | None:
+    """301 for retired sections, 410 Gone for retired agent/compare pages."""
+    lookup = path if path.endswith("/") else f"{path}/"
+    target = _RETIRED_REDIRECTS.get(lookup)
+    if target is not None:
+        return RedirectResponse(target, status_code=301)
+    parts = [p for p in lookup.split("/") if p]
+    if len(parts) != 2:
+        return None
+    gone = False
+    if parts[0] == "agents":
+        gone = parts[1] in _retired_slugs()
+    elif parts[0] == "compare" and "-vs-" in parts[1]:
+        gone = any(s in _retired_slugs() for s in parts[1].split("-vs-"))
+    if gone:
+        return HTMLResponse(
+            "<h1>410 Gone</h1><p>This agent has been retired from the HVTracker "
+            'registry. See the <a href="/">current leaderboard</a>.</p>',
+            status_code=410,
+        )
+    return None
+
 
 def _external_scheme(request: Request) -> str:
     cf_visitor = request.headers.get("cf-visitor")
@@ -320,6 +375,9 @@ async def _cache_headers(request, call_next):
         if redirect_target is not None:
             status_code = 301 if request.method in {"GET", "HEAD"} else 308
             return RedirectResponse(redirect_target, status_code=status_code)
+        retired = _retired_response(path)
+        if retired is not None:
+            return retired
 
     if path == "/mcp" and request.method == "POST":
         if not _mcp_enabled():
