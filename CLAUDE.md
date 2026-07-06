@@ -183,9 +183,32 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   `blog_static/calibration-fix-and-coverage-grade/` announces the v4.2
   compounding fix + coverage grade, wired to all 4 surfaces (post/index
   card/sitemap/feed).
+- GSC cleanup SHIPPED + DEPLOYED 2026-07-06 (#114; owner: "execute the plan").
+  Coverage export showed 913/1,558 known pages not indexed (87 404s, 328
+  redirect pages, 196 crawled/discovered-not-indexed). Fixes: (1) published
+  /compare/ pairs now PERSIST across renders while both agents stay listed in
+  the same category — state in `data/seo_state.json` (gitignored, lives on the
+  volume); rank shuffles no longer 404 indexed URLs. (2) sitemap <lastmod> is
+  per-URL content-hashed (now_str-normalized) — only advances on real change;
+  sitemap now written at END of main() so late-rendered pages hash correctly.
+  (3) category-article datePublished stable (first render), dateModified only
+  on pairing change. (4) app.py middleware: 301 /score-lab/→methodology
+  #runtime-calibration, /spec/runtime-trust/v0.1/→v0.2, /org/i-am-bee/ +
+  /use-cases/recently-active/→ index; 410 Gone for delisted agents via
+  `data/retired.json` (written from legacy_rows each render; hard-deleted
+  bee-agent-framework hardcoded) + compare URLs naming them — fires BEFORE the
+  static mount so volume orphans can't shadow (this closed the "prod-volume
+  orphan check" item). (5) category articles now link compare pairs in
+  canonical alphabetical order. Tests: `tests/test_seo_cleanup.py` (3 renders,
+  sentinel dates). Verified live: all 301/410s, healthz, 486-URL sitemap;
+  this deploy also took #112/#113 live. Note: seo_state seeds all-today on
+  first render — lastmod differentiation starts the next day. Follow-ups: 15
+  hand-written feed items still stamp now_iso; GSC URL-level exports (owner,
+  in Search Console UI) + "Validate fix" clicks on the 404/redirect buckets;
+  internal-linking pass next.
 - Next: `docs/plan-2026-07-06-post-v4.2.md` remaining — GitHub About text
-  (`gh repo edit`, still "172+"), prod-volume orphan check at next deploy,
-  bill re-check 07-12; then T3.3 capability-surface PAGE (grade shipped, page
-  pending), internal-linking SEO pass, badge-adopter audit; later T3.5 drift
+  (`gh repo edit`, still "172+"), bill re-check 07-12; then T3.3
+  capability-surface PAGE (grade shipped, page pending), internal-linking SEO
+  pass (target = GSC crawled-not-indexed list), badge-adopter audit; later T3.5 drift
   monitoring, Postgres consolidation. These content + coverage changes are
   MERGED, NOT yet deployed (need `railway up` to go live).
