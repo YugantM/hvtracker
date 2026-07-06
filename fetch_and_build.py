@@ -5530,6 +5530,11 @@ def main() -> None:
     with open(render_state_path, "w", encoding="utf-8") as _f:
         json.dump({"rows": rows, "legacy_rows": legacy_rows}, _f, ensure_ascii=False)
 
+    # Slugs whose public pages remove_legacy_public_artifacts deleted — app.py
+    # serves 410 Gone for them so crawlers drop the URLs instead of retrying.
+    with open(os.path.join(script_dir, "data", "retired.json"), "w", encoding="utf-8") as _f:
+        json.dump({"agents": sorted({lr["slug"] for lr in legacy_rows if lr.get("slug")})}, _f)
+
     recent_change_window_start = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d")
     recent_change_count = sum(
         1
@@ -5784,6 +5789,17 @@ def main() -> None:
     print(f"Built {len(org_pages)} org pages under org/.")
     prune_stale_page_dirs(org_dir, {o["slug"] for o in org_pages}, "org")
 
+    # SEO state — persists across renders (gitignored; lives on the volume in
+    # prod). Tracks published compare pairs, category-article publish dates,
+    # and per-URL sitemap lastmod fingerprints, so rank shuffles and re-renders
+    # don't churn URLs/dates Google has already indexed (GSC cleanup 2026-07-06).
+    seo_state_path = os.path.join(script_dir, "data", "seo_state.json")
+    try:
+        with open(seo_state_path, encoding="utf-8") as _f:
+            seo_state = json.load(_f)
+    except (OSError, json.JSONDecodeError):
+        seo_state = {}
+
     # /compare/<a>-vs-<b>/ — STATIC pre-rendered comparison pages (SEO).
     # Previously these URLs were served by the interactive (client-rendered)
     # compare tool with no crawlable content; now each precomputed
@@ -5831,6 +5847,40 @@ def main() -> None:
 
     compare_pair_urls = []
     _cmp_seen = set()
+
+    def _render_compare_pair(_a, _b, _cm):
+        _sl = _cmp_lead(_a.get("trust_score"), _b.get("trust_score"))
+        _metrics = [
+            {"label": "HVTrust score", "a": _cmp_r1(_a.get("trust_score")), "b": _cmp_r1(_b.get("trust_score")), "lead": _sl},
+            {"label": "Evidence grade", "grade": True, "lead": _sl},
+            {"label": "Overall rank", "a": f"#{_a.get('rank')}", "b": f"#{_b.get('rank')}", "lead": _cmp_lead(_a.get("rank"), _b.get("rank"), higher=False)},
+            {"label": f"Rank in {_cm['name']}", "a": f"#{_a.get('category_rank')}", "b": f"#{_b.get('category_rank')}", "lead": _cmp_lead(_a.get("category_rank"), _b.get("category_rank"), higher=False)},
+            {"label": "GitHub stars", "a": _a.get("stars_fmt") or "—", "b": _b.get("stars_fmt") or "—", "lead": _cmp_lead(_a.get("stars"), _b.get("stars"))},
+            {"label": "Last updated", "a": _cmp_fresh(_a), "b": _cmp_fresh(_b), "lead": _cmp_lead(_a.get("days_ago"), _b.get("days_ago"), higher=False)},
+            {"label": "Build provenance", "a": "Yes" if _a.get("has_provenance") else "No", "b": "Yes" if _b.get("has_provenance") else "No", "lead": _cmp_lead(1 if _a.get("has_provenance") else 0, 1 if _b.get("has_provenance") else 0)},
+            {"label": "OSSF Scorecard", "a": _cmp_sc(_a), "b": _cmp_sc(_b), "lead": _cmp_lead(_a.get("scorecard_score"), _b.get("scorecard_score"))},
+            {"label": "License", "a": _a.get("license_spdx") or "—", "b": _b.get("license_spdx") or "—", "lead": "none"},
+            {"label": "Downloads", "a": _cmp_dl(_a), "b": _cmp_dl(_b), "lead": _cmp_lead(_a.get("weekly_downloads"), _b.get("weekly_downloads"))},
+        ]
+        _abk = _a.get("trust_breakdown") or {}
+        _bbk = _b.get("trust_breakdown") or {}
+        _dims = [{"label": lbl, "max": mx, "a": _cmp_r1(_abk.get(k)), "b": _cmp_r1(_bbk.get(k)), "lead": _cmp_lead(_abk.get(k), _bbk.get(k))}
+                 for lbl, k, mx in (("Safety / integrity", "safety", 25), ("Identity & provenance", "identity", 20),
+                                    ("Transparency", "transparency", 17), ("Maintenance", "maintenance", 20), ("Adoption", "adoption", 20))]
+        _ctx = {"a": _a, "b": _b, "category": _cm, "metrics": _metrics, "dims": _dims,
+                "updated": now_str, "methodology_version": METHODOLOGY_VERSION,
+                "lead_name": None, "lead_score": None, "lead_grade": None, "trail_score": None, "trail_grade": None, "gap": None}
+        _as, _bs = _a.get("trust_score"), _b.get("trust_score")
+        if _as is not None and _bs is not None and _as != _bs:
+            _hi, _lo = (_a, _b) if _as > _bs else (_b, _a)
+            _ctx.update(lead_name=_hi["name"], lead_score=_cmp_r1(_hi.get("trust_score")), lead_grade=_hi.get("evidence_grade"),
+                        trail_score=_cmp_r1(_lo.get("trust_score")), trail_grade=_lo.get("evidence_grade"), gap=_cmp_r1(abs(_as - _bs)))
+        _pdir = os.path.join(compare_dir, f"{_a['slug']}-vs-{_b['slug']}")
+        os.makedirs(_pdir, exist_ok=True)
+        with open(os.path.join(_pdir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(compare_pair_tmpl.render(**_ctx))
+        compare_pair_urls.append(f"https://hvtracker.net/compare/{_a['slug']}-vs-{_b['slug']}/")
+
     for _cm in categories:
         _top = sorted([r for r in rows if r.get("category") == _cm["name"]],
                       key=lambda x: x.get("category_rank") or 9999)[:3]
@@ -5842,37 +5892,28 @@ def main() -> None:
             if _key in _cmp_seen:
                 continue
             _cmp_seen.add(_key)
-            _sl = _cmp_lead(_a.get("trust_score"), _b.get("trust_score"))
-            _metrics = [
-                {"label": "HVTrust score", "a": _cmp_r1(_a.get("trust_score")), "b": _cmp_r1(_b.get("trust_score")), "lead": _sl},
-                {"label": "Evidence grade", "grade": True, "lead": _sl},
-                {"label": "Overall rank", "a": f"#{_a.get('rank')}", "b": f"#{_b.get('rank')}", "lead": _cmp_lead(_a.get("rank"), _b.get("rank"), higher=False)},
-                {"label": f"Rank in {_cm['name']}", "a": f"#{_a.get('category_rank')}", "b": f"#{_b.get('category_rank')}", "lead": _cmp_lead(_a.get("category_rank"), _b.get("category_rank"), higher=False)},
-                {"label": "GitHub stars", "a": _a.get("stars_fmt") or "—", "b": _b.get("stars_fmt") or "—", "lead": _cmp_lead(_a.get("stars"), _b.get("stars"))},
-                {"label": "Last updated", "a": _cmp_fresh(_a), "b": _cmp_fresh(_b), "lead": _cmp_lead(_a.get("days_ago"), _b.get("days_ago"), higher=False)},
-                {"label": "Build provenance", "a": "Yes" if _a.get("has_provenance") else "No", "b": "Yes" if _b.get("has_provenance") else "No", "lead": _cmp_lead(1 if _a.get("has_provenance") else 0, 1 if _b.get("has_provenance") else 0)},
-                {"label": "OSSF Scorecard", "a": _cmp_sc(_a), "b": _cmp_sc(_b), "lead": _cmp_lead(_a.get("scorecard_score"), _b.get("scorecard_score"))},
-                {"label": "License", "a": _a.get("license_spdx") or "—", "b": _b.get("license_spdx") or "—", "lead": "none"},
-                {"label": "Downloads", "a": _cmp_dl(_a), "b": _cmp_dl(_b), "lead": _cmp_lead(_a.get("weekly_downloads"), _b.get("weekly_downloads"))},
-            ]
-            _abk = _a.get("trust_breakdown") or {}
-            _bbk = _b.get("trust_breakdown") or {}
-            _dims = [{"label": lbl, "max": mx, "a": _cmp_r1(_abk.get(k)), "b": _cmp_r1(_bbk.get(k)), "lead": _cmp_lead(_abk.get(k), _bbk.get(k))}
-                     for lbl, k, mx in (("Safety / integrity", "safety", 25), ("Identity & provenance", "identity", 20),
-                                        ("Transparency", "transparency", 17), ("Maintenance", "maintenance", 20), ("Adoption", "adoption", 20))]
-            _ctx = {"a": _a, "b": _b, "category": _cm, "metrics": _metrics, "dims": _dims,
-                    "updated": now_str, "methodology_version": METHODOLOGY_VERSION,
-                    "lead_name": None, "lead_score": None, "lead_grade": None, "trail_score": None, "trail_grade": None, "gap": None}
-            _as, _bs = _a.get("trust_score"), _b.get("trust_score")
-            if _as is not None and _bs is not None and _as != _bs:
-                _hi, _lo = (_a, _b) if _as > _bs else (_b, _a)
-                _ctx.update(lead_name=_hi["name"], lead_score=_cmp_r1(_hi.get("trust_score")), lead_grade=_hi.get("evidence_grade"),
-                            trail_score=_cmp_r1(_lo.get("trust_score")), trail_grade=_lo.get("evidence_grade"), gap=_cmp_r1(abs(_as - _bs)))
-            _pdir = os.path.join(compare_dir, f"{_a['slug']}-vs-{_b['slug']}")
-            os.makedirs(_pdir, exist_ok=True)
-            with open(os.path.join(_pdir, "index.html"), "w", encoding="utf-8") as f:
-                f.write(compare_pair_tmpl.render(**_ctx))
-            compare_pair_urls.append(f"https://hvtracker.net/compare/{_a['slug']}-vs-{_b['slug']}/")
+            _render_compare_pair(_a, _b, _cm)
+
+    # Previously published pairs keep their static page as long as both agents
+    # are still listed in the same category — a rank shuffle must not 404 URLs
+    # Google already indexed. A pair is dropped only when an agent delists or
+    # switches category; app.py then serves the interactive tool (or 410 for
+    # retired agents) at that URL.
+    _row_by_slug = {r["slug"]: r for r in rows}
+    _cat_by_name = {c["name"]: c for c in categories}
+    for _prev_pair in seo_state.get("published_compare_pairs", []):
+        _key = tuple(_prev_pair)
+        if len(_key) != 2 or _key in _cmp_seen:
+            continue
+        _a, _b = _row_by_slug.get(_key[0]), _row_by_slug.get(_key[1])
+        if not _a or not _b or _a.get("category") != _b.get("category"):
+            continue
+        _cm = _cat_by_name.get(_a.get("category"))
+        if not _cm:
+            continue
+        _cmp_seen.add(_key)
+        _render_compare_pair(_a, _b, _cm)
+    seo_state["published_compare_pairs"] = sorted(list(_k) for _k in _cmp_seen)
     print(f"Built {len(compare_pair_urls)} static comparison pages under compare/.")
 
     # Blog comparison articles — one SEO article per category using the top two
@@ -5901,8 +5942,11 @@ def main() -> None:
 
     article_tmpl = env.get_template("blog_category_comparison.html.j2")
     blog_articles = []
-    article_date = datetime.now(timezone.utc).strftime("%B %-d, %Y")
     article_iso = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    # Stable per-article dates: datePublished is the first render, dateModified
+    # only advances when the top-2 pairing changes — re-stamping every render
+    # as "published today" taught Google to distrust the dates (GSC cleanup).
+    _article_meta = seo_state.setdefault("article_meta", {})
     for cat_m in categories:
         cat_agents = sorted(
             [r for r in rows if r.get("category") == cat_m["name"]],
@@ -5913,6 +5957,14 @@ def main() -> None:
         a, b = cat_agents[0], cat_agents[1]
         winner, loser = (a, b) if (a.get("trust_score") or 0) >= (b.get("trust_score") or 0) else (b, a)
         article_slug = f"{cat_m['slug']}-top-agents"
+        _pair_id = f"{a['slug']}|{b['slug']}"
+        _meta = _article_meta.get(article_slug)
+        if not isinstance(_meta, dict) or "published" not in _meta:
+            _meta = {"published": article_iso, "modified": article_iso, "pair": _pair_id}
+        elif _meta.get("pair") != _pair_id:
+            _meta.update(pair=_pair_id, modified=article_iso)
+        _article_meta[article_slug] = _meta
+        article_date = datetime.strptime(_meta["published"], "%Y-%m-%d").strftime("%B %-d, %Y")
         title = f"Best Open-Source {cat_m['name']}: {a['name']} vs {b['name']}"
         h1 = f"Best Open-Source {cat_m['name']}: {a['name']} vs {b['name']}"
         description = (
@@ -5938,7 +5990,10 @@ def main() -> None:
             "category": cat_m["name"],
             "category_slug": cat_m["slug"],
             "date": article_date,
-            "date_iso": article_iso,
+            "date_iso": _meta["published"],
+            "modified_iso": _meta["modified"],
+            # Canonical (alphabetical) pair URL — linking in rank order 301s.
+            "compare_url": "/compare/{}-vs-{}/".format(*sorted((a["slug"], b["slug"]))),
             "read_time": 4,
             "a": a,
             "b": b,
@@ -5953,8 +6008,8 @@ def main() -> None:
             "description": description,
             "author": {"@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net"},
             "publisher": {"@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net"},
-            "datePublished": article_iso,
-            "dateModified": article_iso,
+            "datePublished": _meta["published"],
+            "dateModified": _meta["modified"],
             "mainEntityOfPage": url,
             "url": url,
             "about": [
@@ -6115,17 +6170,9 @@ def main() -> None:
         ("https://hvtracker.net/data/signals/scorecard.json", "0.5", "daily"),
         ("https://hvtracker.net/data/signals/provenance.json", "0.5", "daily"),
     ]
-    sitemap_lines = ['<?xml version="1.0" encoding="UTF-8"?>',
-                     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-    for loc, prio, freq in sitemap_urls:
-        sitemap_lines.append(
-            f"  <url><loc>{loc}</loc><lastmod>{today_iso}</lastmod>"
-            f"<changefreq>{freq}</changefreq><priority>{prio}</priority></url>"
-        )
-    sitemap_lines.append("</urlset>")
-    with open(os.path.join(script_dir, "sitemap.xml"), "w", encoding="utf-8") as f:
-        f.write("\n".join(sitemap_lines) + "\n")
-    print(f"Wrote sitemap.xml with {len(sitemap_urls)} URLs.")
+    # sitemap.xml itself is written at the END of main(): its per-URL
+    # <lastmod> fingerprints the rendered files, and methodology/badges/
+    # roadmap/spec pages are rendered after this point.
 
     # IndexNow — notify Bing/Yandex/Seznam (and IndexNow-consuming AI search)
     # that content changed, for near-instant (re)indexing. Best-effort; never
@@ -6322,7 +6369,7 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "url": f"https://hvtracker.net/blog/{a['slug']}",
             "title": a["title"],
             "content_text": a["excerpt"],
-            "date_modified": now_iso,
+            "date_modified": a.get("modified_iso") or now_iso,
             "tags": [a["category"], "Comparison"],
         }
         for a in blog_articles
@@ -6415,6 +6462,48 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
     with open(os.path.join(spec_base, "index.html"), "w", encoding="utf-8") as f:
         f.write(index_html)
     print(f"Built spec index with {len(ALL_SPECS)} spec(s).")
+
+    # sitemap.xml — written last so every listed page already exists on disk.
+    # Honest per-URL <lastmod>: fingerprint each page's rendered output
+    # (normalized to drop the per-render "updated" timestamp) and only advance
+    # the date when content actually changed. Stamping every URL "today" on
+    # every render taught Google to ignore lastmod entirely (GSC cleanup).
+    _lastmod_state = seo_state.setdefault("sitemap_lastmod", {})
+    _now_str_bytes = now_str.encode("utf-8")
+
+    def _sitemap_lastmod(_loc):
+        _path = _loc[len("https://hvtracker.net"):] or "/"
+        _fp = os.path.join(script_dir, _path.lstrip("/"))
+        if _path.endswith("/"):
+            _fp = os.path.join(_fp, "index.html")
+        _prev = _lastmod_state.get(_loc)
+        try:
+            with open(_fp, "rb") as _f:
+                _content = _f.read()
+        except OSError:
+            return _prev["date"] if isinstance(_prev, dict) and "date" in _prev else today_iso
+        _h = hashlib.sha256(_content.replace(_now_str_bytes, b"")).hexdigest()
+        if isinstance(_prev, dict) and _prev.get("hash") == _h:
+            return _prev["date"]
+        _lastmod_state[_loc] = {"hash": _h, "date": today_iso}
+        return today_iso
+
+    sitemap_lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+                     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for loc, prio, freq in sitemap_urls:
+        sitemap_lines.append(
+            f"  <url><loc>{loc}</loc><lastmod>{_sitemap_lastmod(loc)}</lastmod>"
+            f"<changefreq>{freq}</changefreq><priority>{prio}</priority></url>"
+        )
+    sitemap_lines.append("</urlset>")
+    with open(os.path.join(script_dir, "sitemap.xml"), "w", encoding="utf-8") as f:
+        f.write("\n".join(sitemap_lines) + "\n")
+    print(f"Wrote sitemap.xml with {len(sitemap_urls)} URLs.")
+    _current_locs = {loc for loc, _, _ in sitemap_urls}
+    for _stale_loc in [k for k in _lastmod_state if k not in _current_locs]:
+        del _lastmod_state[_stale_loc]
+    with open(seo_state_path, "w", encoding="utf-8") as _f:
+        json.dump(seo_state, _f, ensure_ascii=False)
 
 
 def refresh_argv(mode: str = "auto") -> list[str]:
