@@ -214,7 +214,18 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
 - Next: **`docs/master-plan-2026-07-07.md` is the active plan** (supersedes
   product-plan-2026-h2 as forward plan; full verified state audit + ecosystem
   forecast + phased feature plan; per-task status lives in its checkboxes).
-- **Phase 0 executed 2026-07-07** (#116–#120, merged, NOT yet deployed):
+- **Phase 0 DEPLOYED 2026-07-07 ~20:35 UTC** (owner-instructed `railway up`
+  from clean worktree @325cdbffd, then `railway restart` → pending-only
+  scored all 9 provisional agents in one poll). Verified live: 324 agents /
+  0 pending (strands-agents 82.7, oh-my-pi 73.9, mistral-vibe 73.2, goose
+  69.1, open-interpreter 47.9, opencode 46.5, mini-swe-agent 43.4, cowagent
+  24.5, solace-agent-mesh 68.9); methodology `#verify-yourself` live; feed
+  dates stable; `board_invariant_violations: []` in live build_report;
+  moved-agent pages 200; new-agent credential verifies via
+  `scripts/verify_credential.py`. New agents' OSSF sub-scores fill in after
+  the next daily scorecard scan (grade = score band since v4.0, so no
+  provisional-D issue).
+- **Phase 0 executed 2026-07-07** (#116–#120, merged, deployed above):
   offsite history backup live in private repo `hvtracker-history-backup`
   (daily GH Actions, 46 prod snapshots seeded, run verified green — external
   to this repo, no deploy needed); board-integrity invariants
