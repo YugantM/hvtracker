@@ -6338,7 +6338,7 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "url": "https://hvtracker.net/blog/calibration-fix-and-coverage-grade",
             "title": "Correcting HVTrust: A Calibration Fix and a New Coverage Grade",
             "content_text": "We found and fixed a build-loop bug that let the bounded runtime-trust adjustment compound across builds and inflate HVTrust scores. Here's what happened, the v4.2 fix that de-inflated the leaderboard, and a new evidence-coverage grade that keeps thin evidence visible next to every score.",
-            "date_modified": now_iso,
+            "date_modified": "2026-07-06T00:00:00Z",
             "tags": ["Methodology", "Transparency", "Supply chain trust"],
         },
         {
@@ -6346,7 +6346,7 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "url": "https://hvtracker.net/blog/scan-your-stack",
             "title": "Scan Your Stack: Verify, Now for Every Dependency at Once",
             "content_text": "Verify checks one project deep; Scan runs the same trust engine over your whole requirements.txt, package.json, or MCP config — a trust verdict for every agent, framework, and server in one pass, plus your stack's average HVTrust.",
-            "date_modified": now_iso,
+            "date_modified": "2026-06-23T00:00:00Z",
             "tags": ["Product launch", "Supply chain trust", "Stack scan"],
         },
         {
@@ -6354,7 +6354,7 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "url": "https://hvtracker.net/blog/mcp-server-launch",
             "title": "HVTracker Is Now an MCP Server: Trust Checks Before Your Agent Connects",
             "content_text": "HVTracker's public trust registry is now an MCP server at hvtracker.net/mcp. Coding agents can verify any MCP server, package, or agent before they connect, using three read-only tools over Streamable HTTP — no auth, open verdict.",
-            "date_modified": now_iso,
+            "date_modified": "2026-06-21T00:00:00Z",
             "tags": ["MCP", "Product launch", "Supply chain trust"],
         },
         {
@@ -6362,7 +6362,7 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "url": "https://hvtracker.net/blog/state-of-ai-agent-supply-chain-trust-2026",
             "title": "The State of AI Agent Supply-Chain Trust (2026): 272 Agents, Graded",
             "content_text": "We graded 272 open-source AI agents on supply-chain trust. Only 13% earn an A; 43% land at D. 17% publish build provenance and the median OSSF Scorecard is 5.3/10.",
-            "date_modified": now_iso,
+            "date_modified": "2026-06-21T00:00:00Z",
             "tags": ["Supply chain trust", "State of the ecosystem"],
         },
         {
@@ -6370,7 +6370,7 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "url": "https://hvtracker.net/blog/ai-agents-mcp-servers-trust",
             "title": "Hundreds of AI Agents Now Ship MCP Servers. How Many Can You Actually Trust?",
             "content_text": "45% of the AI agents we track now implement or declare an MCP server, and 76% of them ship no build provenance. Here's who you can verify and who you can't.",
-            "date_modified": now_iso,
+            "date_modified": "2026-06-21T00:00:00Z",
             "tags": ["MCP", "Supply chain trust"],
         },
         {
@@ -6378,7 +6378,7 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "url": "https://hvtracker.net/blog/trapdoor-supply-chain-provenance",
             "title": "TrapDoor Hit npm, PyPI, and Crates at Once. Provenance Is the Signal That Catches It.",
             "content_text": "The 2026 TrapDoor campaign weaponized npm, PyPI, and Crates simultaneously. Build provenance detects registry injection, and 83% of open-source AI agents don't publish it.",
-            "date_modified": now_iso,
+            "date_modified": "2026-06-21T00:00:00Z",
             "tags": ["Provenance", "Supply chain trust"],
         },
         {
@@ -6386,7 +6386,7 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "url": "https://hvtracker.net/blog/how-to-evaluate-ai-agent-safety",
             "title": "How to Evaluate AI Agent Safety: 5 Signals That Actually Matter",
             "content_text": "A practical guide to evaluating open-source AI agent safety using OSSF Scorecard, package provenance, signed commits, activity patterns, and transparency indicators.",
-            "date_modified": now_iso,
+            "date_modified": "2026-05-27T00:00:00Z",
             "tags": ["AI agent safety", "Trust signals"],
         },
         {
@@ -6394,7 +6394,7 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "url": "https://hvtracker.net/blog/most-starred-ai-agents-no-provenance",
             "title": "The Most Popular AI Agents Ship Without Provenance — Here's the List",
             "content_text": "375k stars, 184k stars, 167k stars — and zero package provenance. We checked the top 10 most-starred AI agents.",
-            "date_modified": now_iso,
+            "date_modified": "2026-05-30T00:00:00Z",
             "tags": ["Provenance", "Supply chain trust"],
         },
         {
@@ -6402,7 +6402,7 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "url": "https://hvtracker.net/blog/coding-agents-trust-rankings",
             "title": "Coding Agents Ranked by Trust, Not Stars — The Results Are Embarrassing",
             "content_text": "We ranked 26 coding agents by supply-chain trust. opencode (167k stars) lands at #127. Only one coding agent cracks the top 10.",
-            "date_modified": now_iso,
+            "date_modified": "2026-05-30T00:00:00Z",
             "tags": ["Coding agents", "Trust rankings"],
         },
         {
@@ -6410,7 +6410,7 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "url": "https://hvtracker.net/blog/ai-agent-frameworks-ranked-by-trust",
             "title": "LangChain vs LangGraph vs CrewAI vs AutoGPT — Ranked by Trust, Not Hype",
             "content_text": "LangGraph #1, AutoGPT #39, LlamaIndex #126. We ranked the top AI frameworks by supply-chain trust instead of stars.",
-            "date_modified": now_iso,
+            "date_modified": "2026-05-30T00:00:00Z",
             "tags": ["Agent frameworks", "Trust rankings"],
         },
         {
@@ -6418,7 +6418,7 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "url": "https://hvtracker.net/blog/github-stars-dont-predict-ai-agent-trust",
             "title": "GitHub Stars Don't Predict AI Agent Trust — I Scored 192 to Prove It",
             "content_text": "24 of the 30 most-starred AI agents ship with no build provenance. The full list, the six exceptions, and why stars are the wrong metric.",
-            "date_modified": now_iso,
+            "date_modified": "2026-05-31T00:00:00Z",
             "tags": ["Provenance", "Trust rankings"],
         },
         {
@@ -6426,7 +6426,7 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "url": "https://hvtracker.net/blog/codex-vs-claude-code",
             "title": "Codex vs Claude Code: Which Coding Agent Is Easier to Trust?",
             "content_text": "Claude Code has more stars, but Codex ranks far higher on HVTracker. The gap is about provenance, signed commits, and public verifiability.",
-            "date_modified": now_iso,
+            "date_modified": "2026-06-01T00:00:00Z",
             "tags": ["Coding agents", "Comparison"],
         },
         {
@@ -6434,7 +6434,7 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "url": "https://hvtracker.net/blog/runtime-trust-is-live",
             "title": "Runtime Trust Is Live on HVTracker",
             "content_text": "HVTracker v3.2 adds public runtime-trust discovery and an experimental score lab. See how the current top 10 would move under the first calibration.",
-            "date_modified": now_iso,
+            "date_modified": "2026-06-05T00:00:00Z",
             "tags": ["Runtime trust", "Methodology"],
         },
     ] + [

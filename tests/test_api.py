@@ -242,6 +242,39 @@ def test_sitemap_and_feeds_get_cache_headers(client):
         assert "s-maxage=1800" in r.headers.get("cache-control", ""), path
 
 
+def test_handwritten_feed_items_have_stable_dates(client):
+    """Hand-written blog posts must not re-stamp date_modified every render
+    (master plan 0.6) — a fresh render's feed must carry their real publish
+    dates, byte-identical across renders."""
+    expected = {
+        "calibration-fix-and-coverage-grade": "2026-07-06T00:00:00Z",
+        "scan-your-stack": "2026-06-23T00:00:00Z",
+        "mcp-server-launch": "2026-06-21T00:00:00Z",
+        "state-of-ai-agent-supply-chain-trust-2026": "2026-06-21T00:00:00Z",
+        "ai-agents-mcp-servers-trust": "2026-06-21T00:00:00Z",
+        "trapdoor-supply-chain-provenance": "2026-06-21T00:00:00Z",
+        "how-to-evaluate-ai-agent-safety": "2026-05-27T00:00:00Z",
+        "most-starred-ai-agents-no-provenance": "2026-05-30T00:00:00Z",
+        "coding-agents-trust-rankings": "2026-05-30T00:00:00Z",
+        "ai-agent-frameworks-ranked-by-trust": "2026-05-30T00:00:00Z",
+        "github-stars-dont-predict-ai-agent-trust": "2026-05-31T00:00:00Z",
+        "codex-vs-claude-code": "2026-06-01T00:00:00Z",
+        "runtime-trust-is-live": "2026-06-05T00:00:00Z",
+    }
+    feed = client.get("/feed.json").json()
+    by_slug = {
+        item["id"].rsplit("/", 1)[-1]: item
+        for item in feed["items"]
+        if "/blog/" in item["id"]
+    }
+    for slug, date in expected.items():
+        assert slug in by_slug, f"hand-written post {slug!r} missing from feed"
+        assert by_slug[slug]["date_modified"] == date, (
+            f"{slug}: date_modified {by_slug[slug]['date_modified']!r} != {date!r} "
+            "— hand-written posts must keep their real publish date"
+        )
+
+
 def test_api_v1_graph(client):
     r = client.get("/api/v1/graph")
     assert r.status_code == 200

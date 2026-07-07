@@ -360,10 +360,12 @@ Closes out committed work and eliminates the one catastrophic risk.
   live one, confirm the other is orphaned, delete it. **Destructive —
   requires explicit owner go-ahead and a verified backup first.** *Accept:*
   one Postgres service; sign-in and watchlists still work in prod.
-- [ ] **0.6 Feed lastmod fix — S.** The 15 hand-written `blog_feed_items`
-  stamp `now_iso` every render (noted in #114 follow-ups). Give them stable
-  dates (their real publish dates). *Accept:* two consecutive renders
-  produce byte-identical feed entries for hand-written posts.
+- [x] **0.6 Feed lastmod fix — DONE 2026-07-07.** The 13 hand-written
+  `blog_feed_items` now carry their real publish dates (recovered from each
+  post's JSON-LD `datePublished`) instead of `now_iso`. The two remaining
+  `now_iso` uses are intentional: compare-article fallback and per-agent
+  items whose content genuinely changes each render. Locked by
+  `test_handwritten_feed_items_have_stable_dates` in `tests/test_api.py`.
 - [ ] **0.7 Bill re-check on 2026-07-12 — S.** Railway metrics API, same
   windows as `plan-2026-07-06-post-v4.2.md` §2. *Accept:* memory average
   still ~0.2 GB; note result here.
