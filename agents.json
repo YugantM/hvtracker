@@ -181,7 +181,7 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "OpenInterpreter/open-interpreter",
+    "repo": "openinterpreter/openinterpreter",
     "name": "Open Interpreter",
     "category": "Coding Agents",
     "pypi_package": "open-interpreter",
@@ -621,7 +621,7 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "strands-agents/sdk-python",
+    "repo": "strands-agents/harness-sdk",
     "name": "Strands Agents",
     "category": "Agent Frameworks",
     "pypi_package": "strands-agents",
@@ -944,7 +944,7 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "sst/opencode",
+    "repo": "anomalyco/opencode",
     "name": "opencode",
     "category": "Coding Agents",
     "hn_search_term": "opencode",
@@ -953,7 +953,7 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "block/goose",
+    "repo": "aaif-goose/goose",
     "name": "Goose",
     "category": "Coding Agents",
     "hn_search_term": "block goose",
@@ -1907,7 +1907,9 @@
     "listing_status": "listed",
     "tracking_mode": "direct",
     "license_override": "proprietary",
-    "suppress_warnings": ["4.1.1"],
+    "suppress_warnings": [
+      "4.1.1"
+    ],
     "source_note": "This GitHub repository is a public issue tracker for Antigravity, a closed-source product — it does not contain the product's source code. The OpenSSF Scorecard and license signals below describe that issue-tracker repo, not the shipped product."
   },
   {
@@ -2820,6 +2822,45 @@
     "repo": "cacheplane/dawnai",
     "name": "DawnAI",
     "category": "Agent Frameworks",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "SWE-agent/mini-swe-agent",
+    "name": "mini-SWE-agent",
+    "category": "Coding Agents",
+    "pypi_package": "mini-swe-agent",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "mistralai/mistral-vibe",
+    "name": "Mistral Vibe",
+    "category": "Coding Agents",
+    "pypi_package": "mistral-vibe",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "zhayujie/CowAgent",
+    "name": "CowAgent",
+    "category": "Agent Frameworks",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "can1357/oh-my-pi",
+    "name": "oh-my-pi",
+    "category": "Coding Agents",
+    "npm_package": "@oh-my-pi/pi-coding-agent",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "SolaceLabs/solace-agent-mesh",
+    "name": "Solace Agent Mesh",
+    "category": "Multi-Agent Systems",
+    "pypi_package": "solace-agent-mesh",
     "listing_status": "listed",
     "tracking_mode": "direct"
   }

@@ -348,13 +348,19 @@ Closes out committed work and eliminates the one catastrophic risk.
   refresh degrades to a loud report instead of stale data (flipping prod to
   strict is a later owner call). Tests: `tests/test_board_invariants.py`
   (8 cases, each defect class + healthy/growth/methodology-change paths).
-- [ ] **0.4 Roster refresh — M.** Apply `docs/research/
-  new-agent-candidates-2026-07-06.*`: add the 5 P1 agents (copy-ready JSON
-  provided), apply the 4 repository moves to existing entries (opencode,
-  goose, open-interpreter, strands — update in place, never duplicate;
-  beware the name-based dedupe in the loader). Follow the add-agent runbook
-  (`deploy_mechanism` memory): new agents enter provisional until scored.
-  *Accept:* gates green; new entries listed provisional; moved repos resolve.
+- [x] **0.4 Roster refresh — DONE 2026-07-07.** Added the 5 P1 agents
+  (mini-SWE-agent, Mistral Vibe, CowAgent, oh-my-pi, Solace Agent Mesh; all
+  re-verified via live github.com redirects) and applied the 4 repo moves in
+  place (sst/opencode→anomalyco/opencode, block/goose→aaif-goose/goose,
+  OpenInterpreter/open-interpreter→openinterpreter/openinterpreter,
+  strands-agents/sdk-python→strands-agents/harness-sdk) preserving verified
+  package fields. Catalog 342→347; board 319→324. All 9 render provisional
+  (score 0) until the next prod signals refresh scores them — standard
+  add-agent flow. *Known trade-off:* rank-delta/sparkline history is keyed
+  by repo, so the 4 moved agents show as NEW until history re-accumulates
+  under the new key (slugs/URLs unchanged — no 404s). The 3 manual-review
+  candidates (LobsterAI, Agent Orchestrator, Sandcastle) still await owner
+  judgment per the research doc.
 - [ ] **0.5 Postgres consolidation — M, owner-gated.** Verify which Postgres
   `web`'s `DATABASE_URL` points at (service ids in §1.3 memory), dump the
   live one, confirm the other is orphaned, delete it. **Destructive —
