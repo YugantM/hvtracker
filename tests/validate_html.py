@@ -30,6 +30,7 @@ SAMPLES = [
     "badges/index.html",
     "ecosystem/index.html",
     "ecosystem/anthropic/index.html",
+    "capabilities/index.html",
     "changes/index.html",
     "org/index.html",
     "org/microsoft/index.html",

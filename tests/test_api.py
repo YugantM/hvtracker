@@ -275,6 +275,13 @@ def test_handwritten_feed_items_have_stable_dates(client):
         )
 
 
+def test_capabilities_page_serves(client):
+    r = client.get("/capabilities/")
+    assert r.status_code == 200
+    assert "Capability Matrix" in r.text
+    assert "/ecosystem/" in r.text  # provider links resolve to ecosystem pages
+
+
 def test_api_v1_graph(client):
     r = client.get("/api/v1/graph")
     assert r.status_code == 200
