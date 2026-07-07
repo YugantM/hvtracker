@@ -27,6 +27,24 @@ HEADERS = {
 if TOKEN:
     HEADERS["Authorization"] = f"Bearer {TOKEN}"
 
+# Repos the owner reviewed and rejected — never re-propose them. Keyed by
+# lowercase "owner/name"; value records the decision for the audit trail.
+# Add entries here whenever a manual-review candidate is declined.
+REVIEWED_REJECTED = {
+    "netease-youdao/lobsterai": (
+        "2026-07-07 owner: rejected — OpenClaw is the execution runtime; "
+        "thin-wrapper boundary (see docs/research/new-agent-candidates-2026-07-06.md)"
+    ),
+    "agentwrapper/agent-orchestrator": (
+        "2026-07-07 owner: rejected — supervisory harness; external agents do "
+        "the coding, lifecycle management not goal-directed orchestration"
+    ),
+    "mattpocock/sandcastle": (
+        "2026-07-07 owner: rejected — sandbox automation delegating model "
+        "interaction to coding-agent CLIs, not an agent framework"
+    ),
+}
+
 # Topics to query (one request each)
 TOPICS = [
     "ai-agent",
@@ -148,9 +166,13 @@ def main() -> None:
 
     print(f"\nTotal unique repos found: {len(seen)}")
 
-    # Filter out already-tracked repos
+    # Filter out already-tracked repos and owner-rejected candidates
     novel = {k: v for k, v in seen.items() if k not in existing}
     print(f"New (not in agents.json): {len(novel)}")
+    rejected_hits = sorted(k for k in novel if k in REVIEWED_REJECTED)
+    if rejected_hits:
+        novel = {k: v for k, v in novel.items() if k not in REVIEWED_REJECTED}
+        print(f"Skipping {len(rejected_hits)} owner-rejected repo(s): {', '.join(rejected_hits)}")
 
     # Eligibility pre-checks
     candidates = []

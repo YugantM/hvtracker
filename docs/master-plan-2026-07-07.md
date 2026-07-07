@@ -361,20 +361,31 @@ Closes out committed work and eliminates the one catastrophic risk.
   under the new key (slugs/URLs unchanged — no 404s). The 3 manual-review
   candidates (LobsterAI, Agent Orchestrator, Sandcastle) still await owner
   judgment per the research doc.
-- [ ] **0.5 Postgres consolidation — M, owner-gated.** Verify which Postgres
-  `web`'s `DATABASE_URL` points at (service ids in §1.3 memory), dump the
-  live one, confirm the other is orphaned, delete it. **Destructive —
-  requires explicit owner go-ahead and a verified backup first.** *Accept:*
-  one Postgres service; sign-in and watchlists still work in prod.
+- [x] **0.5 Postgres consolidation — RESOLVED 2026-07-07 (owner-approved).**
+  Verification found it was **already done**: the second Postgres
+  (5431cb90…) was deleted 2026-06-21T23:25Z — the 2026-06-22 billing memory
+  captured its final hours. The project now runs exactly 3 services (web,
+  Postgres-6A6t, Redis); `web`'s `DATABASE_URL` confirmed pointing at
+  `postgres-6a6t.railway.internal`. Safety data dump of the live accounts
+  DB taken to `~/hvtracker-db-backups/hvtracker-accounts-2026-07-07.json`
+  (8 tables; 5 users, 6 watchlist rows — contains emails, keep local).
+  *Bonus finding:* the render pipeline already archives each day's history
+  snapshot to the Railway bucket `hvtracker-archive`
+  (`storage.py` / `fetch_and_build.py` ~5432; 39 objects, 37 MB) — so the
+  moat now has volume + Railway-bucket + GitHub-private-repo (46/46
+  snapshots) redundancy.
 - [x] **0.6 Feed lastmod fix — DONE 2026-07-07.** The 13 hand-written
   `blog_feed_items` now carry their real publish dates (recovered from each
   post's JSON-LD `datePublished`) instead of `now_iso`. The two remaining
   `now_iso` uses are intentional: compare-article fallback and per-agent
   items whose content genuinely changes each render. Locked by
   `test_handwritten_feed_items_have_stable_dates` in `tests/test_api.py`.
-- [ ] **0.7 Bill re-check on 2026-07-12 — S.** Railway metrics API, same
-  windows as `plan-2026-07-06-post-v4.2.md` §2. *Accept:* memory average
-  still ~0.2 GB; note result here.
+- [x] **0.7 Bill re-check — DONE EARLY 2026-07-07 (owner moved it up).**
+  Post-fix window 07-05 15:40 → 07-07 20:03 UTC (3,144 points): web avg
+  **0.267 GB** (p95 0.322, max 0.742); daily means 0.228 → 0.277 → 0.271 —
+  **flat, no slow ratchet**, spikes release. Postgres avg 0.039 GB, Redis
+  0.031 GB. Total memory run-rate ≈ **$3.4/mo**; fix verdict unchanged:
+  WORKING. Optional re-glance on 07-12 for the 7-day mark.
 
 ### Phase 1 — Trust as infrastructure (the irreplaceability play, ~3–4 weeks)
 
@@ -515,6 +526,13 @@ and either traffic doubles or maintainer inbound appears)
   HVTrust fields in that format. Only when there's a consumer.
 
 ### Standing decisions already made (do not relitigate)
+
+- 2026-07-07 (owner): the three manual-review candidates — LobsterAI,
+  Agent Orchestrator, Sandcastle — are **rejected, not listed**; denylisted
+  in `discover_agents.py` `REVIEWED_REJECTED` so discovery can't re-propose.
+- 2026-07-07 (owner): the publicly fetchable history paths
+  (`/output/history/<date>.json`) **stay as they are** — no restriction for
+  now; revisit only if/when a paid extended-history tier becomes real.
 
 - Keep ALL grades public including D — transparency IS the product.
 - Popularity stays below audit signals in tie-breaking (v4.1 owner call).

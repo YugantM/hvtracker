@@ -24,6 +24,11 @@ use only verified package identifiers and the registry's existing
 
 ## Manual-review items
 
+> **RESOLVED 2026-07-07 (owner): all three rejected — do not list.** None of
+> them were ever on the leaderboard; the decision is recorded mechanically in
+> `discover_agents.py` `REVIEWED_REJECTED` so discovery cannot re-propose
+> them. (The five recommended adds shipped in PR #119 the same day.)
+
 - [LobsterAI](https://github.com/netease-youdao/LobsterAI) performs multi-step
   desktop work and has substantial local session, memory, permission, skill,
   and workflow code. Its README explicitly identifies OpenClaw as the execution
