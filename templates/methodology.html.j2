@@ -374,6 +374,28 @@
         <p class="note">The pre-calibration baseline remains visible for comparison on the leaderboard ("Compare to pre-calibration"), and every agent's per-field adjustment breakdown is published in the <a href="/data/">Data API</a>.</p>
       </section>
 
+      <section id="verify-yourself">
+        <h2>Verify A Score Yourself</h2>
+        <p>You do not have to trust this site's word for a score. Every agent's current score ships as a <strong>signed trust credential</strong> — an Ed25519 signature over the score, grade, confidence, and evidence fields — verifiable <strong>offline</strong> against the issuer public key published at <a href="/.well-known/hvtracker.json"><code>/.well-known/hvtracker.json</code></a>. If anyone (including us) alters a number after signing, verification fails.</p>
+        <p>Fetch any agent's credential from <code>/data/agents/&lt;slug&gt;.json</code> under <code>trust_credential</code>, then check it in a dozen lines of Python (needs <code>pip install cryptography</code>):</p>
+        <pre><code>import base64, json, urllib.request
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+
+get = lambda u: json.load(urllib.request.urlopen(
+    urllib.request.Request(u, headers={"User-Agent": "hvt-verify/1.0"})))
+
+slug = "haystack"  # any agent slug
+cred = get(f"https://hvtracker.net/data/agents/{slug}.json")["trust_credential"]
+key = get("https://hvtracker.net/.well-known/hvtracker.json")["trust_credential"]["public_key"]
+
+payload = {k: v for k, v in cred.items() if k != "signature"}
+message = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+Ed25519PublicKey.from_public_bytes(base64.b64decode(key)).verify(
+    base64.b64decode(cred["signature"]), message.encode("utf-8"))
+print("verified:", cred["subject"]["repo"], "=", cred["trust_score"])</code></pre>
+        <p class="note">A fuller reference verifier — expiry, evidence-hash, and revocation checks included — lives in the repository at <a href="https://github.com/YugantM/hvtracker/blob/main/scripts/verify_credential.py" target="_blank" rel="noopener">scripts/verify_credential.py</a>. The exact canonicalization and rejection rules are normative in <a href="/spec/trust-credential/v0.2/">the Trust Credential spec, §5–§7</a>. Credentials expire after 7 days; a <code>delisted</code> status is revocation regardless of score.</p>
+      </section>
+
       <section id="policy-log">
         <h2>Trust Policy Decision Log</h2>
         <ul class="changelog">
