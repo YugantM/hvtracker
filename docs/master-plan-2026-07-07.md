@@ -318,27 +318,36 @@ L = split into 2–3 PRs. Every task ships with the three gates green (§0).
 
 Closes out committed work and eliminates the one catastrophic risk.
 
-- [ ] **0.1 Offsite history backup (R1) — S/M, HIGHEST PRIORITY.**
-  Automate a daily/weekly copy of the prod volume's `output/history/*.json`
-  (plus `data/seo_state.json`, `data/render_state.json`) to storage that
-  survives Railway: simplest fit is committing new snapshots to the existing
-  `data` branch (already the scorecard-scan channel, no new secrets), or a
-  Railway-native object-storage bucket if available. Include a restore note
-  in this doc. *Accept:* a snapshot created today exists off-volume without
-  manual action; documented restore path. *(Owner may need to approve the
-  mechanism — ask once, with a recommendation.)*
+- [x] **0.1 Offsite history backup (R1) — DONE 2026-07-07.** Mechanism:
+  **private repo `YugantM/hvtracker-history-backup`** (main repo is public,
+  so the `data` branch would have exposed the full time series against the
+  open-core boundary). A self-contained GitHub Actions workflow there runs
+  daily at 23:23 UTC: fetches the last 8 days of
+  `hvtracker.net/output/history/<date>.json` (self-healing lookback) plus
+  `data/{seo_state,render_state,retired,latest}.json` over public HTTP — no
+  secrets needed. Seeded with all **46 prod snapshots (2026-05-23→07-07,
+  no gaps, 37 MB)**; manual dispatch run verified green on GitHub's runner.
+  Restore procedure documented in that repo's README. *Two observations for
+  the owner:* (a) the full history is publicly fetchable by date-guessable
+  URL at `/output/history/<date>.json` — fine today, but it undercuts the
+  future paid extended-history boundary; decide later whether to restrict.
+  (b) prod held 46 snapshots vs 35 locally — the volume, not the local
+  checkout, is canonical.
 - [x] **0.2 Truth sweep — S.** Done 2026-07-07: fixed the stale "MERGED,
   NOT yet deployed" trailing bullet in CLAUDE.md (everything through #114
   verified live); GitHub About text found already updated ("300+ …
   runtime-trust calibrated") — no `gh repo edit` needed; this plan +
   the 2026-07-06 agent-candidates research committed to the repo.
-- [ ] **0.3 Board-integrity invariants — M.** Render-time assertions that
-  fail the build (or print a loud warning block in `build_report.json`) if:
-  max trust_score ≥ 99.5, any score outside [0,100], mean |Δrank| vs prior
-  snapshot > 15 without a `METHODOLOGY_VERSION` change, or listed-agent
-  count drops > 5% in one render. This turns the v4.2 class of bug from
-  "discovered by the owner eyeballing the board" into "caught at render."
-  *Accept:* pytest simulating each violation trips the invariant.
+- [x] **0.3 Board-integrity invariants — DONE 2026-07-07.**
+  `check_board_invariants()` in `fetch_and_build.py` runs on the final
+  ranked board each render: max trust_score ≥ 99.5, scores outside [0,100],
+  mean |Δrank| > 15 vs prior snapshot without a `METHODOLOGY_VERSION`
+  change, listed-count drop > 5%. Violations print a loud stderr block and
+  land in `build_report.json` (`board_invariant_violations`); the build
+  fails hard only with `HVT_STRICT_INVARIANTS=1` so an unattended prod
+  refresh degrades to a loud report instead of stale data (flipping prod to
+  strict is a later owner call). Tests: `tests/test_board_invariants.py`
+  (8 cases, each defect class + healthy/growth/methodology-change paths).
 - [ ] **0.4 Roster refresh — M.** Apply `docs/research/
   new-agent-candidates-2026-07-06.*`: add the 5 P1 agents (copy-ready JSON
   provided), apply the 4 repository moves to existing entries (opencode,
