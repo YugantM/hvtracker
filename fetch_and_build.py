@@ -2103,6 +2103,60 @@ def load_previous_downloads(history_dir: str) -> dict[str, tuple[int, str]]:
         return {}
 
 
+def check_board_invariants(rows: list[dict], prior_snapshot: dict | None) -> list[str]:
+    """Sanity-check the final ranked board against defects a human would only
+    catch by eyeballing the live leaderboard (the v4.2 compounding bug sat in
+    prod because nothing asserted board-level shape at render time).
+
+    Returns human-readable violation strings; empty list = healthy. Callers
+    decide severity: the build surfaces these in data/build_report.json and
+    stderr, and fails hard only when HVT_STRICT_INVARIANTS=1 so an unattended
+    prod refresh degrades to a loud report instead of stale data.
+    """
+    violations: list[str] = []
+    scores = [r.get("trust_score") for r in rows if r.get("trust_score") is not None]
+    if scores:
+        top = max(scores)
+        if top >= 99.5:
+            violations.append(
+                f"max trust_score {top:.1f} >= 99.5 — possible calibration inflation/pinning"
+            )
+        out_of_range = [s for s in scores if s < 0 or s > 100]
+        if out_of_range:
+            violations.append(
+                f"{len(out_of_range)} trust_score value(s) outside [0,100], e.g. {out_of_range[:3]}"
+            )
+    if prior_snapshot:
+        prior_agents = prior_snapshot.get("agents", [])
+        prior_ranks = {
+            a.get("repo", "").lower(): a.get("rank")
+            for a in prior_agents
+            if a.get("repo") and a.get("rank") is not None
+        }
+        deltas = [
+            abs(r["rank"] - prior_ranks[r["repo"].lower()])
+            for r in rows
+            if r.get("rank") is not None and r["repo"].lower() in prior_ranks
+        ]
+        same_methodology = (
+            prior_snapshot.get("methodology_version") == METHODOLOGY_VERSION
+        )
+        if deltas and same_methodology:
+            mean_delta = sum(deltas) / len(deltas)
+            if mean_delta > 15:
+                violations.append(
+                    f"mean |Δrank| {mean_delta:.1f} > 15 vs prior snapshot with unchanged "
+                    f"methodology {METHODOLOGY_VERSION} — mass churn without a declared scoring change"
+                )
+        prior_count = len(prior_agents)
+        if prior_count and len(rows) < prior_count * 0.95:
+            violations.append(
+                f"listed-agent count dropped {prior_count} -> {len(rows)} (>5%) — "
+                "possible mass delisting or fetch failure"
+            )
+    return violations
+
+
 def load_cached_commit_counts(data_path: str, history_dir: str) -> dict[str, int]:
     """Load last-known-good commit counts from data.json, then prior history.
 
@@ -5433,6 +5487,24 @@ def main() -> None:
     ]
     sc_unavailable = [r["repo"] for r in rows if r.get("scorecard_score") is None]
 
+    # Board-integrity invariants (master plan 0.3): catch v4.2-class defects
+    # (inflation, out-of-range scores, silent mass churn) at render time.
+    invariant_violations = check_board_invariants(
+        rows, _load_prior_snapshot(history_dir)
+    )
+    if invariant_violations:
+        print("=" * 72, file=sys.stderr)
+        print("BOARD INTEGRITY VIOLATIONS — the rendered board looks defective:",
+              file=sys.stderr)
+        for v in invariant_violations:
+            print(f"  !! {v}", file=sys.stderr)
+        print("=" * 72, file=sys.stderr)
+        if os.environ.get("HVT_STRICT_INVARIANTS") == "1":
+            raise RuntimeError(
+                "board integrity violations (HVT_STRICT_INVARIANTS=1): "
+                + "; ".join(invariant_violations)
+            )
+
     build_report = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "data_timestamp": now_str,
@@ -5452,6 +5524,8 @@ def main() -> None:
         "scorecard_unavailable_count": len(sc_unavailable),
         "fingerprint_agents": fp_agents,
         "fingerprint_agent_count": len(fp_agents),
+        "board_invariant_violations": invariant_violations,
+        "board_invariant_violation_count": len(invariant_violations),
     }
     report_path = os.path.join(script_dir, "data", "build_report.json")
     os.makedirs(os.path.dirname(report_path), exist_ok=True)
