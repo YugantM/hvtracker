@@ -56,3 +56,15 @@ def test_infer_category_fallback():
 
 def test_infer_category_is_case_insensitive():
     assert aa.infer_category(["CODING-AGENT"]) == "Coding Agents"
+
+
+def test_reviewed_rejected_repos_are_never_reproposed():
+    """Owner-rejected candidates (2026-07-07: LobsterAI, Agent Orchestrator,
+    Sandcastle) must stay in the denylist so discovery can't re-propose them."""
+    for repo in ("netease-youdao/lobsterai",
+                 "agentwrapper/agent-orchestrator",
+                 "mattpocock/sandcastle"):
+        assert repo in da.REVIEWED_REJECTED, repo
+        assert "rejected" in da.REVIEWED_REJECTED[repo]
+    # keys must be lowercase — main() filters with lowercase full_name keys
+    assert all(k == k.lower() for k in da.REVIEWED_REJECTED)

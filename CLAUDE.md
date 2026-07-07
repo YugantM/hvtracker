@@ -224,8 +224,15 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   signals refresh scores them); hand-written feed items carry real publish
   dates; methodology `#verify-yourself` section + standalone
   `scripts/verify_credential.py` (plan 1.5, verified against live prod).
-  Still open in Phase 0: bill re-check 2026-07-12; Postgres consolidation
-  (owner-gated, destructive). 3 manual-review agent candidates await owner
-  judgment (research doc). Next code work: Phase 1 — T3.3 capability page
-  (1.1), API docs + usage measurement (1.2), MCP server productization
-  (1.3), CI trust gate (1.4), dataset exports (1.6).
+  Phase 0 CLOSED 2026-07-07 evening (owner decisions): Postgres
+  consolidation verified ALREADY DONE (2nd instance deleted 06-21; 3
+  services remain; accounts-DB safety dump local at ~/hvtracker-db-backups/);
+  bill re-check early — web avg 0.267 GB flat post-fix, total memory
+  run-rate ≈$3.4/mo, no ratchet; 3 manual-review candidates (LobsterAI,
+  Agent Orchestrator, Sandcastle) REJECTED + denylisted in
+  discover_agents.py REVIEWED_REJECTED; public /output/history/ paths stay
+  as-is (owner). Render pipeline also already archives snapshots to Railway
+  bucket hvtracker-archive (storage.py) — triple redundancy with the GH
+  backup. Next code work: Phase 1 — T3.3 capability page (1.1), API docs +
+  usage measurement (1.2), MCP server productization (1.3), CI trust gate
+  (1.4), dataset exports (1.6).
