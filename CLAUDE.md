@@ -206,9 +206,17 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   hand-written feed items still stamp now_iso; GSC URL-level exports (owner,
   in Search Console UI) + "Validate fix" clicks on the 404/redirect buckets;
   internal-linking pass next.
-- Next: `docs/plan-2026-07-06-post-v4.2.md` remaining — GitHub About text
-  (`gh repo edit`, still "172+"), bill re-check 07-12; then T3.3
-  capability-surface PAGE (grade shipped, page pending), internal-linking SEO
-  pass (target = GSC crawled-not-indexed list), badge-adopter audit; later T3.5 drift
-  monitoring, Postgres consolidation. These content + coverage changes are
-  MERGED, NOT yet deployed (need `railway up` to go live).
+- State verified live 2026-07-07: everything through #114 IS deployed
+  (coverage grade + content-truth + GSC cleanup confirmed via live API);
+  credential signing works end-to-end (`trust_credential.signature` verifies
+  against the `.well-known` Ed25519 key); GitHub About text already updated
+  to "300+ … runtime-trust calibrated".
+- Next: **`docs/master-plan-2026-07-07.md` is the active plan** (supersedes
+  product-plan-2026-h2 as forward plan; full verified state audit + ecosystem
+  forecast + phased feature plan). Phase 0 first: offsite history backup
+  (highest priority — moat dataset has no backup), board-integrity
+  invariants, roster refresh (5 adds + 4 repo moves from
+  docs/research/new-agent-candidates-2026-07-06), feed lastmod fix, bill
+  re-check 07-12, Postgres consolidation (owner-gated). Then Phase 1
+  (trust-as-infrastructure: T3.3 capability page, API docs, MCP server
+  productization, CI trust gate, verify-yourself page, dataset exports).

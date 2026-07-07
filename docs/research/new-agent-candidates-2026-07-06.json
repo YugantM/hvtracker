@@ -1,0 +1,272 @@
+{
+  "snapshot_date": "2026-07-06",
+  "discovery_command": "python3 discover_agents.py",
+  "discovery_totals": {
+    "repositories_found": 558,
+    "novel_against_agents_json": 424,
+    "passed_automated_prechecks": 389
+  },
+  "recommended_adds": [
+    {
+      "source_url": "https://github.com/SWE-agent/mini-swe-agent",
+      "snapshot_evidence": {
+        "repository": "SWE-agent/mini-swe-agent",
+        "stars": 5594,
+        "license": "MIT",
+        "archived": false,
+        "last_push": "2026-07-02T16:51:56Z",
+        "agent_behaviors": [
+          "iterative goal-directed loop for resolving GitHub issues",
+          "executes shell actions through subprocess.run",
+          "adapts subsequent actions from command results"
+        ],
+        "implementation_evidence": [
+          "src/minisweagent/agents/default.py",
+          "src/minisweagent/agents/interactive.py",
+          "tests/agents/"
+        ],
+        "package_evidence": "PyPI mini-swe-agent 2.4.4"
+      },
+      "reason": "A runnable coding agent with its own compact execution loop, shell action tool, prompts, state handling, and agent tests. It satisfies autonomous multi-step execution, tool use, and adaptation.",
+      "confidence": "high",
+      "priority": "P1",
+      "exact_agents_json_entry": {
+        "repo": "SWE-agent/mini-swe-agent",
+        "name": "mini-SWE-agent",
+        "category": "Coding Agents",
+        "pypi_package": "mini-swe-agent",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    },
+    {
+      "source_url": "https://github.com/mistralai/mistral-vibe",
+      "snapshot_evidence": {
+        "repository": "mistralai/mistral-vibe",
+        "stars": 4634,
+        "license": "Apache-2.0",
+        "archived": false,
+        "last_push": "2026-07-03T14:16:10Z",
+        "agent_behaviors": [
+          "breaks complex coding requests into tasks",
+          "uses file, search, version-control, and shell tools",
+          "delegates work to parallel subagents"
+        ],
+        "implementation_evidence": [
+          "tests/agent_loop/e2e/test_e2e_agent_loop.py",
+          "tests/agent_loop/e2e/test_e2e_fork_and_plan.py",
+          "tests/agent_loop/e2e/test_e2e_tools.py"
+        ],
+        "package_evidence": "PyPI mistral-vibe 2.19.0"
+      },
+      "reason": "A source-distributed CLI coding agent with a tested agent loop, planning, stateful command execution, repository tools, and subagent delegation.",
+      "confidence": "high",
+      "priority": "P1",
+      "exact_agents_json_entry": {
+        "repo": "mistralai/mistral-vibe",
+        "name": "Mistral Vibe",
+        "category": "Coding Agents",
+        "pypi_package": "mistral-vibe",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    },
+    {
+      "source_url": "https://github.com/zhayujie/CowAgent",
+      "snapshot_evidence": {
+        "repository": "zhayujie/CowAgent",
+        "stars": 45820,
+        "license": "MIT",
+        "archived": false,
+        "last_push": "2026-07-06T08:02:59Z",
+        "agent_behaviors": [
+          "decomposes goals and loops over tools",
+          "takes browser, terminal, file, scheduler, and MCP actions",
+          "maintains long-term memory and evolves skills"
+        ],
+        "implementation_evidence": [
+          "agent/evolution/",
+          "agent/memory/",
+          "agent/knowledge/",
+          "agent/chat/"
+        ],
+        "package_evidence": "Runnable from source and documented one-line installer; no registry package added to the proposed entry"
+      },
+      "reason": "The former chatgpt-on-wechat codebase now presents a complete agent harness with first-party planning, action tools, memory, knowledge, and self-evolution logic rather than a chat wrapper.",
+      "confidence": "high",
+      "priority": "P1",
+      "exact_agents_json_entry": {
+        "repo": "zhayujie/CowAgent",
+        "name": "CowAgent",
+        "category": "Agent Frameworks",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    },
+    {
+      "source_url": "https://github.com/can1357/oh-my-pi",
+      "snapshot_evidence": {
+        "repository": "can1357/oh-my-pi",
+        "stars": 16293,
+        "license": "MIT",
+        "archived": false,
+        "last_push": "2026-07-06T09:42:23Z",
+        "agent_behaviors": [
+          "iterative coding-agent tool loop",
+          "uses more than 30 built-in code, shell, browser, and search tools",
+          "spawns isolated subagents and incorporates typed results"
+        ],
+        "implementation_evidence": [
+          "packages/coding-agent/",
+          "packages/agent/",
+          "crates/pi-shell/",
+          "crates/pi-iso/"
+        ],
+        "package_evidence": "npm @oh-my-pi/pi-coding-agent 16.3.10"
+      },
+      "reason": "A substantial terminal coding agent with a first-party execution harness, persistent runtimes, code-editing tools, planning/review workflows, memory, and subagent coordination.",
+      "confidence": "high",
+      "priority": "P1",
+      "exact_agents_json_entry": {
+        "repo": "can1357/oh-my-pi",
+        "name": "oh-my-pi",
+        "category": "Coding Agents",
+        "npm_package": "@oh-my-pi/pi-coding-agent",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    },
+    {
+      "source_url": "https://github.com/SolaceLabs/solace-agent-mesh",
+      "snapshot_evidence": {
+        "repository": "SolaceLabs/solace-agent-mesh",
+        "stars": 4968,
+        "license": "Apache-2.0",
+        "archived": false,
+        "last_push": "2026-06-29T19:48:43Z",
+        "agent_behaviors": [
+          "orchestrator decomposes tasks and delegates them to peer agents",
+          "agents register tools and act on real data sources",
+          "executes multi-step event-driven workflows over A2A"
+        ],
+        "implementation_evidence": [
+          "src/solace_agent_mesh/agent/",
+          "cli/commands/add_cmd/agent_cmd.py",
+          "cli/commands/init_cmd/orchestrator_step.py",
+          "preset/agents/basic/main_orchestrator.yaml"
+        ],
+        "package_evidence": "PyPI solace-agent-mesh 1.28.4"
+      },
+      "reason": "An active agent-specific framework with first-party orchestration, tool/plugin registration, agent lifecycle configuration, peer delegation, and multi-step execution.",
+      "confidence": "high",
+      "priority": "P1",
+      "exact_agents_json_entry": {
+        "repo": "SolaceLabs/solace-agent-mesh",
+        "name": "Solace Agent Mesh",
+        "category": "Multi-Agent Systems",
+        "pypi_package": "solace-agent-mesh",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    }
+  ],
+  "manual_review": [
+    {
+      "source_url": "https://github.com/netease-youdao/LobsterAI",
+      "snapshot_evidence": {
+        "repository": "netease-youdao/LobsterAI",
+        "stars": 5463,
+        "license": "MIT",
+        "archived": false,
+        "last_push": "2026-07-06T10:26:03Z",
+        "agent_behaviors": [
+          "runs long-form tasks against files, browser, terminal, and office documents",
+          "supports multi-agent workflows and scheduled jobs",
+          "persists sessions, memory, permissions, and tool state locally"
+        ],
+        "implementation_evidence": [
+          "src/main/coworkStore.ts",
+          "src/renderer/components/cowork/",
+          "openclaw-extensions/",
+          "SKILLs/"
+        ],
+        "package_evidence": "Source build and GitHub desktop releases; no registry package added to the proposed entry"
+      },
+      "reason": "The product behavior is clearly agentic, but its README says OpenClaw is the runtime used for agent execution. Confirm that LobsterAI's own orchestration logic exceeds the rubric's thin-wrapper boundary before listing it separately from OpenClaw.",
+      "confidence": "medium",
+      "priority": "P2",
+      "exact_agents_json_entry": {
+        "repo": "netease-youdao/LobsterAI",
+        "name": "LobsterAI",
+        "category": "Workflow Platforms",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    },
+    {
+      "source_url": "https://github.com/AgentWrapper/agent-orchestrator",
+      "snapshot_evidence": {
+        "repository": "AgentWrapper/agent-orchestrator",
+        "stars": 8083,
+        "license": "Apache-2.0",
+        "archived": false,
+        "last_push": "2026-07-06T09:32:59Z",
+        "agent_behaviors": [
+          "coordinates parallel coding agents in isolated workspaces",
+          "feeds CI failures, review comments, and conflicts back to agents",
+          "tracks sessions, pull requests, branches, and agent lifecycle state"
+        ],
+        "implementation_evidence": [
+          "backend/internal/adapters/agent/",
+          "backend/internal/adapters/agent/activitydispatch/",
+          "backend/internal/adapters/agent/activitystate/"
+        ],
+        "package_evidence": "npm @aoagents/ao 0.10.0"
+      },
+      "reason": "The implementation is substantial and agent-specific, but the README describes it as a supervisory harness where external agents still perform the coding. Confirm whether its automatic feedback loop constitutes enough goal-directed planning rather than only lifecycle management.",
+      "confidence": "medium",
+      "priority": "P2",
+      "exact_agents_json_entry": {
+        "repo": "AgentWrapper/agent-orchestrator",
+        "name": "Agent Orchestrator",
+        "category": "Multi-Agent Systems",
+        "npm_package": "@aoagents/ao",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    },
+    {
+      "source_url": "https://github.com/mattpocock/sandcastle",
+      "snapshot_evidence": {
+        "repository": "mattpocock/sandcastle",
+        "stars": 6650,
+        "license": "MIT",
+        "archived": false,
+        "last_push": "2026-06-29T20:16:27Z",
+        "agent_behaviors": [
+          "runs iterative coding-agent workflows in sandboxes",
+          "provides lifecycle hooks, completion signals, and persistent workspaces",
+          "ships exploration, implementation, review, and branch-update workflows"
+        ],
+        "implementation_evidence": [
+          "src/",
+          ".sandcastle/agent-workflows/",
+          ".github/workflows/agent-implement.yml",
+          ".github/workflows/agent-review.yml"
+        ],
+        "package_evidence": "npm @ai-hero/sandcastle 0.12.0"
+      },
+      "reason": "It has a real iterative execution engine and agent workflows, but it delegates model interaction to supported coding-agent CLIs and intentionally avoids task-management opinions. Confirm it is an agent framework rather than agent-specific sandbox automation.",
+      "confidence": "medium",
+      "priority": "P2",
+      "exact_agents_json_entry": {
+        "repo": "mattpocock/sandcastle",
+        "name": "Sandcastle",
+        "category": "Agent Frameworks",
+        "npm_package": "@ai-hero/sandcastle",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    }
+  ]
+}
