@@ -5745,6 +5745,9 @@ def main() -> None:
     agent_tmpl = env.get_template("agent.html.j2")
     agents_dir = os.path.join(script_dir, "agents")
     os.makedirs(agents_dir, exist_ok=True)
+    # Provider name -> ecosystem-page slug, so agent pages can link each
+    # detected provider to its /ecosystem/<slug>/ hub (T3.3 / plan 1.1b).
+    provider_slug_map = {p["provider"]: p["slug"] for p in ecosystem_pages}
     # Add category_slug so agent pages can link to category pages
     for row in rows + legacy_rows:
         row["category_slug"] = slugify(row.get("category", "")) if row.get("category") else ""
@@ -5764,7 +5767,7 @@ def main() -> None:
         slug_dir = os.path.join(agents_dir, row["slug"])
         os.makedirs(slug_dir, exist_ok=True)
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, methodology_version=METHODOLOGY_VERSION, comparisons=compare_by_slug.get(row['slug'], [])))
+            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, methodology_version=METHODOLOGY_VERSION, comparisons=compare_by_slug.get(row['slug'], []), provider_slugs=provider_slug_map))
 
     print(f"Built {len(rows)} active agent profile pages under agents/.")
 

@@ -393,8 +393,13 @@ Theme: make HVTracker the thing machines consult, not just a site humans
 visit. Every task turns an existing internal asset into an external,
 embeddable surface. This phase is the direct answer to §2 F2/F3/F6.
 
-- [~] **1.1 T3.3 capability-surface page — hub SHIPPED 2026-07-07 (1.1a);
-  agent-page section pending (1.1b).** `/capabilities/` hub live:
+- [x] **1.1 T3.3 capability-surface page — COMPLETE 2026-07-07 (1.1a hub +
+  1.1b agent sections).** 1.1b: agent-page runtime panels now link each
+  detected provider to its `/ecosystem/<slug>/` page (slug map passed from
+  the generator, never slugified in Jinja) and the section intro links the
+  capability matrix; Capabilities added to the shared `_site_header` nav.
+  T3.3 acceptance fully met (hub + agent sections render, capabilities link
+  to ecosystem pages, sitemap, validate_html). `/capabilities/` hub live:
   `build_capability_matrix(rows)` + `templates/capabilities.html.j2` — all
   324 agents × MCP status / provider chips (linked to ecosystem pages) /
   tool-plugin surface / provenance drift, trust-ranked with summary stats

@@ -730,7 +730,7 @@
         {% set ext = row.external_service_dependencies or {"providers": [], "requires_api_keys": false, "confidence": none, "evidence": []} %}
         {% set tooling = row.tool_plugin_surface or {"plugin_system": "none", "tool_tags": [], "confidence": none, "evidence": []} %}
         {% set drift = row.package_provenance_drift or {"status": "not_applicable", "confidence": none, "summary": "No package source configured", "evidence": []} %}
-        <p class="runtime-intro">These runtime-trust fields — detected from public repo docs and manifests — <strong>contribute a bounded adjustment to this project's HVTrust score</strong> alongside supply-chain evidence. The exact values each field can add or subtract are documented in the <a href="/methodology/#runtime-calibration" style="color:var(--accent);">methodology →</a></p>
+        <p class="runtime-intro">These runtime-trust fields — detected from public repo docs and manifests — <strong>contribute a bounded adjustment to this project's HVTrust score</strong> alongside supply-chain evidence. The exact values each field can add or subtract are documented in the <a href="/methodology/#runtime-calibration" style="color:var(--accent);">methodology →</a> Compare this surface across every listed agent in the <a href="/capabilities/" style="color:var(--accent);">capability matrix →</a></p>
 
         <div class="runtime-grid">
           <div class="runtime-panel">
@@ -785,7 +785,7 @@
             {% if ext.providers %}
             <ul class="runtime-provider-list">
               {% for provider in ext.providers %}
-              <li class="runtime-provider">{{ provider }}</li>
+              <li class="runtime-provider">{% if provider_slugs and provider in provider_slugs %}<a href="/ecosystem/{{ provider_slugs[provider] }}/">{{ provider }}</a>{% else %}{{ provider }}{% endif %}</li>
               {% endfor %}
             </ul>
             {% endif %}
