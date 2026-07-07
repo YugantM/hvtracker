@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="s2YUWbGP7cJsI6HUCKRX9YCtbVJVyA1Q1_jsNWj1RHc">
+  <title>AI Agent Capability Matrix — What Each Agent Can Touch | HVTracker</title>
+  <meta name="description" content="Runtime capability surface for {{ matrix.stats.total }} open-source AI agents: MCP server support, external providers, tool/plugin surface, and package-provenance drift — all evidence-based.">
+  <link rel="canonical" href="https://hvtracker.net/capabilities/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AI Agent Capability Matrix | HVTracker">
+  <meta property="og:description" content="What can each AI agent reach, depend on, or expose at runtime? MCP support, providers, tool surface, and provenance drift for {{ matrix.stats.total }} agents.">
+  <meta property="og:url" content="https://hvtracker.net/capabilities/">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI Agent Capability Matrix | HVTracker">
+  <meta name="twitter:description" content="MCP support, providers, tool surface, and provenance drift for {{ matrix.stats.total }} open-source AI agents.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--muted:#6f665d}
+    body{min-height:100vh;background:var(--paper); color:var(--ink);font:16px/1.7 var(--font-sans)}
+    a{color:inherit;text-decoration:none}
+    a:hover{text-decoration:underline}
+    .page{background:var(--paper);max-width:1180px;margin:0 auto;padding:28px 24px 52px}
+    .hero{padding:28px 0 18px;border-bottom:1px solid var(--line)}
+    h1{font-size:34px;line-height:1.12;letter-spacing:0;margin-bottom:10px}
+    .hero p{color:var(--muted);max-width:820px}
+    .metric-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin:20px 0}
+    .metric{padding:12px 0;border-top:2px solid var(--ink)}
+    .metric strong{display:block;font:700 24px var(--font-mono);color:var(--ink)}
+    .metric span{color:var(--muted);font-size:12px}
+    .legend{margin:16px 0 0;color:var(--muted);font-size:13px}
+    .legend code{font:12px var(--font-mono);border:1px solid var(--line);padding:1px 6px}
+    table{width:100%;border-collapse:collapse;margin-top:24px;font-size:14px;border-top:2px solid var(--ink)}
+    th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{font:12px var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    td.num{text-align:right;font-family:var(--font-mono);white-space:nowrap}
+    .agent{font-weight:700}
+    .repo{display:block;color:var(--muted);font:12px var(--font-mono);margin-top:3px}
+    .grade{display:inline-flex;min-width:24px;justify-content:center;padding:3px 8px;font:700 12px var(--font-mono);border:1px solid var(--line);color:var(--lobster)}
+    .cap{font:12px var(--font-mono);white-space:nowrap}
+    .cap-yes{color:#2f6846;font-weight:700}
+    .cap-part{color:#8b6914}
+    .cap-warn{color:#9b3c3c;font-weight:700}
+    .cap-none{color:var(--muted)}
+    .prov-list{max-width:260px}
+    .prov-list a{font:12px var(--font-mono);border:1px solid var(--line);padding:1px 6px;margin:0 4px 4px 0;display:inline-block}
+    .prov-list a:hover{background:var(--paper-2);text-decoration:none}
+    .keys{font:11px var(--font-mono);color:#9b3c3c}
+    footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font:12px var(--font-mono);color:var(--muted);text-align:center}
+    footer a{color:var(--lobster)}
+    @media(max-width:900px){.metric-row{grid-template-columns:repeat(2,1fr)}h1{font-size:26px}table{font-size:12px}th:nth-child(6),td:nth-child(6){display:none}.prov-list{max-width:160px}}
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Capability Matrix" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "AI Agent Capability Matrix",
+    "numberOfItems": {{ matrix.stats.total }},
+    "itemListElement": [
+      {% for agent in matrix.agents[:25] %}
+      { "@type": "ListItem", "position": {{ loop.index }}, "url": "https://hvtracker.net/agents/{{ agent.slug }}/", "name": "{{ agent.name }}" }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  }
+  </script>
+  <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="capabilities">
+  {% include "_site_header.html.j2" %}
+  <div class="page">
+
+    <section class="hero">
+      <h1>Capability Matrix</h1>
+      <p>What can each agent reach, depend on, or expose when it runs? Every listed agent's runtime capability surface — MCP server support, external service providers, tool/plugin surface, and package-provenance drift — from public, checkable evidence. These fields feed the <a href="/methodology/#runtime-calibration">runtime-trust calibration</a>; per-field evidence is on each agent's profile.</p>
+    </section>
+
+    <section class="metric-row" aria-label="Capability summary">
+      <div class="metric"><strong>{{ matrix.stats.mcp_implemented }}</strong><span>Implement an MCP server</span></div>
+      <div class="metric"><strong>{{ matrix.stats.provider_count }}</strong><span>Distinct external providers</span></div>
+      <div class="metric"><strong>{{ matrix.stats.requires_keys }}</strong><span>Require API keys</span></div>
+      <div class="metric"><strong>{{ matrix.stats.marketplace + matrix.stats.extension_based }}</strong><span>Plugin marketplace / extensions</span></div>
+      <div class="metric"><strong>{{ matrix.stats.drift_warning }}</strong><span>Provenance drift warnings</span></div>
+    </section>
+
+    <p class="legend">
+      MCP: <code class="cap-yes">implemented</code> <code class="cap-part">declared</code> ·
+      Provenance: <code class="cap-yes">match</code> <code class="cap-part">partial</code> <code class="cap-warn">warning</code> <code class="cap-none">unknown / —</code> ·
+      Providers link to their <a href="/ecosystem/">ecosystem pages</a>; <span class="keys">keys</span> = API keys required.
+    </p>
+
+    <table>
+      <thead>
+        <tr><th class="num">Rank</th><th>Agent</th><th>MCP server</th><th>External providers</th><th>Tool surface</th><th>Provenance</th><th class="num">HVTrust</th></tr>
+      </thead>
+      <tbody>
+        {% for agent in matrix.agents %}
+        <tr>
+          <td class="num">{% if agent.display_rank %}#{{ agent.display_rank }}{% else %}—{% endif %}</td>
+          <td><a class="agent" href="/agents/{{ agent.slug }}/">{{ agent.name }}</a><span class="repo">{{ agent.repo }}</span></td>
+          <td>{% if agent.mcp_status == "implemented" %}<span class="cap cap-yes">implemented</span>{% elif agent.mcp_status == "declared" %}<span class="cap cap-part">declared</span>{% else %}<span class="cap cap-none">—</span>{% endif %}</td>
+          <td class="prov-list">{% for p in agent.providers %}<a href="/ecosystem/{{ p.slug }}/">{{ p.name }}</a>{% endfor %}{% if agent.requires_keys %}<span class="keys">keys</span>{% endif %}{% if not agent.providers %}<span class="cap cap-none">—</span>{% endif %}</td>
+          <td>{% if agent.plugin_system == "marketplace" %}<span class="cap cap-warn">marketplace</span>{% elif agent.plugin_system == "extension-based" %}<span class="cap cap-part">extensions</span>{% elif agent.plugin_system == "declared" %}<span class="cap cap-part">plugins</span>{% endif %}{% if agent.tool_tag_count %} <span class="cap cap-none">{{ agent.tool_tag_count }} tag{{ "s" if agent.tool_tag_count != 1 else "" }}</span>{% elif agent.plugin_system == "none" %}<span class="cap cap-none">—</span>{% endif %}</td>
+          <td>{% if agent.drift_status == "match" %}<span class="cap cap-yes">match</span>{% elif agent.drift_status == "partial" %}<span class="cap cap-part">partial</span>{% elif agent.drift_status == "warning" %}<span class="cap cap-warn">warning</span>{% elif agent.drift_status == "unknown" %}<span class="cap cap-none">unknown</span>{% else %}<span class="cap cap-none">—</span>{% endif %}</td>
+          <td class="num">{{ agent.trust_score }} <span class="grade">{{ agent.evidence_grade }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <footer>
+      <a href="/methodology/">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/ecosystem/">Ecosystem</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/spec/runtime-trust/v0.2/">Runtime-Trust Spec</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/compare/">Compare</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>

@@ -393,16 +393,17 @@ Theme: make HVTracker the thing machines consult, not just a site humans
 visit. Every task turns an existing internal asset into an external,
 embeddable surface. This phase is the direct answer to §2 F2/F3/F6.
 
-- [ ] **1.1 T3.3 capability-surface page — L (owner-approved already).**
-  A browsable "what can this agent touch" view: per-agent capability section
-  (MCP status, providers, tool/plugin surface, provenance drift — all
-  already on every row) plus a `/capabilities/` hub with filters (MCP
-  verified / no API keys / drift-flagged). Model the hub on
-  `build_ecosystem_pages`; per-agent section in `templates/agent.html.j2`.
-  This is simultaneously the best evaluator content (audience B) and the
-  best LLM-citable content (audience A). *Accept:* hub + agent sections
-  render; each capability links to its ecosystem page; sitemap entries;
-  validate_html covers a sample.
+- [~] **1.1 T3.3 capability-surface page — hub SHIPPED 2026-07-07 (1.1a);
+  agent-page section pending (1.1b).** `/capabilities/` hub live:
+  `build_capability_matrix(rows)` + `templates/capabilities.html.j2` — all
+  324 agents × MCP status / provider chips (linked to ecosystem pages) /
+  tool-plugin surface / provenance drift, trust-ranked with summary stats
+  (70 implement MCP, 17 providers, 85 require keys, 24 drift warnings) and
+  ItemList/Breadcrumb JSON-LD. Wired: sitemap, llms.txt, homepage nav
+  (Ecosystem panel), .gitignore, validate_html sample; tests
+  `tests/test_capabilities.py` (4) + serving test in test_api. Remaining
+  1.1b: per-agent capability section in `templates/agent.html.j2` linking
+  back to the hub + ecosystem pages.
 - [ ] **1.2 API: documentation, stability promise, and measurement — M.**
   (a) A real `/api/` docs page (OpenAPI or hand-written — hand-written is
   fine and cheaper) covering `/api/v1/agents`, `/api/v1/graph`,

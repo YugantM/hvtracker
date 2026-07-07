@@ -3375,6 +3375,76 @@ def build_ecosystem_pages(rows: list[dict]) -> list[dict]:
     return pages
 
 
+def build_capability_matrix(rows: list[dict]) -> dict:
+    """Aggregate every agent's runtime capability surface — MCP support,
+    external providers, tool/plugin surface, provenance drift — into the one
+    browsable "what can this agent touch" matrix for /capabilities/ (T3.3).
+    The per-row fields already exist; this only reshapes them for display."""
+    def _prov_slug(name: str) -> str:
+        return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+    agents = []
+    stats = {
+        "total": len(rows),
+        "mcp_implemented": 0,
+        "mcp_declared": 0,
+        "requires_keys": 0,
+        "keyless": 0,
+        "marketplace": 0,
+        "extension_based": 0,
+        "drift_match": 0,
+        "drift_warning": 0,
+        "providers": set(),
+    }
+    for r in sorted(rows, key=lambda x: x.get("rank") or 9999):
+        mcp = r.get("mcp_server_support") or {}
+        ext = r.get("external_service_dependencies") or {}
+        tooling = r.get("tool_plugin_surface") or {}
+        drift = r.get("package_provenance_drift") or {}
+        mcp_status = mcp.get("status") or "none"
+        providers = ext.get("providers") or []
+        requires_keys = bool(ext.get("requires_api_keys"))
+        plugin_system = tooling.get("plugin_system") or "none"
+        drift_status = drift.get("status") or "not_applicable"
+
+        if mcp_status == "implemented":
+            stats["mcp_implemented"] += 1
+        elif mcp_status == "declared":
+            stats["mcp_declared"] += 1
+        if providers:
+            if requires_keys:
+                stats["requires_keys"] += 1
+            else:
+                stats["keyless"] += 1
+        if plugin_system == "marketplace":
+            stats["marketplace"] += 1
+        elif plugin_system == "extension-based":
+            stats["extension_based"] += 1
+        if drift_status == "match":
+            stats["drift_match"] += 1
+        elif drift_status == "warning":
+            stats["drift_warning"] += 1
+        stats["providers"].update(providers)
+
+        agents.append({
+            "slug": r["slug"],
+            "name": r["name"],
+            "repo": r["repo"],
+            "rank": r.get("rank"),
+            "display_rank": r.get("display_rank") or r.get("rank"),
+            "trust_score": r.get("trust_score"),
+            "evidence_grade": r.get("evidence_grade", "D"),
+            "mcp_status": mcp_status,
+            "providers": [{"name": p, "slug": _prov_slug(p)} for p in providers],
+            "requires_keys": requires_keys,
+            "plugin_system": plugin_system,
+            "tool_tag_count": len(tooling.get("tool_tags") or []),
+            "drift_status": drift_status,
+        })
+    stats["provider_count"] = len(stats.pop("providers"))
+    return {"agents": agents, "stats": stats}
+
+
 def build_org_pages(rows: list[dict]) -> list[dict]:
     """Build org pages for GitHub owners with >=2 tracked projects."""
     owner_map: dict[str, list[dict]] = {}
@@ -5849,6 +5919,15 @@ def main() -> None:
             f.write(eco_tmpl.render(page=page, pages=ecosystem_pages, updated=now_str, is_index=False))
     print(f"Built {len(ecosystem_pages)} ecosystem pages under ecosystem/.")
     prune_stale_page_dirs(eco_dir, {p["slug"] for p in ecosystem_pages}, "ecosystem")
+
+    # Capability matrix — /capabilities/ (T3.3): every agent's runtime surface.
+    capability_matrix = build_capability_matrix(rows)
+    cap_dir = os.path.join(script_dir, "capabilities")
+    os.makedirs(cap_dir, exist_ok=True)
+    with open(os.path.join(cap_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(env.get_template("capabilities.html.j2").render(
+            matrix=capability_matrix, updated=now_str))
+    print(f"Built capability matrix ({capability_matrix['stats']['total']} agents) under capabilities/.")
     # Organization pages — /org/ and /org/<owner>/
     org_tmpl = env.get_template("org.html.j2")
     org_dir = os.path.join(script_dir, "org")
@@ -6202,6 +6281,7 @@ def main() -> None:
         sitemap_urls.append((f"https://hvtracker.net/categories/{cat_m['slug']}/", "0.7", "daily"))
     for page in use_case_pages:
         sitemap_urls.append((f"https://hvtracker.net/use-cases/{page['slug']}/", "0.8", "daily"))
+    sitemap_urls.append(("https://hvtracker.net/capabilities/", "0.8", "daily"))
     sitemap_urls.append(("https://hvtracker.net/ecosystem/", "0.8", "daily"))
     for page in ecosystem_pages:
         sitemap_urls.append((f"https://hvtracker.net/ecosystem/{page['slug']}/", "0.8", "daily"))
@@ -6301,6 +6381,7 @@ HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Ma
 - [Per-agent record](https://hvtracker.net/data/agents/): /data/agents/{{slug}}.json — includes a signed-ready trust_credential block
 - [Authority descriptor](https://hvtracker.net/.well-known/hvtracker.json)
 - [Trust Credential spec](https://hvtracker.net/spec/trust-credential/v0.1)
+- [Capability matrix](https://hvtracker.net/capabilities/): per-agent runtime surface — MCP support, external providers, tool/plugin surface, provenance drift
 
 ## MCP server (trust layer for agents)
 Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Streamable HTTP — no auth, no install). Tools: `verify_mcp_server` (pre-connect "Safe Browsing for MCP" verdict), `check_agent_trust` (trust profile for a tracked agent/framework by name, repo, or package), and `search_agents`. Call these before installing or connecting to an AI agent, framework, or MCP server.
