@@ -213,10 +213,19 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   to "300+ … runtime-trust calibrated".
 - Next: **`docs/master-plan-2026-07-07.md` is the active plan** (supersedes
   product-plan-2026-h2 as forward plan; full verified state audit + ecosystem
-  forecast + phased feature plan). Phase 0 first: offsite history backup
-  (highest priority — moat dataset has no backup), board-integrity
-  invariants, roster refresh (5 adds + 4 repo moves from
-  docs/research/new-agent-candidates-2026-07-06), feed lastmod fix, bill
-  re-check 07-12, Postgres consolidation (owner-gated). Then Phase 1
-  (trust-as-infrastructure: T3.3 capability page, API docs, MCP server
-  productization, CI trust gate, verify-yourself page, dataset exports).
+  forecast + phased feature plan; per-task status lives in its checkboxes).
+- **Phase 0 executed 2026-07-07** (#116–#120, merged, NOT yet deployed):
+  offsite history backup live in private repo `hvtracker-history-backup`
+  (daily GH Actions, 46 prod snapshots seeded, run verified green — external
+  to this repo, no deploy needed); board-integrity invariants
+  (`check_board_invariants`, loud in build_report.json,
+  `HVT_STRICT_INVARIANTS=1` makes fatal); roster refresh (5 adds + 4 repo
+  moves — catalog 347, board 324; all 9 render provisional until prod's next
+  signals refresh scores them); hand-written feed items carry real publish
+  dates; methodology `#verify-yourself` section + standalone
+  `scripts/verify_credential.py` (plan 1.5, verified against live prod).
+  Still open in Phase 0: bill re-check 2026-07-12; Postgres consolidation
+  (owner-gated, destructive). 3 manual-review agent candidates await owner
+  judgment (research doc). Next code work: Phase 1 — T3.3 capability page
+  (1.1), API docs + usage measurement (1.2), MCP server productization
+  (1.3), CI trust gate (1.4), dataset exports (1.6).
