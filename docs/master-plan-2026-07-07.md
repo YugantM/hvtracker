@@ -416,11 +416,15 @@ embeddable surface. This phase is the direct answer to §2 F2/F3/F6.
   server cost, permissionless adoption, and every adopting repo embeds
   HVTracker in its CI (asset #2). Marketplace listing. *Accept:* action
   published; demo workflow in its README; hvtracker.net badges page links it.
-- [ ] **1.5 "Verify this score yourself" page — S/M.** Signing is live but
-  illegible to outsiders. A short page (+ ~20-line reference script in the
-  repo) showing how to verify `trust_credential.signature` against the
-  `.well-known` Ed25519 key, offline. Neutrality asset #3 made tangible.
-  *Accept:* copy-pasteable verification succeeds against live prod data.
+- [x] **1.5 "Verify this score yourself" — DONE 2026-07-07.** New
+  `#verify-yourself` section on the methodology page with a 12-line
+  copy-paste verifier snippet, plus a fuller standalone reference verifier
+  `scripts/verify_credential.py` (signature, evidence-hash, expiry, and
+  delisted-revocation checks; certifi-aware for macOS Pythons; needs only
+  `cryptography`). Verified against LIVE prod data (haystack,
+  vercel-ai-sdk both verify OK; a tampered score fails both signature and
+  evidence-hash). Byte-compatibility with the production signer locked by
+  `tests/test_verify_credential_script.py` (7 cases).
 - [ ] **1.6 Quarterly dataset export — S/M.** A stable-URL, versioned dump
   (`/data/exports/hvtrust-2026-Q3.json.gz` + CSV) of the public fields, CC
   BY 4.0, linked from the API docs and llms.txt, with a suggested-citation
