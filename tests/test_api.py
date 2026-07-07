@@ -282,6 +282,15 @@ def test_capabilities_page_serves(client):
     assert "/ecosystem/" in r.text  # provider links resolve to ecosystem pages
 
 
+def test_agent_page_links_capability_surface(client):
+    """T3.3 acceptance: agent pages link each detected provider to its
+    ecosystem page, and the runtime section links the capability matrix."""
+    r = client.get("/agents/vercel-ai-sdk/")
+    assert r.status_code == 200
+    assert 'href="/capabilities/"' in r.text
+    assert 'href="/ecosystem/anthropic/"' in r.text
+
+
 def test_api_v1_graph(client):
     r = client.get("/api/v1/graph")
     assert r.status_code == 200
