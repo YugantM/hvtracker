@@ -332,6 +332,17 @@ def test_dataset_export_serves(client):
     assert "QUARTER_LABEL" not in r.text
 
 
+def test_trend_badge_serves(client):
+    """Plan 2.3 regression: /badge/<slug>-trend.svg is pre-rendered and must
+    be served by the dynamic badge route (which previously only knew -grade
+    and 404'd the advertised trend URL)."""
+    r = client.get("/badge/haystack-trend.svg")
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("image/svg")
+    assert "HVTrust" in r.text
+    assert client.get("/badge/not-an-agent-trend.svg").status_code == 404
+
+
 def test_agent_page_has_related_agents_strip(client):
     """Plan 2.1: every agent page cross-links its ranked category
     neighbours — >=3 internal agent links for a mid-category agent."""
