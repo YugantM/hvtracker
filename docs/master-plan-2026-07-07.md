@@ -420,19 +420,24 @@ embeddable surface. This phase is the direct answer to §2 F2/F3/F6.
   api_v1 / mcp / data_json / exports requests, exposed as `machine_usage`
   in `/healthz` (in-memory since process start — baseline KPI, no storage).
   Tests: counters increment, docs-page content assertions.
-- [~] **1.3 MCP server productized — code DONE 2026-07-08; registry
-  submissions = OWNER ACTION.** `mcp_server.py` v0.2.0: new
-  `compare_agents(a, b)` tool (both profiles + evidence-based verdict +
-  published compare-page URL when one exists); `check_agent_trust` now
-  returns `coverage_grade`, a `capabilities` block (MCP status, provider
-  count, keys, plugin system, drift), and `credential_url` (the signed
-  trust_credential, offline-verifiable). Docs updated on /data-api/ +
-  llms.txt; server card at `/.well-known/mcp/server-card.json` includes the
-  new tool. Tests: 10 in test_mcp.py. **Remaining (owner, needs accounts):**
-  registry submissions per `docs/mcp-registry-listing.md` — official
-  registry via `mcp-publisher login github`, Smithery add-server flow,
-  plus the no-account directories. Track adoption via `machine_usage.mcp`
-  in /healthz.
+- [x] **1.3 MCP server productized — DONE 2026-07-08.** `mcp_server.py`
+  v0.2.0: new `compare_agents(a, b)` tool (both profiles + evidence-based
+  verdict + published compare-page URL when one exists);
+  `check_agent_trust` now returns `coverage_grade`, a `capabilities` block
+  (MCP status, provider count, keys, plugin system, drift), and
+  `credential_url` (the signed trust_credential, offline-verifiable). Docs
+  updated on /data-api/ + llms.txt; server card at
+  `/.well-known/mcp/server-card.json` includes the new tool. Tests: 10 in
+  test_mcp.py. **Distribution (2026-07-08):** the owner's
+  `YugantM/hvtracker-mcp` is the canonical listing/distribution repo —
+  brought to v0.2.0 (compare_agents + enrichment in BOTH stdio
+  implementations, Node + Python; verified against live prod), tagged;
+  its CI auto-publishes npm/PyPI/GHCR/Docker Hub/MCPB on `v*` tags and
+  pushes server.json to the official MCP registry via OIDC
+  workflow_dispatch (no owner tokens needed). Remaining owner actions:
+  only the signed-in directory submissions (Smithery, mcp.so,
+  awesome-mcp-servers) per that repo's REGISTRY_SUBMISSIONS.md. Track
+  adoption via `machine_usage.mcp` in /healthz.
 - [x] **1.4 CI trust gate — SHIPPED 2026-07-08 (Marketplace listing =
   OWNER ACTION).** Public repo **`YugantM/hvtrust-gate`** (tags `v1` /
   `v0.1.0`): composite action, stdlib-only `gate.py` against
