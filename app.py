@@ -1170,11 +1170,13 @@ def badge_by_slug(slug: str):
     elif slug.endswith("-trend"):
         # Trend badges need history (the era-aware rank series), so they are
         # pre-rendered by generate_badges() each render rather than built
-        # per-request like the score/grade badges. Serve the file.
+        # per-request like the score/grade badges. Serve the file from the
+        # render output root (the volume in prod) — NOT BASE_DIR, which is
+        # the immutable code dir and never receives rendered badges.
         base_slug = slug[:-6]
         if not find_agent_by_slug(base_slug):
             return JSONResponse({"error": "not found"}, status_code=404)
-        path = os.path.join(BASE_DIR, "badge", f"{base_slug}-trend.svg")
+        path = os.path.join(OUTPUT_DIR, "badge", f"{base_slug}-trend.svg")
         if not os.path.isfile(path):
             return JSONResponse({"error": "not found"}, status_code=404)
         return FileResponse(path, media_type="image/svg+xml")
