@@ -283,3 +283,22 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   action already works via uses: YugantM/hvtrust-gate@v1 without it).
   Next: Phase 2 (internal linking, compare v2, badge audit + trend badge,
   watchlist alerts, corrections page).
+- **Phase 2 COMPLETE 2026-07-08** (#135–#139; merged, NOT yet deployed —
+  owner `railway up` pending). (2.5) /correct/ leads with the full public
+  dispute policy (evidence standard, ~1-week turnaround, GitHub-issue
+  appeal, "scores change only on evidence"); linked from methodology
+  #corrections + About nav + sitemap; templates/correct.html is DEAD code
+  (route builds inline). (2.2) compare pairs: coverage-grade row, runtime-
+  capability diff (`compare_capability_rows`, leads only where defensible),
+  honest verdict caveat when the leader's coverage is thinner; NO title/
+  meta changes (GSC churn lesson). (2.3) `/badge/<slug>-trend.svg` (grade +
+  30d era-aware rank arrow via `trend_arrow`, ±3 threshold; 324×3 badges);
+  adopter audit: composio DOWNGRADED A→B, aipass/lightrag improved to A,
+  haystack healthy — recorded in badge-outreach memory, no outreach (spam
+  freeze). (2.4) `derive_agent_events` + grade_changed (methodology-
+  suppressed) + drift_warning_raised/cleared; bell path verified. (2.1)
+  related-agents strip (`related_agents`, 4 category neighbours) on every
+  agent page; GSC-precision half still needs the owner's Search Console
+  URL export. Suite at 266 tests. Next: deploy when instructed; then
+  Phase 3 (drift monitoring T3.5, /trends/ + quarterly report, 90-day
+  history API) per the master plan; Dependabot #133 still open.
