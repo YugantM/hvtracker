@@ -282,6 +282,27 @@ def test_capabilities_page_serves(client):
     assert "/ecosystem/" in r.text  # provider links resolve to ecosystem pages
 
 
+def test_machine_usage_counters(client):
+    """Plan 1.2: /api/v1, /mcp, /data json, and export requests are counted
+    and exposed via healthz so machine-surface usage becomes a visible KPI."""
+    before = client.get("/healthz").json()["machine_usage"]
+    client.get("/api/v1/agents")
+    client.get("/data/latest.json")
+    after = client.get("/healthz").json()["machine_usage"]
+    # raw request counting: a canonical 301 + its follow-up may both count
+    assert after["api_v1"] > before["api_v1"]
+    assert after["data_json"] > before["data_json"]
+    assert "since" in after
+
+
+def test_data_api_page_documents_machine_surface(client):
+    r = client.get("/data-api/")
+    assert "/api/v1/mcp/verify" in r.text
+    assert ".well-known/hvtracker.json" in r.text
+    assert "add-only" in r.text  # stability promise
+    assert "CC BY 4.0" in r.text
+
+
 def test_dataset_export_serves(client):
     import fetch_and_build as fab
     label = fab.quarter_label()
