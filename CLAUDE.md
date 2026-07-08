@@ -271,7 +271,15 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   publish = OWNER ACTION). **DEPLOYED 2026-07-08 ~01:18 UTC** (#128–#130
   via clean-worktree `railway up` @2c596a5c1); verified live: healthz ok +
   `machine_usage` counters, MCP server card v0.2.0 with 4 tools incl.
-  compare_agents, /data-api/ stability promise, badges CI snippet. Next:
-  Phase 2 (internal linking, compare v2, badge audit + trend badge,
-  watchlist alerts, corrections page) + owner actions (MCP registry
-  submissions, Marketplace listing).
+  compare_agents, /data-api/ stability promise, badges CI snippet.
+- MCP distribution closed 2026-07-08: canonical repo `YugantM/hvtracker-mcp`
+  updated to v0.2.0 (compare_agents + enrichment in BOTH stdio impls), tag
+  fired npm/PyPI/GHCR/DockerHub/MCPB publishes (all green), official MCP
+  registry publish via OIDC verified live (io.github.YugantM/hvtracker-mcp
+  0.2.0). Owner confirmed directory submissions already done: Smithery,
+  awesome-mcp-servers, official registry. On future SERVER_VERSION bumps:
+  mirror in hvtracker-mcp, tag, re-dispatch publish-mcp-registry.yml.
+  Only open owner item: hvtrust-gate Marketplace listing (agreed; the
+  action already works via uses: YugantM/hvtrust-gate@v1 without it).
+  Next: Phase 2 (internal linking, compare v2, badge audit + trend badge,
+  watchlist alerts, corrections page).

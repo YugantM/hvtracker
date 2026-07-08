@@ -434,10 +434,10 @@ embeddable surface. This phase is the direct answer to §2 F2/F3/F6.
   implementations, Node + Python; verified against live prod), tagged;
   its CI auto-publishes npm/PyPI/GHCR/Docker Hub/MCPB on `v*` tags and
   pushes server.json to the official MCP registry via OIDC
-  workflow_dispatch (no owner tokens needed). Remaining owner actions:
-  only the signed-in directory submissions (Smithery, mcp.so,
-  awesome-mcp-servers) per that repo's REGISTRY_SUBMISSIONS.md. Track
-  adoption via `machine_usage.mcp` in /healthz.
+  workflow_dispatch (no owner tokens needed). Directory submissions
+  CONFIRMED DONE by owner 2026-07-08: Smithery, awesome-mcp-servers, and
+  the official MCP registry — nothing open. Track adoption via
+  `machine_usage.mcp` in /healthz.
 - [x] **1.4 CI trust gate — SHIPPED 2026-07-08 (Marketplace listing =
   OWNER ACTION).** Public repo **`YugantM/hvtrust-gate`** (tags `v1` /
   `v0.1.0`): composite action, stdlib-only `gate.py` against
@@ -447,9 +447,10 @@ embeddable surface. This phase is the direct answer to §2 F2/F3/F6.
   outages warn instead of breaking builds. **Self-test verified green on
   GitHub runners** (pass-gate on haystack+vercel/ai at min B; strict
   warn-only job asserting failures≥1 survives). Badges page links it with a
-  copy-paste snippet. *Remaining (owner):* publish to the GitHub
-  Marketplace from the repo's releases UI (requires accepting the
-  Marketplace agreement).
+  copy-paste snippet. *Marketplace listing:* owner agreed 2026-07-08 —
+  publish from the hvtrust-gate repo's releases UI when convenient
+  (requires the owner's account to accept the Marketplace agreement;
+  the action already works via `uses: YugantM/hvtrust-gate@v1` without it).
 - [x] **1.5 "Verify this score yourself" — DONE 2026-07-07.** New
   `#verify-yourself` section on the methodology page with a 12-line
   copy-paste verifier snippet, plus a fuller standalone reference verifier
