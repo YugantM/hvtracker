@@ -126,6 +126,13 @@
         <div class="snippet">&lt;a href="https://hvtracker.net/agents/your-slug/"&gt;&lt;img src="https://hvtracker.net/badge/your-slug.svg" alt="HVTrust"&gt;&lt;/a&gt;</div>
 
         <p class="note">Badges are plain SVGs served from this site, so they always show your project's current score and grade — there is nothing to update once the badge is in place.</p>
+
+        <div class="snippet-label" style="margin-top:22px">Gate your CI on trust — <a href="https://github.com/YugantM/hvtrust-gate" target="_blank" rel="noopener">hvtrust-gate</a> GitHub Action</div>
+        <div class="snippet">- uses: YugantM/hvtrust-gate@v1
+  with:
+    targets: "langchain-ai/langgraph, crewai"
+    min-grade: C</div>
+        <p class="note">Fails the job when an AI-agent dependency's evidence-based grade drops below your threshold. No API key; outages never break your build.</p>
       </section>
 
       <section id="top-repos">
