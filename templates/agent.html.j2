@@ -722,6 +722,20 @@
     </section>
     {% endif %}
 
+    {% if related %}
+    <section class="compare-strip">
+      <h2 class="section-title">Ranked neighbours in <a href="/categories/{{ row.category_slug }}/" style="color:inherit">{{ row.category }}</a></h2>
+      <div class="cmp-row">
+        {% for r in related %}
+        <a class="cmp-link" href="/agents/{{ r.slug }}/">
+          <span class="cmp-name">#{{ r.category_rank }} {{ r.name }} — {{ r.trust_score }} ({{ r.evidence_grade }})</span>
+          <span class="cmp-arrow">→</span>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
     <section class="runtime-soon">
       <h2 class="section-title">AI agent surface</h2>
       <div class="rt-card">
