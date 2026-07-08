@@ -247,3 +247,15 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   backup. Next code work: Phase 1 — T3.3 capability page (1.1), API docs +
   usage measurement (1.2), MCP server productization (1.3), CI trust gate
   (1.4), dataset exports (1.6).
+- **Phase 1 first batch DEPLOYED 2026-07-08 ~00:45 UTC** (owner-instructed;
+  #124–#126 via clean-worktree `railway up` @dd31a22bd). (1.1) `/capabilities/`
+  capability matrix — all agents × MCP/providers/tool-surface/drift,
+  provider chips link to /ecosystem/ pages, in nav + llms.txt + sitemap;
+  agent-page runtime panels link providers + the matrix. (1.6) quarterly
+  dataset export `/data/exports/hvtrust-<Y>-Q<n>.json.gz`+`.csv` (CC BY 4.0,
+  embedded citation; rolls within quarter, freezes at quarter end), on
+  llms.txt + /data-api/ (quarter substituted at request time). Verified
+  live: healthz ok/324/in-sync, capabilities 200, haystack→/ecosystem/
+  anthropic/ link, export downloads (17.7KB gz), docs + sitemap updated.
+  With 1.5 (#120), Phase 1 remaining: 1.2 API docs+usage measurement,
+  1.3 MCP productization, 1.4 CI trust gate.
