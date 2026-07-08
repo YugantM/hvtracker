@@ -1810,6 +1810,8 @@ def sponsor_post(request: Request, name: str = Form(...), company: str = Form(..
 @app.get("/data-api", response_class=HTMLResponse)
 @app.get("/data-api/", response_class=HTMLResponse, include_in_schema=False)
 def data_api_page():
+    _now = datetime.now(timezone.utc)
+    quarter = f"{_now.year}-Q{(_now.month - 1) // 3 + 1}"
     body = """
     <div class='grid'>
       <div class='card'>
@@ -1852,6 +1854,13 @@ def data_api_page():
   -d '{"input": "langchain\ncrewai\nautogen"}' | python -m json.tool</code></pre>
       </div>
       <p style='margin-top:12px;color:var(--muted);font-size:13px'>Auth and rate quotas for a paid tier are intentionally out of scope for now.</p>
+    </div>
+    <div class='card'>
+      <h2>Quarterly dataset export</h2>
+      <p>A citable, versioned snapshot of every public field for research and press — refreshed through the quarter, frozen when the quarter ends. <strong>CC BY 4.0</strong>; attribution: "HVTracker (hvtracker.net)".</p>
+      <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>curl -sO https://hvtracker.net/data/exports/hvtrust-QUARTER_LABEL.json.gz
+curl -sO https://hvtracker.net/data/exports/hvtrust-QUARTER_LABEL.csv</code></pre>
+      <p style='margin-top:12px;color:var(--muted);font-size:13px'>Filename pattern: <code>hvtrust-&lt;year&gt;-Q&lt;n&gt;</code>. Past quarters stay at their end-of-quarter state.</p>
     </div>
     <div class='card'>
       <h2>MCP server — trust layer for agents</h2>
@@ -1904,6 +1913,7 @@ def data_api_page():
       </form>
     </div>
     """
+    body = body.replace("QUARTER_LABEL", quarter)
     return HTMLResponse(_marketing_page("Data API and pricing — HVTracker", "Data", "Public data today. Commercial access next.", body, description="Explore the HVTracker data API, exports, and future commercial access options.", path="/data-api/"))
 
 
