@@ -22,6 +22,8 @@ server at `hvtracker.net/mcp`). On any future `SERVER_VERSION` bump in this
 repo's `mcp_server.py`, mirror the change in hvtracker-mcp (both stdio
 implementations + metadata), tag, and re-dispatch the registry publish.
 
-Directory submissions that need a signed-in human (Smithery add-server,
-mcp.so issue, awesome-mcp-servers PR) remain owner actions — the field
-values are in `REGISTRY_SUBMISSIONS.md`.
+**Submission status (owner-confirmed 2026-07-08): DONE** on Smithery,
+awesome-mcp-servers, and the official MCP registry (the registry also
+re-verified live at 0.2.0 via the OIDC publish). No open submission work;
+if more directories become worth listing on later, the field values are in
+`REGISTRY_SUBMISSIONS.md`.
