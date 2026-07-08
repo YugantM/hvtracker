@@ -288,16 +288,20 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   caveat, related-agents strips, alerts machinery) — EXCEPT the trend
   badge, which 404'd in prod: `badge_by_slug` serves badges dynamically
   and only knew `-grade`, so the pre-rendered `-trend.svg` files were
-  never consulted. Fix merged (#141: route serves the pre-rendered file
-  for `-trend`) but **NOT yet deployed**: 4 consecutive `railway up`
-  attempts failed Railway-side at the CREATE_CONTAINER step ("Failed to
-  create deployment"; SNAPSHOT_CODE and BUILD_IMAGE green, no runtime
-  logs, status page "operational", prod container unaffected throughout).
-  Diagnose via GraphQL `deploymentEvents(id){edges{node{step payload{
-  error}}}}`. NEXT DEPLOY: retry `railway up` from a clean worktree of
-  latest main (includes #141) after the platform blip clears, or use the
-  dashboard's Redeploy on the failed deployment; then verify
-  `/badge/<slug>-trend.svg` returns 200.
+  never consulted. **RESOLVED 2026-07-08 ~22:21 UTC**: two fixes were
+  needed — #141 (route handles `-trend`) plus #143 (the route must read
+  `OUTPUT_DIR/badge/`, the volume, NOT `BASE_DIR` the code dir; the
+  original test passed falsely because local BASE_DIR = repo root
+  contained rendered badges — test now asserts served bytes == the
+  render-written file). Deploys of #141 were also blocked for ~50 min by
+  4 consecutive Railway-side CREATE_CONTAINER failures ("Failed to create
+  deployment"; build green, no runtime logs, status page "operational",
+  prod unaffected — this failure mode does NOT take the site down); the
+  blip cleared on its own by 22:06. Diagnose that class via GraphQL
+  `deploymentEvents(id){edges{node{step payload{error}}}}`. Verified
+  live: `/badge/<slug>-trend.svg` 200 for haystack (A →), composio (B →),
+  vercel-ai-sdk, n8n; healthz ok. Arrows are all "→" until the v4.2 era
+  accumulates ±3-rank movements (by design).
 - **Phase 2 COMPLETE 2026-07-08** (#135–#139; merged, deployed above). (2.5) /correct/ leads with the full public
   dispute policy (evidence standard, ~1-week turnaround, GitHub-issue
   appeal, "scores change only on evidence"); linked from methodology
