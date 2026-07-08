@@ -433,12 +433,18 @@ embeddable surface. This phase is the direct answer to §2 F2/F3/F6.
   registry via `mcp-publisher login github`, Smithery add-server flow,
   plus the no-account directories. Track adoption via `machine_usage.mcp`
   in /healthz.
-- [ ] **1.4 CI trust gate (GitHub Action) — M, separate tiny repo.**
-  `hvtrust-gate`: given agent slugs/packages in a workflow, fail or warn if
-  grade < threshold or a drift flag is present. Pure API consumer — zero
-  server cost, permissionless adoption, and every adopting repo embeds
-  HVTracker in its CI (asset #2). Marketplace listing. *Accept:* action
-  published; demo workflow in its README; hvtracker.net badges page links it.
+- [x] **1.4 CI trust gate — SHIPPED 2026-07-08 (Marketplace listing =
+  OWNER ACTION).** Public repo **`YugantM/hvtrust-gate`** (tags `v1` /
+  `v0.1.0`): composite action, stdlib-only `gate.py` against
+  `/api/v1/mcp/verify`. Inputs: `targets` (repo/URL/npm/PyPI/slug/name),
+  `min-grade` (default C), `fail-on-untracked`, `warn-only`; step-summary
+  table + per-finding annotations + `failures`/`report` outputs; HVTracker
+  outages warn instead of breaking builds. **Self-test verified green on
+  GitHub runners** (pass-gate on haystack+vercel/ai at min B; strict
+  warn-only job asserting failures≥1 survives). Badges page links it with a
+  copy-paste snippet. *Remaining (owner):* publish to the GitHub
+  Marketplace from the repo's releases UI (requires accepting the
+  Marketplace agreement).
 - [x] **1.5 "Verify this score yourself" — DONE 2026-07-07.** New
   `#verify-yourself` section on the methodology page with a 12-line
   copy-paste verifier snippet, plus a fuller standalone reference verifier

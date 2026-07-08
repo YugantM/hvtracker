@@ -259,3 +259,15 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   anthropic/ link, export downloads (17.7KB gz), docs + sitemap updated.
   With 1.5 (#120), Phase 1 remaining: 1.2 API docs+usage measurement,
   1.3 MCP productization, 1.4 CI trust gate.
+- **Phase 1 COMPLETE (code) 2026-07-08** (#128 #129 + external repo; merged,
+  NOT yet deployed unless noted): (1.2) /data-api/ documents the full
+  machine surface + stability promise (v1 fields add-only); `machine_usage`
+  counters (api_v1/mcp/data_json/exports) in /healthz. (1.3) MCP server
+  v0.2.0 — new `compare_agents` tool; check_agent_trust returns
+  coverage_grade + capabilities block + credential_url; registry-submission
+  kit in docs/mcp-registry-listing.md (registry auth = OWNER ACTION).
+  (1.4) public repo `YugantM/hvtrust-gate` (v1): CI trust-gate action,
+  self-test green on GitHub runners; badges page links it (Marketplace
+  publish = OWNER ACTION). Next: deploy #128/#129 batch when instructed;
+  then Phase 2 (internal linking, compare v2, badge audit + trend badge,
+  watchlist alerts, corrections page).
