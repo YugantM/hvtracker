@@ -66,9 +66,36 @@ def test_search_agents_ranks_by_trust_and_filters_category():
     assert [a["name"] for a in r2["results"]] == ["AIPass"]
 
 
+def test_check_agent_trust_includes_capabilities_and_credential():
+    r = mcp_server.check_agent_trust("langgraph")
+    assert r["coverage_grade"] is None  # fixture has no coverage_grade
+    caps = r["capabilities"]
+    assert caps["mcp_status"] == "none"
+    assert caps["provider_count"] == 0
+    assert caps["requires_api_keys"] is False
+    assert r["credential_url"] == "https://hvtracker.net/data/agents/langgraph.json"
+
+
+def test_compare_agents_verdict_and_profiles():
+    r = mcp_server.compare_agents("LangGraph", "aipass")
+    assert r["a"]["tracked"] and r["b"]["tracked"]
+    assert "LangGraph scores higher" in r["verdict"]
+    assert "92.2" in r["verdict"] and "70" in r["verdict"]
+    # no published compare page in the test env
+    assert r["compare_url"] is None
+
+
+def test_compare_agents_untracked_side_is_graceful():
+    r = mcp_server.compare_agents("LangGraph", "not-a-real-agent-xyz")
+    assert r["b"]["tracked"] is False
+    assert r["verdict"].startswith("No verdict")
+    assert r["compare_url"] is None
+
+
 def test_tools_registered_with_input_schemas():
     tools = {t.name: t for t in asyncio.run(mcp_server.mcp.list_tools())}
-    assert set(tools) == {"check_agent_trust", "verify_mcp_server", "search_agents"}
+    assert set(tools) == {"check_agent_trust", "verify_mcp_server",
+                          "search_agents", "compare_agents"}
     assert "name_or_repo" in tools["check_agent_trust"].inputSchema["properties"]
     assert "server" in tools["verify_mcp_server"].inputSchema["properties"]
     check_schema = tools["check_agent_trust"].outputSchema["properties"]
@@ -147,4 +174,8 @@ def test_smithery_server_card_endpoint(monkeypatch):
         "check_agent_trust",
         "verify_mcp_server",
         "search_agents",
+        "compare_agents",
     }
+    compare_card = card_tools["compare_agents"]
+    assert set(compare_card["inputSchema"]["required"]) == {"a", "b"}
+    assert compare_card["outputSchema"]["required"] == ["a", "b", "verdict", "compare_url"]

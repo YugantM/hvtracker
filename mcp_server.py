@@ -20,7 +20,7 @@ from mcp.server.transport_security import TransportSecuritySettings
 import mcp_trust
 
 SERVER_DISPLAY_NAME = "HVTracker MCP"
-SERVER_VERSION = "0.1.2"
+SERVER_VERSION = "0.2.0"
 SERVER_DESCRIPTION = (
     "Pre-connect trust checks for AI agents, frameworks, packages, and MCP "
     "servers using HVTracker's public trust registry."
@@ -49,6 +49,19 @@ AGENT_PROFILE_SCHEMA = {
     "required": ["name", "repo", "trust_score", "evidence_grade", "category", "profile_url"],
 }
 
+CAPABILITIES_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "mcp_status": {"type": "string"},
+        "provider_count": {"type": "integer"},
+        "requires_api_keys": {"type": "boolean"},
+        "plugin_system": {"type": "string"},
+        "drift_status": {"type": "string"},
+    },
+    "required": ["mcp_status", "provider_count", "requires_api_keys",
+                 "plugin_system", "drift_status"],
+}
+
 CHECK_AGENT_TRUST_OUTPUT_SCHEMA = {
     "type": "object",
     "properties": {
@@ -62,11 +75,25 @@ CHECK_AGENT_TRUST_OUTPUT_SCHEMA = {
         "category": {"type": ["string", "null"]},
         "has_provenance": {"type": ["boolean", "null"]},
         "scorecard_score": {"type": ["number", "null"]},
+        "coverage_grade": {"type": ["string", "null"]},
+        "capabilities": {**CAPABILITIES_SCHEMA, "type": ["object", "null"]},
+        "credential_url": {"type": ["string", "null"]},
         "profile_url": {"type": ["string", "null"]},
         "message": {"type": ["string", "null"]},
         "submit_url": {"type": ["string", "null"]},
     },
     "required": ["query", "tracked"],
+}
+
+COMPARE_AGENTS_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "a": CHECK_AGENT_TRUST_OUTPUT_SCHEMA,
+        "b": CHECK_AGENT_TRUST_OUTPUT_SCHEMA,
+        "verdict": {"type": "string"},
+        "compare_url": {"type": ["string", "null"]},
+    },
+    "required": ["a", "b", "verdict", "compare_url"],
 }
 
 VERIFY_MCP_SERVER_OUTPUT_SCHEMA = {
@@ -109,6 +136,14 @@ SEARCH_AGENTS_OUTPUT_SCHEMA = {
 }
 
 
+class Capabilities(TypedDict):
+    mcp_status: str
+    provider_count: int
+    requires_api_keys: bool
+    plugin_system: str
+    drift_status: str
+
+
 class AgentProfile(TypedDict):
     tracked: bool
     name: str | None
@@ -119,6 +154,9 @@ class AgentProfile(TypedDict):
     category: str | None
     has_provenance: bool | None
     scorecard_score: float | None
+    coverage_grade: str | None
+    capabilities: Capabilities
+    credential_url: str
     profile_url: str
 
 
@@ -133,9 +171,19 @@ class CheckAgentTrustResult(TypedDict):
     category: NotRequired[str | None]
     has_provenance: NotRequired[bool | None]
     scorecard_score: NotRequired[float | None]
+    coverage_grade: NotRequired[str | None]
+    capabilities: NotRequired[Capabilities | None]
+    credential_url: NotRequired[str | None]
     profile_url: NotRequired[str | None]
     message: NotRequired[str | None]
     submit_url: NotRequired[str | None]
+
+
+class CompareAgentsResult(TypedDict):
+    a: CheckAgentTrustResult
+    b: CheckAgentTrustResult
+    verdict: str
+    compare_url: str | None
 
 
 class VerifyMcpServerResult(TypedDict):
@@ -199,6 +247,10 @@ CHECK_AGENT_TRUST_DESCRIPTION = (
 SEARCH_AGENTS_DESCRIPTION = (
     "Search tracked AI agents and frameworks by name, repo, description, or "
     "category, ranked by trust score."
+)
+COMPARE_AGENTS_DESCRIPTION = (
+    "Compare two tracked AI agents side by side: trust scores, grades, "
+    "runtime capabilities, and an evidence-based verdict."
 )
 
 
@@ -294,6 +346,26 @@ def server_card() -> dict:
                 },
                 SEARCH_AGENTS_OUTPUT_SCHEMA,
             ),
+            _tool_card(
+                "compare_agents",
+                "Compare Agents",
+                COMPARE_AGENTS_DESCRIPTION,
+                {
+                    "type": "object",
+                    "properties": {
+                        "a": {
+                            "type": "string",
+                            "description": "First agent — name, slug, GitHub repo/URL, or package.",
+                        },
+                        "b": {
+                            "type": "string",
+                            "description": "Second agent — name, slug, GitHub repo/URL, or package.",
+                        },
+                    },
+                    "required": ["a", "b"],
+                },
+                COMPARE_AGENTS_OUTPUT_SCHEMA,
+            ),
         ],
         "resources": [],
         "prompts": [],
@@ -354,6 +426,10 @@ def _resolve_agent(query: str) -> dict | None:
 
 
 def _profile(a: dict) -> AgentProfile:
+    mcp_support = a.get("mcp_server_support") or {}
+    ext = a.get("external_service_dependencies") or {}
+    tooling = a.get("tool_plugin_surface") or {}
+    drift = a.get("package_provenance_drift") or {}
     return {
         "tracked": True,
         "name": a.get("name"),
@@ -364,6 +440,17 @@ def _profile(a: dict) -> AgentProfile:
         "category": a.get("category"),
         "has_provenance": a.get("has_provenance"),
         "scorecard_score": a.get("scorecard_score"),
+        "coverage_grade": a.get("coverage_grade"),
+        "capabilities": {
+            "mcp_status": mcp_support.get("status") or "none",
+            "provider_count": len(ext.get("providers") or []),
+            "requires_api_keys": bool(ext.get("requires_api_keys")),
+            "plugin_system": tooling.get("plugin_system") or "none",
+            "drift_status": drift.get("status") or "not_applicable",
+        },
+        # Ed25519-signed trust_credential lives here; verifiable offline
+        # against /.well-known/hvtracker.json (methodology#verify-yourself).
+        "credential_url": f"https://hvtracker.net/data/agents/{a.get('slug')}.json",
         "profile_url": f"https://hvtracker.net/agents/{a.get('slug')}/",
     }
 
@@ -403,6 +490,49 @@ def verify_mcp_server(server: str) -> VerifyMcpServerResult:
     resolves to a tracked, trusted project, with grade, score, and reasons. An
     unknown server returns trusted=false (no evidence) — not a guarantee of harm."""
     return mcp_trust.evaluate(_resolve_agent(server), server)
+
+
+@mcp.tool(
+    title="Compare Agents",
+    description=COMPARE_AGENTS_DESCRIPTION,
+    annotations=_tool_annotations("Compare Agents"),
+)
+def compare_agents(a: str, b: str) -> CompareAgentsResult:
+    """Compare two tracked AI agents side by side. Accepts the same
+    identifiers as check_agent_trust for each side. Returns both trust
+    profiles, an evidence-based one-line verdict, and the HVTracker compare
+    page URL when one is published."""
+    ra = check_agent_trust(a)
+    rb = check_agent_trust(b)
+    if not ra["tracked"] or not rb["tracked"]:
+        missing = [q for q, r in ((a, ra), (b, rb)) if not r["tracked"]]
+        verdict = (f"No verdict: {', '.join(missing)} not in the registry — "
+                   "no independent trust evidence to compare.")
+        return {"a": ra, "b": rb, "verdict": verdict, "compare_url": None}
+
+    sa, sb = ra.get("trust_score") or 0, rb.get("trust_score") or 0
+    if sa == sb:
+        verdict = (f"{ra['name']} and {rb['name']} tie at HVTrust {sa} "
+                   f"(grades {ra['evidence_grade']}/{rb['evidence_grade']}).")
+    else:
+        hi, lo = (ra, rb) if sa > sb else (rb, ra)
+        verdict = (f"{hi['name']} scores higher on verifiable trust: HVTrust "
+                   f"{hi['trust_score']} (grade {hi['evidence_grade']}) vs "
+                   f"{lo['name']} at {lo['trust_score']} (grade {lo['evidence_grade']}).")
+
+    # Published compare pages use canonical alphabetical slug order; only
+    # link one that actually exists on this deployment.
+    import os as _os
+
+    from app import BASE_DIR
+    slug_a = (ra.get("profile_url") or "").rstrip("/").rsplit("/", 1)[-1]
+    slug_b = (rb.get("profile_url") or "").rstrip("/").rsplit("/", 1)[-1]
+    first, second = sorted([slug_a, slug_b])
+    pair = f"{first}-vs-{second}"
+    compare_url = (f"https://hvtracker.net/compare/{pair}/"
+                   if _os.path.isdir(_os.path.join(BASE_DIR, "compare", pair))
+                   else None)
+    return {"a": ra, "b": rb, "verdict": verdict, "compare_url": compare_url}
 
 
 @mcp.tool(
