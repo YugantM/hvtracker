@@ -495,14 +495,18 @@ visitor exactly one durable hook (the watchlist).
   agency-swarm-vs-aipass "coverage B vs A"). A verdict line already
   existed. Deliberately NO `<title>`/meta changes (GSC title-churn lesson).
   Tests: `tests/test_compare_v2.py`.
-- [ ] **2.3 Badge-adopter audit + trend badge — M.** Audit the 4 adopters'
-  current grades post-v4.2 (some likely dropped). Ship a **trend badge**
-  variant (grade + 30-day direction arrow) so improving projects have a
-  reason to adopt regardless of absolute grade. Refresh the outreach target
-  list from the corrected top-30 — but **respect the spam freeze**: only
-  contact repos with an existing relationship or inbound signal. *Accept:*
-  trend badge SVG live at `/badge/<slug>-trend.svg`; audit results appended
-  to `badge-outreach-campaign` memory/doc.
+- [x] **2.3 Badge-adopter audit + trend badge — DONE 2026-07-08.**
+  Audit (live API): haystack A/94.2 healthy; **composio DOWNGRADED A→B
+  (74.8)** — its README badge now shows B (no proactive ping per spam
+  freeze; the answer if they ask is /correct/ + the trend badge); aipass
+  improved to A/81.9; lightrag improved to A/82.9. Trend badge shipped:
+  `/badge/<slug>-trend.svg` = grade + 30-day rank arrow via
+  `trend_arrow()` reading the **era-aware** sparkline series (never reads
+  a methodology cutover as movement; ±3-rank threshold so the dense board's
+  jitter stays flat). 324×3 badges generate per render; badges page shows
+  all three variants. Candidate pool refreshed (vercel-ai-sdk, codex, n8n,
+  qwen-code, pydantic-ai) — recorded in badge-outreach memory, NO outreach
+  sent. Tests: `tests/test_trend_badge.py` (6).
 - [ ] **2.4 Watchlist alerts that matter — M.** The bell currently derives
   from `recent_events`. Make the events worth watching: grade flips, drift
   flags raised/cleared, abandonment threshold crossed (no push > N months),

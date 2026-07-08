@@ -112,11 +112,12 @@
 
       <section id="get-badge">
         <h2>Get your badge</h2>
-        <p>Every tracked project has two badges at <code>/badge/&lt;slug&gt;.svg</code> (trust score) and <code>/badge/&lt;slug&gt;-grade.svg</code> (evidence grade). Find your project on the <a href="/">leaderboard</a>, open its page, and copy the snippet from the <em>Embed Badge</em> section — or use the pattern below, replacing <code>your-slug</code> with your project's slug.</p>
+        <p>Every tracked project has three badges: <code>/badge/&lt;slug&gt;.svg</code> (trust score), <code>/badge/&lt;slug&gt;-grade.svg</code> (evidence grade), and <code>/badge/&lt;slug&gt;-trend.svg</code> (grade + 30-day rank direction — ↗ climbing, → steady, ↘ slipping). Find your project on the <a href="/">leaderboard</a>, open its page, and copy the snippet from the <em>Embed Badge</em> section — or use the pattern below, replacing <code>your-slug</code> with your project's slug.</p>
 
         <div class="badge-preview">
           <img src="/badge/{{ sample.slug }}.svg" alt="HVTrust score badge example" height="20">
           <img src="/badge/{{ sample.slug }}-grade.svg" alt="Evidence grade badge example" height="20">
+          <img src="/badge/{{ sample.slug }}-trend.svg" alt="HVTrust trend badge example" height="20">
         </div>
 
         <div class="snippet-label">Markdown</div>

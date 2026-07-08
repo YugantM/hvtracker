@@ -4199,7 +4199,34 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
     return all_events
 
 
-def generate_badges(script_dir: str, rows: list[dict]) -> None:
+def trend_arrow(points: list[dict], days: int = 30, threshold: int = 3) -> str:
+    """30-day rank direction for the trend badge (plan 2.3).
+
+    `points` is the era-aware sparkline series ({date, rank, ...}), already
+    trimmed at the last METHODOLOGY_VERSION change — so the arrow never
+    reads a scoring cutover as a real movement. Net improvement of >=
+    `threshold` rank positions shows ↗, decline shows ↘, else → (the board
+    is dense — median 0.1pt between adjacent ranks — so tiny jitter must
+    not render as a trend)."""
+    if not points:
+        return "→"
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
+    window = [p for p in points if (p.get("date") or "") >= cutoff] or points
+    if len(window) < 2:
+        return "→"
+    first, last = window[0].get("rank"), window[-1].get("rank")
+    if first is None or last is None:
+        return "→"
+    delta = first - last  # rank going down = climbing the board
+    if delta >= threshold:
+        return "↗"
+    if delta <= -threshold:
+        return "↘"
+    return "→"
+
+
+def generate_badges(script_dir: str, rows: list[dict],
+                    sparkline_data: dict[str, list[dict]] | None = None) -> None:
     """Generate shields.io-style SVG badges under /badge/{slug}.svg."""
     badge_dir = os.path.join(script_dir, "badge")
     os.makedirs(badge_dir, exist_ok=True)
@@ -4253,9 +4280,16 @@ def generate_badges(script_dir: str, rows: list[dict]) -> None:
         svg_grade = _make_badge("Grade", grade, _color_for_grade(grade))
         with open(os.path.join(badge_dir, f"{slug}-grade.svg"), "w") as f:
             f.write(svg_grade)
+
+        # Trend badge — grade + 30-day rank direction (era-aware; plan 2.3)
+        points = (sparkline_data or {}).get(row.get("repo", "").lower(), [])
+        svg_trend = _make_badge("HVTrust", f"{grade} {trend_arrow(points)}",
+                                _color_for_grade(grade))
+        with open(os.path.join(badge_dir, f"{slug}-trend.svg"), "w") as f:
+            f.write(svg_trend)
         count += 1
 
-    print(f"Generated {count * 2} badges under badge/ ({count} agents × 2 badge types).")
+    print(f"Generated {count * 3} badges under badge/ ({count} agents × 3 badge types).")
 
 
 def compute_trust_trends(history_dir: str, today_agents: dict[str, dict]) -> dict[str, dict]:
@@ -5759,7 +5793,7 @@ def main() -> None:
         json.dump(build_report, f, indent=2, ensure_ascii=False)
     print(f"Wrote data/build_report.json (active={len(rows)}, legacy={len(legacy_rows)}, warnings={len(eligibility_violations)}, failed={len(failed_repos)}).")
 
-    generate_badges(script_dir, rows)
+    generate_badges(script_dir, rows, sparkline_data)
 
     templates_dir = os.path.join(base_dir, "templates")
     env = Environment(
