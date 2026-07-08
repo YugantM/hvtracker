@@ -340,6 +340,13 @@ def test_trend_badge_serves(client):
     assert r.status_code == 200
     assert r.headers["content-type"].startswith("image/svg")
     assert "HVTrust" in r.text
+    # Must serve the file the RENDER wrote (OUTPUT_DIR / the prod volume) —
+    # not a stale copy under the code dir. This is exactly the prod bug the
+    # first version of this test missed: BASE_DIR happened to contain
+    # locally-rendered badges, masking the wrong path.
+    rendered = os.path.join(os.environ["OUTPUT_DIR"], "badge", "haystack-trend.svg")
+    with open(rendered, encoding="utf-8") as f:
+        assert r.text == f.read()
     assert client.get("/badge/not-an-agent-trend.svg").status_code == 404
 
 
