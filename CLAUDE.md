@@ -283,8 +283,22 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   action already works via uses: YugantM/hvtrust-gate@v1 without it).
   Next: Phase 2 (internal linking, compare v2, badge audit + trend badge,
   watchlist alerts, corrections page).
-- **Phase 2 COMPLETE 2026-07-08** (#135–#139; merged, NOT yet deployed —
-  owner `railway up` pending). (2.5) /correct/ leads with the full public
+- **Phase 2 DEPLOYED 2026-07-08 ~17:46 UTC** (@71018954, owner-instructed)
+  and verified live (corrections policy, compare v2 incl. live coverage
+  caveat, related-agents strips, alerts machinery) — EXCEPT the trend
+  badge, which 404'd in prod: `badge_by_slug` serves badges dynamically
+  and only knew `-grade`, so the pre-rendered `-trend.svg` files were
+  never consulted. Fix merged (#141: route serves the pre-rendered file
+  for `-trend`) but **NOT yet deployed**: 4 consecutive `railway up`
+  attempts failed Railway-side at the CREATE_CONTAINER step ("Failed to
+  create deployment"; SNAPSHOT_CODE and BUILD_IMAGE green, no runtime
+  logs, status page "operational", prod container unaffected throughout).
+  Diagnose via GraphQL `deploymentEvents(id){edges{node{step payload{
+  error}}}}`. NEXT DEPLOY: retry `railway up` from a clean worktree of
+  latest main (includes #141) after the platform blip clears, or use the
+  dashboard's Redeploy on the failed deployment; then verify
+  `/badge/<slug>-trend.svg` returns 200.
+- **Phase 2 COMPLETE 2026-07-08** (#135–#139; merged, deployed above). (2.5) /correct/ leads with the full public
   dispute policy (evidence standard, ~1-week turnaround, GitHub-issue
   appeal, "scores change only on evidence"); linked from methodology
   #corrections + About nav + sitemap; templates/correct.html is DEAD code
