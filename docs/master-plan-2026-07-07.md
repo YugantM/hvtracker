@@ -420,14 +420,19 @@ embeddable surface. This phase is the direct answer to §2 F2/F3/F6.
   api_v1 / mcp / data_json / exports requests, exposed as `machine_usage`
   in `/healthz` (in-memory since process start — baseline KPI, no storage).
   Tests: counters increment, docs-page content assertions.
-- [ ] **1.3 HVTracker MCP server, productized — M/L.** `/mcp` exists
-  (in-memory, rate-limited, kill-switched). Make it a first-class product:
-  tools `lookup_agent_trust(slug|repo|package)`, `verify_mcp_server(id)`,
-  `compare_agents(a, b)`, each returning the signed credential fields +
-  grades + capability summary. Then **list it in MCP registries/directories**
-  so assistants discover it organically. This is the single most direct
-  "assistants consult us at runtime" wedge. *Accept:* tools callable from a
-  standard MCP client; README/docs page section; registry listing submitted.
+- [~] **1.3 MCP server productized — code DONE 2026-07-08; registry
+  submissions = OWNER ACTION.** `mcp_server.py` v0.2.0: new
+  `compare_agents(a, b)` tool (both profiles + evidence-based verdict +
+  published compare-page URL when one exists); `check_agent_trust` now
+  returns `coverage_grade`, a `capabilities` block (MCP status, provider
+  count, keys, plugin system, drift), and `credential_url` (the signed
+  trust_credential, offline-verifiable). Docs updated on /data-api/ +
+  llms.txt; server card at `/.well-known/mcp/server-card.json` includes the
+  new tool. Tests: 10 in test_mcp.py. **Remaining (owner, needs accounts):**
+  registry submissions per `docs/mcp-registry-listing.md` — official
+  registry via `mcp-publisher login github`, Smithery add-server flow,
+  plus the no-account directories. Track adoption via `machine_usage.mcp`
+  in /healthz.
 - [ ] **1.4 CI trust gate (GitHub Action) — M, separate tiny repo.**
   `hvtrust-gate`: given agent slugs/packages in a workflow, fail or warn if
   grade < threshold or a drift flag is present. Pure API consumer — zero
