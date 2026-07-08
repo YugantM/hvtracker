@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Fetch GitHub data for tracked agents and render index.html."""
 
+import csv
+import gzip
 import hashlib
+import io
 import json
 import math
 import os
@@ -3445,6 +3448,92 @@ def build_capability_matrix(rows: list[dict]) -> dict:
     return {"agents": agents, "stats": stats}
 
 
+EXPORT_CSV_FIELDS = [
+    "rank", "display_rank", "slug", "name", "repo", "category",
+    "trust_score", "evidence_grade", "coverage_grade", "trust_confidence",
+    "stars", "weekly_downloads", "license_spdx", "has_provenance",
+    "scorecard_score", "signed_commits_ratio", "mcp_status",
+    "provider_count", "requires_api_keys", "plugin_system", "drift_status",
+    "listing_status",
+]
+
+
+def quarter_label(now: datetime | None = None) -> str:
+    """Calendar quarter for export filenames, e.g. '2026-Q3'."""
+    now = now or datetime.now(timezone.utc)
+    return f"{now.year}-Q{(now.month - 1) // 3 + 1}"
+
+
+def write_dataset_export(script_dir: str, rows: list[dict],
+                         now: datetime | None = None) -> str:
+    """Quarterly public dataset export (master plan 1.6, CC BY 4.0):
+    data/exports/hvtrust-<year>-Q<n>.json.gz + .csv at a stable URL for
+    citation. The file is refreshed every render WITHIN its quarter and
+    freezes naturally when renders roll over to the next quarter's filename
+    — so each past quarter's export is its end-of-quarter state.
+    Returns the quarter label used."""
+    label = quarter_label(now)
+    export_dir = os.path.join(script_dir, "data", "exports")
+    os.makedirs(export_dir, exist_ok=True)
+
+    records = []
+    for r in sorted(rows, key=lambda x: x.get("rank") or 9999):
+        mcp = r.get("mcp_server_support") or {}
+        ext = r.get("external_service_dependencies") or {}
+        tooling = r.get("tool_plugin_surface") or {}
+        drift = r.get("package_provenance_drift") or {}
+        records.append({
+            "rank": r.get("rank"),
+            "display_rank": r.get("display_rank") or r.get("rank"),
+            "slug": r.get("slug"),
+            "name": r.get("name"),
+            "repo": r.get("repo"),
+            "category": r.get("category"),
+            "trust_score": r.get("trust_score"),
+            "evidence_grade": r.get("evidence_grade"),
+            "coverage_grade": r.get("coverage_grade"),
+            "trust_confidence": r.get("trust_confidence"),
+            "stars": r.get("stars"),
+            "weekly_downloads": r.get("weekly_downloads"),
+            "license_spdx": r.get("license_spdx"),
+            "has_provenance": bool(r.get("has_provenance")),
+            "scorecard_score": r.get("scorecard_score"),
+            "signed_commits_ratio": r.get("signed_commits_ratio"),
+            "mcp_status": mcp.get("status") or "none",
+            "provider_count": len(ext.get("providers") or []),
+            "requires_api_keys": bool(ext.get("requires_api_keys")),
+            "plugin_system": tooling.get("plugin_system") or "none",
+            "drift_status": drift.get("status") or "not_applicable",
+            "listing_status": r.get("listing_status"),
+        })
+
+    doc = {
+        "dataset": f"HVTrust quarterly export {label}",
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "methodology_version": METHODOLOGY_VERSION,
+        "license": "CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/",
+        "citation": (f"HVTracker, 'HVTrust quarterly export {label}', "
+                     f"https://hvtracker.net/data/exports/hvtrust-{label}.json.gz"),
+        "count": len(records),
+        "agents": records,
+    }
+    json_path = os.path.join(export_dir, f"hvtrust-{label}.json.gz")
+    with gzip.open(json_path, "wt", encoding="utf-8") as f:
+        json.dump(doc, f, separators=(",", ":"), ensure_ascii=False)
+
+    buf = io.StringIO()
+    writer = csv.DictWriter(buf, fieldnames=EXPORT_CSV_FIELDS)
+    writer.writeheader()
+    for rec in records:
+        writer.writerow(rec)
+    csv_path = os.path.join(export_dir, f"hvtrust-{label}.csv")
+    with open(csv_path, "w", encoding="utf-8", newline="") as f:
+        f.write(buf.getvalue())
+
+    print(f"Wrote dataset export {label} ({len(records)} agents) under data/exports/.")
+    return label
+
+
 def build_org_pages(rows: list[dict]) -> list[dict]:
     """Build org pages for GitHub owners with >=2 tracked projects."""
     owner_map: dict[str, list[dict]] = {}
@@ -5557,6 +5646,9 @@ def main() -> None:
     ]
     sc_unavailable = [r["repo"] for r in rows if r.get("scorecard_score") is None]
 
+    # Quarterly public dataset export (master plan 1.6) — rows are final here.
+    write_dataset_export(script_dir, rows)
+
     # Board-integrity invariants (master plan 0.3): catch v4.2-class defects
     # (inflation, out-of-range scores, silent mass churn) at render time.
     invariant_violations = check_board_invariants(
@@ -6385,6 +6477,7 @@ HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Ma
 - [Authority descriptor](https://hvtracker.net/.well-known/hvtracker.json)
 - [Trust Credential spec](https://hvtracker.net/spec/trust-credential/v0.1)
 - [Capability matrix](https://hvtracker.net/capabilities/): per-agent runtime surface — MCP support, external providers, tool/plugin surface, provenance drift
+- [Quarterly dataset export](https://hvtracker.net/data/exports/hvtrust-{quarter_label()}.json.gz): citable snapshot of all public fields (also .csv at the same path)
 
 ## MCP server (trust layer for agents)
 Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Streamable HTTP — no auth, no install). Tools: `verify_mcp_server` (pre-connect "Safe Browsing for MCP" verdict), `check_agent_trust` (trust profile for a tracked agent/framework by name, repo, or package), and `search_agents`. Call these before installing or connecting to an AI agent, framework, or MCP server.

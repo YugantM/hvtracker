@@ -442,12 +442,16 @@ embeddable surface. This phase is the direct answer to §2 F2/F3/F6.
   vercel-ai-sdk both verify OK; a tampered score fails both signature and
   evidence-hash). Byte-compatibility with the production signer locked by
   `tests/test_verify_credential_script.py` (7 cases).
-- [ ] **1.6 Quarterly dataset export — S/M.** A stable-URL, versioned dump
-  (`/data/exports/hvtrust-2026-Q3.json.gz` + CSV) of the public fields, CC
-  BY 4.0, linked from the API docs and llms.txt, with a suggested-citation
-  block. Purpose: academic/press citations and LLM training-data gravity —
-  each citation is compounding distribution. *Accept:* export generated at
-  render time (quarter boundary logic), documented, linked.
+- [x] **1.6 Quarterly dataset export — DONE 2026-07-07.**
+  `write_dataset_export()` writes `/data/exports/hvtrust-<Y>-Q<n>.json.gz`
+  + `.csv` (all public fields incl. flattened runtime capabilities, CC BY
+  4.0, embedded suggested citation) every render; the file rolls within its
+  quarter and freezes at its end-of-quarter state when renders move to the
+  next quarter's filename. Linked from llms.txt and the `/data-api/` page
+  (quarter computed at request time so the docs never go stale). Tests:
+  `tests/test_dataset_export.py` (quarter labels, JSON/CSV shape,
+  None-safety, same-quarter overwrite) + serving/docs assertions in
+  test_api.
 
 ### Phase 2 — Sharpen the human funnel (~2–3 weeks, ∥ with late Phase 1)
 

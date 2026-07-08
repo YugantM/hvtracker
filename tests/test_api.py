@@ -282,6 +282,20 @@ def test_capabilities_page_serves(client):
     assert "/ecosystem/" in r.text  # provider links resolve to ecosystem pages
 
 
+def test_dataset_export_serves(client):
+    import fetch_and_build as fab
+    label = fab.quarter_label()
+    r = client.get(f"/data/exports/hvtrust-{label}.json.gz")
+    assert r.status_code == 200
+    r = client.get(f"/data/exports/hvtrust-{label}.csv")
+    assert r.status_code == 200
+    assert r.text.startswith("rank,")
+    # docs page advertises the current quarter's stable URL
+    r = client.get("/data-api/")
+    assert f"hvtrust-{label}" in r.text
+    assert "QUARTER_LABEL" not in r.text
+
+
 def test_agent_page_links_capability_surface(client):
     """T3.3 acceptance: agent pages link each detected provider to its
     ecosystem page, and the runtime section links the capability matrix."""
