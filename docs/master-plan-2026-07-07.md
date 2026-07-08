@@ -476,12 +476,16 @@ embeddable surface. This phase is the direct answer to §2 F2/F3/F6.
 Theme: convert the queries we already rank for; give the one-and-done
 visitor exactly one durable hook (the watchlist).
 
-- [ ] **2.1 Internal-linking pass — M.** Target the GSC
-  crawled-not-indexed list (owner exports URL-level data from Search
-  Console UI). Mesh: agent → category article → compare pairs → capability
-  hub → ecosystem pages; related-agents block on agent pages (same
-  category, adjacent rank). No new content, just links. *Accept:* every
-  agent page gains ≥3 relevant internal links; validate_html green.
+- [x] **2.1 Internal-linking pass — structural part DONE 2026-07-08.**
+  Agent pages gain a **"Ranked neighbours in <category>" strip**
+  (`related_agents()`: nearest 4 same-category agents by category rank,
+  padding from the other side at the edges) — every agent page now links
+  ≥3 sibling agents plus its category page, on top of the provider→
+  ecosystem, capability-matrix, org, and compare-pair links shipped in
+  Phase 1. Tests: `tests/test_related_agents.py` (5) + rendered-page
+  assertion in test_api. *Still open (needs owner):* the GSC URL-level
+  export from Search Console UI for precision-targeting the 196
+  crawled-not-indexed pages — do that pass when the export exists.
 - [x] **2.2 Compare surface v2 — DONE 2026-07-08.** Compare pairs gain:
   (a) a **coverage-grade row** (badge per side, leader highlighted);
   (b) a **"Runtime capability surface" section** — MCP server, providers,

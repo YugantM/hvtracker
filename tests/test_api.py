@@ -332,6 +332,18 @@ def test_dataset_export_serves(client):
     assert "QUARTER_LABEL" not in r.text
 
 
+def test_agent_page_has_related_agents_strip(client):
+    """Plan 2.1: every agent page cross-links its ranked category
+    neighbours — >=3 internal agent links for a mid-category agent."""
+    import re as _re
+    html = client.get("/agents/haystack/").text
+    assert "Ranked neighbours in" in html
+    strip = html.split("Ranked neighbours in", 1)[1]
+    links = _re.findall(r'href="/agents/([a-z0-9-]+)/"', strip)
+    neighbours = [s for s in links if s != "haystack"]
+    assert len(set(neighbours)) >= 3
+
+
 def test_agent_page_links_capability_surface(client):
     """T3.3 acceptance: agent pages link each detected provider to its
     ecosystem page, and the runtime section links the capability matrix."""

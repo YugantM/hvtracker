@@ -3448,6 +3448,24 @@ def build_capability_matrix(rows: list[dict]) -> dict:
     return {"agents": agents, "stats": stats}
 
 
+def related_agents(row: dict, cat_sorted: dict[str, list[dict]], limit: int = 4) -> list[dict]:
+    """Nearest same-category neighbours by category rank (plan 2.1 internal
+    mesh): the agents a reader evaluating `row` would compare next. Returns
+    up to `limit` compact link dicts, rank-ordered."""
+    lst = cat_sorted.get(row.get("category") or "", [])
+    idx = next((i for i, r in enumerate(lst) if r.get("slug") == row.get("slug")), None)
+    if idx is None:
+        return []
+    others = [(abs(i - idx), i, r) for i, r in enumerate(lst) if i != idx]
+    others.sort(key=lambda t: (t[0], t[1]))
+    picked = sorted((t[2] for t in others[:limit]),
+                    key=lambda r: r.get("category_rank") or 9999)
+    return [{"name": r.get("name"), "slug": r.get("slug"),
+             "trust_score": r.get("trust_score"),
+             "evidence_grade": r.get("evidence_grade"),
+             "category_rank": r.get("category_rank")} for r in picked]
+
+
 _GRADE_VAL = {"A": 4, "B": 3, "C": 2, "D": 1}
 _MCP_VAL = {"implemented": 2, "declared": 1}
 _DRIFT_VAL = {"match": 3, "partial": 2, "unknown": 1, "not_applicable": 1, "warning": 0}
@@ -5962,6 +5980,13 @@ def main() -> None:
     # Provider name -> ecosystem-page slug, so agent pages can link each
     # detected provider to its /ecosystem/<slug>/ hub (T3.3 / plan 1.1b).
     provider_slug_map = {p["provider"]: p["slug"] for p in ecosystem_pages}
+    # Category -> rank-sorted rows, for the related-agents strip (plan 2.1).
+    cat_sorted_rows: dict[str, list[dict]] = {}
+    for _r in rows:
+        if _r.get("category"):
+            cat_sorted_rows.setdefault(_r["category"], []).append(_r)
+    for _lst in cat_sorted_rows.values():
+        _lst.sort(key=lambda x: x.get("category_rank") or 9999)
     # Add category_slug so agent pages can link to category pages
     for row in rows + legacy_rows:
         row["category_slug"] = slugify(row.get("category", "")) if row.get("category") else ""
@@ -5981,7 +6006,7 @@ def main() -> None:
         slug_dir = os.path.join(agents_dir, row["slug"])
         os.makedirs(slug_dir, exist_ok=True)
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, methodology_version=METHODOLOGY_VERSION, comparisons=compare_by_slug.get(row['slug'], []), provider_slugs=provider_slug_map))
+            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, methodology_version=METHODOLOGY_VERSION, comparisons=compare_by_slug.get(row['slug'], []), provider_slugs=provider_slug_map, related=related_agents(row, cat_sorted_rows)))
 
     print(f"Built {len(rows)} active agent profile pages under agents/.")
 
