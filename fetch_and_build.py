@@ -3644,6 +3644,9 @@ def render_event_timeline_svg(events: list[dict]) -> str:
         "scorecard_removed": "Scorecard",
         "provenance_added": "Provenance",
         "provenance_removed": "Provenance",
+        "grade_changed": "Grade",
+        "drift_warning_raised": "Drift",
+        "drift_warning_cleared": "Drift",
         "license_changed": "License",
         "delisted": "Delisted",
     }
@@ -3659,6 +3662,9 @@ def render_event_timeline_svg(events: list[dict]) -> str:
         "scorecard_removed": "#9b3c3c",
         "provenance_added": "#2f6846",
         "provenance_removed": "#9b3c3c",
+        "grade_changed": "#2c5282",
+        "drift_warning_raised": "#9b3c3c",
+        "drift_warning_cleared": "#2f6846",
         "license_changed": "#8b6914",
         "delisted": "#9b3c3c",
     }
@@ -3841,6 +3847,15 @@ def derive_agent_events(history_by_date: dict[str, dict[str, dict]], today_agent
                     direction = "rose" if delta_rank > 0 else "dropped"
                     repo_events.append(make_agent_event(curr_date, "rank_changed", f"Rank {direction} {abs(delta_rank)} spots (#{pr} → #{cr})", reason_code=f"rank_{'up' if delta_rank > 0 else 'down'}"))
 
+                # Grade flip (plan 2.4) — the single most watchable change.
+                # Grade derives from the score band since v4.0, so a
+                # methodology cutover flips grades wholesale; suppressed
+                # across the change like trust_score/rank above.
+                pg, cg = prev.get("evidence_grade"), curr.get("evidence_grade")
+                if pg and cg and pg != cg:
+                    direction = "up" if cg < pg else "down"  # A < B lexically
+                    repo_events.append(make_agent_event(curr_date, "grade_changed", f"Trust grade {pg} → {cg}", reason_code=f"grade_{direction}"))
+
             # Listing status changed
             prev_status = prev.get("listing_status")
             curr_status = curr.get("listing_status")
@@ -3871,6 +3886,15 @@ def derive_agent_events(history_by_date: dict[str, dict[str, dict]], today_agent
                 repo_events.append(make_agent_event(curr_date, "provenance_added", "Package provenance attestation detected", reason_code="provenance_added"))
             elif prev.get("has_provenance") and not curr.get("has_provenance"):
                 repo_events.append(make_agent_event(curr_date, "provenance_removed", "Package provenance attestation no longer detected", reason_code="provenance_removed"))
+
+            # Provenance-drift warning raised/cleared (plan 2.4) — the
+            # supply-chain event a watcher most needs to hear about.
+            prev_drift = (prev.get("package_provenance_drift") or {}).get("status")
+            curr_drift = (curr.get("package_provenance_drift") or {}).get("status")
+            if prev_drift != "warning" and curr_drift == "warning":
+                repo_events.append(make_agent_event(curr_date, "drift_warning_raised", "Package-provenance drift warning: package metadata no longer clearly points at this repo", reason_code="drift_warning_raised"))
+            elif prev_drift == "warning" and curr_drift and curr_drift != "warning":
+                repo_events.append(make_agent_event(curr_date, "drift_warning_cleared", f"Provenance drift warning cleared (now: {curr_drift})", reason_code="drift_warning_cleared"))
 
             # License changed — compare like-for-like fields only.
             prev_license_spdx = prev.get("license_spdx")

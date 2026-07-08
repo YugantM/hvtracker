@@ -507,13 +507,18 @@ visitor exactly one durable hook (the watchlist).
   all three variants. Candidate pool refreshed (vercel-ai-sdk, codex, n8n,
   qwen-code, pydantic-ai) — recorded in badge-outreach memory, NO outreach
   sent. Tests: `tests/test_trend_badge.py` (6).
-- [ ] **2.4 Watchlist alerts that matter — M.** The bell currently derives
-  from `recent_events`. Make the events worth watching: grade flips, drift
-  flags raised/cleared, abandonment threshold crossed (no push > N months),
-  new listing in a watched category. Uses `derive_agent_events` — extend
-  event types, keep the methodology-cutover suppression intact. *Accept:*
-  watch an agent, simulate an event in a test render, bell shows exactly one
-  meaningful notification.
+- [x] **2.4 Watchlist alerts that matter — DONE 2026-07-08.**
+  `derive_agent_events` gains: **grade flips** ("Trust grade B → A",
+  suppressed across METHODOLOGY_VERSION changes exactly like trust/rank —
+  grade is a score band, so cutovers flip grades wholesale) and
+  **provenance-drift warning raised/cleared** (transitions to/from
+  `warning` only; benign unknown↔partial↔match shifts stay silent).
+  Abandonment was already covered (stale_warning at 90 days). Timeline
+  labels/colors extended; bell/summary consumers are fallback-tolerant so
+  the new types flow through. *Not done by design:* "new listing in a
+  watched category" — the watchlist schema has no category concept; would
+  be its own slice. Tests: `tests/test_watchlist_alerts.py` (5, incl. the
+  acceptance bell-path test: a watched grade flip rings exactly once).
 - [x] **2.5 Corrections & appeals — DONE 2026-07-08.** A `/correct/` form +
   `corrections` DB table already existed; what was missing was the public
   POLICY. `/correct/` now leads with the full process: anything published
