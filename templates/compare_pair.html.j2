@@ -80,7 +80,7 @@
     </div>
 
     <div class="cmp-verdict">
-      {% if lead_name %}<strong>{{ lead_name }}</strong> leads on trust — {{ lead_score }}/100 (Grade {{ lead_grade }}) vs {{ trail_score }}/100 (Grade {{ trail_grade }}), a {{ gap }}-point gap.{% else %}{{ a.name }} and {{ b.name }} are tied on HVTrust at {{ a.trust_score }}/100.{% endif %} Full breakdown below.
+      {% if lead_name %}<strong>{{ lead_name }}</strong> leads on trust — {{ lead_score }}/100 (Grade {{ lead_grade }}) vs {{ trail_score }}/100 (Grade {{ trail_grade }}), a {{ gap }}-point gap.{% else %}{{ a.name }} and {{ b.name }} are tied on HVTrust at {{ a.trust_score }}/100.{% endif %}{% if coverage_caveat %} {{ coverage_caveat }}{% endif %} Full breakdown below.
     </div>
 
     <table class="cmp">
@@ -98,6 +98,9 @@
           {% if m.grade %}
           <td class="val{% if m.lead == 'a' %} lead{% endif %}"><span class="badge grade-{{ a.evidence_grade }}">{{ a.evidence_grade }}</span></td>
           <td class="val{% if m.lead == 'b' %} lead{% endif %}"><span class="badge grade-{{ b.evidence_grade }}">{{ b.evidence_grade }}</span></td>
+          {% elif m.cov %}
+          <td class="val{% if m.lead == 'a' %} lead{% endif %}">{% if a.coverage_grade %}<span class="badge grade-{{ a.coverage_grade }}">{{ a.coverage_grade }}</span>{% else %}—{% endif %}</td>
+          <td class="val{% if m.lead == 'b' %} lead{% endif %}">{% if b.coverage_grade %}<span class="badge grade-{{ b.coverage_grade }}">{{ b.coverage_grade }}</span>{% else %}—{% endif %}</td>
           {% else %}
           <td class="val{% if m.lead == 'a' %} lead{% endif %}">{{ m.a }}</td>
           <td class="val{% if m.lead == 'b' %} lead{% endif %}">{{ m.b }}</td>
@@ -110,6 +113,14 @@
           <td class="metric">{{ d.label }} <span style="color:var(--muted);font-family:var(--font-mono);font-size:11px">/ {{ d.max }}</span></td>
           <td class="val{% if d.lead == 'a' %} lead{% endif %}">{{ d.a }}</td>
           <td class="val{% if d.lead == 'b' %} lead{% endif %}">{{ d.b }}</td>
+        </tr>
+        {% endfor %}
+        <tr class="dim-head"><td colspan="3">Runtime capability surface (<a href="/capabilities/" style="color:var(--muted)">full matrix</a>)</td></tr>
+        {% for c in caps %}
+        <tr>
+          <td class="metric">{{ c.label }}</td>
+          <td class="val{% if c.lead == 'a' %} lead{% endif %}">{{ c.a }}</td>
+          <td class="val{% if c.lead == 'b' %} lead{% endif %}">{{ c.b }}</td>
         </tr>
         {% endfor %}
       </tbody>

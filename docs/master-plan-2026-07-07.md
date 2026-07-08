@@ -482,12 +482,19 @@ visitor exactly one durable hook (the watchlist).
   hub → ecosystem pages; related-agents block on agent pages (same
   category, adjacent rank). No new content, just links. *Accept:* every
   agent page gains ≥3 relevant internal links; validate_html green.
-- [ ] **2.2 Compare surface v2 — M.** "X vs Y" queries are the best
-  performers (genkit-vs-langchain = position 1). Add to compare pages: the
-  capability diff (MCP/providers/tool surface side-by-side), coverage
-  grades, and a one-line evidence-based verdict sentence derived from
-  existing fields (template logic, no LLM). *Accept:* compare pages render
-  the new blocks; pairs persist per the #114 seo_state mechanism.
+- [x] **2.2 Compare surface v2 — DONE 2026-07-08.** Compare pairs gain:
+  (a) a **coverage-grade row** (badge per side, leader highlighted);
+  (b) a **"Runtime capability surface" section** — MCP server, providers,
+  API-key requirement, plugin surface, provenance drift side-by-side via
+  `compare_capability_rows()` (leads only where a direction is defensible:
+  implemented>declared MCP, keyless wins, match>warning drift; provider
+  mix and plugin style deliberately have no winner) with a link to the
+  capability matrix; (c) an **honest coverage caveat** on the verdict via
+  `compare_coverage_caveat()` — when the trust leader has thinner evidence
+  coverage than the trailer, the verdict says so (fires on real pairs, e.g.
+  agency-swarm-vs-aipass "coverage B vs A"). A verdict line already
+  existed. Deliberately NO `<title>`/meta changes (GSC title-churn lesson).
+  Tests: `tests/test_compare_v2.py`.
 - [ ] **2.3 Badge-adopter audit + trend badge — M.** Audit the 4 adopters'
   current grades post-v4.2 (some likely dropped). Ship a **trend badge**
   variant (grade + 30-day direction arrow) so improving projects have a
