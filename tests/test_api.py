@@ -303,6 +303,21 @@ def test_data_api_page_documents_machine_surface(client):
     assert "CC BY 4.0" in r.text
 
 
+def test_corrections_policy_page(client):
+    """Plan 2.5: /correct/ carries the public dispute policy (evidence
+    standard, turnaround, appeal path), is linked from methodology and the
+    shared nav, and appears in the sitemap."""
+    r = client.get("/correct/")
+    assert r.status_code == 200
+    for phrase in ("What counts as evidence", "within a week",
+                   "Public appeal", "never changed by request"):
+        assert phrase in r.text, phrase
+    meth = client.get("/methodology/").text
+    assert 'href="/correct/"' in meth
+    assert 'href="/correct/"' in client.get("/").text  # nav
+    assert "https://hvtracker.net/correct/" in client.get("/sitemap.xml").text
+
+
 def test_dataset_export_serves(client):
     import fetch_and_build as fab
     label = fab.quarter_label()

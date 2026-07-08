@@ -6377,6 +6377,7 @@ def main() -> None:
     for page in use_case_pages:
         sitemap_urls.append((f"https://hvtracker.net/use-cases/{page['slug']}/", "0.8", "daily"))
     sitemap_urls.append(("https://hvtracker.net/capabilities/", "0.8", "daily"))
+    sitemap_urls.append(("https://hvtracker.net/correct/", "0.5", "monthly"))
     sitemap_urls.append(("https://hvtracker.net/ecosystem/", "0.8", "daily"))
     for page in ecosystem_pages:
         sitemap_urls.append((f"https://hvtracker.net/ecosystem/{page['slug']}/", "0.8", "daily"))

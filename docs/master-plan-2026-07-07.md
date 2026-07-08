@@ -503,11 +503,17 @@ visitor exactly one durable hook (the watchlist).
   event types, keep the methodology-cutover suppression intact. *Accept:*
   watch an agent, simulate an event in a test render, bell shows exactly one
   meaningful notification.
-- [ ] **2.5 Corrections & appeals page — S.** Public, short: how to dispute
-  a score/signal, what evidence is required, expected turnaround (solo-run,
-  "within a week" honest). Every honest correction strengthens asset #3,
-  and this page is the R5 (defamation-risk) mitigation. Link from footer +
-  methodology. *Accept:* page live, linked, in sitemap.
+- [x] **2.5 Corrections & appeals — DONE 2026-07-08.** A `/correct/` form +
+  `corrections` DB table already existed; what was missing was the public
+  POLICY. `/correct/` now leads with the full process: anything published
+  is disputable, evidence = public checkable sources only, re-check against
+  the source, fixes ship next render, methodology-level errors disclosed in
+  the changelog, ~1-week turnaround, public appeal via GitHub issues,
+  "scores change only on evidence, never on request." Linked from the
+  methodology #corrections section (score-dispute paragraph), the shared
+  About nav (homepage + all j2 pages), and the sitemap. Test locks policy
+  phrases + links. Note: `templates/correct.html` is dead code (the route
+  builds its own page) — left in place per working style.
 
 ### Phase 3 — History as product (~3–4 weeks, after 0.1 backup exists)
 

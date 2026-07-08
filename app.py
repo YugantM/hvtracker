@@ -1522,6 +1522,17 @@ def submit_post(request: Request, repo: str = Form(...), name: str = Form(...),
 def correct_form():
     body = """
     <div class='card'>
+      <h2>Corrections &amp; appeals — how it works</h2>
+      <p>Any listed project (or anyone else) can dispute anything we publish: a trust score, a grade, a capability field, provenance drift, category, or listing status. This is the process, in full:</p>
+      <ul>
+        <li><strong>What counts as evidence.</strong> Scores are computed only from public, checkable signals, so disputes are settled the same way: point at the public source (repo, registry, manifest, commit) that contradicts what we show. "Our score should be higher" isn't reviewable; "your provenance check missed our PEP 740 attestation, here's the PyPI link" is.</li>
+        <li><strong>What happens next.</strong> We re-check the signal against the source. If we're wrong, the fix ships as a data or detector change and takes effect on the next render — and if the error was in the methodology itself, that's said plainly in the <a href='/methodology/#changelog'>methodology changelog</a>. If we're right, you get the reasoning, not silence.</li>
+        <li><strong>Turnaround.</strong> HVTracker is independently run; expect a response within a week, usually sooner.</li>
+        <li><strong>Public appeal.</strong> Prefer a public record, or disagree with the outcome? Open a <a href='https://github.com/YugantM/hvtracker/issues' target='_blank' rel='noopener'>GitHub issue</a> — disputes and their resolutions stay visible there.</li>
+      </ul>
+      <p style='color:var(--muted);font-size:13px'>Scores are never changed by request — only by evidence. You can also <a href='/methodology/#verify-yourself'>verify any score yourself</a> against its signed credential.</p>
+    </div>
+    <div class='card'>
       <h2>Request a correction</h2>
       <p>Spotted wrong data on a listing? Send the repo, explain what is wrong, and optionally leave a contact email for follow-up.</p>
       <form method='post' action='/correct'>
