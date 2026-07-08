@@ -268,6 +268,10 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   kit in docs/mcp-registry-listing.md (registry auth = OWNER ACTION).
   (1.4) public repo `YugantM/hvtrust-gate` (v1): CI trust-gate action,
   self-test green on GitHub runners; badges page links it (Marketplace
-  publish = OWNER ACTION). Next: deploy #128/#129 batch when instructed;
-  then Phase 2 (internal linking, compare v2, badge audit + trend badge,
-  watchlist alerts, corrections page).
+  publish = OWNER ACTION). **DEPLOYED 2026-07-08 ~01:18 UTC** (#128–#130
+  via clean-worktree `railway up` @2c596a5c1); verified live: healthz ok +
+  `machine_usage` counters, MCP server card v0.2.0 with 4 tools incl.
+  compare_agents, /data-api/ stability promise, badges CI snippet. Next:
+  Phase 2 (internal linking, compare v2, badge audit + trend badge,
+  watchlist alerts, corrections page) + owner actions (MCP registry
+  submissions, Marketplace listing).
