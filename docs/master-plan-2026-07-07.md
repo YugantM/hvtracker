@@ -409,16 +409,17 @@ embeddable surface. This phase is the direct answer to §2 F2/F3/F6.
   `tests/test_capabilities.py` (4) + serving test in test_api. Remaining
   1.1b: per-agent capability section in `templates/agent.html.j2` linking
   back to the hub + ecosystem pages.
-- [ ] **1.2 API: documentation, stability promise, and measurement — M.**
-  (a) A real `/api/` docs page (OpenAPI or hand-written — hand-written is
-  fine and cheaper) covering `/api/v1/agents`, `/api/v1/graph`,
-  `/api/v1/mcp/verify`, `/data/agents/<slug>.json`, the `.well-known`
-  discovery doc, and the CC BY 4.0 data license + attribution rule.
-  (b) A one-paragraph versioning policy (fields are add-only within v1;
-  breaking changes bump the path). (c) Cheap usage measurement: a
-  UA/path counter middleware or log-line so API/MCP call volume becomes a
-  visible KPI (currently unmeasured). *Accept:* docs page live in nav +
-  llms.txt; counter visible in logs or build report.
+- [x] **1.2 API docs + stability promise + measurement — DONE 2026-07-08.**
+  (a) `/data-api/` (already in nav as "Data & API") now documents the full
+  machine surface: `/api/v1/agents`, `/api/v1/graph`, `/api/v1/scan`,
+  `/api/v1/mcp/verify` (with spec link), `/data/agents/<slug>.json` +
+  `/data/latest.json` (signed credential + verify-yourself link),
+  `.well-known` discovery, quarterly exports. (b) Stability promise
+  published: fields add-only within v1, breaking changes bump the path;
+  CC BY 4.0 + attribution. (c) Usage measurement: middleware counts
+  api_v1 / mcp / data_json / exports requests, exposed as `machine_usage`
+  in `/healthz` (in-memory since process start — baseline KPI, no storage).
+  Tests: counters increment, docs-page content assertions.
 - [ ] **1.3 HVTracker MCP server, productized — M/L.** `/mcp` exists
   (in-memory, rate-limited, kill-switched). Make it a first-class product:
   tools `lookup_agent_trust(slug|repo|package)`, `verify_mcp_server(id)`,

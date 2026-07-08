@@ -367,9 +367,28 @@ def _canonical_redirect_target(request: Request) -> str | None:
     return f"https://{_CANONICAL_HOST}{target_path}{suffix}"
 
 
+# ---- machine-surface usage counters (master plan 1.2) ---------------------
+# In-memory since last process start — enough to establish the API/MCP usage
+# baseline KPI without any storage. Exposed in /healthz as machine_usage.
+_usage_counters = {"api_v1": 0, "mcp": 0, "data_json": 0, "exports": 0}
+_USAGE_SINCE = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _count_machine_usage(path: str) -> None:
+    if path.startswith("/api/v1/"):
+        _usage_counters["api_v1"] += 1
+    elif path == "/mcp" or path.startswith("/mcp/"):
+        _usage_counters["mcp"] += 1
+    elif path.startswith("/data/exports/"):
+        _usage_counters["exports"] += 1
+    elif path.startswith("/data/") and path.endswith(".json"):
+        _usage_counters["data_json"] += 1
+
+
 @app.middleware("http")
 async def _cache_headers(request, call_next):
     path = request.url.path
+    _count_machine_usage(path)
     if path not in _HEALTHCHECK_PATHS:
         redirect_target = _canonical_redirect_target(request)
         if redirect_target is not None:
@@ -757,6 +776,7 @@ def healthz():
         "last_refresh_succeeded": refresh_status.get("last_succeeded"),
         "last_refresh_mode": refresh_status.get("last_mode"),
         "last_refresh_error": refresh_status.get("last_error"),
+        "machine_usage": {"since": _USAGE_SINCE, **_usage_counters},
     }
 
 
@@ -1853,7 +1873,16 @@ def data_api_page():
         <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>curl -s https://hvtracker.net/api/v1/scan -H 'Content-Type: application/json' \
   -d '{"input": "langchain\ncrewai\nautogen"}' | python -m json.tool</code></pre>
       </div>
-      <p style='margin-top:12px;color:var(--muted);font-size:13px'>Auth and rate quotas for a paid tier are intentionally out of scope for now.</p>
+      <div class='card' style='margin-top:12px'>
+        <h2 style='font-family:var(--font-mono);font-size:13px'><code>GET /api/v1/mcp/verify?server=&lt;repo|url|npm|pypi&gt;</code></h2>
+        <p>Pre-connect trust verdict for an MCP server — a signed attestation when the server is tracked, an explicit "not tracked, unverified" verdict when it isn't. Spec: <a href='/spec/mcp-server-trust/v0.1'>MCP Server Trust v0.1</a>.</p>
+        <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>curl -s 'https://hvtracker.net/api/v1/mcp/verify?server=deepset-ai/haystack' | python -m json.tool</code></pre>
+      </div>
+      <div class='card' style='margin-top:12px'>
+        <h2 style='font-family:var(--font-mono);font-size:13px'><code>GET /data/agents/&lt;slug&gt;.json</code> · <code>GET /data/latest.json</code></h2>
+        <p>Per-agent record with the full signal set and an <strong>Ed25519-signed <code>trust_credential</code></strong> (verify it offline — see <a href='/methodology/#verify-yourself'>verify a score yourself</a>), and the full-registry snapshot. Machine discovery starts at <a href='/.well-known/hvtracker.json'><code>/.well-known/hvtracker.json</code></a>.</p>
+      </div>
+      <p style='margin-top:12px;color:var(--muted);font-size:13px'><strong>Stability promise:</strong> within v1, fields are add-only — existing fields are never renamed or removed; breaking changes ship under a new path version. Data license: <strong>CC BY 4.0</strong>, attribution "HVTracker (hvtracker.net)". Auth and rate quotas for a paid tier are intentionally out of scope for now.</p>
     </div>
     <div class='card'>
       <h2>Quarterly dataset export</h2>
