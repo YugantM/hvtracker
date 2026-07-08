@@ -3448,6 +3448,70 @@ def build_capability_matrix(rows: list[dict]) -> dict:
     return {"agents": agents, "stats": stats}
 
 
+_GRADE_VAL = {"A": 4, "B": 3, "C": 2, "D": 1}
+_MCP_VAL = {"implemented": 2, "declared": 1}
+_DRIFT_VAL = {"match": 3, "partial": 2, "unknown": 1, "not_applicable": 1, "warning": 0}
+
+
+def compare_capability_rows(a: dict, b: dict) -> list[dict]:
+    """Side-by-side runtime-capability rows for a compare pair (plan 2.2).
+    Display values + which side 'leads' where a direction is defensible
+    (MCP: implemented > declared > none; keys: not requiring them; drift:
+    match > partial/unknown > warning). Provider mix and plugin style are
+    shown without a winner — more providers isn't better or worse."""
+    def _lead(av, bv):
+        if av == bv:
+            return "none"
+        return "a" if av > bv else "b"
+
+    def _mcp(r):
+        return (r.get("mcp_server_support") or {}).get("status") or "none"
+
+    def _ext(r):
+        return r.get("external_service_dependencies") or {}
+
+    def _prov_disp(r):
+        provs = _ext(r).get("providers") or []
+        if not provs:
+            return "—"
+        shown = ", ".join(provs[:3])
+        return f"{len(provs)} — {shown}" + (", …" if len(provs) > 3 else "")
+
+    def _plugin(r):
+        p = (r.get("tool_plugin_surface") or {}).get("plugin_system") or "none"
+        return {"marketplace": "marketplace", "extension-based": "extensions",
+                "declared": "plugins"}.get(p, "—")
+
+    def _drift(r):
+        return (r.get("package_provenance_drift") or {}).get("status") or "not_applicable"
+
+    mcp_disp = {"implemented": "Implemented", "declared": "Declared", "none": "—"}
+    drift_disp = {"match": "Match", "partial": "Partial", "warning": "Warning",
+                  "unknown": "Unknown", "not_applicable": "—"}
+    keys_a, keys_b = bool(_ext(a).get("requires_api_keys")), bool(_ext(b).get("requires_api_keys"))
+    return [
+        {"label": "MCP server", "a": mcp_disp[_mcp(a)], "b": mcp_disp[_mcp(b)],
+         "lead": _lead(_MCP_VAL.get(_mcp(a), 0), _MCP_VAL.get(_mcp(b), 0))},
+        {"label": "External providers", "a": _prov_disp(a), "b": _prov_disp(b), "lead": "none"},
+        {"label": "Requires API keys", "a": "Yes" if keys_a else "No",
+         "b": "Yes" if keys_b else "No", "lead": _lead(not keys_a, not keys_b)},
+        {"label": "Plugin surface", "a": _plugin(a), "b": _plugin(b), "lead": "none"},
+        {"label": "Provenance drift", "a": drift_disp[_drift(a)], "b": drift_disp[_drift(b)],
+         "lead": _lead(_DRIFT_VAL[_drift(a)], _DRIFT_VAL[_drift(b)])},
+    ]
+
+
+def compare_coverage_caveat(lead_row: dict, trail_row: dict) -> str | None:
+    """One honest sentence when the trust leader has THINNER evidence
+    coverage than the trailer — a high score on thin evidence deserves the
+    asterisk (coverage grade counts independent public signal types)."""
+    lg, tg = lead_row.get("coverage_grade"), trail_row.get("coverage_grade")
+    if not lg or not tg or _GRADE_VAL.get(lg, 0) >= _GRADE_VAL.get(tg, 0):
+        return None
+    return (f"Note: {lead_row['name']}'s evidence coverage is thinner "
+            f"(coverage {lg} vs {tg}) — its score rests on fewer independent signal types.")
+
+
 EXPORT_CSV_FIELDS = [
     "rank", "display_rank", "slug", "name", "repo", "category",
     "trust_score", "evidence_grade", "coverage_grade", "trust_confidence",
@@ -6101,6 +6165,8 @@ def main() -> None:
         _metrics = [
             {"label": "HVTrust score", "a": _cmp_r1(_a.get("trust_score")), "b": _cmp_r1(_b.get("trust_score")), "lead": _sl},
             {"label": "Evidence grade", "grade": True, "lead": _sl},
+            {"label": "Coverage grade", "cov": True,
+             "lead": _cmp_lead(_GRADE_VAL.get(_a.get("coverage_grade"), 0), _GRADE_VAL.get(_b.get("coverage_grade"), 0))},
             {"label": "Overall rank", "a": f"#{_a.get('rank')}", "b": f"#{_b.get('rank')}", "lead": _cmp_lead(_a.get("rank"), _b.get("rank"), higher=False)},
             {"label": f"Rank in {_cm['name']}", "a": f"#{_a.get('category_rank')}", "b": f"#{_b.get('category_rank')}", "lead": _cmp_lead(_a.get("category_rank"), _b.get("category_rank"), higher=False)},
             {"label": "GitHub stars", "a": _a.get("stars_fmt") or "—", "b": _b.get("stars_fmt") or "—", "lead": _cmp_lead(_a.get("stars"), _b.get("stars"))},
@@ -6116,13 +6182,16 @@ def main() -> None:
                  for lbl, k, mx in (("Safety / integrity", "safety", 25), ("Identity & provenance", "identity", 20),
                                     ("Transparency", "transparency", 17), ("Maintenance", "maintenance", 20), ("Adoption", "adoption", 20))]
         _ctx = {"a": _a, "b": _b, "category": _cm, "metrics": _metrics, "dims": _dims,
+                "caps": compare_capability_rows(_a, _b),
                 "updated": now_str, "methodology_version": METHODOLOGY_VERSION,
-                "lead_name": None, "lead_score": None, "lead_grade": None, "trail_score": None, "trail_grade": None, "gap": None}
+                "lead_name": None, "lead_score": None, "lead_grade": None, "trail_score": None, "trail_grade": None, "gap": None,
+                "coverage_caveat": None}
         _as, _bs = _a.get("trust_score"), _b.get("trust_score")
         if _as is not None and _bs is not None and _as != _bs:
             _hi, _lo = (_a, _b) if _as > _bs else (_b, _a)
             _ctx.update(lead_name=_hi["name"], lead_score=_cmp_r1(_hi.get("trust_score")), lead_grade=_hi.get("evidence_grade"),
-                        trail_score=_cmp_r1(_lo.get("trust_score")), trail_grade=_lo.get("evidence_grade"), gap=_cmp_r1(abs(_as - _bs)))
+                        trail_score=_cmp_r1(_lo.get("trust_score")), trail_grade=_lo.get("evidence_grade"), gap=_cmp_r1(abs(_as - _bs)),
+                        coverage_caveat=compare_coverage_caveat(_hi, _lo))
         _pdir = os.path.join(compare_dir, f"{_a['slug']}-vs-{_b['slug']}")
         os.makedirs(_pdir, exist_ok=True)
         with open(os.path.join(_pdir, "index.html"), "w", encoding="utf-8") as f:
