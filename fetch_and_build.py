@@ -3448,6 +3448,23 @@ def build_capability_matrix(rows: list[dict]) -> dict:
     return {"agents": agents, "stats": stats}
 
 
+# Event types that describe the agent's runtime surface / supply-chain
+# posture changing over time — the drift timeline (T3.5 / plan 3.1), as
+# opposed to score/rank/listing movements.
+DRIFT_EVENT_TYPES = {
+    "mcp_status_changed", "provider_added", "provider_removed",
+    "tool_surface_changed", "drift_warning_raised", "drift_warning_cleared",
+    "provenance_added", "provenance_removed", "stale_warning",
+    "freshness_restored",
+}
+
+
+def filter_drift_events(events: list[dict]) -> list[dict]:
+    """The subset of an agent's events that belong on its runtime-drift
+    timeline (chronological, capability/posture changes only)."""
+    return [e for e in events if e.get("type") in DRIFT_EVENT_TYPES]
+
+
 def related_agents(row: dict, cat_sorted: dict[str, list[dict]], limit: int = 4) -> list[dict]:
     """Nearest same-category neighbours by category rank (plan 2.1 internal
     mesh): the agents a reader evaluating `row` would compare next. Returns
@@ -3665,6 +3682,10 @@ def render_event_timeline_svg(events: list[dict]) -> str:
         "grade_changed": "Grade",
         "drift_warning_raised": "Drift",
         "drift_warning_cleared": "Drift",
+        "mcp_status_changed": "MCP",
+        "provider_added": "Surface",
+        "provider_removed": "Surface",
+        "tool_surface_changed": "Surface",
         "license_changed": "License",
         "delisted": "Delisted",
     }
@@ -3683,6 +3704,10 @@ def render_event_timeline_svg(events: list[dict]) -> str:
         "grade_changed": "#2c5282",
         "drift_warning_raised": "#9b3c3c",
         "drift_warning_cleared": "#2f6846",
+        "mcp_status_changed": "#2c5282",
+        "provider_added": "#8b6914",
+        "provider_removed": "#8b6914",
+        "tool_surface_changed": "#8b6914",
         "license_changed": "#8b6914",
         "delisted": "#9b3c3c",
     }
@@ -3913,6 +3938,41 @@ def derive_agent_events(history_by_date: dict[str, dict[str, dict]], today_agent
                 repo_events.append(make_agent_event(curr_date, "drift_warning_raised", "Package-provenance drift warning: package metadata no longer clearly points at this repo", reason_code="drift_warning_raised"))
             elif prev_drift == "warning" and curr_drift and curr_drift != "warning":
                 repo_events.append(make_agent_event(curr_date, "drift_warning_cleared", f"Provenance drift warning cleared (now: {curr_drift})", reason_code="drift_warning_cleared"))
+
+            # Runtime capability-surface drift (T3.5 / plan 3.1) — what the
+            # agent can reach changed. Wording says "detected" throughout:
+            # these track our public-evidence detectors, so a detector
+            # improvement can also move them (the #96-#99 lesson) — the
+            # timeline records the detection change either way.
+            prev_mcp = (prev.get("mcp_server_support") or {}).get("status") or "none"
+            curr_mcp = (curr.get("mcp_server_support") or {}).get("status") or "none"
+            if prev_mcp != curr_mcp:
+                repo_events.append(make_agent_event(
+                    curr_date, "mcp_status_changed",
+                    f"Detected MCP server support changed: {prev_mcp} → {curr_mcp}",
+                    reason_code="mcp_status_changed"))
+
+            prev_provs = set((prev.get("external_service_dependencies") or {}).get("providers") or [])
+            curr_provs = set((curr.get("external_service_dependencies") or {}).get("providers") or [])
+            added, removed = sorted(curr_provs - prev_provs), sorted(prev_provs - curr_provs)
+            if added:
+                repo_events.append(make_agent_event(
+                    curr_date, "provider_added",
+                    f"Runtime surface grew — new detected provider dependenc{'ies' if len(added) > 1 else 'y'}: {', '.join(added)}",
+                    reason_code="provider_added"))
+            if removed:
+                repo_events.append(make_agent_event(
+                    curr_date, "provider_removed",
+                    f"Runtime surface shrank — no longer detected: {', '.join(removed)}",
+                    reason_code="provider_removed"))
+
+            prev_plugin = (prev.get("tool_plugin_surface") or {}).get("plugin_system") or "none"
+            curr_plugin = (curr.get("tool_plugin_surface") or {}).get("plugin_system") or "none"
+            if prev_plugin != curr_plugin:
+                repo_events.append(make_agent_event(
+                    curr_date, "tool_surface_changed",
+                    f"Detected tool/plugin surface changed: {prev_plugin} → {curr_plugin}",
+                    reason_code="tool_surface_changed"))
 
             # License changed — compare like-for-like fields only.
             prev_license_spdx = prev.get("license_spdx")
@@ -6006,7 +6066,7 @@ def main() -> None:
         slug_dir = os.path.join(agents_dir, row["slug"])
         os.makedirs(slug_dir, exist_ok=True)
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, methodology_version=METHODOLOGY_VERSION, comparisons=compare_by_slug.get(row['slug'], []), provider_slugs=provider_slug_map, related=related_agents(row, cat_sorted_rows)))
+            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, drift_events=filter_drift_events(events), methodology_version=METHODOLOGY_VERSION, comparisons=compare_by_slug.get(row['slug'], []), provider_slugs=provider_slug_map, related=related_agents(row, cat_sorted_rows)))
 
     print(f"Built {len(rows)} active agent profile pages under agents/.")
 

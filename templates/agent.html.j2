@@ -887,6 +887,24 @@
           <li class="live">Tool / plugin surface live</li>
           <li class="live">Package provenance drift live</li>
         </ul>
+
+        {% if drift_events %}
+        <div class="runtime-kicker" style="margin-top:18px">How this surface has changed</div>
+        <p class="runtime-intro">Detected changes to {{ row.name }}'s runtime surface and supply-chain posture, from daily public-signal snapshots. A change here means our detectors see something different — a genuinely changed capability, or better evidence of an existing one.</p>
+        <div class="timeline-scroll">
+          <div class="timeline-event-list">
+          {% for e in drift_events|reverse %}
+          <div class="timeline-event">
+            <span class="timeline-date">{{ e.date }}</span>
+            <div class="timeline-body">
+              <span class="timeline-label">{{ e.label or e.type|replace('_', ' ') }}</span>
+              <div class="timeline-detail">{{ e.detail }}</div>
+            </div>
+          </div>
+          {% endfor %}
+          </div>
+        </div>
+        {% endif %}
       </div>
     </section>
 
