@@ -553,16 +553,24 @@ annotate the cutovers, never smooth across them.
   section (287 pages show it from the local 35-day history); events flow
   to the bell via the existing recent_events path. Tests:
   `tests/test_drift_timeline.py` (6, incl. the acceptance bell test).
-- [ ] **3.2 `/trends/` + the "State of Agent Trust" quarterly report — L.**
-  Ecosystem-level charts from snapshot history + `graph_summary`: MCP
-  adoption %, provider share shifts, grade-distribution migration,
-  abandonment rate by category. Then a quarterly deterministic report post
-  (same machinery as weekly snapshot posts) — **the citation magnet**:
-  journalists and LLMs cite "State of Agent Trust Q3 2026" and every
-  citation points here (assets #1+#2). *Accept:* trends page renders from
-  ≥2 snapshots with era boundaries marked; Q3 report generates on the
-  quarter boundary with every figure traceable to snapshot data (reuse the
-  fact-check test pattern from T2.3).
+- [x] **3.2 `/trends/` + "State of Agent Trust" quarterly report — DONE
+  2026-07-09 (merged, NOT deployed per owner).** `/trends/` renders 5
+  era-annotated SVG line charts from the 38-day local history
+  (`compute_ecosystem_trends` + `render_trend_chart_svg`): roster, MCP
+  implemented, grade distribution (lines BREAK at every methodology change
+  — a cutover redefines the bands, so charting across one would fake a
+  migration; all 6 markers v2.0→v4.2 drawn), provider dependencies (top-6
+  from graph_summary), staleness. In Registry nav + llms.txt + sitemap.
+  Quarterly reports via `compute_quarterly_reports` (same deterministic
+  contract as T2.3 weekly posts: completed quarters only, ≥21 snapshot
+  days, every figure traces to the two snapshots it names) → `blog_
+  quarterly.html.j2`, wired to blog index + sitemap + JSON feed. **Signal-
+  capture honesty:** metrics baseline at first *informative* snapshot in
+  the quarter (not day 1) so detector rollout doesn't read as ecosystem
+  change ("MCP 0→102" corrected to "66→102"); the report discloses each
+  baseline date + a tracking-began note. Live Q2 2026 report generated.
+  Tests: `tests/test_trends.py` (9, incl. fact-check + baseline +
+  era-break).
 - [ ] **3.3 Public 90-day history API — M.** `/api/v1/agents/<slug>/history`
   serving the last 90 days of public fields per the open-core boundary
   (extended history stays reserved for a future paid layer — do not expose

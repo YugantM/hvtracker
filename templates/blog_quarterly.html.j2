@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ post.title }} | HVTracker</title>
+  <meta name="description" content="{{ post.excerpt }}">
+  <link rel="canonical" href="https://hvtracker.net/blog/{{ post.slug }}/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ post.title }}">
+  <meta property="og:description" content="{{ post.excerpt }}">
+  <meta property="og:url" content="https://hvtracker.net/blog/{{ post.slug }}/">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ post.title }}">
+  <meta name="twitter:description" content="{{ post.excerpt }}">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": {{ post.title | tojson }},
+    "description": {{ post.excerpt | tojson }},
+    "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "publisher": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "datePublished": "{{ post.date_iso }}",
+    "dateModified": "{{ post.date_iso }}",
+    "mainEntityOfPage": "https://hvtracker.net/blog/{{ post.slug }}/"
+  }
+  </script>
+  <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--muted:#6f665d}
+    body{background:var(--paper);color:var(--ink);font:17px/1.7 var(--font-sans)}
+    a{color:inherit}
+    .page{max-width:760px;margin:0 auto;padding:24px 24px 56px}
+    .logo{font-family:var(--font-mono);font-weight:700;font-size:20px;text-decoration:none}.logo span{color:var(--lobster)}
+    .crumb{font:12px var(--font-mono);color:var(--muted);margin:18px 0 26px}
+    h1{font-size:32px;line-height:1.15;letter-spacing:-.02em;margin-bottom:10px}
+    .meta{font:13px var(--font-mono);color:var(--muted);margin-bottom:26px}
+    h2{font-size:21px;margin:34px 0 12px}
+    p{margin:0 0 16px}
+    table{width:100%;border-collapse:collapse;font-size:14px;margin:0 0 10px}
+    th{font:11px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:6px 10px 6px 0;border-bottom:1px solid var(--line)}
+    td{padding:7px 10px 7px 0;border-bottom:1px solid var(--line)}
+    td.num{font-family:var(--font-mono)}
+    .note{font-size:13px;color:var(--muted)}
+    .foot{margin-top:38px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+  </style>
+</head>
+<body>
+<div class="page">
+  <a class="logo" href="/">HV<span>Tracker</span></a>
+  <div class="crumb"><a href="/blog/">Blog</a> / State of Agent Trust</div>
+  <article>
+    <h1>{{ post.title }}</h1>
+    <div class="meta">{{ post.date_display }} · {{ post.stats.start_date }} → {{ post.stats.end_date }} · {{ post.stats.snapshot_days }} daily snapshots · CC BY 4.0</div>
+
+    <p>{{ post.excerpt }}</p>
+    <p class="note">Every figure below is computed from HVTracker's public daily registry snapshots for the quarter — the same data anyone can download and recheck. Methodology version{{ "s" if post.stats.methodology_versions|length != 1 else "" }} active during the quarter: {{ post.stats.methodology_versions | join(", ") }}. Because scoring definitions can change between versions, this report tracks <strong>score-independent</strong> ecosystem facts; the grade table is a point-in-time distribution at quarter end, not a trend.</p>
+    {% if post.stats.tracking_began %}
+    <p class="note"><strong>Coverage note:</strong> HVTracker began daily tracking on {{ post.stats.tracking_began }}, so registry growth this quarter largely reflects the initial roster build-out rather than newly created projects.</p>
+    {% endif %}
+    {% if post.stats.field_baselines %}
+    <p class="note"><strong>Signal-capture note:</strong> some signals started being captured during the quarter; their "start" columns baseline at first capture rather than the quarter start — {% for label, d in post.stats.field_baselines.items() %}{{ label }} from {{ d }}{% if not loop.last %}, {% endif %}{% endfor %}.</p>
+    {% endif %}
+
+    <h2>Registry</h2>
+    <table>
+      <thead><tr><th>Measure</th><th>Start of quarter</th><th>End of quarter</th></tr></thead>
+      <tbody>
+        <tr><td>Agents tracked</td><td class="num">{{ post.stats.agents_start }}</td><td class="num">{{ post.stats.agents_end }}</td></tr>
+        <tr><td>MCP servers implemented</td><td class="num">{{ post.stats.mcp_start }}</td><td class="num">{{ post.stats.mcp_end }}</td></tr>
+        <tr><td>Build provenance published</td><td class="num">{{ post.stats.provenance_start }}</td><td class="num">{{ post.stats.provenance_end }}</td></tr>
+        <tr><td>Stale (no push ≥ 90 days)</td><td class="num">{{ post.stats.stale_start }}</td><td class="num">{{ post.stats.stale_end }}</td></tr>
+      </tbody>
+    </table>
+    <p>{{ post.stats.newly_listed }} project{{ "s" if post.stats.newly_listed != 1 else "" }} entered the registry during the quarter; {{ post.stats.delisted }} left active tracking.</p>
+
+    <h2>Provider dependencies at quarter end</h2>
+    <table>
+      <thead><tr><th>Provider</th><th>Agents depending on it</th></tr></thead>
+      <tbody>
+        {% for p in post.stats.top_providers %}
+        <tr><td>{{ p.name }}</td><td class="num">{{ p.count }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if post.stats.provider_gainers %}
+    <p>Fastest-growing dependencies this quarter: {% for g in post.stats.provider_gainers %}{{ g.name }} (+{{ g.delta }}){% if not loop.last %}, {% endif %}{% endfor %}.</p>
+    {% endif %}
+
+    <h2>Trust-grade distribution at quarter end</h2>
+    <table>
+      <thead><tr><th>Grade</th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead>
+      <tbody>
+        <tr><td>Agents</td><td class="num">{{ post.stats.grades_end.A }}</td><td class="num">{{ post.stats.grades_end.B }}</td><td class="num">{{ post.stats.grades_end.C }}</td><td class="num">{{ post.stats.grades_end.D }}</td></tr>
+      </tbody>
+    </table>
+
+    <div class="foot">
+      Auto-generated from registry snapshots at render time — no numbers are written by hand. Data: CC BY 4.0, attribution "HVTracker (hvtracker.net)". Live charts: <a href="/trends/">/trends/</a> · Method: <a href="/methodology/">/methodology/</a> · Verify any score: <a href="/methodology/#verify-yourself">verify yourself</a>.
+    </div>
+  </article>
+</div>
+</body>
+</html>
