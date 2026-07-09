@@ -371,6 +371,43 @@ def test_agent_page_links_capability_surface(client):
     assert 'href="/ecosystem/anthropic/"' in r.text
 
 
+def test_api_v1_agent_history(client):
+    """Plan 3.3: per-agent 90-day public history — one entry per snapshot
+    day, public fields only, CORS + cache headers, window capped."""
+    r = client.get("/api/v1/agents/haystack/history")
+    assert r.status_code == 200
+    assert r.headers["access-control-allow-origin"] == "*"
+    assert "max-age=900" in r.headers["cache-control"]
+    body = r.json()
+    assert body["slug"] == "haystack"
+    assert body["window_days"] == 90
+    assert body["count"] == len(body["history"])
+    assert "CC BY 4.0" in body["license"]
+    if body["history"]:
+        pt = body["history"][0]
+        assert "date" in pt
+        # only whitelisted public fields leak through — no evidence blobs,
+        # no trust_breakdown, no internal v2 aliases
+        allowed = {"date", "rank", "trust_score", "evidence_grade",
+                   "coverage_grade", "trust_confidence", "has_provenance",
+                   "scorecard_score", "signed_commits_ratio", "stars",
+                   "weekly_downloads", "days_ago", "listing_status",
+                   "methodology_version"}
+        assert set(pt) <= allowed
+        # entries are date-ordered and inside the 90-day window
+        import datetime as _dt
+        dates = [p["date"] for p in body["history"]]
+        assert dates == sorted(dates)
+        cutoff = (_dt.date.today() - _dt.timedelta(days=90)).isoformat()
+        assert all(d >= cutoff for d in dates)
+
+
+def test_api_v1_agent_history_unknown_404(client):
+    r = client.get("/api/v1/agents/not-a-real-agent/history")
+    assert r.status_code == 404
+    assert r.headers["access-control-allow-origin"] == "*"
+
+
 def test_api_v1_graph(client):
     r = client.get("/api/v1/graph")
     assert r.status_code == 200

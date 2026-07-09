@@ -571,11 +571,20 @@ annotate the cutovers, never smooth across them.
   baseline date + a tracking-began note. Live Q2 2026 report generated.
   Tests: `tests/test_trends.py` (9, incl. fact-check + baseline +
   era-break).
-- [ ] **3.3 Public 90-day history API — M.** `/api/v1/agents/<slug>/history`
-  serving the last 90 days of public fields per the open-core boundary
-  (extended history stays reserved for a future paid layer — do not expose
-  the full series). *Accept:* endpoint documented on the API page; window
-  enforced by test.
+- [x] **3.3 Public 90-day history API — DONE 2026-07-09 (merged, NOT
+  deployed per owner).** `GET /api/v1/agents/<slug>/history` serves one
+  entry per daily snapshot over a **hard 90-day window**
+  (`_HISTORY_PUBLIC_DAYS`), oldest first, with a `_HISTORY_PUBLIC_FIELDS`
+  whitelist (rank, trust_score, both grades, confidence, provenance,
+  scorecard, signed-commits, stars, downloads, days_ago, listing_status,
+  methodology_version) — no evidence blobs, trust_breakdown, or internal
+  v2 aliases leak. CORS `*` + 900s cache like the other v1 routes; 404 for
+  unknown slug; counted in `machine_usage.api_v1` (from 1.2). Response
+  carries the CC BY 4.0 note pointing beyond 90d to the quarterly export.
+  Documented on `/data-api/`. Tests: window cap, field whitelist,
+  date-ordering, CORS/cache, 404 in `tests/test_api.py`. Open-core
+  boundary honored — extended continuous history stays reserved for a
+  future tier.
 
 ### Phase 4 — Two-sided platform (gated: start only after Phases 1–2 ship
 and either traffic doubles or maintainer inbound appears)
