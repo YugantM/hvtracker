@@ -2500,6 +2500,254 @@ def compute_snapshot_posts(history: list[dict]) -> list[dict]:
     return posts
 
 
+def compute_ecosystem_trends(history: list[dict]) -> dict:
+    """Ecosystem-level daily series for /trends/ (master plan 3.2).
+
+    One point per snapshot day: roster size, trust-grade distribution,
+    MCP-implemented count, stale share, and per-provider dependency counts
+    (from graph_summary where present). `eras` lists every day the
+    METHODOLOGY_VERSION changed — grade series must never be drawn across
+    those boundaries (a cutover redefines the bands, it isn't a migration).
+    """
+    days: list[dict] = []
+    eras: list[dict] = []
+    prev_version = None
+    for snap in history:
+        date = snap.get("_date")
+        if not date:
+            continue
+        agents = snap.get("agents", [])
+        version = snap.get("methodology_version")
+        grades = {"A": 0, "B": 0, "C": 0, "D": 0}
+        mcp_implemented = 0
+        stale = 0
+        for a in agents:
+            g = a.get("evidence_grade")
+            if g in grades:
+                grades[g] += 1
+            if (a.get("mcp_server_support") or {}).get("status") == "implemented":
+                mcp_implemented += 1
+            if (a.get("days_ago") or 0) >= 90:
+                stale += 1
+        gs = snap.get("graph_summary") or {}
+        days.append({
+            "date": date,
+            "methodology_version": version,
+            "total": len(agents),
+            "grades": grades,
+            "mcp_implemented": mcp_implemented,
+            "stale_90d": stale,
+            "providers": gs.get("providers") or None,
+        })
+        if version != prev_version and prev_version is not None:
+            eras.append({"date": date, "version": version})
+        prev_version = version
+    return {"days": days, "eras": eras}
+
+
+def render_trend_chart_svg(days: list[dict], series: list[dict], *,
+                           break_at_eras: bool = False,
+                           width: int = 760, height: int = 200) -> str:
+    """Multi-line SVG chart over snapshot days.
+
+    series: [{"label", "color", "values": [float|None per day]}]. Lines
+    break at None gaps, and — when break_at_eras is set — at methodology
+    boundaries, which are always drawn as dashed markers with the version
+    name (charting a score-band series across a cutover would render the
+    redefinition as a fake migration).
+    """
+    if len(days) < 2 or not series:
+        return ""
+    pad_l, pad_r, pad_t, pad_b = 40, 12, 10, 30
+    plot_w, plot_h = width - pad_l - pad_r, height - pad_t - pad_b
+    n = len(days)
+    era_idx = {i for i in range(1, n)
+               if days[i].get("methodology_version") != days[i - 1].get("methodology_version")}
+    all_vals = [v for s in series for v in s["values"] if v is not None]
+    if not all_vals:
+        return ""
+    y_max = max(all_vals) or 1
+    y_min = 0
+
+    def _x(i: int) -> float:
+        return pad_l + plot_w * i / (n - 1)
+
+    def _y(v: float) -> float:
+        return pad_t + plot_h * (1 - (v - y_min) / (y_max - y_min or 1))
+
+    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
+             f'width="100%" role="img" aria-label="trend chart">']
+    # y gridlines (0, mid, max)
+    for v in (y_min, y_max / 2, y_max):
+        y = _y(v)
+        parts.append(f'<line x1="{pad_l}" y1="{y:.1f}" x2="{width - pad_r}" y2="{y:.1f}" '
+                     'stroke="#d8d2c8" stroke-width="1"/>')
+        parts.append(f'<text x="{pad_l - 6}" y="{y + 4:.1f}" text-anchor="end" '
+                     f'font-size="10" fill="#6f665d" font-family="monospace">{v:.0f}</text>')
+    # month ticks
+    seen_months = set()
+    for i, d in enumerate(days):
+        month = d["date"][:7]
+        if month not in seen_months:
+            seen_months.add(month)
+            parts.append(f'<text x="{_x(i):.1f}" y="{height - 8}" text-anchor="middle" '
+                         f'font-size="10" fill="#6f665d" font-family="monospace">{d["date"][5:7]}/{d["date"][2:4]}</text>')
+    # era markers
+    for i in sorted(era_idx):
+        x = _x(i)
+        parts.append(f'<line x1="{x:.1f}" y1="{pad_t}" x2="{x:.1f}" y2="{pad_t + plot_h}" '
+                     'stroke="#9b3c3c" stroke-width="1" stroke-dasharray="4,3"/>')
+        parts.append(f'<text x="{x + 3:.1f}" y="{pad_t + 10}" font-size="9" fill="#9b3c3c" '
+                     f'font-family="monospace">{days[i].get("methodology_version") or ""}</text>')
+    # series polylines, broken at gaps (and eras when requested)
+    for s in series:
+        seg: list[str] = []
+        for i, v in enumerate(s["values"]):
+            boundary = break_at_eras and i in era_idx
+            if v is None or boundary:
+                if len(seg) >= 2:
+                    parts.append(f'<polyline points="{" ".join(seg)}" fill="none" '
+                                 f'stroke="{s["color"]}" stroke-width="1.8"/>')
+                seg = []
+            if v is not None:
+                seg.append(f"{_x(i):.1f},{_y(v):.1f}")
+        if len(seg) >= 2:
+            parts.append(f'<polyline points="{" ".join(seg)}" fill="none" '
+                         f'stroke="{s["color"]}" stroke-width="1.8"/>')
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+def compute_quarterly_reports(history: list[dict], min_days: int = 21) -> list[dict]:
+    """Deterministic "State of Agent Trust" posts, one per completed calendar
+    quarter with at least `min_days` snapshot days (master plan 3.2 — the
+    citation magnet). Same contract as compute_snapshot_posts: every figure
+    comes from the two snapshots it names, so posts regenerate
+    byte-identically and appear automatically when a quarter completes.
+
+    Figures are deliberately SCORE-INDEPENDENT (roster, MCP adoption,
+    provenance, providers, staleness) plus a point-in-time grade
+    distribution at quarter end — never grade/score *trends*, which cannot
+    be charted across the methodology changes a quarter may span.
+    """
+    def _quarter(date_str: str) -> tuple[int, int]:
+        return int(date_str[:4]), (int(date_str[5:7]) - 1) // 3 + 1
+
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    current_q = _quarter(today)
+    by_q: dict[tuple[int, int], list[dict]] = {}
+    for snap in history:
+        date = snap.get("_date")
+        if not date:
+            continue
+        q = _quarter(date)
+        if q >= current_q:
+            continue  # only completed quarters
+        by_q.setdefault(q, []).append(snap)
+
+    history_first_date = min((s["_date"] for s in history if s.get("_date")), default=None)
+    posts = []
+    for (year, qn), snaps in sorted(by_q.items()):
+        if len(snaps) < min_days:
+            continue
+        snaps.sort(key=lambda s: s["_date"])
+        first, last = snaps[0], snaps[-1]
+        f_agents, l_agents = first.get("agents", []), last.get("agents", [])
+        f_repos = {a["repo"].lower() for a in f_agents}
+        l_repos = {a["repo"].lower() for a in l_agents}
+
+        def _mcp(agents):
+            return sum(1 for a in agents
+                       if (a.get("mcp_server_support") or {}).get("status") == "implemented")
+
+        def _prov(agents):
+            return sum(1 for a in agents if a.get("has_provenance"))
+
+        def _stale(agents):
+            return sum(1 for a in agents if (a.get("days_ago") or 0) >= 90)
+
+        def _providers(agents):
+            counts: dict[str, int] = {}
+            for a in agents:
+                for p in (a.get("external_service_dependencies") or {}).get("providers") or []:
+                    counts[p] = counts.get(p, 0) + 1
+            return counts
+
+        # Signal capture rolled out over time: early snapshots lack some
+        # fields entirely, and for a while the MCP/provider detectors wrote
+        # the field with only empty values before detection went live.
+        # Reading either state as 0 would publish tracking artifacts as
+        # ecosystem change ("MCP 0 → 102"). Each transition metric therefore
+        # baselines at the first snapshot IN the quarter where its signal is
+        # actually informative on at least one agent; the report discloses
+        # any baseline that differs from the quarter start.
+        def _baseline(informative) -> dict:
+            return next((s for s in snaps
+                         if any(informative(a) for a in s.get("agents", []))), last)
+
+        mcp_base = _baseline(
+            lambda a: (a.get("mcp_server_support") or {}).get("status") not in (None, "none"))
+        prov_base = _baseline(lambda a: "has_provenance" in a)
+        stale_base = _baseline(lambda a: "days_ago" in a)
+        providers_base = _baseline(
+            lambda a: (a.get("external_service_dependencies") or {}).get("providers"))
+
+        grades = {"A": 0, "B": 0, "C": 0, "D": 0}
+        for a in l_agents:
+            g = a.get("evidence_grade")
+            if g in grades:
+                grades[g] += 1
+        prov_counts_start = _providers(providers_base.get("agents", []))
+        prov_counts_end = _providers(l_agents)
+        top_providers = sorted(prov_counts_end.items(), key=lambda kv: -kv[1])[:5]
+        gainers = sorted(((p, c - prov_counts_start.get(p, 0)) for p, c in prov_counts_end.items()),
+                         key=lambda kv: -kv[1])[:3]
+        versions = sorted({s.get("methodology_version") for s in snaps if s.get("methodology_version")})
+
+        stats = {
+            "start_date": first["_date"], "end_date": last["_date"],
+            "snapshot_days": len(snaps),
+            "agents_start": len(f_agents), "agents_end": len(l_agents),
+            "newly_listed": len(l_repos - f_repos),
+            "delisted": len(f_repos - l_repos),
+            "mcp_start": _mcp(mcp_base.get("agents", [])),
+            "mcp_end": _mcp(l_agents),
+            "provenance_start": _prov(prov_base.get("agents", [])),
+            "provenance_end": _prov(l_agents),
+            "stale_start": _stale(stale_base.get("agents", [])),
+            "stale_end": _stale(l_agents),
+            "grades_end": grades,
+            "top_providers": [{"name": p, "count": c} for p, c in top_providers],
+            "provider_gainers": [{"name": p, "delta": d} for p, d in gainers if d > 0],
+            "methodology_versions": versions,
+            "field_baselines": {
+                label: base["_date"]
+                for label, base in (("MCP", mcp_base), ("provenance", prov_base),
+                                    ("staleness", stale_base), ("providers", providers_base))
+                if base["_date"] != first["_date"]
+            },
+            "tracking_began": first["_date"] if first["_date"] == history_first_date else None,
+        }
+        end_dt = datetime.strptime(last["_date"], "%Y-%m-%d")
+        posts.append({
+            "slug": f"state-of-agent-trust-{year}-q{qn}",
+            "title": f"State of Agent Trust — Q{qn} {year}",
+            "year": year, "quarter": qn,
+            "date_iso": last["_date"],
+            "date_display": end_dt.strftime("%B %-d, %Y"),
+            "excerpt": (
+                f"Q{qn} {year} across {stats['agents_end']} tracked agents: "
+                f"{stats['newly_listed']} new listings, MCP-implemented servers "
+                f"{stats['mcp_start']} → {stats['mcp_end']}, build provenance "
+                f"{stats['provenance_start']} → {stats['provenance_end']}, from "
+                f"{stats['snapshot_days']} daily registry snapshots."
+            ),
+            "stats": stats,
+        })
+    posts.reverse()
+    return posts
+
+
 def build_changes_rss(sections: list[tuple[str, list[dict]]], base: str, pub_date: str) -> str:
     """Render the /changes/ RSS 2.0 feed from weekly-change sections.
 
@@ -6230,6 +6478,71 @@ def main() -> None:
         f.write(env.get_template("capabilities.html.j2").render(
             matrix=capability_matrix, updated=now_str))
     print(f"Built capability matrix ({capability_matrix['stats']['total']} agents) under capabilities/.")
+
+    # Ecosystem trends — /trends/ (plan 3.2): longitudinal charts from the
+    # daily snapshots, era-annotated at every methodology change.
+    trends = compute_ecosystem_trends(history)
+    t_days = trends["days"]
+    if len(t_days) >= 2:
+        grade_palette = {"A": "#2f6846", "B": "#2c5282", "C": "#8b6914", "D": "#9b3c3c"}
+        prov_palette = ["#2c5282", "#2f6846", "#8b6914", "#9b3c3c", "#6b6560", "#b3593c"]
+        latest_provs = next((d["providers"] for d in reversed(t_days) if d["providers"]), {})
+        top_provs = [p for p, _ in sorted(latest_provs.items(), key=lambda kv: -kv[1])[:6]]
+        trend_charts = [
+            {
+                "title": "Tracked agents",
+                "description": "Actively listed agents in the registry each day.",
+                "legend": [{"label": "Listed agents", "color": "#2c5282"}],
+                "svg": render_trend_chart_svg(t_days, [
+                    {"label": "Listed", "color": "#2c5282",
+                     "values": [d["total"] for d in t_days]}]),
+            },
+            {
+                "title": "MCP servers implemented",
+                "description": "Agents with public evidence of an implemented MCP server — adoption of the structured tool protocol.",
+                "legend": [{"label": "MCP implemented", "color": "#2f6846"}],
+                "svg": render_trend_chart_svg(t_days, [
+                    {"label": "MCP", "color": "#2f6846",
+                     "values": [d["mcp_implemented"] for d in t_days]}]),
+            },
+            {
+                "title": "Trust-grade distribution",
+                "description": "Agents per grade band. Lines restart at methodology changes — a cutover redefines the bands, so connecting across one would fake a migration.",
+                "legend": [{"label": f"Grade {g}", "color": c} for g, c in grade_palette.items()],
+                "svg": render_trend_chart_svg(t_days, [
+                    {"label": g, "color": c,
+                     "values": [d["grades"][g] for d in t_days]}
+                    for g, c in grade_palette.items()], break_at_eras=True),
+            },
+            {
+                "title": "Provider dependencies",
+                "description": "Agents depending on each of the currently-largest runtime providers (detected from manifests and credential markers).",
+                "legend": [{"label": p, "color": prov_palette[i % len(prov_palette)]}
+                           for i, p in enumerate(top_provs)],
+                "svg": render_trend_chart_svg(t_days, [
+                    {"label": p, "color": prov_palette[i % len(prov_palette)],
+                     "values": [(d["providers"] or {}).get(p) if d["providers"] else None
+                                for d in t_days]}
+                    for i, p in enumerate(top_provs)]),
+            },
+            {
+                "title": "Stale agents",
+                "description": "Agents with no repository push for 90+ days — the abandonment signal.",
+                "legend": [{"label": "Stale ≥90d", "color": "#9b3c3c"}],
+                "svg": render_trend_chart_svg(t_days, [
+                    {"label": "Stale", "color": "#9b3c3c",
+                     "values": [d["stale_90d"] for d in t_days]}]),
+            },
+        ]
+        trend_charts = [c for c in trend_charts if c["svg"]]
+        trends_dir = os.path.join(script_dir, "trends")
+        os.makedirs(trends_dir, exist_ok=True)
+        with open(os.path.join(trends_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(env.get_template("trends.html.j2").render(
+                charts=trend_charts, eras=trends["eras"],
+                day_count=len(t_days), first_date=t_days[0]["date"],
+                latest_total=t_days[-1]["total"], updated=now_str))
+        print(f"Built ecosystem trends page ({len(t_days)} days, {len(trend_charts)} charts) under trends/.")
     # Organization pages — /org/ and /org/<owner>/
     org_tmpl = env.get_template("org.html.j2")
     org_dir = os.path.join(script_dir, "org")
@@ -6551,9 +6864,22 @@ def main() -> None:
     if snapshot_posts:
         print(f"Built {len(snapshot_posts)} weekly trust-snapshot posts under blog/.")
 
+    # Quarterly "State of Agent Trust" reports (plan 3.2) — same deterministic
+    # contract, one page per completed quarter with enough snapshot coverage.
+    quarterly_reports = compute_quarterly_reports(history)
+    quarterly_tmpl = env.get_template("blog_quarterly.html.j2")
+    for post in quarterly_reports:
+        post_dir = os.path.join(blog_dir, post["slug"])
+        os.makedirs(post_dir, exist_ok=True)
+        with open(os.path.join(post_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(quarterly_tmpl.render(post=post))
+    if quarterly_reports:
+        print(f"Built {len(quarterly_reports)} quarterly State-of-Agent-Trust reports under blog/.")
+
     blog_index_html = env.get_template("blog_index.html.j2").render(
         articles=blog_articles,
         snapshot_posts=snapshot_posts,
+        quarterly_reports=quarterly_reports,
         categories=categories,
         total=len(rows),
         top_agent=rows[0],
@@ -6589,6 +6915,7 @@ def main() -> None:
     for page in use_case_pages:
         sitemap_urls.append((f"https://hvtracker.net/use-cases/{page['slug']}/", "0.8", "daily"))
     sitemap_urls.append(("https://hvtracker.net/capabilities/", "0.8", "daily"))
+    sitemap_urls.append(("https://hvtracker.net/trends/", "0.8", "daily"))
     sitemap_urls.append(("https://hvtracker.net/correct/", "0.5", "monthly"))
     sitemap_urls.append(("https://hvtracker.net/ecosystem/", "0.8", "daily"))
     for page in ecosystem_pages:
@@ -6609,6 +6936,8 @@ def main() -> None:
     sitemap_urls.append(("https://hvtracker.net/blog/calibration-fix-and-coverage-grade/", "0.9", "weekly"))
     for _p in snapshot_posts:
         sitemap_urls.append((f"https://hvtracker.net/blog/{_p['slug']}/", "0.7", "monthly"))
+    for _p in quarterly_reports:
+        sitemap_urls.append((f"https://hvtracker.net/blog/{_p['slug']}/", "0.9", "monthly"))
     sitemap_urls.append(("https://hvtracker.net/blog/ai-agents-mcp-servers-trust/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/trapdoor-supply-chain-provenance/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/mcp-server-launch/", "0.9", "weekly"))
@@ -6690,6 +7019,7 @@ HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Ma
 - [Authority descriptor](https://hvtracker.net/.well-known/hvtracker.json)
 - [Trust Credential spec](https://hvtracker.net/spec/trust-credential/v0.1)
 - [Capability matrix](https://hvtracker.net/capabilities/): per-agent runtime surface — MCP support, external providers, tool/plugin surface, provenance drift
+- [Ecosystem trends](https://hvtracker.net/trends/): MCP adoption, grade distribution, provider dependencies, and staleness over time (era-annotated); quarterly State of Agent Trust reports on the blog
 - [Quarterly dataset export](https://hvtracker.net/data/exports/hvtrust-{quarter_label()}.json.gz): citable snapshot of all public fields (also .csv at the same path)
 
 ## MCP server (trust layer for agents)
@@ -6722,6 +7052,16 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
             "tags": ["Weekly snapshot", "Supply chain trust"],
         }
         for _p in snapshot_posts
+    ] + [
+        {
+            "id": f"https://hvtracker.net/blog/{_p['slug']}",
+            "url": f"https://hvtracker.net/blog/{_p['slug']}",
+            "title": _p["title"],
+            "content_text": _p["excerpt"],
+            "date_modified": f"{_p['date_iso']}T00:00:00Z",
+            "tags": ["State of Agent Trust", "Quarterly report"],
+        }
+        for _p in quarterly_reports
     ] + [
         {
             "id": "https://hvtracker.net/blog/calibration-fix-and-coverage-grade",

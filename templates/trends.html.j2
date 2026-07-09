@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="s2YUWbGP7cJsI6HUCKRX9YCtbVJVyA1Q1_jsNWj1RHc">
+  <title>AI Agent Ecosystem Trends — MCP Adoption, Grades, Providers | HVTracker</title>
+  <meta name="description" content="Longitudinal trends across {{ latest_total }} tracked AI agents from {{ day_count }} daily registry snapshots: MCP adoption, trust-grade distribution, provider dependencies, and staleness — era-annotated at every methodology change.">
+  <link rel="canonical" href="https://hvtracker.net/trends/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AI Agent Ecosystem Trends | HVTracker">
+  <meta property="og:description" content="MCP adoption, grade distribution, provider dependencies, and staleness over time — from daily registry snapshots.">
+  <meta property="og:url" content="https://hvtracker.net/trends/">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI Agent Ecosystem Trends | HVTracker">
+  <meta name="twitter:description" content="Longitudinal ecosystem trends from HVTracker's daily registry snapshots.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--muted:#6f665d}
+    body{min-height:100vh;background:var(--paper);color:var(--ink);font:16px/1.7 var(--font-sans)}
+    a{color:inherit}
+    a:hover{text-decoration:underline}
+    .page{background:var(--paper);max-width:900px;margin:0 auto;padding:28px 24px 52px}
+    .hero{padding:28px 0 18px;border-bottom:1px solid var(--line)}
+    h1{font-size:34px;line-height:1.12;margin-bottom:10px}
+    .hero p{color:var(--muted);max-width:760px}
+    .chart-block{margin:30px 0 6px;padding-top:18px;border-top:2px solid var(--ink)}
+    .chart-block h2{font-size:20px;margin-bottom:6px}
+    .chart-block p{color:var(--muted);font-size:14px;margin-bottom:12px;max-width:720px}
+    .legend{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0 4px;font:12px var(--font-mono);color:var(--muted)}
+    .legend span::before{content:"";display:inline-block;width:10px;height:10px;margin-right:5px;background:var(--c)}
+    .era-note{margin:26px 0 0;padding:12px 14px;border:1px solid var(--line);border-left:3px solid #9b3c3c;font-size:13px;color:var(--muted)}
+    footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font:12px var(--font-mono);color:var(--muted);text-align:center}
+    footer a{color:var(--lobster)}
+    @media(max-width:640px){h1{font-size:26px}}
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Trends" }
+    ]
+  }
+  </script>
+  <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
+  <script>
+    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="trends">
+  {% include "_site_header.html.j2" %}
+  <div class="page">
+
+    <section class="hero">
+      <h1>Ecosystem Trends</h1>
+      <p>Longitudinal view of the tracked AI-agent ecosystem, computed from {{ day_count }} daily registry snapshots (since {{ first_date }}). Dashed red markers are <strong>methodology changes</strong> — score-derived series restart there instead of pretending a redefinition is a migration. Quarterly summaries publish as <a href="/blog/">State of Agent Trust reports</a>.</p>
+    </section>
+
+    {% for chart in charts %}
+    <div class="chart-block">
+      <h2>{{ chart.title }}</h2>
+      <p>{{ chart.description }}</p>
+      <div class="legend">
+        {% for s in chart.legend %}<span style="--c:{{ s.color }}">{{ s.label }}</span>{% endfor %}
+      </div>
+      {{ chart.svg | safe }}
+    </div>
+    {% endfor %}
+
+    {% if eras %}
+    <div class="era-note">
+      <strong>Methodology changes in this window:</strong>
+      {% for e in eras %}{{ e.date }} → {{ e.version }}{% if not loop.last %} · {% endif %}{% endfor %}.
+      Grade bands are redefined at each change (see the <a href="/methodology/#changelog">methodology changelog</a>), so grade series are deliberately not connected across the markers.
+    </div>
+    {% endif %}
+
+    <footer>
+      <a href="/methodology/">Methodology</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/capabilities/">Capability matrix</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/changes/">Weekly changes</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/data/">Data API</a>
+      <span class="footer-sep">&middot;</span>
+      <a href="/blog/">Blog</a>
+      &middot; Updated {{ updated }}
+    </footer>
+  </div>
+</body>
+</html>
