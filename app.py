@@ -866,6 +866,76 @@ def api_v1_agents():
     })
 
 
+# Public history window. The full time series is reserved future paid
+# surface per docs/open-core.md ("90-day public history: Yes ... Extended
+# history: paid"); this endpoint never serves beyond it.
+_HISTORY_PUBLIC_DAYS = 90
+# Per-day public fields — the subset already public on the agent page and
+# the CC BY 4.0 dataset export. NOT the full snapshot row.
+_HISTORY_PUBLIC_FIELDS = (
+    "rank", "trust_score", "evidence_grade", "coverage_grade",
+    "trust_confidence", "has_provenance", "scorecard_score",
+    "signed_commits_ratio", "stars", "weekly_downloads", "days_ago",
+    "listing_status", "methodology_version",
+)
+
+
+@app.get("/api/v1/agents/{slug}/history")
+def api_v1_agent_history(slug: str):
+    """Last 90 days of an agent's public trust fields, one entry per daily
+    snapshot (oldest first). Extended history stays reserved for a future
+    paid tier, so the window is capped regardless of how much we hold."""
+    agent = find_agent_by_slug(slug)
+    if agent is None:
+        return JSONResponse({"error": "agent not found"}, status_code=404,
+                            headers={"Access-Control-Allow-Origin": _API_V1_CORS})
+    repo_key = (agent.get("repo") or "").lower()
+    hist_dir = os.path.join(OUTPUT_DIR, "output", "history")
+    cutoff = (datetime.now(timezone.utc).date()
+              - timedelta(days=_HISTORY_PUBLIC_DAYS - 1)).isoformat()
+
+    entries = []
+    if os.path.isdir(hist_dir):
+        for fn in sorted(os.listdir(hist_dir)):
+            if not (len(fn) == 15 and fn.endswith(".json")):
+                continue
+            date_str = fn[:-5]
+            if date_str < cutoff:
+                continue  # outside the public window
+            try:
+                with open(os.path.join(hist_dir, fn), encoding="utf-8") as f:
+                    snap = json.load(f)
+            except (OSError, json.JSONDecodeError):
+                continue
+            mv = snap.get("methodology_version")
+            for a in snap.get("agents", []):
+                if (a.get("repo") or "").lower() != repo_key:
+                    continue
+                point = {"date": date_str}
+                for k in _HISTORY_PUBLIC_FIELDS:
+                    if k == "methodology_version":
+                        point[k] = a.get(k, mv)
+                    elif k in a:
+                        point[k] = a[k]
+                entries.append(point)
+                break
+
+    return JSONResponse({
+        "slug": agent.get("slug"),
+        "repo": agent.get("repo"),
+        "name": agent.get("name"),
+        "window_days": _HISTORY_PUBLIC_DAYS,
+        "count": len(entries),
+        "note": ("Public 90-day window. Full history is available under the "
+                 "CC BY 4.0 quarterly dataset export and future extended-history access."),
+        "license": "CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/",
+        "history": entries,
+    }, headers={
+        "Cache-Control": _API_V1_CACHE,
+        "Access-Control-Allow-Origin": _API_V1_CORS,
+    })
+
+
 @app.get("/api/v1/mcp/verify")
 def api_v1_mcp_verify(request: Request, server: str = ""):
     """Pre-connect trust verdict for an agent or MCP server.
@@ -1905,6 +1975,11 @@ def data_api_page():
       <div class='card' style='margin-top:12px'>
         <h2 style='font-family:var(--font-mono);font-size:13px'><code>GET /data/agents/&lt;slug&gt;.json</code> · <code>GET /data/latest.json</code></h2>
         <p>Per-agent record with the full signal set and an <strong>Ed25519-signed <code>trust_credential</code></strong> (verify it offline — see <a href='/methodology/#verify-yourself'>verify a score yourself</a>), and the full-registry snapshot. Machine discovery starts at <a href='/.well-known/hvtracker.json'><code>/.well-known/hvtracker.json</code></a>.</p>
+      </div>
+      <div class='card' style='margin-top:12px'>
+        <h2 style='font-family:var(--font-mono);font-size:13px'><code>GET /api/v1/agents/&lt;slug&gt;/history</code></h2>
+        <p>An agent's public trust fields over the <strong>last 90 days</strong>, one entry per daily snapshot (rank, HVTrust, grades, provenance, Scorecard, downloads, stars). Beyond 90 days, use the <a href='#'>quarterly dataset export</a> below; deeper continuous history is reserved for a future tier.</p>
+        <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>curl -s https://hvtracker.net/api/v1/agents/haystack/history | python -m json.tool | head</code></pre>
       </div>
       <p style='margin-top:12px;color:var(--muted);font-size:13px'><strong>Stability promise:</strong> within v1, fields are add-only — existing fields are never renamed or removed; breaking changes ship under a new path version. Data license: <strong>CC BY 4.0</strong>, attribution "HVTracker (hvtracker.net)". Auth and rate quotas for a paid tier are intentionally out of scope for now.</p>
     </div>
