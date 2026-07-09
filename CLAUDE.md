@@ -342,5 +342,16 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   Cloudflare-cached copy without it — `cf-cache-status:HIT`, cleared on
   edge TTL). Next: Phase 4 (maintainer claim v2, incident
   annotations, A2A interop) is gated on traffic/inbound; interim owner
-  items — Dependabot #133, hvtrust-gate Marketplace listing, GSC URL
-  export for the 2.1 precision pass.
+  items — hvtrust-gate Marketplace listing, GSC URL export for the 2.1
+  precision pass.
+- **Phase 4 HELD 2026-07-09 (owner)** — gate (traffic double / maintainer
+  inbound) not yet met; each 4.x task needs an owner product/security call.
+  Cleared the unblocked interim items instead: **Dependabot #133 merged**
+  (#133 — fastapi 0.139, uvicorn 0.51, mcp 1.28.1, boto3, apscheduler,
+  pytest 9.1.1, ruff 0.15.20, pip-audit; all 3 gates re-run green under
+  the bumped stack) — **these deps are on main but NOT on prod yet; the
+  next `railway up` picks them up at build time**. **Sitemap-lastmod
+  test flake FIXED** (#150 — froze `fetch_and_build.datetime` across the
+  fixture's 3 renders; it had degraded to failing even in isolation as
+  renders slowed). Remaining owner-only: hvtrust-gate Marketplace listing,
+  GSC URL export.
