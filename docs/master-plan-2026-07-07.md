@@ -541,12 +541,18 @@ Theme: surface the only asset nobody can copy. **All trend features must
 segment at METHODOLOGY_VERSION boundaries** (§1.4) — chart within eras,
 annotate the cutovers, never smooth across them.
 
-- [ ] **3.1 T3.5 runtime-drift monitoring — L.** Per-agent drift timeline
-  from history snapshots (fields locked by #89): capability surface grew/
-  shrank, provenance changes, maintainer inactivity onset. Render-time
-  computation → agent-page section + `drift` event type feeding 2.4 bell
-  alerts. *Accept:* an agent with a synthetic drift in test snapshots shows
-  the timeline and emits one event.
+- [x] **3.1 T3.5 runtime-drift monitoring — DONE 2026-07-09 (merged, NOT
+  deployed per owner).** `derive_agent_events` gains capability-surface
+  events from the #89-locked snapshot fields: `mcp_status_changed`,
+  `provider_added`/`provider_removed` (surface grew/shrank, names listed),
+  `tool_surface_changed` — wording says "detected" throughout since
+  detector improvements also move these (#96-#99 lesson). Provenance/
+  drift/staleness events already existed (2.4). New `filter_drift_events`
+  + `DRIFT_EVENT_TYPES` select the drift-class subset for a "How this
+  surface has changed" timeline inside the agent page's AI-agent-surface
+  section (287 pages show it from the local 35-day history); events flow
+  to the bell via the existing recent_events path. Tests:
+  `tests/test_drift_timeline.py` (6, incl. the acceptance bell test).
 - [ ] **3.2 `/trends/` + the "State of Agent Trust" quarterly report — L.**
   Ecosystem-level charts from snapshot history + `graph_summary`: MCP
   adoption %, provider share shifts, grade-distribution migration,
