@@ -317,6 +317,25 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   suppressed) + drift_warning_raised/cleared; bell path verified. (2.1)
   related-agents strip (`related_agents`, 4 category neighbours) on every
   agent page; GSC-precision half still needs the owner's Search Console
-  URL export. Suite at 266 tests. Next: deploy when instructed; then
-  Phase 3 (drift monitoring T3.5, /trends/ + quarterly report, 90-day
-  history API) per the master plan; Dependabot #133 still open.
+  URL export.
+- **Phase 3 COMPLETE (code) 2026-07-09** (#145–#147; merged, **NOT
+  deployed** — owner ran Phase 3 as local-only, deferred all `railway up`).
+  (3.1 T3.5) `derive_agent_events` gains capability-surface drift
+  (`mcp_status_changed`, `provider_added`/`removed`, `tool_surface_changed`;
+  "detected" wording per the #96-#99 detector-vs-reality lesson) →
+  `filter_drift_events`/`DRIFT_EVENT_TYPES` → "How this surface has
+  changed" timeline on agent pages + bell. (3.2) `/trends/` = 5
+  era-annotated SVG charts (`compute_ecosystem_trends`,
+  `render_trend_chart_svg`; grade series BREAK at every METHODOLOGY_VERSION
+  marker) in Registry nav + llms.txt + sitemap; quarterly "State of Agent
+  Trust" reports (`compute_quarterly_reports`, deterministic like T2.3,
+  ≥21 snapshot days, `blog_quarterly.html.j2`) — metrics baseline at first
+  INFORMATIVE snapshot so detector rollout isn't reported as change
+  ("MCP 0→102"→"66→102"), with disclosure notes. (3.3)
+  `GET /api/v1/agents/<slug>/history` — hard 90-day window, public-field
+  whitelist, CC BY 4.0, open-core boundary honored (extended history =
+  future tier). Suite at 283 tests. **Deploy pending owner instruction**
+  (#145-#147 unshipped). Next: Phase 4 (maintainer claim v2, incident
+  annotations, A2A interop) is gated on traffic/inbound; interim owner
+  items — Dependabot #133, hvtrust-gate Marketplace listing, GSC URL
+  export for the 2.1 precision pass.
