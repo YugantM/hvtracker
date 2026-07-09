@@ -334,8 +334,13 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   ("MCP 0→102"→"66→102"), with disclosure notes. (3.3)
   `GET /api/v1/agents/<slug>/history` — hard 90-day window, public-field
   whitelist, CC BY 4.0, open-core boundary honored (extended history =
-  future tier). Suite at 283 tests. **Deploy pending owner instruction**
-  (#145-#147 unshipped). Next: Phase 4 (maintainer claim v2, incident
+  future tier). Suite at 283 tests. **DEPLOYED 2026-07-09 ~15:07 UTC**
+  (@78352d114, clean-worktree `railway up`, ~100s, no CREATE_CONTAINER
+  blip). Verified live: healthz ok/324/in-sync; /trends/ 200 with charts;
+  Q2 report "MCP 66→104"; drift timeline on agent pages; history API
+  `window:90 count:48`; Trends nav link present (homepage briefly served a
+  Cloudflare-cached copy without it — `cf-cache-status:HIT`, cleared on
+  edge TTL). Next: Phase 4 (maintainer claim v2, incident
   annotations, A2A interop) is gated on traffic/inbound; interim owner
   items — Dependabot #133, hvtrust-gate Marketplace listing, GSC URL
   export for the 2.1 precision pass.
