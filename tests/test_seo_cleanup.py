@@ -19,10 +19,29 @@ import os
 import shutil
 import tempfile
 from collections import defaultdict
+from datetime import datetime, timezone
+from unittest import mock
 
 import pytest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# The lastmod-stability assertion compares three renders of identical data.
+# Renders take minutes each now (the site grew a lot), so wall-clock time
+# advances between them, and any page carrying a relative-time value
+# (days_ago, "N hours ago") re-hashes and re-stamps — a spurious failure.
+# Freeze the clock fetch_and_build sees so all three renders are byte-stable.
+_FROZEN_NOW = datetime(2026, 7, 9, 12, 0, 0, tzinfo=timezone.utc)
+
+
+class _FrozenDatetime(datetime):
+    @classmethod
+    def now(cls, tz=None):
+        return _FROZEN_NOW if tz is None else _FROZEN_NOW.astimezone(tz)
+
+    @classmethod
+    def utcnow(cls):
+        return _FROZEN_NOW.replace(tzinfo=None)
 
 SENTINEL_LASTMOD = "2020-01-01"
 SENTINEL_PUBLISHED = "2020-02-02"
@@ -55,15 +74,18 @@ def site():
     os.environ["DISABLE_SCHEDULER"] = "1"
 
     import fetch_and_build
-    fetch_and_build.run_refresh("render")  # writes today's history snapshot
-    fetch_and_build.run_refresh("render")  # steady state
+    # Freeze fetch_and_build's clock across all renders in this fixture so
+    # relative-time content is identical between them (see _FROZEN_NOW).
+    with mock.patch.object(fetch_and_build, "datetime", _FrozenDatetime):
+        fetch_and_build.run_refresh("render")  # writes today's history snapshot
+        fetch_and_build.run_refresh("render")  # steady state
 
-    seo_path = os.path.join(tmp, "data", "seo_state.json")
-    with open(seo_path, encoding="utf-8") as f:
-        state1 = json.load(f)
+        seo_path = os.path.join(tmp, "data", "seo_state.json")
+        with open(seo_path, encoding="utf-8") as f:
+            state1 = json.load(f)
 
-    with open(os.path.join(tmp, "data", "render_state.json"), encoding="utf-8") as f:
-        rows = json.load(f)["rows"]
+        with open(os.path.join(tmp, "data", "render_state.json"), encoding="utf-8") as f:
+            rows = json.load(f)["rows"]
 
     # Fabricate a persisted pair no current top-3 combination produces:
     # category leader vs the category's #4.
@@ -91,7 +113,8 @@ def site():
     with open(seo_path, "w", encoding="utf-8") as f:
         json.dump(doctored, f)
 
-    fetch_and_build.run_refresh("render")
+    with mock.patch.object(fetch_and_build, "datetime", _FrozenDatetime):
+        fetch_and_build.run_refresh("render")
     with open(seo_path, encoding="utf-8") as f:
         state2 = json.load(f)
 
