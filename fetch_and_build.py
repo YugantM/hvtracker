@@ -4789,15 +4789,34 @@ def load_existing_data_repos(data_path: str) -> set[str]:
         return set()
 
 
+def _commit_count_suspect(a: dict) -> bool:
+    """True when a row's 4-week commit count needs (re)fetching.
+
+    None = never fetched. 0 with a push inside the window is near-
+    contradictory (a push implies commits; rare tag/wiki-only pushes get
+    re-checked cheaply and settle via the low-confidence handling) — rows
+    written before the None-seed fix have this 0 baked in, and the GraphQL
+    signals prefetch can miss a repo indefinitely, so both states self-heal
+    through the repair pass.
+    """
+    if not a.get("repo"):
+        return False
+    commits = a.get("weekly_commits")
+    if commits is None:
+        return True
+    days = a.get("days_ago")
+    return commits == 0 and days is not None and days <= 28
+
+
 def load_repos_with_missing_commits(data_path: str) -> set[str]:
-    """Return repos whose generated row has a missing 4-week commit count."""
+    """Return repos whose generated row has a missing/suspect commit count."""
     try:
         with open(data_path, encoding="utf-8") as f:
             existing = json.load(f)
         return {
             a["repo"].lower()
             for a in existing.get("agents", [])
-            if a.get("repo") and a.get("weekly_commits") is None
+            if _commit_count_suspect(a)
         }
     except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
         return set()

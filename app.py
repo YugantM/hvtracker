@@ -2292,11 +2292,25 @@ def _sync_prebuilt_to_volume() -> bool:
 
 
 def _has_missing_commit_rows() -> bool:
-    """Detect broken generated rows where weekly_commits is missing."""
+    """Detect rows whose 4-week commit count needs (re)fetching, so startup
+    kicks the repair-commits refresh. Must match fetch_and_build's
+    _commit_count_suspect: None = never fetched; 0 alongside a push inside
+    the window is near-contradictory (a push implies commits) and covers
+    rows written before the None-seed fix plus GraphQL-prefetch misses."""
+    # Inlined (not imported) to keep fetch_and_build out of the web process.
+    def suspect(a: dict) -> bool:
+        if not a.get("repo"):
+            return False
+        commits = a.get("weekly_commits")
+        if commits is None:
+            return True
+        days = a.get("days_ago")
+        return commits == 0 and days is not None and days <= 28
+
     try:
         with open(DATA_PATH, encoding="utf-8") as f:
             data = json.load(f)
-        return any(a.get("weekly_commits") is None for a in data.get("agents", []))
+        return any(suspect(a) for a in data.get("agents", []))
     except (OSError, json.JSONDecodeError, TypeError):
         return False
 

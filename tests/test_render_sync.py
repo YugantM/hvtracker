@@ -98,10 +98,29 @@ def test_missing_commit_detection_catches_provisional_rows(tmp_path, monkeypatch
     p.write_text(json.dumps(data))
     monkeypatch.setattr(app_mod, "DATA_PATH", str(p))
     assert app_mod._has_missing_commit_rows() is True
-    # and stays quiet when every row has a real count
-    data["agents"][1]["weekly_commits"] = 0
+    # 0 commits on a long-quiet repo is a real count — stays quiet
+    data["agents"][1]["weekly_commits"] = 0  # provisional days_ago is 999
     p.write_text(json.dumps(data))
     assert app_mod._has_missing_commit_rows() is False
+    # 0 commits but pushed inside the window is near-contradictory
+    # (a push implies commits) — re-check it
+    data["agents"][1]["days_ago"] = 4
+    p.write_text(json.dumps(data))
+    assert app_mod._has_missing_commit_rows() is True
+
+
+def test_commit_count_suspect_predicate():
+    """Shared predicate for the repair selector and the startup trigger."""
+    ok = {"repo": "a/b", "weekly_commits": 12, "days_ago": 2}
+    never_fetched = {"repo": "a/b", "weekly_commits": None, "days_ago": 999}
+    quiet = {"repo": "a/b", "weekly_commits": 0, "days_ago": 200}
+    contradictory = {"repo": "a/b", "weekly_commits": 0, "days_ago": 4}
+    no_repo = {"weekly_commits": None}
+    assert fb._commit_count_suspect(ok) is False
+    assert fb._commit_count_suspect(never_fetched) is True
+    assert fb._commit_count_suspect(quiet) is False
+    assert fb._commit_count_suspect(contradictory) is True
+    assert fb._commit_count_suspect(no_repo) is False
 
 
 def test_provisional_listing_skips_already_present():
