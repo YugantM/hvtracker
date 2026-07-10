@@ -355,3 +355,28 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   fixture's 3 renders; it had degraded to failing even in isolation as
   renders slowed). Remaining owner-only: hvtrust-gate Marketplace listing,
   GSC URL export.
+- **Platform-health pass 2026-07-10** (#157–#161, DEPLOYED ~16:34 UTC —
+  this deploy also took the #133 dep bumps live; suite 289 tests): the
+  "new agents have no commits/scorecard" report traced to 4 defects, all
+  fixed+verified live. (①#157) scorecard-scan reshard 4→6 — roster growth
+  to 351 made 82-repo shards get runner-killed (exit 143), so repos after
+  the kill never scanned (why deepanalyze scorecard=None; heals at next
+  green scan + cache pull; re-shard again at ~420 repos). (②#158)
+  `provisional_agent_row` seeded weekly_commits=0 — looked already-counted,
+  repair never fired; now seeds None. (③#159+⑥#161) legacy rows: prod's
+  render cache lost all 23 legacy rows (emptied retired.json → 410s
+  fell to 404, miscounted as failed fetches). #159 restores them
+  provisionally on the signals/render path; #161 fixes the ROOT CAUSE —
+  pending-only/repair-commits modes blanked legacy_agents and wrote
+  renders with zero legacy rows (only batch carried them forward); the
+  merge block now carries forward + provisionally restores in all
+  incremental modes. Verified live: restart now keeps legacy=23,
+  failed=0, and the 410s survive. (④#159) SuperAGI had contradictory
+  status=legacy + listing_status=listed; test now locks agreement.
+  (⑤#160) `_commit_count_suspect`: repair selector + startup trigger
+  (inlined in app.py) also re-check 0-commits+pushed≤28d rows. **Key
+  data fact learned:** weekly_commits counts the DEFAULT branch only
+  (GraphQL c30 / stats API), while pushed_at moves on any-branch push —
+  so 0 commits with a recent push is common and REAL (qdrant works on
+  dev, master tip 2026-06-03; promptflow/grok-cli/Integuru similar), not
+  a bug; ~10 such rows get cheaply re-verified each boot, by design.
