@@ -4833,7 +4833,11 @@ def provisional_agent_row(agent: dict) -> dict:
         "last_push": "pending",
         "days_ago": 999,
         "freshness_class": freshness_class(999),
-        "weekly_commits": 0,
+        # None = "not fetched yet" — the value app._has_missing_commit_rows()
+        # looks for to fire the startup repair-commits refresh. Seeding 0 here
+        # made new agents look already-counted, so the repair never ran and
+        # they showed 0 commits indefinitely (templates render None as "—").
+        "weekly_commits": None,
         "commits_low_confidence": False,
         "score": 0.0,
         "score_class": score_class(0),
