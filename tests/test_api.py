@@ -332,6 +332,22 @@ def test_dataset_export_serves(client):
     assert "QUARTER_LABEL" not in r.text
 
 
+def test_readme_adopter_logos_serve(client):
+    """Every logo referenced by the homepage's 'Featured in READMEs' strip
+    needs an explicit BASE_DIR route — the StaticFiles mount serves
+    OUTPUT_DIR (the volume), so a logo shipped only in the image 404s."""
+    for path, ctype in (
+        ("/haystack-logo.png", "image/png"),
+        ("/aipass-logo.png", "image/png"),
+        ("/composio-logo.svg", "image/svg"),
+        ("/lightrag-logo.png", "image/png"),
+        ("/threadplane-logo.png", "image/png"),
+    ):
+        r = client.get(path)
+        assert r.status_code == 200, path
+        assert r.headers["content-type"].startswith(ctype), path
+
+
 def test_trend_badge_serves(client):
     """Plan 2.3 regression: /badge/<slug>-trend.svg is pre-rendered and must
     be served by the dynamic badge route (which previously only knew -grade

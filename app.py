@@ -1182,6 +1182,11 @@ def lightrag_logo():
     return FileResponse(os.path.join(BASE_DIR, "lightrag-logo.png"), media_type="image/png")
 
 
+@app.get("/threadplane-logo.png")
+def threadplane_logo():
+    return FileResponse(os.path.join(BASE_DIR, "threadplane-logo.png"), media_type="image/png")
+
+
 @app.get("/hex-bg.svg")
 def hex_bg():
     return FileResponse(os.path.join(BASE_DIR, "hex-bg.svg"), media_type="image/svg+xml")
