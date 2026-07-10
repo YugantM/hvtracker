@@ -4880,7 +4880,10 @@ def provisional_agent_row(agent: dict) -> dict:
 
 
 def add_provisional_missing_agents(rows: list[dict], agents: list[dict]) -> int:
-    """Append provisional rows for active agents missing from cached output."""
+    """Append provisional rows for agents missing from the given cached list.
+
+    Used for both the active board (rows/all_agents) and the internal legacy
+    set (legacy_rows/legacy_agents) — pass matching halves."""
     existing = {r["repo"].lower() for r in rows if r.get("repo")}
     added = 0
     for agent in agents:
@@ -5462,10 +5465,19 @@ def main() -> None:
         if moved:
             print(f"RENDER-ONLY: reclassified {moved} row(s) as legacy from agents.json")
         provisional_count = add_provisional_missing_agents(rows, all_agents)
+        # Legacy agents keep internal rows too (no public pages, but they feed
+        # data/retired.json for 410s and stay refreshable). Prod only runs
+        # signals/batch modes — which never re-fetch a legacy agent that has
+        # no row — so once the cache lost them they were gone for good and
+        # the build report miscounted all of them as failed fetches. Restore
+        # them provisionally; the next signals refresh fills real data.
+        legacy_provisional = add_provisional_missing_agents(legacy_rows, legacy_agents)
         mode_label = "SIGNALS-ONLY" if signals_only else ("RUNTIME-ONLY" if runtime_only else "RENDER-ONLY")
         print(f"{mode_label}: loaded {len(rows)} active + {len(legacy_rows)} legacy rows from render_state.json")
         if provisional_count:
             print(f"{mode_label}: added {provisional_count} provisional agent listing(s) pending signal refresh")
+        if legacy_provisional:
+            print(f"{mode_label}: restored {legacy_provisional} missing legacy row(s) (internal only)")
         if signals_only:
             active_refreshed = refresh_github_signals(rows, "SIGNALS")
             legacy_refreshed = refresh_github_signals(legacy_rows, "SIGNALS-LEGACY") if legacy_rows else 0
