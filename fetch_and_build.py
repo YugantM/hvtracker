@@ -5249,6 +5249,10 @@ def main() -> None:
 
     # In batch mode, only fetch a slice of active agents
     all_agents = agents  # keep full list for context
+    # Keep the unfiltered legacy list too: incremental modes blank
+    # `legacy_agents` to skip fetching, but the merge step still needs it to
+    # carry forward / restore legacy rows (they feed data/retired.json 410s).
+    all_legacy_agents = legacy_agents
     if pending_only:
         existing_data_repos = load_existing_data_repos(data_path)
         agents = [
@@ -5672,9 +5676,13 @@ def main() -> None:
         provisional_count = add_provisional_missing_agents(rows, all_agents)
         if provisional_count:
             print(f"Batch merge: added {provisional_count} provisional agent listing(s) pending signal refresh")
-        # If batch mode skipped legacy fetches (batch_num != 1), carry forward
-        # legacy_rows from the prior render so we don't lose them.
-        if batch and not legacy_rows and os.path.isfile(render_state_path):
+        # When this run skipped legacy fetches (batch_num != 1, pending-only,
+        # repair-commits), carry forward legacy_rows from the prior render so
+        # we don't lose them. Before 2026-07-10 only batch mode did this: a
+        # pending/repair startup refresh wrote a render with zero legacy rows,
+        # emptying data/retired.json (breaking the 410s) until the next
+        # signals refresh restored them.
+        if not legacy_rows and os.path.isfile(render_state_path):
             try:
                 with open(render_state_path, encoding="utf-8") as _f:
                     legacy_rows = json.load(_f).get("legacy_rows", []) or []
@@ -5682,12 +5690,17 @@ def main() -> None:
                     print(f"Batch merge: carried forward {len(legacy_rows)} legacy row(s) from prior render")
             except (OSError, json.JSONDecodeError):
                 pass
+        # And restore any still missing (e.g. the prior render itself lost
+        # them) provisionally, same as the signals/render path.
+        legacy_provisional = add_provisional_missing_agents(legacy_rows, all_legacy_agents)
+        if legacy_provisional:
+            print(f"Batch merge: restored {legacy_provisional} missing legacy row(s) (internal only)")
         # Re-apply agents.json legacy classification so status flips in the
-        # config propagate even when batch mode didn't refetch them.
+        # config propagate even when this run didn't refetch them.
         restored = restore_active_classification(rows, legacy_rows, all_agents)
         if restored:
             print(f"Batch merge: restored {restored} row(s) from legacy based on agents.json")
-        reclassified = apply_legacy_classification(rows, legacy_rows, legacy_agents)
+        reclassified = apply_legacy_classification(rows, legacy_rows, all_legacy_agents)
         if reclassified:
             print(f"Batch merge: reclassified {reclassified} row(s) as legacy from agents.json")
         print(f"\nMerged incremental refresh: {len(rows)} total agents ({len(rows) - len(old_agents)} refreshed, {len(old_agents)} carried forward)")
