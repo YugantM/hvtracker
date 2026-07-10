@@ -43,6 +43,35 @@ def test_provisional_listing_adds_missing_agent():
     assert "new-org/new-agent" in repos
 
 
+def test_provisional_row_seeds_commits_as_unknown():
+    """weekly_commits must seed as None ("not fetched yet"), not 0.
+    app._has_missing_commit_rows() only detects None, so a 0 seed made new
+    agents look already-counted — the startup repair-commits refresh never
+    fired and they showed 0 commits indefinitely (2026-07-10 bug)."""
+    row = fb.provisional_agent_row(
+        {"repo": "new-org/new-agent", "name": "NewAgent", "category": "Agent Frameworks"}
+    )
+    assert row["weekly_commits"] is None
+    assert row["pending_signals"] is True
+
+
+def test_missing_commit_detection_catches_provisional_rows(tmp_path, monkeypatch):
+    """The startup repair trigger must see a freshly-provisioned agent."""
+    import app as app_mod
+    provisional = fb.provisional_agent_row(
+        {"repo": "new-org/new-agent", "name": "NewAgent", "category": "Agent Frameworks"}
+    )
+    data = {"agents": [{"repo": "old/agent", "weekly_commits": 12}, provisional]}
+    p = tmp_path / "data.json"
+    p.write_text(json.dumps(data))
+    monkeypatch.setattr(app_mod, "DATA_PATH", str(p))
+    assert app_mod._has_missing_commit_rows() is True
+    # and stays quiet when every row has a real count
+    data["agents"][1]["weekly_commits"] = 0
+    p.write_text(json.dumps(data))
+    assert app_mod._has_missing_commit_rows() is False
+
+
 def test_provisional_listing_skips_already_present():
     """Don't double-add agents already in `rows`."""
     rows = [
