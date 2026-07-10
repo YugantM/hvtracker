@@ -43,6 +43,38 @@ def test_provisional_listing_adds_missing_agent():
     assert "new-org/new-agent" in repos
 
 
+def test_legacy_rows_restored_provisionally():
+    """Legacy agents lost from the render cache must be re-added (internal
+    only): prod never runs a full fetch, so without this they stayed gone —
+    emptying data/retired.json (breaking the 410s) and getting miscounted
+    as failed fetches (2026-07-10 bug: all 22 legacy agents affected)."""
+    legacy_rows = []
+    legacy_agents = [
+        {"repo": "stale/old-agent", "name": "OldAgent",
+         "category": "Agent Frameworks", "listing_status": "legacy"},
+    ]
+    added = fb.add_provisional_missing_agents(legacy_rows, legacy_agents)
+    assert added == 1
+    row = legacy_rows[0]
+    assert row["listing_status"] == "legacy"
+    assert row["pending_signals"] is True
+    # retired.json needs slugs — assign_unique_slugs covers legacy rows too
+    fb.assign_unique_slugs(legacy_rows)
+    assert row["slug"] == "oldagent"
+
+
+def test_agents_json_status_fields_agree():
+    """status and listing_status must never contradict each other — SuperAGI
+    carried status=legacy + listing_status=listed, so the split treated it
+    as legacy while everything keying on listing_status counted it listed."""
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    with open(os.path.join(root, "agents.json"), encoding="utf-8") as f:
+        agents = json.load(f)
+    bad = [a["repo"] for a in agents
+           if {a.get("status"), a.get("listing_status")} >= {"legacy", "listed"}]
+    assert bad == [], f"contradictory status fields: {bad}"
+
+
 def test_provisional_row_seeds_commits_as_unknown():
     """weekly_commits must seed as None ("not fetched yet"), not 0.
     app._has_missing_commit_rows() only detects None, so a 0 seed made new
