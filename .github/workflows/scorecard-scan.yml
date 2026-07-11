@@ -2,10 +2,22 @@ name: Scorecard scan
 
 on:
   schedule:
-    # Daily at 04:00 UTC. Scores move ~1pt/week on active repos, so a daily
-    # cadence keeps the public site within a day of the real CLI result.
-    - cron: "0 4 * * *"
+    # One SHARD per run, six runs spread across the day. The scorecard CLI
+    # burns a few thousand GitHub API calls per ~55-repo shard, so two shards
+    # back-to-back exhaust the PAT's 5k/hr quota and the next shard starves:
+    # every repo stalls to the 300s timeout until the hosted runner gets
+    # reclaimed (observed kills at 8 and 25 minutes on 2026-07-11 — reclaim
+    # timing is arbitrary, and killed runners never reach the artifact-upload
+    # step, so the shard publishes nothing). Giving each shard its own quota
+    # window removes the contention entirely; each repo still gets scanned
+    # once a day.
+    - cron: "0 1,5,9,13,17,21 * * *"
   workflow_dispatch:
+    inputs:
+      shard:
+        description: "Shard 1-6 to scan (empty = derived from current UTC hour)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -16,30 +28,34 @@ env:
   SCORECARD_VERSION: "v5.5.0"
 
 jobs:
-  # Split the full repo set across shards. Each shard self-limits to a
-  # 30-minute budget (SCAN_TIME_BUDGET) and writes its cache incrementally,
-  # so hosted-runner reclaims (~40 min, exit 143, "runner received a shutdown
-  # signal") can no longer throw away a shard's completed work — the
-  # 2026-07-10 run lost 24 finished scans that way. Repos a budget cuts off
-  # keep their prior values (freshest-wins merge) and lead the next run's
-  # stalest-first queue, so coverage converges across days instead of
-  # starving the same tail. Re-count shards when the roster passes ~420.
+  # One shard (~55 repos, ~25 min) per run. The shard self-limits to a time
+  # budget, aborts on consecutive timeouts (quota-exhaustion signature), and
+  # writes its cache incrementally; repos a cutoff misses keep prior values
+  # (freshest-wins merge) and lead the next run's stalest-first queue, so
+  # coverage converges within the day instead of starving a fixed tail.
+  # Re-count shards when the roster passes ~420.
   scan:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      # One shard at a time: parallel shards share the PAT's 5k/hr quota, and
-      # quota starvation shows up as consecutive 300s per-repo timeouts — the
-      # exact wall-clock burn that pushed both 2026-07-10 failures into
-      # runner reclaim. Serial is slower (~3h nightly) but fine for a cron
-      # job, and each shard gets the whole quota window.
-      max-parallel: 1
-      matrix:
-        shard: [1, 2, 3, 4, 5, 6]
+    outputs:
+      shard: ${{ steps.pick.outputs.shard }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
+
+      # Scheduled runs rotate through shards by UTC-hour bucket (cron hours
+      # 1,5,9,... → shards 1..6). hour/4 bucketing tolerates GitHub's cron
+      # delays of up to ~4h without skipping a shard. Manual dispatches may
+      # pin a shard explicitly.
+      - name: Pick shard
+        id: pick
+        run: |
+          shard="${{ github.event.inputs.shard }}"
+          if [ -z "$shard" ]; then
+            shard=$(( (10#$(date -u +%H) / 4) % 6 + 1 ))
+          fi
+          echo "shard=$shard" >> "$GITHUB_OUTPUT"
+          echo "Scanning shard $shard/6"
 
       - name: Download scorecard CLI
         run: |
@@ -62,18 +78,20 @@ jobs:
             git show origin/data:scorecard-cache.json > scorecard-cache.json
           fi
 
-      - name: Run scorecard scan (shard ${{ matrix.shard }}/6)
+      - name: Run scorecard scan
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        run: python scan_scorecards.py --shard ${{ matrix.shard }}/6
+        run: python scan_scorecards.py --shard ${{ steps.pick.outputs.shard }}/6
 
       # if: always() — partial results from a failed step are still valid
       # (incremental writes mean the file reflects every completed repo).
+      # A reclaimed runner never reaches this step; those repos heal on the
+      # next run via the stalest-first queue.
       - name: Upload shard cache
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: scorecard-shard-${{ matrix.shard }}
+          name: scorecard-shard-${{ steps.pick.outputs.shard }}
           path: scorecard-cache.json
           retention-days: 2
 

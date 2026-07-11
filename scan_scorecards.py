@@ -42,9 +42,10 @@ TIME_BUDGET = int(os.environ.get("SCAN_TIME_BUDGET", "1800"))
 
 # Consecutive per-repo timeouts almost always mean the GitHub API quota is
 # exhausted (each stall burns the full SCAN_TIMEOUT of wall clock, which is
-# what used to push shards into runner reclaim). Stop early; tomorrow's run
-# starts with these repos.
-MAX_CONSECUTIVE_TIMEOUTS = 5
+# what used to push shards into runner reclaim — observed kills came during
+# the 4th-5th consecutive stall on 2026-07-11, so bail after 3). The next
+# run starts with these repos via the stalest-first queue.
+MAX_CONSECUTIVE_TIMEOUTS = 3
 
 
 def find_scorecard_bin() -> str:
