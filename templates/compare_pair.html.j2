@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="google-site-verification" content="s2YUWbGP7cJsI6HUCKRX9YCtbVJVyA1Q1_jsNWj1RHc">
   <title>{{ a.name }} vs {{ b.name }}: AI agent trust comparison | HVTracker</title>
-  <meta name="description" content="{{ a.name }} vs {{ b.name }}: an independent, evidence-based trust comparison — HVTrust score, grade, supply-chain provenance, OSSF Scorecard, and the five trust dimensions, side by side.">
+  <meta name="description" content="{{ a.name }} scores {{ a.trust_score }}/100 (Grade {{ a.evidence_grade }}), {{ b.name }} scores {{ b.trust_score }}/100 (Grade {{ b.evidence_grade }}). Compared on provenance, OSSF Scorecard, MCP support, maintenance, and downloads — public, checkable evidence, not hype.">
   <link rel="canonical" href="https://hvtracker.net/compare/{{ a.slug }}-vs-{{ b.slug }}/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="{{ a.name }} vs {{ b.name }} — AI agent trust comparison">
-  <meta property="og:description" content="Side-by-side trust signals for {{ a.name }} and {{ b.name }}: HVTrust score, grade, provenance, and maintenance — from public, checkable data.">
+  <meta property="og:description" content="{{ a.name }} {{ a.trust_score }}/100 (Grade {{ a.evidence_grade }}) vs {{ b.name }} {{ b.trust_score }}/100 (Grade {{ b.evidence_grade }}) — provenance, Scorecard, MCP support, and activity from public, checkable data.">
   <meta property="og:url" content="https://hvtracker.net/compare/{{ a.slug }}-vs-{{ b.slug }}/">
   <meta property="og:image" content="https://hvtracker.net/og-v2.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ a.name }} vs {{ b.name }} — AI agent trust comparison">
-  <meta name="twitter:description" content="Side-by-side trust signals for {{ a.name }} and {{ b.name }} on HVTracker.">
+  <meta name="twitter:description" content="{{ a.name }} {{ a.trust_score }}/100 vs {{ b.name }} {{ b.trust_score }}/100 — evidence-based trust comparison on HVTracker.">
   <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
   <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
   <style>
