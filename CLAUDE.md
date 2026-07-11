@@ -405,3 +405,28 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   open from the plan: watchlist email digest (needs owner email-provider
   choice — Resend/Postmark free tier), GSC-driven internal-linking pass,
   weekly KPI snapshot.
+- **Scorecard-scan hardening COMPLETE 2026-07-11** (#167–#170; CI-only, no
+  deploy; issue #84 closed after green run 29152099788 — 49/55, the shard
+  that had failed 4× straight). Four stacked root causes, each exposed by
+  fixing the previous: (①#167) cache written only at end-of-run — killed
+  shards lost ALL completed scans; now incremental per-success writes +
+  stalest-first queue (seeded from the data branch) + 30-min self-budget +
+  0-success exit floor. (②#168) all shards shared one 5k/hr PAT window —
+  even serial, shard 3+ started starved; now ONE shard per run, cron
+  6×/day (hours 1,5,9,13,17,21 UTC; shard = hour/4 bucket, tolerant of
+  GitHub's multi-hour cron delays; workflow_dispatch takes a pinned shard
+  input). (③#169) head-of-line deadlock: never-succeeding repos had no
+  timestamp so they permanently led the queue; now failures write a
+  `scan_failed_at` marker (old data preserved; site consumers unaffected)
+  and ordering is max(scanned_at, scan_failed_at) — chronic failers retry
+  daily at the BACK; breaker consults /rate_limit (free) after timeouts:
+  exhausted→stop, healthy→skip repo-specific slowpokes. (④#170) the REAL
+  killer behind every exit-143 "runner reclaim": the scorecard CLI
+  ballooning past the 7GB runner on monster repos — proven when a 4GB
+  RLIMIT_AS cap turned the kills into explicit Go OOM errors (LocalAI,
+  mlflow, lagent, BrowserGym). Timeout 300→180s (healthy scans 15-60s);
+  merge job tolerates zero artifacts. KNOWN chronic failers (marker'd,
+  retry daily): activepieces (OSV backend error), BrowserGym/mlflow/
+  lagent (CLI OOM even at 4GB), traceroot + deepanalyze (180s timeout) —
+  deepanalyze's scorecard stays null until the CLI copes; site renders
+  null fine. If scans break again the alert workflow opens a fresh issue.
