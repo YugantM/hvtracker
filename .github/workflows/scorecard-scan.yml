@@ -16,23 +16,24 @@ env:
   SCORECARD_VERSION: "v5.5.0"
 
 jobs:
-  # Split the full repo set across parallel shards, sized so each shard stays
-  # around the tested ~57-repos/~40min profile — longer shards reliably get the
-  # hosted runner reclaimed mid-scan (exit 143, "runner received a shutdown
-  # signal"). Sized for 4 shards at ~228 repos, the roster's growth to ~350
-  # pushed shards to 82 repos and shard 4 was killed at repo ~52 on 3 of 4
-  # daily runs (2026-07-10) — every repo after the kill never got scanned,
-  # which is why newly-added agents sat with a null scorecard. Six shards
-  # restores ~59 repos each. Re-count when the roster passes ~420 (7 shards).
+  # Split the full repo set across shards. Each shard self-limits to a
+  # 30-minute budget (SCAN_TIME_BUDGET) and writes its cache incrementally,
+  # so hosted-runner reclaims (~40 min, exit 143, "runner received a shutdown
+  # signal") can no longer throw away a shard's completed work — the
+  # 2026-07-10 run lost 24 finished scans that way. Repos a budget cuts off
+  # keep their prior values (freshest-wins merge) and lead the next run's
+  # stalest-first queue, so coverage converges across days instead of
+  # starving the same tail. Re-count shards when the roster passes ~420.
   scan:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      # Cap concurrency: 4 shards hitting GitHub at once exhausted even the PAT's
-      # 5k/hr (403/429 -> ~40% of repos timed out and carried stale values). Two
-      # at a time keeps API pressure under the limit; combined with the 300s
-      # per-repo timeout, far fewer repos get skipped.
-      max-parallel: 2
+      # One shard at a time: parallel shards share the PAT's 5k/hr quota, and
+      # quota starvation shows up as consecutive 300s per-repo timeouts — the
+      # exact wall-clock burn that pushed both 2026-07-10 failures into
+      # runner reclaim. Serial is slower (~3h nightly) but fine for a cron
+      # job, and each shard gets the whole quota window.
+      max-parallel: 1
       matrix:
         shard: [1, 2, 3, 4, 5, 6]
 
@@ -52,12 +53,24 @@ jobs:
         with:
           python-version: "3.12"
 
+      # The prior cache drives stalest-first ordering (never-scanned repos
+      # first, then oldest scanned_at). Shard output still contains only
+      # freshly-scanned repos; the merge job overlays them freshest-wins.
+      - name: Seed prior cache from data branch
+        run: |
+          if git fetch origin data 2>/dev/null && git cat-file -e origin/data:scorecard-cache.json 2>/dev/null; then
+            git show origin/data:scorecard-cache.json > scorecard-cache.json
+          fi
+
       - name: Run scorecard scan (shard ${{ matrix.shard }}/6)
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         run: python scan_scorecards.py --shard ${{ matrix.shard }}/6
 
+      # if: always() — partial results from a failed step are still valid
+      # (incremental writes mean the file reflects every completed repo).
       - name: Upload shard cache
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: scorecard-shard-${{ matrix.shard }}
