@@ -85,7 +85,27 @@ def find_scorecard_bin() -> str:
     sys.exit("ERROR: scorecard binary not found. Place it in the repo root or add to PATH.")
 
 
-SCAN_TIMEOUT = int(os.environ.get("SCORECARD_TIMEOUT", "300"))
+# 180s: healthy scans finish in 15-60s; anything past 3 minutes never
+# completes (observed). Every stalled repo at the front of the queue extends
+# the window in which a hosted-runner kill can strike before the first
+# success is persisted, so shorter timeouts directly shrink kill exposure
+# (2026-07-11: three runs died inside stall zones at minutes 8-25).
+SCAN_TIMEOUT = int(os.environ.get("SCORECARD_TIMEOUT", "180"))
+
+# Cap the scorecard subprocess's address space. Huge repos can balloon the
+# CLI's memory past the runner's 7GB and take the whole runner down — the
+# "shutdown signal" kills repeatedly coincided with the same monster repos
+# (mudler/LocalAI twice on 2026-07-10/11). With a cap the CLI dies alone,
+# the repo records a failure marker, and the run continues.
+SCAN_MEM_LIMIT = int(os.environ.get("SCORECARD_MEM_LIMIT", str(4 * 1024**3)))
+
+
+def _limit_memory() -> None:
+    try:
+        import resource
+        resource.setrlimit(resource.RLIMIT_AS, (SCAN_MEM_LIMIT, SCAN_MEM_LIMIT))
+    except Exception:
+        pass  # non-Linux or restricted environment — run uncapped
 
 
 def scan_repo(bin_path: str, owner_repo: str) -> dict | None:
@@ -96,6 +116,7 @@ def scan_repo(bin_path: str, owner_repo: str) -> dict | None:
             capture_output=True,
             text=True,
             timeout=SCAN_TIMEOUT,
+            preexec_fn=_limit_memory,
         )
         if result.returncode != 0:
             print(f"  WARN: non-zero exit for {owner_repo}: {result.stderr[:120].strip()}")

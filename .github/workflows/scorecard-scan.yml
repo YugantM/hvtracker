@@ -115,6 +115,15 @@ jobs:
 
       - name: Merge shards and push to data branch
         run: |
+          # A scan killed by runner reclaim uploads no artifact; an unguarded
+          # glob then passes a literal path and the merge crashes (2026-07-11
+          # run 29151228066). Nothing to merge = nothing to do; the scan
+          # failure already routes to the alert job.
+          if ! ls shards/scorecard-shard-*/scorecard-cache.json >/dev/null 2>&1; then
+            echo "No shard artifacts to merge."
+            exit 0
+          fi
+
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
