@@ -40,12 +40,38 @@ SLEEP_BETWEEN = 1  # seconds between scans — burst throttle courtesy
 # next run's queue (stalest-first ordering below).
 TIME_BUDGET = int(os.environ.get("SCAN_TIME_BUDGET", "1800"))
 
-# Consecutive per-repo timeouts almost always mean the GitHub API quota is
-# exhausted (each stall burns the full SCAN_TIMEOUT of wall clock, which is
-# what used to push shards into runner reclaim — observed kills came during
-# the 4th-5th consecutive stall on 2026-07-11, so bail after 3). The next
-# run starts with these repos via the stalest-first queue.
+# Fallback breaker for when the rate-limit API can't be consulted: repeated
+# timeouts burn SCAN_TIMEOUT of wall clock each, which is what used to push
+# runners into reclaim. When the API IS reachable it answers authoritatively
+# (see _quota_starved) and this counter never accumulates.
 MAX_CONSECUTIVE_TIMEOUTS = 3
+
+
+def _quota_starved() -> bool | None:
+    """After a timeout, ask GitHub whether the token is rate-limited.
+
+    /rate_limit is free (doesn't count against quota). Distinguishes quota
+    starvation — where every subsequent repo will stall too, so continuing
+    just burns runner wall clock — from a repo-specific slow scan (huge
+    repo, wedged check) that should simply be skipped. Returns True/False,
+    or None when the check itself fails (caller falls back to counting).
+    """
+    token = os.environ.get("GITHUB_TOKEN", "")
+    if not token:
+        return None
+    try:
+        import urllib.request
+        req = urllib.request.Request(
+            "https://api.github.com/rate_limit",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            remaining = json.load(r).get("resources", {}).get("core", {}).get("remaining")
+        if remaining is None:
+            return None
+        return remaining < 100
+    except Exception:
+        return None
 
 
 def find_scorecard_bin() -> str:
@@ -139,11 +165,18 @@ def main() -> None:
         except (json.JSONDecodeError, OSError):
             pass
 
-    # Stalest-first: never-scanned repos lead, then oldest scanned_at. With a
-    # time budget in play this is what guarantees coverage converges — a repo
-    # skipped by yesterday's cutoff is at the front of today's queue.
+    # Stalest-first: never-ATTEMPTED repos lead, then oldest attempt. The key
+    # is max(scanned_at, scan_failed_at) — failed attempts count as attempts,
+    # so a repo that consistently times out (huge repo, wedged check, OSV
+    # backend errors) is demoted behind everything healthy instead of
+    # permanently blocking the front of the queue (2026-07-11: four such
+    # repos deadlocked shard 3 — each run burned its budget on them, they
+    # never earned a timestamp, so they led the queue again next run).
     if not single_repo:
-        agents.sort(key=lambda a: existing.get(a["repo"], {}).get("scanned_at", ""))
+        agents.sort(key=lambda a: max(
+            existing.get(a["repo"], {}).get("scanned_at") or "",
+            existing.get(a["repo"], {}).get("scan_failed_at") or "",
+        ))
 
     def write_cache() -> None:
         # A shard writes only its freshly-scanned repos; the CI merge job
@@ -179,10 +212,25 @@ def main() -> None:
             write_cache()
         else:
             print("FAILED — skipped")
-            consecutive_timeouts = consecutive_timeouts + 1 if timed_out else 0
+            # Record the failed attempt (keeping any prior data) so the
+            # stalest-first ordering demotes this repo for ~a day instead of
+            # letting it block the queue front. Site consumers ignore the
+            # marker: they key on score/scanned_at.
+            failed_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            results[repo] = {**(existing.get(repo) or {}), "scan_failed_at": failed_at}
+            write_cache()
+            if timed_out:
+                starved = _quota_starved()
+                if starved is True:
+                    stopped_early = "GitHub API quota exhausted (rate_limit check)"
+                    break
+                # Repo-specific timeout (quota is fine): skip it and move on.
+                consecutive_timeouts = consecutive_timeouts + 1 if starved is None else 0
+            else:
+                consecutive_timeouts = 0
 
         if consecutive_timeouts >= MAX_CONSECUTIVE_TIMEOUTS:
-            stopped_early = f"{consecutive_timeouts} consecutive timeouts (API quota likely exhausted)"
+            stopped_early = f"{consecutive_timeouts} consecutive timeouts (rate-limit state unknown)"
             break
         if TIME_BUDGET and time.monotonic() - t0 > TIME_BUDGET and i < total:
             stopped_early = f"time budget ({TIME_BUDGET}s) reached"
