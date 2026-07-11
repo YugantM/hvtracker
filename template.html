@@ -118,6 +118,18 @@
     .intro h2 { font-size: 26px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
     .intro p { color: var(--muted); font-size: 16px; line-height: 1.7; max-width: 680px; }
 
+    .tool-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; margin: 14px 0 0; }
+    .tool-chip {
+      display: block; padding: 10px 14px; border: 1px solid var(--line-strong);
+      border-radius: 6px; background: var(--surface); color: inherit; text-decoration: none;
+    }
+    .tool-chip strong { font-size: 14px; color: var(--text); }
+    .tool-chip span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .tool-chip code { font-family: var(--font-mono); font-size: 11px; }
+    .tool-chip:hover { border-color: var(--accent); text-decoration: none; }
+    .home-verify-cta { border-left: 3px solid var(--accent); }
+    .home-mcp-cta { border-left: 3px solid var(--green); }
+
     .stats-bar {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
       gap: 1px; background: var(--border);
@@ -148,6 +160,12 @@
     .watch-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border: 1px solid var(--border); font-family: var(--font-mono); font-size: 12px; }
     .watch-pill button { border: none; background: none; color: var(--muted); cursor: pointer; font: inherit; padding: 0; }
     .watch-pill button:hover { color: var(--red); }
+    .watch-pill a { color: inherit; text-decoration: none; }
+    .watch-pill a:hover { color: var(--accent); }
+    .watch-chip { font-size: 11px; padding: 1px 5px; border-radius: 3px; }
+    .watch-chip-up { color: var(--green); background: color-mix(in srgb, var(--green) 12%, transparent); }
+    .watch-chip-down { color: var(--red); background: color-mix(in srgb, var(--red) 12%, transparent); }
+    .watch-chip-flat { color: var(--muted); background: var(--surface); }
     .watch-empty { color: var(--muted); font-size: 12px; font-family: var(--font-mono); }
 
     .filter-bar { padding: 12px 0; display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap; }
@@ -463,8 +481,7 @@
     .movers { display: flex; align-items: center; gap: 14px; padding: 9px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; }
     .movers + .movers { border-top: 0; }
     .movers-title { flex: none; min-width: 96px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .movers-gainers .movers-title { color: var(--green); }
-    .movers-losers .movers-title { color: var(--red); }
+    .movers-gainers .movers-title { color: var(--muted); }
     .movers-viewport {
       flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; cursor: grab;
       -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
@@ -542,16 +559,17 @@
 
     <section class="intro" aria-labelledby="intro-title">
       <h2 id="intro-title">AI Trust Registry for open-source AI agent projects.</h2>
-      <p>Independent trust scores for {{ total }} open-source AI agent projects, based on public, checkable signals across activity, adoption, transparency, safety, and provenance.</p>
-      <p>HVTrust folds runtime-trust signals — MCP support, external dependencies, tool/plugin surface, and package-provenance drift — into the score alongside supply-chain evidence. How every point is earned is documented in the <a href="/methodology/" style="color:var(--accent);">methodology →</a></p>
-      <a href="/verify/" class="home-verify-cta" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:18px 0;padding:16px 20px;border:1px solid var(--line-strong);border-left:3px solid var(--accent);border-radius:8px;background:var(--surface);color:inherit;text-decoration:none">
-        <span><strong style="font-size:16px;color:var(--text)">Check your own agent or MCP server &rarr;</strong><br><span style="color:var(--muted);font-size:13px">Paste a repo, package, or MCP server URL and get a signed trust verdict before you connect.</span></span>
-        <span style="background:var(--accent);color:#fff;font-weight:700;font-size:13px;padding:9px 16px;border-radius:6px;white-space:nowrap">Verify now</span>
-      </a>
-      <a href="/blog/mcp-server-launch/" class="home-mcp-cta" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:18px 0;padding:16px 20px;border:1px solid var(--line-strong);border-left:3px solid var(--green);border-radius:8px;background:var(--surface);color:inherit;text-decoration:none">
-        <span><span style="display:inline-block;background:var(--green);color:#fff;font-weight:700;font-size:10px;letter-spacing:0.05em;padding:2px 7px;border-radius:4px;vertical-align:middle;margin-right:8px">NEW</span><strong style="font-size:16px;color:var(--text)">HVTracker is now an MCP server &rarr;</strong><br><span style="color:var(--muted);font-size:13px">Point any MCP client at <code style="font-family:var(--font-mono);font-size:12px">hvtracker.net/mcp</code> and your agent can verify any server, package, or agent before it connects. No auth, no install.</span></span>
-        <span style="background:var(--green);color:#fff;font-weight:700;font-size:13px;padding:9px 16px;border-radius:6px;white-space:nowrap">Use the MCP server</span>
-      </a>
+      <p>Independent trust scores for {{ total }} open-source AI agent projects, based on public, checkable signals across activity, adoption, transparency, safety, and provenance. How every point is earned is documented in the <a href="/methodology/" style="color:var(--accent);">methodology →</a></p>
+      <div class="tool-strip" aria-label="Trust tools">
+        <a href="/verify/" class="tool-chip home-verify-cta">
+          <strong>Verify your agent or MCP server &rarr;</strong>
+          <span>Paste a repo, package, or server URL — get a signed verdict.</span>
+        </a>
+        <a href="/blog/mcp-server-launch/" class="tool-chip home-mcp-cta">
+          <strong>Use HVTracker from your agent &rarr;</strong>
+          <span>MCP server at <code>hvtracker.net/mcp</code> — no auth, no install.</span>
+        </a>
+      </div>
       <div class="stats-bar" aria-label="Registry snapshot">
         <div class="stat-cell">
           <div class="stat-val accent">{{ registry_summary.active_count }}</div>
@@ -580,11 +598,11 @@
       </div>
     </section>
 
-    <section class="watch-panel" aria-label="Tracked projects">
+    <section class="watch-panel" aria-label="Tracked projects" id="watchPanel">
       <div class="watch-panel-head">
         <div class="watch-panel-copy">
-          <strong>Tracked projects.</strong>
-          <p>Track agents (★) to monitor their trust signals. Sign in to sync across devices and get notified when a tracked agent's score, grade, or rank changes. To compare agents side by side, use the ⇄ button instead.</p>
+          <strong>Your tracked agents</strong>
+          <p id="watchPanelHint">Changes since your last visit show up here.</p>
         </div>
         <div class="watch-panel-actions">
           <a class="watch-link primary" href="/account/">View in account</a>
@@ -592,7 +610,7 @@
         </div>
       </div>
       <div class="watch-list" id="watchlistPreview">
-        <span class="watch-empty">No tracked projects yet. Use the ★ buttons in the table to track agents.</span>
+        <span class="watch-empty">Track agents with the ★ button — when you come back, their score, grade, and rank changes are shown here.</span>
       </div>
     </section>
 
@@ -664,9 +682,9 @@
       <a href="#" id="v2Revert">Back to current ranking</a>
     </div>
 
-    {% if movers and movers.up %}
-    <div class="movers movers-gainers" aria-label="Daily gainers vs. yesterday">
-      <span class="movers-title">Daily gainers</span>
+    {% if movers and (movers.up or movers.down) %}
+    <div class="movers movers-gainers" aria-label="Daily movers vs. yesterday">
+      <span class="movers-title">Daily movers</span>
       <div class="movers-viewport">
         <div class="movers-row">
           {% for m in movers.up %}
@@ -676,15 +694,6 @@
             <span class="mover-rank">#{{ m.rank }}</span>
           </a>
           {% endfor %}
-        </div>
-      </div>
-    </div>
-    {% endif %}
-    {% if movers and movers.down %}
-    <div class="movers movers-losers" aria-label="Daily losers vs. yesterday">
-      <span class="movers-title">Daily losers</span>
-      <div class="movers-viewport">
-        <div class="movers-row">
           {% for m in movers.down %}
           <a href="/agents/{{ m.slug }}/" class="mover mover-down">
             <span class="mover-arrow">▼{{ m.delta|abs }}</span>
@@ -734,6 +743,7 @@
         <tbody>
           {% for row in rows %}
           <tr{% if row.rank <= 3 %} class="top-row"{% endif %}
+            data-slug="{{ row.slug }}"
             data-rank="{{ row.rank }}"
             data-display_rank="{{ row.display_rank }}"
             data-is_tied="{% if row.is_tied %}1{% else %}0{% endif %}"
@@ -1250,27 +1260,96 @@
         });
       }
 
+      // ── "Since your last visit" diffs for tracked agents ──
+      // Purely client-side: snapshot score/grade/rank per tracked slug in
+      // localStorage; on the next visit, render the delta chips before
+      // overwriting the snapshot. No account or email needed.
+      const WATCH_SEEN_KEY = "hvtracker_watch_seen_v1";
+      const boardIndex = {};
+      Array.from(tbody.querySelectorAll("tr[data-slug]")).forEach((tr) => {
+        boardIndex[tr.dataset.slug] = {
+          score: parseFloat(tr.dataset.trust_score),
+          grade: tr.dataset.evidence_grade,
+          rank: parseInt(tr.dataset.rank, 10)
+        };
+      });
+
+      function loadSeen() {
+        try {
+          const raw = localStorage.getItem(WATCH_SEEN_KEY);
+          const seen = raw ? JSON.parse(raw) : {};
+          return seen && typeof seen === "object" ? seen : {};
+        } catch (_) {
+          return {};
+        }
+      }
+
+      function snapshotSeen(slugs) {
+        try {
+          const seen = {};
+          slugs.forEach((slug) => {
+            if (boardIndex[slug]) seen[slug] = Object.assign({ ts: Date.now() }, boardIndex[slug]);
+          });
+          localStorage.setItem(WATCH_SEEN_KEY, JSON.stringify(seen));
+        } catch (_) {}
+      }
+
+      // Diffs always compare against the snapshot as it stood when this page
+      // loaded — re-renders during the view (add/remove) must not shift the
+      // baseline or the chips would vanish mid-visit.
+      const seenAtLoad = loadSeen();
+
+      function watchChanges(slug) {
+        const cur = boardIndex[slug];
+        if (!cur) return '<span class="watch-chip watch-chip-flat">off the board</span>';
+        const prev = seenAtLoad[slug];
+        if (!prev) return "";
+        const chips = [];
+        if (prev.grade && cur.grade && prev.grade !== cur.grade) {
+          const up = cur.grade < prev.grade; // grades sort A < B < C < D
+          chips.push(`<span class="watch-chip ${up ? "watch-chip-up" : "watch-chip-down"}">${prev.grade}→${cur.grade}</span>`);
+        }
+        const dScore = Math.round((cur.score - prev.score) * 10) / 10;
+        if (!isNaN(dScore) && Math.abs(dScore) >= 0.1) {
+          chips.push(`<span class="watch-chip ${dScore > 0 ? "watch-chip-up" : "watch-chip-down"}">${dScore > 0 ? "▲" : "▼"}${Math.abs(dScore)}</span>`);
+        }
+        if (prev.rank && cur.rank && prev.rank !== cur.rank && chips.length < 2) {
+          const up = cur.rank < prev.rank;
+          chips.push(`<span class="watch-chip ${up ? "watch-chip-up" : "watch-chip-down"}">#${prev.rank}→#${cur.rank}</span>`);
+        }
+        return chips.join("");
+      }
+
       function renderWatchlistPreview() {
         const items = loadWatchlist();
         const preview = document.getElementById("watchlistPreview");
         const clearLink = document.getElementById("watchlistClearLink");
+        const panelActions = document.querySelector(".watch-panel-actions");
+        const panelHint = document.getElementById("watchPanelHint");
         clearLink.style.visibility = items.length ? "visible" : "hidden";
+        if (panelActions) panelActions.style.display = items.length ? "" : "none";
+        if (panelHint) panelHint.style.display = items.length ? "" : "none";
         if (!items.length) {
-          preview.innerHTML = '<span class="watch-empty">No tracked projects yet. Use the ★ buttons in the table to track agents.</span>';
+          preview.innerHTML = '<span class="watch-empty">Track agents with the ★ button — when you come back, their score, grade, and rank changes are shown here.</span>';
           updateWatchButtons();
           return;
         }
         preview.innerHTML = items.map((item) => (
-          `<span class="watch-pill">${item.name}<button type="button" data-remove-slug="${item.slug}" aria-label="Remove ${item.name}">×</button></span>`
+          `<span class="watch-pill"><a href="/agents/${item.slug}/">${item.name}</a>${watchChanges(item.slug)}<button type="button" data-remove-slug="${item.slug}" aria-label="Remove ${item.name}">×</button></span>`
         )).join("");
         preview.querySelectorAll("[data-remove-slug]").forEach((btn) => {
           btn.addEventListener("click", () => {
             const next = loadWatchlist().filter((item) => item.slug !== btn.dataset.removeSlug);
             saveWatchlist(next);
+            if (window.hvtSyncWatch) window.hvtSyncWatch("remove", btn.dataset.removeSlug);
             renderWatchlistPreview();
           });
         });
         updateWatchButtons();
+        // Advance the snapshot to today's values so the NEXT visit diffs
+        // against this one; chips rendered above used seenAtLoad, so they
+        // survive re-renders (★ add/remove) within this page view.
+        snapshotSeen(items.map((item) => item.slug));
       }
 
       searchInput.addEventListener("input", () => {
@@ -1506,7 +1585,6 @@
         }, { passive: true });
       }
       initMoversTicker(document.querySelector(".movers-gainers .movers-viewport"), false);
-      initMoversTicker(document.querySelector(".movers-losers .movers-viewport"), true);
     })();
   </script>
 </body>
