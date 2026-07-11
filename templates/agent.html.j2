@@ -34,6 +34,18 @@
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "USD"
+    },
+    "review": {
+      "@type": "Review",
+      "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net/" },
+      "url": "https://hvtracker.net/agents/{{ row.slug }}/",
+      "reviewBody": "Evidence-based trust review of {{ row.name }}: HVTrust {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}), ranked #{{ row.rank }} of {{ total }} tracked open-source AI agent projects, from public supply-chain, transparency, maintenance, and adoption signals.",
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": {{ row.trust_score }},
+        "bestRating": 100,
+        "worstRating": 0
+      }
     }
   }
   </script>
@@ -63,6 +75,8 @@
     .back:hover { color:var(--text); }
 
     .hero { padding:24px 0; border-bottom:1px solid var(--border); }
+    .safety-verdict { margin-top:16px; padding:12px 16px; border:1px solid var(--border); border-left:3px solid var(--accent); background:var(--surface); font-size:14px; line-height:1.65; color:var(--text); max-width:680px; }
+    .safety-verdict a { color:var(--accent); }
     h1 { font-size:28px; font-weight:700; margin-bottom:4px; }
     .hero .repo { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
     .hero .repo a:hover { color:var(--accent); }
@@ -366,6 +380,14 @@
           </div>
         </div>
       </div>
+      <p class="safety-verdict" id="is-it-safe">
+        <strong>Is {{ row.name }} safe?</strong>
+        {{ row.name }} scores <strong>{{ row.trust_score }}/100 (Grade {{ row.evidence_grade }})</strong>, ranked #{{ row.rank }} of {{ total }} tracked open-source AI agent projects{% if row.coverage_grade %}, on evidence coverage {{ row.coverage_grade }} ({{ row.signal_types }} of 5 independent signal types){% endif %}.
+        The public evidence: {% if row.has_provenance %}its packages ship with cryptographic provenance{% else %}no package-provenance attestation found{% endif %};
+        {% if row.scorecard_score is not none %}OSSF Scorecard rates its supply-chain practices {{ row.scorecard_score }}/10{% else %}no OSSF Scorecard result yet{% endif %};
+        {% if row.signed_commits_pct is not none and row.signed_commits_pct > 0 %}{{ row.signed_commits_pct }}% of recent commits are signed{% else %}recent commits are unsigned{% endif %};
+        last pushed {{ row.last_push }}. Every point is earned from checkable signals — never paid placement. <a href="/methodology/">How scoring works →</a>
+      </p>
       {% if row.warning_reasons %}
       <div class="warning-banner">
         <strong>Active listing, but review is needed</strong>
