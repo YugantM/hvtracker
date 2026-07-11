@@ -380,3 +380,28 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   so 0 commits with a recent push is common and REAL (qdrant works on
   dev, master tip 2026-06-03; promptflow/grok-cli/Integuru similar), not
   a bug; ~10 such rows get cheaply re-verified each boot, by design.
+- **Retention/SEO batch 2026-07-11** (#163–#165, DEPLOYED ~00:49 UTC,
+  verified live) — driven by the owner's GA+GSC exports (28d: week-1
+  retention 1–3%; alerts popup 554 views→3 submits; search 23.7k
+  impressions→111 clicks with "is X safe" the only clicking pattern;
+  compare queries 142 imps/0 clicks on litellm-vs-vllm). (#163) alerts
+  exit-intent popup REMOVED from analytics.js (the /alerts/ page + POST
+  endpoint remain); homepage decluttered (two CTA banners → compact
+  2-chip tool-strip, one intro para, gainers+losers → single Daily
+  movers strip); watch panel is now the retention surface — "changes
+  since your last visit" chips (grade/score/rank deltas) per tracked
+  agent, client-side via localStorage snapshot (`hvtracker_watch_seen_v1`,
+  diffed against seenAtLoad, advanced after render; rows carry
+  data-slug). (#164) agent pages: above-fold `.safety-verdict` paragraph
+  (score/grade/rank + provenance/Scorecard/signed-commits/last-push) +
+  editorial `Review` w/ reviewRating in the SoftwareApplication JSON-LD
+  (author Organization HVTracker; deliberately NO AggregateRating —
+  policy needs user ratings — and NO datePublished — lastmod churn).
+  (#165) compare pages: per-pair meta/og/twitter descriptions with both
+  scores+grades. NO titles changed anywhere (the #114 churn lesson).
+  Owner conclusion driving this: sharing stopped 2 weeks ago → actives
+  halved; search improving (pos ~9-10, CTR up) but 10x too small; LLM
+  channel is real via MCP (machine_usage), not human referrals. Still
+  open from the plan: watchlist email digest (needs owner email-provider
+  choice — Resend/Postmark free tier), GSC-driven internal-linking pass,
+  weekly KPI snapshot.
