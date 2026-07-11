@@ -41,7 +41,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
 
       # Scheduled runs rotate through shards by UTC-hour bucket (cron hours
       # 1,5,9,... → shards 1..6). hour/4 bucketing tolerates GitHub's cron
@@ -105,7 +105,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
 
       - name: Download shard caches
         uses: actions/download-artifact@v4

@@ -20,7 +20,7 @@ jobs:
     outputs:
       mcp_only: ${{ steps.changed.outputs.mcp_only }}
     steps:
-      - uses: actions/checkout@v6.0.3
+      - uses: actions/checkout@v7.0.0
         with:
           fetch-depth: 2
 
@@ -76,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - uses: actions/checkout@v6.0.3
+      - uses: actions/checkout@v7.0.0
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -108,7 +108,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-smoke
     steps:
-      - uses: actions/checkout@v6.0.3
+      - uses: actions/checkout@v7.0.0
 
       - name: Set up Python
         uses: actions/setup-python@v6
