@@ -295,6 +295,23 @@ def test_machine_usage_counters(client):
     assert "since" in after
 
 
+def test_badge_fetch_counters(client):
+    """Badge SVG fetches are counted per slug and exposed via healthz —
+    READMEs embed badges through GitHub's camo proxy (no referrer, no JS),
+    so this server-side counter is the only visibility into that reach."""
+    slug = client.get("/api/v1/agents").json()["agents"][0]["slug"]
+    before = client.get("/healthz").json()["badge_fetches"]
+    assert client.get(f"/badge/{slug}.svg").status_code == 200
+    assert client.get(f"/badge/{slug}-grade.svg").status_code == 200
+    after = client.get("/healthz").json()["badge_fetches"]
+    assert after["total"] >= before["total"] + 2
+    assert after["top"].get(slug, 0) >= 2
+    # unknown slugs must not pollute the counters
+    total_after_404 = after["total"]
+    assert client.get("/badge/not-a-real-agent-xyz.svg").status_code == 404
+    assert client.get("/healthz").json()["badge_fetches"]["total"] == total_after_404
+
+
 def test_data_api_page_documents_machine_surface(client):
     r = client.get("/data-api/")
     assert "/api/v1/mcp/verify" in r.text
