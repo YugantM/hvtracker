@@ -373,6 +373,17 @@ def _canonical_redirect_target(request: Request) -> str | None:
 _usage_counters = {"api_v1": 0, "mcp": 0, "data_json": 0, "exports": 0}
 _USAGE_SINCE = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
+# Badge SVG fetches per agent slug. READMEs embed badges via GitHub's camo
+# proxy, which caches the SVG and strips referrers — so GA never sees this
+# reach at all, and each fetch here represents MANY actual README views
+# (camo re-fetches only when its cached copy expires). Counted only for
+# badges that resolve to a real agent, so scanner noise can't inflate it.
+_badge_counters: dict[str, int] = {}
+
+
+def _count_badge(slug: str) -> None:
+    _badge_counters[slug] = _badge_counters.get(slug, 0) + 1
+
 
 def _count_machine_usage(path: str) -> None:
     if path.startswith("/api/v1/"):
@@ -777,6 +788,11 @@ def healthz():
         "last_refresh_mode": refresh_status.get("last_mode"),
         "last_refresh_error": refresh_status.get("last_error"),
         "machine_usage": {"since": _USAGE_SINCE, **_usage_counters},
+        "badge_fetches": {
+            "since": _USAGE_SINCE,
+            "total": sum(_badge_counters.values()),
+            "top": dict(sorted(_badge_counters.items(), key=lambda kv: -kv[1])[:20]),
+        },
     }
 
 
@@ -1220,6 +1236,10 @@ def _badge_svg(label: str, value: str, color: str) -> str:
 @app.get("/badge/{owner}/{repo}/{kind}.svg")
 def badge(owner: str, repo: str, kind: str):
     agent = find_agent(f"{owner}/{repo}")
+    # Counts both direct hits and badge_by_slug delegations (which all pass
+    # through here except -trend, counted at its own file-serving branch).
+    if agent:
+        _count_badge(agent.get("slug") or f"{owner}/{repo}")
     if kind == "trust":
         score = (agent or {}).get("trust_score", 0) or 0
         color = "34d399" if score >= 55 else "60a5fa" if score >= 30 else "f87171"
@@ -1254,6 +1274,7 @@ def badge_by_slug(slug: str):
         path = os.path.join(OUTPUT_DIR, "badge", f"{base_slug}-trend.svg")
         if not os.path.isfile(path):
             return JSONResponse({"error": "not found"}, status_code=404)
+        _count_badge(base_slug)
         return FileResponse(path, media_type="image/svg+xml")
     agent = find_agent_by_slug(slug)
     if not agent:
