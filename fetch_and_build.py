@@ -5626,9 +5626,14 @@ def main() -> None:
                     cache_is_fresh = scanned > stale_threshold
                 except (KeyError, ValueError):
                     cache_is_fresh = False
-            if cached and cache_is_fresh:
+            # Marker-only cache entries ({"scan_failed_at": ...} for repos the
+            # CLI scan has never succeeded on) carry no score — treat them as
+            # a cache miss, not a hit (an unguarded cached["score"] here broke
+            # every 2h batch refresh on 2026-07-12 once markers landed).
+            has_cached_score = bool(cached) and cached.get("score") is not None
+            if has_cached_score and cache_is_fresh:
                 row["scorecard_score"] = cached["score"]
-                row["scorecard_checks"] = cached["checks"]
+                row["scorecard_checks"] = cached.get("checks", {})
                 row["scorecard_scanned_at"] = cached.get("scanned_at")
                 cache_hits += 1
             else:
@@ -5639,9 +5644,9 @@ def main() -> None:
                     # Live API hit — dated as of now.
                     row["scorecard_scanned_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
                     api_hits += 1
-                elif cached:
+                elif has_cached_score:
                     row["scorecard_score"] = cached["score"]
-                    row["scorecard_checks"] = cached["checks"]
+                    row["scorecard_checks"] = cached.get("checks", {})
                     row["scorecard_scanned_at"] = cached.get("scanned_at")
                     cache_hits += 1
                 else:
