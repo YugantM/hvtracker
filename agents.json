@@ -1910,7 +1910,7 @@
     "suppress_warnings": [
       "4.1.1"
     ],
-    "source_note": "This GitHub repository is a public issue tracker for Antigravity, a closed-source product — it does not contain the product's source code. The OpenSSF Scorecard and license signals below describe that issue-tracker repo, not the shipped product."
+    "source_note": "This GitHub repository is a public issue tracker for Antigravity, a closed-source product \u2014 it does not contain the product's source code. The OpenSSF Scorecard and license signals below describe that issue-tracker repo, not the shipped product."
   },
   {
     "repo": "nousresearch/hermes-agent",
@@ -2890,6 +2890,158 @@
     "name": "Grok CLI",
     "category": "Coding Agents",
     "npm_package": "grok-dev",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "microsoft/playwright-mcp",
+    "name": "Playwright MCP",
+    "category": "MCP Servers",
+    "npm_package": "@playwright/mcp",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "awslabs/mcp",
+    "name": "AWS MCP Servers",
+    "category": "MCP Servers",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "cloudflare/mcp-server-cloudflare",
+    "name": "Cloudflare MCP Server",
+    "category": "MCP Servers",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "ahujasid/blender-mcp",
+    "name": "Blender MCP",
+    "category": "MCP Servers",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "supabase/mcp",
+    "name": "Supabase MCP Server",
+    "category": "MCP Servers",
+    "npm_package": "@supabase/mcp-server-supabase",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "stripe/ai",
+    "name": "Stripe Agent Toolkit",
+    "category": "MCP Servers",
+    "npm_package": "@stripe/agent-toolkit",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "makenotion/notion-mcp-server",
+    "name": "Notion MCP Server",
+    "category": "MCP Servers",
+    "npm_package": "@notionhq/notion-mcp-server",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "grafana/mcp-grafana",
+    "name": "Grafana MCP Server",
+    "category": "MCP Servers",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "hashicorp/terraform-mcp-server",
+    "name": "Terraform MCP Server",
+    "category": "MCP Servers",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "browserbase/mcp-server-browserbase",
+    "name": "Browserbase MCP Server",
+    "category": "MCP Servers",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "firecrawl/firecrawl-mcp-server",
+    "name": "Firecrawl MCP Server",
+    "category": "MCP Servers",
+    "npm_package": "firecrawl-mcp",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "qdrant/mcp-server-qdrant",
+    "name": "Qdrant MCP Server",
+    "category": "MCP Servers",
+    "pypi_package": "mcp-server-qdrant",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "sooperset/mcp-atlassian",
+    "name": "MCP Atlassian",
+    "category": "MCP Servers",
+    "pypi_package": "mcp-atlassian",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "apify/apify-mcp-server",
+    "name": "Apify MCP Server",
+    "category": "MCP Servers",
+    "npm_package": "@apify/actors-mcp-server",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "Flux159/mcp-server-kubernetes",
+    "name": "Kubernetes MCP Server",
+    "category": "MCP Servers",
+    "npm_package": "mcp-server-kubernetes",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "getsentry/sentry-mcp",
+    "name": "Sentry MCP",
+    "category": "MCP Servers",
+    "npm_package": "@sentry/mcp-server",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "elastic/mcp-server-elasticsearch",
+    "name": "Elasticsearch MCP Server",
+    "category": "MCP Servers",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "perplexityai/modelcontextprotocol",
+    "name": "Perplexity MCP Server",
+    "category": "MCP Servers",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "mindsdb/mindshub",
+    "name": "MindsHub",
+    "category": "MCP Servers",
+    "pypi_package": "mindsdb",
+    "listing_status": "listed",
+    "tracking_mode": "direct"
+  },
+  {
+    "repo": "antvis/mcp-server-chart",
+    "name": "AntV Chart MCP Server",
+    "category": "MCP Servers",
+    "npm_package": "@antv/mcp-server-chart",
     "listing_status": "listed",
     "tracking_mode": "direct"
   }

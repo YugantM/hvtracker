@@ -55,6 +55,9 @@ TOPICS = [
     "agent-framework",
     "multi-agent",
     "agentic",
+    "mcp-server",
+    "mcp-servers",
+    "model-context-protocol",
 ]
 
 # Keyword searches (description field)
@@ -62,6 +65,7 @@ KEYWORDS = [
     '"AI agent" in:description',
     '"coding agent" in:description',
     '"autonomous agent" in:description',
+    '"MCP server" in:description',
 ]
 
 MIN_STARS = 500

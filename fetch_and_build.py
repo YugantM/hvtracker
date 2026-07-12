@@ -5944,6 +5944,7 @@ def main() -> None:
         "Observability & Evaluation",
         "Security & Guardrails",
         "Protocols & Tool Integration",
+        "MCP Servers",
         "Voice & Conversational",
         "Sandboxes & Runtimes",
         "Robotics & Embodied",
