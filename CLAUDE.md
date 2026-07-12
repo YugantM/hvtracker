@@ -430,3 +430,28 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   lagent (CLI OOM even at 4GB), traceroot + deepanalyze (180s timeout) —
   deepanalyze's scorecard stays null until the CLI copes; site renders
   null fine. If scans break again the alert workflow opens a fresh issue.
+- **MCP load-review + stdio v0.2.1 SHIPPED 2026-07-12** (no hv_tracker code
+  change; external repo only). Review vs the 2026-07-28 MCP spec (final ships
+  that day; stateless-first, `Mcp-Method`/`Mcp-Name` headers, `ttlMs`/
+  `cacheScope` on tools/list): hosted /mcp is already best-practice
+  (`stateless_http=True, json_response=True`, in-memory tools, 60/min/IP
+  limiter, `MCP_ENABLED` kill switch; GET /mcp rejects 406 cheap). Live
+  machine_usage proved MCP is the dominant machine channel — 1,847 req/36h vs
+  api_v1=4 — with RAM flat (~0.27GB), so protocol-chatter amplification
+  (~2-3 reqs per real tools/call in stateless mode) is tolerable until the
+  python-sdk ships spec support (~Aug–Oct); THEN: bump `mcp`, set generous
+  ttlMs + cacheScope=public on tools/list, split the /mcp usage counter by
+  the Mcp-Method header (deliberately NOT body-peeked now), and mirror per
+  the SERVER_VERSION runbook. Fixed the real gap: BOTH stdio impls in
+  `YugantM/hvtracker-mcp` re-pulled the full ~1MB `/api/v1/agents` board on
+  EVERY search_agents call — v0.2.1 caches it 15 min
+  (`HVTRACKER_BOARD_TTL_SECONDS`, failures never cached); tag fired
+  npm/PyPI/GHCR/DockerHub/MCPB all green, registry re-dispatch verified
+  (io.github.YugantM/hvtracker-mcp 0.2.1). OWNER Cloudflare dashboard items
+  OPEN: (a) extend the edge-cache rule to cache `GET /api/v1/agents` — it
+  already sends `Cache-Control: public, max-age=900` but the rule excludes
+  /api/* so it serves DYNAMIC (~1MB from origin per fetch; keep POST/auth
+  uncached); (b) optional: the free-plan rate-limiting rule on `POST /mcp`
+  so floods die at the edge (origin 60/min limiter stays as layer 2).
+  NOTE: the local `~/hvtracker-mcp` clone goes stale — always `git fetch`
+  there before working (was at v0.1.2 while origin was v0.2.0).
