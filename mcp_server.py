@@ -20,7 +20,7 @@ from mcp.server.transport_security import TransportSecuritySettings
 import mcp_trust
 
 SERVER_DISPLAY_NAME = "HVTracker MCP"
-SERVER_VERSION = "0.2.0"
+SERVER_VERSION = "0.3.0"
 SERVER_DESCRIPTION = (
     "Pre-connect trust checks for AI agents, frameworks, packages, and MCP "
     "servers using HVTracker's public trust registry."
@@ -215,6 +215,142 @@ class SearchAgentsResult(TypedDict):
     results: list[AgentSearchResult]
 
 
+class ScanItemResult(TypedDict):
+    input: str
+    tracked: bool
+    trusted: bool
+    grade: str | None
+    trust_score: float | None
+    resolved: str | None
+    slug: str | None
+
+
+class ScanSummary(TypedDict):
+    total: int
+    tracked: int
+    untracked: int
+    trusted: int
+    avg_trust: float | None
+
+
+class ScanStackResult(TypedDict):
+    summary: ScanSummary
+    results: list[ScanItemResult]
+
+
+class CategoryCount(TypedDict):
+    category: str
+    count: int
+    leaderboard_hint: str
+
+
+class ListCategoriesResult(TypedDict):
+    count: int
+    categories: list[CategoryCount]
+
+
+class GetLeaderboardResult(TypedDict):
+    category: str | None
+    count: int
+    results: list[AgentSearchResult]
+
+
+class HistoryPoint(TypedDict):
+    date: str
+
+
+class GetAgentHistoryResult(TypedDict):
+    tracked: bool
+    slug: NotRequired[str | None]
+    repo: NotRequired[str | None]
+    name: NotRequired[str | None]
+    window_days: NotRequired[int]
+    count: NotRequired[int]
+    history: NotRequired[list[HistoryPoint]]
+    note: NotRequired[str]
+    message: NotRequired[str]
+
+
+SCAN_ITEM_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "input": {"type": "string"},
+        "tracked": {"type": "boolean"},
+        "trusted": {"type": "boolean"},
+        "grade": {"type": ["string", "null"]},
+        "trust_score": {"type": ["number", "null"]},
+        "resolved": {"type": ["string", "null"]},
+        "slug": {"type": ["string", "null"]},
+    },
+    "required": ["input", "tracked", "trusted", "grade", "trust_score"],
+}
+
+SCAN_STACK_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "summary": {
+            "type": "object",
+            "properties": {
+                "total": {"type": "integer"},
+                "tracked": {"type": "integer"},
+                "untracked": {"type": "integer"},
+                "trusted": {"type": "integer"},
+                "avg_trust": {"type": ["number", "null"]},
+            },
+            "required": ["total", "tracked", "untracked", "trusted", "avg_trust"],
+        },
+        "results": {"type": "array", "items": SCAN_ITEM_SCHEMA},
+    },
+    "required": ["summary", "results"],
+}
+
+LIST_CATEGORIES_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "count": {"type": "integer"},
+        "categories": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "category": {"type": "string"},
+                    "count": {"type": "integer"},
+                    "leaderboard_hint": {"type": "string"},
+                },
+                "required": ["category", "count", "leaderboard_hint"],
+            },
+        },
+    },
+    "required": ["count", "categories"],
+}
+
+GET_LEADERBOARD_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "category": {"type": ["string", "null"]},
+        "count": {"type": "integer"},
+        "results": {"type": "array", "items": AGENT_PROFILE_SCHEMA},
+    },
+    "required": ["category", "count", "results"],
+}
+
+GET_AGENT_HISTORY_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "tracked": {"type": "boolean"},
+        "slug": {"type": ["string", "null"]},
+        "repo": {"type": ["string", "null"]},
+        "name": {"type": ["string", "null"]},
+        "window_days": {"type": "integer"},
+        "count": {"type": "integer"},
+        "history": {"type": "array", "items": {"type": "object"}},
+        "note": {"type": "string"},
+        "message": {"type": "string"},
+    },
+    "required": ["tracked"],
+}
+
+
 def _tool_annotations(title: str) -> ToolAnnotations:
     return ToolAnnotations(title=title, **TOOL_ANNOTATIONS)
 
@@ -251,6 +387,23 @@ SEARCH_AGENTS_DESCRIPTION = (
 COMPARE_AGENTS_DESCRIPTION = (
     "Compare two tracked AI agents side by side: trust scores, grades, "
     "runtime capabilities, and an evidence-based verdict."
+)
+SCAN_STACK_DESCRIPTION = (
+    "Bulk pre-connect trust check for a whole dependency set — paste a "
+    "requirements.txt, package.json, MCP client config, or a plain list and get "
+    "a trust verdict per item plus a stack summary."
+)
+GET_LEADERBOARD_DESCRIPTION = (
+    "Top tracked AI agents and MCP servers ranked by HVTrust score, optionally "
+    "filtered to one category."
+)
+LIST_CATEGORIES_DESCRIPTION = (
+    "List the HVTracker categories with agent counts, so you can then pull a "
+    "category's leaderboard."
+)
+GET_AGENT_HISTORY_DESCRIPTION = (
+    "90-day trust-score, grade, and rank history for one tracked agent — is it "
+    "improving or declining?"
 )
 
 
@@ -365,6 +518,74 @@ def server_card() -> dict:
                     "required": ["a", "b"],
                 },
                 COMPARE_AGENTS_OUTPUT_SCHEMA,
+            ),
+            _tool_card(
+                "scan_stack",
+                "Scan Stack",
+                SCAN_STACK_DESCRIPTION,
+                {
+                    "type": "object",
+                    "properties": {
+                        "input": {
+                            "type": "string",
+                            "description": (
+                                "A requirements.txt, package.json, MCP client "
+                                "config, or newline/comma list of identifiers."
+                            ),
+                        },
+                    },
+                    "required": ["input"],
+                },
+                SCAN_STACK_OUTPUT_SCHEMA,
+            ),
+            _tool_card(
+                "list_categories",
+                "List Categories",
+                LIST_CATEGORIES_DESCRIPTION,
+                {"type": "object", "properties": {}},
+                LIST_CATEGORIES_OUTPUT_SCHEMA,
+            ),
+            _tool_card(
+                "get_leaderboard",
+                "Get Leaderboard",
+                GET_LEADERBOARD_DESCRIPTION,
+                {
+                    "type": "object",
+                    "properties": {
+                        "category": {
+                            "type": "string",
+                            "default": "",
+                            "description": "Optional exact category filter (see list_categories).",
+                        },
+                        "limit": {
+                            "type": "integer",
+                            "default": 10,
+                            "minimum": 1,
+                            "maximum": 50,
+                            "description": "Maximum number of results to return.",
+                        },
+                    },
+                },
+                GET_LEADERBOARD_OUTPUT_SCHEMA,
+            ),
+            _tool_card(
+                "get_agent_history",
+                "Get Agent History",
+                GET_AGENT_HISTORY_DESCRIPTION,
+                {
+                    "type": "object",
+                    "properties": {
+                        "name_or_repo": {
+                            "type": "string",
+                            "description": (
+                                "Agent name, slug, GitHub repo/URL, npm package, "
+                                "or PyPI package."
+                            ),
+                        },
+                    },
+                    "required": ["name_or_repo"],
+                },
+                GET_AGENT_HISTORY_OUTPUT_SCHEMA,
             ),
         ],
         "resources": [],
@@ -564,3 +785,183 @@ def search_agents(query: str = "", category: str = "", limit: int = 10) -> Searc
     out.sort(key=lambda r: (r["trust_score"] is None, -(r["trust_score"] or 0)))
     limit = max(1, min(int(limit or 10), 50))
     return {"count": len(out), "results": out[:limit]}
+
+
+@mcp.tool(
+    title="Scan Stack",
+    description=SCAN_STACK_DESCRIPTION,
+    annotations=_tool_annotations("Scan Stack"),
+)
+def scan_stack(input: str) -> ScanStackResult:
+    """Bulk pre-connect trust check for a whole dependency set. Paste a
+    requirements.txt, package.json, MCP client config, or a newline/comma list;
+    each identifier is resolved against the curated registry and returned with a
+    verdict (tracked/trusted/grade/score) plus a stack summary. Registry-only and
+    in-memory — the same engine as verify_mcp_server, run over many items at once."""
+    from app import _parse_scan_input, _resolve_registry_agent
+    text = input or ""
+    if len(text) > 20000:
+        text = text[:20000]
+    identifiers = _parse_scan_input(text)
+    results: list[ScanItemResult] = []
+    summary: ScanSummary = {
+        "total": 0, "tracked": 0, "untracked": 0, "trusted": 0, "avg_trust": None,
+    }
+    scores: list[float] = []
+    for ident in identifiers:
+        v = mcp_trust.evaluate(_resolve_registry_agent(ident), ident)
+        results.append({
+            "input": ident,
+            "tracked": v["tracked"],
+            "trusted": v["trusted"],
+            "grade": v["grade"],
+            "trust_score": v["trust_score"],
+            "resolved": v.get("resolved"),
+            "slug": v.get("slug"),
+        })
+        summary["total"] += 1
+        summary["tracked" if v["tracked"] else "untracked"] += 1
+        if v["trusted"]:
+            summary["trusted"] += 1
+        if v["trust_score"] is not None:
+            scores.append(v["trust_score"])
+    if scores:
+        summary["avg_trust"] = round(sum(scores) / len(scores), 1)
+    return {"summary": summary, "results": results}
+
+
+@mcp.tool(
+    title="List Categories",
+    description=LIST_CATEGORIES_DESCRIPTION,
+    annotations=_tool_annotations("List Categories"),
+)
+def list_categories() -> ListCategoriesResult:
+    """List HVTracker's categories with the number of tracked agents in each,
+    most-populated first. Use this to discover the taxonomy, then call
+    get_leaderboard(category=...) to pull a category's top agents."""
+    from app import load_data
+    counts: dict[str, int] = {}
+    for a in load_data().get("agents", []):
+        cat = a.get("category")
+        if cat:
+            counts[cat] = counts.get(cat, 0) + 1
+    cats = [
+        {"category": c, "count": n,
+         "leaderboard_hint": f'get_leaderboard(category="{c}")'}
+        for c, n in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
+    ]
+    return {"count": len(cats), "categories": cats}
+
+
+@mcp.tool(
+    title="Get Leaderboard",
+    description=GET_LEADERBOARD_DESCRIPTION,
+    annotations=_tool_annotations("Get Leaderboard"),
+)
+def get_leaderboard(category: str = "", limit: int = 10) -> GetLeaderboardResult:
+    """Top tracked AI agents and MCP servers by HVTrust score. Pass a category
+    (exact name from list_categories) to scope it, or leave blank for the overall
+    board. Returns name, repo, score, grade, category, and profile URL in rank
+    order."""
+    from app import load_data
+    cl = (category or "").lower()
+    out: list[AgentSearchResult] = []
+    for a in load_data().get("agents", []):
+        if cl and (a.get("category") or "").lower() != cl:
+            continue
+        out.append({
+            "name": a.get("name"),
+            "repo": a.get("repo"),
+            "trust_score": a.get("trust_score"),
+            "evidence_grade": a.get("evidence_grade"),
+            "category": a.get("category"),
+            "profile_url": f"https://hvtracker.net/agents/{a.get('slug')}/",
+        })
+    out.sort(key=lambda r: (r["trust_score"] is None, -(r["trust_score"] or 0)))
+    limit = max(1, min(int(limit or 10), 50))
+    return {"category": category or None, "count": len(out), "results": out[:limit]}
+
+
+# Per-agent history index, rebuilt only when the snapshot dir changes (a new
+# daily file lands). Turns get_agent_history from up-to-90 full-board file reads
+# per call into one dict lookup — the cost guard for exposing history over MCP.
+_history_index: dict = {"mtime": None, "data": None}
+
+
+def _get_history_index() -> dict:
+    """Return {repo_lower: [public points]} for the public history window,
+    cached by the history dir's mtime."""
+    import os
+
+    from app import OUTPUT_DIR, _HISTORY_PUBLIC_DAYS, _HISTORY_PUBLIC_FIELDS
+    hist_dir = os.path.join(OUTPUT_DIR, "output", "history")
+    if not os.path.isdir(hist_dir):
+        return {}
+    try:
+        mtime = os.path.getmtime(hist_dir)
+    except OSError:
+        return {}
+    if _history_index["mtime"] == mtime and _history_index["data"] is not None:
+        return _history_index["data"]
+
+    import json
+    from datetime import datetime, timedelta, timezone
+    cutoff = (datetime.now(timezone.utc).date()
+              - timedelta(days=_HISTORY_PUBLIC_DAYS - 1)).isoformat()
+    index: dict[str, list] = {}
+    for fn in sorted(os.listdir(hist_dir)):
+        if not (len(fn) == 15 and fn.endswith(".json")):
+            continue
+        date_str = fn[:-5]
+        if date_str < cutoff:
+            continue
+        try:
+            with open(os.path.join(hist_dir, fn), encoding="utf-8") as f:
+                snap = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            continue
+        mv = snap.get("methodology_version")
+        for a in snap.get("agents", []):
+            repo_key = (a.get("repo") or "").lower()
+            if not repo_key:
+                continue
+            point = {"date": date_str}
+            for k in _HISTORY_PUBLIC_FIELDS:
+                if k == "methodology_version":
+                    point[k] = a.get(k, mv)
+                elif k in a:
+                    point[k] = a[k]
+            index.setdefault(repo_key, []).append(point)
+    _history_index["mtime"] = mtime
+    _history_index["data"] = index
+    return index
+
+
+@mcp.tool(
+    title="Get Agent History",
+    description=GET_AGENT_HISTORY_DESCRIPTION,
+    annotations=_tool_annotations("Get Agent History"),
+)
+def get_agent_history(name_or_repo: str) -> GetAgentHistoryResult:
+    """90-day trust history for one tracked agent — one point per daily snapshot
+    (oldest first) with trust_score, grade, coverage_grade, and rank, so you can
+    tell whether trust is rising or falling. Accepts the same identifiers as
+    check_agent_trust. Extended history is reserved for a future tier."""
+    from app import _HISTORY_PUBLIC_DAYS
+    agent = _resolve_agent(name_or_repo)
+    if agent is None:
+        return {"tracked": False,
+                "message": "Not in the HVTracker registry; no history to show."}
+    repo_key = (agent.get("repo") or "").lower()
+    points = _get_history_index().get(repo_key, [])
+    return {
+        "tracked": True,
+        "slug": agent.get("slug"),
+        "repo": agent.get("repo"),
+        "name": agent.get("name"),
+        "window_days": _HISTORY_PUBLIC_DAYS,
+        "count": len(points),
+        "history": points,
+        "note": "Public 90-day window (CC BY 4.0). Extended history is reserved "
+                "for a future tier.",
+    }
