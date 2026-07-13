@@ -549,3 +549,66 @@ def test_startup_keeps_scheduler_alive(monkeypatch):
 
     app.shutdown()
     assert app._scheduler is None
+
+
+def test_startup_prefers_pending_over_commit_repair(monkeypatch):
+    """A single restart must give freshly added agents their first signal
+    refresh. ~10 rows legitimately sit at 0 commits with a recent push
+    (default-branch-quiet repos), keeping _has_missing_commit_rows() true on
+    nearly every boot — so if repair-commits outranked pending, new agents
+    could never be scored by restarting (observed 2026-07-13, 20-agent add)."""
+    import app
+    importlib.reload(app)
+
+    class FakeScheduler:
+        def __init__(self, timezone):
+            self.jobs = []
+
+        def add_job(self, func, trigger, id, hour=None, minute=None, **kwargs):
+            pass
+
+        def start(self):
+            pass
+
+        def shutdown(self, wait=False):
+            pass
+
+    fake_bg = types.ModuleType("apscheduler.schedulers.background")
+    fake_bg.BackgroundScheduler = FakeScheduler
+    fake_sched = types.ModuleType("apscheduler.schedulers")
+    fake_sched.background = fake_bg
+    fake_ap = types.ModuleType("apscheduler")
+    fake_ap.schedulers = fake_sched
+    monkeypatch.setitem(sys.modules, "apscheduler", fake_ap)
+    monkeypatch.setitem(sys.modules, "apscheduler.schedulers", fake_sched)
+    monkeypatch.setitem(sys.modules, "apscheduler.schedulers.background", fake_bg)
+    monkeypatch.delenv("DISABLE_SCHEDULER", raising=False)
+
+    monkeypatch.setattr(app, "_seed_history_into_volume", lambda: 0)
+    monkeypatch.setattr(app, "_compute_render_fingerprint", lambda: "fp")
+    monkeypatch.setattr(app, "_read_render_fingerprint", lambda: "fp")
+    monkeypatch.setattr(app.db, "init_schema", lambda: None)
+    monkeypatch.setattr(app.db, "enabled", lambda: False)
+    monkeypatch.setattr(app.os.path, "isfile", lambda path: True)
+    # Both startup-refresh conditions hold at once — pending must win.
+    monkeypatch.setattr(app, "_has_missing_commit_rows", lambda: True)
+    monkeypatch.setattr(app, "_has_pending_signal_rows", lambda: True)
+
+    kicked = []
+
+    class FakeThread:
+        def __init__(self, target=None, args=(), daemon=None):
+            self._args = args
+
+        def start(self):
+            if self._args:
+                kicked.append(self._args[0])
+
+    monkeypatch.setattr(app.threading, "Thread", FakeThread)
+
+    app._scheduler = None
+    app.startup()
+    app.shutdown()
+
+    assert "pending" in kicked
+    assert "repair-commits" not in kicked

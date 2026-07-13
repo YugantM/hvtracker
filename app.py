@@ -2420,12 +2420,18 @@ def _startup():
     if not os.path.isfile(DATA_PATH):
         threading.Thread(target=_refresh_and_record, args=("full", fingerprint, "startup"), daemon=True).start()
         print("[startup] no data.json on volume — kicked off initial full build")
+    elif os.environ.get("DISABLE_SCHEDULER") != "1" and _has_pending_signal_rows():
+        # Pending must outrank repair-commits: ~10 rows legitimately sit at
+        # 0 commits with a recent push (default-branch-quiet repos, re-verified
+        # each boot by design), so _has_missing_commit_rows() is true on nearly
+        # every boot — with repair first, freshly added agents could never get
+        # their first signal refresh from a restart. The pending refresh fetches
+        # commit counts for its rows anyway; repair runs on the next boot.
+        threading.Thread(target=_refresh_and_record, args=("pending", fingerprint, "startup"), daemon=True).start()
+        print("[startup] detected provisional rows — kicked off pending refresh")
     elif _has_missing_commit_rows():
         threading.Thread(target=_refresh_and_record, args=("repair-commits", fingerprint, "startup"), daemon=True).start()
         print("[startup] detected rows with missing commit counts — kicked off targeted repair refresh")
-    elif os.environ.get("DISABLE_SCHEDULER") != "1" and _has_pending_signal_rows():
-        threading.Thread(target=_refresh_and_record, args=("pending", fingerprint, "startup"), daemon=True).start()
-        print("[startup] detected provisional rows — kicked off pending refresh")
     elif seeded > 0 or stored_fingerprint != fingerprint or agents_changed:
         # Re-render when:
         #   - we just dropped prior-day snapshots into a volume that already
