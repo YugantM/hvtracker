@@ -2024,7 +2024,7 @@ curl -sO https://hvtracker.net/data/exports/hvtrust-QUARTER_LABEL.csv</code></pr
     "hvtracker": { "url": "https://hvtracker.net/mcp" }
   }
 }</code></pre>
-      <p style='margin-top:12px;color:var(--muted);font-size:13px'>Tools: <code>verify_mcp_server</code> (pre-connect "Safe Browsing for MCP" verdict), <code>check_agent_trust</code> (incl. runtime capabilities + signed-credential URL), <code>compare_agents</code>, <code>search_agents</code>.</p>
+      <p style='margin-top:12px;color:var(--muted);font-size:13px'>Tools: <code>verify_mcp_server</code> (pre-connect "Safe Browsing for MCP" verdict), <code>check_agent_trust</code> (incl. runtime capabilities + signed-credential URL), <code>scan_stack</code> (verdict for a whole requirements.txt / package.json / mcp config), <code>compare_agents</code>, <code>get_leaderboard</code>, <code>list_categories</code>, <code>get_agent_history</code> (90-day trust trend), <code>search_agents</code>.</p>
     </div>
     <div class='card'>
       <h2>Early pricing stub</h2>

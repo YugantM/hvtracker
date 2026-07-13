@@ -4,6 +4,7 @@ Fast and offline: monkeypatches app.load_data with a small fixture so the tools
 are exercised without a built data.json, a database, or network.
 """
 import asyncio
+import json
 
 import pytest
 
@@ -92,10 +93,86 @@ def test_compare_agents_untracked_side_is_graceful():
     assert r["compare_url"] is None
 
 
+def test_scan_stack_verdicts_and_summary_math():
+    r = mcp_server.scan_stack("langgraph\naipass\ntotally-unknown-pkg")
+    s = r["summary"]
+    assert s["total"] == 3
+    assert s["tracked"] == 2
+    assert s["untracked"] == 1
+    assert s["trusted"] >= 1
+    # avg_trust averages only the tracked/scored items (92.2 and 70.0 → 81.1).
+    assert s["avg_trust"] == 81.1
+    by_input = {row["input"]: row for row in r["results"]}
+    assert by_input["langgraph"]["tracked"] is True
+    assert by_input["totally-unknown-pkg"]["tracked"] is False
+
+
+def test_scan_stack_caps_oversized_input():
+    # 20k-char cap keeps work bounded; an overlong blob must not error.
+    r = mcp_server.scan_stack("langgraph\n" + ("x" * 30000))
+    assert r["summary"]["total"] >= 1
+
+
+def test_list_categories_counts_and_hints():
+    r = mcp_server.list_categories()
+    assert r["count"] == 2
+    cats = {c["category"]: c for c in r["categories"]}
+    assert cats["Agent Frameworks"]["count"] == 1
+    assert 'get_leaderboard(category="Agent Frameworks")' == \
+        cats["Agent Frameworks"]["leaderboard_hint"]
+
+
+def test_get_leaderboard_overall_and_by_category():
+    r = mcp_server.get_leaderboard()
+    assert r["count"] == 2
+    assert r["results"][0]["name"] == "LangGraph"  # higher trust first
+    r2 = mcp_server.get_leaderboard(category="Multi-Agent Systems")
+    assert r2["category"] == "Multi-Agent Systems"
+    assert [a["name"] for a in r2["results"]] == ["AIPass"]
+
+
+def test_get_agent_history_unknown_is_graceful():
+    r = mcp_server.get_agent_history("not-a-real-agent-xyz")
+    assert r["tracked"] is False
+    assert "message" in r
+
+
+def test_get_agent_history_reads_snapshots_and_caches(tmp_path, monkeypatch):
+    from datetime import date, timedelta
+    hist = tmp_path / "output" / "history"
+    hist.mkdir(parents=True)
+    today = date.today()
+    for i, sc in enumerate((80.0, 92.2)):
+        day = (today - timedelta(days=1 - i)).isoformat()
+        (hist / f"{day}.json").write_text(json.dumps({
+            "methodology_version": "v4.2",
+            "agents": [{"repo": "langchain-ai/langgraph", "rank": 3 - i,
+                        "trust_score": sc, "evidence_grade": "A"}],
+        }))
+    monkeypatch.setattr(app, "OUTPUT_DIR", str(tmp_path))
+    mcp_server._history_index.update({"mtime": None, "data": None})
+
+    r = mcp_server.get_agent_history("langgraph")
+    assert r["tracked"] is True
+    assert r["count"] == 2
+    assert r["history"][0]["trust_score"] == 80.0  # oldest first
+    assert r["window_days"] == 90
+
+    # Second call must reuse the cached index (same dir mtime → one build).
+    first = mcp_server._get_history_index()
+    second = mcp_server._get_history_index()
+    assert first is second
+
+
+EXPECTED_TOOLS = {
+    "check_agent_trust", "verify_mcp_server", "search_agents", "compare_agents",
+    "scan_stack", "list_categories", "get_leaderboard", "get_agent_history",
+}
+
+
 def test_tools_registered_with_input_schemas():
     tools = {t.name: t for t in asyncio.run(mcp_server.mcp.list_tools())}
-    assert set(tools) == {"check_agent_trust", "verify_mcp_server",
-                          "search_agents", "compare_agents"}
+    assert set(tools) == EXPECTED_TOOLS
     assert "name_or_repo" in tools["check_agent_trust"].inputSchema["properties"]
     assert "server" in tools["verify_mcp_server"].inputSchema["properties"]
     check_schema = tools["check_agent_trust"].outputSchema["properties"]
@@ -170,12 +247,7 @@ def test_smithery_server_card_endpoint(monkeypatch):
         assert tool["outputSchema"]["type"] == "object"
         assert tool["annotations"]["readOnlyHint"] is True
         assert tool["annotations"]["destructiveHint"] is False
-    assert {tool["name"] for tool in body["tools"]} == {
-        "check_agent_trust",
-        "verify_mcp_server",
-        "search_agents",
-        "compare_agents",
-    }
+    assert {tool["name"] for tool in body["tools"]} == EXPECTED_TOOLS
     compare_card = card_tools["compare_agents"]
     assert set(compare_card["inputSchema"]["required"]) == {"a", "b"}
     assert compare_card["outputSchema"]["required"] == ["a", "b", "verdict", "compare_url"]
