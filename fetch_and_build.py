@@ -6688,9 +6688,9 @@ def main() -> None:
         ]
         _abk = _a.get("trust_breakdown") or {}
         _bbk = _b.get("trust_breakdown") or {}
-        _dims = [{"label": lbl, "max": mx, "a": _cmp_r1(_abk.get(k)), "b": _cmp_r1(_bbk.get(k)), "lead": _cmp_lead(_abk.get(k), _bbk.get(k))}
-                 for lbl, k, mx in (("Safety / integrity", "safety", 25), ("Identity & provenance", "identity", 20),
-                                    ("Transparency", "transparency", 17), ("Maintenance", "maintenance", 20), ("Adoption", "adoption", 20))]
+        _dims = [{"label": lbl, "max": TRUST_DIMENSIONS[k][1], "a": _cmp_r1(_abk.get(k)), "b": _cmp_r1(_bbk.get(k)), "lead": _cmp_lead(_abk.get(k), _bbk.get(k))}
+                 for lbl, k in (("Safety / integrity", "safety"), ("Identity & provenance", "identity"),
+                                ("Transparency", "transparency"), ("Maintenance", "maintenance"), ("Adoption", "adoption"))]
         _ctx = {"a": _a, "b": _b, "category": _cm, "metrics": _metrics, "dims": _dims,
                 "caps": compare_capability_rows(_a, _b),
                 "updated": now_str, "methodology_version": METHODOLOGY_VERSION,

@@ -265,11 +265,11 @@
           HVTrust = clamp( base + RuntimeBonuses × min(1, (100 − base) / 20) − RuntimePenalties, 0–100 )
         </div>
         <ul class="weights">
-          <li><strong>Safety / Integrity · 25</strong> — OSSF Scorecard, build provenance, and signed-commit ratio. The hardest signals to fake.</li>
-          <li><strong>Identity / Provenance · 18</strong> — verified listing status and build provenance binding the package to its source.</li>
-          <li><strong>Transparency · 17</strong> — a declared license and OSSF transparency checks.</li>
-          <li><strong>Maintenance · 20</strong> — recency of the last push and log-scaled recent commit activity (halved when commit data is low-confidence).</li>
-          <li><strong>Adoption · 20</strong> — log-scaled, capped stars and package downloads (npm, PyPI, crates.io, Docker Hub, VS Code Marketplace).</li>
+          <li><strong>Safety / Integrity · 25</strong> — OSSF Scorecard, build provenance, and signed-commit ratio. The hardest signals to fake. Weighted <strong>50% OSSF Scorecard · 30% build provenance · 20% signed-commit ratio</strong>.</li>
+          <li><strong>Identity / Provenance · 18</strong> — verified listing status and build provenance binding the package to its source. Weighted <strong>60% listing status · 40% build provenance</strong>.</li>
+          <li><strong>Transparency · 17</strong> — a declared license and OSSF transparency checks. Weighted <strong>50% declared license · 50% OSSF Scorecard</strong>. Note this pillar is half Scorecard: an open-source project with a permissive license earns the full license half, but a low OSSF Scorecard still holds the pillar down.</li>
+          <li><strong>Maintenance · 20</strong> — recency of the last push and log-scaled recent commit activity (halved when commit data is low-confidence). Weighted <strong>60% last-push freshness · 40% commit activity</strong>.</li>
+          <li><strong>Adoption · 20</strong> — log-scaled, capped stars and package downloads (npm, PyPI, crates.io, Docker Hub, VS Code Marketplace). Weighted <strong>60% stars · 40% downloads</strong>.</li>
         </ul>
         <p class="note"><strong>Confidence</strong> = present ÷ applicable signal types (floored at 0.4) and is shown alongside each score. Signals that cannot apply to an agent (for example, package downloads for a project that ships no package) are excluded rather than counted as missing — "not applicable" is not the same as "unverified".</p>
         <p class="note"><strong>Evidence Grade</strong> is derived from the trust score band: A ≥ 80, B ≥ 65, C ≥ 50, D &lt; 50. It summarizes the overall trust level at a glance.</p>
