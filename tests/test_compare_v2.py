@@ -54,3 +54,28 @@ def test_coverage_caveat_only_when_leader_is_thinner():
                                        {"name": "T", "coverage_grade": "B"}) is None
     # missing grades: no caveat
     assert fab.compare_coverage_caveat({"name": "L"}, {"name": "T", "coverage_grade": "A"}) is None
+
+
+def test_published_pillar_maxes_match_what_scoring_can_emit():
+    """The denominators we print (agent page, compare pages, methodology) must
+    equal the real ceiling of each pillar. A row saturated on every input has
+    to land exactly on TRUST_DIMENSIONS — otherwise we publish a bar that can
+    never fill, which is how the compare page came to show identity as / 20
+    when the pillar maxes out at 18.
+    """
+    saturated = {
+        "scorecard_score": 10,
+        "has_provenance": True,
+        "signed_commits_ratio": 1.0,
+        "listing_status": "listed",
+        "license_spdx": "MIT",
+        "days_ago": 0,
+        "weekly_commits": 100,
+        "stars": 100_000,
+        "weekly_downloads": 1_000_000,
+    }
+    breakdown = fab.compute_trust_score(saturated)["trust_breakdown"]
+    for key, (_label, published_max) in fab.TRUST_DIMENSIONS.items():
+        assert breakdown[key] == published_max, (
+            f"{key}: scoring tops out at {breakdown[key]} but we publish / {published_max}")
+    assert sum(mx for _lbl, mx in fab.TRUST_DIMENSIONS.values()) == 100

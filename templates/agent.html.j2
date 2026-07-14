@@ -588,27 +588,27 @@
             </div>
             <div class="metric-list" aria-label="HVTrust dimensions for {{ row.name }}">
               <div class="metric-row">
-                <div class="metric-name"><strong>Safety / Integrity</strong><span class="metric-sub">OSSF, provenance, signatures</span></div>
+                <div class="metric-name"><strong>Safety / Integrity</strong><span class="metric-sub">50% OSSF Scorecard · 30% provenance · 20% signed commits</span></div>
                 <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.safety / 25 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
                 <div class="metric-value">{{ row.trust_breakdown.safety }} <span>/ 25</span></div>
               </div>
               <div class="metric-row">
-                <div class="metric-name"><strong>Identity / Provenance</strong><span class="metric-sub">Listing and build link</span></div>
+                <div class="metric-name"><strong>Identity / Provenance</strong><span class="metric-sub">60% listing status · 40% build provenance</span></div>
                 <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.identity / 18 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
                 <div class="metric-value">{{ row.trust_breakdown.identity }} <span>/ 18</span></div>
               </div>
               <div class="metric-row">
-                <div class="metric-name"><strong>Transparency</strong><span class="metric-sub">License and public checks</span></div>
+                <div class="metric-name"><strong>Transparency</strong><span class="metric-sub">50% declared license · 50% OSSF Scorecard</span></div>
                 <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.transparency / 17 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
                 <div class="metric-value">{{ row.trust_breakdown.transparency }} <span>/ 17</span></div>
               </div>
               <div class="metric-row">
-                <div class="metric-name"><strong>Maintenance</strong><span class="metric-sub">Freshness and commits</span></div>
+                <div class="metric-name"><strong>Maintenance</strong><span class="metric-sub">60% last-push freshness · 40% commit activity</span></div>
                 <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.maintenance / 20 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
                 <div class="metric-value">{{ row.trust_breakdown.maintenance }} <span>/ 20</span></div>
               </div>
               <div class="metric-row">
-                <div class="metric-name"><strong>Adoption</strong><span class="metric-sub">Stars and downloads</span></div>
+                <div class="metric-name"><strong>Adoption</strong><span class="metric-sub">60% stars · 40% downloads, log-scaled</span></div>
                 <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.adoption / 20 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
                 <div class="metric-value">{{ row.trust_breakdown.adoption }} <span>/ 20</span></div>
               </div>
