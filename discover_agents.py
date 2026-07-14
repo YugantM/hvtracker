@@ -43,6 +43,34 @@ REVIEWED_REJECTED = {
         "2026-07-07 owner: rejected — sandbox automation delegating model "
         "interaction to coding-agent CLIs, not an agent framework"
     ),
+    # 2026-07-14: the supervisory-harness class. Each of these is popular
+    # (10k-30k stars) and resurfaces every sweep, but delegates the actual
+    # agent work to an external coding-agent CLI — the same boundary that
+    # disqualified agentwrapper/agent-orchestrator above.
+    "iofficeai/aionui": (
+        "2026-07-14 owner: rejected — desktop GUI wrapping OpenClaw/Claude "
+        "Code/Codex; the wrapped CLI is the agent"
+    ),
+    "bloopai/vibe-kanban": (
+        "2026-07-14 owner: rejected — kanban board that dispatches work to "
+        "external coding agents; task management, not agent logic"
+    ),
+    "manaflow-ai/cmux": (
+        "2026-07-14 owner: rejected — terminal emulator with tabs for coding "
+        "agents; no agent logic of its own"
+    ),
+    "snarktank/ralph": (
+        "2026-07-14 owner: rejected — loop that re-invokes Claude Code until a "
+        "PRD is done; the loop is a harness, the CLI is the agent"
+    ),
+    "stablyai/orca": (
+        "2026-07-14 owner: rejected — ADE for running a fleet of external "
+        "coding agents in parallel; supervisory harness"
+    ),
+    "superset-sh/superset": (
+        "2026-07-14 owner: rejected — editor for running many Claude Code/Codex "
+        "instances; supervisory harness"
+    ),
 }
 
 # Topics to query (one request each)
