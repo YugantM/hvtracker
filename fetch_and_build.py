@@ -6385,7 +6385,9 @@ def main() -> None:
                 slug_dir = os.path.join(agents_dir, row["slug"])
                 og_path = os.path.join(slug_dir, "og.png")
                 try:
-                    generate_og(row, og_path)
+                    # Rows don't carry a board-size field, so without this the
+                    # card's "Rank #N of M" falls back to a stale hardcoded 196.
+                    generate_og({**row, "total": len(rows)}, og_path)
                     og_count += 1
                 except Exception as e:
                     print(f"  WARN: OG card failed for {row['slug']}: {e}")
