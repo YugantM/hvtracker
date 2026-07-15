@@ -455,3 +455,26 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   so floods die at the edge (origin 60/min limiter stays as layer 2).
   NOTE: the local `~/hvtracker-mcp` clone goes stale — always `git fetch`
   there before working (was at v0.1.2 while origin was v0.2.0).
+- **Grok Build listed + OG-card denominator fix DEPLOYED 2026-07-15 ~22:30
+  UTC** (#187 @8ba19ed84, owner-instructed; catalog 440→441, board 418).
+  xai-org/grok-build (first-party xAI coding agent, Rust TUI, Apache-2.0 —
+  NOT the #180-denylisted supervisory-harness class; it ships its own agent
+  runtime like Codex/Claude Code). OSSF scan (3.4) pre-seeded on BOTH the
+  feature branch (image seed) and the `data` branch (@6cfa4aea2) per the
+  add-agent runbook, so the row landed with a real scorecard sub-score on
+  first poll — verified live: 46.2/100 · Grade D · rank #322/418 · coverage
+  B · scorecard 3.4. NOTE: the deploy's startup `repair-commits` refresh
+  scored it WITHOUT needing the pending-only restart (provisional rows seed
+  weekly_commits=None → they're repair targets since #158/#160). OG fix:
+  every agent share card's footer said "Rank #N of 196" (stale hardcoded
+  fallback in generate_og_card.py, confirmed on live prod) — the
+  fetch_and_build.py call site now injects total=len(rows); all cards
+  regenerate at render ("#322 of 418" live). Share cards are X-ready:
+  twitter:card summary_large_image + og:title carries the score;
+  Twitterbot fetches 200 through Cloudflare. Known test-hygiene defect
+  found en route (NOT yet fixed): app.py's startup repair-commits branch
+  ignores DISABLE_SCHEDULER (the pending branch checks it), so pytest on
+  any roster-add branch spawns a real un-tokened fetch subprocess that
+  outlives the suite (orphan 403-retry loops; it also raced pytest's
+  summary line out of the log). /data/latest.json is edge-cached —
+  cache-bust (?cb=) before concluding a fresh render "isn't there".
