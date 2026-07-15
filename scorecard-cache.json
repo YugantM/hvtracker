@@ -1,5 +1,5 @@
 {
-  "scanned_at": "2026-07-15T18:43:11Z",
+  "scanned_at": "2026-07-15T22:07:13Z",
   "agents": {
     "anthropics/claude-code": {
       "score": 5.5,
@@ -9769,6 +9769,30 @@
         "Vulnerabilities": 0
       },
       "scanned_at": "2026-07-15T18:15:57Z"
+    },
+    "xai-org/grok-build": {
+      "score": 3.4,
+      "checks": {
+        "Binary-Artifacts": 10,
+        "Branch-Protection": 5,
+        "CI-Tests": -1,
+        "CII-Best-Practices": 0,
+        "Code-Review": 0,
+        "Contributors": 0,
+        "Dangerous-Workflow": -1,
+        "Dependency-Update-Tool": 0,
+        "Fuzzing": 10,
+        "License": 10,
+        "Maintained": 0,
+        "Packaging": -1,
+        "Pinned-Dependencies": -1,
+        "SAST": 0,
+        "Security-Policy": 9,
+        "Signed-Releases": -1,
+        "Token-Permissions": -1,
+        "Vulnerabilities": 0
+      },
+      "scanned_at": "2026-07-15T22:06:38Z"
     }
   }
 }
