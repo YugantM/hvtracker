@@ -512,8 +512,87 @@ _EXTERNAL_SERVICE_RULES = (
     {
         "label": "Google Gemini",
         "patterns": (r"\bgemini\b", r"\bGOOGLE_API_KEY\b", r"\bGEMINI_API_KEY\b"),
-        "dep_markers": ("google-generativeai", "@google/genai", "google.genai"),
+        "dep_markers": ("google-generativeai", "@google/genai", "google.genai",
+                        "google-genai", "@google/generative-ai", "vertexai",
+                        "google-cloud-aiplatform", "gemini-cli"),
         "env_markers": ("GOOGLE_API_KEY", "GEMINI_API_KEY"),
+    },
+    {
+        "label": "Mistral AI",
+        "patterns": (r"\bmistral\b", r"\bMISTRAL_API_KEY\b"),
+        "dep_markers": ("mistralai",),
+        "env_markers": ("MISTRAL_API_KEY",),
+    },
+    {
+        "label": "Cohere",
+        "patterns": (r"\bcohere\b", r"\bCOHERE_API_KEY\b"),
+        "dep_markers": ("=cohere", "cohere-ai"),  # exact: "coherent" must not match
+        "env_markers": ("COHERE_API_KEY", "CO_API_KEY"),
+    },
+    {
+        "label": "Groq",
+        "patterns": (r"\bgroq\b", r"\bGROQ_API_KEY\b"),
+        "dep_markers": ("groq",),
+        "env_markers": ("GROQ_API_KEY",),
+    },
+    {
+        "label": "xAI Grok",
+        "patterns": (r"\bgrok\b", r"\bXAI_API_KEY\b"),
+        "dep_markers": ("xai-sdk", "@ai-sdk/xai"),
+        "env_markers": ("XAI_API_KEY", "GROK_API_KEY"),
+    },
+    {
+        "label": "DeepSeek",
+        "patterns": (r"\bdeepseek\b", r"\bDEEPSEEK_API_KEY\b"),
+        "dep_markers": ("deepseek",),
+        "env_markers": ("DEEPSEEK_API_KEY",),
+    },
+    {
+        "label": "Together AI",
+        "patterns": (r"\btogether\.?ai\b", r"\bTOGETHER_API_KEY\b"),
+        "dep_markers": ("together-ai",),  # bare "together" is too generic a token
+        "env_markers": ("TOGETHER_API_KEY",),
+    },
+    {
+        "label": "Fireworks AI",
+        "patterns": (r"\bfireworks\.?ai\b", r"\bFIREWORKS_API_KEY\b"),
+        "dep_markers": ("fireworks-ai",),
+        "env_markers": ("FIREWORKS_API_KEY",),
+    },
+    {
+        # "perplexity" is also an LM-evaluation metric: bare marker would
+        # false-positive across ML repo manifests, so only the SDK names count
+        "label": "Perplexity",
+        "patterns": (r"\bperplexity\b", r"\bPERPLEXITY_API_KEY\b"),
+        "dep_markers": ("perplexityai", "@perplexity-ai/"),
+        "env_markers": ("PERPLEXITY_API_KEY", "PPLX_API_KEY"),
+    },
+    {
+        "label": "Replicate",
+        "patterns": (r"\breplicate\b", r"\bREPLICATE_API_TOKEN\b"),
+        "dep_markers": ("=replicate",),  # exact: "replicates"/"replicated" must not match
+        "env_markers": ("REPLICATE_API_TOKEN",),
+    },
+    {
+        "label": "ElevenLabs",
+        "patterns": (r"\belevenlabs\b", r"\bELEVENLABS_API_KEY\b"),
+        "dep_markers": ("elevenlabs",),
+        "env_markers": ("ELEVENLABS_API_KEY", "ELEVEN_API_KEY"),
+    },
+    {
+        "label": "OpenRouter",
+        "patterns": (r"\bopenrouter\b", r"\bOPENROUTER_API_KEY\b"),
+        "dep_markers": ("openrouter",),
+        "env_markers": ("OPENROUTER_API_KEY",),
+    },
+    {
+        # A LiteLLM dependency means the agent can fan out to many providers
+        # through one client. Reported as ONE honest label rather than
+        # guessing which concrete providers a router config enables.
+        "label": "Multi-provider (LiteLLM)",
+        "patterns": (r"\blitellm\b",),
+        "dep_markers": ("litellm",),
+        "env_markers": (),
     },
     {
         "label": "Azure OpenAI",
@@ -615,6 +694,24 @@ _EXTERNAL_SERVICE_API_KEY_PATTERNS = (
 # `extend-exclude = [".claude"]` must not match).
 _CLAUDE_HARNESS_MANIFEST_RE = re.compile(r"\.claude/(?:hooks|commands|agents|skills)\b|\.claude-plugin\b")
 _CLAUDE_HARNESS_PLUGIN_MANIFEST = ".claude-plugin/plugin.json"
+# Same harness-native logic per provider: shipped wiring counts, a bare
+# instructions file (CLAUDE.md / GEMINI.md) does not. OpenAI's Codex CLI has
+# no repo-level plugin/wiring standard (custom prompts live in the user's
+# home directory), so its only detectable signal remains the dep marker.
+_HARNESS_RULES = (
+    {
+        "label": "Anthropic",
+        "kind": "Claude Code",
+        "manifest_re": _CLAUDE_HARNESS_MANIFEST_RE,
+        "plugin_manifest": _CLAUDE_HARNESS_PLUGIN_MANIFEST,
+    },
+    {
+        "label": "Google Gemini",
+        "kind": "Gemini CLI",
+        "manifest_re": re.compile(r"\.gemini/(?:commands|extensions)\b"),
+        "plugin_manifest": "gemini-extension.json",
+    },
+)
 _TOOL_PLUGIN_MANIFEST_FILES = _MCP_MANIFEST_FILES
 _TOOL_PLUGIN_RULES = (
     {
@@ -851,10 +948,24 @@ def _manifest_has_dep_marker(lower_text: str, marker: str) -> bool:
     names) and require the marker to *start* a token, so "psycopg2-binary"
     still matches marker "psycopg" and "pgvector" still matches "pg", but "pg"
     can no longer match inside an unrelated longer word.
+
+    Markers containing `@` or `/` (scoped npm packages like "@google/genai")
+    can never start a token — the tokenizer splits on both characters — so
+    they fall back to a plain substring match; a full scoped name is long and
+    specific enough that substring matching is precise.
+
+    A leading `=` requires an exact token match instead of a prefix match —
+    for markers that are prefixes of common English words ("cohere" would
+    otherwise match "coherent" in a manifest description field).
     """
     marker = marker.lower()
+    if "@" in marker or "/" in marker:
+        return marker in lower_text
+    exact = marker.startswith("=")
+    if exact:
+        marker = marker[1:]
     for token in re.split(r"[^a-z0-9._-]+", lower_text):
-        if token.startswith(marker):
+        if token == marker or (not exact and token.startswith(marker)):
             return True
     return False
 
@@ -876,10 +987,11 @@ def detect_external_service_dependencies(
       and inflated flexible/mature multi-provider frameworks' provider counts
       when treated the same as real evidence (still logged for transparency
       when a real hit exists elsewhere for the same provider)
-    - Claude Code-native projects (#186) never import the anthropic SDK — the
-      agent runs inside the Claude Code harness — so shipped harness wiring
-      (manifest references to functional .claude/ paths, or a published
-      .claude-plugin/ manifest) also counts as Anthropic runtime evidence
+    - harness-native projects (#186) never import the provider SDK — the
+      agent runs inside the harness (Claude Code, Gemini CLI) — so shipped
+      harness wiring (manifest references to functional config paths, or a
+      published plugin/extension manifest, per _HARNESS_RULES) also counts
+      as provider runtime evidence
     - only use already-public repository text
     """
     manifest_text_by_path = manifest_text_by_path or {}
@@ -924,27 +1036,30 @@ def detect_external_service_dependencies(
 
         providers.append(label)
         if dep_hit:
-            evidence.append(f"Found {label} dependency '{dep_hit[1]}' in {dep_hit[0]}")
+            evidence.append(f"Found {label} dependency '{dep_hit[1].lstrip('=')}' in {dep_hit[0]}")
         if env_hit:
             evidence.append(f"Found {label} credential/config marker '{env_hit}'")
             requires_api_keys = True
         if pattern_hit:
             evidence.append(f"README/docs also mention {label}")
 
-    if "Anthropic" not in providers:
+    for harness in _HARNESS_RULES:
+        if harness["label"] in providers:
+            continue
         harness_evidence = None
         for path, _text, lower in manifest_items:
-            m = _CLAUDE_HARNESS_MANIFEST_RE.search(lower)
+            m = harness["manifest_re"].search(lower)
             if m:
-                harness_evidence = f"Ships Claude Code wiring ('{m.group(0)}') in {path}"
+                harness_evidence = f"Ships {harness['kind']} wiring ('{m.group(0)}') in {path}"
                 break
         if harness_evidence is None:
+            plugin_manifest = harness["plugin_manifest"]
             for path in tree_paths or []:
-                if path == _CLAUDE_HARNESS_PLUGIN_MANIFEST or path.endswith("/" + _CLAUDE_HARNESS_PLUGIN_MANIFEST):
-                    harness_evidence = f"Ships a Claude Code plugin manifest ({path})"
+                if path == plugin_manifest or path.endswith("/" + plugin_manifest):
+                    harness_evidence = f"Ships a {harness['kind']} plugin manifest ({path})"
                     break
         if harness_evidence:
-            providers.append("Anthropic")
+            providers.append(harness["label"])
             evidence.append(harness_evidence)
 
     if not requires_api_keys:
