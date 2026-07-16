@@ -357,7 +357,7 @@
           </div>
           <div>
             <dt>External service dependencies · down to −4.0</dt>
-            <dd>Likely runtime providers detected from dependency manifests and credential markers: −0.5 per provider beyond the first (capped at −3.0), and a further −1.0 when API keys are required. A README merely mentioning a provider as an optional integration does not count.</dd>
+            <dd>Likely runtime providers detected from dependency manifests and credential markers: −0.5 per provider beyond the first (capped at −3.0), and a further −1.0 when API keys are required. A README merely mentioning a provider as an optional integration does not count. Agents that run <em>inside</em> a harness are detected through shipped wiring rather than an SDK dependency: Claude Code hooks/commands packaged via the manifest, or a published Claude Code plugin, count as Anthropic runtime evidence — a bare <code>CLAUDE.md</code> or <code>.claude/</code> directory (developing <em>with</em> Claude Code) does not.</dd>
           </div>
           <div>
             <dt>Tool / plugin surface · down to −2.5</dt>
@@ -399,6 +399,7 @@ print("verified:", cred["subject"]["repo"], "=", cred["trust_score"])</code></pr
       <section id="policy-log">
         <h2>Trust Policy Decision Log</h2>
         <ul class="changelog">
+          <li><span class="ver">2026-07-16</span> — External-provider detection now recognizes harness-native agents (correction <a href="https://github.com/YugantM/hvtracker/issues/186" target="_blank" rel="noopener">#186</a>): shipped Claude Code wiring — hooks/commands packaged via the manifest, or a published Claude Code plugin — counts as Anthropic runtime evidence, since such agents run inside the harness and never import an SDK. A bare CLAUDE.md or .claude/ directory (developed <em>with</em> Claude Code, not running <em>on</em> it) still does not count. Detection-only: no adjustment values changed.</li>
           <li><span class="ver">2026-07-05</span> — Runtime calibration v4.2: fixed a build-loop defect where the bounded runtime adjustment was applied on top of the prior build's already-calibrated score rather than the base, so it accumulated across builds and drifted scores toward the rails. Each build now recomputes from the base, so the adjustment stays within the published bounds and scores are stable build-to-build. Ranks restart at this version.</li>
           <li><span class="ver">2026-07-05</span> — Runtime calibration v4.1: positive bonuses are now headroom-scaled (a soft ceiling, so strong agents no longer pile onto a hard-clamped 100); exact-score ties break on evidence (confidence → Scorecard → signed commits) before popularity, and display at a shared rank; a merely <em>declared</em> MCP intention no longer earns a bonus (only an implemented server does). Penalties remain absolute.</li>
           <li><span class="ver">2026-07-02</span> — Promoted runtime-trust calibration into the production rank (v4.0): MCP support became trust-positive; external service dependencies and tool/plugin surface became trust-negative; package provenance drift gained a positive side (verified match). Detection rules were audited first — same-owner variants, repo transfers, and docs-only mentions are excluded. See <a href="/spec/runtime-trust/v0.2/">the runtime-trust spec</a>.</li>
