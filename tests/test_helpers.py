@@ -404,6 +404,60 @@ def test_external_service_dependencies_dev_tooling_claude_dir_is_not_evidence():
     assert result["providers"] == []
 
 
+def test_manifest_dep_marker_scoped_npm_packages_match_as_substring():
+    """Markers with @ or / can never start a token (the tokenizer splits on
+    both), so "@google/genai" was a dead marker — scoped names now match as
+    substrings."""
+    assert fb._manifest_has_dep_marker('"@google/genai": "^1.0"', "@google/genai") is True
+    assert fb._manifest_has_dep_marker('"@google/other": "^1.0"', "@google/genai") is False
+
+
+def test_manifest_dep_marker_exact_mode_rejects_english_word_prefixes():
+    """A leading `=` requires an exact token: "cohere" must not match
+    "coherent" in a manifest description field."""
+    assert fb._manifest_has_dep_marker('"cohere": "^7"', "=cohere") is True
+    assert fb._manifest_has_dep_marker('"description": "a coherent toolkit"', "=cohere") is False
+    assert fb._manifest_has_dep_marker('"description": "replicates state"', "=replicate") is False
+    assert fb._manifest_has_dep_marker("replicate==0.32", "=replicate") is True
+
+
+def test_external_service_dependencies_expanded_llm_providers():
+    result = fb.detect_external_service_dependencies(
+        manifest_text_by_path={
+            "requirements.txt": "mistralai>=1.0\ngroq>=0.9\ndeepseek>=0.1\n",
+            "package.json": '{"dependencies":{"@google/genai":"^1.0","elevenlabs":"^1.0"}}',
+        },
+    )
+    assert result["providers"] == ["DeepSeek", "ElevenLabs", "Google Gemini", "Groq", "Mistral AI"]
+
+
+def test_external_service_dependencies_router_labels():
+    """Routers are reported honestly: a LiteLLM dep is ONE multi-provider
+    label (not a guess at which concrete providers a config enables), and
+    OpenRouter is a real external service in its own right."""
+    result = fb.detect_external_service_dependencies(
+        readme_text="Set OPENROUTER_API_KEY to route models.",
+        manifest_text_by_path={"requirements.txt": "litellm>=1.40\nopenrouter>=0.3\n"},
+    )
+    assert result["providers"] == ["Multi-provider (LiteLLM)", "OpenRouter"]
+    assert result["requires_api_keys"] is True
+
+
+def test_external_service_dependencies_gemini_cli_extension_harness():
+    """Harness symmetry: a shipped Gemini CLI extension manifest is Google
+    Gemini runtime evidence, while a bare GEMINI.md instructions file (the
+    CLAUDE.md analog) is dev tooling and never counts."""
+    shipped = fb.detect_external_service_dependencies(
+        tree_paths=["gemini-extension.json", "README.md"],
+    )
+    assert shipped["providers"] == ["Google Gemini"]
+    dev_only = fb.detect_external_service_dependencies(
+        readme_text="We develop with Gemini CLI.",
+        tree_paths=["GEMINI.md", ".gemini/settings.json"],
+    )
+    assert dev_only["providers"] == []
+
+
 def test_tool_plugin_surface_readme_mention_alone_is_not_a_tag():
     """"search"/"code" patterns (bare "search", "github", "repository") are
     common enough to false-positive on nearly any README; require manifest

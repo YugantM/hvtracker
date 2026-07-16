@@ -502,3 +502,32 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   router-mediated Claude use (aider/goose via litellm/openrouter show
   OpenAI-only/none) — candidate fix is an honest "Multi-provider router"
   label, needs its own slice. Reply to issue #186 pending owner approval.
+- **Provider-coverage expansion 2026-07-16 (merged, NOT yet deployed; rides
+  with #189 at the next deploy — owner: "look for all the providers" before
+  deploying):** (a) matcher fixes — scoped npm markers ("@google/genai")
+  could NEVER match (the tokenizer splits on @ and /), now substring-matched;
+  leading "=" on a marker = exact-token mode ("cohere" must not match
+  "coherent", "replicate" not "replicates"). (b) ten new provider rules
+  (Mistral AI, Cohere, Groq, xAI Grok, DeepSeek, Together AI, Fireworks AI,
+  Perplexity, Replicate, ElevenLabs) + OpenRouter + "Multi-provider
+  (LiteLLM)" — routers reported as ONE honest label, never guessed fan-out
+  providers. Google Gemini markers now include google-genai (the post-2025
+  SDK — previously fully invisible), vertexai, google-cloud-aiplatform,
+  gemini-cli. (c) harness symmetry via _HARNESS_RULES table:
+  gemini-extension.json / .gemini/(commands|extensions) count as Google
+  Gemini runtime evidence; bare GEMINI.md stays non-evidence like CLAUDE.md;
+  Codex CLI documented as having no repo-level wiring signal (dep markers
+  only). Deliberately EXCLUDED: Ollama (local runtime, not an external
+  service — counting it would penalize local-first projects) and HuggingFace
+  Hub (dep usually means artifact download, not runtime inference).
+  Evidence gate v2 (PROD-deployed detector vs final, identical fetched
+  inputs, all 407 listed agents, 0 fetch errors): 200 agents change —
+  additions ONLY (0 removals, 0 requires_api_keys flips); Gemini +86,
+  LiteLLM +60, Groq +45, Anthropic +29 (incl. the #189 harness set);
+  9 grade flips (roo-code C→D, crewai/smolagents/context7 among them),
+  11 agents move >10 ranks (max 23: cherry-studio 165→188), bystanders
+  shift ≤7. Spot-checked movers: every addition traces to a named dep in a
+  named manifest (crewai←litellm, google-genkit finally credited with
+  Gemini, stagehand←@ai-sdk/xai). ~200 provider_added bell events fire at
+  deploy — genuine, unsuppressed. Aider/goose now carry the LiteLLM label,
+  closing the #186 follow-up.
