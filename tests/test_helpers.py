@@ -357,6 +357,53 @@ def test_external_service_dependencies_mixed_real_and_docs_only():
     assert "Anthropic" not in result["providers"]
 
 
+def test_external_service_dependencies_claude_code_harness_manifest_wiring():
+    """#186: a Claude Code-native project never imports the anthropic SDK —
+    the agent runs inside the harness. Manifest references to functional
+    .claude/ paths (AIPass ships hooks via pyproject packaging) are the
+    runtime evidence."""
+    result = fb.detect_external_service_dependencies(
+        readme_text="AIPass agents run inside Claude Code.",
+        manifest_text_by_path={
+            "pyproject.toml": '[project]\ndependencies = ["openai>=1.0"]\n'
+                              '[tool.setuptools.package-dir]\n".claude/hooks" = "aipass/_hooks"\n',
+        },
+    )
+    assert result["providers"] == ["Anthropic", "OpenAI"]
+    assert any("Claude Code wiring" in item for item in result["evidence"])
+    assert result["requires_api_keys"] is False
+
+
+def test_external_service_dependencies_claude_plugin_manifest_in_tree():
+    """A published Claude Code plugin (.claude-plugin/plugin.json) exists to
+    be installed into users' Claude Code — runtime evidence by definition."""
+    result = fb.detect_external_service_dependencies(
+        tree_paths=[".claude-plugin/plugin.json", "README.md"],
+    )
+    assert result["providers"] == ["Anthropic"]
+    assert result["confidence"] == "medium"
+
+
+def test_external_service_dependencies_claude_sdk_dep_markers():
+    result = fb.detect_external_service_dependencies(
+        manifest_text_by_path={"requirements.txt": "claude-agent-sdk>=0.1"},
+    )
+    assert result["providers"] == ["Anthropic"]
+
+
+def test_external_service_dependencies_dev_tooling_claude_dir_is_not_evidence():
+    """The #96-#99 lesson applied to #186: bare CLAUDE.md / .claude/ config
+    (including a .claude/hooks tree used for repo-local dev automation, or a
+    lint exclude naming the directory) means the maintainers develop WITH
+    Claude Code, not that the product runs ON it — never a provider."""
+    result = fb.detect_external_service_dependencies(
+        readme_text="We use Claude Code for development.",
+        tree_paths=["CLAUDE.md", ".claude/settings.json", ".claude/hooks/lint.sh"],
+        manifest_text_by_path={"pyproject.toml": '[tool.ruff]\nextend-exclude = [".claude"]\n'},
+    )
+    assert result["providers"] == []
+
+
 def test_tool_plugin_surface_readme_mention_alone_is_not_a_tag():
     """"search"/"code" patterns (bare "search", "github", "repository") are
     common enough to false-positive on nearly any README; require manifest

@@ -478,3 +478,27 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   outlives the suite (orphan 403-retry loops; it also raced pytest's
   summary line out of the log). /data/latest.json is edge-cached —
   cache-bust (?cb=) before concluding a fresh render "isn't there".
+- **#186 correction — harness-native provider detection 2026-07-16 (merged,
+  NOT yet deployed):** AIPass's "Provider Removed: Anthropic" (2026-07-04)
+  inverted reality — they're Claude Code-native. Root cause: #98 rightly
+  stopped counting README mentions, but harness-native agents never import
+  the anthropic SDK, so no dep/env marker can fire; history snapshots prove
+  the 07-04 event was OUR #98 deploy (11 agents lost Anthropic that day,
+  incl. claude-code itself, which was absent from /ecosystem/anthropic/).
+  Fix: `detect_external_service_dependencies` gains `tree_paths` + a
+  harness-evidence class — manifest refs to functional
+  `.claude/(hooks|commands|agents|skills)` or `.claude-plugin`, a shipped
+  `.claude-plugin/plugin.json` anywhere in the tree, and `claude-code`/
+  `claude-agent-sdk` dep markers. Bare CLAUDE.md/.claude/ (developing WITH
+  Claude Code, not running ON it) stays non-evidence, test-locked.
+  Detection-only: no adjustment values changed, no METHODOLOGY_VERSION bump
+  (#98 precedent), spec §4 untouched (no spec bump); methodology external-
+  deps copy + policy-log entry added. Evidence gate (board-wide old-vs-new
+  on identical fetched inputs, 0 fetch errors): 21 agents gain Anthropic
+  (aipass 82.0→81.5 rank 50→51), max rank move +7, one grade flip (context7
+  65.0→64.5 B→C boundary case), bystanders shift ≤2; 14 no-op hits already
+  listed Anthropic. `provider_added` bell events will fire for the 21 at
+  deploy — genuine, unsuppressed. KNOWN separate gap, NOT fixed here:
+  router-mediated Claude use (aider/goose via litellm/openrouter show
+  OpenAI-only/none) — candidate fix is an honest "Multi-provider router"
+  label, needs its own slice. Reply to issue #186 pending owner approval.

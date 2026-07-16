@@ -506,7 +506,7 @@ _EXTERNAL_SERVICE_RULES = (
     {
         "label": "Anthropic",
         "patterns": (r"\banthropic\b", r"\bANTHROPIC_API_KEY\b"),
-        "dep_markers": ("anthropic",),
+        "dep_markers": ("anthropic", "claude-code", "claude-agent-sdk"),
         "env_markers": ("ANTHROPIC_API_KEY",),
     },
     {
@@ -607,6 +607,14 @@ _EXTERNAL_SERVICE_API_KEY_PATTERNS = (
     r"\bSUPABASE_URL\b",
     r"\bPOSTGRES_URL\b",
 )
+# Claude Code harness wiring (#186): evidence that the *shipped product* runs
+# inside Anthropic's Claude Code — hooks/commands/agents packaged through the
+# manifest, or a published Claude Code plugin. A bare CLAUDE.md or .claude/
+# directory means the maintainers develop WITH Claude Code and is deliberately
+# not evidence, so the manifest pattern requires a functional subpath (a ruff
+# `extend-exclude = [".claude"]` must not match).
+_CLAUDE_HARNESS_MANIFEST_RE = re.compile(r"\.claude/(?:hooks|commands|agents|skills)\b|\.claude-plugin\b")
+_CLAUDE_HARNESS_PLUGIN_MANIFEST = ".claude-plugin/plugin.json"
 _TOOL_PLUGIN_MANIFEST_FILES = _MCP_MANIFEST_FILES
 _TOOL_PLUGIN_RULES = (
     {
@@ -856,6 +864,7 @@ def detect_external_service_dependencies(
     description: str = "",
     readme_text: str = "",
     manifest_text_by_path: dict[str, str] | None = None,
+    tree_paths: list[str] | None = None,
 ) -> dict:
     """Detect publicly declared external service dependencies.
 
@@ -867,6 +876,10 @@ def detect_external_service_dependencies(
       and inflated flexible/mature multi-provider frameworks' provider counts
       when treated the same as real evidence (still logged for transparency
       when a real hit exists elsewhere for the same provider)
+    - Claude Code-native projects (#186) never import the anthropic SDK — the
+      agent runs inside the Claude Code harness — so shipped harness wiring
+      (manifest references to functional .claude/ paths, or a published
+      .claude-plugin/ manifest) also counts as Anthropic runtime evidence
     - only use already-public repository text
     """
     manifest_text_by_path = manifest_text_by_path or {}
@@ -918,6 +931,22 @@ def detect_external_service_dependencies(
         if pattern_hit:
             evidence.append(f"README/docs also mention {label}")
 
+    if "Anthropic" not in providers:
+        harness_evidence = None
+        for path, _text, lower in manifest_items:
+            m = _CLAUDE_HARNESS_MANIFEST_RE.search(lower)
+            if m:
+                harness_evidence = f"Ships Claude Code wiring ('{m.group(0)}') in {path}"
+                break
+        if harness_evidence is None:
+            for path in tree_paths or []:
+                if path == _CLAUDE_HARNESS_PLUGIN_MANIFEST or path.endswith("/" + _CLAUDE_HARNESS_PLUGIN_MANIFEST):
+                    harness_evidence = f"Ships a Claude Code plugin manifest ({path})"
+                    break
+        if harness_evidence:
+            providers.append("Anthropic")
+            evidence.append(harness_evidence)
+
     if not requires_api_keys:
         combined_text = "\n".join([description or "", readme_text or "", *manifest_text_by_path.values()])
         for pattern in _EXTERNAL_SERVICE_API_KEY_PATTERNS:
@@ -966,6 +995,7 @@ def fetch_external_service_dependencies(owner_repo: str, ref: str, description: 
         description=description,
         readme_text=readme_text,
         manifest_text_by_path=manifest_text_by_path,
+        tree_paths=tree_paths,
     )
 
 
