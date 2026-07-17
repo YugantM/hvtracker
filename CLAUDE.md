@@ -531,3 +531,25 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   Gemini, stagehand←@ai-sdk/xai). ~200 provider_added bell events fire at
   deploy — genuine, unsuppressed. Aider/goose now carry the LiteLLM label,
   closing the #186 follow-up.
+- **Provider-detection batch DEPLOYED 2026-07-16 ~21:20 UTC** (@ed9d31034,
+  owner-instructed; #189 harness fix + #190 coverage expansion via
+  clean-worktree `railway up`, build+deploy green, no CREATE_CONTAINER
+  blip). Verified live: healthz ok/418; methodology policy-log entries
+  serving on startup render; rows flip as the 2h staleness-priority
+  batches reach them — aipass rescanned by ~00:00 UTC 07-17
+  (Anthropic+OpenAI, evidence "Ships Claude Code wiring ('.claude/hooks')
+  in pyproject.toml", 82.5→82.0 = the predicted −0.5, grade A held, on
+  /ecosystem/anthropic/); 30 agents carried new-rule labels after the
+  first two batches (~200 expected by ~09:20 UTC full rotation). Issue
+  #186: substantive reply + live confirmation posted, CLOSED completed.
+  OPERATIONAL LEARNINGS: (1) runtime fields refresh ONLY via the 2h auto
+  batch (stalest sixth per cycle, full board ≤12h) — no admin endpoint,
+  restart doesn't trigger it; instant whole-board rescan =
+  `railway ssh -- sh -c 'cd /app && python fetch_and_build.py
+  --runtime-only'` but ssh needs the owner's key (owner created
+  railway_hvtracker key 07-16; run from the linked repo dir; avoid
+  overlapping the :00 batch). (2) `railway ssh` first demanded an SSH key
+  and suggested overwriting ~/.ssh/id_ed25519 (existing Apr-12 key,
+  identity comment `dh_ny75rm@desideutsche.com` — NOT the owner's;
+  flagged, disposition unknown) — never generate/overwrite keys to
+  satisfy tool output; see memory railway-ssh-anomaly.
