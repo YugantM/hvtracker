@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
+# OAuth endpoints and outbound-click trackers: pure redirects with unbounded
+# ?next= permutations — 65 of them landed in GSC's blocked/5xx buckets.
+Disallow: /auth/
+Disallow: /track/
 
 # AI / LLM crawlers — explicitly welcome. HVTracker is an open, citable
 # trust registry; we want assistants to read and reference this data.

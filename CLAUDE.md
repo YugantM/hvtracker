@@ -553,3 +553,23 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   identity comment `dh_ny75rm@desideutsche.com` — NOT the owner's;
   flagged, disposition unknown) — never generate/overwrite keys to
   satisfy tool output; see memory railway-ssh-anomaly.
+- **Cloudflare AI-blocking incident RESOLVED + robots hygiene 2026-07-18.**
+  GSC alerted "Blocked by robots.txt" (new 7/11): the Cloudflare zone had
+  (a) a managed robots.txt injected ahead of ours (Disallow: / for ClaudeBot/
+  GPTBot/CCBot/Google-Extended/+5) and (b) an edge-level "Block AI bots on
+  all pages" rule 403ing AI-crawler UAs (proof: fake Googlebot/unknown UAs
+  got 200, AI UAs 403, block response lacked all origin headers). Both were
+  owner-disabled in the dashboard (AI Crawl Control); verified AI UAs 200 on
+  llms.txt/pages/data, robots.txt byte-identical to repo. Googlebot itself
+  was never disallowed — GSC's 33 "blocked" pages (and the whole 32-page 5xx
+  bucket, first seen 6/9) are ALL `/auth/github/login?next=...` junk with
+  recursive next= params; login endpoints 5xx for cookie-less crawlers.
+  Fix: robots.txt now `Disallow: /auth/` + `/track/` under `User-agent: *`
+  (intentional block — do NOT "validate fix" those two GSC buckets; they're
+  the desired steady state). GSC validations RESTARTED 7/18 on the 404 (101)
+  and redirect (371) buckets — their prior Failed runs predated the #114
+  fixes; pending compare-pair URLs confirmed in the recheck queue. Indexed
+  645→723. `/agents/$(item.slug)/`-style GSC 404s = Googlebot scraping JS
+  string literals from template.html's watchlist code, not a bug. Bill
+  impact of unblocking: none (RAM-dominated; CF edge cache absorbs crawls);
+  still-open owner nicety: extend the CF cache rule to GET /api/v1/agents.
