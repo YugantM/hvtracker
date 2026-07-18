@@ -1132,7 +1132,11 @@ def compare_pair(pair: str):
     if os.path.isfile(static_pair):
         with open(static_pair, encoding="utf-8") as f:
             return HTMLResponse(f.read())
-    return compare_tool()
+    # The fallback serves the hub (canonical /compare/) under an unbounded
+    # /compare/<a>-vs-<b>/ URL space — noindex so crawlers drop these URLs.
+    resp = compare_tool()
+    resp.headers["X-Robots-Tag"] = "noindex"
+    return resp
 
 
 @app.api_route("/verify", methods=["GET", "HEAD"], response_class=HTMLResponse)
@@ -1298,8 +1302,10 @@ def _marketing_page(
     *,
     description: str = "HVTracker validates demand for alerts, data access, sponsorship, submissions, and corrections before building heavier workflows.",
     path: str = "/",
+    noindex: bool = False,
 ) -> str:
     canonical = f"https://hvtracker.net{path}"
+    robots_meta = '\n  <meta name="robots" content="noindex">' if noindex else ""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1307,7 +1313,7 @@ def _marketing_page(
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{escape(title)}</title>
   <meta name="description" content="{escape(description)}">
-  <link rel="canonical" href="{escape(canonical)}">
+  <link rel="canonical" href="{escape(canonical)}">{robots_meta}
   <meta property="og:type" content="website">
   <meta property="og:title" content="{escape(title)}">
   <meta property="og:description" content="{escape(description)}">

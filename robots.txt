@@ -4,6 +4,10 @@ Allow: /
 # ?next= permutations — 65 of them landed in GSC's blocked/5xx buckets.
 Disallow: /auth/
 Disallow: /track/
+# /login?next= chains self-nest (421 crawled URLs, up to 7 levels deep in
+# GSC); per-agent JSON is a machine surface Google crawls but never indexes.
+Disallow: /login
+Disallow: /data/agents/
 
 # AI / LLM crawlers — explicitly welcome. HVTracker is an open, citable
 # trust registry; we want assistants to read and reference this data.

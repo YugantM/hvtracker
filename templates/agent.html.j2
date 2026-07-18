@@ -478,7 +478,7 @@
 {% else %}
         <a class="compare-link" href="/compare/?a={{ row.slug }}">Compare with another agent</a>
 {% endif %}
-        <a class="secondary-link" href="/track/{{ row.slug }}">Track {{ row.name }}</a>
+        <a class="secondary-link" href="/track/{{ row.slug }}/">Track {{ row.name }}</a>
         {% if row.category %}<a class="secondary-link" href="/categories/{{ row.category_slug }}/">View {{ row.category }}</a>{% endif %}
         <a class="secondary-link" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Report missing data</a>
       </div>

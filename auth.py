@@ -399,7 +399,7 @@ def login_page(request: Request, next: str = "/", error: str = ""):
     return HTMLResponse(_marketing_page(
         "Sign in — HVTracker", "Account", "Sign in or create an account", body,
         description="Sign in to HVTracker to track agents and get trust-change alerts.",
-        path="/login/"))
+        path="/login/", noindex=True))
 
 
 @router.get("/account", response_class=HTMLResponse)

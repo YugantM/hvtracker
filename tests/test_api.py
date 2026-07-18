@@ -612,3 +612,68 @@ def test_startup_prefers_pending_over_commit_repair(monkeypatch):
 
     assert "pending" in kicked
     assert "repair-commits" not in kicked
+
+
+# ---- GSC crawl-waste hygiene (2026-07-18 coverage drilldown fixes) ----
+
+def test_login_page_is_noindex(client):
+    r = client.get("/login")
+    assert r.status_code == 200
+    assert '<meta name="robots" content="noindex">' in r.text
+    assert 'rel="canonical" href="https://hvtracker.net/login/"' in r.text
+
+
+def test_robots_txt_blocks_crawl_waste(client):
+    r = client.get("/robots.txt")
+    assert r.status_code == 200
+    star_group = r.text.split("User-agent: GPTBot")[0]
+    for rule in ("Disallow: /auth/", "Disallow: /track/",
+                 "Disallow: /login", "Disallow: /data/agents/"):
+        assert rule in star_group
+    # AI-crawler groups keep their own Allow: / and inherit no * rules.
+    assert "User-agent: GPTBot\nAllow: /" in r.text
+
+
+def test_compare_fallback_is_noindex_but_static_pairs_index(client):
+    out = os.environ["OUTPUT_DIR"]
+    static_pairs = sorted(
+        os.path.basename(p) for p in glob.glob(os.path.join(out, "compare", "*-vs-*"))
+        if os.path.isfile(os.path.join(p, "index.html")))
+    assert static_pairs, "fixture render produced no static compare pairs"
+    r = client.get(f"/compare/{static_pairs[0]}/")
+    assert r.status_code == 200
+    assert "x-robots-tag" not in r.headers
+
+    slugs = sorted(a["slug"] for a in
+                   client.get("/api/agents", params={"limit": 60}).json()["agents"])
+    existing = set(static_pairs)
+    a, b = next((a, b) for i, a in enumerate(slugs) for b in slugs[i + 1:]
+                if f"{a}-vs-{b}" not in existing)
+    r = client.get(f"/compare/{a}-vs-{b}/")
+    assert r.status_code == 200
+    assert r.headers.get("x-robots-tag") == "noindex"
+
+
+def test_agent_page_track_link_has_trailing_slash(client):
+    slug = client.get("/api/agents", params={"limit": 1}).json()["agents"][0]["slug"]
+    r = client.get(f"/agents/{slug}/")
+    assert r.status_code == 200
+    assert f'href="/track/{slug}/"' in r.text
+    assert f'href="/track/{slug}"/' not in r.text
+
+
+def test_blog_urls_carry_trailing_slash(client):
+    # Hand-written posts: canonical/og:url/mainEntityOfPage must match the
+    # served URL (every page URL ends in /) — no-slash values 301 and landed
+    # 25 posts in GSC's redirect bucket.
+    import re
+    offenders = []
+    for path in glob.glob(os.path.join(ROOT, "blog_static", "*", "index.html")):
+        with open(path, encoding="utf-8") as f:
+            for m in re.finditer(r'https://hvtracker\.net/blog/[a-z0-9-]+["\)]', f.read()):
+                offenders.append(f"{path}: {m.group(0)}")
+    assert not offenders, offenders
+    # feed.json: item urls resolve without a redirect hop (ids stay stable).
+    feed = client.get("/feed.json").json()
+    blog_urls = [i["url"] for i in feed["items"] if "/blog/" in i["url"]]
+    assert blog_urls and all(u.endswith("/") for u in blog_urls)
