@@ -57,8 +57,18 @@
     tray.innerHTML = "⇄ Compare <strong>" + n + "</strong> →";
     tray.hidden = n === 0;
   }
+  function nextDest() {
+    // On /login itself, reuse its ?next= target instead of wrapping the current
+    // URL again — otherwise each hop nests another /login?next=… level.
+    if (location.pathname === "/login" || location.pathname === "/login/") {
+      var m = /[?&]next=([^&]*)/.exec(location.search);
+      if (m) { try { return decodeURIComponent(m[1]); } catch (e) { /* malformed */ } }
+      return "/";
+    }
+    return location.pathname + location.search;
+  }
   function loginUrl(provider) {
-    return "/auth/" + provider + "/login?next=" + encodeURIComponent(location.pathname + location.search);
+    return "/auth/" + provider + "/login?next=" + encodeURIComponent(nextDest());
   }
   function toggle(id) {
     var e = document.getElementById(id);
@@ -102,7 +112,7 @@
     if (!canSignIn) { slot.innerHTML = ""; return; }  // no sign-in method -> show nothing publicly
     // Link to the real /login page rather than a cramped dropdown.
     slot.innerHTML = '<a class="hvt-auth-btn hvt-auth-signin" href="/login?next=' +
-      encodeURIComponent(location.pathname + location.search) + '">Sign in</a>';
+      encodeURIComponent(nextDest()) + '">Sign in</a>';
   }
 
   // ---- header: signed in ----

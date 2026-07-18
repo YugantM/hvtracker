@@ -1255,7 +1255,7 @@
         <thead>
           <tr>
             <th>Feature</th>
-            ${selected.map((agent) => `<th style="--agent-color:${agentColor(agent)}"><div class="agent-col-head"><strong><a href="/agents/${agent.slug}">${escapeHtml(agent.name)}</a></strong><span>${escapeHtml(agent.repo)}</span></div></th>`).join("")}
+            ${selected.map((agent) => `<th style="--agent-color:${agentColor(agent)}"><div class="agent-col-head"><strong><a href="/agents/${agent.slug}/">${escapeHtml(agent.name)}</a></strong><span>${escapeHtml(agent.repo)}</span></div></th>`).join("")}
           </tr>
         </thead>
         <tbody>${rows.join("")}</tbody>
@@ -1317,7 +1317,7 @@
         <article class="agent-card">
           <div class="agent-card-head">
             <div>
-              <div class="agent-card-name"><a href="/agents/${agent.slug}">${escapeHtml(agent.name)}</a></div>
+              <div class="agent-card-name"><a href="/agents/${agent.slug}/">${escapeHtml(agent.name)}</a></div>
               <div class="agent-card-repo">${escapeHtml(agent.repo)}</div>
             </div>
             ${formatGrade(agent.evidence_grade)}

@@ -573,3 +573,23 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   string literals from template.html's watchlist code, not a bug. Bill
   impact of unblocking: none (RAM-dominated; CF edge cache absorbs crawls);
   still-open owner nicety: extend the CF cache rule to GET /api/v1/agents.
+- **GSC crawl-waste fixes 2026-07-18 (#193; merged, NOT deployed):** the five
+  coverage-drilldown exports (1,307 not-indexed URLs) traced to two
+  self-inflicted infinite URL spaces + slash hygiene, all fixed. (1) auth.js
+  wrapped the login page's own ?next= again → /login?next= chains 7 deep
+  (421 URLs, compounding); `nextDest()` now unwraps on /login, login page is
+  meta-noindex (`_marketing_page(noindex=True)`), robots.txt `Disallow:
+  /login`. (2) compare_pair()'s hub fallback (canonical /compare/) made every
+  valid-slug pair URL a 200 that can never index (235 stuck in
+  alternate-canonical) — fallback now sends `X-Robots-Tag: noindex`; static
+  pairs untouched. (3) trailing slashes: agent-page /track/ link, compare-hub
+  /agents/ links, and ALL 14 blog_static posts' canonical/og:url/
+  mainEntityOfPage were no-slash (canonicals that 301!) + generator blog
+  JSON-LD/llms.txt/feed `url` fields (feed `id`s deliberately stable — no
+  re-announce). (4) robots.txt `Disallow: /data/agents/` (119
+  crawled-never-indexed JSONs; AI-crawler UA groups unaffected). Remaining
+  GSC 404s verified already-410 live (#159/#161 doing its job — Validate fix
+  will drain them). 5 new tests incl. a blog-canonical lint — NOTE: the 3
+  in-flight roster-batch posts (evidence-coverage-audit etc.) have no-slash
+  canonicals and WILL fail that lint until slashed. Verified in local
+  uvicorn preview end-to-end.
