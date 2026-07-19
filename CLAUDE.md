@@ -573,7 +573,18 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   string literals from template.html's watchlist code, not a bug. Bill
   impact of unblocking: none (RAM-dominated; CF edge cache absorbs crawls);
   still-open owner nicety: extend the CF cache rule to GET /api/v1/agents.
-- **GSC crawl-waste fixes 2026-07-18 (#193; merged, NOT deployed):** the five
+- **GSC crawl-waste fixes 2026-07-18 (#193; DEPLOYED 2026-07-19 ~14:12 UTC
+  @6cf4db729, owner-instructed clean-worktree `railway up`, verified live):**
+  healthz ok/418/in-sync post-refresh; robots.txt Disallow /login +
+  /data/agents/ serving; login page noindex + nextDest in served auth.js;
+  compare fallback X-Robots-Tag noindex (static pairs clean, reverse-order
+  301s); agent-page /track/ links, blog canonicals/og:url, feed.json 38/38,
+  and llms.txt blog links all slash-verified. The 3 in-flight roster-batch
+  posts' canonicals were slash-fixed in place in the working tree (they'd
+  have failed the new lint). GSC note: do NOT "Validate fix" the
+  login//data/agents buckets — robots-blocked is their steady state (same
+  as /auth/+/track/ per #192); alternate-canonical + redirect buckets drain
+  on recrawl. Original analysis: the five
   coverage-drilldown exports (1,307 not-indexed URLs) traced to two
   self-inflicted infinite URL spaces + slash hygiene, all fixed. (1) auth.js
   wrapped the login page's own ?next= again → /login?next= chains 7 deep
