@@ -1,5 +1,5 @@
 {
-  "scanned_at": "2026-07-21T15:38:46Z",
+  "scanned_at": "2026-07-21T18:49:54Z",
   "agents": {
     "anthropics/claude-code": {
       "score": 5.5,
@@ -239,7 +239,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-19T18:28:34Z"
+      "scanned_at": "2026-07-21T18:19:53Z"
     },
     "Significant-Gravitas/AutoGPT": {
       "score": 5.8,
@@ -386,7 +386,7 @@
       "scanned_at": "2026-07-10T07:36:51Z"
     },
     "e2b-dev/e2b": {
-      "score": 6.3,
+      "score": 6.4,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 4,
@@ -405,9 +405,9 @@
         "Security-Policy": 0,
         "Signed-Releases": -1,
         "Token-Permissions": 0,
-        "Vulnerabilities": 3
+        "Vulnerabilities": 4
       },
-      "scanned_at": "2026-07-19T18:29:01Z"
+      "scanned_at": "2026-07-21T18:20:14Z"
     },
     "OpenInterpreter/open-interpreter": {
       "score": 5.0,
@@ -506,13 +506,13 @@
       "scanned_at": "2026-07-21T15:20:11Z"
     },
     "composiohq/composio": {
-      "score": 7.4,
+      "score": 7.0,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 5,
-        "CI-Tests": 8,
+        "CI-Tests": 9,
         "CII-Best-Practices": 0,
-        "Code-Review": 6,
+        "Code-Review": 7,
         "Contributors": 10,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 10,
@@ -521,13 +521,13 @@
         "Maintained": 10,
         "Packaging": 10,
         "Pinned-Dependencies": 7,
-        "SAST": 6,
+        "SAST": 8,
         "Security-Policy": 10,
-        "Signed-Releases": -1,
+        "Signed-Releases": 0,
         "Token-Permissions": 10,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-19T18:29:33Z"
+      "scanned_at": "2026-07-21T18:20:41Z"
     },
     "kuafuai/DevOpsGPT": {
       "score": 3.0,
@@ -713,13 +713,13 @@
         "Maintained": 10,
         "Packaging": 10,
         "Pinned-Dependencies": 5,
-        "SAST": 9,
+        "SAST": 8,
         "Security-Policy": 10,
         "Signed-Releases": -1,
         "Token-Permissions": 10,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-07-19T18:30:06Z"
+      "scanned_at": "2026-07-21T18:21:07Z"
     },
     "entropy-research/Devon": {
       "score": 1.4,
@@ -935,7 +935,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 8
       },
-      "scanned_at": "2026-07-19T18:30:33Z"
+      "scanned_at": "2026-07-21T18:21:27Z"
     },
     "BerriAI/litellm": {
       "score": 6.0,
@@ -1055,7 +1055,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-19T18:30:59Z"
+      "scanned_at": "2026-07-21T18:21:47Z"
     },
     "QwenLM/Qwen-Agent": {
       "score": 3.6,
@@ -1175,7 +1175,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-19T18:31:33Z"
+      "scanned_at": "2026-07-21T18:22:15Z"
     },
     "QwenLM/qwen-code": {
       "score": 6.4,
@@ -1320,7 +1320,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-07-20T19:01:34Z"
+      "scanned_at": "2026-07-21T18:25:28Z"
     },
     "google/adk-go": {
       "score": 6.9,
@@ -1515,10 +1515,10 @@
       "scanned_at": "2026-07-21T15:12:23Z"
     },
     "flyteorg/flyte": {
-      "score": 5.5,
+      "score": 5.8,
       "checks": {
         "Binary-Artifacts": 10,
-        "Branch-Protection": 5,
+        "Branch-Protection": 9,
         "CI-Tests": 10,
         "CII-Best-Practices": 5,
         "Code-Review": 10,
@@ -1536,7 +1536,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:02:15Z"
+      "scanned_at": "2026-07-21T18:26:14Z"
     },
     "bytedance/UI-TARS-desktop": {
       "score": 4.8,
@@ -1680,7 +1680,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:02:27Z"
+      "scanned_at": "2026-07-21T18:26:27Z"
     },
     "firecrawl/firecrawl": {
       "score": 5.9,
@@ -1779,13 +1779,13 @@
       "scanned_at": "2026-07-21T11:36:35Z"
     },
     "langchain-ai/langchain": {
-      "score": 6.0,
+      "score": 6.6,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 3,
         "CI-Tests": 10,
         "CII-Best-Practices": 0,
-        "Code-Review": 3,
+        "Code-Review": 4,
         "Contributors": 10,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 10,
@@ -1798,9 +1798,9 @@
         "Security-Policy": 10,
         "Signed-Releases": 0,
         "Token-Permissions": 0,
-        "Vulnerabilities": 0
+        "Vulnerabilities": 7
       },
-      "scanned_at": "2026-07-20T19:02:50Z"
+      "scanned_at": "2026-07-21T18:26:52Z"
     },
     "openai/openai-agents-python": {
       "score": 5.7,
@@ -1968,7 +1968,7 @@
         "Token-Permissions": 10,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:03:23Z"
+      "scanned_at": "2026-07-21T18:27:23Z"
     },
     "langroid/langroid": {
       "score": 4.4,
@@ -2016,7 +2016,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:05:50Z"
+      "scanned_at": "2026-07-21T18:30:08Z"
     },
     "aitomatic/openssa": {
       "score": 4.0,
@@ -2136,7 +2136,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:06:12Z"
+      "scanned_at": "2026-07-21T18:30:32Z"
     },
     "block/goose": {
       "score": 5.9,
@@ -2304,7 +2304,7 @@
         "Token-Permissions": -1,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:06:25Z"
+      "scanned_at": "2026-07-21T18:30:47Z"
     },
     "openclaw/openclaw": {
       "score": 4.8,
@@ -2448,7 +2448,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:07:04Z"
+      "scanned_at": "2026-07-21T18:31:29Z"
     },
     "botpress/botpress": {
       "score": 5.8,
@@ -2599,7 +2599,7 @@
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 3,
-        "CI-Tests": 10,
+        "CI-Tests": 9,
         "CII-Best-Practices": 0,
         "Code-Review": 8,
         "Contributors": 10,
@@ -2616,7 +2616,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:07:29Z"
+      "scanned_at": "2026-07-21T18:31:57Z"
     },
     "open-webui/open-webui": {
       "score": 6.1,
@@ -2760,7 +2760,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 1
       },
-      "scanned_at": "2026-07-20T19:07:50Z"
+      "scanned_at": "2026-07-21T18:32:20Z"
     },
     "qdrant/qdrant": {
       "score": 5.0,
@@ -2904,7 +2904,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:08:36Z"
+      "scanned_at": "2026-07-21T18:33:05Z"
     },
     "langfuse/langfuse": {
       "score": 6.6,
@@ -3072,7 +3072,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:09:03Z"
+      "scanned_at": "2026-07-21T18:33:31Z"
     },
     "NVIDIA/NeMo-Guardrails": {
       "score": 5.9,
@@ -3216,7 +3216,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:09:21Z"
+      "scanned_at": "2026-07-21T18:33:50Z"
     },
     "modelcontextprotocol/registry": {
       "score": 8.0,
@@ -3336,7 +3336,7 @@
         "Token-Permissions": 8,
         "Vulnerabilities": 3
       },
-      "scanned_at": "2026-07-20T19:09:41Z"
+      "scanned_at": "2026-07-21T18:34:12Z"
     },
     "SalesforceAIResearch/AgentLite": {
       "score": 3.2,
@@ -3625,7 +3625,7 @@
         "Vulnerabilities": 0
       },
       "scanned_at": "2026-07-11T08:14:23Z",
-      "scan_failed_at": "2026-07-20T19:10:08Z"
+      "scan_failed_at": "2026-07-21T18:34:38Z"
     },
     "wisdom-pan/Agent_Hospital": {
       "score": 2.6,
@@ -3745,7 +3745,7 @@
         "Token-Permissions": 10,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:10:34Z"
+      "scanned_at": "2026-07-21T18:35:07Z"
     },
     "1Panel-dev/1Panel": {
       "score": 5.6,
@@ -3889,7 +3889,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 2
       },
-      "scanned_at": "2026-07-20T19:10:54Z"
+      "scanned_at": "2026-07-21T18:35:26Z"
     },
     "HolmesGPT/holmesgpt": {
       "score": 5.1,
@@ -4033,7 +4033,7 @@
         "Token-Permissions": 10,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-07-20T19:11:13Z"
+      "scanned_at": "2026-07-21T18:35:48Z"
     },
     "lingxi-agent/Lingxi": {
       "score": 2.6,
@@ -4153,7 +4153,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:11:54Z"
+      "scanned_at": "2026-07-21T18:36:43Z"
     },
     "facebookresearch/faiss": {
       "score": 6.1,
@@ -4393,7 +4393,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:12:16Z"
+      "scanned_at": "2026-07-21T18:37:06Z"
     },
     "google-antigravity/antigravity-cli": {
       "score": 2.5,
@@ -4516,13 +4516,13 @@
       "scanned_at": "2026-07-21T15:17:47Z"
     },
     "Hmbown/CodeWhale": {
-      "score": 5.8,
+      "score": 5.0,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 3,
-        "CI-Tests": 10,
+        "CI-Tests": -1,
         "CII-Best-Practices": 0,
-        "Code-Review": 1,
+        "Code-Review": 0,
         "Contributors": 10,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 10,
@@ -4531,13 +4531,13 @@
         "Maintained": 10,
         "Packaging": 10,
         "Pinned-Dependencies": 3,
-        "SAST": 9,
+        "SAST": 0,
         "Security-Policy": 10,
         "Signed-Releases": 0,
         "Token-Permissions": 0,
-        "Vulnerabilities": 3
+        "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:21:33Z"
+      "scanned_at": "2026-07-21T18:46:25Z"
     },
     "rohitg00/agentmemory": {
       "score": 5.7,
@@ -4666,7 +4666,7 @@
         "Branch-Protection": 3,
         "CI-Tests": 10,
         "CII-Best-Practices": 0,
-        "Code-Review": 8,
+        "Code-Review": 9,
         "Contributors": 10,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 10,
@@ -4675,13 +4675,13 @@
         "Maintained": 10,
         "Packaging": -1,
         "Pinned-Dependencies": 1,
-        "SAST": 2,
+        "SAST": 1,
         "Security-Policy": 10,
         "Signed-Releases": -1,
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:21:54Z"
+      "scanned_at": "2026-07-21T18:46:47Z"
     },
     "allenai/molmoweb": {
       "score": 3.2,
@@ -4756,7 +4756,7 @@
       "scanned_at": "2026-07-21T07:52:55Z"
     },
     "Xiangyue-Zhang/auto-deep-researcher-24x7": {
-      "score": 5.1,
+      "score": 4.9,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 3,
@@ -4768,7 +4768,7 @@
         "Dependency-Update-Tool": 0,
         "Fuzzing": 0,
         "License": 10,
-        "Maintained": 10,
+        "Maintained": 8,
         "Packaging": -1,
         "Pinned-Dependencies": 0,
         "SAST": 0,
@@ -4777,7 +4777,7 @@
         "Token-Permissions": 10,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-07-20T19:22:01Z"
+      "scanned_at": "2026-07-21T18:46:55Z"
     },
     "JetBrains/junie": {
       "score": 3.2,
@@ -5114,7 +5114,7 @@
         "Token-Permissions": -1,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:22:15Z"
+      "scanned_at": "2026-07-21T18:47:11Z"
     },
     "Panniantong/Agent-Reach": {
       "score": 4.9,
@@ -5186,7 +5186,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-07-20T19:22:45Z"
+      "scanned_at": "2026-07-21T18:47:46Z"
     },
     "HKUDS/ClawWork": {
       "score": 3.3,
@@ -5300,13 +5300,13 @@
         "Maintained": 10,
         "Packaging": 10,
         "Pinned-Dependencies": 3,
-        "SAST": 10,
+        "SAST": 9,
         "Security-Policy": 0,
         "Signed-Releases": -1,
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:22:28Z"
+      "scanned_at": "2026-07-21T18:47:27Z"
     },
     "Gentleman-Programming/engram": {
       "score": 4.9,
@@ -5714,7 +5714,7 @@
         "Token-Permissions": 9,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:23:05Z"
+      "scanned_at": "2026-07-21T18:48:08Z"
     },
     "mcp-use/mcp-use": {
       "score": 6.0,
@@ -5786,7 +5786,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:23:40Z"
+      "scanned_at": "2026-07-21T18:48:46Z"
     },
     "agentjido/jido": {
       "score": 5.4,
@@ -5859,7 +5859,7 @@
         "Vulnerabilities": 0
       },
       "scanned_at": "2026-07-11T03:40:17Z",
-      "scan_failed_at": "2026-07-20T19:24:17Z"
+      "scan_failed_at": "2026-07-21T18:49:42Z"
     },
     "dzhng/deep-research": {
       "score": 1.8,
@@ -6897,13 +6897,13 @@
       "scanned_at": "2026-07-21T11:38:43Z"
     },
     "modelcontextprotocol/modelcontextprotocol": {
-      "score": 7.1,
+      "score": 6.9,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 5,
         "CI-Tests": 10,
         "CII-Best-Practices": 0,
-        "Code-Review": 5,
+        "Code-Review": 6,
         "Contributors": 10,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 10,
@@ -6912,13 +6912,13 @@
         "Maintained": 10,
         "Packaging": -1,
         "Pinned-Dependencies": 3,
-        "SAST": 8,
+        "SAST": 6,
         "Security-Policy": 10,
         "Signed-Releases": -1,
         "Token-Permissions": 0,
-        "Vulnerabilities": 10
+        "Vulnerabilities": 9
       },
-      "scanned_at": "2026-07-20T19:23:26Z"
+      "scanned_at": "2026-07-21T18:48:31Z"
     },
     "Upsonic/Upsonic": {
       "score": 4.6,
@@ -6990,7 +6990,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:23:57Z"
+      "scanned_at": "2026-07-21T18:49:07Z"
     },
     "openai/openai-cua-sample-app": {
       "score": 2.7,
@@ -7956,13 +7956,13 @@
       "scanned_at": "2026-07-21T15:29:57Z"
     },
     "strands-agents/harness-sdk": {
-      "score": 5.5,
+      "score": 5.4,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 5,
         "CI-Tests": 10,
         "CII-Best-Practices": 0,
-        "Code-Review": 10,
+        "Code-Review": 9,
         "Contributors": 10,
         "Dangerous-Workflow": 0,
         "Dependency-Update-Tool": 10,
@@ -7971,22 +7971,22 @@
         "Maintained": 10,
         "Packaging": 10,
         "Pinned-Dependencies": 2,
-        "SAST": 2,
+        "SAST": 3,
         "Security-Policy": 10,
         "Signed-Releases": -1,
         "Token-Permissions": 0,
-        "Vulnerabilities": 1
+        "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:01:54Z"
+      "scanned_at": "2026-07-21T18:25:50Z"
     },
     "can1357/oh-my-pi": {
-      "score": 4.0,
+      "score": 4.2,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 0,
-        "CI-Tests": 7,
+        "CI-Tests": 8,
         "CII-Best-Practices": 0,
-        "Code-Review": 3,
+        "Code-Review": 6,
         "Contributors": 10,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 0,
@@ -8001,7 +8001,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-19T18:28:05Z"
+      "scanned_at": "2026-07-21T18:19:29Z"
     },
     "superagent-ai/grok-cli": {
       "score": 3.5,
@@ -8125,13 +8125,13 @@
       "scan_failed_at": "2026-07-21T15:11:54Z"
     },
     "continuedev/continue": {
-      "scan_failed_at": "2026-07-20T19:15:17Z"
+      "scan_failed_at": "2026-07-21T18:40:07Z"
     },
     "promptfoo/promptfoo": {
-      "scan_failed_at": "2026-07-20T19:18:18Z"
+      "scan_failed_at": "2026-07-21T18:43:09Z"
     },
     "comet-ml/opik": {
-      "scan_failed_at": "2026-07-20T19:21:14Z"
+      "scan_failed_at": "2026-07-21T18:46:10Z"
     },
     "run-llama/llama_index": {
       "scan_failed_at": "2026-07-20T22:11:06Z"
@@ -8155,7 +8155,7 @@
       "scan_failed_at": "2026-07-21T07:39:17Z"
     },
     "microsoft/playwright-mcp": {
-      "score": 6.6,
+      "score": 6.5,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 3,
@@ -8174,9 +8174,9 @@
         "Security-Policy": 10,
         "Signed-Releases": -1,
         "Token-Permissions": 0,
-        "Vulnerabilities": 10
+        "Vulnerabilities": 9
       },
-      "scanned_at": "2026-07-20T19:03:42Z"
+      "scanned_at": "2026-07-21T18:27:45Z"
     },
     "awslabs/mcp": {
       "score": 8.5,
@@ -8299,7 +8299,7 @@
       "scanned_at": "2026-07-20T15:38:42Z"
     },
     "makenotion/notion-mcp-server": {
-      "score": 4.7,
+      "score": 4.5,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 6,
@@ -8318,9 +8318,9 @@
         "Security-Policy": 0,
         "Signed-Releases": -1,
         "Token-Permissions": 0,
-        "Vulnerabilities": 2
+        "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:03:57Z"
+      "scanned_at": "2026-07-21T18:28:03Z"
     },
     "grafana/mcp-grafana": {
       "score": 6.7,
@@ -8443,13 +8443,13 @@
       "scanned_at": "2026-07-20T15:39:03Z"
     },
     "sooperset/mcp-atlassian": {
-      "score": 5.4,
+      "score": 5.2,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 5,
         "CI-Tests": 10,
         "CII-Best-Practices": 0,
-        "Code-Review": 8,
+        "Code-Review": 6,
         "Contributors": 10,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 0,
@@ -8464,7 +8464,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:04:15Z"
+      "scanned_at": "2026-07-21T18:28:24Z"
     },
     "apify/apify-mcp-server": {
       "score": 4.4,
@@ -8608,7 +8608,7 @@
         "Token-Permissions": 10,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-07-20T19:04:31Z"
+      "scanned_at": "2026-07-21T18:28:41Z"
     },
     "antvis/mcp-server-chart": {
       "score": 5.1,
@@ -8635,13 +8635,13 @@
       "scanned_at": "2026-07-19T22:28:25Z"
     },
     "charmbracelet/crush": {
-      "score": 7.2,
+      "score": 7.1,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 3,
         "CI-Tests": 10,
         "CII-Best-Practices": 0,
-        "Code-Review": 6,
+        "Code-Review": 5,
         "Contributors": 10,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 10,
@@ -8656,7 +8656,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 7
       },
-      "scanned_at": "2026-07-20T19:04:50Z"
+      "scanned_at": "2026-07-21T18:29:02Z"
     },
     "jackwener/OpenCLI": {
       "score": 5.0,
@@ -8779,7 +8779,7 @@
       "scanned_at": "2026-07-19T22:26:37Z"
     },
     "vercel-labs/deepsec": {
-      "score": 5.6,
+      "score": 5.5,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 3,
@@ -8798,9 +8798,9 @@
         "Security-Policy": 10,
         "Signed-Releases": -1,
         "Token-Permissions": 10,
-        "Vulnerabilities": 10
+        "Vulnerabilities": 8
       },
-      "scanned_at": "2026-07-20T19:05:06Z"
+      "scanned_at": "2026-07-21T18:29:19Z"
     },
     "microsoft/graphrag": {
       "score": 6.6,
@@ -8896,7 +8896,7 @@
         "Token-Permissions": 10,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:05:20Z"
+      "scanned_at": "2026-07-21T18:29:33Z"
     },
     "anthropics/claude-agent-sdk-python": {
       "score": 4.9,
@@ -8920,7 +8920,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-07-20T19:05:32Z"
+      "scanned_at": "2026-07-21T18:29:47Z"
     },
     "rowboatlabs/rowboat": {
       "score": 3.5,
@@ -9667,7 +9667,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T18:58:24Z"
+      "scanned_at": "2026-07-21T18:22:33Z"
     },
     "taylorwilsdon/google_workspace_mcp": {
       "score": 6.5,
@@ -9691,7 +9691,7 @@
         "Token-Permissions": 10,
         "Vulnerabilities": 5
       },
-      "scanned_at": "2026-07-20T18:58:43Z"
+      "scanned_at": "2026-07-21T18:22:53Z"
     },
     "modelcontextprotocol/csharp-sdk": {
       "score": 7.2,
@@ -9715,7 +9715,7 @@
         "Token-Permissions": 8,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T18:59:03Z"
+      "scanned_at": "2026-07-21T18:23:14Z"
     },
     "open-webui/mcpo": {
       "score": 3.4,
@@ -9739,7 +9739,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T18:59:21Z"
+      "scanned_at": "2026-07-21T18:23:33Z"
     },
     "ModelEngine-Group/nexent": {
       "score": 7.2,
@@ -9763,7 +9763,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-07-20T18:59:43Z"
+      "scanned_at": "2026-07-21T18:23:55Z"
     },
     "stagewise-io/stagewise": {
       "score": 5.1,
@@ -9787,7 +9787,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:00:02Z"
+      "scanned_at": "2026-07-21T18:24:15Z"
     },
     "dagger/container-use": {
       "score": 4.4,
@@ -9811,7 +9811,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-07-20T19:00:24Z"
+      "scanned_at": "2026-07-21T18:24:35Z"
     },
     "xai-org/grok-build": {
       "score": 3.4,
