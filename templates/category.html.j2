@@ -171,11 +171,11 @@
     <table>
       <thead>
         <tr>
-          <th>#</th>
-          <th>Agent</th>
-          <th>Trust</th>
-          <th>Stars</th>
-          <th>Language</th>
+          <th scope="col">#</th>
+          <th scope="col">Agent</th>
+          <th scope="col">Trust</th>
+          <th scope="col">Stars</th>
+          <th scope="col">Language</th>
         </tr>
       </thead>
       <tbody>
@@ -195,6 +195,7 @@
         {% endfor %}
       </tbody>
     </table>
+    <p style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:6px;">Grade = trust band: A ≥ 80, B ≥ 65, C ≥ 50, D &lt; 50 — <a href="/methodology/" style="color:var(--accent);">methodology</a></p>
 
     {% if comparisons %}
     <nav class="cat-nav">

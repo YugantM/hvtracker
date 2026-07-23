@@ -1,3 +1,4 @@
+<a class="skip-link" href="#main">Skip to main content</a>
 <header class="site-header">
     <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
@@ -17,3 +18,12 @@
     </div>
   </header>
   <script defer src="/auth.js?v={{ auth_js_hash }}"></script>
+  <script>
+    // Mark the current page in the nav (progressive enhancement; harmless without JS)
+    (function () {
+      var p = location.pathname;
+      document.querySelectorAll(".site-nav a").forEach(function (a) {
+        if (a.getAttribute("href") === p) a.setAttribute("aria-current", "page");
+      });
+    })();
+  </script>

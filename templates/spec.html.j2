@@ -162,7 +162,7 @@
   <!-- Google tag (gtag.js) -->
   <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
   <script>
-    (function(){try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    (function(){var host=window.location.hostname||"";if(/^(localhost|127(?:\.\d{1,3}){3}|0(?:\.\d{1,3}){3}|::1)$/i.test(host)){window["ga-disable-G-TZ8921LR0K"]=true;return}try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
     var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
   </script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
@@ -172,6 +172,7 @@
     gtag('js', new Date());
     gtag('config', 'G-TZ8921LR0K');
   </script>
+  <script defer src="/analytics.js"></script>
 </head>
 <body>
   {% include "_site_header.html.j2" %}
