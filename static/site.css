@@ -80,10 +80,11 @@
   --text: #1a1a1a;
   --muted: #57524c;
   --accent: #26405e;
-  --accent-warm: #b05a3a;
+  --accent-warm: #a34e30;
   --green: #2f6846;
   --red: #9b3c3c;
   --amber: #8b6914;
+  --aging: #8b6914;
   --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
   --font-sans: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
   /* Aliases used by blog/methodology/spec/movers/badges/roadmap templates */
@@ -92,15 +93,16 @@
   --ink: #1f1b17;
   --line: #d5cbbc;
   --line-strong: #b9aa96;
-  --lobster: #c67c6d;
-  --lobster-soft: rgba(198,124,109,.14);
-  --moss: #6f876e;
-  --moss-soft: rgba(111,135,110,.14);
+  /* Darkened for WCAG AA contrast (>=4.5:1) on --paper; hues preserved */
+  --lobster: #9d5a47;
+  --lobster-soft: rgba(157,90,71,.14);
+  --moss: #56704f;
+  --moss-soft: rgba(86,112,79,.14);
   --blue: #a7bfd9;
-  --blue-strong: #7f9cbd;
+  --blue-strong: #4f6f93;
   --blue-soft: rgba(167,191,217,.18);
-  --stale: #8d887e;
-  --muted-2: #8a7f72;
+  --stale: #6f6a61;
+  --muted-2: #6e675f;
 }
 
 body {

@@ -112,10 +112,10 @@
   <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
   <style>
     .tagline { font-size: 12px; color: var(--muted); font-family: var(--font-mono); }
-    .site-status { font-family: var(--font-mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+    /* .site-status / .live-dot come from site.css — no page-level overrides */
 
     .intro { padding: 28px 0 20px; border-bottom: 1px solid var(--border); }
-    .intro h2 { font-size: 26px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+    .intro h1 { font-size: 26px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
     .intro p { color: var(--muted); font-size: 16px; line-height: 1.7; max-width: 680px; }
 
     .tool-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; margin: 14px 0 0; }
@@ -172,7 +172,7 @@
     .search-input {
       flex: 1; min-width: 180px; max-width: 300px;
       padding: 7px 10px; font-family: var(--font-mono); font-size: 12px;
-      border: 1px solid var(--border); background: #fff; color: var(--text); outline: none;
+      border: 1px solid var(--border); background: #fff; color: var(--text);
     }
     .search-input:focus { border-color: var(--accent); }
     .search-input::placeholder { color: var(--muted); }
@@ -271,7 +271,7 @@
       font-family: var(--font-mono); font-size: 11px; font-weight: 600;
       letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted);
       border-bottom: 1px solid var(--border); background: var(--bg);
-      cursor: pointer; user-select: none; position: sticky; top: 0; z-index: 2;
+      cursor: pointer; user-select: none;
     }
     thead th:hover { color: var(--text); }
     thead th.sorted { color: var(--text); }
@@ -302,20 +302,28 @@
     tbody tr[data-rank="1"]:hover { background: linear-gradient(90deg, rgba(160,128,80,0.40) 0%, rgba(160,128,80,0.20) 40%, rgba(160,128,80,0.08) 100%); }
     tbody tr[data-rank="2"]:hover { background: linear-gradient(90deg, rgba(138,133,126,0.36) 0%, rgba(138,133,126,0.18) 40%, rgba(138,133,126,0.07) 100%); }
     tbody tr[data-rank="3"]:hover { background: linear-gradient(90deg, rgba(155,107,74,0.38) 0%, rgba(155,107,74,0.18) 40%, rgba(155,107,74,0.07) 100%); }
-    tbody tr[data-rank="1"] .rank { color: #a08050; font-weight: 700; font-size: 15px; }
-    tbody tr[data-rank="2"] .rank { color: #8a857e; font-weight: 700; font-size: 15px; }
-    tbody tr[data-rank="3"] .rank { color: #9b6b4a; font-weight: 700; font-size: 15px; }
+    tbody tr[data-rank="1"] .rank { color: var(--text); font-weight: 700; font-size: 15px; }
+    tbody tr[data-rank="2"] .rank { color: var(--text); font-weight: 700; font-size: 15px; }
+    tbody tr[data-rank="3"] .rank { color: var(--text); font-weight: 700; font-size: 15px; }
+
+    /* Single-category view shows the category rank — suppress global medals */
+    table.cat-rank-view tbody tr[data-rank="1"],
+    table.cat-rank-view tbody tr[data-rank="2"],
+    table.cat-rank-view tbody tr[data-rank="3"] { border-left: 0; background: none; }
+    table.cat-rank-view tbody tr:nth-child(odd)  { background: var(--bg); }
+    table.cat-rank-view tbody tr:nth-child(even) { background: var(--surface); }
+    table.cat-rank-view tbody tr:hover { background: #ddd8ce; }
 
     td { padding: 9px 8px; vertical-align: middle; border-bottom: 1px solid rgba(0,0,0,0.06); }
     td.agent-cell { vertical-align: top; }
 
     .rank { font-family: var(--font-mono); font-size: 12px; color: var(--muted); text-align: right; }
-    .rank-global-muted { font-family: var(--font-mono); font-size: 11px; color: #999; }
+    .rank-global-muted { font-family: var(--font-mono); font-size: 11px; color: var(--muted-2); }
 
     .delta { font-family: var(--font-mono); font-size: 12px; font-weight: 600; text-align: center; white-space: nowrap; }
     .delta-up   { color: var(--green); }
     .delta-down { color: var(--red); }
-    .delta-same { color: #999; }
+    .delta-same { color: var(--muted-2); }
     .delta-new  { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.03em; }
 
     .agent-cell { min-width: 0; overflow: hidden; }
@@ -335,7 +343,7 @@
     .state-chip { font-family: var(--font-mono); font-size: 11px; font-weight: 600; margin-top: 2px; margin-left: 2px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
     .state-listed { color: var(--green); }
     .state-warning { color: var(--red); }
-    .state-legacy { color: #999; }
+    .state-legacy { color: var(--muted-2); }
     .state-rejected, .state-delisted { color: var(--red); }
 
     .agent-tags { display: flex; gap: 2px; flex-wrap: wrap; align-items: center; margin-top: 1px; }
@@ -505,15 +513,17 @@
     .formula strong { color: var(--text); }
 
     .category-panel { padding: 16px 0; border-top: 1px solid var(--border); margin-top: 12px; }
-
-    .live-dot { display: inline-block; width: 5px; height: 5px; background: var(--green); border-radius: 50%; margin-right: 3px; vertical-align: middle; }
+    .cat-panel-title { font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
+    .cat-chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .cat-chip { font-family: var(--font-mono); font-size: 12px; padding: 4px 10px; background: var(--surface); color: var(--muted); text-decoration: none; }
+    .cat-chip:hover, .cat-chip:focus-visible { color: var(--accent); text-decoration: none; }
 
     @media (max-width: 985px) {
       .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
       .agent-desc { max-width: 200px; }
     }
     @media (max-width: 640px) {
-      .intro h2 { font-size: 18px; }
+      .intro h1 { font-size: 18px; }
       .hero-metrics { flex-wrap: wrap; gap: 12px; }
       .registry-strip { flex-direction: column; }
       .registry-grid { gap: 12px; }
@@ -536,41 +546,23 @@
   <script defer src="/analytics.js"></script>
 </head>
 <body data-page-type="leaderboard">
-  <header class="site-header">
-    <div class="site-header-inner">
-      <h1 class="logo"><a href="/" style="color:inherit;text-decoration:none">HV<span>Tracker</span></a></h1>
-      <nav class="site-nav" aria-label="Site">
-        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a><a href="/trends/">Trends</a></div></div>
-        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/scan/">Scan stack</a><a href="/methodology/">Methodology</a><a href="/badges/">Badges</a></div></div>
-        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/capabilities/">Capabilities</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
-        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
-        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/correct/">Corrections</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
-      </nav>
-      <div class="site-header-right">
-        <div class="site-status">
-          <span class="live-dot"></span>updated {{ updated }}
-        </div>
-        <div id="hvt-auth-slot" class="hvt-auth-slot"></div>
-      </div>
-    </div>
-  </header>
-  <script defer src="/auth.js?v={{ auth_js_hash }}"></script>
-  <div class="page">
+  {% include "_site_header.html.j2" %}
+  <main class="page" id="main">
 
     <section class="intro" aria-labelledby="intro-title">
-      <h2 id="intro-title">AI Trust Registry for open-source AI agent projects.</h2>
+      <h1 id="intro-title">AI Trust Registry for open-source AI agent projects.</h1>
       <p>Independent trust scores for {{ total }} open-source AI agent projects, based on public, checkable signals across activity, adoption, transparency, safety, and provenance. How every point is earned is documented in the <a href="/methodology/" style="color:var(--accent);">methodology →</a></p>
-      <div class="tool-strip" aria-label="Trust tools">
+      <div class="tool-strip" role="group" aria-label="Trust tools">
         <a href="/verify/" class="tool-chip home-verify-cta">
           <strong>Verify your agent or MCP server &rarr;</strong>
           <span>Paste a repo, package, or server URL — get a signed verdict.</span>
         </a>
-        <a href="/blog/mcp-server-launch/" class="tool-chip home-mcp-cta">
+        <a href="/data/" class="tool-chip home-mcp-cta">
           <strong>Use HVTracker from your agent &rarr;</strong>
           <span>MCP server at <code>hvtracker.net/mcp</code> — no auth, no install.</span>
         </a>
       </div>
-      <div class="stats-bar" aria-label="Registry snapshot">
+      <div class="stats-bar" role="group" aria-label="Registry snapshot">
         <div class="stat-cell">
           <div class="stat-val accent">{{ registry_summary.active_count }}</div>
           <div class="stat-label">Active agents</div>
@@ -610,14 +602,14 @@
         </div>
       </div>
       <div class="watch-list" id="watchlistPreview">
-        <span class="watch-empty">Track agents with the ★ button — when you come back, their score, grade, and rank changes are shown here.</span>
+        <span class="watch-empty">Track agents with the ★ button — their score, grade, and rank changes show up here on your next visit. <a href="/login">Sign in</a> to sync across devices and get alerts.</span>
       </div>
     </section>
 
     <div class="filter-bar" id="filterBar">
-      <input type="text" class="search-input" id="searchInput" placeholder="Search agents…  ⌘K" autocomplete="off">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search agents…  ⌘K" autocomplete="off" aria-label="Search agents">
       <div class="cat-dropdown" id="catDropdown">
-        <span class="cat-toggle" id="catToggle">Categories <span class="arrow">▾</span></span>
+        <button type="button" class="cat-toggle" id="catToggle" aria-haspopup="true" aria-expanded="false" aria-controls="catPanel">Categories <span class="arrow">▾</span></button>
         <div class="cat-panel" id="catPanel">
           <label class="cat-option all-opt">
             <input type="checkbox" id="catAll" checked> All ({{ total }})
@@ -632,7 +624,7 @@
         </div>
       </div>
       <div class="cat-dropdown" id="licDropdown">
-        <span class="cat-toggle" id="licToggle">License <span class="arrow">▾</span></span>
+        <button type="button" class="cat-toggle" id="licToggle" aria-haspopup="true" aria-expanded="false" aria-controls="licPanel">License <span class="arrow">▾</span></button>
         <div class="cat-panel" id="licPanel">
           <label class="cat-option all-opt">
             <input type="radio" name="lic" value="all" checked> All
@@ -652,7 +644,7 @@
         </div>
       </div>
       <div class="cat-dropdown" id="trustDropdown">
-        <span class="cat-toggle" id="trustToggle">Trust signals <span class="arrow">▾</span></span>
+        <button type="button" class="cat-toggle" id="trustToggle" aria-haspopup="true" aria-expanded="false" aria-controls="trustPanel">Trust signals <span class="arrow">▾</span></button>
         <div class="cat-panel" id="trustPanel">
           <label class="cat-option">
             <input type="checkbox" class="trust-cb" value="provenance"> Provenance
@@ -674,7 +666,7 @@
       <button type="button" class="v2-toggle" id="v2Toggle" aria-pressed="false">
         Compare to pre-calibration
       </button>
-      <span class="cat-clear" id="catClear">✕ Clear filters</span>
+      <button type="button" class="cat-clear" id="catClear">✕ Clear filters</button>
     </div>
     <div class="v2-banner" id="v2Banner">
       <span id="v2BannerText">Showing the pre-calibration baseline (methodology {{ methodology_version }} superseded this). This is no longer the live ranking.</span>
@@ -683,7 +675,7 @@
     </div>
 
     {% if movers and (movers.up or movers.down) %}
-    <div class="movers movers-gainers" aria-label="Daily movers vs. yesterday">
+    <div class="movers movers-gainers" role="group" aria-label="Daily movers vs. yesterday">
       <span class="movers-title">Daily movers</span>
       <div class="movers-viewport">
         <div class="movers-row">
@@ -706,16 +698,17 @@
     </div>
     {% endif %}
 
-    <div class="cat-tabs" id="catTabs" role="tablist" aria-label="Browse by category">
-      <button class="cat-tab active" data-tab="__all__" role="tab" aria-selected="true">Global</button>
+    <div class="cat-tabs" id="catTabs" role="group" aria-label="Category presets">
+      <button class="cat-tab active" data-tab="__all__" aria-pressed="true">Global</button>
       {% for cat in categories[:5] %}
-      <button class="cat-tab" data-tab="{{ cat.name }}" role="tab" aria-selected="false">{{ cat.name }}</button>
+      <button class="cat-tab" data-tab="{{ cat.name }}" aria-pressed="false">{{ cat.name }}</button>
       {% endfor %}
       {% if newly_added %}
-      <button class="cat-tab special" data-tab="__new__" role="tab" aria-selected="false">Newly added <span class="cat-tab-badge">{{ newly_added|length }}</span></button>
+      <button class="cat-tab special" data-tab="__new__" aria-pressed="false">Newly added <span class="cat-tab-badge">{{ newly_added|length }}</span></button>
       {% endif %}
     </div>
 
+    <noscript><p style="font-family:var(--font-mono);font-size:12px;color:var(--muted);padding:8px 0;">JavaScript is disabled — showing the full registry without search, filtering, sorting, or pagination.</p></noscript>
     <div class="table-wrap">
       <table id="leaderboard">
         <colgroup>
@@ -730,14 +723,14 @@
         </colgroup>
         <thead>
           <tr>
-            <th class="r sorted" data-col="rank">#<span class="sort-arrow">↑</span></th>
-            <th class="c" data-col="rank_delta">Δ<span class="sort-arrow"></span></th>
-            <th data-col="name">Agent</th>
-            <th class="c" data-col="evidence_grade">Grade<span class="sort-arrow"></span></th>
-            <th class="c" data-col="stars">Stars<span class="sort-arrow"></span></th>
-            <th data-col="last_push">Last Push<span class="sort-arrow"></span></th>
-            <th class="c" data-col="weekly_commits" title="Commits in the last 4 weeks">Commits<span class="sort-arrow"></span></th>
-            <th class="c" data-col="trust_score">HVTrust<span class="sort-arrow"></span></th>
+            <th scope="col" class="r sorted" data-col="rank" aria-sort="ascending">#<span class="sort-arrow">↑</span></th>
+            <th scope="col" class="c" data-col="rank_delta">Δ<span class="sort-arrow"></span></th>
+            <th scope="col" data-col="name">Agent<span class="sort-arrow"></span></th>
+            <th scope="col" class="c" data-col="evidence_grade">Grade<span class="sort-arrow"></span></th>
+            <th scope="col" class="c" data-col="stars">Stars<span class="sort-arrow"></span></th>
+            <th scope="col" data-col="last_push">Last Push<span class="sort-arrow"></span></th>
+            <th scope="col" class="c" data-col="weekly_commits" title="Commits in the last 4 weeks">Commits<span class="sort-arrow"></span></th>
+            <th scope="col" class="c" data-col="trust_score">HVTrust<span class="sort-arrow"></span></th>
           </tr>
         </thead>
         <tbody>
@@ -830,23 +823,23 @@
       </div>
     </div>
 
-    <section class="featured-footer" aria-label="Featured in READMEs">
-      <div class="featured-footer-label">Featured in READMEs</div>
+    <section class="featured-footer" aria-label="Projects carrying the HVTracker badge">
+      <div class="featured-footer-label">Projects carrying the HVTracker badge</div>
       <div class="featured-footer-list">
-        <a class="featured-repo" href="https://github.com/deepset-ai/haystack" target="_blank" rel="noopener noreferrer">
+        <a class="featured-repo" href="/agents/haystack/" title="Haystack trust scorecard">
           <img src="/haystack-logo.png?v=20260604" alt="Haystack logo" loading="lazy" decoding="async">
         </a>
-        <a class="featured-repo featured-repo--dark" href="https://github.com/AIOSAI/AIPass" target="_blank" rel="noopener noreferrer">
+        <a class="featured-repo featured-repo--dark" href="/agents/aipass/" title="AIPass trust scorecard">
           <img src="/aipass-logo.png?v=20260608" alt="AIPass logo" loading="lazy" decoding="async">
         </a>
-        <a class="featured-repo featured-repo--center featured-repo--wordmark" href="https://github.com/ComposioHQ/composio" target="_blank" rel="noopener noreferrer">
+        <a class="featured-repo featured-repo--center featured-repo--wordmark" href="/agents/composio/" title="Composio trust scorecard">
           <img src="/composio-logo.svg?v=20260612b" alt="Composio logo" loading="lazy" decoding="async">
         </a>
-        <a class="featured-repo featured-repo--icon" href="https://github.com/HKUDS/LightRAG" target="_blank" rel="noopener noreferrer">
+        <a class="featured-repo featured-repo--icon" href="/agents/lightrag/" title="LightRAG trust scorecard">
           <img src="/lightrag-logo.png?v=20260624" alt="LightRAG logo" loading="lazy" decoding="async">
           LightRAG
         </a>
-        <a class="featured-repo featured-repo--icon" href="https://github.com/cacheplane/angular-agent-framework" target="_blank" rel="noopener noreferrer">
+        <a class="featured-repo featured-repo--icon" href="/agents/threadplane/" title="Threadplane trust scorecard">
           <img src="/threadplane-logo.png?v=20260710b" alt="Threadplane logo" loading="lazy" decoding="async">
           Threadplane
         </a>
@@ -872,11 +865,11 @@
     </section>
     {% endif %}
 
-    <nav class="category-panel">
-      <div style="font-family:var(--font-mono);font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">Browse by Category</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+    <nav class="category-panel" aria-label="Browse by category">
+      <div class="cat-panel-title">Browse by Category</div>
+      <div class="cat-chip-row">
         {% for cat in categories %}
-        <a href="/categories/{{ cat.slug }}/" style="font-family:var(--font-mono);font-size:12px;padding:4px 10px;background:var(--surface);color:var(--muted);text-decoration:none;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">{{ cat.name }} ({{ cat.count }})</a>
+        <a class="cat-chip" href="/categories/{{ cat.slug }}/">{{ cat.name }} ({{ cat.count }})</a>
         {% endfor %}
       </div>
     </nav>
@@ -896,16 +889,18 @@
       <span class="footer-sep">·</span>
       <a href="/blog/">Blog</a>
       <span class="footer-sep">·</span>
-      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <a href="/submit/">Submit Agent</a>
       <span class="footer-sep">·</span>
       <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
 
-  </div>
+  </main>
 
   <script>
     // ── Category filtering, sorting & pagination ──
     (function () {
+      // Stub so blocked analytics.js never breaks interactions (scroll, sort, etc.)
+      window.hvtTrack = window.hvtTrack || function () {};
       const WATCHLIST_KEY = "hvtracker_watchlist_v1";
       const PAGE_SIZE = 15;
       let currentPage = 0;
@@ -942,8 +937,8 @@
       const licToggle = document.getElementById("licToggle");
       const licDropdown = document.getElementById("licDropdown");
       const licRadios = Array.from(document.querySelectorAll('input[name="lic"]'));
-      licToggle.addEventListener("click", (e) => { e.stopPropagation(); licDropdown.classList.toggle("open"); });
-      document.addEventListener("click", (e) => { if (!licDropdown.contains(e.target)) licDropdown.classList.remove("open"); });
+      licToggle.addEventListener("click", (e) => { e.stopPropagation(); licToggle.setAttribute("aria-expanded", licDropdown.classList.toggle("open") ? "true" : "false"); });
+      document.addEventListener("click", (e) => { if (!licDropdown.contains(e.target)) { licDropdown.classList.remove("open"); licToggle.setAttribute("aria-expanded", "false"); } });
       licRadios.forEach(r => r.addEventListener("change", () => {
         selectedLicense = r.value;
         licDropdown.classList.remove("open");
@@ -956,8 +951,8 @@
       const trustToggle = document.getElementById("trustToggle");
       const trustDropdown = document.getElementById("trustDropdown");
       const trustCbs = Array.from(document.querySelectorAll(".trust-cb"));
-      trustToggle.addEventListener("click", (e) => { e.stopPropagation(); trustDropdown.classList.toggle("open"); });
-      document.addEventListener("click", (e) => { if (!trustDropdown.contains(e.target)) trustDropdown.classList.remove("open"); });
+      trustToggle.addEventListener("click", (e) => { e.stopPropagation(); trustToggle.setAttribute("aria-expanded", trustDropdown.classList.toggle("open") ? "true" : "false"); });
+      document.addEventListener("click", (e) => { if (!trustDropdown.contains(e.target)) { trustDropdown.classList.remove("open"); trustToggle.setAttribute("aria-expanded", "false"); } });
       trustCbs.forEach(cb => cb.addEventListener("change", () => {
         if (cb.checked) selectedTrust.add(cb.value); else selectedTrust.delete(cb.value);
         syncTrustUI();
@@ -978,7 +973,7 @@
           catTabs.forEach(t => {
             const on = t.dataset.tab === "__new__";
             t.classList.toggle("active", on);
-            t.setAttribute("aria-selected", on ? "true" : "false");
+            t.setAttribute("aria-pressed", on ? "true" : "false");
           });
           return;
         }
@@ -988,7 +983,7 @@
           const tab = t.dataset.tab;
           const on = tab === "__all__" ? allSelected : (only === tab);
           t.classList.toggle("active", on);
-          t.setAttribute("aria-selected", on ? "true" : "false");
+          t.setAttribute("aria-pressed", on ? "true" : "false");
         });
       }
       catTabs.forEach(t => {
@@ -1005,7 +1000,21 @@
       });
 
       function getFilteredRows() {
-        return Array.from(tbody.querySelectorAll("tr:not(.hidden)"));
+        return Array.from(tbody.querySelectorAll("tr[data-slug]:not(.hidden)"));
+      }
+
+      // Real empty state when filters/search match nothing (renderPage re-adds
+      // it after every sort/filter pass, since sortRows drops it from the DOM).
+      let emptyRow = null;
+      function renderEmptyRow() {
+        if (!emptyRow) {
+          const cols = table.querySelectorAll("thead th").length;
+          emptyRow = document.createElement("tr");
+          emptyRow.className = "empty-row";
+          emptyRow.innerHTML = '<td colspan="' + cols + '" style="text-align:center;color:var(--muted);padding:24px 8px;">No agents match these filters. <button type="button" class="watch-link" id="emptyClearBtn">Clear filters</button></td>';
+          emptyRow.querySelector("#emptyClearBtn").addEventListener("click", () => clearBtn.click());
+        }
+        tbody.appendChild(emptyRow);
       }
 
       function renderPage() {
@@ -1020,6 +1029,7 @@
             r.classList.add("pg-hidden");
           }
         });
+        if (total === 0) renderEmptyRow();
         prevBtn.disabled = currentPage === 0;
         nextBtn.disabled = end >= total;
         pgInfo.textContent = total === 0 ? "No results" :
@@ -1041,8 +1051,11 @@
           }
           let av = a.dataset[col];
           let bv = b.dataset[col];
-          const num = !isNaN(parseFloat(av));
-          if (num) { av = parseFloat(av); bv = parseFloat(bv); }
+          if (col === "last_push") {
+            // ISO dates sort correctly as strings; parseFloat would truncate to the year
+            av = av || "";
+            bv = bv || "";
+          } else if (!isNaN(parseFloat(av))) { av = parseFloat(av); bv = parseFloat(bv); }
           if (av < bv) return sortAsc ? -1 : 1;
           if (av > bv) return sortAsc ? 1 : -1;
           return 0;
@@ -1065,6 +1078,9 @@
         }
         const singleCat = selectedCats.size === 1;
         const historical = rankMode === "historical";
+        // Visible number is the category rank in single-cat view — suppress the
+        // global top-3 medal styling so it doesn't contradict the shown rank.
+        table.classList.toggle("cat-rank-view", singleCat && !historical);
         rows.forEach(row => {
           const rankCell = row.querySelector(".rank");
           const globalRank = row.dataset.rank || "";
@@ -1177,7 +1193,7 @@
       function applyFilters() {
         currentPage = 0;
         const allSelected = selectedCats.size === totalCats;
-        tbody.querySelectorAll("tr").forEach(row => {
+        tbody.querySelectorAll("tr[data-slug]").forEach(row => {
           const name = (row.dataset.name || "").toLowerCase();
           const repo = (row.dataset.repo || "").toLowerCase();
           const cat = row.dataset.category || "";
@@ -1210,8 +1226,9 @@
         revertLink.textContent = historical ? "Back to current ranking" : "Compare to pre-calibration";
         sortCol = "rank";
         sortAsc = true;
-        headers.forEach(h => { h.classList.remove("sorted"); const a = h.querySelector(".sort-arrow"); if (a) a.textContent = ""; });
+        headers.forEach(h => { h.classList.remove("sorted"); h.removeAttribute("aria-sort"); const a = h.querySelector(".sort-arrow"); if (a) a.textContent = ""; });
         rankHeader.classList.add("sorted");
+        rankHeader.setAttribute("aria-sort", "ascending");
         currentPage = 0;
         updateRankDisplay();
         sortRows();
@@ -1256,7 +1273,9 @@
       function updateCompareButtons() {
         if (!window.hvtCompare) return;
         document.querySelectorAll(".compare-toggle").forEach((btn) => {
-          btn.classList.toggle("is-saved", window.hvtCompare.has(btn.dataset.cmpSlug));
+          const saved = window.hvtCompare.has(btn.dataset.cmpSlug);
+          btn.classList.toggle("is-saved", saved);
+          btn.setAttribute("aria-pressed", saved ? "true" : "false");
         });
       }
 
@@ -1330,7 +1349,7 @@
         if (panelActions) panelActions.style.display = items.length ? "" : "none";
         if (panelHint) panelHint.style.display = items.length ? "" : "none";
         if (!items.length) {
-          preview.innerHTML = '<span class="watch-empty">Track agents with the ★ button — when you come back, their score, grade, and rank changes are shown here.</span>';
+          preview.innerHTML = '<span class="watch-empty">Track agents with the ★ button — their score, grade, and rank changes show up here on your next visit. <a href="/login">Sign in</a> to sync across devices and get alerts.</span>';
           updateWatchButtons();
           return;
         }
@@ -1370,10 +1389,10 @@
       // ── Dropdown toggle ──
       toggle.addEventListener("click", (e) => {
         e.stopPropagation();
-        dropdown.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", dropdown.classList.toggle("open") ? "true" : "false");
       });
       document.addEventListener("click", (e) => {
-        if (!dropdown.contains(e.target)) dropdown.classList.remove("open");
+        if (!dropdown.contains(e.target)) { dropdown.classList.remove("open"); toggle.setAttribute("aria-expanded", "false"); }
       });
 
       // ── Category checkbox logic ──
@@ -1479,6 +1498,7 @@
 
       document.getElementById("watchlistClearLink").addEventListener("click", (e) => {
         e.preventDefault();
+        if (!window.confirm("Remove all tracked agents?")) return;
         const cleared = loadWatchlist().map((item) => item.slug);
         saveWatchlist([]);
         renderWatchlistPreview();
@@ -1507,11 +1527,13 @@
 
       // ── Column sort ──
       headers.forEach(th => {
-        th.addEventListener("click", () => {
+        th.setAttribute("tabindex", "0");
+        function activateSort() {
           const col = th.dataset.col;
           if (col === sortCol) { sortAsc = !sortAsc; } else { sortCol = col; sortAsc = col === "name" || col === "last_push"; }
-          headers.forEach(h => { h.classList.remove("sorted"); const a = h.querySelector(".sort-arrow"); if (a) a.textContent = ""; });
+          headers.forEach(h => { h.classList.remove("sorted"); h.removeAttribute("aria-sort"); const a = h.querySelector(".sort-arrow"); if (a) a.textContent = ""; });
           th.classList.add("sorted");
+          th.setAttribute("aria-sort", sortAsc ? "ascending" : "descending");
           const arrow = th.querySelector(".sort-arrow");
           if (arrow) arrow.textContent = sortAsc ? "↑" : "↓";
           currentPage = 0;
@@ -1522,6 +1544,10 @@
             sort_dir: sortAsc ? "asc" : "desc",
             result_count: getFilteredRows().length
           });
+        }
+        th.addEventListener("click", activateSort);
+        th.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activateSort(); }
         });
       });
 
@@ -1583,6 +1609,9 @@
         viewport.addEventListener("touchend", () => {
           resumeTimer = setTimeout(() => { pos = viewport.scrollLeft; paused = false; }, 3000);
         }, { passive: true });
+        // Keyboard users: don't let the strip scroll away from a focused link
+        viewport.addEventListener("focusin", () => { paused = true; clearTimeout(resumeTimer); });
+        viewport.addEventListener("focusout", () => { pos = viewport.scrollLeft; paused = false; });
       }
       initMoversTicker(document.querySelector(".movers-gainers .movers-viewport"), false);
     })();

@@ -81,11 +81,8 @@
     .name-cell a { font-weight:600; }
     .name-cell a:hover { color:var(--accent); }
     .name-cell .desc { font-size:12px; color:var(--muted); margin-top:1px; display:block; max-width:360px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .grade { font-family:var(--font-mono); font-size:11px; font-weight:700; margin-left:4px; }
-    .grade-A { color:var(--green); }
-    .grade-B { color:var(--accent); }
-    .grade-C { color:var(--amber); }
-    .grade-D { color:var(--muted); }
+    .grade { font-family:var(--font-mono); font-size:11px; font-weight:700; margin-left:4px; padding:1px 5px; border-radius:3px; }
+    /* grade colors come from site.css (.grade-A..D = white on color) */
     .state-chip { font-family:var(--font-mono); font-size:11px; font-weight:600; margin-left:4px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); }
     .state-listed { color:var(--green); }
     .state-warning { color:var(--red); }
@@ -131,7 +128,7 @@
 </head>
 <body data-page-type="category_page" data-category="{{ category }}">
   {% include "_site_header.html.j2" %}
-  <div class="page">
+  <main class="page" id="main">
 
     <section class="hero">
       <h1>{{ category }}</h1>
@@ -234,10 +231,10 @@
       <span class="footer-sep">&middot;</span>
       <a href="/blog/">Blog</a>
       <span class="footer-sep">&middot;</span>
-      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <a href="/submit/">Submit Agent</a>
       <span class="footer-sep">&middot;</span>
       <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
-  </div>
+  </main>
 </body>
 </html>
