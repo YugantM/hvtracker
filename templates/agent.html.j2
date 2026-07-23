@@ -88,10 +88,10 @@
     .badge.grade-A, .badge.grade-B, .badge.grade-C, .badge.grade-D { color:#fff; padding:2px 8px; border-radius:4px; }
     .badge.state-listed { color:var(--green); }
     .badge.state-warning { color:var(--red); }
-    .badge.state-legacy { color:#999; }
+    .badge.state-legacy { color:var(--muted-2); }
     .badge.state-rejected, .badge.state-delisted { color:var(--red); }
     .hero-actions { margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; }
-    .hero-summary-grid { margin-top:16px; display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:1px; background:var(--border); }
+    .hero-summary-grid { margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:1px; background:var(--border); }
     .hero-summary-item { padding:10px; background:var(--bg); }
     .hero-summary-label { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); margin-bottom:4px; }
     .hero-summary-value { font-family:var(--font-mono); font-size:13px; font-weight:600; line-height:1.3; }
@@ -125,10 +125,10 @@
     .fresh  .fresh-dot { background:var(--green); }
     .recent .fresh-dot { background:#5a8a6a; }
     .aging  .fresh-dot { background:var(--amber); }
-    .stale  .fresh-dot { background:#999; }
+    .stale  .fresh-dot { background:var(--muted-2); }
 
     .analysis { padding:18px 0; border-top:1px solid var(--border); }
-    .section-title { font-size:13px; font-weight:600; margin-bottom:12px; }
+    .section-title { font-size:15px; font-weight:600; margin-bottom:12px; }
     .analysis-panel { display:grid; gap:12px; }
     .analysis-card { border:1px solid var(--border); padding:14px; }
     .analysis-card-head { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:10px; }
@@ -142,7 +142,7 @@
     .metric-row { display:grid; grid-template-columns:160px minmax(160px, 1fr) 80px; gap:12px; align-items:center; min-height:28px; font-family:var(--font-mono); }
     .metric-name { color:var(--muted); font-size:12px; line-height:1.3; }
     .metric-name strong { display:block; color:var(--text); font-size:12px; }
-    .metric-sub { color:#999; font-size:11px; }
+    .metric-sub { color:var(--muted-2); font-size:11px; }
     .metric-track { position:relative; height:6px; overflow:hidden; background:var(--border); }
     .metric-fill { height:100%; width:var(--fill); background:var(--bar, var(--accent)); }
     .metric-value { color:var(--text); text-align:right; font-size:12px; font-weight:700; }
@@ -163,7 +163,7 @@
     .prov-label { font-family:var(--font-mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px; }
     .prov-value { font-family:var(--font-mono); font-size:16px; font-weight:600; }
     .prov-yes { color:var(--green); }
-    .prov-no { color:#999; }
+    .prov-no { color:var(--muted-2); }
     .prov-sub { font-size:12px; color:var(--muted); margin-top:2px; }
     .sc-checks { margin-top:8px; display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:4px 14px; font-family:var(--font-mono); font-size:12px; }
     .sc-check { display:flex; justify-content:space-between; padding:2px 0; border-bottom:1px solid rgba(0,0,0,0.06); }
@@ -328,7 +328,7 @@
 </head>
 <body data-page-type="agent_profile" data-agent-slug="{{ row.slug }}" data-agent-name="{{ row.name }}" data-category="{{ row.category }}" data-global-rank="{{ row.rank }}" data-trust-score="{{ row.trust_score }}">
   {% include "_site_header.html.j2" %}
-  <div class="page">
+  <main class="page" id="main">
 
     <section class="hero">
       <h1>{{ row.name }}</h1>
@@ -478,7 +478,7 @@
 {% else %}
         <a class="compare-link" href="/compare/?a={{ row.slug }}">Compare with another agent</a>
 {% endif %}
-        <a class="secondary-link" href="/track/{{ row.slug }}/">Track {{ row.name }}</a>
+        <a class="secondary-link" href="/track/{{ row.slug }}/">Get email alerts for {{ row.name }}</a>
         {% if row.category %}<a class="secondary-link" href="/categories/{{ row.category_slug }}/">View {{ row.category }}</a>{% endif %}
         <a class="secondary-link" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Report missing data</a>
       </div>
@@ -487,7 +487,7 @@
     <section class="rank-block">
       <div>
         <div class="score-pill {{ row.score_class }}">{{ row.score }}</div>
-        <div class="rank-label">Activity Score · out of 100</div>
+        <div class="rank-label">Activity sub-score · out of 100</div>
       </div>
       {% if row.trust_score is defined %}
       <div>
@@ -553,7 +553,7 @@
         </div>
         <div>
           <div class="stat-label">Commits (4 wk)</div>
-          <div class="stat-value">{% if row.weekly_commits is not none %}{{ row.weekly_commits }}{% else %}—{% endif %}{% if row.commits_low_confidence %}<span title="Recent push detected; GitHub's commit stats cache may be stale, so this 4-week count could be temporarily under-reported." style="color:var(--amber);font-size:13px;margin-left:3px;cursor:help;">?</span>{% endif %}</div>
+          <div class="stat-value">{% if row.weekly_commits is not none %}{{ row.weekly_commits }}{% else %}—{% endif %}{% if row.commits_low_confidence %}<span tabindex="0" title="Recent push detected; GitHub's commit stats cache may be stale, so this 4-week count could be temporarily under-reported." style="color:var(--amber);font-size:13px;margin-left:3px;cursor:help;">?</span>{% endif %}</div>
         </div>
         <div>
           <div class="stat-label">Downloads (7d)</div>
@@ -1076,22 +1076,6 @@
     </section>
     {% endif %}
 
-    {% if comparisons %}
-    <section class="siblings">
-      <h2 class="section-title">{{ row.name }} head-to-head</h2>
-      <ul>
-        {% for c in comparisons %}
-        <li>
-          <a href="{{ c.url }}">
-            <span class="sib-name">{{ row.name }} vs {{ c.name }}</span>
-            <span class="sib-score">compare →</span>
-          </a>
-        </li>
-        {% endfor %}
-      </ul>
-    </section>
-    {% endif %}
-
     <section class="terminal-note" style="padding:18px 20px;font-size:12px;color:var(--muted);line-height:1.7;">
       <strong style="color:var(--text);font-size:12px;">Data sources</strong><br>
       GitHub REST API (repo, commits, stars, forks, license){% if row.npm_package %} · npm Registry (downloads, provenance){% endif %}{% if row.pypi_package %} · PyPI / pypistats (downloads, provenance){% endif %}{% if row.crate_package %} · crates.io (downloads){% endif %}{% if row.scorecard_score is not none %} · OpenSSF Scorecard CLI{% endif %}{% if row.hn_mentions_30d is not none %} · Algolia HN Search API{% endif %}{% if row.public_actions %} · GitHub Search API (fingerprint actions){% endif %}
@@ -1113,12 +1097,12 @@
       <span class="footer-sep">·</span>
       <a href="/blog/">Blog</a>
       <span class="footer-sep">·</span>
-      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <a href="/submit/">Submit Agent</a>
       <span class="footer-sep">·</span>
       <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
 
-  </div>
+  </main>
   <script>
     (function () {
       const WATCHLIST_KEY = "hvtracker_watchlist_v1";

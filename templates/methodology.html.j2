@@ -238,7 +238,7 @@
 </head>
 <body data-page-type="methodology">
   {% include "_site_header.html.j2" %}
-  <div class="page">
+  <main class="page" id="main">
 
     <article class="content">
       <h1 class="doc-title">Methodology</h1>
@@ -247,7 +247,7 @@
       <section id="what-it-measures">
         <h2>What HVTracker Measures</h2>
         <p>HVTracker primarily measures open-source AI agent projects using public, independently checkable signals. A limited number of public GitHub-hosted proprietary or source-available comparators may also appear when they are important reference points for the ecosystem. The goal is to show project health, maintenance momentum, community adoption, supply-chain trust, and a first-pass runtime picture without relying on vendor claims or self-reported submissions.</p>
-        <p>The production leaderboard currently ranks on supply-chain-weighted HVTrust. Separate AI-agent surface fields are shown on agent pages, but they do not affect the live trust score.</p>
+        <p>The production leaderboard ranks on supply-chain-weighted HVTrust <strong>plus a bounded runtime-trust calibration</strong>: the AI-agent surface fields shown on agent pages (MCP support, external dependencies, tool/plugin surface, provenance drift) feed the calibration and therefore do affect the live trust score — see <a href="#runtime-calibration">Runtime-Trust Calibration</a>.</p>
       </section>
 
       <section id="hvtrust-production-rank">
@@ -471,11 +471,11 @@ print("verified:", cred["subject"]["repo"], "=", cred["trust_score"])</code></pr
       <span class="footer-sep">&middot;</span>
       <a href="/blog/">Blog</a>
       <span class="footer-sep">&middot;</span>
-      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <a href="/submit/">Submit Agent</a>
       <span class="footer-sep">&middot;</span>
       <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
 
-  </div>
+  </main>
 </body>
 </html>

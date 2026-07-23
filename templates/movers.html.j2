@@ -36,6 +36,8 @@
     .mover-list h2{font-size:15px;margin-bottom:8px}
     .mover-item{display:grid;grid-template-columns:52px minmax(0,1fr) 48px;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}
     .mover-item:last-child{border-bottom:none}
+    .mover-item:hover{text-decoration:none}
+    .mover-item:hover .name{text-decoration:underline}
     .delta{font:700 13px var(--font-mono)}.up .delta{color:var(--green)}.down .delta{color:var(--lobster)}
     .name{font-weight:600;font-size:13px}
     .sub{display:block;color:var(--muted);font:12px var(--font-mono);margin-top:2px}
@@ -83,7 +85,7 @@
 </head>
 <body data-page-type="movers">
   {% include "_site_header.html.j2" %}
-  <div class="page">
+  <main class="page" id="main">
 
     <section class="hero">
       <h1>AI Agent Rank Movers</h1>
@@ -181,10 +183,10 @@
       <span class="footer-sep">&middot;</span>
       <a href="/blog/">Blog</a>
       <span class="footer-sep">&middot;</span>
-      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <a href="/submit/">Submit Agent</a>
       <span class="footer-sep">&middot;</span>
       <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
-  </div>
+  </main>
 </body>
 </html>

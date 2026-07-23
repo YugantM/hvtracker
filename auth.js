@@ -70,10 +70,30 @@
   function loginUrl(provider) {
     return "/auth/" + provider + "/login?next=" + encodeURIComponent(nextDest());
   }
-  function toggle(id) {
-    var e = document.getElementById(id);
-    if (e) e.hidden = !e.hidden;
+  var POP_IDS = ["hvtAcctPop", "hvtNotifPop"];
+  var POP_TRIGGERS = { hvtAcctPop: "hvtAcct", hvtNotifPop: "hvtBell" };
+  function closePops(exceptId) {
+    POP_IDS.forEach(function (id) {
+      if (id === exceptId) return;
+      var o = document.getElementById(id);
+      if (o) o.hidden = true;
+      var t = document.getElementById(POP_TRIGGERS[id]);
+      if (t) t.setAttribute("aria-expanded", "false");
+    });
   }
+  function togglePop(id) {
+    var e = document.getElementById(id);
+    if (!e) return;
+    var open = e.hidden;
+    closePops(id);
+    e.hidden = !open;
+    var t = document.getElementById(POP_TRIGGERS[id]);
+    if (t) t.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closePops(); });
+  document.addEventListener("click", function (e) {
+    if (!(e.target.closest && e.target.closest(".hvt-auth"))) closePops();
+  });
   function esc(s) { return (s == null ? "" : String(s)).replace(/[&<>"]/g, function (c) {
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
@@ -120,9 +140,9 @@
     if (!slot) return;
     var avatar = user.avatar_url ? '<img class="hvt-auth-avatar" src="' + esc(user.avatar_url) + '" alt="">' : "";
     slot.innerHTML = '<div class="hvt-auth">' +
-      '<button class="hvt-bell" id="hvtBell" title="Notifications" aria-label="Notifications">◉' +
+      '<button class="hvt-bell" id="hvtBell" title="Notifications" aria-label="Notifications" aria-haspopup="true" aria-expanded="false" aria-controls="hvtNotifPop">◉' +
         '<span class="hvt-bell-count" id="hvtBellCount" hidden>0</span></button>' +
-      '<button class="hvt-auth-btn" id="hvtAcct">' + avatar + "<span>" + esc(user.login || user.name || "Account") + "</span></button>" +
+      '<button class="hvt-auth-btn" id="hvtAcct" aria-haspopup="true" aria-expanded="false" aria-controls="hvtAcctPop">' + avatar + "<span>" + esc(user.login || user.name || "Account") + "</span></button>" +
       '<div class="hvt-auth-pop" id="hvtAcctPop" hidden>' +
         '<a class="hvt-auth-item" href="/account/">Your account</a>' +
         '<a class="hvt-auth-item" href="/account/#watchlist">Tracked projects</a>' +
@@ -131,9 +151,9 @@
         '<div class="hvt-notif-head">Trust activity on your tracked projects</div>' +
         '<div id="hvtNotifList" class="hvt-notif-list"><div class="hvt-notif-empty">Loading…</div></div></div>' +
       "</div>";
-    document.getElementById("hvtAcct").addEventListener("click", function () { toggle("hvtAcctPop"); });
+    document.getElementById("hvtAcct").addEventListener("click", function (ev) { ev.stopPropagation(); togglePop("hvtAcctPop"); });
     document.getElementById("hvtLogout").addEventListener("click", logout);
-    document.getElementById("hvtBell").addEventListener("click", function () { toggle("hvtNotifPop"); markRead(); });
+    document.getElementById("hvtBell").addEventListener("click", function (ev) { ev.stopPropagation(); togglePop("hvtNotifPop"); markRead(); });
     syncWatchlist();
     loadNotifications();
   }
@@ -204,15 +224,15 @@
       ".hvt-auth-pop{position:absolute;top:calc(100% + 6px);right:0;min-width:220px;background:#fff;border:1px solid var(--border,#d5cbbc);box-shadow:0 18px 50px rgba(34,28,22,.16);z-index:1100;display:flex;flex-direction:column}" +
       ".hvt-auth-pop[hidden]{display:none}" +
       ".hvt-auth-item{display:block;padding:10px 12px;color:var(--text,#1f1b17);text-decoration:none;border:0;background:none;text-align:left;cursor:pointer;font:inherit;border-bottom:1px solid var(--border,#eee)}" +
-      ".hvt-auth-item:last-child{border-bottom:0}.hvt-auth-item:hover{background:#f4f1eb;color:var(--accent-warm,#c67c6d)}" +
-      ".hvt-auth-muted{color:#9a9189;cursor:default}" +
+      ".hvt-auth-item:last-child{border-bottom:0}.hvt-auth-item:hover{background:#f4f1eb;color:var(--accent-warm,#a34e30)}" +
+      ".hvt-auth-muted{color:#6f665d;cursor:default}" +
       ".hvt-notif{min-width:320px;max-width:380px}" +
       ".hvt-notif-head{padding:10px 12px;border-bottom:1px solid var(--border,#eee);color:#6f665d;text-transform:uppercase;letter-spacing:.06em;font-size:10px}" +
       ".hvt-notif-list{max-height:340px;overflow:auto}" +
       ".hvt-notif-empty{padding:14px 12px;color:#6f665d}" +
       ".hvt-notif-item{display:grid;gap:2px;padding:10px 12px;border-bottom:1px solid var(--border,#eee);text-decoration:none;color:var(--text,#1f1b17)}" +
       ".hvt-notif-item:hover{background:#f4f1eb}.hvt-notif-item.is-unread{background:#fbf6ee}" +
-      ".hvt-notif-name{font-weight:700}.hvt-notif-detail{color:#4a443d}.hvt-notif-date{color:#9a9189;font-size:10px}" +
+      ".hvt-notif-name{font-weight:700}.hvt-notif-detail{color:#4a443d}.hvt-notif-date{color:#6f665d;font-size:10px}" +
       "";
     document.head.appendChild(s);
   }

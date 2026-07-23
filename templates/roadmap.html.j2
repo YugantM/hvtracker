@@ -87,11 +87,11 @@
 </head>
 <body data-page-type="roadmap">
   {% include "_site_header.html.j2" %}
-  <div class="page">
+  <main class="page" id="main">
 
     <article class="content">
       <h1 class="doc-title">Roadmap</h1>
-      <p class="doc-lede">Today HVTrust still ranks on <strong>supply-chain trust</strong> — how a project is built, signed, and released. Runtime-trust discovery is now live on profiles, and the next step is deciding how much those new fields should actually affect rank.</p>
+      <p class="doc-lede">HVTrust ranks on <strong>supply-chain trust plus a bounded runtime-trust calibration</strong> — how a project is built, signed, and released, adjusted by its declared runtime surface. Both layers are live in production; the work below is about making them clearer and more useful.</p>
 
       <section>
         <h2>Now Shipped</h2>
@@ -103,7 +103,7 @@
           </div>
           <p>HVTrust ranks open-source AI agents on five weighted dimensions: Safety/Integrity (25), Identity/Provenance (18), Transparency (17), Maintenance (20), Adoption (20).</p>
           <ul>
-            <li><strong>OSSF Scorecard</strong> via deps.dev + fallback</li>
+            <li><strong>OSSF Scorecard</strong> from our own CLI scan</li>
             <li><strong>npm + PyPI provenance</strong> attestation checks</li>
             <li><strong>Signed commit ratio</strong> from GitHub verification</li>
             <li><strong>Confidence-weighted</strong> evidence grades A–D</li>
@@ -123,10 +123,6 @@
             <li><strong>Package provenance drift</strong> — whether published package metadata still points back to the tracked repo</li>
           </ul>
         </div>
-      </section>
-
-      <section>
-        <h2>Building Now</h2>
 
         <div class="stage">
           <div class="stage-header">
@@ -148,22 +144,21 @@
         <div class="stage">
           <div class="stage-header">
             <span class="stage-tag next">Q3</span>
-            <span class="stage-title">Runtime trust — production scoring</span>
+            <span class="stage-title">Runtime trust — deeper visibility</span>
           </div>
-          <p>Once calibration stabilises, selected runtime signals will be folded into HVTrust as a visible, separate scoring slice so readers can distinguish supply-chain posture from runtime reach and complexity.</p>
+          <p>Runtime signals already affect rank; the next step is showing them more clearly so readers can distinguish supply-chain posture from runtime reach and complexity.</p>
           <ul>
             <li>Per-agent <strong>capability surface</strong> page with clearer breakdowns</li>
             <li>Trend tracking for runtime drift over time</li>
-            <li>Public spec at <code>/spec/runtime-trust</code></li>
           </ul>
         </div>
 
         <div class="stage">
           <div class="stage-header">
             <span class="stage-tag next">Q3</span>
-            <span class="stage-title">Weekly alerts and watchlists</span>
+            <span class="stage-title">Weekly digest</span>
           </div>
-          <p>The free alert layer should stay low-friction and editorial: a simple weekly digest of meaningful leaderboard and trust changes. Granular watchlists can come later.</p>
+          <p>Watchlists and on-site alerts are live (track any agent from its profile). Next: a low-friction weekly digest of meaningful leaderboard and trust changes.</p>
           <ul>
             <li><strong>Weekly “what changed” digest</strong> for the leaderboard</li>
             <li>Major trust/regression callouts when they truly matter</li>
@@ -221,11 +216,11 @@
       <span class="footer-sep">&middot;</span>
       <a href="/blog/">Blog</a>
       <span class="footer-sep">&middot;</span>
-      <a href="https://github.com/YugantM/hvtracker/issues/new?template=agent-listing.yml" target="_blank" rel="noopener">Submit Agent</a>
+      <a href="/submit/">Submit Agent</a>
       <span class="footer-sep">&middot;</span>
       <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
 
-  </div>
+  </main>
 </body>
 </html>

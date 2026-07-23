@@ -41,7 +41,7 @@
     table{width:100%;border-collapse:collapse;margin-top:24px;font-size:15px;border-top:2px solid var(--ink)}
     th,td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
     th{font:12px var(--font-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-    td.num{text-align:right;font-family:var(--font-mono)}
+    th.num,td.num{text-align:right;font-family:var(--font-mono)}
     .agent{font-weight:700}
     .repo{display:block;color:var(--muted);font:12px var(--font-mono);margin-top:3px}
     .grade{display:inline-flex;min-width:24px;justify-content:center;padding:3px 8px;font:700 12px var(--font-mono);border:1px solid var(--line);color:var(--lobster)}
@@ -76,7 +76,7 @@
 </head>
 <body data-page-type="{% if is_index %}org_index{% else %}org{% endif %}">
   {% include "_site_header.html.j2" %}
-  <div class="page">
+  <main class="page" id="main">
 
 {% if is_index %}
     <section class="hero">
@@ -149,6 +149,6 @@
       <span class="footer-sep">&middot;</span>
       <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
-  </div>
+  </main>
 </body>
 </html>
