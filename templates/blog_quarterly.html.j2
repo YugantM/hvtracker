@@ -35,7 +35,6 @@
     body{background:var(--paper);color:var(--ink);font:17px/1.7 var(--font-sans)}
     a{color:inherit}
     .page{max-width:760px;margin:0 auto;padding:24px 24px 56px}
-    .logo{font-family:var(--font-mono);font-weight:700;font-size:20px;text-decoration:none}.logo span{color:var(--lobster)}
     .crumb{font:12px var(--font-mono);color:var(--muted);margin:18px 0 26px}
     h1{font-size:32px;line-height:1.15;letter-spacing:-.02em;margin-bottom:10px}
     .meta{font:13px var(--font-mono);color:var(--muted);margin-bottom:26px}
@@ -48,11 +47,26 @@
     .note{font-size:13px;color:var(--muted)}
     .foot{margin-top:38px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
   </style>
+  <!-- Google tag (gtag.js) -->
+  <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
+  <script>
+    (function(){var host=window.location.hostname||"";if(/^(localhost|127(?:\.\d{1,3}){3}|0(?:\.\d{1,3}){3}|::1)$/i.test(host)){window["ga-disable-G-TZ8921LR0K"]=true;return}try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TZ8921LR0K');
+  </script>
+  <script defer src="/analytics.js"></script>
 </head>
 <body>
-<div class="page">
-  <a class="logo" href="/">HV<span>Tracker</span></a>
-  <div class="crumb"><a href="/blog/">Blog</a> / State of Agent Trust</div>
+{% set updated = post.date_iso %}
+{% include "_site_header.html.j2" %}
+<main class="page" id="main">
+  <nav class="crumb" aria-label="Breadcrumb"><a href="/blog/">Blog</a> / State of Agent Trust</nav>
   <article>
     <h1>{{ post.title }}</h1>
     <div class="meta">{{ post.date_display }} · {{ post.stats.start_date }} → {{ post.stats.end_date }} · {{ post.stats.snapshot_days }} daily snapshots · CC BY 4.0</div>
@@ -103,6 +117,26 @@
       Auto-generated from registry snapshots at render time — no numbers are written by hand. Data: CC BY 4.0, attribution "HVTracker (hvtracker.net)". Live charts: <a href="/trends/">/trends/</a> · Method: <a href="/methodology/">/methodology/</a> · Verify any score: <a href="/methodology/#verify-yourself">verify yourself</a>.
     </div>
   </article>
-</div>
+
+  <footer>
+    <a href="/methodology/">Methodology</a>
+    <span class="footer-sep">·</span>
+    <a href="/spec/">Specifications</a>
+    <span class="footer-sep">·</span>
+    <a href="/data/">Data API</a>
+    <span class="footer-sep">·</span>
+    <a href="/compare/">Compare</a>
+    <span class="footer-sep">·</span>
+    <a href="/badges/">Badges</a>
+    <span class="footer-sep">·</span>
+    <a href="/changelog/">Changelog</a>
+    <span class="footer-sep">·</span>
+    <a href="/blog/">Blog</a>
+    <span class="footer-sep">·</span>
+    <a href="/submit/">Submit Agent</a>
+    <span class="footer-sep">·</span>
+    <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
+  </footer>
+</main>
 </body>
 </html>

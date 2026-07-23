@@ -117,6 +117,17 @@ body {
 a { color: inherit; text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+.skip-link {
+  position: absolute; left: 8px; top: -48px; z-index: 300;
+  padding: 8px 12px; background: var(--text); color: var(--bg);
+  font: 13px var(--font-sans); border-radius: 4px;
+  transition: top .15s ease;
+}
+.skip-link:focus { top: 8px; text-decoration: none; }
+
+/* Current-page nav indication (set by the header script via aria-current) */
+.site-nav a[aria-current="page"] { color: var(--text); border-color: var(--border); background: var(--surface); }
+
 .page { max-width: 1100px; margin: 0 auto; padding: 0 24px; background: var(--bg); min-height: 100vh; }
 
 .site-header {
