@@ -183,9 +183,35 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   `blog_static/calibration-fix-and-coverage-grade/` announces the v4.2
   compounding fix + coverage grade, wired to all 4 surfaces (post/index
   card/sitemap/feed).
-- Next: `docs/plan-2026-07-06-post-v4.2.md` remaining — GitHub About text
-  (`gh repo edit`, still "172+"), prod-volume orphan check at next deploy,
-  bill re-check 07-12; then T3.3 capability-surface PAGE (grade shipped, page
-  pending), internal-linking SEO pass, badge-adopter audit; later T3.5 drift
-  monitoring, Postgres consolidation. These content + coverage changes are
-  MERGED, NOT yet deployed (need `railway up` to go live).
+- UI/UX fix batches DEPLOYED 2026-07-23 (owner-approved): #198 (P0 bugs —
+  category invisible grades, Last Push sort, hero grid, stale methodology/
+  roadmap/blog copy; AA contrast tokens in site.css; keyboard-accessible
+  filters/sort; `<main id="main">` on 17 page types; shared
+  `_site_header.html.j2`; auth.js popover fixes) and #199 (skip link,
+  aria-current nav, blog snapshot/quarterly full chrome, GA localhost guard
+  everywhere, branded /correct//submit, category internal links on org/
+  ecosystem/use_case, unified grade pills + legends, table scope attrs,
+  compare coverage outlined chip, movers empty states, 26px tap targets).
+  Verified live end-to-end via cache-busted origin curls (edge cache serves
+  stale HTML for its TTL — always verify with a `?cb=` query string): css
+  hash matched local build, grade pills on category+org pages, blog chrome,
+  /submit//correct branding. Deferred UI items (need generator edits,
+  avoided to not collide with stashed roster WIP): llms.txt v0.1→v0.2 spec
+  link 404, agent sibling-list activity score unlabeled, footer/analytics
+  partial extraction, score-color threshold centralization, Activity Score
+  visual demotion, bell glyph ◉→SVG, compare tray mobile overlap.
+- Prod-volume orphan check DONE at the 2026-07-23 deploy: /score-lab/ → 301
+  /methodology/#runtime-calibration, /spec/runtime-trust/v0.1/ → 301 v0.2,
+  /org/i-am-bee/ → 301 /org/, /agents/bee-agent-framework/ → 410
+  (retired.json), /use-case/recently-active/ → 404. Zero action needed.
+  GitHub About text already says "300+" (done at some point before
+  2026-07-23 — plan item closed).
+- Next: bill re-check (was due 2026-07-12, now overdue — Railway metrics
+  API, memory baseline after #106); T3.3 capability-surface PAGE (grade
+  shipped, page pending); internal-linking SEO pass; badge-adopter audit;
+  later T3.5 drift monitoring, Postgres consolidation. Roster-batch WIP
+  sits in `git stash` ("roster-batch WIP") + untracked blog_static drafts/
+  candidates.json — do NOT commit or deploy those accidentally; deploy only
+  from a clean worktree (`git worktree add --detach <path> main`, link with
+  `railway link -p 336fa70c-… -e dfc35ffb-… -s web`, then `railway up
+  --detach`).
