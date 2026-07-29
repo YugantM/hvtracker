@@ -1,0 +1,217 @@
+{
+  "snapshot_date": "2026-07-09",
+  "discovery_command": "GITHUB_TOKEN=$(gh auth token) python3 discover_agents.py",
+  "discovery_totals": {
+    "repositories_found": 561,
+    "novel_against_agents_json": 416,
+    "passed_automated_prechecks": 381,
+    "after_rubric_text_filter": 287,
+    "manually_vetted": 18
+  },
+  "context_note": "The ai-agent topic space is heavily star-farmed in 2026: the top results by stars are awesome-lists, skills libraries, format specs, and tools-for-agents, plus 2026-created repos with implausible star counts. Candidates below were filtered against docs/strict-inclusion-rubric.md and verified via the GitHub API (creation date, license, repo structure, README-vs-description). HVTrust is robust to inflated stars — since v4.1 popularity ranks BELOW audit signals and does not lift the score — so even a star-farmed repo lands at its true (usually low) trust once real signals fill in. agents.json was NOT changed; this is a discovery report for owner decision.",
+  "recommended_adds": [
+    {
+      "source_url": "https://github.com/Intelligent-Internet/ii-agent",
+      "snapshot_evidence": {
+        "repository": "Intelligent-Internet/ii-agent",
+        "created": "2025-04-07",
+        "last_push": "2026-04-13",
+        "stars": 3365,
+        "license": "Apache-2.0",
+        "language": "Python",
+        "topics_or_dirs": "open-source AI agent, runnable/forkable, BYOK",
+        "readme_evidence": "\"II-Agent is an open-source AI agent built for real work\" — general-purpose agent, run/fork/extend, bring-your-own-key."
+      },
+      "reason": "General-purpose first-party AI agent with its own execution codebase, Apache-2.0, credible org (Intelligent-Internet), created before the 2026 star-farm era. Clears the agent test (multi-step execution, tool use, autonomy).",
+      "confidence": "high",
+      "priority": "P1",
+      "exact_agents_json_entry": {
+        "repo": "Intelligent-Internet/ii-agent",
+        "name": "II-Agent",
+        "category": "Agent Frameworks",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    },
+    {
+      "source_url": "https://github.com/Integuru-AI/Integuru",
+      "snapshot_evidence": {
+        "repository": "Integuru-AI/Integuru",
+        "created": "2024-10-22",
+        "last_push": "2026-06-24",
+        "stars": 4633,
+        "license": "AGPL-3.0",
+        "language": "Python",
+        "readme_evidence": "Agent identifies the request that performs an action, traverses a dependency graph of network requests, and converts each node into runnable Python code — goal-directed, multi-step, tool-using."
+      },
+      "reason": "First-party autonomous agent that reverse-engineers platform integrations into runnable code via graph traversal. Oldest and most credible of the batch (created 2024-10), clear OSS license, real agent logic in-repo.",
+      "confidence": "high",
+      "priority": "P1",
+      "exact_agents_json_entry": {
+        "repo": "Integuru-AI/Integuru",
+        "name": "Integuru",
+        "category": "Coding Agents",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    },
+    {
+      "source_url": "https://github.com/ruc-datalab/DeepAnalyze",
+      "snapshot_evidence": {
+        "repository": "ruc-datalab/DeepAnalyze",
+        "created": "2025-10-11",
+        "last_push": "2026-07-01",
+        "stars": 4342,
+        "license": "MIT",
+        "language": "Python",
+        "readme_evidence": "\"Agentic Large Language Models for Autonomous Data Science\" — performs data-oriented deep research and data-centric tasks locally without any workflow or closed-source APIs."
+      },
+      "reason": "Autonomous data-science agent from a real academic lab (RUC DataLab). First-party agentic loop, MIT-licensed, deployable locally. Clears the agent test (autonomous multi-step task execution + tool use).",
+      "confidence": "high",
+      "priority": "P1",
+      "exact_agents_json_entry": {
+        "repo": "ruc-datalab/DeepAnalyze",
+        "name": "DeepAnalyze",
+        "category": "Research & Data",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    },
+    {
+      "source_url": "https://github.com/superagent-ai/grok-cli",
+      "snapshot_evidence": {
+        "repository": "superagent-ai/grok-cli",
+        "created": "2025-07-14",
+        "last_push": "2026-07-06",
+        "stars": 3219,
+        "license": "MIT",
+        "language": "TypeScript",
+        "npm_package": "grok-dev (published, verified)",
+        "readme_evidence": "Terminal coding agent: tool rounds (--max-tool-rounds), sub-agents on by default, X/web search, remote control via Telegram. Same class as coding agents already tracked."
+      },
+      "reason": "Community-built open-source terminal coding agent (known org superagent-ai), MIT, published npm package, first-party agent loop with sub-agents and tool use. Disclaims xAI affiliation (community project, not a vendor wrapper).",
+      "confidence": "high",
+      "priority": "P1",
+      "exact_agents_json_entry": {
+        "repo": "superagent-ai/grok-cli",
+        "name": "Grok CLI",
+        "category": "Coding Agents",
+        "npm_package": "grok-dev",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    }
+  ],
+  "manual_review": [
+    {
+      "source_url": "https://github.com/lsdefine/GenericAgent",
+      "snapshot_evidence": {
+        "repository": "lsdefine/GenericAgent",
+        "created": "2026-01-16",
+        "last_push": "2026-07-09",
+        "stars": 13345,
+        "license": "MIT",
+        "language": "Python",
+        "pypi_package": "genericagent (published, verified)",
+        "structure": "ga_cli, memory, plugins, reflect, frontends; topics: autonomous-agent, self-evolving, skill-tree, memory-system, computer-control, browser-automation"
+      },
+      "reason": "General-purpose self-evolving agent with first-party CLI loop, memory, plugins, and reflection — a strong fit on the merits. Held for review only because it was created in 2026 with an implausibly high star count (star-farm era); confirm canonicity (not a renamed clone) before listing.",
+      "confidence": "medium",
+      "priority": "P2",
+      "exact_agents_json_entry": {
+        "repo": "lsdefine/GenericAgent",
+        "name": "GenericAgent",
+        "category": "Agent Frameworks",
+        "pypi_package": "genericagent",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    },
+    {
+      "source_url": "https://github.com/HKUDS/Vibe-Trading",
+      "snapshot_evidence": {
+        "repository": "HKUDS/Vibe-Trading",
+        "created": "2026-04-01",
+        "last_push": "2026-07-09",
+        "stars": 18858,
+        "license": "MIT",
+        "language": "Python",
+        "pypi_package": "vibe-trading-ai (published, verified)",
+        "structure": "agent/ (first-party), tools/, frontend/; topics: ai-agent, multi-agent, mcp, algorithmic-trading, backtesting"
+      },
+      "reason": "Trading agent from HKUDS — the lab behind LightRAG, an existing HVTracker badge adopter — with a first-party agent/ module and MCP support. Real agent, credible lab. Held only because it is domain-specific (finance) and very recently created; confirm it is a general enough agent vs a single-purpose app.",
+      "confidence": "medium",
+      "priority": "P2",
+      "exact_agents_json_entry": {
+        "repo": "HKUDS/Vibe-Trading",
+        "name": "Vibe-Trading",
+        "category": "Research & Data",
+        "pypi_package": "vibe-trading-ai",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    },
+    {
+      "source_url": "https://github.com/666ghj/BettaFish",
+      "snapshot_evidence": {
+        "repository": "666ghj/BettaFish",
+        "created": "2024-07-01",
+        "last_push": "2026-05-24",
+        "stars": 41685,
+        "license": "GPL-2.0",
+        "language": "Python",
+        "structure": "ForumEngine, InsightEngine, MediaEngine, MindSpider, QueryEngine, ReportEngine, SentimentAnalysisModel; topics: agent-framework, multi-agent-system, deep-research",
+        "note": "README is primarily Chinese"
+      },
+      "reason": "Substantial multi-agent public-opinion-analysis system with first-party engines built 'from 0, no framework dependency'. Age-credible (created 2024-07, predates the star-farm era). Held because it is a domain-specific application (opinion analysis) rather than a general agent/framework — owner judgment on whether the multi-agent orchestration clears the 'primary purpose is agent construction / goal-directed agent' bar.",
+      "confidence": "medium",
+      "priority": "P2",
+      "exact_agents_json_entry": {
+        "repo": "666ghj/BettaFish",
+        "name": "BettaFish",
+        "category": "Multi-Agent Systems",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    },
+    {
+      "source_url": "https://github.com/ModelEngine-Group/nexent",
+      "snapshot_evidence": {
+        "repository": "ModelEngine-Group/nexent",
+        "created": "2025-04-28",
+        "last_push": "2026-07-09",
+        "stars": 5555,
+        "license": "MIT",
+        "language": "Python",
+        "description": "Zero-code platform for auto-generating production-grade agents"
+      },
+      "reason": "Agent-construction platform, MIT, age-credible, actively maintained. Held because 'zero-code platform for generating agents' sits near the UI-app-builder / no-code boundary — confirm it provides genuine agent-framework abstractions (tool dispatch, memory, lifecycle) rather than being a generic no-code builder with incidental agent support.",
+      "confidence": "low",
+      "priority": "P3",
+      "exact_agents_json_entry": {
+        "repo": "ModelEngine-Group/nexent",
+        "name": "Nexent",
+        "category": "Agent Frameworks",
+        "listing_status": "listed",
+        "tracking_mode": "direct"
+      }
+    }
+  ],
+  "notable_rejections": [
+    {"repo": "code-yeongyu/oh-my-openagent", "stars": 65396, "reason": "NOASSERTION (no clear OSS license) + wrapper/TUI orchestrating other coding agents (claude, codex, cursor, opencode) rather than a first-party agent."},
+    {"repo": "santifer/career-ops", "stars": 59307, "reason": "Implausible star count for a job-search app created 2026-04 (star-farm); domain-narrow application."},
+    {"repo": "the-open-agent/openagent", "stars": 5366, "reason": "Creation date 2020-05 with a modern LLM/RAG description — canonicity red flag (likely renamed/repurposed repo); verify identity before ever listing."},
+    {"repo": "elder-plinius/T3MP3ST", "stars": 4094, "reason": "Created 2026-07-02 (days old) with 4k stars — extreme star-farm; too new to assess as a real, maintained project."},
+    {"repo": "golutra/golutra", "stars": 3752, "reason": "NOASSERTION license (no clear OSS license)."},
+    {"repo": "snarktank/ralph", "stars": 20964, "reason": "Stale (no push since 2026-02) and 21k stars weeks after a 2026-01 creation — viral/star-farmed, not actively maintained."},
+    {"repo": "NVIDIA/OpenShell", "stars": 7511, "reason": "Runtime/sandbox for agents — a tool-for-agents without its own autonomous loop (same class excluded in the 2026-07-06 report)."},
+    {"repo": "*skills / *tools / *templates / OpenClaw-clients / htop-for-agents / slide+ppt+video generators / memory+context layers / format specs (agents.md, design.md)", "reason": "Rubric out-of-scope classes: prompt/skill collections, tools-for-agents, UI/media generators, wrappers around hosted agents, and format specifications. The bulk of the 287 post-filter survivors."}
+  ],
+  "verification_notes": [
+    "GitHub metadata (created/pushed/stars/license/language, dir structure, topics) captured 2026-07-09 via the authenticated API.",
+    "README claims spot-checked against implementation intent for all four recommended adds (descriptions alone were not accepted).",
+    "Package identities verified against the live registries: PyPI genericagent 200, vibe-trading-ai 200; npm grok-dev 200; PyPI ii-agent 404 and integuru 404 (repo-only tracking). DeepAnalyze/nexent have no published package (repo-only).",
+    "The three previously owner-rejected repos (LobsterAI, Agent Orchestrator, Sandcastle) were correctly filtered out by discover_agents.py REVIEWED_REJECTED.",
+    "candidates.json (full 381) is a scratch artifact and intentionally not part of this deliverable."
+  ]
+}
