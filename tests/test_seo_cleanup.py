@@ -14,6 +14,7 @@ sentinel dates and a fabricated below-top-3 pair.
 """
 import glob
 import importlib
+import itertools
 import json
 import os
 import shutil
@@ -87,8 +88,13 @@ def site():
         with open(os.path.join(tmp, "data", "render_state.json"), encoding="utf-8") as f:
             rows = json.load(f)["rows"]
 
-    # Fabricate a persisted pair no current top-3 combination produces:
-    # category leader vs the category's #4.
+    # Fabricate a persisted pair the current generation rule does NOT produce,
+    # so the re-render can only keep it via seo_state persistence.
+    #
+    # Derived from the published set rather than a fixed rank index: this used
+    # to hardcode "leader vs #4", which silently stopped fabricating anything
+    # the moment the rule widened past top-3 (every such pair became published,
+    # so there was nothing left to test persistence with).
     published = {tuple(p) for p in state1.get("published_compare_pairs", [])}
     by_cat = defaultdict(list)
     for r in rows:
@@ -97,12 +103,14 @@ def site():
     fabricated = None
     for rs in by_cat.values():
         rs.sort(key=lambda x: x.get("category_rank") or 9999)
-        if len(rs) >= 4:
-            pair = tuple(sorted((rs[0]["slug"], rs[3]["slug"])))
+        for a, b in itertools.combinations(rs, 2):
+            pair = tuple(sorted((a["slug"], b["slug"])))
             if pair not in published:
                 fabricated = pair
                 break
-    assert fabricated, "need a category with >=4 agents to fabricate a pair"
+        if fabricated:
+            break
+    assert fabricated, "need one same-category pair outside the current generation rule"
 
     doctored = json.loads(json.dumps(state1))
     doctored["published_compare_pairs"].append(list(fabricated))

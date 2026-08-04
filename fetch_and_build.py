@@ -4683,7 +4683,11 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>HVTracker — Data Endpoints</title>
+  <title>Free AI Agent Dataset &amp; JSON API — Trust Scores for {len(data_output["agents"])} Agents | HVTracker</title>
+  <!-- Ranked ~13 with 526 impressions and zero clicks: the page shipped no
+       meta description and no canonical, so Google had no snippet to show. -->
+  <meta name="description" content="Free, machine-readable trust data for {len(data_output["agents"])} open-source AI agents: JSON endpoints, per-agent history, quarterly CSV exports and an MCP server. CC BY 4.0, no key required.">
+  <link rel="canonical" href="https://hvtracker.net/data/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -6207,10 +6211,13 @@ def main() -> None:
     compare_by_slug = {}        # agent slug -> [{name, url}] for agent pages
     compare_by_cat = {}         # cat slug   -> [{a, b, url}] for category pages
     for _cm in categories:
+        # Must match the top-8 rule used when rendering the pair pages below —
+        # otherwise the extra pages exist with no internal links pointing at
+        # them, and Google has no path to crawl them.
         _top = sorted(
             [r for r in rows if r.get("category") == _cm["name"]],
             key=lambda x: x.get("category_rank") or 9999,
-        )[:3]
+        )[:8]
         for _a, _b in itertools.combinations(_top, 2):
             # Canonical pair URL is alphabetical — that is where the static page
             # is written and what app.py redirects to. Building it in rank order
@@ -6956,9 +6963,16 @@ def main() -> None:
             f.write(compare_pair_tmpl.render(**_ctx))
         compare_pair_urls.append(f"https://hvtracker.net/compare/{_a['slug']}-vs-{_b['slug']}/")
 
+    # Top-8 per category = 28 pairs each (~450 pages) rather than top-3's 3.
+    # Compare pages are the best-converting surface after agent profiles
+    # (1.38% CTR vs 1.60%) and were the most under-built: 67 pages for 468
+    # agents. The top 8 of a category are the set a reader actually chooses
+    # between, so every pair is a comparison someone plausibly searches for;
+    # widening further would start pairing agents nobody weighs against
+    # each other. Pairs persist via seo_state, so this only ever adds URLs.
     for _cm in categories:
         _top = sorted([r for r in rows if r.get("category") == _cm["name"]],
-                      key=lambda x: x.get("category_rank") or 9999)[:3]
+                      key=lambda x: x.get("category_rank") or 9999)[:8]
         for _x, _y in _it.combinations(_top, 2):
             # Canonical (alphabetical) slug order so the dir/URL/canonical match
             # app.py's /compare/<a>-vs-<b>/ routing (which 301s to alpha order).
