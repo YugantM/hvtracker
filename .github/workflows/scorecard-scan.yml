@@ -2,20 +2,38 @@ name: Scorecard scan
 
 on:
   schedule:
-    # One SHARD per run, six runs spread across the day. The scorecard CLI
-    # burns a few thousand GitHub API calls per ~55-repo shard, so two shards
+    # One SHARD per run, twenty-four runs spread across the day. The scorecard
+    # CLI burns a few thousand GitHub API calls per shard, so two shards
     # back-to-back exhaust the PAT's 5k/hr quota and the next shard starves:
     # every repo stalls to the 300s timeout until the hosted runner gets
     # reclaimed (observed kills at 8 and 25 minutes on 2026-07-11 — reclaim
     # timing is arbitrary, and killed runners never reach the artifact-upload
-    # step, so the shard publishes nothing). Giving each shard its own quota
-    # window removes the contention entirely; each repo still gets scanned
-    # once a day.
-    - cron: "0 1,5,9,13,17,21 * * *"
+    # step, so the shard publishes nothing). One shard per hourly quota window
+    # keeps each repo scanned once a day — but see the quota warning below:
+    # at 24 shards the margin that made this safe is gone.
+    #
+    # RESHARDED 6 -> 24 on 2026-08-06, in two steps:
+    #   6 -> 12: at 545 repos the old 6 shards assigned 91 each, but a 1800s
+    #     SCAN_TIME_BUDGET completes only ~66 (measured ~27s/repo, from the
+    #     ~55-repos-in-25-min design point) — EVERY shard was truncating ~25
+    #     repos. That regression predates the MCP work; the roster passed the
+    #     "re-count at ~420" trigger and the shard count never followed.
+    #   12 -> 24: the MCP-server ingest takes the roster to 1,227, which would
+    #     put 12 shards back at 102 each. 24 assigns ~51.
+    #
+    # ⚠️ QUOTA WARNING — this schedule needs a DEDICATED PAT before deploy.
+    # At ~51 repos/shard the CLI burns roughly 3,300 REST calls per run, and
+    # hourly runs give each shard only one 5k/hr window. The same PAT also
+    # serves the site's 30-minute signals refresh, so the two now contend.
+    # The correct fix is a separate workflow + PAT for the MCP rows (see
+    # ~/hv_marketing/MCP-INGESTION-PLAN.md §4); this hourly schedule is the
+    # best available interim and should NOT be considered safe under the
+    # shared token.
+    - cron: "0 * * * *"
   workflow_dispatch:
     inputs:
       shard:
-        description: "Shard 1-6 to scan (empty = derived from current UTC hour)"
+        description: "Shard 1-24 to scan (empty = derived from current UTC hour)"
         required: false
         default: ""
 
@@ -28,12 +46,12 @@ env:
   SCORECARD_VERSION: "v5.5.0"
 
 jobs:
-  # One shard (~55 repos, ~25 min) per run. The shard self-limits to a time
+  # One shard (~51 repos, ~23 min) per run. The shard self-limits to a time
   # budget, aborts on consecutive timeouts (quota-exhaustion signature), and
   # writes its cache incrementally; repos a cutoff misses keep prior values
   # (freshest-wins merge) and lead the next run's stalest-first queue, so
   # coverage converges within the day instead of starving a fixed tail.
-  # Re-count shards when the roster passes ~420.
+  # Re-count shards when the roster passes ~1,580 (budget completes ~66/shard).
   scan:
     runs-on: ubuntu-latest
     outputs:
@@ -44,18 +62,18 @@ jobs:
         uses: actions/checkout@v6.0.3
 
       # Scheduled runs rotate through shards by UTC-hour bucket (cron hours
-      # 1,5,9,... → shards 1..6). hour/4 bucketing tolerates GitHub's cron
-      # delays of up to ~4h without skipping a shard. Manual dispatches may
+      # 0,1,2,... → shards 1..24). One shard per hour; a cron delay now shifts
+      # rather than skips (stalest-first heals it). Manual dispatches may
       # pin a shard explicitly.
       - name: Pick shard
         id: pick
         run: |
           shard="${{ github.event.inputs.shard }}"
           if [ -z "$shard" ]; then
-            shard=$(( (10#$(date -u +%H) / 4) % 6 + 1 ))
+            shard=$(( 10#$(date -u +%H) % 24 + 1 ))
           fi
           echo "shard=$shard" >> "$GITHUB_OUTPUT"
-          echo "Scanning shard $shard/6"
+          echo "Scanning shard $shard/24"
 
       - name: Download scorecard CLI
         run: |
@@ -81,7 +99,7 @@ jobs:
       - name: Run scorecard scan
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        run: python scan_scorecards.py --shard ${{ steps.pick.outputs.shard }}/6
+        run: python scan_scorecards.py --shard ${{ steps.pick.outputs.shard }}/24
 
       # if: always() — partial results from a failed step are still valid
       # (incremental writes mean the file reflects every completed repo).
