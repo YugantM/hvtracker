@@ -351,7 +351,7 @@ def test_external_service_dependencies_mixed_real_and_docs_only():
     mention too); a provider mentioned only in docs does not count at all."""
     result = fb.detect_external_service_dependencies(
         readme_text="Supports OpenAI (see docs) and can optionally integrate with Anthropic.",
-        manifest_text_by_path={"pyproject.toml": "openai = \"^1.0\""},
+        manifest_text_by_path={"pyproject.toml": '[tool.poetry.dependencies]\nopenai = "^1.0"\n'},
     )
     assert result["providers"] == ["OpenAI"]
     assert "Anthropic" not in result["providers"]
@@ -466,6 +466,133 @@ def test_tool_plugin_surface_readme_mention_alone_is_not_a_tag():
         readme_text="See our GitHub repository for search and retrieval examples.",
     )
     assert result["tool_tags"] == []
+
+
+def test_external_service_dependencies_dev_dependencies_are_not_runtime():
+    """Reported by the Apify MCP Server maintainers (apify/apify-mcp-server#1086):
+    the server was labelled an OpenAI consumer because "openai" sits in
+    devDependencies, imported only by an evaluation harness. A package the
+    project never ships to users is not a runtime provider dependency."""
+    result = fb.detect_external_service_dependencies(
+        manifest_text_by_path={
+            "package.json": '{"dependencies":{"express":"^4"},'
+                            '"devDependencies":{"openai":"^6.10.0","@ai-sdk/openai":"^3.0.52"}}',
+        },
+    )
+    assert result["providers"] == []
+
+
+def test_external_service_dependencies_ignore_non_dependency_manifest_text():
+    """The marker used to be matched against the whole manifest, so a provider
+    name anywhere in it counted: an npm keyword, a docker-compose build script,
+    a ruff lint selector ("PGH" starts with "pg"), a maintainer's @anthropic.com
+    address, or the package's own name. Only dependency declarations count."""
+    result = fb.detect_external_service_dependencies(
+        manifest_text_by_path={
+            "package.json": json.dumps({
+                "name": "@openai/codex",
+                "keywords": ["openai", "anthropic"],
+                "author": "Anthropic, PBC",
+                "scripts": {"db": "docker compose up -d db redis"},
+                "exports": {"./providers/openai": "./providers/openai"},
+                "dependencies": {"chalk": "^5"},
+            }),
+        },
+    )
+    assert result["providers"] == []
+
+
+def test_external_service_dependencies_pyproject_sections():
+    """Runtime deps and extras count; dev groups do not."""
+    runtime = fb.detect_external_service_dependencies(
+        manifest_text_by_path={"pyproject.toml": '[project]\ndependencies = ["openai>=1.0"]\n'},
+    )
+    assert runtime["providers"] == ["OpenAI"]
+
+    extra = fb.detect_external_service_dependencies(
+        manifest_text_by_path={
+            "pyproject.toml": '[project.optional-dependencies]\nllm = ["anthropic>=0.30"]\n',
+        },
+    )
+    assert extra["providers"] == ["Anthropic"]
+
+    dev_group = fb.detect_external_service_dependencies(
+        manifest_text_by_path={
+            "pyproject.toml": '[dependency-groups]\ndev = ["openai>=1.0"]\n'
+                              '[tool.poetry.group.test.dependencies]\nanthropic = "^0.30"\n',
+        },
+    )
+    assert dev_group["providers"] == []
+
+    commented_out = fb.detect_external_service_dependencies(
+        manifest_text_by_path={"pyproject.toml": '[project]\ndependencies = [\n#    "openai>=1.45.0",\n]\n'},
+    )
+    assert commented_out["providers"] == []
+
+    # A dynamic-versioning hook is where some projects state their whole
+    # dependency set (PydanticAI); dropping it would erase a real surface.
+    hatch_hook = fb.detect_external_service_dependencies(
+        manifest_text_by_path={
+            "pyproject.toml": '[tool.hatch.metadata.hooks.uv-dynamic-versioning]\n'
+                              'dependencies = ["pydantic-ai-slim[openai,anthropic]=={{ version }}"]\n',
+        },
+    )
+    assert hatch_hook["providers"] == ["Anthropic", "OpenAI"]
+
+
+def test_external_service_dependencies_unparseable_manifest_falls_back():
+    """An exotic or malformed manifest must not silently drop a real signal —
+    fall back to scanning the whole file rather than reporting nothing."""
+    result = fb.detect_external_service_dependencies(
+        manifest_text_by_path={"package.json": '{"dependencies": {"openai": "^4",,,'},
+    )
+    assert result["providers"] == ["OpenAI"]
+
+
+def test_tool_plugin_surface_readme_mention_alone_is_not_a_plugin_system():
+    """Companion to #98's tool_tags rule, from apify/apify-mcp-server#1086: one
+    prose "extension" — Apify's README calling MCPB "formerly known as Anthropic
+    Desktop extension file" — set plugin_system=extension-based and cost -0.6.
+    Shipped structure counts; a word in a sentence does not."""
+    prose_only = fb.detect_tool_plugin_surface(
+        readme_text="Or use the MCP bundle file (formerly known as Anthropic Desktop "
+                    "extension file, or DXT) for one-click installation.",
+    )
+    assert prose_only["plugin_system"] == "none"
+    assert prose_only["evidence"] == []
+
+    shipped = fb.detect_tool_plugin_surface(
+        readme_text="Extensions let users add integrations.",
+        tree_paths=["extensions/example/index.ts"],
+    )
+    assert shipped["plugin_system"] == "extension-based"
+    assert any("also mention" in item for item in shipped["evidence"])
+
+
+def test_requires_api_keys_never_penalises_silently():
+    """53 agents carried the -1.0 with no evidence line, so the number was
+    unattributable on the page — which is how apify/apify-mcp-server#1086 read
+    it as an OpenAI penalty. The fallback path must name its trigger."""
+    result = fb.detect_external_service_dependencies(
+        readme_text="Set APIFY_TOKEN before starting the server.",
+    )
+    assert result["requires_api_keys"] is True
+    assert any("APIFY_TOKEN" in item for item in result["evidence"])
+
+
+def test_requires_api_keys_ignores_placeholders_and_ci_secrets():
+    """A docs placeholder is not a declared credential requirement (Apify's
+    -1.0 came from "YOUR_SKYFIRE_API_KEY" in an optional payments snippet), and
+    a CI/publishing secret is not a runtime service credential."""
+    placeholder = fb.detect_external_service_dependencies(
+        readme_text="Pass YOUR_SKYFIRE_API_KEY in the header, or <MY_API_KEY_HERE>.",
+    )
+    assert placeholder["requires_api_keys"] is False
+
+    ci_secret = fb.detect_external_service_dependencies(
+        readme_text="Releases are published with GITHUB_TOKEN and NPM_TOKEN.",
+    )
+    assert ci_secret["requires_api_keys"] is False
 
 
 def test_detect_package_provenance_drift_match_and_warning():
@@ -849,6 +976,37 @@ def test_derive_agent_events_still_fires_within_same_methodology():
     kinds = {e["type"] for e in events.get("o/agent", [])}
     assert "trust_score_changed" in kinds
     assert "rank_changed" in kinds
+
+
+def test_derive_agent_events_skips_surface_drift_across_methodology_change():
+    """A detector correction shipped with a version bump moves the detected
+    surface for every agent at once. "Runtime surface shrank — no longer
+    detected: OpenAI" would then announce our own fix as if the project had
+    dropped a dependency, so surface drift is skipped for that one day too."""
+    def surfaced(repo, providers, plugin):
+        row = _mk_agent(repo, 70.0, 10)
+        row["external_service_dependencies"] = {"providers": providers}
+        row["tool_plugin_surface"] = {"plugin_system": plugin}
+        return row
+
+    history_by_date = {
+        "2026-07-01": {"o/agent": surfaced("o/agent", ["OpenAI"], "extension-based")},
+        "2026-07-02": {"o/agent": surfaced("o/agent", [], "none")},
+    }
+    today_agents = history_by_date["2026-07-02"]
+
+    across = fb.derive_agent_events(history_by_date, today_agents,
+                                    {"2026-07-01": "v4.2", "2026-07-02": "v4.3"})
+    kinds = {e["type"] for e in across.get("o/agent", [])}
+    assert "provider_removed" not in kinds
+    assert "tool_surface_changed" not in kinds
+
+    # A genuine surface change on an ordinary day still reaches the bell.
+    within = fb.derive_agent_events(history_by_date, today_agents,
+                                    {"2026-07-01": "v4.3", "2026-07-02": "v4.3"})
+    kinds = {e["type"] for e in within.get("o/agent", [])}
+    assert "provider_removed" in kinds
+    assert "tool_surface_changed" in kinds
 
 
 def test_derive_agent_events_defaults_to_firing_without_methodology_map():

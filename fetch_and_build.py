@@ -12,6 +12,7 @@ import re
 import shutil
 import sys
 import time
+import tomllib
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
 from html import escape
@@ -37,7 +38,7 @@ HEADERS = {
 if TOKEN:
     HEADERS["Authorization"] = f"Bearer {TOKEN}"
 
-METHODOLOGY_VERSION = "v4.2"  # fix: runtime calibration reads the base, not the prior final (no compounding)
+METHODOLOGY_VERSION = "v4.3"  # runtime signals count declared evidence only (dep sections, shipped plugin paths, named credentials)
 DATA_SCHEMA_VERSION = "v0.1"
 
 
@@ -681,11 +682,50 @@ _EXTERNAL_SERVICE_RULES = (
 )
 _EXTERNAL_SERVICE_API_KEY_PATTERNS = (
     r"\b[A-Z0-9_]+_API_KEY\b",
+    r"\b[A-Z0-9_]+_TOKEN\b",
+    r"\b[A-Z0-9_]+_SECRET_KEY\b",
     r"\bDATABASE_URL\b",
     r"\bREDIS_URL\b",
     r"\bSUPABASE_URL\b",
     r"\bPOSTGRES_URL\b",
 )
+# Credentials that belong to a CI/publishing pipeline rather than to a service
+# the shipped project calls at runtime. Needed once the patterns above widened
+# past *_API_KEY to catch real service tokens (Apify's own credential is
+# APIFY_TOKEN, previously invisible while a docs placeholder did the work).
+_CREDENTIAL_MARKER_DENYLIST = frozenset({
+    "GITHUB_TOKEN", "GH_TOKEN", "NPM_TOKEN", "PYPI_TOKEN", "CODECOV_TOKEN",
+    "CARGO_REGISTRY_TOKEN", "VERCEL_TOKEN", "NETLIFY_AUTH_TOKEN", "TURBO_TOKEN",
+    "DOCKER_TOKEN", "DOCKERHUB_TOKEN", "SENTRY_AUTH_TOKEN", "RELEASE_TOKEN",
+    "ACTIONS_RUNTIME_TOKEN", "NX_CLOUD_ACCESS_TOKEN", "CSRF_TOKEN", "ACCESS_TOKEN",
+})
+# Documentation placeholders: "<YOUR_API_KEY>", "EXAMPLE_API_KEY", "..._HERE".
+_CREDENTIAL_PLACEHOLDER_PREFIXES = ("YOUR_", "MY_", "EXAMPLE_", "SAMPLE_", "DUMMY_",
+                                    "FAKE_", "TEST_", "PLACEHOLDER_", "XXX")
+_CREDENTIAL_PLACEHOLDER_SUFFIXES = ("_HERE", "_PLACEHOLDER", "_EXAMPLE", "_XXX")
+
+
+def _first_credential_marker(text: str) -> str | None:
+    """First credential marker in `text` that names a real runtime requirement.
+
+    The fallback that sets requires_api_keys (-1.0) used to match any
+    *_API_KEY-shaped string anywhere and record nothing, so 53 agents carried
+    the penalty with no evidence line — unattributable on their page, which is
+    how apify/apify-mcp-server#1086 read it as an OpenAI penalty when it had
+    actually fired on "YOUR_SKYFIRE_API_KEY" in an optional-payments snippet.
+    A placeholder in a docs example and a CI secret are both excluded.
+    """
+    for pattern in _EXTERNAL_SERVICE_API_KEY_PATTERNS:
+        for match in re.finditer(pattern, text or ""):
+            marker = match.group(0)
+            if marker in _CREDENTIAL_MARKER_DENYLIST:
+                continue
+            if marker.startswith(_CREDENTIAL_PLACEHOLDER_PREFIXES):
+                continue
+            if marker.endswith(_CREDENTIAL_PLACEHOLDER_SUFFIXES):
+                continue
+            return marker
+    return None
 # Claude Code harness wiring (#186): evidence that the *shipped product* runs
 # inside Anthropic's Claude Code — hooks/commands/agents packaged through the
 # manifest, or a published Claude Code plugin. A bare CLAUDE.md or .claude/
@@ -937,6 +977,140 @@ def fetch_mcp_server_support(owner_repo: str, ref: str, description: str = "") -
     )
 
 
+_PACKAGE_JSON_DEP_SECTIONS = ("dependencies", "peerDependencies", "optionalDependencies",
+                              "resolutions", "overrides")
+
+
+def _bracketed_block(text: str, key: str) -> str:
+    """The bracketed literal following `key`, for setup.py's install_requires."""
+    start = text.find(key)
+    if start < 0:
+        return ""
+    depth = 0
+    out: list[str] = []
+    for ch in text[start:start + 8000]:
+        if ch in "[({":
+            depth += 1
+        elif ch in "])}":
+            depth -= 1
+            if depth <= 0:
+                break
+        out.append(ch)
+    return "".join(out)
+
+
+def _manifest_dependency_text(path: str, text: str) -> str | None:
+    """Reduce a manifest to the parts that actually declare dependencies.
+
+    Markers used to be matched against the whole manifest file, so a provider
+    name occurring anywhere in it counted as a runtime dependency. The 2026-08
+    audit (803 provider claims re-fetched and attributed to the field that
+    triggered them) put ~15% of all claims on text that declares nothing:
+    npm `keywords`, a `docker compose up -d db redis` build script, a ruff
+    `PGH` lint selector matching marker "pg", a maintainer's @anthropic.com
+    address, a VS Code settings enum, a `!dist/extensions/firecrawl/**` file
+    glob, commented-out requirements, and the package's own name (`@openai/codex`
+    made Codex an OpenAI consumer). A further 6% sat in dev-only groups —
+    packages never shipped to a user — which is what apify/apify-mcp-server#1086
+    reported.
+
+    Dev/test/lint groups are excluded; extras and optional dependencies are
+    kept, since those are integration paths a user can actually turn on.
+    Returns None when the format isn't recognised or won't parse, so callers
+    fall back to the full text rather than silently losing a real signal.
+    """
+    base = path.rsplit("/", 1)[-1].lower()
+    parts: list[str] = []
+
+    if base == "package.json":
+        try:
+            doc = json.loads(text)
+        except (ValueError, TypeError):
+            return None
+        if not isinstance(doc, dict):
+            return None
+        sections = [doc.get(name) for name in _PACKAGE_JSON_DEP_SECTIONS]
+        pnpm = doc.get("pnpm")
+        if isinstance(pnpm, dict):
+            sections.append(pnpm.get("overrides"))
+        for section in sections:
+            if isinstance(section, dict):
+                for name, spec in section.items():
+                    parts.append(str(name))
+                    if isinstance(spec, str):
+                        parts.append(spec)  # npm aliases: "npm:@ai-sdk/openai@4.0.81"
+            elif isinstance(section, list):
+                parts.extend(str(item) for item in section)
+        return "\n".join(parts)
+
+    if base == "pyproject.toml":
+        try:
+            doc = tomllib.loads(text)
+        except (tomllib.TOMLDecodeError, ValueError, TypeError):
+            return None
+        project = doc.get("project")
+        if isinstance(project, dict):
+            parts.extend(str(d) for d in (project.get("dependencies") or []) if isinstance(d, str))
+            extras = project.get("optional-dependencies")
+            if isinstance(extras, dict):
+                for group in extras.values():
+                    parts.extend(str(d) for d in (group or []) if isinstance(d, str))
+        tool = doc.get("tool")
+        # Hatch metadata hooks declare the real runtime requirements for
+        # projects with dynamic versioning (PydanticAI's root pyproject states
+        # its whole provider surface here and nowhere else).
+        hatch = tool.get("hatch") if isinstance(tool, dict) else None
+        hooks = ((hatch.get("metadata") or {}).get("hooks") or {}) if isinstance(hatch, dict) else {}
+        if isinstance(hooks, dict):
+            for hook in hooks.values():
+                if not isinstance(hook, dict):
+                    continue
+                parts.extend(str(d) for d in (hook.get("dependencies") or []) if isinstance(d, str))
+                extras = hook.get("optional-dependencies")
+                if isinstance(extras, dict):
+                    for group in extras.values():
+                        parts.extend(str(d) for d in (group or []) if isinstance(d, str))
+        poetry = tool.get("poetry") if isinstance(tool, dict) else None
+        if isinstance(poetry, dict):
+            deps = poetry.get("dependencies")
+            if isinstance(deps, dict):
+                parts.extend(str(name) for name in deps)
+            extras = poetry.get("extras")
+            if isinstance(extras, dict):
+                for group in extras.values():
+                    parts.extend(str(d) for d in (group or []) if isinstance(d, str))
+        return "\n".join(parts)
+
+    if base.startswith("requirements") and base.endswith(".txt"):
+        for raw_line in text.splitlines():
+            line = raw_line.split("#", 1)[0].strip()
+            if line and not line.startswith("-"):
+                parts.append(line)
+        return "\n".join(parts)
+
+    if base == "setup.py":
+        for key in ("install_requires", "extras_require"):
+            block = _bracketed_block(text, key)
+            if block:
+                parts.append(block)
+        # setup.py can build its dependency list dynamically; fall back rather
+        # than claim a project declares nothing.
+        return "\n".join(parts) or None
+
+    return None
+
+
+def _dep_scan_text(path: str, text: str) -> str:
+    """The text a dep_marker may be matched against.
+
+    Distinguishes "parsed, declares no dependencies" (empty string — match
+    nothing) from "could not parse" (None — fall back to the whole file), so a
+    manifest whose only mention of a provider sits in a dev group scans clean.
+    """
+    reduced = _manifest_dependency_text(path, text)
+    return text if reduced is None else reduced
+
+
 def _manifest_has_dep_marker(lower_text: str, marker: str) -> bool:
     """Whether `marker` appears as a package-name token in manifest text.
 
@@ -995,7 +1169,13 @@ def detect_external_service_dependencies(
     - only use already-public repository text
     """
     manifest_text_by_path = manifest_text_by_path or {}
-    manifest_items = [(path, text, text.lower()) for path, text in manifest_text_by_path.items()]
+    # Two views of each manifest: the full text (harness wiring and credential
+    # markers legitimately live in packaging/tool config) and the
+    # dependency-declaring slice alone (what a dep_marker is allowed to match).
+    manifest_items = [
+        (path, text, text.lower(), _dep_scan_text(path, text).lower())
+        for path, text in manifest_text_by_path.items()
+    ]
 
     providers: list[str] = []
     evidence: list[str] = []
@@ -1012,9 +1192,9 @@ def detect_external_service_dependencies(
                 pattern_hit = True
                 break
 
-        for path, _text, lower in manifest_items:
+        for path, _text, _lower, dep_lower in manifest_items:
             for marker in rule["dep_markers"]:
-                if _manifest_has_dep_marker(lower, marker):
+                if _manifest_has_dep_marker(dep_lower, marker):
                     dep_hit = (path, marker)
                     break
             if dep_hit:
@@ -1024,7 +1204,7 @@ def detect_external_service_dependencies(
             if marker in (readme_text or "") or marker in (description or ""):
                 env_hit = marker
                 break
-            for _path, text, _lower in manifest_items:
+            for _path, text, _lower, _dep_lower in manifest_items:
                 if marker in text:
                     env_hit = marker
                     break
@@ -1047,7 +1227,7 @@ def detect_external_service_dependencies(
         if harness["label"] in providers:
             continue
         harness_evidence = None
-        for path, _text, lower in manifest_items:
+        for path, _text, lower, _dep_lower in manifest_items:
             m = harness["manifest_re"].search(lower)
             if m:
                 harness_evidence = f"Ships {harness['kind']} wiring ('{m.group(0)}') in {path}"
@@ -1064,10 +1244,10 @@ def detect_external_service_dependencies(
 
     if not requires_api_keys:
         combined_text = "\n".join([description or "", readme_text or "", *manifest_text_by_path.values()])
-        for pattern in _EXTERNAL_SERVICE_API_KEY_PATTERNS:
-            if re.search(pattern, combined_text):
-                requires_api_keys = True
-                break
+        fallback_marker = _first_credential_marker(combined_text)
+        if fallback_marker:
+            requires_api_keys = True
+            evidence.append(f"Found credential/config marker '{fallback_marker}'")
 
     providers = sorted(set(providers))
     deduped_evidence: list[str] = []
@@ -1128,29 +1308,40 @@ def detect_tool_plugin_surface(
     tags: list[str] = []
     plugin_system = "none"
 
+    # plugin_system needs shipped structure, not a word in a sentence. The old
+    # regex-first order let one prose "extension" set extension-based (-0.6):
+    # Apify's README calls MCPB "formerly known as Anthropic Desktop extension
+    # file", its only occurrence of the word (apify/apify-mcp-server#1086). It
+    # fired for 73% of the board, so which of "plugin"/"integration"/
+    # "extension"/"marketplace" a README happened to use was worth up to a
+    # point of score. #98 already applied this standard to tool_tags below; the
+    # plugin surface was left behind. A doc mention is still logged as
+    # supporting evidence when real structure exists.
+    readme_hit: str | None = None
     for pattern, label in _PLUGIN_SYSTEM_PATTERNS:
         if re.search(pattern, readme_text or "", re.IGNORECASE) or re.search(pattern, description or "", re.IGNORECASE):
-            plugin_system = label
-            evidence.append(f"README/docs mention a {label} plugin/integration surface")
+            readme_hit = label
             break
 
-    if plugin_system == "none":
-        for path in tree_paths:
-            lower = path.lower()
-            for hint, label in _PLUGIN_PATH_HINTS:
-                if hint in lower:
-                    plugin_system = label
-                    evidence.append(f"Found {label} path: {path}")
-                    break
-            if plugin_system != "none":
+    for path in tree_paths:
+        lower = path.lower()
+        for hint, label in _PLUGIN_PATH_HINTS:
+            if hint in lower:
+                plugin_system = label
+                evidence.append(f"Found {label} path: {path}")
                 break
+        if plugin_system != "none":
+            break
+
+    if plugin_system != "none" and readme_hit:
+        evidence.append(f"README/docs also mention a {readme_hit} plugin/integration surface")
 
     # tool_tags require dependency-manifest evidence, not a README mention
     # alone -- "search" and "code" patterns in particular (bare "search",
     # "github", "repository") are common enough that most project READMEs
     # would match regardless of whether the project genuinely ships that
     # tool surface. A doc mention is still logged when a real hit exists.
-    manifest_items = [(path, text.lower()) for path, text in manifest_text_by_path.items()]
+    manifest_items = [(path, _dep_scan_text(path, text).lower()) for path, text in manifest_text_by_path.items()]
     for rule in _TOOL_PLUGIN_RULES:
         dep_hit: tuple[str, str] | None = None
         for path, lower in manifest_items:
@@ -4337,35 +4528,42 @@ def derive_agent_events(history_by_date: dict[str, dict[str, dict]], today_agent
             # these track our public-evidence detectors, so a detector
             # improvement can also move them (the #96-#99 lesson) — the
             # timeline records the detection change either way.
-            prev_mcp = (prev.get("mcp_server_support") or {}).get("status") or "none"
-            curr_mcp = (curr.get("mcp_server_support") or {}).get("status") or "none"
-            if prev_mcp != curr_mcp:
-                repo_events.append(make_agent_event(
-                    curr_date, "mcp_status_changed",
-                    f"Detected MCP server support changed: {prev_mcp} → {curr_mcp}",
-                    reason_code="mcp_status_changed"))
+            #
+            # Across a methodology boundary they are skipped for that one day,
+            # like trust_score/rank above: a detector correction that lands
+            # with a version bump moves these for every agent at once, and
+            # "Runtime surface shrank — no longer detected: OpenAI" would
+            # announce our own fix as if the project had dropped a dependency.
+            if same_methodology:
+                prev_mcp = (prev.get("mcp_server_support") or {}).get("status") or "none"
+                curr_mcp = (curr.get("mcp_server_support") or {}).get("status") or "none"
+                if prev_mcp != curr_mcp:
+                    repo_events.append(make_agent_event(
+                        curr_date, "mcp_status_changed",
+                        f"Detected MCP server support changed: {prev_mcp} → {curr_mcp}",
+                        reason_code="mcp_status_changed"))
 
-            prev_provs = set((prev.get("external_service_dependencies") or {}).get("providers") or [])
-            curr_provs = set((curr.get("external_service_dependencies") or {}).get("providers") or [])
-            added, removed = sorted(curr_provs - prev_provs), sorted(prev_provs - curr_provs)
-            if added:
-                repo_events.append(make_agent_event(
-                    curr_date, "provider_added",
-                    f"Runtime surface grew — new detected provider dependenc{'ies' if len(added) > 1 else 'y'}: {', '.join(added)}",
-                    reason_code="provider_added"))
-            if removed:
-                repo_events.append(make_agent_event(
-                    curr_date, "provider_removed",
-                    f"Runtime surface shrank — no longer detected: {', '.join(removed)}",
-                    reason_code="provider_removed"))
+                prev_provs = set((prev.get("external_service_dependencies") or {}).get("providers") or [])
+                curr_provs = set((curr.get("external_service_dependencies") or {}).get("providers") or [])
+                added, removed = sorted(curr_provs - prev_provs), sorted(prev_provs - curr_provs)
+                if added:
+                    repo_events.append(make_agent_event(
+                        curr_date, "provider_added",
+                        f"Runtime surface grew — new detected provider dependenc{'ies' if len(added) > 1 else 'y'}: {', '.join(added)}",
+                        reason_code="provider_added"))
+                if removed:
+                    repo_events.append(make_agent_event(
+                        curr_date, "provider_removed",
+                        f"Runtime surface shrank — no longer detected: {', '.join(removed)}",
+                        reason_code="provider_removed"))
 
-            prev_plugin = (prev.get("tool_plugin_surface") or {}).get("plugin_system") or "none"
-            curr_plugin = (curr.get("tool_plugin_surface") or {}).get("plugin_system") or "none"
-            if prev_plugin != curr_plugin:
-                repo_events.append(make_agent_event(
-                    curr_date, "tool_surface_changed",
-                    f"Detected tool/plugin surface changed: {prev_plugin} → {curr_plugin}",
-                    reason_code="tool_surface_changed"))
+                prev_plugin = (prev.get("tool_plugin_surface") or {}).get("plugin_system") or "none"
+                curr_plugin = (curr.get("tool_plugin_surface") or {}).get("plugin_system") or "none"
+                if prev_plugin != curr_plugin:
+                    repo_events.append(make_agent_event(
+                        curr_date, "tool_surface_changed",
+                        f"Detected tool/plugin surface changed: {prev_plugin} → {curr_plugin}",
+                        reason_code="tool_surface_changed"))
 
             # License changed — compare like-for-like fields only.
             prev_license_spdx = prev.get("license_spdx")
