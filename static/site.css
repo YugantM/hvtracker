@@ -220,11 +220,17 @@ main blockquote a:not([class]):hover {
   .live-pill.lp-bump, .live-pill.lp-bump .lp-dot { animation: none; }
 }
 /* Three tiers, so the badge never sits on top of the prose it annotates.
-   The content column is 780px wide, so a 158px badge plus a 20px gap needs
-   178px of gutter — i.e. a viewport of at least 780 + 2*178 = 1136px. Above
-   that it moves OUT of the content span entirely and floats in the margin. */
+   The agent page's content column is 780px, so a 158px badge plus a 20px gap
+   needs 178px of gutter — a viewport of at least 780 + 2*178 = 1136px. Above
+   that it leaves the content span entirely and PINS to the viewport, staying
+   put as the page scrolls.
+     left: 50% + 390 (half the column) + 20 (gap) = 50% + 410px
+     top:  clears the 56px sticky header with room to breathe
+     z-index below the header's 100, so it can never cover the nav. */
 @media (min-width: 1140px) {
-  .live-pill { right: -178px; }
+  .live-pill {
+    position: fixed; top: 86px; left: calc(50% + 410px); right: auto; z-index: 90;
+  }
 }
 /* Between those widths there is no gutter to spare, so it tucks into the
    hero's top-right corner (the h1 reserves room for it, see agent.html.j2). */
