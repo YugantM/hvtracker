@@ -25,6 +25,7 @@ from fastapi.staticfiles import StaticFiles
 
 import db
 import mcp_server
+import usage
 import verify_log
 
 # Load local secrets/config from a gitignored .env (OAuth client ids/secrets,
@@ -170,9 +171,11 @@ DATA_PATH = os.path.join(OUTPUT_DIR, "data.json")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 COMPARE_TOOL_PATH = os.path.join(BASE_DIR, "compare", "index.html")
 VERIFY_TOOL_PATH = os.path.join(BASE_DIR, "verify", "index.html")
+LIVE_PAGE_PATH = os.path.join(BASE_DIR, "live", "index.html")
 SCAN_TOOL_PATH = os.path.join(BASE_DIR, "scan", "index.html")
 RENDER_FINGERPRINT_PATH = os.path.join(OUTPUT_DIR, ".render_fingerprint")
 verify_log.init(OUTPUT_DIR)  # public "recently checked" feed (transparency)
+usage.init(OUTPUT_DIR)  # machine-channel usage rollup behind /live/
 REFRESH_STATUS_PATH = os.path.join(OUTPUT_DIR, ".refresh_status.json")
 MAX_DATA_AGE = timedelta(hours=int(os.environ.get("MAX_DATA_AGE_HOURS", "6")))
 # OSSF scores are baked into the image from the `data` branch at build time
@@ -385,15 +388,29 @@ def _count_badge(slug: str) -> None:
     _badge_counters[slug] = _badge_counters.get(slug, 0) + 1
 
 
+# The /live/ page polls /api/v1/usage, and the badge/status widgets poll their
+# own endpoints. Counting those would let our own site inflate the "machine
+# consumer" numbers it is reporting — the same self-counting mistake the
+# verify feed made. Excluded from machine_usage by path.
+_USAGE_EXCLUDED_PATHS = frozenset({"/api/v1/usage"})
+
+
 def _count_machine_usage(path: str) -> None:
+    if path in _USAGE_EXCLUDED_PATHS:
+        return
+    channel = None
     if path.startswith("/api/v1/"):
-        _usage_counters["api_v1"] += 1
+        channel = "api_v1"
     elif path == "/mcp" or path.startswith("/mcp/"):
-        _usage_counters["mcp"] += 1
+        channel = "mcp"
     elif path.startswith("/data/exports/"):
-        _usage_counters["exports"] += 1
+        channel = "exports"
     elif path.startswith("/data/") and path.endswith(".json"):
-        _usage_counters["data_json"] += 1
+        channel = "data_json"
+    if channel is None:
+        return
+    _usage_counters[channel] += 1
+    usage.bump(channel)  # durable rollup behind /live/
 
 
 @app.middleware("http")
@@ -1032,6 +1049,23 @@ def api_v1_verify_recent():
     })
 
 
+@app.get("/api/v1/usage")
+def api_v1_usage(hours: int = 24):
+    """Public machine-channel usage: how much the trust layer is actually used.
+
+    Powers /live/. Counts only channel/tool names and the hour they happened
+    in — no IPs, arguments, or anything user-identifying. Excluded from
+    machine_usage itself so the page cannot inflate what it reports.
+    """
+    hours = max(1, min(int(hours or 24), 168))
+    return JSONResponse(usage.snapshot(hours), headers={
+        # Short edge TTL: enough to absorb many viewers polling at once while
+        # still feeling live. Matches the client poll interval.
+        "Cache-Control": "public, max-age=10, s-maxage=10",
+        "Access-Control-Allow-Origin": _API_V1_CORS,
+    })
+
+
 @app.post("/api/v1/scan")
 async def api_v1_scan(request: Request):
     """Bulk pre-connect trust check for a whole dependency set.
@@ -1145,6 +1179,18 @@ def verify_tool():
     if not os.path.isfile(VERIFY_TOOL_PATH):
         return HTMLResponse("<p>Verify tool is not available yet.</p>", status_code=503)
     with open(VERIFY_TOOL_PATH, encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+
+@app.api_route("/live", methods=["GET", "HEAD"], response_class=HTMLResponse)
+@app.api_route("/live/", methods=["GET", "HEAD"], response_class=HTMLResponse)
+def live_usage_page():
+    """Public machine-channel usage. Hand-written source shipped in the image
+    (like /verify/), so it reads from BASE_DIR — the numbers themselves are
+    fetched client-side from /api/v1/usage."""
+    if not os.path.isfile(LIVE_PAGE_PATH):
+        return HTMLResponse("<p>Live usage page is not available yet.</p>", status_code=503)
+    with open(LIVE_PAGE_PATH, encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 
@@ -2355,7 +2401,12 @@ def _has_pending_signal_rows() -> bool:
 def _refresh_verify_feed():
     """Daily: re-verify the provisional (open-lookup) repos in the public feed
     so their verdicts stay fresh. Curated repos are refreshed by the main cron;
-    only the open-lookup ones need this. Gentle on the GitHub budget."""
+    only the open-lookup ones need this. Gentle on the GitHub budget.
+
+    Uses verify_log.refresh, NOT .record: this is our own revalidation, so it
+    must not count as a check or restamp `checked_at`. Recording it as a check
+    pinned the same provisional repos to the top of the public feed every night
+    with identical timestamps and inflated their `checks` counters."""
     if not db.enabled():
         return
     import open_lookup
@@ -2365,8 +2416,11 @@ def _refresh_verify_feed():
         try:
             v = open_lookup.evaluate_open(repo, repo, token)
             if v.get("eligibility") == "ok":
-                verify_log.record(v.get("resolved") or repo, None, v.get("grade"),
-                                  v.get("trusted"), True, v.get("stars"))
+                # Key on the row we selected, not v["resolved"]: a transferred
+                # repo resolves to its new name, and updating that instead
+                # would no-op and leave this row permanently stalest-first.
+                verify_log.refresh(repo, None, v.get("grade"),
+                                   v.get("trusted"), v.get("stars"))
                 refreshed += 1
         except Exception:
             pass
@@ -2478,6 +2532,17 @@ def _startup():
                 max_instances=1,
                 coalesce=True,
             )
+            # Persist the in-memory machine-usage rollup. Runs regardless of
+            # db.enabled() — usage.flush falls back to the volume JSON — and is
+            # cheap: one upsert per (hour, channel) touched since the last run.
+            _scheduler.add_job(
+                usage.flush,
+                "cron",
+                minute="*",
+                id="usage-flush",
+                max_instances=1,
+                coalesce=True,
+            )
             if db.enabled():
                 _scheduler.add_job(
                     _refresh_verify_feed,
@@ -2496,6 +2561,7 @@ def _shutdown():
     if _scheduler is not None:
         _scheduler.shutdown(wait=False)
         _scheduler = None
+    usage.flush()  # don't lose the last minute of counts on redeploy
 
 
 def startup():

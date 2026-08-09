@@ -7099,6 +7099,7 @@ def main() -> None:
         ("https://hvtracker.net/methodology/", "0.5", "monthly"),
         ("https://hvtracker.net/verify/", "0.8", "weekly"),
         ("https://hvtracker.net/scan/", "0.7", "weekly"),
+        ("https://hvtracker.net/live/", "0.6", "daily"),
         ("https://hvtracker.net/movers/", "0.8", "daily"),
         ("https://hvtracker.net/changes/", "0.8", "weekly"),
         ("https://hvtracker.net/use-cases/", "0.8", "daily"),
@@ -7225,6 +7226,7 @@ HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Ma
 
 ## MCP server (trust layer for agents)
 Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Streamable HTTP — no auth, no install). Tools: `verify_mcp_server` (pre-connect "Safe Browsing for MCP" verdict), `check_agent_trust` (trust profile incl. runtime capabilities and the signed-credential URL), `compare_agents` (side-by-side with an evidence-based verdict), and `search_agents`. Call these before installing or connecting to an AI agent, framework, or MCP server.
+- [Live usage](https://hvtracker.net/live/): how much the trust layer is actually called, updated live — machine-readable at /api/v1/usage (tool-call and request counts per hour; no identifying data)
 
 ## Browse by category
 {cat_lines}

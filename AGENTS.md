@@ -206,6 +206,48 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   (retired.json), /use-case/recently-active/ → 404. Zero action needed.
   GitHub About text already says "300+" (done at some point before
   2026-07-23 — plan item closed).
+- **Verify-feed timestamp fix + /live/ usage surface 2026-08-09** (merged,
+  NOT deployed). Reported symptom: the /verify/ "Recently checked" feed showed
+  most entries with the same elapsed time. Root cause: `_refresh_verify_feed`
+  (nightly, hour=4 UTC) called `verify_log.record()` — the CLIENT-check writer
+  — for every provisional row, so each night restamped `checked_at` and bumped
+  `checks` on all of them. They landed 9-in-9-seconds, rendered identical
+  "Nh ago", held feed slots 1-9 permanently (the target query's `ORDER BY
+  checked_at ASC` + sequential restamping is order-preserving), and inflated
+  `checks` to 11-51 vs 1-7 on untouched curated rows — ~50 daily self-writes
+  since the job shipped 2026-06-19 (39dd8c8e). All 9 were grade C because
+  `open_lookup.py:72` can only emit C/D, so the top of the feed read as a wall
+  of identical rows. Star data was never wrong (spot-checked vs GitHub).
+  Fix: split the column meanings — `checked_at`/`checks` mean "a client asked"
+  and only `record()` writes them; new `refreshed_at` + `db.refresh_verify_check`
+  / `verify_log.refresh()` carry "we revalidated our own data", never insert,
+  never reorder. `verify_check_targets` now orders by
+  `COALESCE(refreshed_at, checked_at)`; the job keys the UPDATE on the row it
+  selected, not `v["resolved"]` (a transferred repo would no-op and strand the
+  row head-of-line — the #169 failure mode). `name` is COALESCEd both paths
+  (refresh had been nulling curated display names). Feed UI now shows "checked
+  Xd ago" with "revalidated Yh ago" as separate metadata.
+  `scripts/backfill_verify_checks.py` (dry-run default, re-run safe) estimates
+  and removes the machine-generated `checks`; **it needs DATABASE_URL and has
+  NOT been run — owner action.** `checked_at` on those 9 rows is left as-is
+  (any corrected value would be a guess; they now age down naturally).
+  NEW /live/ surface: `usage.py` counts machine channels durably —
+  `usage_hourly(bucket, channel, count)` rollup, flushed once a minute (not
+  per request) with a volume-JSON fallback and a shutdown flush. Two numbers,
+  deliberately distinct on the page: `tool_calls` (recorded INSIDE each
+  mcp_server.py tool, so one increment = one answered question) and
+  `requests` (raw HTTP, inflated ~2-3x by stateless MCP chatter). Extracted
+  `_check_agent_trust` so `compare_agents` counts once, not three times.
+  `/api/v1/usage` is excluded from its own counters so the page can't inflate
+  what it reports. `/live/` = odometer + 24h zero-filled hourly chart + tool
+  breakdown + live call feed (**tool name and timestamp only — never
+  arguments, IPs, or anything identifying**); compact live strips on /verify/
+  and the homepage. Verified locally end-to-end against a real uvicorn +
+  29 real MCP JSON-RPC tool calls: 29 calls → 29 counted, 30 requests
+  (29 + `initialize`), api_v1 stayed 0, counts survived SIGTERM→restart.
+  LESSON: the odometer's count-up animation must commit its value BEFORE
+  animating — `requestAnimationFrame` never fires in a hidden tab, which
+  silently froze the headline number while the rest of the page updated.
 - Next: bill re-check (was due 2026-07-12, now overdue — Railway metrics
   API, memory baseline after #106); T3.3 capability-surface PAGE (grade
   shipped, page pending); internal-linking SEO pass; badge-adopter audit;
