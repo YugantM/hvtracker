@@ -533,6 +533,11 @@ def test_startup_keeps_scheduler_alive(monkeypatch):
     monkeypatch.setattr(app.db, "init_schema", lambda: None)
     monkeypatch.setattr(app.db, "enabled", lambda: False)
     monkeypatch.setattr(app, "_has_missing_commit_rows", lambda: False)
+    # Stub the sibling predicate too. This test asserts which scheduler jobs
+    # get registered; it deletes DISABLE_SCHEDULER and does NOT fake the
+    # thread, so leaving this reading the real data.json meant any roster with
+    # provisional rows kicked a real fetch subprocess that outlived the suite.
+    monkeypatch.setattr(app, "_has_pending_signal_rows", lambda: False)
     monkeypatch.setattr(app.os.path, "isfile", lambda path: True)
 
     app._scheduler = None

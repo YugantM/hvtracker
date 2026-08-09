@@ -2489,7 +2489,12 @@ def _startup():
         # commit counts for its rows anyway; repair runs on the next boot.
         threading.Thread(target=_refresh_and_record, args=("pending", fingerprint, "startup"), daemon=True).start()
         print("[startup] detected provisional rows — kicked off pending refresh")
-    elif _has_missing_commit_rows():
+    elif os.environ.get("DISABLE_SCHEDULER") != "1" and _has_missing_commit_rows():
+        # Same DISABLE_SCHEDULER guard as the pending branch above. Without it
+        # pytest on a roster-add branch spawned a real, un-tokened fetch
+        # subprocess that outlived the suite in 403-retry loops (and raced
+        # pytest's own summary line out of the log). No production effect:
+        # DISABLE_SCHEDULER is set only by the tests and docker-compose.
         threading.Thread(target=_refresh_and_record, args=("repair-commits", fingerprint, "startup"), daemon=True).start()
         print("[startup] detected rows with missing commit counts — kicked off targeted repair refresh")
     elif seeded > 0 or stored_fingerprint != fingerprint or agents_changed:
