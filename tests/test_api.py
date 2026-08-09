@@ -743,3 +743,23 @@ def test_usage_endpoint_carries_site_freshness_for_the_header(client):
     import usage
     usage._snapshot_cache = None
     assert "data_updated" not in usage.snapshot(), "must not leak into the cached snapshot"
+
+
+def test_raw_daily_snapshots_are_not_publicly_served(client):
+    """Daily snapshots hold every row with the full scoring internals and are
+    enumerable by date, so the raw files must never be reachable over HTTP.
+
+    The site reads them from disk; only the curated 90-day history API is public.
+    """
+    for path in (
+        "/output/history/2026-08-08.json",
+        "/output/history/2026-06-01.json",
+        "/output/history/",
+        "/output/history",
+    ):
+        assert client.get(path).status_code == 404, path
+
+    # The deliberate, documented public surface must still work.
+    repo = client.get("/api/agents", params={"limit": 1}).json()["agents"][0]
+    r = client.get(f"/api/v1/agents/{repo['slug']}/history")
+    assert r.status_code == 200

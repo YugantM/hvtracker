@@ -394,6 +394,23 @@ def _count_badge(slug: str) -> None:
 # verify feed made. Excluded from machine_usage by path.
 _USAGE_EXCLUDED_PATHS = frozenset({"/api/v1/usage"})
 
+# Daily snapshots are the registry's irreplaceable asset: one 4MB file per day
+# holding every row with all 62 fields, including trust_breakdown and
+# scorecard_checks — the scoring internals, not just the published scores. They
+# were never deliberately published; the catch-all StaticFiles mount over
+# OUTPUT_DIR simply exposed them, and the date-based filenames make the whole
+# corpus enumerable with a loop. The site itself reads these from DISK, never
+# over HTTP, so refusing them here costs nothing.
+#
+# The curated public history surface stays open and unaffected:
+# GET /api/v1/agents/<slug>/history (90-day window, whitelisted fields).
+_PRIVATE_SNAPSHOT_PREFIXES = ("/output/history/", "/output/history")
+
+
+def _is_private_snapshot_path(path: str) -> bool:
+    """True for raw daily-snapshot paths, which must not be served publicly."""
+    return path.startswith(_PRIVATE_SNAPSHOT_PREFIXES[0]) or path == _PRIVATE_SNAPSHOT_PREFIXES[1]
+
 
 def _count_machine_usage(path: str) -> None:
     if path in _USAGE_EXCLUDED_PATHS:
@@ -425,6 +442,9 @@ async def _cache_headers(request, call_next):
         retired = _retired_response(path)
         if retired is not None:
             return retired
+        if _is_private_snapshot_path(path):
+            # 404, not 403: don't confirm that a given date's snapshot exists.
+            return Response("Not Found", status_code=404, media_type="text/plain")
 
     if path == "/mcp" and request.method == "POST":
         if not _mcp_enabled():
