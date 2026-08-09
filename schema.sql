@@ -48,6 +48,13 @@ CREATE TABLE IF NOT EXISTS interest_signups (
 
 -- Public "recently checked" feed for /verify. One row per repo (newest check
 -- wins); `checks` counts how many times it's been verified. Public by default.
+--
+-- `checked_at`/`checks` mean "a CLIENT asked about this repo" and are the only
+-- things the public feed orders and counts by. `refreshed_at` means "we
+-- re-evaluated our own data for this repo" and is written by the nightly
+-- verify-feed refresh job. Keeping them apart is what stops that job from
+-- restamping every provisional row with the same timestamp each night and
+-- pinning it to the top of the feed (see scripts/backfill_verify_checks.py).
 CREATE TABLE IF NOT EXISTS verify_checks (
     repo           TEXT PRIMARY KEY,
     name           TEXT,
@@ -59,7 +66,20 @@ CREATE TABLE IF NOT EXISTS verify_checks (
     first_checked  TIMESTAMPTZ NOT NULL DEFAULT now(),
     checked_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE verify_checks ADD COLUMN IF NOT EXISTS refreshed_at TIMESTAMPTZ;
 
+-- Machine-channel usage rollup behind /live/ and /api/v1/usage. One row per
+-- (hour, channel) — written on a timer by usage.py, never per request.
+-- `channel` is a request surface (mcp | api_v1 | data_json | exports) or an
+-- answered MCP tool call ("tool:<name>"). No IPs, arguments, or identifiers.
+CREATE TABLE IF NOT EXISTS usage_hourly (
+    bucket   TIMESTAMPTZ NOT NULL,
+    channel  TEXT NOT NULL,
+    count    BIGINT NOT NULL DEFAULT 0,
+    PRIMARY KEY (bucket, channel)
+);
+
+CREATE INDEX IF NOT EXISTS usage_hourly_bucket_idx ON usage_hourly (bucket DESC);
 CREATE INDEX IF NOT EXISTS verify_checks_checked_at_idx ON verify_checks (checked_at DESC);
 CREATE INDEX IF NOT EXISTS submissions_status_idx ON submissions (status);
 CREATE INDEX IF NOT EXISTS corrections_status_idx ON corrections (status);

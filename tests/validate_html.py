@@ -24,6 +24,8 @@ SAMPLES = [
     "categories/coding-agents/index.html",
     "compare/index.html",
     "scan/index.html",
+    "verify/index.html",
+    "live/index.html",
     "methodology/index.html",
     "blog/index.html",
     "roadmap/index.html",

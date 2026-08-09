@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Live — the trust layer in use — HVTracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Live usage of the HVTracker trust layer: how often AI agents call the MCP server and public API to check whether a project is safe before connecting to it.">
+  <link rel="canonical" href="https://hvtracker.net/live/">
+  <meta property="og:title" content="Live — the trust layer in use — HVTracker">
+  <meta property="og:description" content="How often AI agents check HVTracker before they connect. Live MCP tool-call counts, updated every few seconds.">
+  <meta property="og:image" content="https://hvtracker.net/og-mcp.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://hvtracker.net/live/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hvtracker.net/og-mcp.png">
+  <link rel="stylesheet" href="/static/site.css">
+  <script defer src="/static/site-status.js"></script>
+  <script defer src="/analytics.js"></script>
+  <style>
+    .live-hero { max-width: 860px; margin: 28px auto 22px; text-align: center; }
+    .live-hero h1 { font-size: 30px; line-height: 1.12; letter-spacing: -.02em; margin-bottom: 10px; }
+    .live-hero p { color: var(--muted); font-size: 16px; max-width: 620px; margin: 0 auto; }
+    .live-wrap { max-width: 860px; margin: 0 auto; }
+
+    .odometer { text-align: center; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 26px 20px 22px; }
+    .odometer-value { font: 700 clamp(38px, 9vw, 68px)/1 var(--font-mono); letter-spacing: -.03em; color: var(--text); font-variant-numeric: tabular-nums; }
+    .odometer-label { color: var(--muted); font-size: 14px; margin-top: 8px; }
+    .odometer-label strong { color: var(--text); font-weight: 600; }
+    .odometer-since { color: var(--muted); font: 11px var(--font-mono); margin-top: 6px; }
+    .pulse { display: inline-block; width: 7px; height: 7px; border-radius: 999px; background: var(--green); margin-right: 7px; vertical-align: middle; box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 18%, transparent); }
+    .pulse.beat { animation: livebeat .9s ease-out; }
+    @keyframes livebeat { 0% { transform: scale(1); } 35% { transform: scale(1.9); } 100% { transform: scale(1); } }
+
+    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+    .stat { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 14px 16px; }
+    .stat-v { font: 700 22px var(--font-mono); color: var(--text); font-variant-numeric: tabular-nums; }
+    .stat-k { color: var(--muted); font-size: 12px; margin-top: 3px; }
+
+    .panel { margin-top: 26px; }
+    .panel h2 { font-size: 15px; margin-bottom: 10px; display: flex; align-items: baseline; gap: 8px; }
+    .panel h2 span { color: var(--muted); font: 12px var(--font-mono); font-weight: 400; }
+
+    .chart { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 14px 16px 10px; }
+    .chart svg { display: block; width: 100%; height: 120px; overflow: visible; }
+    .chart-x { display: flex; justify-content: space-between; color: var(--muted); font: 11px var(--font-mono); margin-top: 6px; }
+
+    .tools { display: grid; gap: 7px; }
+    .tool-row { display: grid; grid-template-columns: minmax(120px, 190px) 1fr auto; align-items: center; gap: 12px; font-size: 13px; }
+    .tool-name { font-family: var(--font-mono); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tool-bar { height: 9px; border-radius: 999px; background: color-mix(in srgb, var(--line) 60%, transparent); overflow: hidden; }
+    .tool-bar i { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+    .tool-n { font: 12px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+
+    .feed { display: grid; gap: 6px; }
+    .feed-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font-size: 13px; }
+    .feed-row.fresh { animation: feedin .5s ease-out; }
+    @keyframes feedin { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    .feed-tool { font-family: var(--font-mono); color: var(--text); }
+    .feed-when { margin-left: auto; color: var(--muted); font: 12px var(--font-mono); white-space: nowrap; }
+    .feed-empty, .live-loading { color: var(--muted); font-size: 13px; }
+
+    .live-note { margin-top: 26px; color: var(--muted); font-size: 12px; border-top: 1px dashed var(--line); padding-top: 12px; }
+    .live-note a { color: var(--accent); }
+    .live-note code { font: 11px var(--font-mono); background: var(--bg); border: 1px solid var(--line); border-radius: 3px; padding: 1px 4px; }
+
+    .live-cta { margin-top: 22px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); padding: 16px 18px; }
+    .live-cta h2 { font-size: 15px; margin-bottom: 6px; }
+    .live-cta p { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+    .live-cta pre { margin: 0; padding: 11px 13px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; overflow-x: auto; font: 12px/1.5 var(--font-mono); color: var(--text); }
+
+    @media (max-width: 600px) {
+      .stat-row { grid-template-columns: 1fr; }
+      .tool-row { grid-template-columns: minmax(100px, 150px) 1fr auto; }
+    }
+  </style>
+</head>
+<body data-page-type="live">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="/" class="logo">HV<span>Tracker</span></a>
+      <nav class="site-nav" aria-label="Site">
+        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a><a href="/trends/">Trends</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/scan/">Scan stack</a><a href="/methodology/">Methodology</a><a href="/badges/">Badges</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/capabilities/">Capabilities</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/live/">Live usage</a><a href="/spec/">Specs</a></div></div>
+        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/correct/">Corrections</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
+      </nav>
+      <div class="site-status"><span class="live-dot"></span>updated <span class="site-status-value"></span></div>
+    </div>
+  </header>
+
+  <div class="page">
+    <section class="live-hero">
+      <h1>Agents are checking before they connect</h1>
+      <p>HVTracker's trust layer is called by AI agents at decision time — over MCP and the public API. This page shows that traffic as it happens.</p>
+    </section>
+
+    <div class="live-wrap">
+      <div class="odometer">
+        <div class="odometer-value" id="odo">—</div>
+        <div class="odometer-label"><span class="pulse" id="pulse"></span><strong>trust questions answered</strong> for AI agents</div>
+        <div class="odometer-since" id="odo-since">loading…</div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat"><div class="stat-v" id="s-24h">—</div><div class="stat-k">tool calls · last 24h</div></div>
+        <div class="stat"><div class="stat-v" id="s-tools">—</div><div class="stat-k">distinct tools used · 24h</div></div>
+        <div class="stat"><div class="stat-v" id="s-req">—</div><div class="stat-k">machine requests · 24h</div></div>
+      </div>
+
+      <section class="panel">
+        <h2>Last 24 hours <span>· tool calls per hour</span></h2>
+        <div class="chart">
+          <svg id="chart" viewBox="0 0 720 120" preserveAspectRatio="none" role="img" aria-label="Tool calls per hour over the last 24 hours"></svg>
+          <div class="chart-x"><span id="x-start">—</span><span id="x-end">now</span></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Which questions <span>· last 24h</span></h2>
+        <div class="tools" id="tools"><span class="live-loading">Loading…</span></div>
+      </section>
+
+      <section class="panel">
+        <h2>Live calls <span>· tool name and time only</span></h2>
+        <div class="feed" id="feed"><span class="live-loading">Loading…</span></div>
+      </section>
+
+      <div class="live-cta">
+        <h2>Point your own agent at it</h2>
+        <p>Free, read-only, no key. The same endpoint every call on this page came through.</p>
+        <pre>claude mcp add --transport http hvtracker https://hvtracker.net/mcp</pre>
+      </div>
+
+      <p class="live-note">
+        <strong>What's counted.</strong> <code>tool calls</code> are answered MCP tool
+        invocations — one per real question an agent asked. <code>machine requests</code>
+        are raw HTTP hits on <code>/mcp</code>, <code>/api/v1/*</code> and the JSON data
+        files; a single tool call costs several of those in stateless MCP, so that number
+        is always higher and is <em>not</em> a measure of work done. Traffic from this page
+        is excluded from both. We record the tool name and the hour — never arguments, IPs,
+        or anything identifying who asked. Raw numbers: <a href="/api/v1/usage">/api/v1/usage</a> ·
+        <a href="/data/">API docs</a>.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var POLL_MS = 10000;
+      var odo = document.getElementById('odo');
+      var pulse = document.getElementById('pulse');
+      var shown = null;          // number currently displayed on the odometer
+      var seenCall = null;       // newest call timestamp we've already animated
+
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+      function fmt(n) { return Number(n || 0).toLocaleString(); }
+
+      function timeAgo(iso) {
+        var s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+        if (s < 10) return 'just now';
+        if (s < 60) return Math.floor(s) + 's ago';
+        if (s < 3600) return Math.floor(s / 60) + 'm ago';
+        if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+        return Math.floor(s / 86400) + 'd ago';
+      }
+
+      // Count up to the new total rather than snapping, so the page reads as
+      // live. The animation is decoration only: `shown` is committed up front
+      // and the text is written immediately, because requestAnimationFrame does
+      // not run in a hidden tab — animating first would leave the headline
+      // number silently frozen at a stale value while the rest of the page
+      // moved on. Big jumps (first paint, long tab-away) skip the animation.
+      var rollFrame = null;
+      function rollTo(target) {
+        var from = shown;
+        if (shown === target) return;
+        shown = target;
+        if (rollFrame !== null) { cancelAnimationFrame(rollFrame); rollFrame = null; }
+        if (from === null || document.hidden || Math.abs(target - from) > 500) {
+          odo.textContent = fmt(target);
+          return;
+        }
+        odo.textContent = fmt(target);
+        pulse.classList.remove('beat');
+        void pulse.offsetWidth;
+        pulse.classList.add('beat');
+        var delta = target - from, t0 = performance.now(), dur = 700;
+        rollFrame = requestAnimationFrame(function step(now) {
+          var p = Math.min(1, (now - t0) / dur);
+          odo.textContent = fmt(Math.round(from + delta * (1 - Math.pow(1 - p, 3))));
+          if (p < 1) { rollFrame = requestAnimationFrame(step); }
+          else { rollFrame = null; odo.textContent = fmt(target); }
+        });
+      }
+
+      function drawChart(hourly) {
+        var svg = document.getElementById('chart');
+        if (!hourly || !hourly.length) { svg.innerHTML = ''; return; }
+        var W = 720, H = 120, n = hourly.length;
+        var max = Math.max(1, Math.max.apply(null, hourly.map(function (h) { return h.tool_calls; })));
+        var gap = n > 1 ? 2 : 0, bw = (W - gap * (n - 1)) / n;
+        var parts = hourly.map(function (h, i) {
+          var bh = Math.max(h.tool_calls > 0 ? 2 : 0, Math.round((h.tool_calls / max) * (H - 6)));
+          var x = i * (bw + gap), y = H - bh;
+          return '<rect x="' + x.toFixed(2) + '" y="' + y + '" width="' + bw.toFixed(2) + '" height="' + bh +
+            '" rx="1.5" fill="var(--accent)" opacity="' + (i === n - 1 ? 1 : 0.72) + '"><title>' +
+            esc(h.bucket.slice(11, 16)) + ' UTC · ' + fmt(h.tool_calls) + ' tool calls</title></rect>';
+        });
+        svg.innerHTML = parts.join('');
+        var first = hourly[0].bucket;
+        document.getElementById('x-start').textContent = first.slice(11, 16) + ' UTC';
+      }
+
+      function drawTools(byTool) {
+        var el = document.getElementById('tools');
+        var names = Object.keys(byTool || {});
+        if (!names.length) { el.innerHTML = '<span class="feed-empty">No tool calls in the last 24 hours.</span>'; return; }
+        var max = Math.max.apply(null, names.map(function (k) { return byTool[k]; }));
+        el.innerHTML = names.map(function (k) {
+          var pct = Math.max(2, Math.round((byTool[k] / max) * 100));
+          return '<div class="tool-row"><span class="tool-name">' + esc(k) + '</span>' +
+            '<span class="tool-bar"><i style="width:' + pct + '%"></i></span>' +
+            '<span class="tool-n">' + fmt(byTool[k]) + '</span></div>';
+        }).join('');
+      }
+
+      function drawFeed(calls) {
+        var el = document.getElementById('feed');
+        if (!calls || !calls.length) { el.innerHTML = '<span class="feed-empty">No calls yet in this window.</span>'; return; }
+        var newest = calls[0].at, isNew = seenCall !== null && newest !== seenCall;
+        el.innerHTML = calls.slice(0, 12).map(function (c, i) {
+          var fresh = isNew && i === 0 ? ' fresh' : '';
+          return '<div class="feed-row' + fresh + '"><span class="feed-tool">' + esc(c.tool) + '</span>' +
+            '<span class="feed-when">' + esc(timeAgo(c.at)) + '</span></div>';
+        }).join('');
+        seenCall = newest;
+      }
+
+      function load() {
+        fetch('/api/v1/usage')
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            rollTo(d.totals.tool_calls);
+            document.getElementById('odo-since').textContent =
+              'all-time · ' + fmt(d.totals.requests) + ' machine requests served';
+            document.getElementById('s-24h').textContent = fmt(d.window.tool_calls);
+            document.getElementById('s-tools').textContent = fmt(Object.keys(d.window.by_tool || {}).length);
+            document.getElementById('s-req').textContent = fmt(d.window.requests);
+            drawChart(d.window.hourly);
+            drawTools(d.window.by_tool);
+            drawFeed(d.recent_calls);
+          })
+          .catch(function () {
+            if (shown === null) odo.textContent = '—';
+            document.getElementById('odo-since').textContent = 'could not reach the usage API';
+          });
+      }
+
+      load();
+      var timer = setInterval(load, POLL_MS);
+      // Don't poll a hidden tab; refresh immediately on return so the numbers
+      // are never stale-looking when the user comes back.
+      document.addEventListener('visibilitychange', function () {
+        clearInterval(timer);
+        if (!document.hidden) { load(); timer = setInterval(load, POLL_MS); }
+      });
+    })();
+  </script>
+</body>
+</html>

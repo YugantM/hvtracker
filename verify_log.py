@@ -39,9 +39,23 @@ def init(output_dir: str) -> None:
     _log = deque(items[-MAX_ENTRIES:], maxlen=MAX_ENTRIES)
 
 
+def _now() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _persist() -> None:
+    """Write the ring-buffer to the volume. Caller must hold _lock."""
+    try:
+        os.makedirs(os.path.dirname(_path), exist_ok=True)
+        with open(_path, "w", encoding="utf-8") as f:
+            json.dump(list(_log), f)
+    except OSError:
+        pass
+
+
 def record(repo: str, name: str | None, grade: str | None, trusted: bool,
            provisional: bool, stars: int | None) -> None:
-    """Append a successful check (deduped by repo, newest wins).
+    """Append a CLIENT-initiated check (deduped by repo, newest wins).
 
     Persists to Postgres when configured (Railway); otherwise falls back to the
     on-disk JSON ring-buffer (local/dev).
@@ -54,26 +68,55 @@ def record(repo: str, name: str | None, grade: str | None, trusted: bool,
             pass  # fall through to the JSON buffer if the DB write fails
     if _log is None:
         return
-    entry = {
-        "repo": repo,
-        "name": name or (repo.split("/")[-1] if repo else repo),
-        "grade": grade,
-        "trusted": bool(trusted),
-        "provisional": bool(provisional),
-        "stars": stars,
-        "checked_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-    }
+    now = _now()
     with _lock:
+        prior = next((e for e in _log if e.get("repo") == repo), None)
+        entry = {
+            "repo": repo,
+            "name": name or (prior or {}).get("name")
+            or (repo.split("/")[-1] if repo else repo),
+            "grade": grade,
+            "trusted": bool(trusted),
+            "provisional": bool(provisional),
+            "stars": stars,
+            "checks": int((prior or {}).get("checks") or 0) + 1,
+            "checked_at": now,
+            "refreshed_at": now,
+        }
         kept = [e for e in _log if e.get("repo") != repo]
         _log.clear()
         _log.extend(kept)
         _log.append(entry)
+        _persist()
+
+
+def refresh(repo: str, name: str | None, grade: str | None, trusted: bool,
+            stars: int | None) -> None:
+    """Re-evaluate an existing entry's data without counting it as a check.
+
+    Mirrors db.refresh_verify_check for the file fallback: updates the verdict
+    fields and `refreshed_at`, leaves `checked_at`/`checks`/position alone, and
+    never creates an entry.
+    """
+    if db.enabled():
         try:
-            os.makedirs(os.path.dirname(_path), exist_ok=True)
-            with open(_path, "w", encoding="utf-8") as f:
-                json.dump(list(_log), f)
-        except OSError:
+            db.refresh_verify_check(repo, name, grade, trusted, stars)
+            return
+        except Exception:
             pass
+    if _log is None:
+        return
+    with _lock:
+        for e in _log:
+            if e.get("repo") == repo:
+                if name:
+                    e["name"] = name
+                e["grade"] = grade
+                e["trusted"] = bool(trusted)
+                e["stars"] = stars
+                e["refreshed_at"] = _now()
+                _persist()
+                return
 
 
 def recent(limit: int = MAX_ENTRIES) -> list[dict]:
