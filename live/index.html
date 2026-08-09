@@ -25,11 +25,9 @@
     .live-wrap { max-width: 860px; margin: 0 auto; }
 
     .odometer { text-align: center; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 26px 20px 22px; }
-    .odometer-value { font: 700 clamp(32px, 7vw, 56px)/1 var(--font-mono); letter-spacing: -.03em; color: var(--text); font-variant-numeric: tabular-nums; }
-    .odo-pair { display: flex; align-items: center; justify-content: center; gap: clamp(18px, 6vw, 54px); flex-wrap: wrap; }
-    .odo-cell { min-width: 150px; }
-    .odo-sep { width: 1px; align-self: stretch; background: var(--line); min-height: 54px; }
-    @media (max-width: 520px) { .odo-sep { display: none; } }
+    .odometer-value { font: 700 clamp(38px, 9vw, 68px)/1 var(--font-mono); letter-spacing: -.03em; color: var(--text); font-variant-numeric: tabular-nums; }
+    .odo-second { margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .odo-second strong { color: var(--text); font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
     .odometer-label { color: var(--muted); font-size: 14px; margin-top: 8px; }
     .odometer-label strong { color: var(--text); font-weight: 600; }
     .odometer-since { color: var(--muted); font: 11px var(--font-mono); margin-top: 6px; }
@@ -108,18 +106,10 @@
 
     <div class="live-wrap">
       <div class="odometer">
-        <div class="odo-pair">
-          <div class="odo-cell">
-            <div class="odometer-value" id="odo-req">—</div>
-            <div class="odometer-label"><strong>machine requests</strong> served</div>
-          </div>
-          <div class="odo-sep" aria-hidden="true"></div>
-          <div class="odo-cell">
-            <div class="odometer-value" id="odo">—</div>
-            <div class="odometer-label"><span class="pulse" id="pulse"></span><strong>trust questions answered</strong></div>
-          </div>
-        </div>
+        <div class="odometer-value" id="odo-req">—</div>
+        <div class="odometer-label"><span class="pulse" id="pulse"></span><strong>machine requests</strong> served to AI agents</div>
         <div class="odometer-since" id="odo-since">loading…</div>
+        <div class="odo-second">of which <strong id="odo">—</strong> were answered tool calls</div>
       </div>
 
       <div class="stat-row">
@@ -157,13 +147,15 @@
       </div>
 
       <p class="live-note">
-        <strong>What's counted.</strong> <code>tool calls</code> are answered MCP tool
-        invocations — one per real question an agent asked. <code>machine requests</code>
-        are raw HTTP hits on <code>/mcp</code>, <code>/api/v1/*</code> and the JSON data
-        files; a single tool call costs several of those in stateless MCP, so that number
-        is always higher and is <em>not</em> a measure of work done. Traffic from this page
-        is excluded from both. We record the tool name and the hour — never arguments, IPs,
-        or anything identifying who asked. Raw numbers: <a href="/api/v1/usage">/api/v1/usage</a> ·
+        <strong>What's counted.</strong> The headline is <code>machine requests</code> —
+        raw HTTP hits on <code>/mcp</code>, <code>/api/v1/*</code> and the JSON data files.
+        It measures <em>traffic</em>, not work done: much of it is MCP protocol handshakes,
+        and a single answered question costs several requests in stateless MCP.
+        <code>tool calls</code>, shown beneath it and broken out per tool above, count
+        invocations an agent actually got an answer from — the stricter number, and the one
+        to watch as clients adopt the server. Traffic from this page is excluded from both.
+        We record the tool name and the hour — never arguments, IPs, or anything identifying
+        who asked. Raw numbers: <a href="/api/v1/usage">/api/v1/usage</a> ·
         <a href="/data/">API docs</a>.
       </p>
     </div>
@@ -172,7 +164,8 @@
   <script>
     (function () {
       var POLL_MS = 10000;
-      var odo = document.getElementById('odo');
+      // rollTo animates the HEADLINE number, which is now machine requests.
+      var odo = document.getElementById('odo-req');
       var pulse = document.getElementById('pulse');
       var shown = null;          // number currently displayed on the odometer
       var seenCall = null;       // newest call timestamp we've already animated
@@ -290,8 +283,10 @@
         fetch('/api/v1/usage')
           .then(function (r) { return r.json(); })
           .then(function (d) {
-            rollTo(d.totals.tool_calls);
-            document.getElementById('odo-req').textContent = fmt(d.totals.requests);
+            // Requests is the headline (it has real volume today); answered
+            // tool calls sit beneath it, still labelled for what they are.
+            rollTo(d.totals.requests);
+            document.getElementById('odo').textContent = fmt(d.totals.tool_calls);
             // Say when counting started. The MCP endpoint has served traffic
             // far longer than this rollup has existed, so an unqualified
             // all-time figure would understate history rather than flatter it.

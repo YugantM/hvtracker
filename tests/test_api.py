@@ -724,8 +724,13 @@ def test_api_v1_usage_counts_other_api_traffic(client):
 def test_live_page_is_served(client):
     r = client.get("/live/")
     assert r.status_code == 200
-    assert "trust questions answered" in r.text
     assert "/api/v1/usage" in r.text
+    # Structure, not prose — the headline wording has changed twice already.
+    # Both figures must be present: the headline count and the tool-call
+    # breakdown beneath it, so one can never silently replace the other.
+    assert 'id="odo-req"' in r.text        # headline: machine requests
+    assert 'id="odo"' in r.text            # secondary: answered tool calls
+    assert "machine requests" in r.text and "tool calls" in r.text
 
 
 def test_usage_endpoint_carries_site_freshness_for_the_header(client):

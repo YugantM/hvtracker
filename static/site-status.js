@@ -38,15 +38,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const paint = (payload) => {
     const fallbackUpdated = (payload.data_updated || "").trim();
     const win = payload.window || {};
-    // Prefer answered tool calls — one per real question an agent asked. Fall
-    // back to raw machine requests so a quiet hour still shows the traffic
-    // that is genuinely arriving, rather than a bare zero.
-    let count = win.tool_calls || 0;
-    let label = "checks";
-    if (!count) {
-      count = win.requests || 0;
-      label = "requests";
-    }
+    // Lead with raw machine requests. Answered tool calls are the more
+    // meaningful measure of work, but this rollup only began on 2026-08-09 and
+    // most /mcp traffic is protocol handshakes, so tool calls sit near zero
+    // while requests already show real traffic. Labelled "machine requests"
+    // precisely so it is never read as questions answered — /live/ breaks out
+    // both. Revisit once tool calls accumulate.
+    const count = win.requests || 0;
+    const label = "machine requests";
 
     const changed = shown !== null && count !== shown;
     statusNodes.forEach((node) => {
@@ -65,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // page whose markup has drifted from this script shows an empty badge.
         if (!num) return;
         num.textContent = fmt(count);
-        if (sub) sub.textContent = label + " · last 24h";
+        if (sub) sub.textContent = label + " · 24h";
         pill.hidden = false;
         if (changed) {
           pill.classList.remove("lp-bump");
