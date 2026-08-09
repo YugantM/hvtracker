@@ -37,7 +37,7 @@ COPY --from=builder /opt/venv /opt/venv
 
 # Application code
 COPY app.py fetch_and_build.py generate_og_card.py specs.py db.py cache.py storage.py schema.sql ./
-COPY signing.py mcp_trust.py open_lookup.py verify_log.py mcp_server.py auth.py ./
+COPY signing.py mcp_trust.py open_lookup.py verify_log.py mcp_server.py auth.py usage.py ./
 # Generator inputs: curated seed, scorecard cache, and templates/assets
 COPY agents.json template.html ./
 COPY --from=builder /build/scorecard-cache.json ./scorecard-cache.json
@@ -45,6 +45,7 @@ COPY templates/ templates/
 COPY docs/import-candidates.json docs/import-candidates.json
 COPY compare/index.html compare/index.html
 COPY verify/index.html verify/index.html
+COPY live/index.html live/index.html
 COPY scan/index.html scan/index.html
 COPY static/ static/
 COPY blog_static/ blog_static/
