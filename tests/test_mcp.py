@@ -251,3 +251,44 @@ def test_smithery_server_card_endpoint(monkeypatch):
     compare_card = card_tools["compare_agents"]
     assert set(compare_card["inputSchema"]["required"]) == {"a", "b"}
     assert compare_card["outputSchema"]["required"] == ["a", "b", "verdict", "compare_url"]
+
+
+# ---- usage instrumentation (/live/) ----------------------------------------
+
+def test_tool_calls_are_counted_once_each(tmp_path):
+    """Each answered tool call increments exactly one counter.
+
+    compare_agents calls check_agent_trust twice internally; counting those
+    would report one client question as three tool calls on /live/.
+    """
+    import usage
+    usage._pending.clear()
+    usage._recent_calls.clear()
+    usage._fallback = None
+    usage._snapshot_cache = None
+    usage.init(str(tmp_path))
+
+    mcp_server.check_agent_trust("LangGraph")
+    mcp_server.compare_agents("LangGraph", "AIPass")
+    mcp_server.search_agents("lang")
+    mcp_server.list_categories()
+
+    usage._snapshot_cache = None
+    by_tool = usage.snapshot()["totals"]["by_tool"]
+    assert by_tool == {
+        "check_agent_trust": 1,
+        "compare_agents": 1,
+        "search_agents": 1,
+        "list_categories": 1,
+    }
+
+
+def test_every_exposed_tool_records_usage(tmp_path):
+    """No tool may be exposed without being counted, or /live/ understates use."""
+    import inspect
+    counted = set()
+    for name in EXPECTED_TOOLS:
+        fn = getattr(mcp_server, name)
+        if "usage.record_tool_call" in inspect.getsource(fn):
+            counted.add(name)
+    assert counted == EXPECTED_TOOLS, f"not counted: {EXPECTED_TOOLS - counted}"

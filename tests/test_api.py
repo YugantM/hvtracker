@@ -677,3 +677,47 @@ def test_blog_urls_carry_trailing_slash(client):
     feed = client.get("/feed.json").json()
     blog_urls = [i["url"] for i in feed["items"] if "/blog/" in i["url"]]
     assert blog_urls and all(u.endswith("/") for u in blog_urls)
+
+
+# ---- /api/v1/usage + /live/ (machine-channel transparency) -----------------
+
+def test_api_v1_usage_shape_and_self_exclusion(client):
+    """The usage endpoint reports the machine channels without counting itself.
+
+    The /live/ page polls this endpoint; if it were counted as api_v1 traffic
+    the page would inflate the very number it reports.
+    """
+    import usage
+    usage._snapshot_cache = None
+    before = usage.snapshot()["totals"]["by_channel"]["api_v1"]
+
+    for _ in range(3):
+        r = client.get("/api/v1/usage")
+        assert r.status_code == 200
+
+    body = r.json()
+    assert set(body) >= {"totals", "window", "recent_calls", "generated_at", "note"}
+    assert set(body["totals"]) >= {"tool_calls", "requests", "by_channel", "by_tool"}
+    assert set(body["window"]) >= {"tool_calls", "requests", "by_tool", "hourly"}
+    assert isinstance(body["window"]["hourly"], list)
+
+    usage._snapshot_cache = None
+    after = usage.snapshot()["totals"]["by_channel"]["api_v1"]
+    assert after == before, "/api/v1/usage must not count itself as machine usage"
+
+
+def test_api_v1_usage_counts_other_api_traffic(client):
+    """Sanity check the exclusion is path-scoped, not a disabled counter."""
+    import usage
+    usage._snapshot_cache = None
+    before = usage.snapshot()["totals"]["by_channel"]["api_v1"]
+    client.get("/api/v1/agents")
+    usage._snapshot_cache = None
+    assert usage.snapshot()["totals"]["by_channel"]["api_v1"] > before
+
+
+def test_live_page_is_served(client):
+    r = client.get("/live/")
+    assert r.status_code == 200
+    assert "trust questions answered" in r.text
+    assert "/api/v1/usage" in r.text
