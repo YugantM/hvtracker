@@ -175,6 +175,70 @@ main blockquote a:not([class]):hover {
 .nav-panel a { color: var(--muted); padding: 6px 10px; border-radius: 4px; border: 0; white-space: nowrap; }
 .nav-panel a:hover { color: var(--text); background: var(--surface); text-decoration: none; }
 .site-status { font: 12px var(--font-mono); color: var(--muted); margin-left: 0; white-space: nowrap; justify-self: end; }
+/* Live machine-usage pill, filled in and kept ticking by site-status.js.
+   Sits top-right of the page content (a chat-bubble-style badge, deliberately
+   NOT in the header). Dark fill + white text so it reads as live and current
+   against the paper background. Hidden until there is a real number. */
+.live-pill {
+  position: absolute; top: 0; right: 0; z-index: 2;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  min-width: 158px; padding: 12px 16px 13px; border-radius: 16px;
+  background: var(--accent); color: #fff;
+  text-decoration: none; white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(31, 27, 23, .22);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.live-pill:hover {
+  color: #fff; text-decoration: none; transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(31, 27, 23, .28);
+}
+.live-pill[hidden] { display: none; }
+.live-pill .lp-head {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase;
+  color: rgba(255, 255, 255, .72);
+}
+.live-pill .lp-num {
+  font: 700 26px/1.05 var(--font-mono); font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em; color: #fff;
+}
+.live-pill .lp-sub { font: 11px var(--font-mono); color: rgba(255, 255, 255, .7); }
+.live-pill .lp-dot {
+  width: 7px; height: 7px; border-radius: 999px; background: #7ee2a8; flex: none;
+  box-shadow: 0 0 0 3px rgba(126, 226, 168, .25);
+}
+/* Fires only when the number actually changes, so it stays calm when idle. */
+.live-pill.lp-bump { animation: lp-bump 1s ease-out; }
+@keyframes lp-bump {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.06); box-shadow: 0 3px 14px rgba(31, 27, 23, .28); }
+  100% { transform: scale(1); }
+}
+.live-pill.lp-bump .lp-dot { animation: lp-dot 1s ease-out; }
+@keyframes lp-dot { 0% { transform: scale(1); } 35% { transform: scale(1.9); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .live-pill.lp-bump, .live-pill.lp-bump .lp-dot { animation: none; }
+}
+/* Three tiers, so the badge never sits on top of the prose it annotates.
+   The content column is 780px wide, so a 158px badge plus a 20px gap needs
+   178px of gutter — i.e. a viewport of at least 780 + 2*178 = 1136px. Above
+   that it moves OUT of the content span entirely and floats in the margin. */
+@media (min-width: 1140px) {
+  .live-pill { right: -178px; }
+}
+/* Between those widths there is no gutter to spare, so it tucks into the
+   hero's top-right corner (the h1 reserves room for it, see agent.html.j2). */
+
+/* Narrow: out of the corner altogether, laid out horizontally so it costs one
+   short row rather than three. */
+@media (max-width: 640px) {
+  .live-pill {
+    position: static; margin-bottom: 14px;
+    flex-direction: row; align-items: baseline; gap: 8px;
+    min-width: 0; padding: 8px 14px; border-radius: 12px;
+  }
+  .live-pill .lp-num { font-size: 18px; }
+}
 .site-header-right { display: flex; align-items: center; gap: 12px; justify-self: end; min-width: 0; }
 .live-dot { display: inline-block; width: 7px; height: 7px; border-radius: 999px; background: var(--green); margin-right: 6px; vertical-align: middle; box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 18%, transparent); }
 

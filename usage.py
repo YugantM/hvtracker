@@ -169,6 +169,19 @@ def _read_rollup(hours: int) -> tuple[dict[str, int], list[dict]]:
     return totals, series
 
 
+def _counting_since() -> str | None:
+    """Date (UTC) of the oldest bucket in the rollup, or None when empty."""
+    try:
+        if db.enabled():
+            oldest = db.usage_oldest_bucket()
+        else:
+            buckets = [b for b in (_fallback or {}) if b != "total"]
+            oldest = min(buckets) if buckets else None
+        return oldest[:10] if oldest else None
+    except Exception:
+        return None
+
+
 def snapshot(hours: int = 24) -> dict:
     """Public payload for /api/v1/usage and the /live/ page.
 
@@ -225,6 +238,11 @@ def snapshot(hours: int = 24) -> dict:
     payload = {
         "generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "window_hours": hours,
+        # Oldest bucket we hold. The machine surfaces served traffic long
+        # before this rollup existed, so the totals below are "since we
+        # started counting", not "since launch" — say so rather than let the
+        # number read as all of history.
+        "counting_since": _counting_since(),
         "totals": {
             "tool_calls": sum(tools_total.values()),
             "requests": _sum(REQUEST_CHANNELS, totals),

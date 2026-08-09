@@ -726,3 +726,15 @@ def test_live_page_is_served(client):
     assert r.status_code == 200
     assert "trust questions answered" in r.text
     assert "/api/v1/usage" in r.text
+
+
+def test_usage_endpoint_carries_site_freshness_for_the_header(client):
+    """The header widget reads freshness + activity from this one response.
+
+    It used to fetch /data/latest.json (multi-megabyte) for the timestamp.
+    """
+    body = client.get("/api/v1/usage").json()
+    assert "data_updated" in body
+    import usage
+    usage._snapshot_cache = None
+    assert "data_updated" not in usage.snapshot(), "must not leak into the cached snapshot"

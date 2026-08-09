@@ -25,7 +25,11 @@
     .live-wrap { max-width: 860px; margin: 0 auto; }
 
     .odometer { text-align: center; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 26px 20px 22px; }
-    .odometer-value { font: 700 clamp(38px, 9vw, 68px)/1 var(--font-mono); letter-spacing: -.03em; color: var(--text); font-variant-numeric: tabular-nums; }
+    .odometer-value { font: 700 clamp(32px, 7vw, 56px)/1 var(--font-mono); letter-spacing: -.03em; color: var(--text); font-variant-numeric: tabular-nums; }
+    .odo-pair { display: flex; align-items: center; justify-content: center; gap: clamp(18px, 6vw, 54px); flex-wrap: wrap; }
+    .odo-cell { min-width: 150px; }
+    .odo-sep { width: 1px; align-self: stretch; background: var(--line); min-height: 54px; }
+    @media (max-width: 520px) { .odo-sep { display: none; } }
     .odometer-label { color: var(--muted); font-size: 14px; margin-top: 8px; }
     .odometer-label strong { color: var(--text); font-weight: 600; }
     .odometer-since { color: var(--muted); font: 11px var(--font-mono); margin-top: 6px; }
@@ -45,6 +49,11 @@
     .chart { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 14px 16px 10px; }
     .chart svg { display: block; width: 100%; height: 120px; overflow: visible; }
     .chart-x { display: flex; justify-content: space-between; color: var(--muted); font: 11px var(--font-mono); margin-top: 6px; }
+    .chart-legend { display: flex; gap: 14px; margin-bottom: 10px; }
+    .chart-legend .lg { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font: 11px var(--font-mono); }
+    .chart-legend .sw { width: 10px; height: 10px; border-radius: 2px; background: var(--accent); }
+    .chart-legend .sw-req { opacity: .28; }
+    .chart-legend .sw-call { opacity: 1; }
 
     .tools { display: grid; gap: 7px; }
     .tool-row { display: grid; grid-template-columns: minmax(120px, 190px) 1fr auto; align-items: center; gap: 12px; font-size: 13px; }
@@ -99,8 +108,17 @@
 
     <div class="live-wrap">
       <div class="odometer">
-        <div class="odometer-value" id="odo">—</div>
-        <div class="odometer-label"><span class="pulse" id="pulse"></span><strong>trust questions answered</strong> for AI agents</div>
+        <div class="odo-pair">
+          <div class="odo-cell">
+            <div class="odometer-value" id="odo-req">—</div>
+            <div class="odometer-label"><strong>machine requests</strong> served</div>
+          </div>
+          <div class="odo-sep" aria-hidden="true"></div>
+          <div class="odo-cell">
+            <div class="odometer-value" id="odo">—</div>
+            <div class="odometer-label"><span class="pulse" id="pulse"></span><strong>trust questions answered</strong></div>
+          </div>
+        </div>
         <div class="odometer-since" id="odo-since">loading…</div>
       </div>
 
@@ -111,9 +129,13 @@
       </div>
 
       <section class="panel">
-        <h2>Last 24 hours <span>· tool calls per hour</span></h2>
+        <h2>Last 24 hours <span>· per hour</span></h2>
         <div class="chart">
-          <svg id="chart" viewBox="0 0 720 120" preserveAspectRatio="none" role="img" aria-label="Tool calls per hour over the last 24 hours"></svg>
+          <div class="chart-legend">
+            <span class="lg"><i class="sw sw-req"></i>machine requests</span>
+            <span class="lg"><i class="sw sw-call"></i>tool calls</span>
+          </div>
+          <svg id="chart" viewBox="0 0 720 120" preserveAspectRatio="none" role="img" aria-label="Machine requests and answered tool calls per hour over the last 24 hours"></svg>
           <div class="chart-x"><span id="x-start">—</span><span id="x-end">now</span></div>
         </div>
       </section>
@@ -200,22 +222,43 @@
         });
       }
 
+      // Both series share one Y scale, on purpose: requests always exceed tool
+      // calls (stateless MCP costs ~2-3 requests per call), so drawing them on
+      // separate scales would make the smaller, more meaningful number look
+      // bigger than the traffic that produced it.
       function drawChart(hourly) {
         var svg = document.getElementById('chart');
         if (!hourly || !hourly.length) { svg.innerHTML = ''; return; }
         var W = 720, H = 120, n = hourly.length;
-        var max = Math.max(1, Math.max.apply(null, hourly.map(function (h) { return h.tool_calls; })));
+        var max = Math.max(1, Math.max.apply(null, hourly.map(function (h) {
+          return Math.max(h.requests, h.tool_calls);
+        })));
         var gap = n > 1 ? 2 : 0, bw = (W - gap * (n - 1)) / n;
-        var parts = hourly.map(function (h, i) {
-          var bh = Math.max(h.tool_calls > 0 ? 2 : 0, Math.round((h.tool_calls / max) * (H - 6)));
-          var x = i * (bw + gap), y = H - bh;
-          return '<rect x="' + x.toFixed(2) + '" y="' + y + '" width="' + bw.toFixed(2) + '" height="' + bh +
-            '" rx="1.5" fill="var(--accent)" opacity="' + (i === n - 1 ? 1 : 0.72) + '"><title>' +
-            esc(h.bucket.slice(11, 16)) + ' UTC · ' + fmt(h.tool_calls) + ' tool calls</title></rect>';
+        var inner = Math.max(1.5, bw * 0.46);
+        var parts = [];
+        hourly.forEach(function (h, i) {
+          var x = i * (bw + gap), last = (i === n - 1);
+          var rh = Math.max(h.requests > 0 ? 2 : 0, Math.round((h.requests / max) * (H - 6)));
+          var th = Math.max(h.tool_calls > 0 ? 2 : 0, Math.round((h.tool_calls / max) * (H - 6)));
+          var tip = esc(h.bucket.slice(11, 16)) + ' UTC · ' + fmt(h.requests) +
+                    ' requests · ' + fmt(h.tool_calls) + ' tool calls';
+          // Requests sit behind as the lighter envelope; tool calls are the
+          // solid bar in front, so the gap between them is the protocol
+          // overhead and is readable at a glance.
+          if (rh) {
+            parts.push('<rect x="' + x.toFixed(2) + '" y="' + (H - rh) + '" width="' + bw.toFixed(2) +
+              '" height="' + rh + '" rx="1.5" fill="var(--accent)" opacity="' + (last ? 0.34 : 0.22) +
+              '"><title>' + tip + '</title></rect>');
+          }
+          if (th) {
+            var ix = x + (bw - inner) / 2;
+            parts.push('<rect x="' + ix.toFixed(2) + '" y="' + (H - th) + '" width="' + inner.toFixed(2) +
+              '" height="' + th + '" rx="1.5" fill="var(--accent)" opacity="' + (last ? 1 : 0.8) +
+              '"><title>' + tip + '</title></rect>');
+          }
         });
         svg.innerHTML = parts.join('');
-        var first = hourly[0].bucket;
-        document.getElementById('x-start').textContent = first.slice(11, 16) + ' UTC';
+        document.getElementById('x-start').textContent = hourly[0].bucket.slice(11, 16) + ' UTC';
       }
 
       function drawTools(byTool) {
@@ -248,8 +291,12 @@
           .then(function (r) { return r.json(); })
           .then(function (d) {
             rollTo(d.totals.tool_calls);
+            document.getElementById('odo-req').textContent = fmt(d.totals.requests);
+            // Say when counting started. The MCP endpoint has served traffic
+            // far longer than this rollup has existed, so an unqualified
+            // all-time figure would understate history rather than flatter it.
             document.getElementById('odo-since').textContent =
-              'all-time · ' + fmt(d.totals.requests) + ' machine requests served';
+              'counting since ' + (d.counting_since || '—') + ' · updated every 10s';
             document.getElementById('s-24h').textContent = fmt(d.window.tool_calls);
             document.getElementById('s-tools').textContent = fmt(Object.keys(d.window.by_tool || {}).length);
             document.getElementById('s-req').textContent = fmt(d.window.requests);

@@ -74,7 +74,13 @@
     .back { font-family:var(--font-mono); font-size:12px; color:var(--muted); margin-left:auto; }
     .back:hover { color:var(--text); }
 
-    .hero { padding:24px 0; border-bottom:1px solid var(--border); }
+    /* position:relative anchors the absolutely-positioned .live-pill to the
+       hero's top-right; padding-right keeps it clear of a long agent name. */
+    .hero { padding:24px 0; border-bottom:1px solid var(--border); position:relative; }
+    /* Reserve room only in the band where the badge tucks INSIDE the hero.
+       Above 1139px it floats out in the right gutter, so the title gets the
+       full column width back. */
+    @media (min-width:641px) and (max-width:1139px) { .hero h1, .hero .desc { padding-right:200px; } }
     .safety-verdict { margin-top:16px; padding:12px 16px; border:1px solid var(--border); border-left:3px solid var(--accent); background:var(--surface); font-size:14px; line-height:1.65; color:var(--text); max-width:680px; }
     .safety-verdict a { color:var(--accent); }
     h1 { font-size:28px; font-weight:700; margin-bottom:4px; }
@@ -432,6 +438,14 @@
   <main class="page" id="main">
 
     <section class="hero">
+      {# Live machine-usage pill, filled in and kept ticking by site-status.js.
+         Sits top-right of the profile content (not the header) and stays
+         hidden until there is a real number to show. #}
+      <a class="live-pill" href="/live/" hidden title="How much AI agents are using the trust layer right now">
+        <span class="lp-head"><span class="lp-dot"></span>Live</span>
+        <span class="lp-num"></span>
+        <span class="lp-sub"></span>
+      </a>
       <h1>{{ row.name }}</h1>
       <div class="repo">
         {% if row.display_repo %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.display_repo }}</a>{% elif row.org_slug_or_none %}<a href="/org/{{ row.org_slug_or_none }}/">{{ row.repo.split('/')[0] }}</a>/<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo.split('/')[1] }}</a>{% else %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>{% endif %}

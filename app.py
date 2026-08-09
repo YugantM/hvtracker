@@ -1058,7 +1058,13 @@ def api_v1_usage(hours: int = 24):
     machine_usage itself so the page cannot inflate what it reports.
     """
     hours = max(1, min(int(hours or 24), 168))
-    return JSONResponse(usage.snapshot(hours), headers={
+    # Copy: snapshot() hands back its own cached dict, and this response is
+    # per-request. The header widget on every page reads freshness AND activity
+    # from this one small, edge-cached response — it previously pulled the
+    # multi-megabyte /data/latest.json just to read this string.
+    payload = dict(usage.snapshot(hours))
+    payload["data_updated"] = load_data().get("updated")
+    return JSONResponse(payload, headers={
         # Short edge TTL: enough to absorb many viewers polling at once while
         # still feeling live. Matches the client poll interval.
         "Cache-Control": "public, max-age=10, s-maxage=10",

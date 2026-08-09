@@ -27,3 +27,7 @@
       });
     })();
   </script>
+  <!-- Header status widget (freshness + live machine usage). Loaded here, in
+       the shared partial, because the header renders on every page but only
+       one of the 20 page templates was pulling this script in. -->
+  <script defer src="/static/site-status.js"></script>
