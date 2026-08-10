@@ -71,6 +71,40 @@ REVIEWED_REJECTED = {
         "2026-07-14 owner: rejected — editor for running many Claude Code/Codex "
         "instances; supervisory harness"
     ),
+    # 2026-08-10 sweep. The 2026-08-06 batch (635557e5) reviewed 269 candidates
+    # and recorded its ~228 declines only in the commit message, so this sweep
+    # re-proposed all of them. Recording decisions here is the mechanism that
+    # stops that; see docs/research/new-listing-candidates-2026-08-10.md.
+    "generalaction/emdash": (
+        "2026-08-10 rejected — desktop app running Claude Code/Codex/OpenCode "
+        "in git worktrees; the #180 supervisory-harness class"
+    ),
+    "firerpa/lamda": (
+        "2026-08-10 rejected — Android automation/reverse-engineering framework "
+        "(frida, mitmproxy, ADB); agent support is incidental, predates agents"
+    ),
+    "bhouston/mycoder": (
+        "2026-08-10 rejected — real coding agent with its own tool system, but "
+        "214 days since last push; fails the activity requirement"
+    ),
+    "nikmcfly/mirofish-offline": (
+        "2026-08-10 rejected — self-declared fork of 666ghj/MiroFish; the "
+        "upstream is the canonical candidate"
+    ),
+    "tastyeffectco/sandboxd": (
+        "2026-08-10 rejected — self-hosted AI app builder whose coding agent "
+        "does the work; the rubric excludes general UI app builders"
+    ),
+    # Adoption signals that do not survive inspection. Both would have entered
+    # the leaderboard on stars they did not earn.
+    "sv-number/mcp-server": (
+        "2026-08-10 rejected — 492 stars on a 3-day-old repo with 0 forks, 0 "
+        "watchers, 0 issues, 1 contributor and 71 KB of code; inorganic"
+    ),
+    "keon/browser-control": (
+        "2026-08-10 rejected — repo created 2016-12-21 with zero commits before "
+        "2025; the 3,127 stars belong to the repo's previous life, not this code"
+    ),
 }
 
 # Topics to query (one request each)
