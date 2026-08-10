@@ -604,8 +604,9 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   in-flight roster-batch posts (evidence-coverage-audit etc.) have no-slash
   canonicals and WILL fail that lint until slashed. Verified in local
   uvicorn preview end-to-end.
-- **SERP favicon + compare structured data 2026-08-10 (branch
-  `feat/serp-favicon-richsnippet`; NOT deployed):** owner reported Bing
+- **SERP favicon + compare structured data 2026-08-10 (#fbcac35e on
+  `feat/serp-favicon-richsnippet`; DEPLOYED ~16:10 UTC, deployment
+  fddfe6b8, verified live):** owner reported Bing
   showing a blank globe and a bare snippet for /compare/ results. Two real
   defects, both fixed. (1) FAVICON: no generated page declared an icon at all
   — only `template.html` did, so every `.j2`-rendered page (agents, compare,
@@ -638,3 +639,31 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   `msvalidate.01` in `template.html` is a commented-out placeholder, so there
   is no way to request a favicon refresh or read Bing-side diagnostics; a
   token from bing.com/webmasters would also speed re-crawl of the fix.
+  VERIFIED LIVE: `/favicon.ico` 200 `image/x-icon`, 0 redirects, bytes
+  identical to the committed file (was 301→SVG); apple-touch-icon likewise;
+  3 icon links on homepage/agent/methodology/blog/capabilities//data/;
+  compare pair serves BreadcrumbList + ItemList (Docling 88.6, Firecrawl
+  74.2), no aggregateRating; healthz 1204/1227 unchanged;
+  `board_invariant_violations: []`.
+  DEPLOY RUNBOOK GOTCHAS learned here: (1) `railway up <ABS_PATH>` outside
+  the cwd dies at "Indexing... prefix not found" — it uploads nothing, so
+  prod is untouched; deploy by `cd`ing INTO the dir. An unlinked worktree
+  works with explicit `--project <id> --environment production --service web`
+  (links are keyed by directory path in `~/.railway/config.json`). (2) The
+  Railway project is *named* `hvtracker-cron`; the web service is the `web`
+  service inside it — check `railway status` before assuming. (3) `--ci`
+  exits **1** on "Failed to stream build logs" even when the deploy is fine —
+  never read that exit code as failure; poll `railway status` until the
+  deployment ID changes and status leaves Building. (4) A local
+  `--render-only` will report a board-invariant violation ("mass churn")
+  that prod does NOT have: `agents.json` carries ZERO trust_scores (pure
+  roster; scores live on the volume), so a network-free render leaves ~770
+  agents unscored and every rank shifts. Check prod's own
+  `/data/build_report.json` rather than trusting the local one. (5)
+  `configured_agents` in build_report is the size of THAT render pass
+  (~201 = the stalest sixth), not the roster — `active_agents` /
+  `total_generated` are the roster numbers. (6) Deployed from a pinned
+  clean worktree because another session was concurrently editing
+  `agents.json`/`scorecard-cache.json` in the shared tree; the Dockerfile
+  COPYs `scorecard-cache.json` directly, so a dirty-tree `railway up`
+  would have baked someone else's WIP into the image.
