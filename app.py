@@ -25,6 +25,7 @@ from fastapi.staticfiles import StaticFiles
 
 import db
 import mcp_server
+import usage
 import verify_log
 
 # Load local secrets/config from a gitignored .env (OAuth client ids/secrets,
@@ -170,9 +171,11 @@ DATA_PATH = os.path.join(OUTPUT_DIR, "data.json")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 COMPARE_TOOL_PATH = os.path.join(BASE_DIR, "compare", "index.html")
 VERIFY_TOOL_PATH = os.path.join(BASE_DIR, "verify", "index.html")
+LIVE_PAGE_PATH = os.path.join(BASE_DIR, "live", "index.html")
 SCAN_TOOL_PATH = os.path.join(BASE_DIR, "scan", "index.html")
 RENDER_FINGERPRINT_PATH = os.path.join(OUTPUT_DIR, ".render_fingerprint")
 verify_log.init(OUTPUT_DIR)  # public "recently checked" feed (transparency)
+usage.init(OUTPUT_DIR)  # machine-channel usage rollup behind /live/
 REFRESH_STATUS_PATH = os.path.join(OUTPUT_DIR, ".refresh_status.json")
 MAX_DATA_AGE = timedelta(hours=int(os.environ.get("MAX_DATA_AGE_HOURS", "6")))
 # OSSF scores are baked into the image from the `data` branch at build time
@@ -385,15 +388,46 @@ def _count_badge(slug: str) -> None:
     _badge_counters[slug] = _badge_counters.get(slug, 0) + 1
 
 
+# The /live/ page polls /api/v1/usage, and the badge/status widgets poll their
+# own endpoints. Counting those would let our own site inflate the "machine
+# consumer" numbers it is reporting — the same self-counting mistake the
+# verify feed made. Excluded from machine_usage by path.
+_USAGE_EXCLUDED_PATHS = frozenset({"/api/v1/usage"})
+
+# Daily snapshots are the registry's irreplaceable asset: one 4MB file per day
+# holding every row with all 62 fields, including trust_breakdown and
+# scorecard_checks — the scoring internals, not just the published scores. They
+# were never deliberately published; the catch-all StaticFiles mount over
+# OUTPUT_DIR simply exposed them, and the date-based filenames make the whole
+# corpus enumerable with a loop. The site itself reads these from DISK, never
+# over HTTP, so refusing them here costs nothing.
+#
+# The curated public history surface stays open and unaffected:
+# GET /api/v1/agents/<slug>/history (90-day window, whitelisted fields).
+_PRIVATE_SNAPSHOT_PREFIXES = ("/output/history/", "/output/history")
+
+
+def _is_private_snapshot_path(path: str) -> bool:
+    """True for raw daily-snapshot paths, which must not be served publicly."""
+    return path.startswith(_PRIVATE_SNAPSHOT_PREFIXES[0]) or path == _PRIVATE_SNAPSHOT_PREFIXES[1]
+
+
 def _count_machine_usage(path: str) -> None:
+    if path in _USAGE_EXCLUDED_PATHS:
+        return
+    channel = None
     if path.startswith("/api/v1/"):
-        _usage_counters["api_v1"] += 1
+        channel = "api_v1"
     elif path == "/mcp" or path.startswith("/mcp/"):
-        _usage_counters["mcp"] += 1
+        channel = "mcp"
     elif path.startswith("/data/exports/"):
-        _usage_counters["exports"] += 1
+        channel = "exports"
     elif path.startswith("/data/") and path.endswith(".json"):
-        _usage_counters["data_json"] += 1
+        channel = "data_json"
+    if channel is None:
+        return
+    _usage_counters[channel] += 1
+    usage.bump(channel)  # durable rollup behind /live/
 
 
 @app.middleware("http")
@@ -408,6 +442,9 @@ async def _cache_headers(request, call_next):
         retired = _retired_response(path)
         if retired is not None:
             return retired
+        if _is_private_snapshot_path(path):
+            # 404, not 403: don't confirm that a given date's snapshot exists.
+            return Response("Not Found", status_code=404, media_type="text/plain")
 
     if path == "/mcp" and request.method == "POST":
         if not _mcp_enabled():
@@ -1032,6 +1069,29 @@ def api_v1_verify_recent():
     })
 
 
+@app.get("/api/v1/usage")
+def api_v1_usage(hours: int = 24):
+    """Public machine-channel usage: how much the trust layer is actually used.
+
+    Powers /live/. Counts only channel/tool names and the hour they happened
+    in — no IPs, arguments, or anything user-identifying. Excluded from
+    machine_usage itself so the page cannot inflate what it reports.
+    """
+    hours = max(1, min(int(hours or 24), 168))
+    # Copy: snapshot() hands back its own cached dict, and this response is
+    # per-request. The header widget on every page reads freshness AND activity
+    # from this one small, edge-cached response — it previously pulled the
+    # multi-megabyte /data/latest.json just to read this string.
+    payload = dict(usage.snapshot(hours))
+    payload["data_updated"] = load_data().get("updated")
+    return JSONResponse(payload, headers={
+        # Short edge TTL: enough to absorb many viewers polling at once while
+        # still feeling live. Matches the client poll interval.
+        "Cache-Control": "public, max-age=10, s-maxage=10",
+        "Access-Control-Allow-Origin": _API_V1_CORS,
+    })
+
+
 @app.post("/api/v1/scan")
 async def api_v1_scan(request: Request):
     """Bulk pre-connect trust check for a whole dependency set.
@@ -1145,6 +1205,18 @@ def verify_tool():
     if not os.path.isfile(VERIFY_TOOL_PATH):
         return HTMLResponse("<p>Verify tool is not available yet.</p>", status_code=503)
     with open(VERIFY_TOOL_PATH, encoding="utf-8") as f:
+        return HTMLResponse(f.read())
+
+
+@app.api_route("/live", methods=["GET", "HEAD"], response_class=HTMLResponse)
+@app.api_route("/live/", methods=["GET", "HEAD"], response_class=HTMLResponse)
+def live_usage_page():
+    """Public machine-channel usage. Hand-written source shipped in the image
+    (like /verify/), so it reads from BASE_DIR — the numbers themselves are
+    fetched client-side from /api/v1/usage."""
+    if not os.path.isfile(LIVE_PAGE_PATH):
+        return HTMLResponse("<p>Live usage page is not available yet.</p>", status_code=503)
+    with open(LIVE_PAGE_PATH, encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 
@@ -2365,7 +2437,12 @@ def _has_pending_signal_rows() -> bool:
 def _refresh_verify_feed():
     """Daily: re-verify the provisional (open-lookup) repos in the public feed
     so their verdicts stay fresh. Curated repos are refreshed by the main cron;
-    only the open-lookup ones need this. Gentle on the GitHub budget."""
+    only the open-lookup ones need this. Gentle on the GitHub budget.
+
+    Uses verify_log.refresh, NOT .record: this is our own revalidation, so it
+    must not count as a check or restamp `checked_at`. Recording it as a check
+    pinned the same provisional repos to the top of the public feed every night
+    with identical timestamps and inflated their `checks` counters."""
     if not db.enabled():
         return
     import open_lookup
@@ -2375,8 +2452,11 @@ def _refresh_verify_feed():
         try:
             v = open_lookup.evaluate_open(repo, repo, token)
             if v.get("eligibility") == "ok":
-                verify_log.record(v.get("resolved") or repo, None, v.get("grade"),
-                                  v.get("trusted"), True, v.get("stars"))
+                # Key on the row we selected, not v["resolved"]: a transferred
+                # repo resolves to its new name, and updating that instead
+                # would no-op and leave this row permanently stalest-first.
+                verify_log.refresh(repo, None, v.get("grade"),
+                                   v.get("trusted"), v.get("stars"))
                 refreshed += 1
         except Exception:
             pass
@@ -2445,7 +2525,12 @@ def _startup():
         # commit counts for its rows anyway; repair runs on the next boot.
         threading.Thread(target=_refresh_and_record, args=("pending", fingerprint, "startup"), daemon=True).start()
         print("[startup] detected provisional rows — kicked off pending refresh")
-    elif _has_missing_commit_rows():
+    elif os.environ.get("DISABLE_SCHEDULER") != "1" and _has_missing_commit_rows():
+        # Same DISABLE_SCHEDULER guard as the pending branch above. Without it
+        # pytest on a roster-add branch spawned a real, un-tokened fetch
+        # subprocess that outlived the suite in 403-retry loops (and raced
+        # pytest's own summary line out of the log). No production effect:
+        # DISABLE_SCHEDULER is set only by the tests and docker-compose.
         threading.Thread(target=_refresh_and_record, args=("repair-commits", fingerprint, "startup"), daemon=True).start()
         print("[startup] detected rows with missing commit counts — kicked off targeted repair refresh")
     elif seeded > 0 or stored_fingerprint != fingerprint or agents_changed:
@@ -2488,6 +2573,17 @@ def _startup():
                 max_instances=1,
                 coalesce=True,
             )
+            # Persist the in-memory machine-usage rollup. Runs regardless of
+            # db.enabled() — usage.flush falls back to the volume JSON — and is
+            # cheap: one upsert per (hour, channel) touched since the last run.
+            _scheduler.add_job(
+                usage.flush,
+                "cron",
+                minute="*",
+                id="usage-flush",
+                max_instances=1,
+                coalesce=True,
+            )
             if db.enabled():
                 _scheduler.add_job(
                     _refresh_verify_feed,
@@ -2506,6 +2602,7 @@ def _shutdown():
     if _scheduler is not None:
         _scheduler.shutdown(wait=False)
         _scheduler = None
+    usage.flush()  # don't lose the last minute of counts on redeploy
 
 
 def startup():

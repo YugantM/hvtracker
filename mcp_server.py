@@ -18,6 +18,7 @@ from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 
 import mcp_trust
+import usage
 
 SERVER_DISPLAY_NAME = "HVTracker MCP"
 SERVER_VERSION = "0.3.0"
@@ -687,6 +688,16 @@ def check_agent_trust(name_or_repo: str) -> CheckAgentTrustResult:
     URL, or an npm/PyPI package name. Returns the trust score (0-100), evidence
     grade (A-F), rank, provenance and OpenSSF Scorecard signals, and the profile
     URL. Returns tracked=false when the project is not in the registry."""
+    usage.record_tool_call("check_agent_trust")
+    return _check_agent_trust(name_or_repo)
+
+
+def _check_agent_trust(name_or_repo: str) -> CheckAgentTrustResult:
+    """check_agent_trust without the usage count, for internal callers.
+
+    compare_agents runs this twice; counting those would report one client
+    question as three tool calls on /live/.
+    """
     a = _resolve_agent(name_or_repo)
     if not a:
         return {
@@ -710,6 +721,7 @@ def verify_mcp_server(server: str) -> VerifyMcpServerResult:
     server's URL, npm/PyPI package, or GitHub owner/repo. Returns whether it
     resolves to a tracked, trusted project, with grade, score, and reasons. An
     unknown server returns trusted=false (no evidence) — not a guarantee of harm."""
+    usage.record_tool_call("verify_mcp_server")
     return mcp_trust.evaluate(_resolve_agent(server), server)
 
 
@@ -723,8 +735,9 @@ def compare_agents(a: str, b: str) -> CompareAgentsResult:
     identifiers as check_agent_trust for each side. Returns both trust
     profiles, an evidence-based one-line verdict, and the HVTracker compare
     page URL when one is published."""
-    ra = check_agent_trust(a)
-    rb = check_agent_trust(b)
+    usage.record_tool_call("compare_agents")
+    ra = _check_agent_trust(a)
+    rb = _check_agent_trust(b)
     if not ra["tracked"] or not rb["tracked"]:
         missing = [q for q, r in ((a, ra), (b, rb)) if not r["tracked"]]
         verdict = (f"No verdict: {', '.join(missing)} not in the registry — "
@@ -765,6 +778,7 @@ def search_agents(query: str = "", category: str = "", limit: int = 10) -> Searc
     """Search tracked AI agents and frameworks by name, repo, or description, with
     an optional category filter. Returns matches ranked by trust score (name,
     repo, trust_score, grade, category, profile URL)."""
+    usage.record_tool_call("search_agents")
     from app import load_data
     ql, cl = (query or "").lower(), (category or "").lower()
     out = []
@@ -798,6 +812,7 @@ def scan_stack(input: str) -> ScanStackResult:
     each identifier is resolved against the curated registry and returned with a
     verdict (tracked/trusted/grade/score) plus a stack summary. Registry-only and
     in-memory — the same engine as verify_mcp_server, run over many items at once."""
+    usage.record_tool_call("scan_stack")
     from app import _parse_scan_input, _resolve_registry_agent
     text = input or ""
     if len(text) > 20000:
@@ -839,6 +854,7 @@ def list_categories() -> ListCategoriesResult:
     """List HVTracker's categories with the number of tracked agents in each,
     most-populated first. Use this to discover the taxonomy, then call
     get_leaderboard(category=...) to pull a category's top agents."""
+    usage.record_tool_call("list_categories")
     from app import load_data
     counts: dict[str, int] = {}
     for a in load_data().get("agents", []):
@@ -863,6 +879,7 @@ def get_leaderboard(category: str = "", limit: int = 10) -> GetLeaderboardResult
     (exact name from list_categories) to scope it, or leave blank for the overall
     board. Returns name, repo, score, grade, category, and profile URL in rank
     order."""
+    usage.record_tool_call("get_leaderboard")
     from app import load_data
     cl = (category or "").lower()
     out: list[AgentSearchResult] = []
@@ -947,6 +964,7 @@ def get_agent_history(name_or_repo: str) -> GetAgentHistoryResult:
     (oldest first) with trust_score, grade, coverage_grade, and rank, so you can
     tell whether trust is rising or falling. Accepts the same identifiers as
     check_agent_trust. Extended history is reserved for a future tier."""
+    usage.record_tool_call("get_agent_history")
     from app import _HISTORY_PUBLIC_DAYS
     agent = _resolve_agent(name_or_repo)
     if agent is None:

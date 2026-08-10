@@ -168,18 +168,45 @@ def list_queue(table: str, status: str = "pending") -> list[dict]:
 
 def record_verify_check(repo: str, name: str | None, grade: str | None,
                         trusted: bool, provisional: bool, stars: int | None) -> None:
-    """Upsert a public verify check (one row per repo, newest wins, count++)."""
+    """Record a CLIENT-initiated verify check (one row per repo, count++).
+
+    Only real requests reach here, so this is the only writer allowed to move
+    `checked_at` or bump `checks`. `name` is coalesced because the open-lookup
+    path has no display name and must not blank one a curated check supplied.
+    """
     if not enabled():
         return
     with _connect() as conn, conn.cursor() as cur:
         cur.execute(
-            "INSERT INTO verify_checks (repo, name, grade, trusted, provisional, stars) "
-            "VALUES (%s, %s, %s, %s, %s, %s) "
+            "INSERT INTO verify_checks (repo, name, grade, trusted, provisional, stars, refreshed_at) "
+            "VALUES (%s, %s, %s, %s, %s, %s, now()) "
             "ON CONFLICT (repo) DO UPDATE SET "
-            "name = EXCLUDED.name, grade = EXCLUDED.grade, trusted = EXCLUDED.trusted, "
+            "name = COALESCE(EXCLUDED.name, verify_checks.name), "
+            "grade = EXCLUDED.grade, trusted = EXCLUDED.trusted, "
             "provisional = EXCLUDED.provisional, stars = EXCLUDED.stars, "
-            "checks = verify_checks.checks + 1, checked_at = now()",
+            "checks = verify_checks.checks + 1, checked_at = now(), refreshed_at = now()",
             (repo, name, grade, trusted, provisional, stars),
+        )
+        conn.commit()
+
+
+def refresh_verify_check(repo: str, name: str | None, grade: str | None,
+                         trusted: bool, stars: int | None) -> None:
+    """Re-evaluate our own data for a repo already in the feed (nightly job).
+
+    Deliberately does NOT touch `checked_at` or `checks` — nobody asked about
+    this repo, we just revalidated it — and never inserts, so the job can only
+    update repos a real client already put in the feed. `provisional` is left
+    alone so a row that has since become curated is not pushed back.
+    """
+    if not enabled():
+        return
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE verify_checks SET "
+            "name = COALESCE(%s, name), grade = %s, trusted = %s, stars = %s, "
+            "refreshed_at = now() WHERE repo = %s",
+            (name, grade, trusted, stars, repo),
         )
         conn.commit()
 
@@ -191,22 +218,86 @@ def recent_verify_checks(limit: int = 100) -> list[dict] | None:
     with _connect() as conn, conn.cursor() as cur:
         cur.execute(
             "SELECT repo, name, grade, trusted, provisional, stars, checks, "
-            "to_char(checked_at, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') "
+            "to_char(checked_at, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'), "
+            "to_char(refreshed_at, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') "
             "FROM verify_checks ORDER BY checked_at DESC LIMIT %s",
             (limit,),
         )
-        cols = ["repo", "name", "grade", "trusted", "provisional", "stars", "checks", "checked_at"]
+        cols = ["repo", "name", "grade", "trusted", "provisional", "stars", "checks",
+                "checked_at", "refreshed_at"]
         return [dict(zip(cols, row)) for row in cur.fetchall()]
 
 
 def verify_check_targets(limit: int = 200) -> list[str]:
-    """Repos in the public feed, for the daily refresh job (oldest-checked first)."""
+    """Repos in the public feed, for the daily refresh job (stalest data first).
+
+    Ordered by when we last REFRESHED (not when a client last asked), so the
+    job walks its own backlog; rows never refreshed sort first via COALESCE.
+    """
     if not enabled():
         return []
     with _connect() as conn, conn.cursor() as cur:
         cur.execute("SELECT repo FROM verify_checks WHERE provisional = true "
-                    "ORDER BY checked_at ASC LIMIT %s", (limit,))
+                    "ORDER BY COALESCE(refreshed_at, checked_at) ASC LIMIT %s", (limit,))
         return [row[0] for row in cur.fetchall()]
+
+
+# ---- machine-usage rollup (usage.py, /live/) -------------------------------
+
+def add_usage_counts(rows: list[tuple[str, str, int]]) -> None:
+    """Add (hour-bucket, channel, count) deltas to the rollup.
+
+    Additive upsert, so a flush that is retried after a partial failure can
+    only over-count by what it actually re-sends, and concurrent web replicas
+    accumulate into the same bucket instead of clobbering each other.
+    """
+    if not enabled() or not rows:
+        return
+    with _connect() as conn, conn.cursor() as cur:
+        cur.executemany(
+            "INSERT INTO usage_hourly (bucket, channel, count) VALUES (%s, %s, %s) "
+            "ON CONFLICT (bucket, channel) DO UPDATE SET "
+            "count = usage_hourly.count + EXCLUDED.count",
+            rows,
+        )
+        conn.commit()
+
+
+def usage_totals() -> dict[str, int] | None:
+    """All-time counts per channel. None when the DB is disabled."""
+    if not enabled():
+        return None
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute("SELECT channel, SUM(count) FROM usage_hourly GROUP BY channel")
+        return {row[0]: int(row[1] or 0) for row in cur.fetchall()}
+
+
+def usage_oldest_bucket() -> str | None:
+    """Timestamp of the earliest rollup bucket, for the "counting since" line."""
+    if not enabled():
+        return None
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute("SELECT to_char(MIN(bucket), 'YYYY-MM-DD\"T\"HH24:00:00\"Z\"') "
+                    "FROM usage_hourly")
+        row = cur.fetchone()
+        return row[0] if row else None
+
+
+def usage_series(hours: int = 24) -> list[dict] | None:
+    """Per-hour counts for the last `hours`, oldest first. None when disabled."""
+    if not enabled():
+        return None
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT to_char(bucket, 'YYYY-MM-DD\"T\"HH24:00:00\"Z\"'), channel, count "
+            "FROM usage_hourly WHERE bucket >= date_trunc('hour', now()) "
+            "- make_interval(hours => %s) ORDER BY bucket ASC",
+            (max(0, int(hours) - 1),),
+        )
+        out: dict[str, dict[str, int]] = {}
+        for bucket, channel, count in cur.fetchall():
+            out.setdefault(bucket, {})[channel] = int(count or 0)
+        return [{"bucket": b, "counts": c} for b, c in sorted(out.items())]
 
 
 # ---- accounts / watchlist (auth.py) ---------------------------------------

@@ -533,6 +533,11 @@ def test_startup_keeps_scheduler_alive(monkeypatch):
     monkeypatch.setattr(app.db, "init_schema", lambda: None)
     monkeypatch.setattr(app.db, "enabled", lambda: False)
     monkeypatch.setattr(app, "_has_missing_commit_rows", lambda: False)
+    # Stub the sibling predicate too. This test asserts which scheduler jobs
+    # get registered; it deletes DISABLE_SCHEDULER and does NOT fake the
+    # thread, so leaving this reading the real data.json meant any roster with
+    # provisional rows kicked a real fetch subprocess that outlived the suite.
+    monkeypatch.setattr(app, "_has_pending_signal_rows", lambda: False)
     monkeypatch.setattr(app.os.path, "isfile", lambda path: True)
 
     app._scheduler = None
@@ -759,3 +764,82 @@ def test_compare_pair_carries_pair_structured_data(client):
         assert 0 <= rating["ratingValue"] <= 100
     # Policy: editorial review only — aggregateRating needs real user ratings.
     assert "aggregateRating" not in html
+# ---- /api/v1/usage + /live/ (machine-channel transparency) -----------------
+
+def test_api_v1_usage_shape_and_self_exclusion(client):
+    """The usage endpoint reports the machine channels without counting itself.
+
+    The /live/ page polls this endpoint; if it were counted as api_v1 traffic
+    the page would inflate the very number it reports.
+    """
+    import usage
+    usage._snapshot_cache = None
+    before = usage.snapshot()["totals"]["by_channel"]["api_v1"]
+
+    for _ in range(3):
+        r = client.get("/api/v1/usage")
+        assert r.status_code == 200
+
+    body = r.json()
+    assert set(body) >= {"totals", "window", "recent_calls", "generated_at", "note"}
+    assert set(body["totals"]) >= {"tool_calls", "requests", "by_channel", "by_tool"}
+    assert set(body["window"]) >= {"tool_calls", "requests", "by_tool", "hourly"}
+    assert isinstance(body["window"]["hourly"], list)
+
+    usage._snapshot_cache = None
+    after = usage.snapshot()["totals"]["by_channel"]["api_v1"]
+    assert after == before, "/api/v1/usage must not count itself as machine usage"
+
+
+def test_api_v1_usage_counts_other_api_traffic(client):
+    """Sanity check the exclusion is path-scoped, not a disabled counter."""
+    import usage
+    usage._snapshot_cache = None
+    before = usage.snapshot()["totals"]["by_channel"]["api_v1"]
+    client.get("/api/v1/agents")
+    usage._snapshot_cache = None
+    assert usage.snapshot()["totals"]["by_channel"]["api_v1"] > before
+
+
+def test_live_page_is_served(client):
+    r = client.get("/live/")
+    assert r.status_code == 200
+    assert "/api/v1/usage" in r.text
+    # Structure, not prose — the headline wording has changed twice already.
+    # Both figures must be present: the headline count and the tool-call
+    # breakdown beneath it, so one can never silently replace the other.
+    assert 'id="odo-req"' in r.text        # headline: machine requests
+    assert 'id="odo"' in r.text            # secondary: answered tool calls
+    assert "machine requests" in r.text and "tool calls" in r.text
+
+
+def test_usage_endpoint_carries_site_freshness_for_the_header(client):
+    """The header widget reads freshness + activity from this one response.
+
+    It used to fetch /data/latest.json (multi-megabyte) for the timestamp.
+    """
+    body = client.get("/api/v1/usage").json()
+    assert "data_updated" in body
+    import usage
+    usage._snapshot_cache = None
+    assert "data_updated" not in usage.snapshot(), "must not leak into the cached snapshot"
+
+
+def test_raw_daily_snapshots_are_not_publicly_served(client):
+    """Daily snapshots hold every row with the full scoring internals and are
+    enumerable by date, so the raw files must never be reachable over HTTP.
+
+    The site reads them from disk; only the curated 90-day history API is public.
+    """
+    for path in (
+        "/output/history/2026-08-08.json",
+        "/output/history/2026-06-01.json",
+        "/output/history/",
+        "/output/history",
+    ):
+        assert client.get(path).status_code == 404, path
+
+    # The deliberate, documented public surface must still work.
+    repo = client.get("/api/agents", params={"limit": 1}).json()["agents"][0]
+    r = client.get(f"/api/v1/agents/{repo['slug']}/history")
+    assert r.status_code == 200

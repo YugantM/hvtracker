@@ -127,6 +127,10 @@
     .tool-chip span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
     .tool-chip code { font-family: var(--font-mono); font-size: 11px; }
     .tool-chip:hover { border-color: var(--accent); text-decoration: none; }
+    .home-live { display: flex; align-items: center; gap: 9px; margin-top: 10px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--muted); font-size: 12.5px; text-decoration: none; }
+    .home-live:hover { border-color: var(--accent); text-decoration: none; }
+    .home-live strong { color: var(--text); font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    .home-live-go { margin-left: auto; color: var(--accent); white-space: nowrap; }
     .home-verify-cta { border-left: 3px solid var(--accent); }
     .home-mcp-cta { border-left: 3px solid var(--green); }
 
@@ -241,6 +245,8 @@
     .cat-tab.special { color: var(--amber); margin: 0 4px 0 8px; }
     .cat-tab.special.active { color: var(--amber); border-bottom-color: var(--amber); }
     .cat-tab-badge { font-family: var(--font-mono); font-size: 11px; margin-left: 4px; color: inherit; }
+    .cat-tab-count { font-family: var(--font-mono); font-size: 11px; margin-left: 5px; color: var(--muted-2); }
+    .cat-tab.active .cat-tab-count { color: inherit; }
 
     .table-wrap { overflow-x: auto; border-top: 2px solid var(--text); }
 
@@ -566,6 +572,11 @@
           <span>MCP server at <code>hvtracker.net/mcp</code> — no auth, no install.</span>
         </a>
       </div>
+      <a class="home-live" id="home-live" href="/live/" hidden>
+        <span class="live-dot"></span>
+        <span><strong id="home-live-n">—</strong><span id="home-live-label"> trust checks answered for AI agents in the last 24h</span></span>
+        <span class="home-live-go">see it live &rarr;</span>
+      </a>
       <div class="stats-bar" role="group" aria-label="Registry snapshot">
         <div class="stat-cell">
           <div class="stat-val accent">{{ registry_summary.active_count }}</div>
@@ -704,8 +715,11 @@
 
     <div class="cat-tabs" id="catTabs" role="group" aria-label="Category presets">
       <button class="cat-tab active" data-tab="__all__" aria-pressed="true">Global</button>
-      {% for cat in categories[:5] %}
-      <button class="cat-tab" data-tab="{{ cat.name }}" aria-pressed="false">{{ cat.name }}</button>
+      {# Tabs are the LARGEST categories, biggest first — so the tab bar tracks
+         what the registry actually holds instead of a hand-fixed order. MCP
+         Servers is 59% of the roster and lands immediately after Global. #}
+      {% for cat in (categories|sort(attribute='count', reverse=true))[:5] %}
+      <button class="cat-tab" data-tab="{{ cat.name }}" aria-pressed="false">{{ cat.name }} <span class="cat-tab-count">{{ cat.count }}</span></button>
       {% endfor %}
       {% if newly_added %}
       <button class="cat-tab special" data-tab="__new__" aria-pressed="false">Newly added <span class="cat-tab-badge">{{ newly_added|length }}</span></button>
@@ -1563,6 +1577,24 @@
       updateCompareButtons();
       document.addEventListener("DOMContentLoaded", updateCompareButtons);  // re-run after auth.js (deferred) defines hvtCompare
       renderPage();
+
+      // Live proof that the machine channel is in use. Stays hidden until
+      // there is a real number to show, so a cold start shows nothing rather
+      // than a zero.
+      fetch("/api/v1/usage")
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          var w = (d && d.window) || {};
+          // Fall back to raw machine requests so the strip shows real traffic
+          // before the day's first tool call; hidden only if both are zero.
+          var n = w.tool_calls || 0, label = " trust checks answered for AI agents in the last 24h";
+          if (!n) { n = w.requests || 0; label = " machine requests served in the last 24h"; }
+          if (!n) return;
+          document.getElementById("home-live-n").textContent = Number(n).toLocaleString();
+          document.getElementById("home-live-label").textContent = label;
+          document.getElementById("home-live").hidden = false;
+        })
+        .catch(function () {});
 
       // ⌘K / Ctrl+K → focus search
       document.addEventListener("keydown", function(e) {

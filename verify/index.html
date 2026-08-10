@@ -32,7 +32,12 @@
     .verify-eg a { color: var(--accent); cursor: pointer; }
     .verify-note { max-width: 760px; margin: 14px auto 0; color: var(--muted); font-size: 12px; border-top: 1px dashed var(--line); padding-top: 12px; }
     .verify-note a { color: var(--accent); }
+    .live-strip { max-width: 760px; margin: 16px auto 0; display: flex; align-items: center; gap: 9px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 13px; color: var(--muted); text-decoration: none; }
+    .live-strip:hover { border-color: var(--line-strong); }
+    .live-strip strong { color: var(--text); font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    .live-strip .go { margin-left: auto; color: var(--accent); white-space: nowrap; }
     .recent { max-width: 760px; margin: 38px auto 0; }
+    .recent-row .r-fresh { color: var(--muted); font: 11px var(--font-mono); }
     .recent-title { font-size: 15px; color: var(--text); margin-bottom: 12px; display: flex; align-items: baseline; gap: 8px; }
     .recent-title span { color: var(--muted); font: 12px var(--font-mono); font-weight: 400; }
     .recent-list { display: grid; gap: 6px; }
@@ -96,6 +101,12 @@
       <div class="result" id="result" hidden></div>
       <p class="verify-note">🔓 Checks are <strong>public</strong> — every successful check appears in the live feed below. Checking a whole project? <a href="/scan/">Scan your stack</a> for every dependency at once. Want it continuously tracked? <a href="/submit/">Submit it</a>. Private checks will require a paid plan.</p>
     </div>
+
+    <a class="live-strip" id="live-strip" href="/live/" hidden>
+      <span class="live-dot"></span>
+      <span><strong id="live-strip-n">—</strong><span id="live-strip-label"> trust checks answered for AI agents in the last 24h</span></span>
+      <span class="go">see it live →</span>
+    </a>
 
     <section class="recent" id="recent">
       <h2 class="recent-title">Recently checked <span>· last 100 · public</span></h2>
@@ -191,15 +202,38 @@
         el.innerHTML = items.map(function (c) {
           var g = c.grade ? '<span class="badge grade-' + esc(c.grade) + '">' + esc(c.grade) + '</span>' : '';
           var tag = c.provisional ? 'provisional' : 'verified';
+          // checked_at = when someone asked. refreshed_at = when we last
+          // re-ran our own evidence for it; shown separately so a nightly
+          // revalidation never masquerades as a fresh check.
+          var fresh = '';
+          if (c.refreshed_at && c.refreshed_at !== c.checked_at) {
+            fresh = '<span class="r-fresh">revalidated ' + esc(timeAgo(c.refreshed_at)) + '</span>';
+          }
           return '<div class="recent-row">' + g +
             '<a class="r-repo" href="https://github.com/' + esc(c.repo) + '" target="_blank" rel="noopener nofollow">' + esc(c.repo) + '</a>' +
-            '<span class="r-tag">' + tag + '</span>' +
-            '<span class="r-when">' + esc(timeAgo(c.checked_at)) + '</span></div>';
+            '<span class="r-tag">' + tag + '</span>' + fresh +
+            '<span class="r-when">checked ' + esc(timeAgo(c.checked_at)) + '</span></div>';
         }).join('');
       }
       function loadRecent() {
         fetch('/api/v1/verify/recent').then(function (r) { return r.json(); })
           .then(function (d) { renderRecent(d.checks || []); })
+          .catch(function () {});
+      }
+      function loadLiveStrip() {
+        fetch('/api/v1/usage').then(function (r) { return r.json(); })
+          .then(function (d) {
+            var w = (d && d.window) || {};
+            // Prefer answered tool calls; fall back to raw machine requests so
+            // the strip still shows real traffic before the first tool call of
+            // the day lands. Hidden only when both are genuinely zero.
+            var n = w.tool_calls || 0, label = ' trust checks answered for AI agents in the last 24h';
+            if (!n) { n = w.requests || 0; label = ' machine requests served in the last 24h'; }
+            if (!n) return;
+            document.getElementById('live-strip-n').textContent = Number(n).toLocaleString();
+            document.getElementById('live-strip-label').textContent = label;
+            document.getElementById('live-strip').hidden = false;
+          })
           .catch(function () {});
       }
 
@@ -208,6 +242,7 @@
         a.addEventListener('click', function () { input.value = a.getAttribute('data-eg'); run(input.value); });
       });
       loadRecent();
+      loadLiveStrip();
     })();
   </script>
 </body>
