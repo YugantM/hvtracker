@@ -1173,13 +1173,21 @@ def favicon_svg():
     return FileResponse(os.path.join(BASE_DIR, "favicon.svg"), media_type="image/svg+xml")
 
 
-# Browsers auto-request these regardless of <link> tags; point them at the SVG
-# so they stop 404ing.
+# Crawlers auto-request these regardless of <link> tags, and Bing's favicon
+# fetcher in particular wants a real file at the root /favicon.ico convention —
+# a 301 to a different format is a known way to end up with a blank globe in the
+# results. Raster sources come from scripts/generate_favicons.py.
 @app.get("/favicon.ico")
+def favicon_ico():
+    return FileResponse(os.path.join(BASE_DIR, "favicon.ico"), media_type="image/x-icon")
+
+
 @app.get("/apple-touch-icon.png")
 @app.get("/apple-touch-icon-precomposed.png")
-def favicon_compat():
-    return RedirectResponse("/favicon.svg", status_code=301)
+def apple_touch_icon():
+    return FileResponse(
+        os.path.join(BASE_DIR, "apple-touch-icon.png"), media_type="image/png"
+    )
 
 
 @app.get("/haystack-logo.png")
@@ -1329,7 +1337,9 @@ def _marketing_page(
   <meta name="twitter:description" content="{escape(description)}">
   <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
   <meta name="twitter:image:alt" content="HVTracker AI trust registry preview">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/static/site.css">
   <style>
     :root {{

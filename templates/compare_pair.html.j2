@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% include "_head_icons.html.j2" %}
   <meta name="google-site-verification" content="s2YUWbGP7cJsI6HUCKRX9YCtbVJVyA1Q1_jsNWj1RHc">
   <title>{{ a.name }} vs {{ b.name }}: AI agent trust comparison | HVTracker</title>
   <meta name="description" content="{{ a.name }} scores {{ a.trust_score }}/100 (Grade {{ a.evidence_grade }}), {{ b.name }} scores {{ b.trust_score }}/100 (Grade {{ b.evidence_grade }}). Compared on provenance, OSSF Scorecard, MCP support, maintenance, and downloads — public, checkable evidence, not hype.">
@@ -55,6 +56,51 @@
       { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
       { "@type": "ListItem", "position": 2, "name": "Compare", "item": "https://hvtracker.net/compare/" },
       { "@type": "ListItem", "position": 3, "name": "{{ a.name }} vs {{ b.name }}" }
+    ]
+  }
+  </script>
+  {#- The compared pair itself. Without this the page carried only breadcrumbs,
+      so the two projects and their scores existed for search engines as prose
+      only. Editorial Review authored by HVTracker, mirroring the agent pages —
+      deliberately no aggregateRating, which would require real user ratings.
+      Unordered: pairs render in both directions, so neither slot is "first". -#}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": {{ (a.name ~ " vs " ~ b.name ~ " — AI agent trust comparison") | tojson }},
+    "itemListOrder": "https://schema.org/ItemListUnordered",
+    "numberOfItems": 2,
+    "itemListElement": [
+      {%- for r in [a, b] %}
+      {
+        "@type": "ListItem",
+        "position": {{ loop.index }},
+        "item": {
+          "@type": "SoftwareApplication",
+          "name": {{ r.name | tojson }},
+          "applicationCategory": {{ r.category | tojson }},
+          "operatingSystem": "Cross-platform",
+          "url": {{ r.url | tojson }},
+          {% if r.description %}"description": {{ r.description | tojson }},{% endif %}
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+          {%- if r.trust_score is not none %},
+          "review": {
+            "@type": "Review",
+            "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net/" },
+            "url": "https://hvtracker.net/agents/{{ r.slug }}/",
+            "reviewBody": {{ ("Evidence-based trust review of " ~ r.name ~ ": HVTrust " ~ r.trust_score ~ "/100 (Grade " ~ r.evidence_grade ~ "), ranked #" ~ r.rank ~ " of " ~ total ~ " tracked open-source AI agent projects, from public supply-chain, transparency, maintenance, and adoption signals.") | tojson }},
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": {{ r.trust_score }},
+              "bestRating": 100,
+              "worstRating": 0
+            }
+          }
+          {%- endif %}
+        }
+      }{{ "," if not loop.last }}
+      {%- endfor %}
     ]
   }
   </script>

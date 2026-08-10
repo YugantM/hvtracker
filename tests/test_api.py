@@ -677,3 +677,85 @@ def test_blog_urls_carry_trailing_slash(client):
     feed = client.get("/feed.json").json()
     blog_urls = [i["url"] for i in feed["items"] if "/blog/" in i["url"]]
     assert blog_urls and all(u.endswith("/") for u in blog_urls)
+
+
+# TestClient talks to host "testserver", which the canonical-host middleware
+# 301s to hvtracker.net before any route runs. Most tests never notice because
+# they follow redirects straight back into the app; a test asserting "this path
+# does not redirect" has to present itself as the canonical origin first.
+_CANONICAL_HEADERS = {"host": "hvtracker.net", "x-forwarded-proto": "https"}
+
+
+def test_icon_routes_serve_real_files_not_redirects(client):
+    # These used to 301 to /favicon.svg. A redirect at the root /favicon.ico
+    # convention, landing on a different format, is the shape that leaves a
+    # blank globe next to the result in Bing.
+    ico = os.path.join(ROOT, "favicon.ico")
+    apple = os.path.join(ROOT, "apple-touch-icon.png")
+
+    r = client.get("/favicon.ico", follow_redirects=False, headers=_CANONICAL_HEADERS)
+    assert r.status_code == 200, f"must not redirect (got {r.status_code})"
+    assert r.headers["content-type"] == "image/x-icon"
+    with open(ico, "rb") as f:
+        assert r.content == f.read()
+
+    with open(apple, "rb") as f:
+        apple_bytes = f.read()
+    for path in ("/apple-touch-icon.png", "/apple-touch-icon-precomposed.png"):
+        r = client.get(path, follow_redirects=False, headers=_CANONICAL_HEADERS)
+        assert r.status_code == 200, f"{path} must not redirect (got {r.status_code})"
+        assert r.headers["content-type"] == "image/png"
+        assert r.content == apple_bytes
+
+    r = client.get("/favicon.svg", follow_redirects=False, headers=_CANONICAL_HEADERS)
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("image/svg+xml")
+
+
+def test_indexed_pages_declare_the_icon_set(client):
+    # The point of the change: the pages search engines actually index carry
+    # the declaration, not just the homepage.
+    links = ('<link rel="icon" href="/favicon.ico" sizes="32x32">',
+             '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
+             '<link rel="apple-touch-icon" href="/apple-touch-icon.png">')
+    output = os.environ["OUTPUT_DIR"]
+    pair = glob.glob(os.path.join(output, "compare", "*-vs-*", "index.html"))
+    agent = glob.glob(os.path.join(output, "agents", "*", "index.html"))
+    assert pair and agent, "expected rendered compare pairs and agent pages"
+
+    for path in (pair[0], agent[0], os.path.join(output, "index.html")):
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        for link in links:
+            assert link in text, f"{path} is missing {link}"
+
+
+def test_compare_pair_carries_pair_structured_data(client):
+    # Compare pages used to emit only BreadcrumbList, leaving the two compared
+    # projects and their scores as prose with nothing machine-readable.
+    import re
+    path = glob.glob(os.path.join(os.environ["OUTPUT_DIR"], "compare",
+                                  "*-vs-*", "index.html"))[0]
+    with open(path, encoding="utf-8") as f:
+        html = f.read()
+    blocks = [json.loads(m) for m in re.findall(
+        r'<script type="application/ld\+json">\s*(.*?)\s*</script>', html, re.S)]
+    by_type = {b["@type"]: b for b in blocks}
+    assert "BreadcrumbList" in by_type, "breadcrumbs must survive"
+
+    lst = by_type["ItemList"]
+    assert lst["numberOfItems"] == 2
+    items = [e["item"] for e in lst["itemListElement"]]
+    assert [e["position"] for e in lst["itemListElement"]] == [1, 2]
+    assert all(i["@type"] == "SoftwareApplication" for i in items)
+    # Names match the pair the page is actually about.
+    slug_a, slug_b = os.path.basename(os.path.dirname(path)).split("-vs-")
+    reviewed = [i["review"]["url"] for i in items if "review" in i]
+    assert f"https://hvtracker.net/agents/{slug_a}/" in reviewed
+    assert f"https://hvtracker.net/agents/{slug_b}/" in reviewed
+    for item in items:
+        rating = item["review"]["reviewRating"]
+        assert rating["bestRating"] == 100 and rating["worstRating"] == 0
+        assert 0 <= rating["ratingValue"] <= 100
+    # Policy: editorial review only — aggregateRating needs real user ratings.
+    assert "aggregateRating" not in html

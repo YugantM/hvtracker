@@ -604,3 +604,37 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   in-flight roster-batch posts (evidence-coverage-audit etc.) have no-slash
   canonicals and WILL fail that lint until slashed. Verified in local
   uvicorn preview end-to-end.
+- **SERP favicon + compare structured data 2026-08-10 (branch
+  `feat/serp-favicon-richsnippet`; NOT deployed):** owner reported Bing
+  showing a blank globe and a bare snippet for /compare/ results. Two real
+  defects, both fixed. (1) FAVICON: no generated page declared an icon at all
+  — only `template.html` did, so every `.j2`-rendered page (agents, compare,
+  categories, blog) left crawlers to the root `/favicon.ico` convention, which
+  `app.py` answered with a **301 to an SVG** (`/apple-touch-icon.png` likewise
+  served SVG bytes under a .png URL). Now: real rasters generated from the SVG
+  by `scripts/generate_favicons.py` (`favicon.ico` 16/32/48, `apple-touch-icon.png`
+  180×180 opaque — iOS composites transparency onto black), served as files not
+  redirects, declared via shared partial `templates/_head_icons.html.j2`
+  (.ico first, SVG second, both `rel="icon"` — Google honours only
+  icon/shortcut icon/apple-touch-icon, never `alternate icon`) included in 19
+  `.j2` templates + `template.html`, literal links in the 14 hand-written
+  `blog_static/` posts (copied verbatim, can't use the include) and the two
+  inline Python heads (`fetch_and_build.py` /data/, `app.py` `_marketing_page`).
+  **Dockerfile COPY updated** — it copies root assets by filename, so the new
+  files would 404 in prod otherwise. (2) COMPARE STRUCTURED DATA: pairs emitted
+  only `BreadcrumbList`; added an `ItemList` of both agents as
+  `SoftwareApplication` with editorial `Review`/`reviewRating` (author
+  Organization HVTracker), mirroring agent pages — **no aggregateRating**
+  (policy: needs real user ratings), `ItemListUnordered` because pairs render
+  in both directions. Uses `| tojson` so names/descriptions can't break the
+  block. **NO title or meta-description changes anywhere** (#114 churn lesson).
+  DELIBERATELY NOT TOUCHED: `prebuilt/` (~380 files) is checked-in generated
+  output and a cold-start volume seed only — regenerate it, never hand-edit;
+  `templates/submit.html` + `templates/correct.html` are dead (unreferenced);
+  the BreadcrumbList's raw `{{ a.name }}` interpolation is latent-fragile
+  against a name containing `"` (no current name has one — real names carry
+  only `&`, which is valid JSON) and rewriting it would re-hash those pages
+  for no live benefit. OWNER ITEM: Bing Webmaster Tools is still unverified —
+  `msvalidate.01` in `template.html` is a commented-out placeholder, so there
+  is no way to request a favicon refresh or read Bing-side diagnostics; a
+  token from bing.com/webmasters would also speed re-crawl of the fix.

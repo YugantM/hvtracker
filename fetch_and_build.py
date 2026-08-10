@@ -4689,6 +4689,9 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
   <meta name="description" content="Free, machine-readable trust data for {len(data_output["agents"])} open-source AI agents: JSON endpoints, per-agent history, quarterly CSV exports and an MCP server. CC BY 4.0, no key required.">
   <link rel="canonical" href="https://hvtracker.net/data/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
@@ -6947,7 +6950,7 @@ def main() -> None:
                  for lbl, k in (("Safety / integrity", "safety"), ("Identity & provenance", "identity"),
                                 ("Transparency", "transparency"), ("Maintenance", "maintenance"), ("Adoption", "adoption"))]
         _ctx = {"a": _a, "b": _b, "category": _cm, "metrics": _metrics, "dims": _dims,
-                "caps": compare_capability_rows(_a, _b),
+                "caps": compare_capability_rows(_a, _b), "total": len(rows),
                 "updated": now_str, "methodology_version": METHODOLOGY_VERSION,
                 "lead_name": None, "lead_score": None, "lead_grade": None, "trail_score": None, "trail_grade": None, "gap": None,
                 "coverage_caveat": None}
