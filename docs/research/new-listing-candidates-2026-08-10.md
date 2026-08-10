@@ -198,3 +198,56 @@ with its reason. The next sweep will not re-propose them.
    `scripts/mcp_registry_pull.py`; its `--since` delta mode pulled 4 days of
    registry growth in **16 seconds** versus ~33 minutes for a full pull, which
    makes the documented monthly re-pull cheap enough to run weekly.
+
+---
+
+## Wave 2 — 2026-08-10, the held-back candidates (21 rows, board 1,285 → 1,306)
+
+Owner call: add the remaining new agents. This clears everything wave 1 held
+back **as a legitimate candidate**, README-vetted and package-verified to the
+same standard.
+
+| Category | Rows | Notable |
+| --- | ---: | --- |
+| MCP Servers | 8 | Chrome MCP Server (12,280⭐), Obsidian Local REST API (2,775), DevDocs (2,098), webclaw (2,131) |
+| Protocols & Tool Integration | 7 | FastAPI-MCP (11,977⭐), NitroStack (2,528), Jarvis Registry (2,881), MCP Hub + MCP Hub for Neovim |
+| Multi-Agent Systems | 1 | **MiroFish (70,842⭐)** — the largest project found in either sweep |
+| Security & Guardrails | 2 | DvalinCode, REA — the two wave-1 borderlines |
+| Research & Data | 1 | Wisp Science |
+| Observability & Evaluation | 1 | SimWorld — an agent evaluation environment |
+| Voice & Conversational | 1 | py-xiaozhi |
+
+Resolves four of the 13 candidates `635557e5` held for an owner call
+(nitrostack, py-xiaozhi, and the two borderlines), and lists the MiroFish
+upstream whose absence was the stated reason for rejecting its fork.
+
+The two staleness holds are in: `hangwin/mcp-chrome` (216 days) and
+`tadata-org/fastapi_mcp` (259 days). Both are well inside the 365-day floor and
+among the three most-adopted MCP projects in the sweep; their freshness scores
+will reflect the gap honestly.
+
+8 of 21 carry a verified package identifier. One deliberate omission:
+`0xMassi/webclaw` publishes `create-webclaw`, which verifies to the right repo
+but is a *project scaffolder* — its download count would misrepresent the
+project's adoption, so the row carries no identifier rather than a misleading
+number.
+
+### Still excluded, and why
+
+- **The 7 in `REVIEWED_REJECTED`** — star-farming (`sv-number/mcp-server`),
+  inherited stars (`keon/browser-control`), the supervisory-harness class
+  (`emdash`), incidental agent support (`firerpa/lamda`), 214-day dormancy
+  (`mycoder`), a fork whose upstream is now listed (`MiroFish-Offline`), and an
+  app builder (`sandboxd`).
+- **Maintainer-declared EOL** — `alexander-zuev/supabase-mcp-server`.
+- **Parent projects whose MCP support is incidental** — `jscpd` (copy/paste
+  detector), `opensumi/core` (IDE framework), `Vexa` (transcription API),
+  `agentset` (RAG platform), `GoNavi` (database client),
+  `zinja-coder/jadx-ai-mcp` (29 MB JADX fork).
+- **Two held for a further call** — `repoprompt/repoprompt-ce` (orchestrates
+  external CLI agents; may be #180 class) and `LING71671/open-reverselab` (a
+  183-article knowledge base with MCP tools attached; the content is the bulk).
+- **~86 agent-stream candidates that pass the automated pre-checks and fail the
+  rubric** — Apache Doris, a streaming music player, a PHP testing framework,
+  tutorial repos, web scrapers. These are what the rubric exists to exclude;
+  listing them would change what the registry means.

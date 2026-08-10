@@ -89,7 +89,7 @@ REVIEWED_REJECTED = {
     ),
     "nikmcfly/mirofish-offline": (
         "2026-08-10 rejected — self-declared fork of 666ghj/MiroFish; the "
-        "upstream is the canonical candidate"
+        "upstream is the canonical candidate and is now listed"
     ),
     "tastyeffectco/sandboxd": (
         "2026-08-10 rejected — self-hosted AI app builder whose coding agent "
