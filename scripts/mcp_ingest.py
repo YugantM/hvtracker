@@ -177,7 +177,7 @@ def main() -> int:
     print(f"roster {len(agents):,} -> {len(agents) + len(new):,}")
     print("package fields wired: " + (", ".join(f"{k}={v}" for k, v in field_counts.most_common())
                                       or "none"))
-    print(f"\nsample:")
+    print("\nsample:")
     for r in new[:6]:
         print("  " + json.dumps(r))
 

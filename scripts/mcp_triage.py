@@ -118,24 +118,33 @@ def main() -> int:
         # Hard gates, in reporting order. First failure wins so the funnel
         # sums to N — a repo can fail several at once.
         if not s.get("resolved"):
-            gates["repo does not resolve (deleted/renamed/private)"] += 1; continue
+            gates["repo does not resolve (deleted/renamed/private)"] += 1
+            continue
         if s.get("is_private"):
-            gates["private"] += 1; continue
+            gates["private"] += 1
+            continue
         if s.get("is_disabled"):
-            gates["disabled"] += 1; continue
+            gates["disabled"] += 1
+            continue
         if s.get("is_empty"):
-            gates["empty repo"] += 1; continue
+            gates["empty repo"] += 1
+            continue
         if s.get("archived"):
-            gates["archived (rubric: non-archived required)"] += 1; continue
+            gates["archived (rubric: non-archived required)"] += 1
+            continue
         if s.get("is_fork"):
-            gates["fork (no original agent logic)"] += 1; continue
+            gates["fork (no original agent logic)"] += 1
+            continue
         if not s.get("license"):
-            gates["no OSI license (rubric hard requirement)"] += 1; continue
+            gates["no OSI license (rubric hard requirement)"] += 1
+            continue
         d = days_since(s.get("pushed_at"))
         if d > args.max_stale_days:
-            gates[f"no push in >{args.max_stale_days}d"] += 1; continue
+            gates[f"no push in >{args.max_stale_days}d"] += 1
+            continue
         if key in existing:
-            gates["already in roster"] += 1; continue
+            gates["already in roster"] += 1
+            continue
 
         repo = (s.get("repo") or key)
         survivors.append({
