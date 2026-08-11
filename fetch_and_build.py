@@ -6503,6 +6503,12 @@ def main() -> None:
                 "repo": r["repo"],
                 "display_repo": r.get("display_repo", ""),
                 "url": r["url"],
+                # Published so consumers can tell the classes apart — `rank` is
+                # per-class, so a skill's #12 is not comparable with an agent's.
+                # This payload is a field whitelist: without the key here the
+                # class is dropped on the way out and /api/v1/agents (which
+                # defaults a missing class to "agent") serves skills too.
+                "listing_class": r.get("listing_class", DEFAULT_LISTING_CLASS),
                 "rank": r["rank"],
                 "previous_rank": r["previous_rank"],
                 "rank_delta": r["rank_delta"],

@@ -104,6 +104,25 @@ def test_class_is_cleared_when_the_roster_drops_it():
     assert fab.listing_class(cached[0]) == "agent"
 
 
+def test_published_payload_carries_listing_class():
+    """Regression: /api/v1/agents served all 148 skills in production.
+
+    data_output["agents"] is a field whitelist built as an explicit dict per
+    row. `listing_class` was set on the internal row but not named in that
+    whitelist, so it was dropped on the way out; the API filter treats a
+    missing class as "agent" (deliberately, so pre-existing renders keep
+    working) and therefore passed every skill through.
+    """
+    import inspect
+    src = inspect.getsource(fab.main)
+    start = src.index("data_output = {")
+    payload = src[start:start + 3000]
+    assert '"listing_class"' in payload, (
+        "listing_class missing from the published agents payload — "
+        "consumers cannot distinguish classes and /api/v1/agents leaks skills"
+    )
+
+
 def test_roster_class_values_are_all_known():
     """A typo in agents.json would silently demote a row to the agent board."""
     import json
