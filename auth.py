@@ -402,6 +402,138 @@ def login_page(request: Request, next: str = "/", error: str = ""):
         path="/login/", noindex=True))
 
 
+def _watch_view(slug: str, agent: dict | None) -> dict:
+    """Normalize one tracked slug into the fields the account page renders.
+
+    A slug with no row in latest.json is a delisted/retired project the user is
+    still tracking — it stays in the list (their record of it is real) but is
+    marked so the missing numbers read as "gone", not as zeros.
+    """
+    a = agent or {}
+    listed = bool(a)
+    delta = a.get("rank_delta")
+    return {
+        "slug": slug,
+        "name": a.get("name") or slug,
+        "listed": listed,
+        "category": a.get("category") or "",
+        "trust_score": a.get("trust_score"),
+        "grade": a.get("evidence_grade"),
+        "coverage_grade": a.get("coverage_grade"),
+        "rank": a.get("rank"),
+        # rank_delta is `previous_rank - rank`, so positive means moved UP.
+        "rank_delta": delta,
+        # days_ago is 999 for rows whose first signal fetch hasn't run yet;
+        # rendering that as "pushed 999d ago" beside a 0.0 score reads as a
+        # dead project rather than an unscored one.
+        "days_ago": a.get("days_ago"),
+        "pending": bool(a.get("pending_signals")),
+        "needs_review": bool(a.get("has_warning")),
+    }
+
+
+def watchlist_summary_html(watch: list[str], index: dict) -> str:
+    """Portfolio strip: size, average trust, movement, and anything flagged."""
+    if not watch:
+        return ""
+    views = [_watch_view(s, index.get(s)) for s in watch]
+    # Pending rows carry a placeholder 0.0 until their first scan — averaging
+    # that in would understate the portfolio.
+    listed = [v for v in views if v["listed"] and not v["pending"]]
+    scores = [v["trust_score"] for v in listed if v["trust_score"] is not None]
+    avg = round(sum(scores) / len(scores), 1) if scores else None
+    up = sum(1 for v in listed if (v["rank_delta"] or 0) > 0)
+    down = sum(1 for v in listed if (v["rank_delta"] or 0) < 0)
+    flagged = sum(1 for v in listed if v["needs_review"])
+
+    if up or down:
+        moved = f'<span class="wl-up">&#9650;{up}</span> <span class="wl-down">&#9660;{down}</span>'
+        moved_label = "moved since yesterday"
+    else:
+        moved = '<span class="wl-flat">&mdash;</span>'
+        moved_label = "no rank moves"
+
+    cells = [
+        (str(len(watch)), "tracked"),
+        (f"{avg}" if avg is not None else "&mdash;", "average trust"),
+        (moved, moved_label),
+        (str(flagged) if flagged else "0", "need review"),
+    ]
+    return ('<div class="wl-summary">' + "".join(
+        f'<div class="wl-cell"><div class="wl-val">{v}</div><div class="wl-lab">{escape(lab)}</div></div>'
+        for v, lab in cells) + "</div>")
+
+
+def watchlist_html(watch: list[str], index: dict) -> str:
+    """The tracked-projects list, richest-first by rank."""
+    if not watch:
+        return ('<p class="auth-note">No projects yet &mdash; open any agent and choose '
+                "<em>Track</em> to follow its score, rank and supply-chain signals here.</p>")
+
+    views = [_watch_view(s, index.get(s)) for s in watch]
+    # Listed agents first, best rank first; delisted sink to the bottom.
+    views.sort(key=lambda v: (not v["listed"], v["rank"] if v["rank"] is not None else 10**6))
+
+    items = []
+    for v in views:
+        slug = escape(v["slug"])
+        name = escape(v["name"])
+        if not v["listed"]:
+            items.append(
+                f'<li class="wl-row is-gone" data-watch-slug="{slug}">'
+                f'<div class="wl-main"><span class="wl-name">{name}</span>'
+                f'<span class="wl-sub">No longer listed</span></div>'
+                f'<button type="button" class="account-remove" data-remove-slug="{slug}">Remove</button></li>')
+            continue
+
+        if v["pending"]:
+            items.append(
+                f'<li class="wl-row is-pending" data-watch-slug="{slug}">'
+                f'<div class="wl-main"><a class="wl-name" href="/agents/{slug}/">{name}</a>'
+                f'<span class="wl-sub">Awaiting first signal scan</span></div>'
+                f'<div class="wl-score">&mdash;</div><div class="wl-rank">&mdash;</div>'
+                f'<button type="button" class="account-remove" data-remove-slug="{slug}">Remove</button></li>')
+            continue
+
+        grade = v["grade"]
+        chip = (f'<span class="evidence-badge grade-{escape(str(grade))}" '
+                f'title="Evidence grade {escape(str(grade))}">{escape(str(grade))}</span>') if grade else ""
+        score = f'{v["trust_score"]}' if v["trust_score"] is not None else "&mdash;"
+
+        d = v["rank_delta"]
+        if d is None:
+            trend = '<span class="wl-trend wl-new">new</span>'
+        elif d > 0:
+            trend = f'<span class="wl-trend wl-up" title="Up {d} since yesterday">&#9650;{d}</span>'
+        elif d < 0:
+            trend = f'<span class="wl-trend wl-down" title="Down {abs(d)} since yesterday">&#9660;{abs(d)}</span>'
+        else:
+            trend = '<span class="wl-trend wl-flat" title="No rank change">&mdash;</span>'
+
+        rank = f'#{v["rank"]}' if v["rank"] is not None else "&mdash;"
+        bits = []
+        if v["category"]:
+            bits.append(escape(v["category"]))
+        if v["coverage_grade"]:
+            bits.append(f'coverage {escape(str(v["coverage_grade"]))}')
+        if v["days_ago"] is not None:
+            bits.append(f'pushed {v["days_ago"]}d ago')
+        sub = " &middot; ".join(bits)
+        flag = '<span class="wl-flag" title="Listed, but flagged for review">needs review</span>' if v["needs_review"] else ""
+
+        items.append(
+            f'<li class="wl-row" data-watch-slug="{slug}">'
+            f'<div class="wl-main">'
+            f'<a class="wl-name" href="/agents/{slug}/">{name}</a>'
+            f'<span class="wl-sub">{sub}</span></div>'
+            f'<div class="wl-score">{score}{chip}</div>'
+            f'<div class="wl-rank">{rank} {trend}</div>'
+            f'{flag}'
+            f'<button type="button" class="account-remove" data-remove-slug="{slug}">Remove</button></li>')
+
+    return '<ul class="account-list wl-list">' + "".join(items) + "</ul>"
+
+
 @router.get("/account", response_class=HTMLResponse)
 @router.get("/account/", response_class=HTMLResponse, include_in_schema=False)
 def account_page(request: Request):
@@ -412,20 +544,8 @@ def account_page(request: Request):
     index = _agents_index()
 
     watch = db.list_watch(user["id"])
-
-    def watch_item(slug: str) -> str:
-        a = index.get(slug) or {}
-        name = a.get("name", slug)
-        grade = a.get("evidence_grade")
-        trust = a.get("trust_score")
-        chip = f'<span class="evidence-badge grade-{escape(str(grade))}">{escape(str(grade))}</span>' if grade else ""
-        meta = f'<span class="account-muted">{escape(str(trust))}/100</span>' if trust is not None else ""
-        return (f'<li data-watch-slug="{escape(slug)}">'
-                f'<a class="account-item-name" href="/agents/{escape(slug)}/">{escape(name)}</a>{chip}{meta}'
-                f'<button type="button" class="account-remove" data-remove-slug="{escape(slug)}">Remove</button></li>')
-
-    watch_html = ("<ul class='account-list'>" + "".join(watch_item(s) for s in watch) + "</ul>") \
-        if watch else "<p class='auth-note'>No projects yet — open any agent and choose <em>Track</em>.</p>"
+    watch_html = watchlist_html(watch, index)
+    summary_html = watchlist_summary_html(watch, index)
 
     avatar = f'<img class="account-avatar" src="{escape(user.get("avatar_url") or "")}" alt="">' if user.get("avatar_url") else ""
     ident = escape(user.get("name") or user.get("login") or "Account")
@@ -441,7 +561,8 @@ def account_page(request: Request):
         '<form method="post" action="/auth/logout" class="account-signout">'
         '<input type="hidden" name="next" value="/"><button class="auth-btn auth-btn--ghost" type="submit">Sign out</button></form>'
         "</div>"
-        f'<h3 id="watchlist">Tracked projects <span class="account-count">{len(watch)}</span></h3>{watch_html}'
+        f'<h3 id="watchlist">Tracked projects <span class="account-count">{len(watch)}</span></h3>'
+        f'{summary_html}{watch_html}'
         "</div>"
     )
     return HTMLResponse(_marketing_page(

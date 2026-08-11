@@ -604,3 +604,66 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   in-flight roster-batch posts (evidence-coverage-audit etc.) have no-slash
   canonicals and WILL fail that lint until slashed. Verified in local
   uvicorn preview end-to-end.
+- **SERP favicon + compare structured data 2026-08-10 (#fbcac35e on
+  `feat/serp-favicon-richsnippet`; DEPLOYED ~16:10 UTC, deployment
+  fddfe6b8, verified live):** owner reported Bing
+  showing a blank globe and a bare snippet for /compare/ results. Two real
+  defects, both fixed. (1) FAVICON: no generated page declared an icon at all
+  — only `template.html` did, so every `.j2`-rendered page (agents, compare,
+  categories, blog) left crawlers to the root `/favicon.ico` convention, which
+  `app.py` answered with a **301 to an SVG** (`/apple-touch-icon.png` likewise
+  served SVG bytes under a .png URL). Now: real rasters generated from the SVG
+  by `scripts/generate_favicons.py` (`favicon.ico` 16/32/48, `apple-touch-icon.png`
+  180×180 opaque — iOS composites transparency onto black), served as files not
+  redirects, declared via shared partial `templates/_head_icons.html.j2`
+  (.ico first, SVG second, both `rel="icon"` — Google honours only
+  icon/shortcut icon/apple-touch-icon, never `alternate icon`) included in 19
+  `.j2` templates + `template.html`, literal links in the 14 hand-written
+  `blog_static/` posts (copied verbatim, can't use the include) and the two
+  inline Python heads (`fetch_and_build.py` /data/, `app.py` `_marketing_page`).
+  **Dockerfile COPY updated** — it copies root assets by filename, so the new
+  files would 404 in prod otherwise. (2) COMPARE STRUCTURED DATA: pairs emitted
+  only `BreadcrumbList`; added an `ItemList` of both agents as
+  `SoftwareApplication` with editorial `Review`/`reviewRating` (author
+  Organization HVTracker), mirroring agent pages — **no aggregateRating**
+  (policy: needs real user ratings), `ItemListUnordered` because pairs render
+  in both directions. Uses `| tojson` so names/descriptions can't break the
+  block. **NO title or meta-description changes anywhere** (#114 churn lesson).
+  DELIBERATELY NOT TOUCHED: `prebuilt/` (~380 files) is checked-in generated
+  output and a cold-start volume seed only — regenerate it, never hand-edit;
+  `templates/submit.html` + `templates/correct.html` are dead (unreferenced);
+  the BreadcrumbList's raw `{{ a.name }}` interpolation is latent-fragile
+  against a name containing `"` (no current name has one — real names carry
+  only `&`, which is valid JSON) and rewriting it would re-hash those pages
+  for no live benefit. OWNER ITEM: Bing Webmaster Tools is still unverified —
+  `msvalidate.01` in `template.html` is a commented-out placeholder, so there
+  is no way to request a favicon refresh or read Bing-side diagnostics; a
+  token from bing.com/webmasters would also speed re-crawl of the fix.
+  VERIFIED LIVE: `/favicon.ico` 200 `image/x-icon`, 0 redirects, bytes
+  identical to the committed file (was 301→SVG); apple-touch-icon likewise;
+  3 icon links on homepage/agent/methodology/blog/capabilities//data/;
+  compare pair serves BreadcrumbList + ItemList (Docling 88.6, Firecrawl
+  74.2), no aggregateRating; healthz 1204/1227 unchanged;
+  `board_invariant_violations: []`.
+  DEPLOY RUNBOOK GOTCHAS learned here: (1) `railway up <ABS_PATH>` outside
+  the cwd dies at "Indexing... prefix not found" — it uploads nothing, so
+  prod is untouched; deploy by `cd`ing INTO the dir. An unlinked worktree
+  works with explicit `--project <id> --environment production --service web`
+  (links are keyed by directory path in `~/.railway/config.json`). (2) The
+  Railway project is *named* `hvtracker-cron`; the web service is the `web`
+  service inside it — check `railway status` before assuming. (3) `--ci`
+  exits **1** on "Failed to stream build logs" even when the deploy is fine —
+  never read that exit code as failure; poll `railway status` until the
+  deployment ID changes and status leaves Building. (4) A local
+  `--render-only` will report a board-invariant violation ("mass churn")
+  that prod does NOT have: `agents.json` carries ZERO trust_scores (pure
+  roster; scores live on the volume), so a network-free render leaves ~770
+  agents unscored and every rank shifts. Check prod's own
+  `/data/build_report.json` rather than trusting the local one. (5)
+  `configured_agents` in build_report is the size of THAT render pass
+  (~201 = the stalest sixth), not the roster — `active_agents` /
+  `total_generated` are the roster numbers. (6) Deployed from a pinned
+  clean worktree because another session was concurrently editing
+  `agents.json`/`scorecard-cache.json` in the shared tree; the Dockerfile
+  COPYs `scorecard-cache.json` directly, so a dirty-tree `railway up`
+  would have baked someone else's WIP into the image.

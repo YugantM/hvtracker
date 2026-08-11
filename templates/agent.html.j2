@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% include "_head_icons.html.j2" %}
   <meta name="google-site-verification" content="s2YUWbGP7cJsI6HUCKRX9YCtbVJVyA1Q1_jsNWj1RHc">
   <title>Is {{ row.name }} Safe? Trust Score &amp; Safety Signals | HVTracker</title>
   <meta name="description" content="Is {{ row.name }} safe to use? An independent trust score for {{ row.name }} based on supply-chain provenance, safety, maintenance, and adoption signals.">
@@ -74,7 +75,13 @@
     .back { font-family:var(--font-mono); font-size:12px; color:var(--muted); margin-left:auto; }
     .back:hover { color:var(--text); }
 
-    .hero { padding:24px 0; border-bottom:1px solid var(--border); }
+    /* position:relative anchors the absolutely-positioned .live-pill to the
+       hero's top-right; padding-right keeps it clear of a long agent name. */
+    .hero { padding:24px 0; border-bottom:1px solid var(--border); position:relative; }
+    /* Reserve room only in the band where the badge tucks INSIDE the hero.
+       Above 1139px it floats out in the right gutter, so the title gets the
+       full column width back. */
+    @media (min-width:641px) and (max-width:1139px) { .hero h1, .hero .desc { padding-right:200px; } }
     .safety-verdict { margin-top:16px; padding:12px 16px; border:1px solid var(--border); border-left:3px solid var(--accent); background:var(--surface); font-size:14px; line-height:1.65; color:var(--text); max-width:680px; }
     .safety-verdict a { color:var(--accent); }
     h1 { font-size:28px; font-weight:700; margin-bottom:4px; }
@@ -90,7 +97,19 @@
     .badge.state-warning { color:var(--red); }
     .badge.state-legacy { color:var(--muted-2); }
     .badge.state-rejected, .badge.state-delisted { color:var(--red); }
-    .hero-actions { margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; }
+    .hero-actions { margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    /* Verdict hero — the page title asks "Is X safe?"; this answers it with
+       visual priority instead of hiding the score among equal metadata cells. */
+    .verdict-hero { position:relative; margin-top:16px; padding:16px 18px; border:1px solid var(--border); background:var(--surface);
+      display:grid; grid-template-columns:auto 1fr auto; gap:2px 16px; align-items:baseline; }
+    .vh-score { font-family:var(--font-mono); line-height:.9; }
+    .vh-num { font-size:44px; font-weight:700; letter-spacing:-0.02em; color:var(--accent); }
+    .vh-den { font-size:15px; color:var(--muted); }
+    .vh-meta { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .vh-rank { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
+    .vh-line { grid-column:1/-1; margin-top:10px; font-size:14px; line-height:1.5; color:var(--text); }
+    .vh-bar { grid-column:1/-1; margin-top:12px; height:6px; background:var(--bg); border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+    .vh-bar i { display:block; height:100%; background:var(--accent); }
     .hero-summary-grid { margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:1px; background:var(--border); }
     .hero-summary-item { padding:10px; background:var(--bg); }
     .hero-summary-label { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); margin-bottom:4px; }
@@ -140,11 +159,94 @@
     .metric-section-title span { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
     .metric-list { display:grid; gap:7px; }
     .metric-row { display:grid; grid-template-columns:160px minmax(160px, 1fr) 80px; gap:12px; align-items:center; min-height:28px; font-family:var(--font-mono); }
+    .metric-row.is-compare { grid-template-columns:150px minmax(120px, 1fr) 74px 132px; min-height:34px; }
     .metric-name { color:var(--muted); font-size:12px; line-height:1.3; }
     .metric-name strong { display:block; color:var(--text); font-size:12px; }
     .metric-sub { color:var(--muted-2); font-size:11px; }
     .metric-track { position:relative; height:6px; overflow:hidden; background:var(--border); }
     .metric-fill { height:100%; width:var(--fill); background:var(--bar, var(--accent)); }
+    /* Comparison rows: the bar is this agent, the tick is the category average.
+       Track opens up so the tick can stand proud of the fill; the 2px surface
+       ring keeps it legible where it sits on top of the filled part. */
+    .metric-row.is-compare .metric-track { height:8px; overflow:visible; }
+    .metric-avg { position:absolute; top:50%; left:var(--avg); width:2px; height:15px;
+      transform:translate(-1px,-50%); background:var(--text);
+      box-shadow:-2px 0 0 var(--bg), 2px 0 0 var(--bg); }
+    .metric-delta { font-size:11px; color:var(--muted); white-space:nowrap; display:flex; align-items:center; gap:4px; }
+    .metric-delta .d-glyph { font-size:10px; }
+    .metric-delta.is-above { color:var(--green); }
+    .metric-delta.is-below { color:var(--red); }
+    .metric-delta.is-level { color:var(--muted-2); }
+    /* Sticky compare prompt, bottom-right. Closed it is a small pill so it never
+       covers content; opening is user-initiated, so overlap is acceptable then. */
+    /* Sits in the verdict block, level with the score, so the compare route is
+       in the same glance as the number people came for. The panel is absolute
+       so opening it never reflows the hero. */
+    .cmp-bubble { grid-row:1; grid-column:3; justify-self:end; align-self:center; position:relative; z-index:20; }
+    .cmp-bubble > summary { cursor:pointer; list-style:none; display:inline-flex; align-items:center; gap:8px;
+      padding:11px 16px; border-radius:22px; background:var(--accent); color:#fff;
+      font:600 13px/1 var(--font-sans); box-shadow:0 6px 20px -6px rgba(31,27,23,.45); }
+    .cmp-bubble > summary::-webkit-details-marker { display:none; }
+    .cmp-bubble > summary:hover { filter:brightness(1.12); }
+    .cmp-bubble > summary:focus-visible { outline:2px solid var(--text); outline-offset:2px; }
+    .cmp-bubble-icon { font-size:15px; }
+    .cmp-bubble[open] > summary { box-shadow:none; }
+    /* Attention pulse: an expanding ring drawn with box-shadow (no layout cost),
+       run four times and then stopped. A permanent loop reads as a broken ad and
+       stops being noticed after the first few seconds; a short burst catches the
+       eye on arrival and then leaves the page alone. */
+    @keyframes cmpPulse {
+      0%   { box-shadow:0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+      70%  { box-shadow:0 0 0 12px color-mix(in srgb, var(--accent) 0%, transparent); }
+      100% { box-shadow:0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent); }
+    }
+    .cmp-bubble:not([open]) > summary { animation:cmpPulse 1.9s ease-out 4; }
+    .cmp-bubble > summary:hover, .cmp-bubble[open] > summary { animation:none; }
+    @media (prefers-reduced-motion: reduce) {
+      .cmp-bubble:not([open]) > summary { animation:none; }
+    }
+    .cmp-bubble-panel { position:absolute; top:calc(100% + 6px); right:0; width:290px; max-width:calc(100vw - 48px);
+      background:var(--bg); border:1px solid var(--line-strong); border-radius:8px;
+      padding:14px; box-shadow:0 14px 40px -12px rgba(31,27,23,.4); }
+    .cmp-bubble-head { font-size:12.5px; line-height:1.45; color:var(--muted); margin-bottom:10px; }
+    .cmp-bubble-list { list-style:none; display:grid; gap:6px; margin-bottom:10px; }
+    .cmp-bubble-list a { display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+      padding:8px 10px; border:1px solid var(--border); border-radius:5px; background:var(--surface); }
+    .cmp-bubble-list a:hover { border-color:var(--accent); text-decoration:none; }
+    .cmp-t-name { font-size:13px; font-weight:600; }
+    /* Deliberately NOT green/red: the delta describes the PEER, so "higher"
+       would paint a competitor beating this agent as good news. The direction
+       is carried by the words. (The vs-category bars above do use green/red —
+       there the subject is this agent, so the polarity is meaningful.) */
+    .cmp-t-delta { font-family:var(--font-mono); font-size:11px; white-space:nowrap; color:var(--muted); }
+    .cmp-bubble-all { display:block; font-family:var(--font-mono); font-size:11.5px; color:var(--accent); }
+    @media (max-width: 620px) {
+      /* Three columns will not fit beside a 44px figure — drop the compare
+         control onto its own full-width row under the score instead. */
+      .verdict-hero { grid-template-columns:auto 1fr; }
+      .cmp-bubble { grid-row:auto; grid-column:1/-1; justify-self:start; margin-top:12px; }
+      .cmp-bubble > summary { padding:10px 14px; font-size:12.5px; }
+      .cmp-bubble-panel { right:auto; left:0; width:100%; }
+    }
+    @media (prefers-reduced-motion: reduce) { .cmp-bubble * { transition:none; } }
+
+    /* Reference-weight sections collapse by default. Content stays in the DOM
+       (so it is still indexed and still findable with ctrl-F) but stops costing
+       the reader four screens of scroll before the next useful thing. */
+    .fold { border-bottom:1px solid var(--border); }
+    .fold > summary { cursor:pointer; list-style:none; padding:14px 0; display:flex; align-items:center; gap:10px; }
+    .fold > summary::-webkit-details-marker { display:none; }
+    .fold > summary::after { content:"+"; margin-left:auto; font-family:var(--font-mono); font-size:15px; color:var(--muted); }
+    .fold[open] > summary::after { content:"\2212"; }
+    .fold > summary:hover { color:var(--accent); }
+    .fold > summary h2 { font-size:13px; font-weight:600; font-family:var(--font-mono); letter-spacing:0.05em; text-transform:uppercase; color:inherit; }
+    .fold-hint { font-family:var(--font-mono); font-size:11px; color:var(--muted-2); }
+    .fold > summary:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+    .fold-body { padding-bottom:16px; }
+    .metric-legend { display:flex; flex-wrap:wrap; gap:6px 18px; margin:0 0 10px; font-family:var(--font-mono); font-size:11px; color:var(--muted); }
+    .lg-item { display:inline-flex; align-items:center; gap:6px; }
+    .lg-bar { width:14px; height:6px; background:var(--accent); flex-shrink:0; }
+    .lg-tick { width:2px; height:12px; background:var(--text); flex-shrink:0; margin:0 6px; }
     .metric-value { color:var(--text); text-align:right; font-size:12px; font-weight:700; }
     .metric-value span { color:var(--muted); font-weight:400; }
 
@@ -178,7 +280,13 @@
     .compare-link.is-saved { color:#fff; background:var(--accent); }
     .secondary-link { font-family:var(--font-mono); font-size:12px; padding:6px 12px; border:1px solid var(--border); color:var(--muted); background:none; cursor:pointer; }
     .secondary-link:hover { color:var(--text); border-color:var(--text); text-decoration:none; }
-    .watch-button.is-saved { color:var(--green); border-color:var(--green); }
+    /* Saved states for the hero .btn toggles. Both selectors outrank the shared
+       .btn-secondary rules, including its hover fill, so a saved button keeps
+       its own colour while the pointer is over it. */
+    .watch-button.is-saved,
+    .watch-button.is-saved:hover { color:var(--green); border-color:var(--green); background:none; }
+    #compareToggle.is-saved,
+    #compareToggle.is-saved:hover { color:#fff; background:var(--accent); border-color:var(--accent); }
 
     .review-card { padding:16px 0; margin:0; border-bottom:1px solid var(--border); }
     .review-grid { display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:10px; }
@@ -331,6 +439,14 @@
   <main class="page" id="main">
 
     <section class="hero">
+      {# Live machine-usage pill, filled in and kept ticking by site-status.js.
+         Sits top-right of the profile content (not the header) and stays
+         hidden until there is a real number to show. #}
+      <a class="live-pill" href="/live/" hidden title="How much AI agents are using the trust layer right now">
+        <span class="lp-head"><span class="lp-dot"></span>Live</span>
+        <span class="lp-num"></span>
+        <span class="lp-sub"></span>
+      </a>
       <h1>{{ row.name }}</h1>
       <div class="repo">
         {% if row.display_repo %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.display_repo }}</a>{% elif row.org_slug_or_none %}<a href="/org/{{ row.org_slug_or_none }}/">{{ row.repo.split('/')[0] }}</a>/<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo.split('/')[1] }}</a>{% else %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>{% endif %}
@@ -344,21 +460,61 @@
         {% if row.license_spdx %}<span class="badge">{{ row.license_spdx }}</span>{% endif %}
         {% if row.license_type and row.license_type != 'open' %}<span class="badge" style="color:{% if row.license_type == 'proprietary' %}var(--red){% elif row.license_type == 'source-available' %}var(--amber){% else %}var(--muted){% endif %}">{{ row.license_type | capitalize }}</span>{% endif %}
       </div>
+      <div class="verdict-hero">
+        <div class="vh-score">
+          <span class="vh-num">{{ row.trust_score }}</span><span class="vh-den">/100</span>
+        </div>
+        {# No grade pill here — the chip row above already carries it, and a
+           second filled pill beside the figure competed with the score. #}
+        <div class="vh-meta">
+          <span class="vh-rank">Rank #{{ row.rank }} of {{ total }}</span>
+        </div>
+        {% if compare_targets %}
+        {# Sticky compare prompt. A <details> so open/close is native — no JS, no
+        extra requests. Closed it is a single pill; the score gap on each row is
+        the hook, since "scores 15 higher" is the thing worth a click. #}
+        <details class="cmp-bubble">
+        <summary aria-label="Compare {{ row.name }} with similar agents">
+        <span class="cmp-bubble-icon" aria-hidden="true">&#8646;</span>
+        <span class="cmp-bubble-label">Compare {{ row.name }}</span>
+        </summary>
+        <div class="cmp-bubble-panel">
+        <p class="cmp-bubble-head">How does it stack up against its {{ row.category }} neighbours?</p>
+        <ul class="cmp-bubble-list">
+        {% for t in compare_targets %}
+        <li>
+        <a href="{{ t.url }}"{% if not t.published %} rel="nofollow"{% endif %}>
+        <span class="cmp-t-name">{{ t.name }}</span>
+        <span class="cmp-t-delta">
+        {% if t.delta > 0 %}+{{ t.delta }} higher{% elif t.delta < 0 %}{{ t.delta | abs }} lower{% else %}same score{% endif %}
+        </span>
+        </a>
+        </li>
+        {% endfor %}
+        </ul>
+        <a class="cmp-bubble-all" href="/compare/?a={{ row.slug }}">Pick any agent to compare &rarr;</a>
+        </div>
+        </details>
+        {% endif %}
+        <p class="vh-line">{{ row.review_insights.verdict }}</p>
+        <div class="vh-bar" role="img" aria-label="HVTrust score {{ row.trust_score }} out of 100">
+          <i style="width:{{ row.trust_score or 0 }}%"></i>
+        </div>
+      </div>
       <div class="hero-actions">
-        <button class="compare-link" id="compareToggle" type="button" data-cmp-slug="{{ row.slug }}" data-cmp-name="{{ row.name }}" data-cmp-repo="{{ row.repo }}">Add to compare</button>
-        <a class="secondary-link" id="compareOpen" href="/compare/?a={{ row.slug }}">Compare &rarr;</a>
-        <button class="secondary-link watch-button" id="watchToggle" type="button" data-watch-slug="{{ row.slug }}" data-watch-name="{{ row.name }}" data-watch-repo="{{ row.repo }}">Track</button>
-        <a class="secondary-link" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Suggest correction</a>
+        {# The compare CTA now lives in the verdict block above, where it offers
+           named opponents rather than an empty tool — so Track leads this row. #}
+        <button class="btn btn-primary watch-button" id="watchToggle" type="button" data-watch-slug="{{ row.slug }}" data-watch-name="{{ row.name }}" data-watch-repo="{{ row.repo }}">Track {{ row.name }}</button>
+        <button class="btn btn-secondary" id="compareToggle" type="button" data-cmp-slug="{{ row.slug }}" data-cmp-name="{{ row.name }}" data-cmp-repo="{{ row.repo }}">Add to compare</button>
+        <a class="btn btn-tertiary" id="compareOpen" href="/compare/?a={{ row.slug }}">Open compare tool</a>
+        <a class="btn btn-tertiary" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Suggest correction</a>
       </div>
       <div class="hero-summary-grid">
         <div class="hero-summary-item">
           <div class="hero-summary-label">Listing state</div>
           <div class="hero-summary-value{% if row.display_status_tone %} {{ row.display_status_tone }}{% endif %}">{{ row.display_status_label }}</div>
         </div>
-        <div class="hero-summary-item">
-          <div class="hero-summary-label">HVTrust</div>
-          <div class="hero-summary-value">{{ row.trust_score }}/100 · Grade {{ row.evidence_grade }}</div>
-        </div>
+        {# HVTrust cell removed — the score now leads the hero in .verdict-hero above. #}
         {% if row.coverage_grade %}
         <div class="hero-summary-item">
           <div class="hero-summary-label">Evidence coverage</div>
@@ -406,28 +562,26 @@
       {% endif %}
     </section>
 
+    {% if related %}
+    <section class="compare-strip">
+      <h2 class="section-title">Ranked neighbours in <a href="/categories/{{ row.category_slug }}/" style="color:inherit">{{ row.category }}</a></h2>
+      <div class="cmp-row">
+        {% for r in related %}
+        <a class="cmp-link" href="/agents/{{ r.slug }}/">
+          <span class="cmp-name">#{{ r.category_rank }} {{ r.name }} — {{ r.trust_score }} ({{ r.evidence_grade }})</span>
+          <span class="cmp-arrow">→</span>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
     <section class="review-card">
       <h2 class="section-title">Quick Trust Read</h2>
       <div class="review-grid">
-        <div class="review-item primary">
-          <div class="review-kicker">Verdict</div>
-          <div class="review-value">{{ row.review_insights.verdict }}</div>
-          <div class="review-metric">{{ row.trust_score }}/100 · Grade {{ row.evidence_grade }}</div>
-        </div>
-{% if row.review_insights.strongest %}
-        <div class="review-item">
-          <div class="review-kicker">Strongest Signal</div>
-          <div class="review-value">{{ row.review_insights.strongest.label }}</div>
-          <div class="review-metric">{{ row.review_insights.strongest.value }}/{{ row.review_insights.strongest.max }}</div>
-        </div>
-{% endif %}
-{% if row.review_insights.weakest %}
-        <div class="review-item">
-          <div class="review-kicker">Weakest Signal</div>
-          <div class="review-value">{{ row.review_insights.weakest.label }}</div>
-          <div class="review-metric">{{ row.review_insights.weakest.value }}/{{ row.review_insights.weakest.max }}</div>
-        </div>
-{% endif %}
+        {# Verdict / strongest / weakest removed: the verdict now leads the
+           hero, and the vs-category bars below show which dimensions are
+           strongest and weakest directly. #}
         <div class="review-item wide">
           <div class="review-kicker">What Would Improve It</div>
           <div class="review-value">{{ row.review_insights.improvement }}</div>
@@ -489,16 +643,7 @@
         <div class="score-pill {{ row.score_class }}">{{ row.score }}</div>
         <div class="rank-label">Activity sub-score · out of 100</div>
       </div>
-      {% if row.trust_score is defined %}
-      <div>
-        <div class="score-pill {% if row.trust_score >= 55 %}score-high{% elif row.trust_score >= 30 %}score-mid{% else %}score-low{% endif %}">{{ row.trust_score }}</div>
-        <div class="rank-label">HVTrust Score · out of 100</div>
-      </div>
-      {% endif %}
-      <div>
-        <div class="rank-big">#{{ row.rank }}</div>
-        <div class="rank-label">Global Rank · of {{ total }}</div>
-      </div>
+      {# HVTrust score and global rank removed: both now lead the hero. #}
       {% if row.category_rank and row.category %}
       <div>
         <div class="rank-big" style="color:var(--amber)">#{{ row.category_rank }}</div>
@@ -583,36 +728,55 @@
         <div class="analysis-card">
           <div class="metric-section">
             <div class="metric-section-title">
-              <h3>HVTrust Dimensions</h3>
+              <h3>{% if row.category_comparison %}HVTrust Dimensions vs {{ row.category }}{% else %}HVTrust Dimensions{% endif %}</h3>
               <span>{{ row.trust_score }} / 100{% if row.trust_confidence is defined and row.trust_confidence %} · {{ (row.trust_confidence * 100) | round }}% confidence{% endif %}</span>
             </div>
-            <div class="metric-list" aria-label="HVTrust dimensions for {{ row.name }}">
-              <div class="metric-row">
-                <div class="metric-name"><strong>Safety / Integrity</strong><span class="metric-sub">50% OSSF Scorecard · 30% provenance · 20% signed commits</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.safety / 25 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
-                <div class="metric-value">{{ row.trust_breakdown.safety }} <span>/ 25</span></div>
+            {% set dim_subs = {
+              "safety": "50% OSSF Scorecard · 30% provenance · 20% signed commits",
+              "identity": "60% listing status · 40% build provenance",
+              "transparency": "50% declared license · 50% OSSF Scorecard",
+              "maintenance": "60% last-push freshness · 40% commit activity",
+              "adoption": "Log-scaled stars · package downloads"
+            } %}
+            {% if row.category_comparison %}
+            {% set cc = row.category_comparison %}
+            <p class="metric-legend">
+              <span class="lg-item"><span class="lg-bar" aria-hidden="true"></span>{{ row.name }}</span>
+              <span class="lg-item"><span class="lg-tick" aria-hidden="true"></span>{{ cc.category }} average ({{ cc.peers }} agents)</span>
+            </p>
+            <div class="metric-list" aria-label="HVTrust dimensions for {{ row.name }} compared with the {{ cc.category }} average">
+              {% for d in cc.dimensions %}
+              <div class="metric-row is-compare">
+                <div class="metric-name"><strong>{{ d.label }}</strong><span class="metric-sub">{{ dim_subs.get(d.key, "") }}</span></div>
+                <div class="metric-track">
+                  <div class="metric-fill" style="--fill:{{ d.pct }}%;--bar:var(--accent);"></div>
+                  <span class="metric-avg" style="--avg:{{ d.avg_pct }}%" aria-hidden="true"></span>
+                </div>
+                <div class="metric-value">{{ d.value }} <span>/ {{ d.max }}</span></div>
+                <div class="metric-delta is-{{ d.direction }}">
+                  <span class="d-glyph" aria-hidden="true">{% if d.direction == "above" %}▲{% elif d.direction == "below" %}▼{% else %}•{% endif %}</span>
+                  {% if d.direction == "level" %}in line with avg {{ d.avg }}{% else %}{{ d.delta | abs }} {{ d.direction }} avg {{ d.avg }}{% endif %}
+                </div>
               </div>
-              <div class="metric-row">
-                <div class="metric-name"><strong>Identity / Provenance</strong><span class="metric-sub">60% listing status · 40% build provenance</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.identity / 18 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
-                <div class="metric-value">{{ row.trust_breakdown.identity }} <span>/ 18</span></div>
-              </div>
-              <div class="metric-row">
-                <div class="metric-name"><strong>Transparency</strong><span class="metric-sub">50% declared license · 50% OSSF Scorecard</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.transparency / 17 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
-                <div class="metric-value">{{ row.trust_breakdown.transparency }} <span>/ 17</span></div>
-              </div>
-              <div class="metric-row">
-                <div class="metric-name"><strong>Maintenance</strong><span class="metric-sub">60% last-push freshness · 40% commit activity</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.maintenance / 20 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
-                <div class="metric-value">{{ row.trust_breakdown.maintenance }} <span>/ 20</span></div>
-              </div>
-              <div class="metric-row">
-                <div class="metric-name"><strong>Adoption</strong><span class="metric-sub">60% stars · 40% downloads, log-scaled</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:{{ (row.trust_breakdown.adoption / 20 * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
-                <div class="metric-value">{{ row.trust_breakdown.adoption }} <span>/ 20</span></div>
-              </div>
+              {% endfor %}
             </div>
+            {% else %}
+            <div class="metric-list" aria-label="HVTrust dimensions for {{ row.name }}">
+              {% for key, label, val, mx in [
+                ("safety", "Safety / Integrity", row.trust_breakdown.safety, 25),
+                ("identity", "Identity / Provenance", row.trust_breakdown.identity, 18),
+                ("transparency", "Transparency", row.trust_breakdown.transparency, 17),
+                ("maintenance", "Maintenance", row.trust_breakdown.maintenance, 20),
+                ("adoption", "Adoption", row.trust_breakdown.adoption, 20)
+              ] %}
+              <div class="metric-row">
+                <div class="metric-name"><strong>{{ label }}</strong><span class="metric-sub">{{ dim_subs.get(key, "") }}</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:{{ (val / mx * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">{{ val }} <span>/ {{ mx }}</span></div>
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
           </div>
           <div class="metric-section">
             <div class="metric-section-title">
@@ -627,17 +791,17 @@
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Freshness</strong><span class="metric-sub">Last push recency</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:{{ row.score_breakdown.freshness_pct }}%;--bar:var(--green);"></div></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:{{ row.score_breakdown.freshness_pct }}%;--bar:var(--accent);"></div></div>
                 <div class="metric-value">{{ row.score_breakdown.freshness }} <span>/ 25</span></div>
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Activity</strong><span class="metric-sub">Recent commits</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:{{ row.score_breakdown.activity_pct }}%;--bar:#9ae6b4;"></div></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:{{ row.score_breakdown.activity_pct }}%;--bar:var(--accent);"></div></div>
                 <div class="metric-value">{{ row.score_breakdown.activity }} <span>/ 25</span></div>
               </div>
               <div class="metric-row">
                 <div class="metric-name"><strong>Community</strong><span class="metric-sub">Fork signal</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:{{ row.score_breakdown.community_pct }}%;--bar:var(--amber);"></div></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:{{ row.score_breakdown.community_pct }}%;--bar:var(--accent);"></div></div>
                 <div class="metric-value">{{ row.score_breakdown.community }} <span>/ 20</span></div>
               </div>
             </div>
@@ -744,22 +908,12 @@
     </section>
     {% endif %}
 
-    {% if related %}
-    <section class="compare-strip">
-      <h2 class="section-title">Ranked neighbours in <a href="/categories/{{ row.category_slug }}/" style="color:inherit">{{ row.category }}</a></h2>
-      <div class="cmp-row">
-        {% for r in related %}
-        <a class="cmp-link" href="/agents/{{ r.slug }}/">
-          <span class="cmp-name">#{{ r.category_rank }} {{ r.name }} — {{ r.trust_score }} ({{ r.evidence_grade }})</span>
-          <span class="cmp-arrow">→</span>
-        </a>
-        {% endfor %}
-      </div>
-    </section>
-    {% endif %}
-
-    <section class="runtime-soon">
-      <h2 class="section-title">AI agent surface</h2>
+    <details class="fold">
+      <summary>
+        <h2>AI agent surface</h2>
+        <span class="fold-hint">MCP, providers, tool surface</span>
+      </summary>
+      <div class="fold-body">
       <div class="rt-card">
         <div class="runtime-kicker">Scored in HVTrust</div>
         {% set mcp = row.mcp_server_support or {"status": "none", "confidence": none, "evidence": []} %}
@@ -928,16 +1082,22 @@
         </div>
         {% endif %}
       </div>
-    </section>
+      </div>
+    </details>
 
-    <section class="maintainer-cta">
-      <h2 class="section-title">Maintain {{ row.name }}?</h2>
+    <details class="fold">
+      <summary>
+        <h2>Maintain {{ row.name }}?</h2>
+        <span class="fold-hint">For maintainers</span>
+      </summary>
+      <div class="fold-body">
       <p>HVTrust scores {{ row.name }} from <strong>public signals only</strong> — we never contact maintainers first. If a signal is wrong, stale, or missing (provenance you publish, a Scorecard you run, signed releases), tell us and we'll review it. Corrections are public and tracked on GitHub.</p>
       <div class="maintainer-actions">
         <a class="cta-correction" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Submit a correction →</a>
         <a class="secondary-link" href="#embed-badge">Add the trust badge</a>
       </div>
-    </section>
+      </div>
+    </details>
 
     {% if row.public_actions %}
     <section class="provenance">
@@ -980,8 +1140,12 @@
     {% endif %}
 
     {% if events %}
-    <section class="provenance">
-      <h2 class="section-title">Reputation Timeline</h2>
+    <details class="fold">
+      <summary>
+        <h2>Reputation Timeline</h2>
+        <span class="fold-hint">Signal history</span>
+      </summary>
+      <div class="fold-body">
       {% if row.event_chart_svg %}
       {{ row.event_chart_svg | safe }}
       {% endif %}
@@ -998,7 +1162,8 @@
         {% endfor %}
         </div>
       </div>
-    </section>
+      </div>
+    </details>
     {% endif %}
 
     <section class="links">
@@ -1007,8 +1172,12 @@
       {% if row.npm_package %}<a href="https://www.npmjs.com/package/{{ row.npm_package }}" target="_blank" rel="noopener noreferrer">npm: {{ row.npm_package }}</a>{% endif %}
     </section>
 
-    <section class="provenance" id="embed-badge" style="margin-top:0;">
-      <h2 class="section-title">Embed Badge <a href="/badges/" style="font-weight:400;color:var(--accent);font-size:12px;margin-left:8px;">Badge guide for maintainers →</a></h2>
+    <details class="fold" id="embed-badge">
+      <summary>
+        <h2>Embed Badge <a href="/badges/" style="font-weight:400;color:var(--accent);font-size:12px;margin-left:8px;">Badge guide for maintainers →</a></h2>
+        <span class="fold-hint">For maintainers</span>
+      </summary>
+      <div class="fold-body">
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
         <img src="/badge/{{ row.slug }}.svg" alt="HVTrust {{ row.trust_score }}" height="20">
         <img src="/badge/{{ row.slug }}-grade.svg" alt="Grade {{ row.evidence_grade }}" height="20">
@@ -1057,7 +1226,8 @@
           });
         });
       </script>
-    </section>
+      </div>
+    </details>
 
     {% if row.siblings %}
     <section class="siblings">
@@ -1103,6 +1273,8 @@
     </footer>
 
   </main>
+
+
   <script>
     (function () {
       const WATCHLIST_KEY = "hvtracker_watchlist_v1";
@@ -1126,7 +1298,9 @@
         const renderTrack = () => {
           const saved = loadWatchlist().some((item) => item.slug === btn.dataset.watchSlug);
           btn.classList.toggle("is-saved", saved);
-          btn.textContent = saved ? "Tracking ✓" : "Track";
+          // Mirror the server-rendered label ("Track <name>") so the button does
+          // not silently shorten itself the moment this runs.
+          btn.textContent = saved ? "Tracking ✓" : ("Track " + btn.dataset.watchName);
         };
         btn.addEventListener("click", () => {
           const items = loadWatchlist();
@@ -1156,7 +1330,11 @@
           if (copen) {
             const n = window.hvtCompare.slugs().length;
             copen.href = n ? window.hvtCompare.url() : ("/compare/?a=" + item.slug);
-            copen.textContent = n ? ("Compare (" + n + ") →") : "Compare →";
+            // Empty state must match the server-rendered label, otherwise this
+            // overwrites it the moment JS runs. Named opponents now live in the
+            // compare bubble, so this link is just the tool: it only advertises
+            // a count once the tray actually holds something.
+            copen.textContent = n ? ("Compare (" + n + ") →") : "Open compare tool";
           }
         };
         cbtn.addEventListener("click", () => {
@@ -1168,6 +1346,19 @@
         document.addEventListener("DOMContentLoaded", renderCmp);  // after auth.js runs
         renderCmp();
       }
+
+      // A collapsed <details class="fold"> must open when something links into
+      // it (e.g. "Add the trust badge" -> #embed-badge). Newer browsers do this
+      // natively; this keeps older ones working and costs nothing.
+      const openTarget = () => {
+        const id = location.hash.slice(1);
+        if (!id) return;
+        const el = document.getElementById(id);
+        const fold = el && el.closest("details.fold");
+        if (fold && !fold.open) { fold.open = true; el.scrollIntoView(); }
+      };
+      window.addEventListener("hashchange", openTarget);
+      openTarget();
     })();
   </script>
 </body>

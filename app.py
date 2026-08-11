@@ -394,6 +394,23 @@ def _count_badge(slug: str) -> None:
 # verify feed made. Excluded from machine_usage by path.
 _USAGE_EXCLUDED_PATHS = frozenset({"/api/v1/usage"})
 
+# Daily snapshots are the registry's irreplaceable asset: one 4MB file per day
+# holding every row with all 62 fields, including trust_breakdown and
+# scorecard_checks — the scoring internals, not just the published scores. They
+# were never deliberately published; the catch-all StaticFiles mount over
+# OUTPUT_DIR simply exposed them, and the date-based filenames make the whole
+# corpus enumerable with a loop. The site itself reads these from DISK, never
+# over HTTP, so refusing them here costs nothing.
+#
+# The curated public history surface stays open and unaffected:
+# GET /api/v1/agents/<slug>/history (90-day window, whitelisted fields).
+_PRIVATE_SNAPSHOT_PREFIXES = ("/output/history/", "/output/history")
+
+
+def _is_private_snapshot_path(path: str) -> bool:
+    """True for raw daily-snapshot paths, which must not be served publicly."""
+    return path.startswith(_PRIVATE_SNAPSHOT_PREFIXES[0]) or path == _PRIVATE_SNAPSHOT_PREFIXES[1]
+
 
 def _count_machine_usage(path: str) -> None:
     if path in _USAGE_EXCLUDED_PATHS:
@@ -425,6 +442,9 @@ async def _cache_headers(request, call_next):
         retired = _retired_response(path)
         if retired is not None:
             return retired
+        if _is_private_snapshot_path(path):
+            # 404, not 403: don't confirm that a given date's snapshot exists.
+            return Response("Not Found", status_code=404, media_type="text/plain")
 
     if path == "/mcp" and request.method == "POST":
         if not _mcp_enabled():
@@ -1058,7 +1078,13 @@ def api_v1_usage(hours: int = 24):
     machine_usage itself so the page cannot inflate what it reports.
     """
     hours = max(1, min(int(hours or 24), 168))
-    return JSONResponse(usage.snapshot(hours), headers={
+    # Copy: snapshot() hands back its own cached dict, and this response is
+    # per-request. The header widget on every page reads freshness AND activity
+    # from this one small, edge-cached response — it previously pulled the
+    # multi-megabyte /data/latest.json just to read this string.
+    payload = dict(usage.snapshot(hours))
+    payload["data_updated"] = load_data().get("updated")
+    return JSONResponse(payload, headers={
         # Short edge TTL: enough to absorb many viewers polling at once while
         # still feeling live. Matches the client poll interval.
         "Cache-Control": "public, max-age=10, s-maxage=10",
@@ -1219,13 +1245,21 @@ def favicon_svg():
     return FileResponse(os.path.join(BASE_DIR, "favicon.svg"), media_type="image/svg+xml")
 
 
-# Browsers auto-request these regardless of <link> tags; point them at the SVG
-# so they stop 404ing.
+# Crawlers auto-request these regardless of <link> tags, and Bing's favicon
+# fetcher in particular wants a real file at the root /favicon.ico convention —
+# a 301 to a different format is a known way to end up with a blank globe in the
+# results. Raster sources come from scripts/generate_favicons.py.
 @app.get("/favicon.ico")
+def favicon_ico():
+    return FileResponse(os.path.join(BASE_DIR, "favicon.ico"), media_type="image/x-icon")
+
+
 @app.get("/apple-touch-icon.png")
 @app.get("/apple-touch-icon-precomposed.png")
-def favicon_compat():
-    return RedirectResponse("/favicon.svg", status_code=301)
+def apple_touch_icon():
+    return FileResponse(
+        os.path.join(BASE_DIR, "apple-touch-icon.png"), media_type="image/png"
+    )
 
 
 @app.get("/haystack-logo.png")
@@ -1375,7 +1409,9 @@ def _marketing_page(
   <meta name="twitter:description" content="{escape(description)}">
   <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
   <meta name="twitter:image:alt" content="HVTracker AI trust registry preview">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/static/site.css">
   <style>
     :root {{
@@ -2489,7 +2525,12 @@ def _startup():
         # commit counts for its rows anyway; repair runs on the next boot.
         threading.Thread(target=_refresh_and_record, args=("pending", fingerprint, "startup"), daemon=True).start()
         print("[startup] detected provisional rows — kicked off pending refresh")
-    elif _has_missing_commit_rows():
+    elif os.environ.get("DISABLE_SCHEDULER") != "1" and _has_missing_commit_rows():
+        # Same DISABLE_SCHEDULER guard as the pending branch above. Without it
+        # pytest on a roster-add branch spawned a real, un-tokened fetch
+        # subprocess that outlived the suite in 403-retry loops (and raced
+        # pytest's own summary line out of the log). No production effect:
+        # DISABLE_SCHEDULER is set only by the tests and docker-compose.
         threading.Thread(target=_refresh_and_record, args=("repair-commits", fingerprint, "startup"), daemon=True).start()
         print("[startup] detected rows with missing commit counts — kicked off targeted repair refresh")
     elif seeded > 0 or stored_fingerprint != fingerprint or agents_changed:

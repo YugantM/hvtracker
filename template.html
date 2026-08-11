@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% include "_head_icons.html.j2" %}
   <meta name="description" content="AI trust registry for open-source AI agent projects. Independent trust scores across activity, adoption, transparency, safety, and provenance using public, checkable signals.">
   <title>AI Trust Registry For Open-Source AI Agent Projects | HVTracker</title>
   <meta name="google-site-verification" content="s2YUWbGP7cJsI6HUCKRX9YCtbVJVyA1Q1_jsNWj1RHc">
   <!-- Bing Webmaster Tools (also indexes for DuckDuckGo): paste token from bing.com/webmasters, then uncomment. -->
   <!-- <meta name="msvalidate.01" content="REPLACE_WITH_BING_TOKEN"> -->
   <link rel="canonical" href="https://hvtracker.net/">
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="alternate" type="application/feed+json" title="HVTracker — JSON Feed" href="/feed.json">
   <meta property="og:type" content="website">
   <meta property="og:title" content="AI Trust Registry — {{ total }} Open-Source AI Agent Projects | HVTracker">
@@ -245,6 +245,8 @@
     .cat-tab.special { color: var(--amber); margin: 0 4px 0 8px; }
     .cat-tab.special.active { color: var(--amber); border-bottom-color: var(--amber); }
     .cat-tab-badge { font-family: var(--font-mono); font-size: 11px; margin-left: 4px; color: inherit; }
+    .cat-tab-count { font-family: var(--font-mono); font-size: 11px; margin-left: 5px; color: var(--muted-2); }
+    .cat-tab.active .cat-tab-count { color: inherit; }
 
     .table-wrap { overflow-x: auto; border-top: 2px solid var(--text); }
 
@@ -572,7 +574,7 @@
       </div>
       <a class="home-live" id="home-live" href="/live/" hidden>
         <span class="live-dot"></span>
-        <span><strong id="home-live-n">—</strong> trust checks answered for AI agents in the last 24h</span>
+        <span><strong id="home-live-n">—</strong><span id="home-live-label"> trust checks answered for AI agents in the last 24h</span></span>
         <span class="home-live-go">see it live &rarr;</span>
       </a>
       <div class="stats-bar" role="group" aria-label="Registry snapshot">
@@ -713,8 +715,11 @@
 
     <div class="cat-tabs" id="catTabs" role="group" aria-label="Category presets">
       <button class="cat-tab active" data-tab="__all__" aria-pressed="true">Global</button>
-      {% for cat in categories[:5] %}
-      <button class="cat-tab" data-tab="{{ cat.name }}" aria-pressed="false">{{ cat.name }}</button>
+      {# Tabs are the LARGEST categories, biggest first — so the tab bar tracks
+         what the registry actually holds instead of a hand-fixed order. MCP
+         Servers is 59% of the roster and lands immediately after Global. #}
+      {% for cat in (categories|sort(attribute='count', reverse=true))[:5] %}
+      <button class="cat-tab" data-tab="{{ cat.name }}" aria-pressed="false">{{ cat.name }} <span class="cat-tab-count">{{ cat.count }}</span></button>
       {% endfor %}
       {% if newly_added %}
       <button class="cat-tab special" data-tab="__new__" aria-pressed="false">Newly added <span class="cat-tab-badge">{{ newly_added|length }}</span></button>
@@ -1579,9 +1584,14 @@
       fetch("/api/v1/usage")
         .then(function (r) { return r.json(); })
         .then(function (d) {
-          var n = d && d.window && d.window.tool_calls;
+          var w = (d && d.window) || {};
+          // Fall back to raw machine requests so the strip shows real traffic
+          // before the day's first tool call; hidden only if both are zero.
+          var n = w.tool_calls || 0, label = " trust checks answered for AI agents in the last 24h";
+          if (!n) { n = w.requests || 0; label = " machine requests served in the last 24h"; }
           if (!n) return;
           document.getElementById("home-live-n").textContent = Number(n).toLocaleString();
+          document.getElementById("home-live-label").textContent = label;
           document.getElementById("home-live").hidden = false;
         })
         .catch(function () {});

@@ -2210,6 +2210,95 @@ def agent_review_insights(row: dict) -> dict:
     }
 
 
+def agent_compare_targets(row: dict, related: list[dict], published: list[dict]) -> list[dict]:
+    """Up to 3 head-to-head suggestions for the sticky compare bubble.
+
+    Targets are the agent's category neighbours, so the suggestion is always a
+    like-for-like matchup. `/compare/<a>-vs-<b>/` serves the static page when one
+    was generated and otherwise the compare tool with both agents preselected
+    (app.py compare_pair), so every target is a working link either way.
+
+    Pairs without a generated page are served noindex, so they carry rel=nofollow
+    — linking 400+ agent pages at them would otherwise spend crawl budget on URLs
+    that can never index (the #193 crawl-waste lesson).
+    """
+    published_urls = {c.get("url") for c in (published or [])}
+    targets = []
+    for peer in (related or [])[:3]:
+        slug_a, slug_b = sorted([row["slug"], peer["slug"]])
+        url = f"/compare/{slug_a}-vs-{slug_b}/"
+        peer_score = peer.get("trust_score") or 0
+        targets.append({
+            "name": peer["name"],
+            "slug": peer["slug"],
+            "url": url,
+            "score": peer_score,
+            # Positive = the peer scores higher than the agent being viewed.
+            "delta": round(peer_score - (row.get("trust_score") or 0), 1),
+            "published": url in published_urls,
+        })
+    return targets
+
+
+def category_dimension_averages(peers: list[dict]) -> dict:
+    """Mean of each trust dimension (and the overall score) across a category.
+
+    `peers` is every listed row in the category INCLUDING the agent itself, so
+    the average is the category's, not a leave-one-out baseline — the agent page
+    reads "vs the Workflow Platforms average", and that average must be the same
+    number on every page in the category.
+    """
+    n = max(len(peers), 1)
+    avgs = {}
+    for key, (_, _max) in TRUST_DIMENSIONS.items():
+        avgs[key] = sum((p.get("trust_breakdown") or {}).get(key, 0) or 0 for p in peers) / n
+    avgs["trust_score"] = sum(p.get("trust_score") or 0 for p in peers) / n
+    return avgs
+
+
+def agent_category_comparison(row: dict, peers: list[dict]) -> dict | None:
+    """Per-dimension comparison of one agent against its category average.
+
+    Returns None when the category is too small for an average to mean anything
+    (a 2-agent category makes every agent "above" or "below" by construction).
+    """
+    if not peers or len(peers) < 4:
+        return None
+    avgs = category_dimension_averages(peers)
+    breakdown = row.get("trust_breakdown") or {}
+    dims = []
+    for key, (label, max_score) in TRUST_DIMENSIONS.items():
+        value = breakdown.get(key, 0) or 0
+        avg = avgs[key]
+        delta = value - avg
+        dims.append({
+            "key": key,
+            "label": label,
+            "value": round(value, 1),
+            "max": max_score,
+            "avg": round(avg, 1),
+            "delta": round(delta, 1),
+            # Bars and the average tick are positioned as % of the dimension max.
+            "pct": round(value / max_score * 100, 1) if max_score else 0,
+            "avg_pct": round(avg / max_score * 100, 1) if max_score else 0,
+            # A dimension within 0.5pt of the mean is "in line" — below that the
+            # delta is noise and an up/down arrow would overstate it.
+            "direction": "above" if delta >= 0.5 else ("below" if delta <= -0.5 else "level"),
+        })
+    score = row.get("trust_score") or 0
+    score_delta = score - avgs["trust_score"]
+    return {
+        "category": row.get("category") or "",
+        "peers": len(peers),
+        "dimensions": dims,
+        "score": round(score, 1),
+        "score_avg": round(avgs["trust_score"], 1),
+        "score_delta": round(score_delta, 1),
+        "score_direction": "above" if score_delta >= 0.5 else ("below" if score_delta <= -0.5 else "level"),
+        "ahead_of": sum(1 for p in peers if (p.get("trust_score") or 0) < score),
+    }
+
+
 def agent_remediation_steps(row: dict) -> list[dict]:
     """Return concrete, evidence-backed trust improvements for maintainers."""
     steps = []
@@ -4792,8 +4881,15 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>HVTracker — Data Endpoints</title>
+  <title>Free AI Agent Dataset &amp; JSON API — Trust Scores for {len(data_output["agents"])} Agents | HVTracker</title>
+  <!-- Ranked ~13 with 526 impressions and zero clicks: the page shipped no
+       meta description and no canonical, so Google had no snippet to show. -->
+  <meta name="description" content="Free, machine-readable trust data for {len(data_output["agents"])} open-source AI agents: JSON endpoints, per-agent history, quarterly CSV exports and an MCP server. CC BY 4.0, no key required.">
+  <link rel="canonical" href="https://hvtracker.net/data/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
@@ -6316,12 +6412,19 @@ def main() -> None:
     compare_by_slug = {}        # agent slug -> [{name, url}] for agent pages
     compare_by_cat = {}         # cat slug   -> [{a, b, url}] for category pages
     for _cm in categories:
+        # Must match the top-8 rule used when rendering the pair pages below —
+        # otherwise the extra pages exist with no internal links pointing at
+        # them, and Google has no path to crawl them.
         _top = sorted(
             [r for r in rows if r.get("category") == _cm["name"]],
             key=lambda x: x.get("category_rank") or 9999,
-        )[:3]
+        )[:8]
         for _a, _b in itertools.combinations(_top, 2):
-            _url = f"/compare/{_a['slug']}-vs-{_b['slug']}/"
+            # Canonical pair URL is alphabetical — that is where the static page
+            # is written and what app.py redirects to. Building it in rank order
+            # made every internal compare link a 301 to its own canonical URL.
+            _lo, _hi = sorted([_a["slug"], _b["slug"]])
+            _url = f"/compare/{_lo}-vs-{_hi}/"
             compare_by_slug.setdefault(_a["slug"], []).append({"name": _b["name"], "url": _url})
             compare_by_slug.setdefault(_b["slug"], []).append({"name": _a["name"], "url": _url})
             compare_by_cat.setdefault(_cm["slug"], []).append({"a": _a["name"], "b": _b["name"], "url": _url})
@@ -6701,6 +6804,12 @@ def main() -> None:
         row["remediation_steps"] = agent_remediation_steps(row)
         row["safety_qa"] = agent_safety_qa(row)
         row["correction_url"] = agent_correction_url(row)
+        # How this agent sits against its category on each trust dimension.
+        # by_cat holds listed rows only, so legacy rows get None and the
+        # template simply omits the comparison block.
+        row["category_comparison"] = agent_category_comparison(
+            row, by_cat.get(row.get("category", ""), [])
+        )
     for row in rows:
         repo_key = row["repo"].lower()
         points = sparkline_data.get(repo_key, [])
@@ -6710,8 +6819,10 @@ def main() -> None:
         row["event_chart_svg"] = render_event_timeline_svg(events)
         slug_dir = os.path.join(agents_dir, row["slug"])
         os.makedirs(slug_dir, exist_ok=True)
+        row_related = related_agents(row, cat_sorted_rows)
+        row_comparisons = compare_by_slug.get(row["slug"], [])
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, drift_events=filter_drift_events(events), methodology_version=METHODOLOGY_VERSION, comparisons=compare_by_slug.get(row['slug'], []), provider_slugs=provider_slug_map, related=related_agents(row, cat_sorted_rows)))
+            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, drift_events=filter_drift_events(events), methodology_version=METHODOLOGY_VERSION, comparisons=row_comparisons, provider_slugs=provider_slug_map, related=row_related, compare_targets=agent_compare_targets(row, row_related, row_comparisons)))
 
     print(f"Built {len(rows)} active agent profile pages under agents/.")
 
@@ -7037,7 +7148,7 @@ def main() -> None:
                  for lbl, k in (("Safety / integrity", "safety"), ("Identity & provenance", "identity"),
                                 ("Transparency", "transparency"), ("Maintenance", "maintenance"), ("Adoption", "adoption"))]
         _ctx = {"a": _a, "b": _b, "category": _cm, "metrics": _metrics, "dims": _dims,
-                "caps": compare_capability_rows(_a, _b),
+                "caps": compare_capability_rows(_a, _b), "total": len(rows),
                 "updated": now_str, "methodology_version": METHODOLOGY_VERSION,
                 "lead_name": None, "lead_score": None, "lead_grade": None, "trail_score": None, "trail_grade": None, "gap": None,
                 "coverage_caveat": None}
@@ -7053,9 +7164,16 @@ def main() -> None:
             f.write(compare_pair_tmpl.render(**_ctx))
         compare_pair_urls.append(f"https://hvtracker.net/compare/{_a['slug']}-vs-{_b['slug']}/")
 
+    # Top-8 per category = 28 pairs each (~450 pages) rather than top-3's 3.
+    # Compare pages are the best-converting surface after agent profiles
+    # (1.38% CTR vs 1.60%) and were the most under-built: 67 pages for 468
+    # agents. The top 8 of a category are the set a reader actually chooses
+    # between, so every pair is a comparison someone plausibly searches for;
+    # widening further would start pairing agents nobody weighs against
+    # each other. Pairs persist via seo_state, so this only ever adds URLs.
     for _cm in categories:
         _top = sorted([r for r in rows if r.get("category") == _cm["name"]],
-                      key=lambda x: x.get("category_rank") or 9999)[:3]
+                      key=lambda x: x.get("category_rank") or 9999)[:8]
         for _x, _y in _it.combinations(_top, 2):
             # Canonical (alphabetical) slug order so the dir/URL/canonical match
             # app.py's /compare/<a>-vs-<b>/ routing (which 301s to alpha order).

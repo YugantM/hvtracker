@@ -37,7 +37,7 @@ COPY --from=builder /opt/venv /opt/venv
 
 # Application code
 COPY app.py fetch_and_build.py generate_og_card.py specs.py db.py cache.py storage.py schema.sql ./
-COPY signing.py mcp_trust.py open_lookup.py verify_log.py mcp_server.py auth.py ./
+COPY signing.py mcp_trust.py open_lookup.py verify_log.py mcp_server.py auth.py usage.py ./
 # Generator inputs: curated seed, scorecard cache, and templates/assets
 COPY agents.json template.html ./
 COPY --from=builder /build/scorecard-cache.json ./scorecard-cache.json
@@ -45,12 +45,13 @@ COPY templates/ templates/
 COPY docs/import-candidates.json docs/import-candidates.json
 COPY compare/index.html compare/index.html
 COPY verify/index.html verify/index.html
+COPY live/index.html live/index.html
 COPY scan/index.html scan/index.html
 COPY static/ static/
 COPY blog_static/ blog_static/
 COPY changelog/ changelog/
 COPY .well-known/ .well-known/
-COPY .nojekyll robots.txt analytics.js auth.js og-v2.png og-verify.png og-provenance.png og-mcp.png og-scan.png favicon.svg hex-bg.svg haystack-logo.png aipass-logo.png composio-logo.svg lightrag-logo.png threadplane-logo.png ./
+COPY .nojekyll robots.txt analytics.js auth.js og-v2.png og-verify.png og-provenance.png og-mcp.png og-scan.png favicon.svg favicon.ico apple-touch-icon.png hex-bg.svg haystack-logo.png aipass-logo.png composio-logo.svg lightrag-logo.png threadplane-logo.png ./
 # render_state.json — baked into the image so that newly-listed agents added
 # via git push are synced to the volume on startup (see fetch_and_build.py).
 COPY data/render_state.json data/render_state.json

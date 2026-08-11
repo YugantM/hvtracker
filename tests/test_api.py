@@ -533,6 +533,11 @@ def test_startup_keeps_scheduler_alive(monkeypatch):
     monkeypatch.setattr(app.db, "init_schema", lambda: None)
     monkeypatch.setattr(app.db, "enabled", lambda: False)
     monkeypatch.setattr(app, "_has_missing_commit_rows", lambda: False)
+    # Stub the sibling predicate too. This test asserts which scheduler jobs
+    # get registered; it deletes DISABLE_SCHEDULER and does NOT fake the
+    # thread, so leaving this reading the real data.json meant any roster with
+    # provisional rows kicked a real fetch subprocess that outlived the suite.
+    monkeypatch.setattr(app, "_has_pending_signal_rows", lambda: False)
     monkeypatch.setattr(app.os.path, "isfile", lambda path: True)
 
     app._scheduler = None
@@ -679,6 +684,86 @@ def test_blog_urls_carry_trailing_slash(client):
     assert blog_urls and all(u.endswith("/") for u in blog_urls)
 
 
+# TestClient talks to host "testserver", which the canonical-host middleware
+# 301s to hvtracker.net before any route runs. Most tests never notice because
+# they follow redirects straight back into the app; a test asserting "this path
+# does not redirect" has to present itself as the canonical origin first.
+_CANONICAL_HEADERS = {"host": "hvtracker.net", "x-forwarded-proto": "https"}
+
+
+def test_icon_routes_serve_real_files_not_redirects(client):
+    # These used to 301 to /favicon.svg. A redirect at the root /favicon.ico
+    # convention, landing on a different format, is the shape that leaves a
+    # blank globe next to the result in Bing.
+    ico = os.path.join(ROOT, "favicon.ico")
+    apple = os.path.join(ROOT, "apple-touch-icon.png")
+
+    r = client.get("/favicon.ico", follow_redirects=False, headers=_CANONICAL_HEADERS)
+    assert r.status_code == 200, f"must not redirect (got {r.status_code})"
+    assert r.headers["content-type"] == "image/x-icon"
+    with open(ico, "rb") as f:
+        assert r.content == f.read()
+
+    with open(apple, "rb") as f:
+        apple_bytes = f.read()
+    for path in ("/apple-touch-icon.png", "/apple-touch-icon-precomposed.png"):
+        r = client.get(path, follow_redirects=False, headers=_CANONICAL_HEADERS)
+        assert r.status_code == 200, f"{path} must not redirect (got {r.status_code})"
+        assert r.headers["content-type"] == "image/png"
+        assert r.content == apple_bytes
+
+    r = client.get("/favicon.svg", follow_redirects=False, headers=_CANONICAL_HEADERS)
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("image/svg+xml")
+
+
+def test_indexed_pages_declare_the_icon_set(client):
+    # The point of the change: the pages search engines actually index carry
+    # the declaration, not just the homepage.
+    links = ('<link rel="icon" href="/favicon.ico" sizes="32x32">',
+             '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
+             '<link rel="apple-touch-icon" href="/apple-touch-icon.png">')
+    output = os.environ["OUTPUT_DIR"]
+    pair = glob.glob(os.path.join(output, "compare", "*-vs-*", "index.html"))
+    agent = glob.glob(os.path.join(output, "agents", "*", "index.html"))
+    assert pair and agent, "expected rendered compare pairs and agent pages"
+
+    for path in (pair[0], agent[0], os.path.join(output, "index.html")):
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        for link in links:
+            assert link in text, f"{path} is missing {link}"
+
+
+def test_compare_pair_carries_pair_structured_data(client):
+    # Compare pages used to emit only BreadcrumbList, leaving the two compared
+    # projects and their scores as prose with nothing machine-readable.
+    import re
+    path = glob.glob(os.path.join(os.environ["OUTPUT_DIR"], "compare",
+                                  "*-vs-*", "index.html"))[0]
+    with open(path, encoding="utf-8") as f:
+        html = f.read()
+    blocks = [json.loads(m) for m in re.findall(
+        r'<script type="application/ld\+json">\s*(.*?)\s*</script>', html, re.S)]
+    by_type = {b["@type"]: b for b in blocks}
+    assert "BreadcrumbList" in by_type, "breadcrumbs must survive"
+
+    lst = by_type["ItemList"]
+    assert lst["numberOfItems"] == 2
+    items = [e["item"] for e in lst["itemListElement"]]
+    assert [e["position"] for e in lst["itemListElement"]] == [1, 2]
+    assert all(i["@type"] == "SoftwareApplication" for i in items)
+    # Names match the pair the page is actually about.
+    slug_a, slug_b = os.path.basename(os.path.dirname(path)).split("-vs-")
+    reviewed = [i["review"]["url"] for i in items if "review" in i]
+    assert f"https://hvtracker.net/agents/{slug_a}/" in reviewed
+    assert f"https://hvtracker.net/agents/{slug_b}/" in reviewed
+    for item in items:
+        rating = item["review"]["reviewRating"]
+        assert rating["bestRating"] == 100 and rating["worstRating"] == 0
+        assert 0 <= rating["ratingValue"] <= 100
+    # Policy: editorial review only — aggregateRating needs real user ratings.
+    assert "aggregateRating" not in html
 # ---- /api/v1/usage + /live/ (machine-channel transparency) -----------------
 
 def test_api_v1_usage_shape_and_self_exclusion(client):
@@ -719,5 +804,42 @@ def test_api_v1_usage_counts_other_api_traffic(client):
 def test_live_page_is_served(client):
     r = client.get("/live/")
     assert r.status_code == 200
-    assert "trust questions answered" in r.text
     assert "/api/v1/usage" in r.text
+    # Structure, not prose — the headline wording has changed twice already.
+    # Both figures must be present: the headline count and the tool-call
+    # breakdown beneath it, so one can never silently replace the other.
+    assert 'id="odo-req"' in r.text        # headline: machine requests
+    assert 'id="odo"' in r.text            # secondary: answered tool calls
+    assert "machine requests" in r.text and "tool calls" in r.text
+
+
+def test_usage_endpoint_carries_site_freshness_for_the_header(client):
+    """The header widget reads freshness + activity from this one response.
+
+    It used to fetch /data/latest.json (multi-megabyte) for the timestamp.
+    """
+    body = client.get("/api/v1/usage").json()
+    assert "data_updated" in body
+    import usage
+    usage._snapshot_cache = None
+    assert "data_updated" not in usage.snapshot(), "must not leak into the cached snapshot"
+
+
+def test_raw_daily_snapshots_are_not_publicly_served(client):
+    """Daily snapshots hold every row with the full scoring internals and are
+    enumerable by date, so the raw files must never be reachable over HTTP.
+
+    The site reads them from disk; only the curated 90-day history API is public.
+    """
+    for path in (
+        "/output/history/2026-08-08.json",
+        "/output/history/2026-06-01.json",
+        "/output/history/",
+        "/output/history",
+    ):
+        assert client.get(path).status_code == 404, path
+
+    # The deliberate, documented public surface must still work.
+    repo = client.get("/api/agents", params={"limit": 1}).json()["agents"][0]
+    r = client.get(f"/api/v1/agents/{repo['slug']}/history")
+    assert r.status_code == 200
