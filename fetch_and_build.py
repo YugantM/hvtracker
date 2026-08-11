@@ -41,6 +41,16 @@ if TOKEN:
 METHODOLOGY_VERSION = "v4.3"  # runtime signals count declared evidence only (dep sections, shipped plugin paths, named credentials)
 DATA_SCHEMA_VERSION = "v0.1"
 
+# Listing classes share the scoring pipeline but NOT the rank space. "agent" is
+# the original board and stays the default for any row without an explicit
+# class, so existing rosters keep their exact ranks. "skill" covers skill
+# definitions and plugin bundles an agent executes: same evidence signals, but
+# ranked among themselves because the trust_score bands are calibrated on
+# agent-shaped evidence — a small skill repo legitimately scores in the 13-24
+# band pre-scan, which would read as a failing agent on a shared board.
+LISTING_CLASSES = ("agent", "skill")
+DEFAULT_LISTING_CLASS = "agent"
+
 
 def _github_retry_delay(resp: requests.Response | None, attempt: int) -> float:
     """Best-effort backoff for transient GitHub API failures."""
@@ -2064,6 +2074,82 @@ def _rank_sort_key(row: dict) -> tuple:
         row.get("stars", 0) or 0,
         row.get("slug", ""),
     )
+
+
+def listing_class(row: dict) -> str:
+    """Which rank space a row belongs to. Rows with no class are agents.
+
+    The registry lists more than one kind of artifact. Agents are the original
+    board; skills (skill definitions and plugin bundles an agent executes) are
+    scored on the same evidence but ranked among themselves — see
+    `LISTING_CLASSES` and the per-class rank block in main().
+    """
+    cls = row.get("class") or DEFAULT_LISTING_CLASS
+    return cls if cls in LISTING_CLASSES else DEFAULT_LISTING_CLASS
+
+
+def group_by_class(rows: list[dict]) -> dict[str, list[dict]]:
+    """Partition rows into per-class rank spaces, preserving input order."""
+    groups: dict[str, list[dict]] = {}
+    for row in rows:
+        groups.setdefault(listing_class(row), []).append(row)
+    return groups
+
+
+def apply_listing_classes(rows: list[dict], agents: list[dict]) -> None:
+    """Re-apply each row's listing class from the roster, in place.
+
+    Must run on EVERY render, not just when a row is created. Rows are built
+    field-by-field — `provisional_agent_row` and the fetch path both copy only
+    the config keys they name — so a row loaded from the render_state cache
+    carries no `class` at all. Without this it silently defaults to "agent" and
+    every skill rejoins the agent board, which is the one outcome the separate
+    rank space exists to prevent.
+    """
+    class_map = {a["repo"].lower(): a.get("class", "") for a in agents if a.get("class")}
+    for row in rows:
+        row["class"] = class_map.get(row.get("repo", "").lower(), DEFAULT_LISTING_CLASS)
+
+
+def assign_ranks(rows: list[dict]) -> list[dict]:
+    """Sort `rows` and assign rank / display_rank WITHIN each listing class.
+
+    Ranking is trust-first, breaking ties with hard-to-fake evidence BEFORE
+    popularity: trust_score → confidence → OSSF Scorecard → signed-commit ratio
+    → momentum → stars → slug. Popularity is retained (it still separates
+    equal-evidence ties) but reaching #1 among tied scores requires real audit
+    posture, not a star farm.
+
+    Each class is ranked among itself, so introducing or growing one class never
+    moves a rank in another — the property that keeps skills off the agent
+    board. Mutates and returns `rows` (sorted globally by the same comparator).
+    """
+    rows.sort(key=_rank_sort_key, reverse=True)
+
+    for class_rows in group_by_class(rows).values():
+        for i, row in enumerate(class_rows, 1):
+            row["rank"] = i
+            row["rank_v2"] = i
+            row["trust_score_v2"] = row["trust_score"]
+
+        # Shared display rank for rows whose live trust_score is exactly equal:
+        # they legitimately tie, so the leaderboard shows the same "=N" for each
+        # rather than manufacturing a rank difference the score doesn't support.
+        # The strict `rank` above is unchanged (deltas/movers/sparklines use it).
+        tie_start = 0
+        for i, row in enumerate(class_rows):
+            if i == 0 or row["trust_score"] != class_rows[i - 1]["trust_score"]:
+                tie_start = i + 1
+            row["display_rank"] = tie_start
+        tie_counts: dict[int, int] = {}
+        for row in class_rows:
+            tie_counts[row["display_rank"]] = tie_counts.get(row["display_rank"], 0) + 1
+        for row in class_rows:
+            row["is_tied"] = tie_counts[row["display_rank"]] > 1
+
+    for row in rows:
+        row["listing_class"] = listing_class(row)
+    return rows
 
 
 def score_components(stars: int, days_since: int, recent_commits: int, forks: int) -> dict:
@@ -6183,6 +6269,7 @@ def main() -> None:
     # `repo` as the tracking/join key while showing the corrected slug.
     _display_repo_map = {a["repo"].lower(): a.get("display_repo", "") for a in all_agents if a.get("display_repo")}
     _source_note_map = {a["repo"].lower(): a.get("source_note", "") for a in all_agents if a.get("source_note")}
+    apply_listing_classes(rows, all_agents)
 
     # Re-apply the latest OSSF scan to every carried-forward agent (cache-only,
     # no API) so scores stay fresh each cycle instead of only the slice that was
@@ -6303,31 +6390,7 @@ def main() -> None:
         else:
             row["evidence_grade"] = "D"
 
-    # Rank by HVTrust (trust-first, runtime-calibrated), then break ties with
-    # hard-to-fake evidence BEFORE popularity: confidence → OSSF Scorecard →
-    # signed-commit ratio → momentum → stars → slug. Popularity is retained
-    # (it still separates equal-evidence ties) but reaching #1 among tied
-    # scores now requires real audit posture, not a star farm.
-    rows.sort(key=_rank_sort_key, reverse=True)
-    for i, row in enumerate(rows, 1):
-        row["rank"] = i
-        row["rank_v2"] = i
-        row["trust_score_v2"] = row["trust_score"]
-
-    # Shared display rank for agents whose live trust_score is exactly equal:
-    # they legitimately tie, so the leaderboard shows the same "=N" for each
-    # rather than manufacturing a rank difference the score doesn't support.
-    # The strict `rank` above is unchanged (deltas/movers/sparklines rely on it).
-    tie_start = 0
-    for i, row in enumerate(rows):
-        if i == 0 or row["trust_score"] != rows[i - 1]["trust_score"]:
-            tie_start = i + 1
-        row["display_rank"] = tie_start
-    tie_counts: dict[int, int] = {}
-    for row in rows:
-        tie_counts[row["display_rank"]] = tie_counts.get(row["display_rank"], 0) + 1
-    for row in rows:
-        row["is_tied"] = tie_counts[row["display_rank"]] > 1
+    assign_ranks(rows)
 
     # Pre-calibration baseline rank, preserved for the leaderboard's
     # compare-to-pre-calibration view — no longer live/authoritative anywhere.
@@ -6668,9 +6731,18 @@ def main() -> None:
     else:
         env.globals["auth_js_hash"] = ""
 
-    movers = compute_movers(history, {r["repo"].lower(): r["slug"] for r in rows}, rows=rows, limit=12)
-    movers_page = compute_movers_page_data(rows, history)
-    newly_added = compute_newly_added(rows, history)
+    # The homepage IS the agent board, so everything on it is agent-scoped: a
+    # separate rank space would otherwise show two rows both ranked "#1", and
+    # a 148-row skill batch would flood movers and "newly added". Skills reach
+    # the public site through their own category page (see LISTING_CLASSES).
+    agent_rows = [r for r in rows if listing_class(r) == "agent"]
+    class_totals = {cls: len(group) for cls, group in group_by_class(rows).items()}
+
+    movers = compute_movers(
+        history, {r["repo"].lower(): r["slug"] for r in agent_rows}, rows=agent_rows, limit=12
+    )
+    movers_page = compute_movers_page_data(agent_rows, history)
+    newly_added = compute_newly_added(agent_rows, history)
     use_case_pages = build_use_case_pages(rows)
     ecosystem_pages = build_ecosystem_pages(rows)
     org_pages = build_org_pages(rows)
@@ -6727,22 +6799,23 @@ def main() -> None:
         if event.get("date", "") >= recent_change_window_start
     )
     registry_summary = {
-        "active_count": len(rows),
-        "warning_count": sum(1 for r in rows if r.get("has_warning")),
+        "active_count": len(agent_rows),
+        "warning_count": sum(1 for r in agent_rows if r.get("has_warning")),
         "legacy_count": len(legacy_rows),
-        "provenance_count": sum(1 for r in rows if r.get("has_provenance")),
-        "fresh_count": sum(1 for r in rows if (r.get("days_ago") or 9999) <= 14),
-        "stale_count": sum(1 for r in rows if (r.get("days_ago") or 0) > 90),
+        "provenance_count": sum(1 for r in agent_rows if r.get("has_provenance")),
+        "fresh_count": sum(1 for r in agent_rows if (r.get("days_ago") or 9999) <= 14),
+        "stale_count": sum(1 for r in agent_rows if (r.get("days_ago") or 0) > 90),
         "recent_change_count": recent_change_count,
+        "skill_count": len(rows) - len(agent_rows),
     }
-    warning_rows = [r for r in rows if r.get("has_warning")][:6]
+    warning_rows = [r for r in agent_rows if r.get("has_warning")][:6]
 
     tmpl = env.get_template("template.html")
     html = tmpl.render(
-        rows=rows,
+        rows=agent_rows,
         legacy_rows=legacy_rows,
         updated=now_str,
-        total=len(rows),
+        total=len(agent_rows),
         categories=categories,
         movers=movers,
         newly_added=newly_added,
@@ -6754,7 +6827,7 @@ def main() -> None:
     out_path = os.path.join(script_dir, "index.html")
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"Built index.html with {len(rows)} agents.")
+    print(f"Built index.html with {len(agent_rows)} agents.")
 
     # Score Lab was retired when the runtime calibration it previewed became
     # the production score (methodology v4.0) — the per-field adjustment rules
@@ -6822,7 +6895,7 @@ def main() -> None:
         row_related = related_agents(row, cat_sorted_rows)
         row_comparisons = compare_by_slug.get(row["slug"], [])
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, drift_events=filter_drift_events(events), methodology_version=METHODOLOGY_VERSION, comparisons=row_comparisons, provider_slugs=provider_slug_map, related=row_related, compare_targets=agent_compare_targets(row, row_related, row_comparisons)))
+            f.write(agent_tmpl.render(row=row, total=class_totals[listing_class(row)], updated=now_str, events=events, drift_events=filter_drift_events(events), methodology_version=METHODOLOGY_VERSION, comparisons=row_comparisons, provider_slugs=provider_slug_map, related=row_related, compare_targets=agent_compare_targets(row, row_related, row_comparisons)))
 
     print(f"Built {len(rows)} active agent profile pages under agents/.")
 
@@ -6841,14 +6914,16 @@ def main() -> None:
                 try:
                     # Rows don't carry a board-size field, so without this the
                     # card's "Rank #N of M" falls back to a stale hardcoded 196.
-                    generate_og({**row, "total": len(rows)}, og_path)
+                    # M is the row's OWN class size — rank is per-class, so a
+                    # skill ranked #12 is "#12 of 148", never "of 1,454".
+                    generate_og({**row, "total": class_totals[listing_class(row)]}, og_path)
                     og_count += 1
                 except Exception as e:
                     print(f"  WARN: OG card failed for {row['slug']}: {e}")
             try:
                 generate_site_card(
                     os.path.join(script_dir, "og-v2.png"),
-                    total=len(rows),
+                    total=len(agent_rows),
                     categories=len(categories),
                 )
             except Exception as e:
@@ -7398,8 +7473,8 @@ def main() -> None:
         snapshot_posts=snapshot_posts,
         quarterly_reports=quarterly_reports,
         categories=categories,
-        total=len(rows),
-        top_agent=rows[0],
+        total=len(agent_rows),
+        top_agent=agent_rows[0],
         blog_schema_json=json.dumps(blog_schema, ensure_ascii=False),
         updated=now_str,
     )
@@ -7745,9 +7820,9 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
 
     # Build /badges/ — Badge for Maintainers page
     badges_html = env.get_template("badges.html.j2").render(
-        top_repos=rows[:12],
-        sample=rows[0],
-        total=len(rows),
+        top_repos=agent_rows[:12],
+        sample=agent_rows[0],
+        total=len(agent_rows),
         updated=now_str,
     )
     badges_dir = os.path.join(script_dir, "badges")

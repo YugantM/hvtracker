@@ -909,10 +909,24 @@ def api_v1_graph():
 
 @app.get("/api/v1/agents")
 def api_v1_agents():
+    """The agent board. Agent-class rows only — see the note below.
+
+    The v1 stability promise is that fields are add-only. Returning a second
+    listing class here would change *which rows* the endpoint serves, not just
+    their fields, and this is the dominant machine channel (the MCP server
+    pulls and caches this board). Skills have their own rank space, so their
+    `rank` is not comparable with an agent's anyway. The complete multi-class
+    snapshot stays available at /data/latest.json.
+    """
     if not os.path.isfile(DATA_PATH):
         return JSONResponse({"error": "data not built yet"}, status_code=503)
     with open(DATA_PATH, encoding="utf-8") as f:
         data = json.load(f)
+    rows = data.get("agents")
+    if isinstance(rows, list):
+        data = {**data, "agents": [
+            r for r in rows if (r.get("listing_class") or "agent") == "agent"
+        ]}
     return JSONResponse(data, headers={
         "Cache-Control": _API_V1_CACHE,
         "Access-Control-Allow-Origin": _API_V1_CORS,
