@@ -1,20 +1,20 @@
 # HVTracker
 
-**AI Trust Registry for Open-Source Agents**
+**AI Trust Registry for Open-Source Agents and MCP Servers**
 
-[hvtracker.net](https://hvtracker.net) ranks open-source AI agents by evidence-weighted trust signals, not GitHub hype.
+[hvtracker.net](https://hvtracker.net) ranks open-source AI agents and MCP servers by evidence-weighted trust signals, not GitHub hype.
 
-HVTracker is an ever-growing leaderboard that tracks open-source AI agents across multiple categories and publishes public, machine-readable trust data for each project: activity, adoption, transparency, supply-chain safety, identity, provenance, evidence grade, and rank movement.
+HVTracker is an ever-growing leaderboard that tracks open-source AI agents and MCP servers across multiple categories and publishes public, machine-readable trust data for each project: activity, adoption, transparency, supply-chain safety, identity, provenance, evidence grade, and rank movement.
 
 The core question is simple:
 
-> Which open-source AI agent projects look active, adopted, transparent, and verifiable right now?
+> Which open-source AI agent and MCP-server projects look active, adopted, transparent, and verifiable right now?
 
 ---
 
 ## Version 4
 
-The production HVTrust score is **runtime-trust calibrated**: the supply-chain base score plus a bounded adjustment for MCP support, external service dependencies, tool/plugin surface, and package-provenance drift (methodology v4.0). A soft ceiling and evidence-first tie-break keep strong agents from piling onto an identical 100 (v4.1), and a v4.2 correction re-derives the score from the base on every build so the bounded adjustment can't compound. Every agent also carries a separate **Evidence Coverage** grade (A–D) showing how many independent signal types back its score. See the [methodology changelog](https://hvtracker.net/methodology/#changelog) and [runtime-trust spec](https://hvtracker.net/spec/runtime-trust/v0.2/).
+The production HVTrust score is **runtime-trust calibrated**: the supply-chain base score plus a bounded adjustment for MCP support, external service dependencies, tool/plugin surface, and package-provenance drift (methodology v4.0). A soft ceiling and evidence-first tie-break keep strong agents from piling onto an identical 100 (v4.1), and a v4.2 correction re-derives the score from the base on every build so the bounded adjustment can't compound. v4.3 narrows every runtime signal to declared evidence: dependency markers are read from dependency sections only, plugin surface from shipped plugin paths, and external services from named credentials — a name in a README, a keyword, or an npm script no longer moves a score. Every agent also carries a separate **Evidence Coverage** grade (A–D) showing how many independent signal types back its score. See the [methodology changelog](https://hvtracker.net/methodology/#changelog) and [runtime-trust spec](https://hvtracker.net/spec/runtime-trust/v0.2/).
 
 Accounts and sign-in (GitHub / Google OAuth), watchlist, the side-by-side compare tray, and crawlable static comparison pages at `/compare/<a>-vs-<b>/` shipped in v3.1 and remain live.
 
@@ -39,8 +39,8 @@ Accounts and sign-in (GitHub / Google OAuth), watchlist, the side-by-side compar
 
 ## Current Snapshot
 
-- 300+ active open-source AI agent projects (see [live count](https://hvtracker.net))
-- Curated categories spanning coding agents, frameworks, infra, security, and more
+- 1,300+ listed projects — open-source AI agents plus MCP servers from the official registry (see [live count](https://hvtracker.net))
+- Curated categories spanning MCP servers, coding agents, frameworks, infra, security, and more
 - **~30-min** signal refresh cadence (tunable via `SIGNALS_REFRESH_MIN`)
 - **~24h** expected full data sweep across sources
 - **90-day** per-agent history where available
@@ -116,7 +116,7 @@ HVTracker is not a security certification. Missing provenance, Scorecard, or sig
 
 ## Categories
 
-Agents are curated across coding agents, agent frameworks, workflow platforms, browser & computer use, memory & knowledge, research & data, observability & evaluation, security & guardrails, protocols & tool integration, and more. Live per-category counts (they move as the registry grows) are on the site: [hvtracker.net/categories](https://hvtracker.net/categories/).
+Projects are curated across MCP servers, coding agents, agent frameworks, workflow platforms, browser & computer use, memory & knowledge, research & data, observability & evaluation, security & guardrails, protocols & tool integration, and more. Live per-category counts (they move as the registry grows) are on the site: [hvtracker.net/categories](https://hvtracker.net/categories/).
 
 ---
 
@@ -213,24 +213,28 @@ python fetch_and_build.py --render-only
 
 ### Manual Production Deploy
 
-If you want to deploy production yourself without waiting on an automated
-GitHub-triggered Railway build:
+Merging is not deploying. Production only changes when someone uploads a
+build, and that upload always comes from a **clean worktree** — the
+Dockerfile copies tracked files by name, so a dirty tree bakes work in
+progress into the image.
 
 ```bash
-./scripts/deploy_production.sh --source
+git worktree add --detach /tmp/hvtracker-deploy main
+cd /tmp/hvtracker-deploy
+railway up --detach
 ```
 
-Use `--source` after your change is already pushed or merged to `main`.
+Deploy from inside the directory: `railway up <path>` given a path outside
+the current directory uploads nothing and exits at "Indexing". The Railway
+project is named `hvtracker-cron`; the site is the `web` service inside it,
+so check `railway status` before assuming. `--ci` exits non-zero on
+"Failed to stream build logs" even when the deploy is fine — poll
+`railway status` until the deployment id changes rather than trusting that
+exit code.
 
-If you need an emergency deploy from your current local workspace instead:
-
-```bash
-./scripts/deploy_production.sh --local
-```
-
-Both modes target the current Railway production `web` service and wait for
-the deployment to finish. Add `--skip-checks` if you intentionally want to
-skip the local verification step.
+Verify with `curl -A "Mozilla/5.0" https://hvtracker.net/healthz` (Cloudflare
+blocks default user agents) and check `agents`, `catalog_agents` and
+`render_in_sync` in the response.
 
 ---
 
@@ -315,13 +319,14 @@ For the strict plain-language boundary, see [docs/strict-inclusion-rubric.md](/U
 
 ## Specifications
 
-- [Trust Credential v0.1](https://hvtracker.net/spec/trust-credential/v0.1)
-- [Methodology v2.0](https://hvtracker.net/spec/methodology/v2.0)
-- [Eligibility v1.0](https://hvtracker.net/spec/eligibility/v1.0)
-- [Listing v0.1](https://hvtracker.net/spec/listing/v0.1)
-- [Data Schema v0.1](https://hvtracker.net/spec/data-schema/v0.1)
-- [Provenance v0.1](https://hvtracker.net/spec/provenance/v0.1)
-- [Build Report v0.1](https://hvtracker.net/spec/build-report/v0.1)
+- [Runtime Trust v0.2](https://hvtracker.net/spec/runtime-trust/v0.2/) - the adjustment table the production score is computed from
+- [Trust Credential v0.2](https://hvtracker.net/spec/trust-credential/v0.2/)
+- [Methodology v2.0](https://hvtracker.net/spec/methodology/v2.0/)
+- [Eligibility v1.0](https://hvtracker.net/spec/eligibility/v1.0/)
+- [Listing v0.1](https://hvtracker.net/spec/listing/v0.1/)
+- [Data Schema v0.1](https://hvtracker.net/spec/data-schema/v0.1/)
+- [Provenance v0.1](https://hvtracker.net/spec/provenance/v0.1/)
+- [Build Report v0.1](https://hvtracker.net/spec/build-report/v0.1/)
 
 ---
 
@@ -330,12 +335,20 @@ For the strict plain-language boundary, see [docs/strict-inclusion-rubric.md](/U
 ```text
 hvtracker/
 ├── fetch_and_build.py        # Core build, scoring, and rendering
+├── app.py                    # FastAPI edge: serving, /healthz, refresh scheduler
+├── auth.py                   # Accounts, watchlist, notifications
+├── db.py                     # Postgres layer, falls back to agents.json
+├── usage.py                  # Machine-traffic counters behind /live/
+├── mcp_server.py             # Hosted MCP server (/mcp)
+├── specs.py                  # Specification content
 ├── template.html             # Main registry template
 ├── templates/                # Agent, category, blog, compare, and spec templates
-├── agents.json               # Curated agent registry
-├── specs.py                  # Specification content
-├── scan_scorecards.py        # Weekly OSSF Scorecard scan
-├── discover_agents.py        # Weekly discovery scan
+├── agents.json               # Curated registry of agents and MCP servers
+├── scan_scorecards.py        # Sharded OSSF Scorecard scan
+├── discover_agents.py        # Discovery scan
+├── scripts/gates.sh          # The PR gates, in one command
+├── tests/                    # Suite + validate_html.py
+├── seed/history/             # Rank-delta baseline shipped in the image
 ├── docs/                     # Launch, research, and operating docs
 ├── data/                     # Generated public data endpoints
 ├── agents/                   # Generated per-agent pages
