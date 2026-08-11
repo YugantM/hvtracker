@@ -667,3 +667,59 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   `agents.json`/`scorecard-cache.json` in the shared tree; the Dockerfile
   COPYs `scorecard-cache.json` directly, so a dirty-tree `railway up`
   would have baked someone else's WIP into the image.
+- **SKILLS listing class SHIPPED + DEPLOYED 2026-08-11 ~22:26 UTC** (#754f5b0e
+  + #cc37a07e, owner-instructed; board 1,306 -> catalog 1,454). The registry
+  now lists more than one kind of artifact. Agents are the original board;
+  **skills** (skill definitions / plugin bundles an agent EXECUTES) are scored
+  on the SAME signals but ranked in their OWN space. Why a class, not a
+  category: appending 148 skills to the shared board measured **27.5 mean
+  |Δrank|** across 1,283 live agents (277 moving >50 ranks) — over
+  `check_board_invariants`' mass-churn threshold of 15 — because they
+  interleave through the crowded tail (413 live agents already score <24.0),
+  not below it. Per-class ranking moves **ZERO** agent ranks, verified against
+  live prod before and after. METHODOLOGY_VERSION deliberately UNCHANGED
+  (v4.3): no scoring rule changed and no agent moved, so no sparkline reset
+  and no notification suppression.
+  Mechanics: `LISTING_CLASSES`/`listing_class()`/`group_by_class()` — a row
+  with no `class` IS an agent (existing rosters keep exact ranks) and an
+  unknown class falls back to agent, never a private rank space.
+  `assign_ranks()` was extracted from main() so the guarantee is testable and
+  now ranks + breaks ties WITHIN each class. Homepage is agent-scoped
+  (leaderboard, movers, newly_added, registry_summary, warning_rows); agent
+  pages and OG cards use per-class denominators ("#12 of 148", never 1,454).
+  Skills surface via `/categories/agent-skills/` on the EXISTING category
+  machinery (the "future-proof" branch picks up any category outside
+  `category_order`) — no new templates.
+  **TWO BUGS this class creates, both fixed, both invisible to unit tests:**
+  (1) rows are built field-by-field, so a row loaded from the render_state
+  cache carries NO `class` and silently defaults to agent — the first render
+  put all 148 on the agent board ("Built index.html with 1431 agents" instead
+  of 1283). Fixed by `apply_listing_classes(rows, agents)`, which re-applies
+  class from the roster on EVERY render (all modes). Caught only because the
+  render printed the wrong count. (2) `data_output["agents"]` is a field
+  WHITELIST built as an explicit per-row dict; `listing_class` was set on the
+  internal row but not named there, so it was stripped on the way out and
+  `/api/v1/agents` (which defaults a missing class to "agent" so renders
+  predating the class keep working) served all 148 skills in prod. Fixed by
+  publishing the key. **Verification lesson:** the first API check passed
+  because it ran against a render that PREDATED the class — a permissive
+  default makes the transition safe AND the failure silent, so verify against
+  the post-change render specifically.
+  `/api/v1/agents` stays agent-only (v1 promise is fields are add-only;
+  changing which ROWS it serves would break the MCP channel); the full
+  multi-class snapshot is `/data/latest.json`, and rows now carry
+  `listing_class` so consumers can filter.
+  Discovery: `discover_skills.py` (mirrors `discover_agents.py`'s rubric +
+  denylist) adds a RIPENESS stage — structural proof the repo ships an
+  executable artifact, not a stray SKILL.md. Excludes mirrors (provenance
+  belongs upstream), awesome-lists, and repos carrying `.claude/` for their
+  own development (the #189 lesson one level up). 468 eligible -> 334
+  skill-as-product -> 148 ripe. `build_skill_rows.py` resolves real npm/PyPI
+  ids (56/148) and org-qualifies colliding names — TEN repos are literally
+  named `skills` (trailofbits, android, dotnet, expo, microsoft, cloudflare…),
+  and 4 would have displayed as "Agent Skills", identical to their category.
+  KNOWN follow-ups: the 148 landed PROVISIONAL (scorecard null, trust 0.0)
+  because scans were not pre-seeded on the `data` branch per the add-agent
+  runbook — they heal as the OSSF rotation reaches them (24 hourly shards).
+  Scan headroom drops 274 -> 126 repos (~61/shard; workflow re-shards at
+  ~1,580). `/movers/` page and history snapshots are still class-mixed.
