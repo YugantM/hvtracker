@@ -561,7 +561,7 @@
 
     <section class="intro" aria-labelledby="intro-title">
       <h1 id="intro-title">AI Trust Registry for open-source AI agent projects.</h1>
-      <p>Independent trust scores for {{ total }} open-source AI agent projects, based on public, checkable signals across activity, adoption, transparency, safety, and provenance. How every point is earned is documented in the <a href="/methodology/" style="color:var(--accent);">methodology →</a></p>
+      <p>Independent trust scores for {{ total }} open-source AI agent projects{% if skill_count %} and <a href="/categories/agent-skills/" style="color:var(--accent);">{{ skill_count }} agent skills</a>{% endif %}, based on public, checkable signals across activity, adoption, transparency, safety, and provenance. How every point is earned is documented in the <a href="/methodology/" style="color:var(--accent);">methodology →</a></p>
       <div class="tool-strip" role="group" aria-label="Trust tools">
         <a href="/verify/" class="tool-chip home-verify-cta">
           <strong>Verify your agent or MCP server &rarr;</strong>
@@ -945,8 +945,14 @@
       const catAllCb = document.getElementById("catAll");
       const catCbs = Array.from(document.querySelectorAll(".cat-cb"));
       const clearBtn = document.getElementById("catClear");
-      const totalCats = catCbs.length;
-      let selectedCats = new Set(catCbs.map(cb => cb.value));
+      // Categories holding a non-agent listing class (skills). Their rows are
+      // in the DOM so their tab works, but "Global" means every AGENT category
+      // — a skill ranked #3 in its own space must never sit next to an agent
+      // ranked #3 in the default board.
+      const skillCats = new Set({{ skill_categories|default([])|tojson }});
+      const defaultCats = catCbs.map(cb => cb.value).filter(v => !skillCats.has(v));
+      const totalCats = defaultCats.length;
+      let selectedCats = new Set(defaultCats);
       let selectedLicense = "all";
       let selectedTrust = new Set();
       let selectedSpecialTab = "__all__";
@@ -1009,7 +1015,7 @@
           const tab = t.dataset.tab;
           selectedSpecialTab = tab === "__new__" ? "__new__" : "__all__";
           selectedCats = tab === "__all__" || tab === "__new__"
-            ? new Set(catCbs.map(cb => cb.value))
+            ? new Set(defaultCats)
             : new Set([tab]);
           syncUI();
           updateFilterUrl();
@@ -1151,7 +1157,7 @@
       }
       if (urlParams.get("tab") === "new") {
         selectedSpecialTab = "__new__";
-        selectedCats = new Set(catCbs.map(cb => cb.value));
+        selectedCats = new Set(defaultCats);
       }
       if (urlParams.get("compare") === "historical") rankMode = "historical";
 
@@ -1217,7 +1223,11 @@
           const cat = row.dataset.category || "";
           const lic = row.dataset.license_type || "unlicensed";
           const matchesSearch = !searchTerm || name.includes(searchTerm) || repo.includes(searchTerm) || cat.toLowerCase().includes(searchTerm);
-          const matchesCat = allSelected || selectedCats.has(cat);
+          // Membership only — no `allSelected ||` shortcut. "Global" selects
+          // every AGENT category, so short-circuiting on "all selected" would
+          // wave skill rows through and float their per-class #1-#8 to the top
+          // of the default board.
+          const matchesCat = selectedCats.has(cat);
           const matchesLic = selectedLicense === "all" || lic === selectedLicense;
           const matchesTrust = matchesTrustFilters(row);
           const matchesNew = selectedSpecialTab !== "__new__" || row.dataset.newlyAdded === "1";
@@ -1477,7 +1487,7 @@
 
       clearBtn.addEventListener("click", () => {
         selectedSpecialTab = "__all__";
-        selectedCats = new Set(catCbs.map(cb => cb.value));
+        selectedCats = new Set(defaultCats);
         selectedLicense = "all";
         selectedTrust = new Set();
         licRadios.forEach(r => { r.checked = r.value === "all"; });

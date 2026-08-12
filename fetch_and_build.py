@@ -6817,8 +6817,18 @@ def main() -> None:
     warning_rows = [r for r in agent_rows if r.get("has_warning")][:6]
 
     tmpl = env.get_template("template.html")
+    # Skill rows ARE in the homepage DOM so the "Agent Skills" category tab
+    # filters to something (it earned a tab by size, and shipped empty when the
+    # rows were withheld). The Global view still selects only agent categories,
+    # so the default board is unchanged and per-class ranks never sit
+    # side-by-side. `total` stays the AGENT count: it feeds the title, meta
+    # description and JSON-LD, and those must not churn (#114).
+    skill_rows = [r for r in rows if listing_class(r) != "agent"]
+    skill_categories = sorted({r.get("category", "") for r in skill_rows} - {""})
     html = tmpl.render(
-        rows=agent_rows,
+        rows=agent_rows + skill_rows,
+        skill_count=len(skill_rows),
+        skill_categories=skill_categories,
         legacy_rows=legacy_rows,
         updated=now_str,
         total=len(agent_rows),
