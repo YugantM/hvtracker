@@ -6960,10 +6960,16 @@ def main() -> None:
         cat_dir = os.path.join(categories_dir, cat_slug)
         os.makedirs(cat_dir, exist_ok=True)
         with open(os.path.join(cat_dir, "index.html"), "w", encoding="utf-8") as f:
+            # A category holds one listing class, so its copy takes that
+            # class's noun — a skills category calling its rows "agents" is
+            # just wrong on the page.
+            _cat_class = listing_class(cat_agents[0])
             f.write(cat_tmpl.render(
                 category=cat_name,
                 slug=cat_slug,
                 agents=cat_agents,
+                item_noun=_cat_class,
+                item_plural=_cat_class + "s",
                 all_categories=all_cat_meta,
                 updated=now_str,
                 avg_trust=avg_trust,

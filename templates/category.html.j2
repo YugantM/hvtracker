@@ -133,12 +133,19 @@
 
     <section class="hero">
       <h1>{{ category }}</h1>
-      <p class="subtitle">{{ agents|length }} agents tracked &middot; Open-source-first, with limited public GitHub comparators &middot; Ranked by trust score &middot; Updated {{ updated }}</p>
+      <p class="subtitle">{{ agents|length }} {{ item_plural|default('agents') }} tracked &middot; Open-source-first, with limited public GitHub comparators &middot; Ranked by trust score &middot; Updated {{ updated }}</p>
 
       <div class="seo-intro">
         <p>HVTracker independently evaluates <strong>{{ agents|length }} {{ category|lower }}</strong> using daily signals from GitHub, package registries, and security databases. The category is open-source-first, with a limited set of public GitHub-hosted proprietary or source-available comparators when they are important ecosystem reference points.
-        Each agent is scored on activity, adoption, transparency, safety, and identity.
-        {% if agents|length > 0 %}The top-ranked {{ category|lower|replace('agents','agent') }} is <strong>{{ agents[0].name }}</strong> with a trust score of {{ agents[0].trust_score }}/100 (Grade {{ agents[0].evidence_grade }}).{% endif %}
+        Each {{ item_noun|default('agent') }} is scored on activity, adoption, transparency, safety, and identity.
+        {# Singularise the category for "the top-ranked <X> is". The old
+           replace('agents','agent') only matched categories containing the
+           literal "agents", so "Agent Skills" fell through as a plural and
+           read "The top-ranked agent skills is". Trailing-s is stripped only
+           when present, so "Memory & Knowledge" survives untouched. #}
+        {% set cat_singular = category|lower %}
+        {% set cat_singular = cat_singular[:-1] if cat_singular.endswith('s') else cat_singular %}
+        {% if agents|length > 0 %}The top-ranked {{ cat_singular }} is <strong>{{ agents[0].name }}</strong> with a trust score of {{ agents[0].trust_score }}/100 (Grade {{ agents[0].evidence_grade }}).{% endif %}
         {% if agents|length > 2 %}Other leading projects include {{ agents[1].name }} and {{ agents[2].name }}.{% endif %}
         </p>
       </div>
@@ -147,7 +154,7 @@
     <div class="stats-bar">
       <div class="stat">
         <div class="num">{{ agents|length }}</div>
-        <div class="lbl">Agents</div>
+        <div class="lbl">{{ item_plural|default('agents')|title }}</div>
       </div>
       <div class="stat">
         <div class="num">{{ avg_trust }}</div>
