@@ -45,17 +45,23 @@ HEADERS = {
 if TOKEN:
     HEADERS["Authorization"] = f"Bearer {TOKEN}"
 
+# See the note in discover_agents.py: topics are exact, so singulars and
+# plurals both have to be listed, and a new harness brings its own tag.
 TOPICS = [
     "agent-skills",
+    "agent-skill",
     "claude-skills",
     "claude-code-skills",
-    "agent-skill",
     "claude-plugin",
     "claude-code-plugin",
     "claude-code-hooks",
     "claude-code-commands",
+    "claude-code",
     "agent-plugin",
+    "agent-plugins",
     "skills",
+    "skill",
+    "dsh-plugin",
 ]
 
 KEYWORDS = [

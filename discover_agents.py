@@ -108,18 +108,44 @@ REVIEWED_REJECTED = {
 }
 
 # Topics to query (one request each)
+# GitHub topics are exact strings: `topic:ai-agent` does not match a repo
+# tagged `ai-agents`. That single missing plural made
+# deepseek-ai/deepseek-harness — 130k stars, MIT, first-party — unreachable by
+# every sweep, because its topics are ai-agents/cordis/dsh/dsh-plugin and its
+# description ("DeepSeek Harness: Everything is a Plugin.") matches no keyword
+# either. Measured 2026-08-16: the additions below reach 536 novel repos the
+# original list could not see. Add plurals whenever you add a singular.
 TOPICS = [
     "ai-agent",
+    "ai-agents",
     "coding-agent",
+    "coding-agents",
     "llm-agent",
+    "llm-agents",
     "autonomous-agent",
+    "autonomous-agents",
     "ai-coding-assistant",
     "agent-framework",
+    "ai-agent-framework",
+    "agent-harness",
+    "agent-orchestration",
     "multi-agent",
+    "multi-agent-systems",
     "agentic",
+    "agent-tools",
+    "agent-memory",
+    "mcp",
     "mcp-server",
     "mcp-servers",
+    "mcp-client",
+    "mcp-tools",
     "model-context-protocol",
+    "claude-code",
+    # Vendor-ecosystem topics. A first-party launch spawns its own tag before
+    # it adopts the generic ones — dsh/dsh-plugin appeared with the DeepSeek
+    # Harness release and held 46 repos within three days.
+    "dsh",
+    "dsh-plugin",
 ]
 
 # Keyword searches (description field)
@@ -128,6 +154,8 @@ KEYWORDS = [
     '"coding agent" in:description',
     '"autonomous agent" in:description',
     '"MCP server" in:description',
+    '"agent harness" in:description',
+    '"harness" in:description',
 ]
 
 MIN_STARS = 500
