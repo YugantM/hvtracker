@@ -2,20 +2,22 @@ name: Scorecard scan
 
 on:
   schedule:
-    # One SHARD per run, six runs spread across the day. The scorecard CLI
-    # burns a few thousand GitHub API calls per ~55-repo shard, so two shards
-    # back-to-back exhaust the PAT's 5k/hr quota and the next shard starves:
-    # every repo stalls to the 300s timeout until the hosted runner gets
-    # reclaimed (observed kills at 8 and 25 minutes on 2026-07-11 — reclaim
-    # timing is arbitrary, and killed runners never reach the artifact-upload
-    # step, so the shard publishes nothing). Giving each shard its own quota
-    # window removes the contention entirely; each repo still gets scanned
-    # once a day.
-    - cron: "0 1,5,9,13,17,21 * * *"
+    # One SHARD per run, 24 runs spread across the day (hourly). Each shard is
+    # ~61 repos and completes inside the ~1800s runner budget; the full live
+    # roster (~1,467 repos, fetched fresh each run — see "Fetch live roster")
+    # is therefore rescanned once every 24h. The scorecard CLI burns a few
+    # thousand GitHub API calls per shard, so back-to-back shards would exhaust
+    # the PAT's 5k/hr quota and starve the next one (every repo stalls to the
+    # timeout until the hosted runner is reclaimed — observed 2026-07-11 —
+    # and a killed runner uploads nothing). One shard per hour = one shard per
+    # 5k/hr window, so the scan never contends with itself; the script's
+    # rate-limit breaker also backs off if the shared PAT (which serves prod's
+    # 30-min signals refresh too) is momentarily depleted.
+    - cron: "0 * * * *"
   workflow_dispatch:
     inputs:
       shard:
-        description: "Shard 1-6 to scan (empty = derived from current UTC hour)"
+        description: "Shard 1-24 to scan (empty = derived from current UTC hour)"
         required: false
         default: ""
 
@@ -28,12 +30,15 @@ env:
   SCORECARD_VERSION: "v5.5.0"
 
 jobs:
-  # One shard (~55 repos, ~25 min) per run. The shard self-limits to a time
+  # One shard (~61 repos, ~30 min) per run. The shard self-limits to a time
   # budget, aborts on consecutive timeouts (quota-exhaustion signature), and
   # writes its cache incrementally; repos a cutoff misses keep prior values
   # (freshest-wins merge) and lead the next run's stalest-first queue, so
   # coverage converges within the day instead of starving a fixed tail.
-  # Re-count shards when the roster passes ~420.
+  # The roster scanned is the LIVE prod board, not this repo's agents.json
+  # (main lags prod by the unmerged MCP/skills roster — scanning agents.json
+  # left ~1,000 live agents permanently unscored). Re-count shards when the
+  # live roster passes ~1,580 (budget completes ~66/shard).
   scan:
     runs-on: ubuntu-latest
     outputs:
@@ -43,19 +48,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.3
 
-      # Scheduled runs rotate through shards by UTC-hour bucket (cron hours
-      # 1,5,9,... → shards 1..6). hour/4 bucketing tolerates GitHub's cron
-      # delays of up to ~4h without skipping a shard. Manual dispatches may
-      # pin a shard explicitly.
+      # Scheduled runs rotate through shards by UTC hour (hour 0→shard 1 …
+      # hour 23→shard 24). A late cron now shifts the shard rather than
+      # skipping it; the stalest-first queue heals any hour that is missed
+      # entirely. Manual dispatches may pin a shard explicitly.
       - name: Pick shard
         id: pick
         run: |
           shard="${{ github.event.inputs.shard }}"
           if [ -z "$shard" ]; then
-            shard=$(( (10#$(date -u +%H) / 4) % 6 + 1 ))
+            shard=$(( 10#$(date -u +%H) % 24 + 1 ))
           fi
           echo "shard=$shard" >> "$GITHUB_OUTPUT"
-          echo "Scanning shard $shard/6"
+          echo "Scanning shard $shard/24"
 
       - name: Download scorecard CLI
         run: |
@@ -69,6 +74,36 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Replace the checked-out agents.json with the roster the SITE actually
+      # serves. main's agents.json trails production by the unmerged MCP/skills
+      # ingest (~1,000 rows), so scanning the checked-out file left the
+      # majority of live agents with no OSSF score forever. /data/latest.json
+      # carries repo + listing_status for every board row; we normalise it to
+      # scan_scorecards.py's agents.json shape (all live rows count as
+      # "listed"). Cloudflare blocks default UAs, hence the browser UA. On any
+      # failure — fetch error, or an implausibly small roster — we KEEP the
+      # checked-out agents.json so a bad edge response can't shrink coverage.
+      - name: Fetch live roster
+        run: |
+          curl -sfL -A "Mozilla/5.0 (scorecard-scan)" \
+            "https://hvtracker.net/data/latest.json?cb=$(date -u +%s)" \
+            -o live.json || { echo "roster fetch failed; keeping checked-out agents.json"; exit 0; }
+          python - <<'PY'
+          import json, sys
+          try:
+              rows = json.load(open("live.json")).get("agents") or []
+          except Exception as e:
+              print(f"parse failed ({e}); keeping checked-out agents.json"); sys.exit(0)
+          roster = [{"repo": r["repo"], "listing_status": "listed"}
+                    for r in rows if r.get("repo")]
+          # Guard against a truncated/edge-error response shrinking coverage.
+          if len(roster) < 400:
+              print(f"live roster only {len(roster)} rows; keeping checked-out agents.json")
+              sys.exit(0)
+          json.dump(roster, open("agents.json", "w"), indent=2)
+          print(f"live roster: {len(roster)} repos written to agents.json")
+          PY
+
       # The prior cache drives stalest-first ordering (never-scanned repos
       # first, then oldest scanned_at). Shard output still contains only
       # freshly-scanned repos; the merge job overlays them freshest-wins.
@@ -81,7 +116,7 @@ jobs:
       - name: Run scorecard scan
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        run: python scan_scorecards.py --shard ${{ steps.pick.outputs.shard }}/6
+        run: python scan_scorecards.py --shard ${{ steps.pick.outputs.shard }}/24
 
       # if: always() — partial results from a failed step are still valid
       # (incremental writes mean the file reflects every completed repo).
