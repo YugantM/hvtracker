@@ -105,6 +105,22 @@ REVIEWED_REJECTED = {
         "2026-08-10 rejected — repo created 2016-12-21 with zero commits before "
         "2025; the 3,127 stars belong to the repo's previous life, not this code"
     ),
+    # 2026-08-26 discovery sweep — README-read verdicts (see agents-shortlist.json).
+    "makecindy/cindy": (
+        "2026-08-26 rejected — harness wrapper; README: 'the first supported "
+        "harnesses are Claude Code and Codex', the wrapped CLI does the work. "
+        "Same class as iofficeai/aionui (#180)"
+    ),
+    "simonlin1212/vibe-research": (
+        "2026-08-26 rejected — serves agents, isn't one; README says it 'never "
+        "recommends' and 'leaves an interface to plug in your own AI'. A trading "
+        "data dashboard, not an agent"
+    ),
+    "tsingyuai/growth-lab": (
+        "2026-08-26 not an agent — its own product model is 'Codex/Claude Code = "
+        "Runtime, Skill = method'; a Skills+client bundle running ON an external "
+        "runtime. Skill-class candidate, not the agent board"
+    ),
 }
 
 # Topics to query (one request each)
