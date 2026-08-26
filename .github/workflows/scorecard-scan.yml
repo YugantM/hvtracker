@@ -46,7 +46,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.1
 
       # Scheduled runs rotate through shards by UTC hour (hour 0→shard 1 …
       # hour 23→shard 24). A late cron now shifts the shard rather than
@@ -140,7 +140,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.1
 
       - name: Download shard caches
         uses: actions/download-artifact@v4
