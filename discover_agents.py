@@ -121,6 +121,13 @@ REVIEWED_REJECTED = {
         "Runtime, Skill = method'; a Skills+client bundle running ON an external "
         "runtime. Skill-class candidate, not the agent board"
     ),
+    "pingdotgg/t3code": (
+        "2026-08-27 owner ruling (hold the boundary) — README: 'an agent harness "
+        "control surface', a mobile/web/desktop app to CONTROL Claude Code/Codex/"
+        "Cursor/Grok Build/OpenCode on your machine. Control-surface class with no "
+        "agent logic of its own; same boundary as aionui/cmux/cindy. Direct "
+        "analogs getpaseo/paseo, nanmicoder/cc-haha, milisp/codexia are the same class"
+    ),
 }
 
 # Topics to query (one request each)
