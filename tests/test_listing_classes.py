@@ -140,3 +140,56 @@ def test_listing_class_is_published_on_every_row():
     rows = fab.assign_ranks(_agents(3) + _skills(3))
     assert all("listing_class" in r for r in rows)
     assert sum(1 for r in rows if r["listing_class"] == "skill") == 3
+
+
+def _render_agent_page(listing_class):
+    """Render the real agent.html.j2 against a fully-populated row, so the
+    §2a noindex conditional is exercised end-to-end, not just source-grepped."""
+    import json
+    import os
+    from jinja2 import Environment, FileSystemLoader
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    env = Environment(
+        loader=FileSystemLoader([os.path.join(root, "templates"), root]),
+        autoescape=True,
+    )
+    with open(os.path.join(root, "data", "render_state.json"), encoding="utf-8") as f:
+        row = json.load(f)["rows"][0]
+    row["category_slug"] = fab.slugify(row.get("category", "")) if row.get("category") else ""
+    row["org_slug_or_none"] = None
+    row["review_insights"] = fab.agent_review_insights(row)
+    row["remediation_steps"] = fab.agent_remediation_steps(row)
+    row["safety_qa"] = fab.agent_safety_qa(row)
+    row["correction_url"] = fab.agent_correction_url(row)
+    row["sparkline_svg"] = ""
+    row["rank_history"] = []
+    row["event_chart_svg"] = ""
+    row["listing_class"] = listing_class
+    return env.get_template("agent.html.j2").render(
+        row=row, total=1, updated="", events=[], drift_events=[],
+        methodology_version="v4.3", comparisons=[], provider_slugs={}, related=[],
+    )
+
+
+def test_skill_pages_are_noindexed_but_agent_pages_are_not():
+    """§2a crawl-budget freeze: skill detail pages carry robots noindex; the
+    same template leaves agent pages fully indexable."""
+    skill_html = _render_agent_page("skill")
+    agent_html = _render_agent_page("agent")
+    assert '<meta name="robots" content="noindex, follow">' in skill_html
+    assert "noindex" not in agent_html
+
+
+def test_skills_are_excluded_from_the_sitemap_loop():
+    """The sitemap must not advertise the noindexed skill URLs (mixed signal).
+
+    The sitemap is built inline in main(); lock the exact guard so a refactor
+    that drops it is caught."""
+    import inspect
+    src = inspect.getsource(fab.main)
+    start = src.index('sitemap_urls.append((f"https://hvtracker.net/agents/')
+    window = src[start - 400:start]
+    assert 'listing_class(row) == "skill"' in window and "continue" in window, (
+        "skill rows are no longer skipped before the /agents/ sitemap append — "
+        "noindexed skill pages would be re-advertised to Google"
+    )

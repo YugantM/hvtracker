@@ -7560,6 +7560,11 @@ def main() -> None:
     for article in blog_articles:
         sitemap_urls.append((f"https://hvtracker.net/blog/{article['slug']}/", "0.8", "weekly"))
     for row in rows:
+        # Skill pages are served noindex (§2a crawl-budget freeze), so keep them
+        # out of the sitemap and IndexNow — advertising URLs we ask Google not to
+        # index sends a mixed signal and wastes crawl budget on the tail.
+        if listing_class(row) == "skill":
+            continue
         sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}/", "0.8", "daily"))
     # Legacy entries have their public /agents/<slug>/ page deleted
     # (remove_legacy_public_artifacts); they MUST NOT appear in the sitemap or
