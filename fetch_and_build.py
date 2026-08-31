@@ -2496,6 +2496,38 @@ def check_board_invariants(rows: list[dict], prior_snapshot: dict | None) -> lis
     return violations
 
 
+def summarize_fetch_rotation(rows: list[dict]) -> dict:
+    """Report how far behind the heavy per-repo fetch rotation is.
+
+    The 2h batch refreshes 1/6 of the board by ``full_fetched_at``, so a healthy
+    board's oldest stamp is under ~12h and ``never_fetched`` drains to 0. The
+    rotation froze on the same alphabetical sixth for weeks without anyone
+    noticing because nothing measured it — every downstream field just kept
+    serving its last-known value. Surfacing it in data/build_report.json makes
+    the next stall a two-second check instead of an archaeology session.
+    """
+    now = datetime.now(timezone.utc)
+    never = 0
+    ages: list[float] = []
+    for row in rows:
+        stamp = row.get("full_fetched_at")
+        if not stamp:
+            never += 1
+            continue
+        try:
+            fetched = datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+        except (TypeError, ValueError):
+            never += 1
+            continue
+        ages.append((now - fetched).total_seconds() / 3600)
+    return {
+        "total_rows": len(rows),
+        "never_fetched": never,
+        "fetched_last_24h": sum(1 for a in ages if a <= 24),
+        "stalest_age_hours": round(max(ages), 1) if ages else None,
+    }
+
+
 def load_cached_commit_counts(data_path: str, history_dir: str) -> dict[str, int]:
     """Load last-known-good commit counts from data.json, then prior history.
 
@@ -5045,10 +5077,20 @@ def select_batch(agents: list[dict], batch_num: int, total_batches: int) -> list
 
 
 def load_signals_staleness(data_path: str) -> dict[str, str]:
-    """Map repo → when its GitHub signals were last fetched (ISO ``signals_fetched_at``).
+    """Map repo → when the heavy batch last fetched it (ISO ``full_fetched_at``).
 
     Agents missing from data.json (newly added) or lacking the stamp map to an
     empty string, which sorts first → treated as the most stale.
+
+    Deliberately keyed on ``full_fetched_at`` (written only by the full per-repo
+    fetch) and NOT on ``signals_fetched_at``: the 30-minute GraphQL refresh
+    restamps the latter on every row, so ordering by it would flatten to a
+    permanent tie. It must also be a field data.json publishes — batch mode
+    carries non-batch rows forward from data.json's whitelist
+    (``merge_batch_into_data``), so an unpublished key is gone by the next
+    cycle. That is exactly how this rotation silently froze: the stamp existed
+    on the row, the whitelist dropped it, every agent tied on "", and the
+    secondary sort handed the same alphabetical sixth to every batch for weeks.
     """
     try:
         with open(data_path, encoding="utf-8") as f:
@@ -5056,7 +5098,7 @@ def load_signals_staleness(data_path: str) -> dict[str, str]:
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
     return {
-        a["repo"].lower(): a.get("signals_fetched_at") or ""
+        a["repo"].lower(): a.get("full_fetched_at") or ""
         for a in existing.get("agents", [])
         if a.get("repo")
     }
@@ -5768,6 +5810,11 @@ def main() -> None:
             "category": category,
             "repo": repo_id,
             "signals_fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            # Written ONLY here, by the full per-repo fetch (downloads, HN,
+            # signed commits, provenance, all four runtime-trust fields) —
+            # never by the light GraphQL signals refresh. select_stale_batch
+            # rotates on this stamp, so it has to mean "heavily fetched".
+            "full_fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "url": repo["html_url"],
             "stars": repo["stargazers_count"],
             "stars_fmt": fmt_num(repo["stargazers_count"]),
@@ -6368,6 +6415,9 @@ def main() -> None:
                 "scorecard_checks": r.get("scorecard_checks", {}),
                 "scorecard_scanned_at": r.get("scorecard_scanned_at"),
                 "slug": r.get("slug"),
+                # Must be published: batch mode carries non-batch rows forward
+                # from data.json, so an unpublished stamp resets the rotation.
+                "full_fetched_at": r.get("full_fetched_at"),
                 "source_note": r.get("source_note", ""),
                 "public_actions": r.get("public_actions"),
                 "mcp_server_support": r.get("mcp_server_support", {"status": "none", "confidence": None, "evidence": []}),
@@ -6533,6 +6583,7 @@ def main() -> None:
         "fingerprint_agent_count": len(fp_agents),
         "board_invariant_violations": invariant_violations,
         "board_invariant_violation_count": len(invariant_violations),
+        "fetch_rotation": summarize_fetch_rotation(rows),
     }
     report_path = os.path.join(script_dir, "data", "build_report.json")
     os.makedirs(os.path.dirname(report_path), exist_ok=True)
