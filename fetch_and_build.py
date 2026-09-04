@@ -2600,21 +2600,47 @@ def load_previous_ranks(history_dir: str) -> dict[str, int]:
         return {}
 
 
-def load_previous_downloads(history_dir: str) -> dict[str, tuple[int, str]]:
-    """Load previous download counts for use as a fallback when a fetch fails."""
-    prev = _load_prior_snapshot(history_dir)
-    if not prev:
-        return {}
+def load_previous_downloads(
+    history_dir: str, lookback_days: int = 14
+) -> dict[str, tuple[int, str]]:
+    """Last-known-good download counts, used as a fallback when a fetch fails.
+
+    Scans back through up to ``lookback_days`` recent snapshots (newest first)
+    and keeps each repo's most-recent NON-None value. Reading only the
+    immediately-prior snapshot loses the fallback exactly when it is needed: a
+    failed fetch writes None, so after even one bad day the "previous" value is
+    already None and the score craters with nothing to fall back to. That is
+    what kept vercel/ai pinned at 70.0 (rank 2 -> 226) for days after
+    2026-09-03 — npm rate-limiting nulled ~91 packages, and every recent
+    snapshot already held None. Bounded so a genuinely dead package (fetch
+    failing two weeks straight) eventually drops to None rather than serving
+    stale data forever.
+    """
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     try:
-        result = {}
-        for a in prev.get("agents", []):
-            dl = a.get("weekly_downloads")
-            src = a.get("dl_source", "")
-            if dl is not None:
-                result[a["repo"].lower()] = (dl, src)
-        return result
-    except (KeyError, TypeError):
+        candidates = sorted(
+            [f for f in os.listdir(history_dir)
+             if re.match(r"\d{4}-\d{2}-\d{2}\.json$", f) and f[:-5] < today],
+            reverse=True,
+        )[:lookback_days]
+    except OSError:
         return {}
+    result: dict[str, tuple[int, str]] = {}
+    for fname in candidates:
+        try:
+            with open(os.path.join(history_dir, fname), encoding="utf-8") as f:
+                snap = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            continue
+        for a in snap.get("agents", []):
+            repo = a.get("repo")
+            dl = a.get("weekly_downloads")
+            if not repo or dl is None:
+                continue
+            key = repo.lower()
+            if key not in result:  # newest-first iteration → first hit wins
+                result[key] = (dl, a.get("dl_source", ""))
+    return result
 
 
 def resolve_row_downloads(
