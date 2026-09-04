@@ -2601,7 +2601,7 @@ def load_previous_ranks(history_dir: str) -> dict[str, int]:
 
 
 def load_previous_downloads(history_dir: str) -> dict[str, tuple[int, str]]:
-    """Load previous download counts for use as fallback on PyPI 429."""
+    """Load previous download counts for use as a fallback when a fetch fails."""
     prev = _load_prior_snapshot(history_dir)
     if not prev:
         return {}
@@ -2615,6 +2615,43 @@ def load_previous_downloads(history_dir: str) -> dict[str, tuple[int, str]]:
         return result
     except (KeyError, TypeError):
         return {}
+
+
+def resolve_row_downloads(
+    row: dict, prev_downloads: dict[str, tuple[int, str]]
+) -> str | None:
+    """Combine this run's per-source download counts into weekly_downloads /
+    dl_source, mutating `row`. Sources: npm_dl, crate_dl, docker_pulls,
+    vscode_installs, pypi_dl (each None when absent or its fetch failed).
+
+    If EVERY source is empty this run but the repo previously reported
+    downloads, retain the last-known-good value: a transient fetch failure
+    (rate-limit/outage on any provider) must not null a real number and crater
+    the adoption dimension + confidence. prev_downloads holds only repos that
+    HAD a value, so GitHub-only agents (legitimately no downloads) stay None.
+
+    Returns "live" if a value was summed from live sources, "cached" if the
+    fallback fired, or None if the repo has no downloads at all.
+    """
+    dl_parts = []
+    for key, src in (
+        ("npm_dl", "npm"),
+        ("crate_dl", "crates.io"),
+        ("docker_pulls", "docker"),
+        ("vscode_installs", "vscode"),
+        ("pypi_dl", "pypi"),
+    ):
+        if row.get(key) is not None:
+            dl_parts.append((src, row[key]))
+    if dl_parts:
+        row["weekly_downloads"] = sum(dl for _, dl in dl_parts)
+        row["dl_source"] = "+".join(src for src, _ in dl_parts)
+        return "live"
+    cached = prev_downloads.get(row["repo"].lower())
+    if cached:
+        row["weekly_downloads"], row["dl_source"] = cached
+        return "cached"
+    return None
 
 
 def check_board_invariants(rows: list[dict], prior_snapshot: dict | None) -> list[str]:
@@ -6146,32 +6183,13 @@ def main() -> None:
         print("\nFetching PyPI downloads (serial, with cached fallback on 429)...")
         for row in rows:
             pypi_pkg = row.get("pypi_package", "")
-            repo_key = row["repo"].lower()
-            dl_parts = []
-            if row.get("npm_dl") is not None:
-                dl_parts.append(("npm", row["npm_dl"]))
-            if row.get("crate_dl") is not None:
-                dl_parts.append(("crates.io", row["crate_dl"]))
-            if row.get("docker_pulls") is not None:
-                dl_parts.append(("docker", row["docker_pulls"]))
-            if row.get("vscode_installs") is not None:
-                dl_parts.append(("vscode", row["vscode_installs"]))
             if pypi_pkg:
-                pypi_dl = fetch_pypi_downloads(pypi_pkg)
-                if pypi_dl is not None:
-                    dl_parts.append(("pypi", pypi_dl))
-                else:
-                    # 429 or error — use last known good value from previous run
-                    cached = prev_downloads.get(repo_key)
-                    if cached:
-                        cached_count, cached_src = cached
-                        row["weekly_downloads"] = cached_count
-                        row["dl_source"] = cached_src
-                        print(f"  dl {row['repo']:<45} {cached_count:,} ({cached_src}) [cached fallback]")
-                        continue
-            if dl_parts:
-                row["weekly_downloads"] = sum(dl for _, dl in dl_parts)
-                row["dl_source"] = "+".join(src for src, _ in dl_parts)
+                # None on 429/error; resolve_row_downloads falls back to cache.
+                row["pypi_dl"] = fetch_pypi_downloads(pypi_pkg)
+            origin = resolve_row_downloads(row, prev_downloads)
+            if origin == "cached":
+                print(f"  dl {row['repo']:<45} {row['weekly_downloads']:,} ({row['dl_source']}) [cached fallback]")
+            elif origin == "live":
                 print(f"  dl {row['repo']:<45} {row['weekly_downloads']:,} ({row['dl_source']})")
 
         # Fetch PyPI provenance serially (pypi.org Simple API, ~1 req/s to be safe)
