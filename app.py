@@ -20,6 +20,7 @@ from html import escape
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Form, Request
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
@@ -494,6 +495,19 @@ async def _cache_headers(request, call_next):
     elif path in ("",) or path == "/":
         response.headers["Cache-Control"] = _HTML_CACHE
     return response
+
+
+# Compress on the way out. Cloudflare compresses for visitors, so the site
+# always *looked* fine, but nothing compressed the origin->edge hop and Railway
+# bills that hop uncompressed: the homepage left the container at 6.4MB instead
+# of 0.54MB, and with /data/latest.json (9.0MB raw) the two accounted for ~94%
+# of a ~98GB/month egress bill. StaticFiles never compresses on its own.
+# Registered LAST so it is the outermost middleware (add_middleware inserts at
+# index 0 and the stack is built inside-out), which puts it around both
+# _cache_headers and the StaticFiles mount.
+# compresslevel=6, not the library default of 9: measured on the real homepage,
+# 9 costs 2.1x the CPU of 6 to gain 6.6% (30.6ms/538KB vs 65.3ms/503KB).
+app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=6)
 
 # ---- data.json access (mtime-cached) -------------------------------------
 

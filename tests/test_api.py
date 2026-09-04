@@ -843,3 +843,37 @@ def test_raw_daily_snapshots_are_not_publicly_served(client):
     repo = client.get("/api/agents", params={"limit": 1}).json()["agents"][0]
     r = client.get(f"/api/v1/agents/{repo['slug']}/history")
     assert r.status_code == 200
+
+
+def test_responses_are_gzipped_on_the_origin_hop(client):
+    """Everything large must leave the container compressed.
+
+    Cloudflare compresses for visitors either way, so losing this is invisible
+    in a browser and shows up only on the Railway bill, which meters the
+    uncompressed origin->edge hop: before this middleware the homepage left at
+    6.4MB instead of 0.54MB.
+    """
+    import app as app_module
+    from fastapi.middleware.gzip import GZipMiddleware
+
+    # Outermost, so it wraps both _cache_headers and the StaticFiles mount.
+    # add_middleware inserts at index 0 and the stack is built inside-out, so
+    # index 0 is the outer layer; a middleware added after this one would
+    # silently take the outside and leave static files uncompressed.
+    assert app_module.app.user_middleware[0].cls is GZipMiddleware
+
+    # A StaticFiles page (the bulk of the bill) and a routed JSON response.
+    for path in ("/", "/api/v1/agents"):
+        plain = client.get(path, headers={"Accept-Encoding": "identity"})
+        gzipped = client.get(path, headers={"Accept-Encoding": "gzip"})
+        assert plain.status_code == 200, path
+        assert gzipped.status_code == 200, path
+        assert "content-encoding" not in plain.headers, path
+        assert gzipped.headers["content-encoding"] == "gzip", path
+        assert "accept-encoding" in gzipped.headers["vary"].lower(), path
+        # httpx decodes transparently: the payload must survive compression.
+        assert gzipped.content == plain.content, path
+
+    # Cache-Control is set by _cache_headers, which now runs *inside* the gzip
+    # layer — the headers it writes must still reach the client.
+    assert client.get("/").headers["Cache-Control"] == app_module._HTML_CACHE
