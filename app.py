@@ -225,6 +225,12 @@ _refresh_lock = threading.Lock()
 # fill in the gaps.
 _HTML_CACHE = "public, max-age=300, s-maxage=900, stale-while-revalidate=86400"
 _JSON_CACHE = "public, max-age=600, s-maxage=1800, stale-while-revalidate=86400"
+# Static images/fonts (OG share cards, logos, favicons). Without a header these
+# ship `cf-cache-status: BYPASS` and every social unfurl / crawler fetch of a
+# ~50-60KB card hits Railway. Per-agent OG cards regenerate when a score moves,
+# so a 1-day edge TTL (stale-while-revalidate serves instantly, revalidates in
+# the background) keeps them fresh enough while cutting origin egress to ~zero.
+_ASSET_CACHE = "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800"
 
 
 _CSP = (
@@ -494,6 +500,10 @@ async def _cache_headers(request, call_next):
         response.headers["Cache-Control"] = _HTML_CACHE
     elif path in ("",) or path == "/":
         response.headers["Cache-Control"] = _HTML_CACHE
+    elif path.endswith((".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg",
+                        ".ico", ".woff2", ".woff", ".ttf")):
+        # OG cards, logos, favicons, fonts — without this they're BYPASS.
+        response.headers["Cache-Control"] = _ASSET_CACHE
     return response
 
 

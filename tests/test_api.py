@@ -365,6 +365,17 @@ def test_readme_adopter_logos_serve(client):
         assert r.headers["content-type"].startswith(ctype), path
 
 
+def test_images_get_cache_headers(client):
+    """OG cards / logos / favicons must carry Cache-Control, or Cloudflare
+    marks them BYPASS and every social unfurl + crawler fetch hits the origin
+    (2026-09: ~50-60KB per uncached image was a live egress driver)."""
+    for path in ("/haystack-logo.png", "/composio-logo.svg", "/og-v2.png"):
+        r = client.get(path)
+        assert r.status_code == 200, path
+        cc = r.headers.get("cache-control", "")
+        assert "public" in cc and "s-maxage=86400" in cc, f"{path}: {cc!r}"
+
+
 def test_trend_badge_serves(client):
     """Plan 2.3 regression: /badge/<slug>-trend.svg is pre-rendered and must
     be served by the dynamic badge route (which previously only knew -grade
