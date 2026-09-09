@@ -2680,6 +2680,26 @@ def resolve_row_downloads(
     return None
 
 
+def og_card_signature(row: dict, total: int, gen_src_hash: str) -> str:
+    """Content hash of everything an OG share card renders, so the build can
+    skip regenerating a card whose inputs are unchanged.
+
+    Must list EVERY field generate() in generate_og_card.py reads (name,
+    description, repo, trust_score, evidence_grade, stars_fmt, weekly_commits,
+    category, trust_breakdown, rank) plus `total` (the "of N" denominator) and
+    `gen_src_hash` (a hash of generate_og_card.py itself, so any layout change
+    invalidates every card). A field the card shows but this omits would serve
+    a stale card — keep this in lockstep with generate().
+    """
+    payload = json.dumps([
+        gen_src_hash, row.get("name"), row.get("description"), row.get("repo"),
+        row.get("trust_score"), row.get("evidence_grade"), row.get("stars_fmt"),
+        row.get("weekly_commits"), row.get("category"),
+        row.get("trust_breakdown"), row.get("rank"), total,
+    ], sort_keys=True, default=str)
+    return hashlib.md5(payload.encode()).hexdigest()
+
+
 def check_board_invariants(rows: list[dict], prior_snapshot: dict | None) -> list[str]:
     """Sanity-check the final ranked board against defects a human would only
     catch by eyeballing the live leaderboard (the v4.2 compounding bug sat in
@@ -7020,19 +7040,56 @@ def main() -> None:
     else:
         try:
             from generate_og_card import generate as generate_og, generate_site_card
+            # Content-hash gate: regenerate a card only when its inputs change.
+            # The 2h batch re-fetches ~1/6 of the board, so most cards are
+            # byte-identical to last render — regenerating all ~1,700 PIL images
+            # every run was pure waste (render CPU/time + memory peak). The
+            # signature covers every field generate() reads PLUS a hash of
+            # generate_og_card.py itself, so any layout change auto-busts every
+            # card with no manual version bump. Sigs persist on the volume next
+            # to render_state.json; a missing card forces regen even if its sig
+            # matches. Only successfully-written cards get a recorded sig.
+            og_sig_path = os.path.join(script_dir, "data", "og_card_sigs.json")
+            try:
+                with open(og_sig_path, encoding="utf-8") as _f:
+                    og_sigs = json.load(_f)
+            except (FileNotFoundError, json.JSONDecodeError, OSError):
+                og_sigs = {}
+            try:
+                with open(os.path.join(base_dir, "generate_og_card.py"), "rb") as _f:
+                    gen_src_hash = hashlib.md5(_f.read()).hexdigest()[:12]
+            except OSError:
+                gen_src_hash = "0"
+
             og_count = 0
+            og_skipped = 0
+            new_sigs: dict[str, str] = {}
             for row in rows:
                 slug_dir = os.path.join(agents_dir, row["slug"])
                 og_path = os.path.join(slug_dir, "og.png")
+                # Rows don't carry a board-size field, so without this the
+                # card's "Rank #N of M" falls back to a stale hardcoded 196.
+                # M is the row's OWN class size — rank is per-class, so a
+                # skill ranked #12 is "#12 of 148", never "of 1,454".
+                total = class_totals[listing_class(row)]
+                sig = og_card_signature(row, total, gen_src_hash)
+                new_sigs[row["slug"]] = sig
+                if og_sigs.get(row["slug"]) == sig and os.path.isfile(og_path):
+                    og_skipped += 1
+                    continue
                 try:
-                    # Rows don't carry a board-size field, so without this the
-                    # card's "Rank #N of M" falls back to a stale hardcoded 196.
-                    # M is the row's OWN class size — rank is per-class, so a
-                    # skill ranked #12 is "#12 of 148", never "of 1,454".
-                    generate_og({**row, "total": class_totals[listing_class(row)]}, og_path)
+                    generate_og({**row, "total": total}, og_path)
                     og_count += 1
                 except Exception as e:
                     print(f"  WARN: OG card failed for {row['slug']}: {e}")
+                    new_sigs.pop(row["slug"], None)  # retry next render
+            try:
+                os.makedirs(os.path.dirname(og_sig_path), exist_ok=True)
+                with open(og_sig_path, "w", encoding="utf-8") as _f:
+                    json.dump(new_sigs, _f)
+            except OSError as e:
+                print(f"  WARN: could not write og_card_sigs.json: {e}")
+            print(f"OG cards: {og_count} regenerated, {og_skipped} unchanged (skipped).")
             try:
                 generate_site_card(
                     os.path.join(script_dir, "og-v2.png"),
@@ -7041,7 +7098,6 @@ def main() -> None:
                 )
             except Exception as e:
                 print(f"  WARN: Site OG card failed: {e}")
-            print(f"Generated {og_count} agent OG cards.")
         except ImportError:
             print("WARN: generate_og_card not available — skipping OG cards.")
 
