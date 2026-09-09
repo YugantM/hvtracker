@@ -1,0 +1,69 @@
+name: Railway bill monitor
+
+# The Railway Hobby plan has a HARD $15 cap that STOPS the services when hit —
+# a cost overrun is downtime, not just a big invoice. This runs daily, projects
+# the cycle spend, and opens/updates a tracking issue if it crosses the alert
+# threshold (default $12) so there's headroom to act before the cap.
+#
+# ACTIVATION (owner, one-time):
+#   1. Railway dashboard → this project → Settings → Tokens → create a PROJECT
+#      token (account/session tokens expire daily and won't work here).
+#   2. Repo → Settings → Secrets → Actions → add secret RAILWAY_TOKEN = that token.
+#   3. Trigger once via "Run workflow" and confirm the log prints a dollar figure
+#      (not "could not read estimatedUsage"). A silently-failing monitor is worse
+#      than none — verify it, don't trust green.
+
+on:
+  schedule:
+    - cron: "0 8 * * *"   # daily 08:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.3
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Project spend and evaluate
+        id: check
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          if [ -z "$RAILWAY_TOKEN" ]; then
+            echo "RAILWAY_TOKEN not set — monitor is inactive (see workflow header)."
+            echo "state=inactive" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          set +e
+          out=$(python scripts/check_railway_bill.py); code=$?
+          echo "$out"
+          {
+            echo "report<<EOF"
+            echo "$out"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          if [ $code -eq 2 ]; then echo "state=alert" >> "$GITHUB_OUTPUT";
+          elif [ $code -eq 0 ]; then echo "state=ok" >> "$GITHUB_OUTPUT";
+          else echo "state=error" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Open or update alert issue
+        if: steps.check.outputs.state == 'alert' || steps.check.outputs.state == 'error'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          body=$'Railway projected spend crossed the alert threshold (the $15 Hobby cap STOPS the services).\n\n```\n'"${{ steps.check.outputs.report }}"$'\n```\n\nRun: '"$run_url"
+          gh label create bill-alert --repo "$GITHUB_REPOSITORY" --color B60205 --description "Railway spend approaching the cap" 2>/dev/null || true
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label bill-alert --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "Railway spend approaching the \$15 cap" --label bill-alert --body "$body"
+          fi
