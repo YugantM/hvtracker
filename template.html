@@ -232,11 +232,24 @@
     .dot-aging  { background: var(--amber); }
     .dot-stale  { background: #999; }
 
-    .cat-tabs { display: flex; gap: 0; flex-wrap: wrap; margin: 12px 0 0; border-bottom: 1px solid var(--border); }
+    /* Horizontal scroll strip: all categories fit on one line and scroll
+       instead of wrapping into a tall multi-row block. */
+    .cat-tabs {
+      display: flex; gap: 0; flex-wrap: nowrap; margin: 12px 0 0;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto; overflow-y: hidden;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+      -webkit-overflow-scrolling: touch;
+    }
+    .cat-tabs::-webkit-scrollbar { height: 6px; }
+    .cat-tabs::-webkit-scrollbar-track { background: transparent; }
+    .cat-tabs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .cat-tabs::-webkit-scrollbar-thumb:hover { background: var(--muted-2); }
     .cat-tabs + .table-wrap { margin-top: 0; }
     .cat-tab {
       appearance: none; cursor: pointer; background: none; border: none;
       border-bottom: 2px solid transparent; padding: 8px 14px; margin-bottom: -1px;
+      flex: 0 0 auto; white-space: nowrap;
       font-family: var(--font-sans); font-size: 12px; font-weight: 500; color: var(--muted);
       transition: color .15s, border-color .15s;
     }
@@ -715,10 +728,11 @@
 
     <div class="cat-tabs" id="catTabs" role="group" aria-label="Category presets">
       <button class="cat-tab active" data-tab="__all__" aria-pressed="true">Global</button>
-      {# Tabs are the LARGEST categories, biggest first — so the tab bar tracks
-         what the registry actually holds instead of a hand-fixed order. MCP
-         Servers is 59% of the roster and lands immediately after Global. #}
-      {% for cat in (categories|sort(attribute='count', reverse=true))[:5] %}
+      {# Every category gets a tab, biggest first — the strip scrolls
+         horizontally rather than wrapping, so the bar tracks what the registry
+         actually holds instead of a hand-fixed order. MCP Servers is the
+         largest and lands immediately after Global. #}
+      {% for cat in (categories|sort(attribute='count', reverse=true)) %}
       <button class="cat-tab" data-tab="{{ cat.name }}" aria-pressed="false">{{ cat.name }} <span class="cat-tab-count">{{ cat.count }}</span></button>
       {% endfor %}
       {% if newly_added %}
