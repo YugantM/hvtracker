@@ -7722,10 +7722,42 @@ def main() -> None:
     # Legacy entries have their public /agents/<slug>/ page deleted
     # (remove_legacy_public_artifacts); they MUST NOT appear in the sitemap or
     # Google crawls them as 404s.
-    # Static comparison pages /compare/<a>-vs-<b>/ now serve crawlable content
-    # (generated above), so each pair belongs in the sitemap alongside the tool.
+    # Static comparison pages /compare/<a>-vs-<b>/ are all generated above and
+    # stay reachable, but the sitemap only ADVERTISES the ones worth crawl
+    # budget. GSC showed ~815 of ~1,118 compare pages earned zero impressions in
+    # 3 months while Googlebot's budget is ~347 req/day and falling — advertising
+    # the untested tail just spends discovery crawls on pages that never index.
+    # So: proven pairs (>=1 impression ever, in compare_sitemap_allow.txt) are
+    # always listed; the rest are released COMPARE_SITEMAP_WAVE at a time in
+    # deterministic generation order (top-ranked categories first). Held-back
+    # pairs stay live and get discovered via internal links, not the sitemap.
+    def _norm_pair(_p):
+        _a, _sep, _b = _p.partition("-vs-")
+        return _p if not _b else "-vs-".join(sorted((_a, _b)))
+    _allow_path = os.path.join(base_dir, "compare_sitemap_allow.txt")
+    try:
+        with open(_allow_path, encoding="utf-8") as _f:
+            _compare_proven = {_norm_pair(_l.strip()) for _l in _f if _l.strip()}
+    except OSError:
+        _compare_proven = set()
+    _wave = int(os.environ.get("COMPARE_SITEMAP_WAVE", "150"))
+    _wave_used = 0
+    _cmp_listed = _cmp_proven_hit = 0
     for _cu in compare_pair_urls:
-        sitemap_urls.append((_cu, "0.7", "weekly"))
+        _pair = _norm_pair(_cu.rstrip("/").rsplit("/compare/", 1)[-1])
+        if _pair in _compare_proven:
+            sitemap_urls.append((_cu, "0.7", "weekly"))
+            _cmp_listed += 1
+            _cmp_proven_hit += 1
+        elif _wave_used < _wave:
+            sitemap_urls.append((_cu, "0.5", "weekly"))
+            _cmp_listed += 1
+            _wave_used += 1
+        # else: generated + internally linked, but held out of the sitemap
+    print(f"Compare sitemap: {_cmp_listed} listed "
+          f"({_cmp_proven_hit} proven + {_wave_used} wave) of "
+          f"{len(compare_pair_urls)} generated; "
+          f"{len(compare_pair_urls) - _cmp_listed} held back.")
     sitemap_urls += [
         ("https://hvtracker.net/compare/", "0.7", "daily"),
         ("https://hvtracker.net/changelog/", "0.6", "weekly"),

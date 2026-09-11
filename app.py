@@ -363,6 +363,12 @@ def _canonical_redirect_target(request: Request) -> str | None:
     scheme = _external_scheme(request)
     host = _external_host(request)
     path = request.url.path or "/"
+    # Collapse repeated slashes: /agents/composio// currently 200s (StaticFiles
+    # resolves the doubled path) and Google indexes it as a duplicate of the
+    # single-slash canonical. Redirect to the collapsed path so each page has
+    # exactly one crawlable URL. Query string is untouched.
+    if "//" in path:
+        path = re.sub(r"/{2,}", "/", path)
     target_path = f"{path}/" if _path_needs_trailing_slash(path) else path
     if host in _LOCAL_HOSTS:
         if target_path == path:

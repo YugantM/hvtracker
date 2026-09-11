@@ -13,6 +13,7 @@ changes agent pages), then once more after doctoring seo_state.json with
 sentinel dates and a fabricated below-top-3 pair.
 """
 import glob
+import re
 import importlib
 import itertools
 import json
@@ -152,13 +153,35 @@ def client(site):
         yield c
 
 
-def test_persisted_pair_survives_rank_shuffle(site):
+def test_persisted_pair_survives_rank_shuffle(site, client):
     a, b = site["fabricated"]
     page = os.path.join(site["tmp"], "compare", f"{a}-vs-{b}", "index.html")
     assert os.path.isfile(page), "persisted pair was not re-rendered"
+    # The invariant is anti-404, not sitemap membership: a rank shuffle must
+    # never make an already-indexed compare URL 404. The page stays rendered
+    # and serves 200 even when the crawl-budget policy holds it OUT of the
+    # sitemap (see test_compare_sitemap_prunes_unproven) — the fabricated pair
+    # has no impressions, so it is reachable via internal links, not the
+    # sitemap. Sitemap presence is asserted for proven/wave pairs, not here.
+    r = client.get(f"/compare/{a}-vs-{b}/", follow_redirects=False)
+    assert r.status_code == 200
+
+
+def test_compare_sitemap_prunes_unproven(site):
+    """Crawl-budget policy: the sitemap advertises far fewer compare pairs than
+    are generated on disk — proven pairs (compare_sitemap_allow.txt) plus a
+    bounded wave — while every generated pair stays on disk (reachable)."""
+    compare_root = os.path.join(site["tmp"], "compare")
+    on_disk = {d for d in os.listdir(compare_root)
+               if "-vs-" in d and os.path.isdir(os.path.join(compare_root, d))}
     with open(os.path.join(site["tmp"], "sitemap.xml"), encoding="utf-8") as f:
         sitemap = f.read()
-    assert f"https://hvtracker.net/compare/{a}-vs-{b}/" in sitemap
+    in_sitemap = set(re.findall(r"/compare/([a-z0-9.-]+-vs-[a-z0-9.-]+)/", sitemap))
+    # Something is generated and something is advertised...
+    assert on_disk and in_sitemap
+    # ...but the sitemap is a strict, meaningfully smaller subset of disk.
+    assert in_sitemap <= on_disk
+    assert len(in_sitemap) < len(on_disk)
 
 
 def test_published_pairs_grow_monotonically(site):
