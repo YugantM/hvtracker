@@ -3949,10 +3949,12 @@ def build_ecosystem_pages(rows: list[dict]) -> list[dict]:
         pages.append({
             "slug": slug,
             "provider": provider,
-            "title": f"Projects Using {provider} — Trust-Ranked",
+            "title": f"{len(agents)} AI Agents Using {provider} — Ranked by Trust Score",
             "description": (
-                f"{len(agents)} open-source AI agent projects that integrate {provider}, "
-                f"ranked by evidence-based HVTrust scores."
+                f"Compare {len(agents)} open-source AI agents that integrate {provider}, "
+                f"ranked by independent HVTrust scores and A–D grades from public, "
+                f"checkable signals — provenance, OSSF Scorecard, maintenance, and adoption. "
+                f"See which are safe to use."
             ),
             "agents": agents,
             "faq_answer": faq_answer,
