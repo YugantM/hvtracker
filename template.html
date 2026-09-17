@@ -494,6 +494,20 @@
       object-fit: contain;
       border-radius: 6px;
     }
+    .adopters { padding: 16px 18px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .adopters .featured-footer-label { display: block; margin-bottom: 12px; }
+    .adopter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 10px; }
+    .adopter-card { display: flex; flex-direction: column; gap: 9px; padding: 12px 13px; border: 1px solid var(--border); background: #fff; color: var(--text); text-decoration: none; }
+    .adopter-card:hover { border-color: var(--accent-warm); }
+    .adopter-head { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .adopter-avatar { width: 34px; height: 34px; border-radius: 6px; flex: none; border: 1px solid var(--border); object-fit: cover; background: var(--bg); }
+    .adopter-repo { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.2; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+    .adopter-owner { color: var(--muted); font-weight: 400; }
+    .adopter-desc { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+    .adopter-foot { display: flex; align-items: center; gap: 8px; }
+    .adopter-stars { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+    .adopter-stars .st { color: var(--amber); }
+    .adopter-pill { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: .03em; color: var(--green); background: var(--moss-soft, rgba(86,112,79,.14)); padding: 2px 7px; border-radius: 999px; }
     .movers { display: flex; align-items: center; gap: 14px; padding: 9px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; }
     .movers + .movers { border-top: 0; }
     .movers-title { flex: none; min-width: 96px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -836,30 +850,22 @@
       </div>
     </div>
 
-    <section class="featured-footer" aria-label="Projects carrying the HVTracker badge">
+    <section class="adopters" aria-label="Projects carrying the HVTracker badge">
       <div class="featured-footer-label">Projects carrying the HVTracker badge</div>
-      <div class="featured-footer-list">
-        <a class="featured-repo" href="/agents/haystack/" title="Haystack trust scorecard">
-          <img src="/haystack-logo.png?v=20260604" alt="Haystack logo" loading="lazy" decoding="async">
+      <div class="adopter-grid">
+        {% for a in adopters | default([]) %}
+        <a class="adopter-card" href="/agents/{{ a.slug }}/" title="{{ a.name }} trust scorecard">
+          <span class="adopter-head">
+            <img class="adopter-avatar" src="/adopters/{{ a.slug }}.png?v=20260917" alt="" width="34" height="34" loading="lazy" decoding="async">
+            <span class="adopter-repo"><span class="adopter-owner">{{ a.owner }}/</span>{{ a.name }}</span>
+          </span>
+          <span class="adopter-desc">{{ a.desc }}</span>
+          <span class="adopter-foot">
+            {% if a.stars_fmt %}<span class="adopter-stars"><span class="st">&#9733;</span> {{ a.stars_fmt }}</span>{% endif %}
+            <span class="adopter-pill">HVTrust</span>
+          </span>
         </a>
-        <a class="featured-repo featured-repo--dark" href="/agents/aipass/" title="AIPass trust scorecard">
-          <img src="/aipass-logo.png?v=20260608" alt="AIPass logo" loading="lazy" decoding="async">
-        </a>
-        <a class="featured-repo featured-repo--center featured-repo--wordmark" href="/agents/composio/" title="Composio trust scorecard">
-          <img src="/composio-logo.svg?v=20260612b" alt="Composio logo" loading="lazy" decoding="async">
-        </a>
-        <a class="featured-repo featured-repo--icon" href="/agents/lightrag/" title="LightRAG trust scorecard">
-          <img src="/lightrag-logo.png?v=20260624" alt="LightRAG logo" loading="lazy" decoding="async">
-          LightRAG
-        </a>
-        <a class="featured-repo featured-repo--icon" href="/agents/threadplane/" title="Threadplane trust scorecard">
-          <img src="/threadplane-logo.png?v=20260710b" alt="Threadplane logo" loading="lazy" decoding="async">
-          Threadplane
-        </a>
-        <a class="featured-repo featured-repo--icon" href="/agents/skillspector/" title="SkillSpector trust scorecard">
-          <img src="/skillspector-logo.png?v=20260917" alt="NVIDIA SkillSpector logo" loading="lazy" decoding="async">
-          SkillSpector
-        </a>
+        {% endfor %}
       </div>
     </section>
 

@@ -1253,6 +1253,24 @@ def threadplane_logo():
     return FileResponse(os.path.join(BASE_DIR, "threadplane-logo.png"), media_type="image/png")
 
 
+_ADOPTER_AVATAR_SLUGS = frozenset({
+    "skillspector", "haystack", "lightrag", "composio",
+    "aipass", "threadplane", "reversecore-mcp",
+})
+
+
+@app.get("/adopters/{slug}.png")
+def adopter_avatar(slug: str):
+    # Square avatars for the homepage "Projects carrying the HVTracker badge"
+    # cards. Like the *-logo.png routes above, each BASE_DIR file needs an
+    # explicit route — the StaticFiles mount only serves the volume.
+    if slug not in _ADOPTER_AVATAR_SLUGS:
+        return Response(status_code=404)
+    return FileResponse(
+        os.path.join(BASE_DIR, "adopters", f"{slug}.png"), media_type="image/png"
+    )
+
+
 @app.get("/hex-bg.svg")
 def hex_bg():
     return FileResponse(os.path.join(BASE_DIR, "hex-bg.svg"), media_type="image/svg+xml")
