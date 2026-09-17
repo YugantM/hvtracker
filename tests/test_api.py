@@ -628,7 +628,8 @@ def test_robots_txt_blocks_crawl_waste(client):
     assert r.status_code == 200
     star_group = r.text.split("User-agent: GPTBot")[0]
     for rule in ("Disallow: /auth/", "Disallow: /track/",
-                 "Disallow: /login", "Disallow: /data/agents/"):
+                 "Disallow: /login", "Disallow: /data/agents/",
+                 "Disallow: /compare/?a="):
         assert rule in star_group
     # AI-crawler groups keep their own Allow: / and inherit no * rules.
     assert "User-agent: GPTBot\nAllow: /" in r.text
