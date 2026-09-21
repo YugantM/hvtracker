@@ -45,6 +45,7 @@ COPY templates/ templates/
 COPY docs/import-candidates.json docs/import-candidates.json
 COPY compare/index.html compare/index.html
 COPY verify/index.html verify/index.html
+COPY live/index.html live/index.html
 COPY scan/index.html scan/index.html
 COPY static/ static/
 COPY blog_static/ blog_static/
