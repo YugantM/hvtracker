@@ -6942,7 +6942,31 @@ def main() -> None:
     # description and JSON-LD, and those must not churn (#114).
     skill_rows = [r for r in rows if listing_class(r) != "agent"]
     skill_categories = sorted({r.get("category", "") for r in skill_rows} - {""})
+    _ADOPTERS = [
+        ("lightrag", "HKUDS/LightRAG", "Simple, fast retrieval-augmented generation"),
+        ("composio", "ComposioHQ/composio", "Tooling and context management for AI agents"),
+        ("haystack", "deepset-ai/haystack", "Open-source AI orchestration framework"),
+        ("skillspector", "NVIDIA/SkillSpector", "Security scanner for AI agent skills"),
+        ("aipass", "AIOSAI/AIPass", "Persistent workspace for AI agents"),
+        ("reversecore-mcp", "sjkim1127/Reversecore_MCP", "Security-first MCP server for reverse engineering"),
+        ("threadplane", "cacheplane/threadplane", "Open-source thread-plane for agents"),
+    ]
+    _adopter_rows = {r["slug"]: r for r in rows}
+    adopters = []
+    for _slug, _repo, _desc in _ADOPTERS:
+        _r = _adopter_rows.get(_slug, {})
+        _stars = _r.get("stars", 0) or 0
+        _owner, _, _name = _repo.partition("/")
+        adopters.append({
+            "slug": _slug,
+            "owner": _owner,
+            "name": _name,
+            "repo": _repo,
+            "desc": _desc,
+            "stars_fmt": _r.get("stars_fmt") if _stars > 0 else "",
+        })
     html = tmpl.render(
+        adopters=adopters,
         rows=agent_rows + skill_rows,
         skill_count=len(skill_rows),
         skill_categories=skill_categories,
