@@ -234,6 +234,17 @@ def test_retired_section_redirects(client):
     assert r.headers["location"] == "/org/"
 
 
+def test_double_slash_collapses_to_canonical(site, client):
+    # /agents/<slug>// used to serve 200 (a duplicate of the single-slash
+    # canonical). It must 301 to the collapsed path so each page has one URL.
+    slug = site["fabricated"][0]  # a real agent slug present in this render
+    r = client.get(f"/agents/{slug}//", follow_redirects=False)
+    assert r.status_code == 301
+    assert r.headers["location"] == f"https://hvtracker.net/agents/{slug}/"
+    # A single trailing slash is already canonical and must NOT redirect.
+    assert client.get(f"/agents/{slug}/", follow_redirects=False).status_code == 200
+
+
 def test_retired_agent_pages_are_410(client):
     r = client.get("/agents/retired-test-agent/", follow_redirects=False)
     assert r.status_code == 410
