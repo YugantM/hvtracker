@@ -192,6 +192,8 @@ footer { padding: 24px 0 36px; margin-top: 12px; display: flex; gap: 12px; flex-
 footer a { color: var(--accent); }
 .footer-sep { color: var(--border); }
 
+.nav-toggle { display: none; }
+
 @media (max-width: 900px) {
   .site-header-inner { grid-template-columns: 1fr; gap: 4px; }
   .site-nav { justify-self: start; flex-wrap: wrap; }
@@ -201,6 +203,53 @@ footer a { color: var(--accent); }
      hidden panel never reserves vertical space, and open dropdowns stack inline. */
   .nav-panel { display: none; opacity: 1; visibility: visible; transition: none; }
   .nav-group:hover > .nav-panel, .nav-group:focus-within > .nav-panel { display: flex; position: static; box-shadow: none; border: 0; padding: 2px 0 2px 12px; margin-top: 0; min-width: 0; }
+
+  /* With JS (html.nav-js, set by the header script): a 56px bar with the
+     logo, sign-in and a Menu button; the nav opens as a grouped sheet. The
+     "updated" timestamp is dropped here — pages carry it in their footer. */
+  html.nav-js .site-header-inner { grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 56px; padding: 6px 16px; }
+  html.nav-js .logo { grid-column: 1; grid-row: 1; }
+  html.nav-js .site-header-right { grid-column: 2; grid-row: 1; justify-self: end; }
+  html.nav-js .site-status { display: none; }
+  html.nav-js .nav-toggle {
+    display: inline-flex; align-items: center; gap: 6px; grid-column: 3; grid-row: 1;
+    min-height: 44px; padding: 0 14px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); color: var(--text); font: 600 14px var(--font-sans); cursor: pointer;
+  }
+  html.nav-js .nav-toggle::before { content: "\2630"; font-size: 15px; }
+  html.nav-js .nav-toggle[aria-expanded="true"]::before { content: "\2715"; }
+  html.nav-js .site-nav { display: none; }
+  html.nav-js .nav-open .site-nav {
+    display: grid; grid-column: 1 / -1; grid-row: 2; justify-self: stretch; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 16px; padding: 4px 0 12px; max-height: calc(100vh - 64px); overflow-y: auto;
+  }
+  html.nav-js .nav-open .nav-trigger {
+    pointer-events: none; padding: 10px 0 2px; border: 0; background: none;
+    font: 11px var(--font-mono); text-transform: uppercase; letter-spacing: .05em; color: var(--muted-2);
+  }
+  html.nav-js .nav-open .nav-trigger::after { content: none; }
+  html.nav-js .nav-open .nav-panel { display: flex; position: static; box-shadow: none; border: 0; padding: 0; margin: 0; min-width: 0; background: none; }
+  html.nav-js .nav-open .nav-panel a { display: flex; align-items: center; min-height: 44px; padding: 0 2px; font-size: 15px; color: var(--text); }
+}
+
+/* Touch screens: 44px tap targets for the shared controls. */
+@media (pointer: coarse) {
+  .btn, .nav-trigger { min-height: 44px; }
+  .nav-panel a { display: flex; align-items: center; min-height: 44px; }
+}
+
+/* ---- Motion ------------------------------------------------------------
+   Bars sweep in and the score ring draws on load; nothing moves when the
+   reader has asked for reduced motion. */
+@keyframes hvt-grow { from { transform: scaleX(0); } }
+@keyframes hvt-ring { from { stroke-dasharray: 0 326.7; } }
+@media (prefers-reduced-motion: no-preference) {
+  .metric-fill, .nb-bar i, .dv-fill { transform-origin: left center; animation: hvt-grow .8s cubic-bezier(.2, .7, .2, 1) both; }
+  .dv-fill.to-a { transform-origin: right center; }
+  .vseal circle:not(.vring-track) { animation: hvt-ring 1s cubic-bezier(.2, .7, .2, 1) both; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
 
 /* ── UI/UX polish ──────────────────────────────────────────────
