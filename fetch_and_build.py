@@ -2572,13 +2572,22 @@ def agent_correction_url(row: dict) -> str:
     })
 
 
+# Daily snapshots written while production briefly ran `main`'s stale 464-row
+# roster (2026-09-21: the live board shrank to 441 agents for a day). They stay
+# on disk — history is never deleted — but are never read back as history:
+# every rank delta, mover and trend point computed against them is an artifact
+# (it put "▲887" on the homepage movers strip).
+PARTIAL_SNAPSHOT_DATES = frozenset({"2026-09-21"})
+
+
 def _load_prior_snapshot(history_dir: str) -> dict | None:
-    """Return the most recent history snapshot older than today, or None."""
+    """Return the most recent usable history snapshot older than today, or None."""
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     try:
         candidates = sorted(
             [f for f in os.listdir(history_dir)
-             if re.match(r"\d{4}-\d{2}-\d{2}\.json$", f) and f[:-5] < today],
+             if re.match(r"\d{4}-\d{2}-\d{2}\.json$", f) and f[:-5] < today
+             and f[:-5] not in PARTIAL_SNAPSHOT_DATES],
             reverse=True,
         )
         if not candidates:
@@ -2590,14 +2599,28 @@ def _load_prior_snapshot(history_dir: str) -> dict | None:
 
 
 def load_previous_ranks(history_dir: str) -> dict[str, int]:
-    """Load previous rankings from the most recent prior history snapshot."""
+    """Load previous rankings from the most recent prior history snapshot.
+
+    Rows that were provisional (pending_signals) there are left out: a rank
+    computed from a partial signal set is not a position anything moved from.
+    """
     prev = _load_prior_snapshot(history_dir)
     if not prev:
         return {}
     try:
-        return {a["repo"].lower(): a["rank"] for a in prev.get("agents", [])}
+        return {a["repo"].lower(): a["rank"] for a in prev.get("agents", [])
+                if not a.get("pending_signals")}
     except (KeyError, TypeError):
         return {}
+
+
+def load_previous_pending(history_dir: str) -> set[str]:
+    """Repos that were provisional in the prior snapshot (no comparable rank)."""
+    prev = _load_prior_snapshot(history_dir)
+    if not prev:
+        return set()
+    return {a["repo"].lower() for a in prev.get("agents", [])
+            if a.get("repo") and a.get("pending_signals")}
 
 
 def load_previous_downloads(
@@ -2725,15 +2748,18 @@ def check_board_invariants(rows: list[dict], prior_snapshot: dict | None) -> lis
             )
     if prior_snapshot:
         prior_agents = prior_snapshot.get("agents", [])
+        # Provisional rows (either side) carry ranks from a partial signal set;
+        # their movement is a data-completeness event, not a scoring change.
         prior_ranks = {
             a.get("repo", "").lower(): a.get("rank")
             for a in prior_agents
-            if a.get("repo") and a.get("rank") is not None
+            if a.get("repo") and a.get("rank") is not None and not a.get("pending_signals")
         }
         deltas = [
             abs(r["rank"] - prior_ranks[r["repo"].lower()])
             for r in rows
-            if r.get("rank") is not None and r["repo"].lower() in prior_ranks
+            if r.get("rank") is not None and not r.get("pending_signals")
+            and r["repo"].lower() in prior_ranks
         ]
         same_methodology = (
             prior_snapshot.get("methodology_version") == METHODOLOGY_VERSION
@@ -2823,7 +2849,7 @@ def load_history(history_dir: str) -> list[dict]:
     snapshots = []
     try:
         for f in sorted(os.listdir(history_dir)):
-            if re.match(r"\d{4}-\d{2}-\d{2}\.json$", f):
+            if re.match(r"\d{4}-\d{2}-\d{2}\.json$", f) and f[:-5] not in PARTIAL_SNAPSHOT_DATES:
                 with open(os.path.join(history_dir, f), encoding="utf-8") as fh:
                     snap = json.load(fh)
                     snap["_date"] = f[:-5]
@@ -2930,10 +2956,15 @@ def compute_movers(history: list[dict], slug_map: dict[str, str] | None = None, 
     latest, baseline = select_daily_pair(history)
     if not latest or not baseline:
         return {"up": [], "down": []}
-    old_ranks = {a["repo"].lower(): a["rank"] for a in baseline.get("agents", [])}
+    # Provisional rows on either day have no comparable rank — a row gaining
+    # (or losing) its full signal set is not a mover.
+    old_ranks = {a["repo"].lower(): a["rank"] for a in baseline.get("agents", [])
+                 if not a.get("pending_signals")}
     rows_by_repo = {r.get("repo", "").lower(): r for r in (rows or [])}
     movers = []
     for a in latest.get("agents", []):
+        if a.get("pending_signals"):
+            continue
         repo = a["repo"].lower()
         old = old_ranks.get(repo)
         if old is None:
@@ -5952,6 +5983,7 @@ def main() -> None:
     history_dir = os.path.join(script_dir, "output", "history")
     os.makedirs(history_dir, exist_ok=True)
     prev_ranks = load_previous_ranks(history_dir)
+    prev_pending = load_previous_pending(history_dir)
     prev_downloads = load_previous_downloads(history_dir)
     cached_commit_counts = load_cached_commit_counts(data_path, history_dir)
     existing_agents_map = load_existing_agents_map(data_path)
@@ -6534,7 +6566,15 @@ def main() -> None:
     for row in rows:
         repo_key = row["repo"].lower()
         old_rank = prev_ranks.get(repo_key)
-        if old_rank is None:
+        if row.get("pending_signals") or (old_rank is None and repo_key in prev_pending):
+            # Provisional today or yesterday: listed, not new, but its rank
+            # isn't comparable — show "—" rather than a fake move or "NEW".
+            row["previous_rank"] = None
+            row["rank_delta"] = None
+            row["rank_delta_display"] = rank_delta_display(None, False)
+            row["rank_delta_class"] = rank_delta_class(None, False)
+            row["rank_delta_sort"] = 0
+        elif old_rank is None:
             row["previous_rank"] = None
             row["rank_delta"] = None
             row["rank_delta_display"] = rank_delta_display(None, True)
