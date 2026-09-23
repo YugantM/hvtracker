@@ -861,6 +861,7 @@ def healthz():
         "scheduler_running": bool(_scheduler is not None and _scheduler.running),
         "scheduler_error": _scheduler_error,
         "scheduled_jobs": _scheduled_jobs(),
+        "process_rss_mb": _process_rss_mb(),
         "machine_usage": {"since": _USAGE_SINCE, **_usage_counters},
         "badge_fetches": {
             "since": _USAGE_SINCE,
@@ -2616,6 +2617,22 @@ def _start_scheduler() -> None:
         print(f"[startup] SCHEDULER FAILED TO START — no refreshes will run: {_scheduler_error}",
               flush=True)
         traceback.print_exc()
+
+
+def _process_rss_mb() -> float | None:
+    """Resident memory of the web process (Linux /proc), for /healthz.
+
+    Memory is most of the Railway bill; this makes the web process's own share
+    visible without SSH (render subprocesses are billed on top of it).
+    """
+    try:
+        with open("/proc/self/status", encoding="ascii") as f:
+            for line in f:
+                if line.startswith("VmRSS:"):
+                    return round(int(line.split()[1]) / 1024, 1)
+    except (OSError, ValueError, IndexError):
+        pass
+    return None
 
 
 def _scheduled_jobs() -> dict[str, str | None]:
