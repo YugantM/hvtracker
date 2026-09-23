@@ -5579,7 +5579,7 @@ def provisional_agent_row(agent: dict) -> dict:
         "commits_low_confidence": False,
         "score": 0.0,
         "score_class": score_class(0),
-        "description": agent.get("description", "Pending first signal refresh"),
+        "description": agent.get("description", ""),
         "language": "",
         "open_issues": 0,
         "archived": False,

@@ -705,7 +705,10 @@
           </label>
         </div>
       </div>
-      <button type="button" class="v2-toggle" id="v2Toggle" aria-pressed="false">
+      {# Kept in the DOM (the rank-mode script references it) but hidden: most
+         visitors don't know what "calibration" is. The comparison is still
+         reachable at ?compare=historical, linked from the methodology page. #}
+      <button type="button" class="v2-toggle" id="v2Toggle" aria-pressed="false" hidden>
         Compare to pre-calibration
       </button>
       <button type="button" class="cat-clear" id="catClear">✕ Clear filters</button>
