@@ -164,6 +164,31 @@ def test_get_agent_history_reads_snapshots_and_caches(tmp_path, monkeypatch):
     assert first is second
 
 
+def test_rest_history_endpoint_serves_the_shared_index_and_skips_partial_days(
+        tmp_path, monkeypatch):
+    from datetime import date, timedelta
+    hist = tmp_path / "output" / "history"
+    hist.mkdir(parents=True)
+    days = [(date.today() - timedelta(days=d)).isoformat() for d in (2, 1, 0)]
+    for i, day in enumerate(days):
+        (hist / f"{day}.json").write_text(json.dumps({
+            "methodology_version": "v4.3",
+            "agents": [{"repo": "langchain-ai/langgraph", "rank": 10 - i,
+                        "trust_score": 80.0 + i, "evidence_grade": "A"}],
+        }))
+    monkeypatch.setattr(app, "OUTPUT_DIR", str(tmp_path))
+    # The middle day stands in for a partial snapshot (like 2026-09-21).
+    monkeypatch.setattr(app, "_PARTIAL_SNAPSHOT_DATES", frozenset({days[1]}))
+    mcp_server._history_index.update({"mtime": None, "data": None})
+
+    body = json.loads(app.api_v1_agent_history("langgraph").body)
+    assert [p["date"] for p in body["history"]] == [days[0], days[2]]
+    assert body["count"] == 2
+    # Same data as the MCP tool, from the same cached index.
+    assert body["history"] == mcp_server.get_agent_history("langgraph")["history"]
+    mcp_server._history_index.update({"mtime": None, "data": None})
+
+
 EXPECTED_TOOLS = {
     "check_agent_trust", "verify_mcp_server", "search_agents", "compare_agents",
     "scan_stack", "list_categories", "get_leaderboard", "get_agent_history",
