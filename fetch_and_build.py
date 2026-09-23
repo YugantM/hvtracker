@@ -2096,6 +2096,25 @@ def group_by_class(rows: list[dict]) -> dict[str, list[dict]]:
     return groups
 
 
+# September plan, decision 4: a fixed cohort of skill pages opened to Google as
+# a test while the rest stay noindex (§2a crawl-budget freeze).
+SKILL_INDEX_COHORT = 100
+
+
+def select_indexed_skills(prior, rows: list[dict], size: int = SKILL_INDEX_COHORT) -> set[str]:
+    """The skill pages allowed into the index. Picked ONCE from the top of the
+    skill board (fully checked rows only), then kept for as long as each skill
+    stays listed — re-picking by daily rank would flip pages near the cut in
+    and out of noindex and the sitemap, the URL churn #114 warns about."""
+    listed = {r["slug"] for r in rows if listing_class(r) == "skill" and r.get("slug")}
+    if prior:
+        return set(prior) & listed
+    ranked = sorted(
+        (r for r in rows if listing_class(r) == "skill" and r.get("slug") and not r.get("pending_signals")),
+        key=lambda r: r.get("rank") or 10**9)
+    return {r["slug"] for r in ranked[:size]}
+
+
 def apply_listing_classes(rows: list[dict], agents: list[dict]) -> None:
     """Re-apply each row's listing class from the roster, in place.
 
@@ -7235,6 +7254,15 @@ def main() -> None:
             for s in siblings
         ]
 
+    try:
+        with open(os.path.join(script_dir, "data", "seo_state.json"), encoding="utf-8") as _f:
+            _prior_skills = json.load(_f).get("indexed_skills")
+    except (OSError, json.JSONDecodeError, AttributeError):
+        _prior_skills = None
+    indexed_skills = select_indexed_skills(_prior_skills, rows)
+    for row in rows:
+        row["seo_indexed"] = row.get("slug") in indexed_skills
+
     # Per-agent profile pages — /agents/<slug>/index.html
     agent_tmpl = env.get_template("agent.html.j2")
     agents_dir = os.path.join(script_dir, "agents")
@@ -7702,6 +7730,7 @@ def main() -> None:
         _cmp_seen.add(_key)
         _render_compare_pair(_a, _b, _cm)
     seo_state["published_compare_pairs"] = sorted(list(_k) for _k in _cmp_seen)
+    seo_state["indexed_skills"] = sorted(indexed_skills)
     print(f"Built {len(compare_pair_urls)} static comparison pages under compare/.")
 
     # Blog comparison articles — one SEO article per category using the top two
@@ -7963,8 +7992,9 @@ def main() -> None:
     for row in rows:
         # Skill pages are served noindex (§2a crawl-budget freeze), so keep them
         # out of the sitemap and IndexNow — advertising URLs we ask Google not to
-        # index sends a mixed signal and wastes crawl budget on the tail.
-        if listing_class(row) == "skill":
+        # index sends a mixed signal and wastes crawl budget on the tail. The
+        # decision-4 test cohort is the exception: indexable, so advertised.
+        if listing_class(row) == "skill" and row.get("slug") not in indexed_skills:
             continue
         sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}/", "0.8", "daily"))
     # Legacy entries have their public /agents/<slug>/ page deleted

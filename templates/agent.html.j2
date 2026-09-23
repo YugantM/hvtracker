@@ -8,8 +8,10 @@
   {# Skill pages are noindexed while Google's crawl budget is capped (§2a): they
      draw zero impressions and starve the converting MCP/agent pages of budget.
      The page still renders and serves; only Google indexing pauses. Reversible —
-     remove this block to re-index. `follow` keeps link equity flowing. #}
-  {% if row.listing_class == 'skill' %}<meta name="robots" content="noindex, follow">{% endif %}
+     remove this block to re-index. `follow` keeps link equity flowing.
+     Decision 4 (Sep 2026): a fixed cohort of 100 skills (row.seo_indexed) is
+     indexable as a test — see select_indexed_skills. #}
+  {% if row.listing_class == 'skill' and not row.seo_indexed %}<meta name="robots" content="noindex, follow">{% endif %}
   <title>Is {{ row.name }} Safe? Trust Score &amp; Safety Signals | HVTracker</title>
   <meta name="description" content="Is {{ row.name }} safe? It scores {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}) on HVTracker — an independent trust score from supply-chain provenance, OSSF Scorecard, maintenance, and adoption signals.">
   <link rel="canonical" href="https://hvtracker.net/agents/{{ row.slug }}/">
