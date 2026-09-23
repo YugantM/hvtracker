@@ -27,6 +27,11 @@
   <meta name="twitter:image" content="https://hvtracker.net/agents/{{ row.slug }}/og.png">
   <meta name="twitter:image:alt" content="{{ row.name }} on HVTracker">
 
+  {# Provisional rows (pending_signals) have not had a full signal fetch yet:
+     the score is partial, so no grade, rank or rating is published for them.
+     Rows cached before #238 still carry the old placeholder description. #}
+  {% set pend = row.pending_signals %}
+  {% set desc = "" if row.description == "Pending first signal refresh" else row.description %}
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -35,12 +40,12 @@
     "applicationCategory": "{{ row.category }}",
     "operatingSystem": "Cross-platform",
     "url": "{{ row.url }}",
-    {% if row.description %}"description": "{{ row.description }}",{% endif %}
+    {% if desc %}"description": "{{ desc }}",{% endif %}
     "offers": {
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "USD"
-    },
+    }{% if not pend %},
     "review": {
       "@type": "Review",
       "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net/" },
@@ -52,7 +57,7 @@
         "bestRating": 100,
         "worstRating": 0
       }
-    }
+    }{% endif %}
   }
   </script>
   <script type="application/ld+json">
@@ -63,7 +68,7 @@
       {
         "@type": "Question",
         "name": "Is {{ row.name }} safe to use?",
-        "acceptedAnswer": { "@type": "Answer", "text": "{{ row.name }} has an HVTrust score of {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}), ranked #{{ row.rank }} of {{ total }} tracked AI agent projects. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals." }
+        "acceptedAnswer": { "@type": "Answer", "text": "{% if pend %}{{ row.name }} is newly listed and still being checked: its HVTrust score is provisional until the first full signal fetch completes, so no grade has been assigned yet.{% else %}{{ row.name }} has an HVTrust score of {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}), ranked #{{ row.rank }} of {{ total }} tracked AI agent projects. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals.{% endif %}" }
       },
       {
         "@type": "Question",
@@ -81,7 +86,8 @@
     .back:hover { color:var(--text); }
 
     .hero { padding:24px 0; border-bottom:1px solid var(--border); position:relative; }
-    .safety-verdict { margin-top:16px; padding:12px 16px; border:1px solid var(--border); border-left:3px solid var(--accent); background:var(--surface); font-size:14px; line-height:1.65; color:var(--text); max-width:680px; }
+    /* The long-form evidence behind the verdict card: plain text, not a second box. */
+    .safety-verdict { margin-top:18px; font-size:14px; line-height:1.65; color:var(--text); max-width:680px; }
     .safety-verdict a { color:var(--accent); }
     h1 { font-size:28px; font-weight:700; margin-bottom:4px; }
     .hero .repo { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
@@ -97,25 +103,64 @@
     .badge.state-legacy { color:var(--muted-2); }
     .badge.state-rejected, .badge.state-delisted { color:var(--red); }
     .hero-actions { margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    /* Verdict hero — the page title asks "Is X safe?"; this answers it with
-       visual priority instead of hiding the score among equal metadata cells. */
-    .verdict-hero { position:relative; margin-top:16px; padding:16px 18px; border:1px solid var(--border); background:var(--surface);
-      display:grid; grid-template-columns:auto 1fr auto; gap:2px 16px; align-items:baseline; }
-    .vh-score { font-family:var(--font-mono); line-height:.9; }
-    .vh-num { font-size:44px; font-weight:700; letter-spacing:-0.02em; color:var(--accent); }
-    .vh-den { font-size:15px; color:var(--muted); }
-    .vh-meta { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-    .vh-rank { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
-    .vh-line { grid-column:1/-1; margin-top:10px; font-size:14px; line-height:1.5; color:var(--text); }
-    .vh-bar { grid-column:1/-1; margin-top:12px; height:6px; background:var(--bg); border:1px solid var(--border); border-radius:4px; overflow:hidden; }
-    .vh-bar i { display:block; height:100%; background:var(--accent); }
-    .hero-summary-grid { margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:1px; background:var(--border); }
-    .hero-summary-item { padding:10px; background:var(--bg); }
-    .hero-summary-label { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); margin-bottom:4px; }
-    .hero-summary-value { font-family:var(--font-mono); font-size:13px; font-weight:600; line-height:1.3; }
-    .hero-summary-value.positive { color:var(--green); }
-    .hero-summary-value.negative { color:var(--red); }
-    .hero-summary-value.neutral { color:var(--accent); }
+    /* Verdict card — the page title asks "Is X safe?"; this answers it before
+       anything else: the verdict and its four deciding signals on the left, the
+       score as a seal in the grade colour on the right. Same data as before,
+       one focal point instead of a row of equal-weight cells. */
+    .vcard { margin-top:18px; display:grid; grid-template-columns:minmax(0,1fr) 236px; gap:22px; align-items:start; }
+    .vcard-verdict { font-size:17px; line-height:1.5; font-weight:500; color:var(--text); margin:0 0 14px; max-width:520px; }
+    .vcard-verdict strong { font-weight:700; }
+    .vfacts { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:1px; background:var(--border);
+      border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+    .vfact { background:var(--bg); padding:9px 10px; min-width:0; }
+    .vfact-label { display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--muted); line-height:1.3; }
+    .vfact-value { display:block; margin-top:3px; font-family:var(--font-mono); font-size:13.5px; font-weight:600; font-variant-numeric:tabular-nums; }
+    .vdot { width:8px; height:8px; border-radius:50%; flex:none; }
+    .vdot.ok { background:var(--green); } .vdot.part { background:var(--amber); } .vdot.gap { background:var(--red); }
+    .vdot.wait { border:1.5px dashed var(--muted-2); }
+    .vfacts.is-5 { grid-template-columns:repeat(5, minmax(0,1fr)); }
+    .vfact-value.is-wait { font-family:inherit; font-size:12px; font-weight:400; color:var(--muted-2); }
+    .vring-pending { stroke:var(--muted-2); }
+    .badge.grade-pending { background:transparent; color:var(--muted); border:1px dashed var(--line-strong); }
+    .vseal { border:1px solid var(--border); background:var(--surface); border-radius:10px; padding:16px 14px 14px; text-align:center; }
+    .vseal svg { display:block; margin:0 auto; }
+    .vring-track { stroke:var(--border); }
+    .vring-A { stroke:#2f6846; } .vring-B { stroke:#2c5282; } .vring-C { stroke:#8b6914; } .vring-D { stroke:#57524c; }
+    .vseal-num { font-family:var(--font-mono); font-size:27px; font-weight:700; fill:var(--text); }
+    .vseal-den { font-family:var(--font-mono); font-size:11px; fill:var(--muted); }
+    .vseal-grade { margin-top:6px; font-family:var(--font-mono); font-size:12px; }
+    .vseal-rank { margin:9px 0 0; font-family:var(--font-mono); font-size:11.5px; line-height:1.65; color:var(--muted); }
+    .vseal-rank b { color:var(--text); font-weight:600; }
+    .vfresh { display:inline-flex; align-items:center; gap:6px; margin-top:10px; font-family:var(--font-mono); font-size:11px;
+      color:var(--green); border:1px solid color-mix(in srgb, var(--green) 40%, transparent); border-radius:20px; padding:2px 9px; }
+    @media (max-width: 700px) {
+      .vcard { grid-template-columns:1fr; gap:14px; }
+      .vseal { order:-1; display:grid; grid-template-columns:auto 1fr; gap:4px 14px; align-items:center; text-align:left; padding:12px 14px; }
+      .vseal svg { width:92px; height:92px; grid-row:span 3; margin:0; }
+      .vseal-grade, .vseal-rank { margin:0; }
+      .vfacts, .vfacts.is-5 { grid-template-columns:repeat(2, minmax(0,1fr)); }
+      .vfacts.is-5 .vfact:last-child { grid-column:1 / -1; }
+    }
+    /* Neighbours relative to this agent: each bar is a score, the tick is this
+       agent's, and the gap is written out — "is the click worth it?" at a glance. */
+    .nb-list { list-style:none; margin:0; padding:0; display:grid; gap:2px; }
+    .nb-row a, .nb-row .nb-self { display:grid; grid-template-columns:40px minmax(0,1fr) minmax(90px,170px) 44px 70px; gap:10px;
+      align-items:center; padding:7px 8px; border-radius:5px; font-size:13px; color:var(--text); text-decoration:none; }
+    .nb-row a:hover { background:var(--surface); text-decoration:none; }
+    .nb-row.is-me .nb-self { background:var(--surface); font-weight:600; }
+    .nb-rank { font-family:var(--font-mono); font-size:11.5px; color:var(--muted); }
+    .nb-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .nb-bar { position:relative; height:8px; background:var(--surface); border-radius:4px; }
+    .nb-row.is-me .nb-bar { background:var(--bg); }
+    .nb-bar i { position:absolute; inset:0 auto 0 0; border-radius:4px; background:var(--accent); opacity:.75; }
+    .nb-bar s { position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--text); }
+    .nb-score { font-family:var(--font-mono); font-size:12.5px; text-align:right; font-variant-numeric:tabular-nums; }
+    .nb-delta { font-family:var(--font-mono); font-size:11.5px; text-align:right; color:var(--muted); white-space:nowrap; }
+    .nb-note { margin-top:8px; font-size:11.5px; color:var(--muted); }
+    @media (max-width: 560px) {
+      .nb-row a, .nb-row .nb-self { grid-template-columns:34px minmax(0,1fr) 44px 64px; }
+      .nb-bar { display:none; }
+    }
     .warning-banner { margin-top:12px; padding:10px 12px; border-left:3px solid var(--red); background:var(--surface); }
     .warning-banner strong { font-size:12px; }
     .warning-banner ul { list-style:none; padding:0; margin:4px 0 0; }
@@ -181,30 +226,18 @@
     /* Sits in the verdict block, level with the score, so the compare route is
        in the same glance as the number people came for. The panel is absolute
        so opening it never reflows the hero. */
-    .cmp-bubble { grid-row:1; grid-column:3; justify-self:end; align-self:center; position:relative; z-index:20; }
+    .cmp-bubble { position:relative; z-index:20; }
+    /* Secondary action (Track is the one primary): an outline button that
+       opens named neighbours with their score gaps. */
     .cmp-bubble > summary { cursor:pointer; list-style:none; display:inline-flex; align-items:center; gap:8px;
-      padding:11px 16px; border-radius:22px; background:var(--accent); color:#fff;
-      font:600 13px/1 var(--font-sans); box-shadow:0 6px 20px -6px rgba(31,27,23,.45); }
+      padding:9px 14px; border-radius:6px; border:1px solid var(--accent); background:transparent; color:var(--accent);
+      font:600 13px/1 var(--font-sans); }
     .cmp-bubble > summary::-webkit-details-marker { display:none; }
-    .cmp-bubble > summary:hover { filter:brightness(1.12); }
+    .cmp-bubble > summary:hover, .cmp-bubble[open] > summary { background:var(--accent); color:#fff; }
     .cmp-bubble > summary:focus-visible { outline:2px solid var(--text); outline-offset:2px; }
     .cmp-bubble-icon { font-size:15px; }
     .cmp-bubble[open] > summary { box-shadow:none; }
-    /* Attention pulse: an expanding ring drawn with box-shadow (no layout cost),
-       run four times and then stopped. A permanent loop reads as a broken ad and
-       stops being noticed after the first few seconds; a short burst catches the
-       eye on arrival and then leaves the page alone. */
-    @keyframes cmpPulse {
-      0%   { box-shadow:0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
-      70%  { box-shadow:0 0 0 12px color-mix(in srgb, var(--accent) 0%, transparent); }
-      100% { box-shadow:0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent); }
-    }
-    .cmp-bubble:not([open]) > summary { animation:cmpPulse 1.9s ease-out 4; }
-    .cmp-bubble > summary:hover, .cmp-bubble[open] > summary { animation:none; }
-    @media (prefers-reduced-motion: reduce) {
-      .cmp-bubble:not([open]) > summary { animation:none; }
-    }
-    .cmp-bubble-panel { position:absolute; top:calc(100% + 6px); right:0; width:290px; max-width:calc(100vw - 48px);
+    .cmp-bubble-panel { position:absolute; top:calc(100% + 6px); left:0; width:290px; max-width:calc(100vw - 48px);
       background:var(--bg); border:1px solid var(--line-strong); border-radius:8px;
       padding:14px; box-shadow:0 14px 40px -12px rgba(31,27,23,.4); }
     .cmp-bubble-head { font-size:12.5px; line-height:1.45; color:var(--muted); margin-bottom:10px; }
@@ -219,13 +252,12 @@
        there the subject is this agent, so the polarity is meaningful.) */
     .cmp-t-delta { font-family:var(--font-mono); font-size:11px; white-space:nowrap; color:var(--muted); }
     .cmp-bubble-all { display:block; font-family:var(--font-mono); font-size:11.5px; color:var(--accent); }
+    /* Narrow screens: the pill wraps mid-row, so anchor the panel to the whole
+       actions row instead of the pill — otherwise it opens off the right edge. */
     @media (max-width: 620px) {
-      /* Three columns will not fit beside a 44px figure — drop the compare
-         control onto its own full-width row under the score instead. */
-      .verdict-hero { grid-template-columns:auto 1fr; }
-      .cmp-bubble { grid-row:auto; grid-column:1/-1; justify-self:start; margin-top:12px; }
-      .cmp-bubble > summary { padding:10px 14px; font-size:12.5px; }
-      .cmp-bubble-panel { right:auto; left:0; width:100%; }
+      .hero-actions { position:relative; }
+      .cmp-bubble { position:static; }
+      .cmp-bubble-panel { left:0; right:0; width:auto; max-width:none; z-index:20; }
     }
     @media (prefers-reduced-motion: reduce) { .cmp-bubble * { transition:none; } }
 
@@ -402,6 +434,10 @@
       .review-item.primary { grid-row:auto; }
       .review-item.wide { grid-column:auto; }
       .metric-row { grid-template-columns:1fr; gap:4px; padding:6px 0; }
+      /* Compare rows: name on its own line, then bar · value · delta. The
+         desktop 4-column rule outranks the one above and forced ~530px. */
+      .metric-row.is-compare { grid-template-columns:minmax(0,1fr) auto auto; column-gap:10px; }
+      .metric-row.is-compare .metric-name { grid-column:1 / -1; }
       .metric-value { text-align:left; }
       .runtime-grid { grid-template-columns:1fr; }
     }
@@ -442,99 +478,141 @@
       <div class="repo">
         {% if row.display_repo %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.display_repo }}</a>{% elif row.org_slug_or_none %}<a href="/org/{{ row.org_slug_or_none }}/">{{ row.repo.split('/')[0] }}</a>/<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo.split('/')[1] }}</a>{% else %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>{% endif %}
       </div>
-      {% if row.description %}<p class="desc">{{ row.description }}</p>{% endif %}
+      {% if desc %}<p class="desc">{{ desc }}</p>{% endif %}
       <div class="badges">
         {% if row.category %}<a href="/categories/{{ row.category_slug }}/" class="badge cat" style="text-decoration:none">{{ row.category }}</a>{% endif %}
         {% if row.language %}<span class="badge lang">{{ row.language }}</span>{% endif %}
-        {% if row.evidence_grade %}<span class="badge grade-{{ row.evidence_grade }}" title="Grade {{ row.evidence_grade }}">Grade {{ row.evidence_grade }}</span>{% endif %}
         {% if row.display_listing_status %}<span class="badge state-{{ row.display_listing_status }}">{{ row.display_status_label }}</span>{% endif %}
         {% if row.license_spdx %}<span class="badge">{{ row.license_spdx }}</span>{% endif %}
-        {% if row.license_type and row.license_type != 'open' %}<span class="badge" style="color:{% if row.license_type == 'proprietary' %}var(--red){% elif row.license_type == 'source-available' %}var(--amber){% else %}var(--muted){% endif %}">{{ row.license_type | capitalize }}</span>{% endif %}
+        {% if row.license_type and row.license_type != 'open' and not pend %}<span class="badge" style="color:{% if row.license_type == 'proprietary' %}var(--red){% elif row.license_type == 'source-available' %}var(--amber){% else %}var(--muted){% endif %}">{{ row.license_type | capitalize }}</span>{% endif %}
       </div>
-      <div class="verdict-hero">
-        <div class="vh-score">
-          <span class="vh-num">{{ row.trust_score }}</span><span class="vh-den">/100</span>
-        </div>
-        {# No grade pill here — the chip row above already carries it, and a
-           second filled pill beside the figure competed with the score. #}
-        <div class="vh-meta">
-          <span class="vh-rank">Rank #{{ row.rank }} of {{ total }}</span>
-        </div>
-        {% if compare_targets %}
-        {# Sticky compare prompt. A <details> so open/close is native — no JS, no
-        extra requests. Closed it is a single pill; the score gap on each row is
-        the hook, since "scores 15 higher" is the thing worth a click. #}
-        <details class="cmp-bubble">
-        <summary aria-label="Compare {{ row.name }} with similar agents">
-        <span class="cmp-bubble-icon" aria-hidden="true">&#8646;</span>
-        <span class="cmp-bubble-label">Compare {{ row.name }}</span>
-        </summary>
-        <div class="cmp-bubble-panel">
-        <p class="cmp-bubble-head">How does it stack up against its {{ row.category }} neighbours?</p>
-        <ul class="cmp-bubble-list">
-        {% for t in compare_targets %}
-        <li>
-        <a href="{{ t.url }}"{% if not t.published %} rel="nofollow"{% endif %}>
-        <span class="cmp-t-name">{{ t.name }}</span>
-        <span class="cmp-t-delta">
-        {% if t.delta > 0 %}+{{ t.delta }} higher{% elif t.delta < 0 %}{{ t.delta | abs }} lower{% else %}same score{% endif %}
-        </span>
-        </a>
-        </li>
-        {% endfor %}
-        </ul>
-        <a class="cmp-bubble-all" href="/compare/?a={{ row.slug }}">Pick any agent to compare &rarr;</a>
-        </div>
-        </details>
-        {% endif %}
-        <p class="vh-line">{{ row.review_insights.verdict }}</p>
-        <div class="vh-bar" role="img" aria-label="HVTrust score {{ row.trust_score }} out of 100">
-          <i style="width:{{ row.trust_score or 0 }}%"></i>
-        </div>
-      </div>
-      <div class="hero-actions">
-        {# The compare CTA now lives in the verdict block above, where it offers
-           named opponents rather than an empty tool — so Track leads this row. #}
-        <button class="btn btn-primary watch-button" id="watchToggle" type="button" data-watch-slug="{{ row.slug }}" data-watch-name="{{ row.name }}" data-watch-repo="{{ row.repo }}">Track {{ row.name }}</button>
-        <button class="btn btn-secondary" id="compareToggle" type="button" data-cmp-slug="{{ row.slug }}" data-cmp-name="{{ row.name }}" data-cmp-repo="{{ row.repo }}">Add to compare</button>
-        <a class="btn btn-tertiary" id="compareOpen" href="/compare/?a={{ row.slug }}">Open compare tool</a>
-        <a class="btn btn-tertiary" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Suggest correction</a>
-      </div>
-      <div class="hero-summary-grid">
-        <div class="hero-summary-item">
-          <div class="hero-summary-label">Listing state</div>
-          <div class="hero-summary-value{% if row.display_status_tone %} {{ row.display_status_tone }}{% endif %}">{{ row.display_status_label }}</div>
-        </div>
-        {# HVTrust cell removed — the score now leads the hero in .verdict-hero above. #}
-        {% if row.coverage_grade %}
-        <div class="hero-summary-item">
-          <div class="hero-summary-label">Evidence coverage</div>
-          <div class="hero-summary-value" title="How many independent public signal types verify this agent — distinct from the trust-score grade">Grade {{ row.coverage_grade }} · {{ row.signal_types }}/5 signals</div>
-        </div>
-        {% endif %}
-        <div class="hero-summary-item">
-          <div class="hero-summary-label">Last push</div>
-          <div class="hero-summary-value">{{ row.last_push }}{% if row.days_ago is not none %} · {{ row.days_ago }}d ago{% endif %}</div>
-        </div>
-        <div class="hero-summary-item">
-          <div class="hero-summary-label">Recent change</div>
-          <div class="hero-summary-value{% if row.recent_change_summary %} {{ row.recent_change_summary.tone }}{% endif %}">
-            {% if row.recent_change_summary %}
-              {{ row.recent_change_summary.short_label }}{% if row.recent_change_summary.count > 1 %} +{{ row.recent_change_summary.count - 1 }}{% endif %}
-            {% else %}
-              No recent signal change
+      {# Verdict card: the answer first. Left, the verdict and the four signals
+         that decide it plus the actions; right, the score as a seal. The long
+         "Is X safe?" paragraph below keeps the full evidence for readers and
+         search. #}
+      {% set g = row.evidence_grade or "D" %}
+      {% set sc = row.scorecard_score %}
+      {% set sig = row.signed_commits_pct %}
+      {% set dago = row.days_ago %}
+      <div class="vcard{% if pend %} is-provisional{% endif %}">
+        <div class="vcard-main">
+          {% if pend %}
+          {% set checks = [
+            ("GitHub activity", row.last_push != "pending", row.last_push, "GitHub activity"),
+            ("OSSF Scorecard", sc is not none, (sc ~ " / 10") if sc is not none else "", "OSSF Scorecard"),
+            ("Package downloads", row.weekly_downloads is not none, row.downloads_fmt, "package downloads"),
+            ("Provenance", false, "", "provenance"),
+            ("Signed commits", sig is not none, (sig ~ "%") if sig is not none else "", "signed commits"),
+          ] %}
+          {% set missing = checks | rejectattr(1) | map(attribute=3) | list %}
+          <p class="vcard-verdict"><strong>Evidence is still being collected.</strong>
+            {{ row.name }} hasn't had its first full check yet: {{ 5 - missing | length }} of the 5 signals its score is built from are in{% if missing %} (still to fetch: {{ missing[:-1] | join(", ") }}{% if missing | length > 1 %} and {% endif %}{{ missing[-1] }}){% endif %},
+            so the score is provisional and no grade is shown.</p>
+          <div class="vfacts is-5" role="list" aria-label="Signals fetched so far">
+            {% for label, done, value, _ in checks %}
+            <div class="vfact" role="listitem">
+              <span class="vfact-label"><span class="vdot {% if done %}ok{% else %}wait{% endif %}" aria-hidden="true"></span>{{ label }}</span>
+              <span class="vfact-value{% if not done %} is-wait{% endif %}">{% if done %}{{ value }}{% else %}pending{% endif %}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="vcard-verdict"><strong>Is {{ row.name }} safe?</strong> {{ row.review_insights.verdict }}</p>
+          <div class="vfacts" role="list" aria-label="Key trust signals">
+            <div class="vfact" role="listitem">
+              <span class="vfact-label"><span class="vdot {% if sc is none %}gap{% elif sc >= 7 %}ok{% elif sc >= 4 %}part{% else %}gap{% endif %}" aria-hidden="true"></span>OSSF Scorecard</span>
+              <span class="vfact-value">{% if sc is none %}No result{% else %}{{ sc }} / 10{% endif %}</span>
+            </div>
+            <div class="vfact" role="listitem">
+              <span class="vfact-label"><span class="vdot {% if row.has_provenance %}ok{% else %}gap{% endif %}" aria-hidden="true"></span>Provenance</span>
+              <span class="vfact-value">{% if row.has_provenance %}Attested{% else %}None{% endif %}</span>
+            </div>
+            <div class="vfact" role="listitem">
+              <span class="vfact-label"><span class="vdot {% if sig is none %}part{% elif sig >= 80 %}ok{% elif sig >= 20 %}part{% else %}gap{% endif %}" aria-hidden="true"></span>Signed commits</span>
+              <span class="vfact-value">{% if sig is none %}Unknown{% else %}{{ sig }}%{% endif %}</span>
+            </div>
+            <div class="vfact" role="listitem">
+              <span class="vfact-label"><span class="vdot {% if dago is none %}part{% elif dago <= 30 %}ok{% elif dago <= 180 %}part{% else %}gap{% endif %}" aria-hidden="true"></span>Last push</span>
+              <span class="vfact-value">{% if dago is none %}Unknown{% elif dago == 0 %}today{% elif dago == 1 %}yesterday{% else %}{{ dago }}d ago{% endif %}</span>
+            </div>
+          </div>
+          {% endif %}
+          <div class="hero-actions">
+            <button class="btn btn-primary watch-button" id="watchToggle" type="button" data-watch-slug="{{ row.slug }}" data-watch-name="{{ row.name }}" data-watch-repo="{{ row.repo }}"{% if pend %} data-watch-label="Track: tell me when it's graded"{% endif %}>{% if pend %}Track: tell me when it's graded{% else %}Track {{ row.name }}{% endif %}</button>
+            {% if compare_targets %}
+            {# Sticky compare prompt. A <details> so open/close is native — no JS, no
+            extra requests. Closed it is a single pill; the score gap on each row is
+            the hook, since "scores 15 higher" is the thing worth a click. #}
+            <details class="cmp-bubble">
+            <summary aria-label="Compare {{ row.name }} with similar agents">
+            <span class="cmp-bubble-icon" aria-hidden="true">&#8646;</span>
+            <span class="cmp-bubble-label">Compare {{ row.name }}</span>
+            </summary>
+            <div class="cmp-bubble-panel">
+            <p class="cmp-bubble-head">How does it stack up against its {{ row.category }} neighbours?</p>
+            <ul class="cmp-bubble-list">
+            {% for t in compare_targets %}
+            <li>
+            <a href="{{ t.url }}"{% if not t.published %} rel="nofollow"{% endif %}>
+            <span class="cmp-t-name">{{ t.name }}</span>
+            <span class="cmp-t-delta">
+            {% if t.delta > 0 %}+{{ t.delta }} higher{% elif t.delta < 0 %}{{ t.delta | abs }} lower{% else %}same score{% endif %}
+            </span>
+            </a>
+            </li>
+            {% endfor %}
+            </ul>
+            <a class="cmp-bubble-all" href="/compare/?a={{ row.slug }}">Pick any agent to compare &rarr;</a>
+            </div>
+            </details>
             {% endif %}
+            <button class="btn btn-tertiary" id="compareToggle" type="button" data-cmp-slug="{{ row.slug }}" data-cmp-name="{{ row.name }}" data-cmp-repo="{{ row.repo }}">Add to compare</button>
+            {# Appears only once the compare tray holds something (see script). #}
+            <a class="btn btn-tertiary" id="compareOpen" href="/compare/?a={{ row.slug }}" hidden>Open compare tool</a>
+            <a class="btn btn-tertiary" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Suggest a correction</a>
           </div>
         </div>
+        {% if pend %}
+        <aside class="vseal" aria-label="Provisional HVTrust score {{ row.trust_score }} out of 100; grade pending">
+          <svg width="128" height="128" viewBox="0 0 132 132" aria-hidden="true">
+            <circle class="vring-track" cx="66" cy="66" r="52" fill="none" stroke-width="10"/>
+            <circle class="vring-pending" cx="66" cy="66" r="52" fill="none" stroke-width="10"
+              stroke-dasharray="{{ ((row.trust_score or 0) * 3.2673) | round(1) }} 326.7" transform="rotate(-90 66 66)"/>
+            <text class="vseal-num" x="66" y="68" text-anchor="middle">{{ row.trust_score }}</text>
+            <text class="vseal-den" x="66" y="87" text-anchor="middle">provisional</text>
+          </svg>
+          <div class="vseal-grade"><span class="badge grade-pending">Grade pending</span></div>
+          <p class="vseal-rank">A full check usually lands within 12 h. <a href="/methodology/">How scoring works</a></p>
+        </aside>
+        {% else %}
+        <aside class="vseal" aria-label="HVTrust score {{ row.trust_score }} out of 100, grade {{ g }}">
+          <svg width="128" height="128" viewBox="0 0 132 132" aria-hidden="true">
+            <circle class="vring-track" cx="66" cy="66" r="52" fill="none" stroke-width="10"/>
+            <circle class="vring-{{ g }}" cx="66" cy="66" r="52" fill="none" stroke-width="10" stroke-linecap="round"
+              stroke-dasharray="{{ ((row.trust_score or 0) * 3.2673) | round(1) }} 326.7" transform="rotate(-90 66 66)"/>
+            <text class="vseal-num" x="66" y="68" text-anchor="middle">{{ row.trust_score }}</text>
+            <text class="vseal-den" x="66" y="87" text-anchor="middle">/ 100</text>
+          </svg>
+          <div class="vseal-grade"><span class="badge grade-{{ g }}">Grade {{ g }}</span></div>
+          <p class="vseal-rank">
+            <b>#{{ row.rank }}</b> of {{ total }} overall{% if row.rank_delta %} <span class="{{ row.rank_delta_class }}">{{ row.rank_delta_display }}</span>{% endif %}
+            {% if row.category_rank and row.category %}<br><b>#{{ row.category_rank }}</b> in {{ row.category }}{% endif %}
+            {% if row.coverage_grade %}<br>Coverage <b>{{ row.coverage_grade }}</b> · {{ row.signal_types }}/5 signals{% endif %}
+          </p>
+          {% if row.full_fetched_at %}<span class="vfresh" data-fetched="{{ row.full_fetched_at }}" title="When HVTracker last fetched this agent's full signal set">signals checked {{ row.full_fetched_at[:10] }}</span>{% endif %}
+        </aside>
+        {% endif %}
       </div>
+      {% if not pend %}
       <p class="safety-verdict" id="is-it-safe">
-        <strong>Is {{ row.name }} safe?</strong>
+        <strong>In detail:</strong>
         {{ row.name }} scores <strong>{{ row.trust_score }}/100 (Grade {{ row.evidence_grade }})</strong>, ranked #{{ row.rank }} of {{ total }} tracked open-source AI agent projects{% if row.coverage_grade %}, on evidence coverage {{ row.coverage_grade }} ({{ row.signal_types }} of 5 independent signal types){% endif %}.
         The public evidence: {% if row.has_provenance %}its packages ship with cryptographic provenance{% else %}no package-provenance attestation found{% endif %};
         {% if row.scorecard_score is not none %}OSSF Scorecard rates its supply-chain practices {{ row.scorecard_score }}/10{% else %}no OSSF Scorecard result yet{% endif %};
         {% if row.signed_commits_pct is not none and row.signed_commits_pct > 0 %}{{ row.signed_commits_pct }}% of recent commits are signed{% else %}recent commits are unsigned{% endif %};
         last pushed {{ row.last_push }}. Every point is earned from checkable signals — never paid placement. <a href="/methodology/">How scoring works →</a>
       </p>
+      {% endif %}
       {% if row.warning_reasons %}
       <div class="warning-banner">
         <strong>Active listing, but review is needed</strong>
@@ -554,18 +632,95 @@
     </section>
 
     {% if related %}
-    <section class="compare-strip">
-      <h2 class="section-title">Ranked neighbours in <a href="/categories/{{ row.category_slug }}/" style="color:inherit">{{ row.category }}</a></h2>
-      <div class="cmp-row">
-        {% for r in related %}
-        <a class="cmp-link" href="/agents/{{ r.slug }}/">
-          <span class="cmp-name">#{{ r.category_rank }} {{ r.name }} — {{ r.trust_score }} ({{ r.evidence_grade }})</span>
-          <span class="cmp-arrow">→</span>
-        </a>
+    {# Neighbours drawn relative to this agent: each bar is a score, the tick is
+       this agent's, and the gap is written out, so "is the click worth it?" is
+       answered before the click. This agent sits in the list at its own rank. #}
+    {% set nb = related | list %}
+    {% if row.category_rank and not pend %}{% set nb = (nb + [row]) | sort(attribute="category_rank") %}{% endif %}
+    <section class="neighbours">
+      <h2 class="section-title">How {{ row.name }} compares in <a href="/categories/{{ row.category_slug }}/" style="color:inherit">{{ row.category }}</a></h2>
+      <ol class="nb-list">
+        {% for r in nb %}
+        {% set me = r.slug == row.slug %}
+        <li class="nb-row{% if me %} is-me{% endif %}">
+          {% if me %}<span class="nb-self">{% else %}<a href="/agents/{{ r.slug }}/">{% endif %}
+            <span class="nb-rank">#{{ r.category_rank }}</span>
+            <span class="nb-name">{{ r.name }}</span>
+            <span class="nb-bar" aria-hidden="true"><i style="width:{{ r.trust_score or 0 }}%"></i>{% if not me and row.trust_score is not none %}<s style="left:{{ row.trust_score }}%"></s>{% endif %}</span>
+            <span class="nb-score">{{ r.trust_score }}</span>
+            <span class="nb-delta">{% if me %}this agent{% elif r.trust_score is not none and row.trust_score is not none %}{% set d = (r.trust_score - row.trust_score) | round(1) %}{% if d > 0 %}+{{ d }}{% elif d < 0 %}&minus;{{ (0 - d) | round(1) }}{% else %}&plusmn;0{% endif %}{% endif %}</span>
+          {% if me %}</span>{% else %}</a>{% endif %}
+        </li>
         {% endfor %}
+      </ol>
+      <p class="nb-note">Bars show each HVTrust score; the tick marks {{ row.name }}&rsquo;s {{ row.trust_score }}.</p>
+    </section>
+    {% endif %}
+
+    {% if row.trust_breakdown is defined %}
+    {# Where the score comes from — moved up from Analysis so the explanation of
+       the number sits next to it. Activity inputs stay in Analysis below. #}
+    <section class="analysis score-sources">
+      <h2 class="section-title">Where the {{ row.trust_score }} comes from</h2>
+      <div class="analysis-panel">
+        <div class="analysis-card">
+          <div class="metric-section">
+            <div class="metric-section-title">
+              <h3>{% if row.category_comparison %}HVTrust dimensions vs the {{ row.category }} average{% else %}HVTrust dimensions{% endif %}</h3>
+              <span>{{ row.trust_score }} / 100{% if pend %} · provisional{% elif row.trust_confidence is defined and row.trust_confidence %} · {{ (row.trust_confidence * 100) | round }}% confidence{% endif %}</span>
+            </div>
+            {% set dim_subs = {
+              "safety": "50% OSSF Scorecard · 30% provenance · 20% signed commits",
+              "identity": "60% listing status · 40% build provenance",
+              "transparency": "50% declared license · 50% OSSF Scorecard",
+              "maintenance": "60% last-push freshness · 40% commit activity",
+              "adoption": "Log-scaled stars · package downloads"
+            } %}
+            {% if row.category_comparison %}
+            {% set cc = row.category_comparison %}
+            <p class="metric-legend">
+              <span class="lg-item"><span class="lg-bar" aria-hidden="true"></span>{{ row.name }}</span>
+              <span class="lg-item"><span class="lg-tick" aria-hidden="true"></span>{{ cc.category }} average ({{ cc.peers }} agents)</span>
+            </p>
+            <div class="metric-list" aria-label="HVTrust dimensions for {{ row.name }} compared with the {{ cc.category }} average">
+              {% for d in cc.dimensions %}
+              <div class="metric-row is-compare">
+                <div class="metric-name"><strong>{{ d.label }}</strong><span class="metric-sub">{{ dim_subs.get(d.key, "") }}</span></div>
+                <div class="metric-track">
+                  <div class="metric-fill" style="--fill:{{ d.pct }}%;--bar:var(--accent);"></div>
+                  <span class="metric-avg" style="--avg:{{ d.avg_pct }}%" aria-hidden="true"></span>
+                </div>
+                <div class="metric-value">{{ d.value }} <span>/ {{ d.max }}</span></div>
+                <div class="metric-delta is-{{ d.direction }}">
+                  <span class="d-glyph" aria-hidden="true">{% if d.direction == "above" %}▲{% elif d.direction == "below" %}▼{% else %}•{% endif %}</span>
+                  {% if d.direction == "level" %}in line with avg {{ d.avg }}{% else %}{{ d.delta | abs }} {{ d.direction }} avg {{ d.avg }}{% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <div class="metric-list" aria-label="HVTrust dimensions for {{ row.name }}">
+              {% for key, label, val, mx in [
+                ("safety", "Safety / Integrity", row.trust_breakdown.safety, 25),
+                ("identity", "Identity / Provenance", row.trust_breakdown.identity, 18),
+                ("transparency", "Transparency", row.trust_breakdown.transparency, 17),
+                ("maintenance", "Maintenance", row.trust_breakdown.maintenance, 20),
+                ("adoption", "Adoption", row.trust_breakdown.adoption, 20)
+              ] %}
+              <div class="metric-row">
+                <div class="metric-name"><strong>{{ label }}</strong><span class="metric-sub">{{ dim_subs.get(key, "") }}</span></div>
+                <div class="metric-track"><div class="metric-fill" style="--fill:{{ (val / mx * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
+                <div class="metric-value">{{ val }} <span>/ {{ mx }}</span></div>
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
       </div>
     </section>
     {% endif %}
+
 
     <section class="review-card">
       <h2 class="section-title">Quick Trust Read</h2>
@@ -717,58 +872,6 @@
       <h2 class="section-title">Analysis</h2>
       <div class="analysis-panel">
         <div class="analysis-card">
-          <div class="metric-section">
-            <div class="metric-section-title">
-              <h3>{% if row.category_comparison %}HVTrust Dimensions vs {{ row.category }}{% else %}HVTrust Dimensions{% endif %}</h3>
-              <span>{{ row.trust_score }} / 100{% if row.trust_confidence is defined and row.trust_confidence %} · {{ (row.trust_confidence * 100) | round }}% confidence{% endif %}</span>
-            </div>
-            {% set dim_subs = {
-              "safety": "50% OSSF Scorecard · 30% provenance · 20% signed commits",
-              "identity": "60% listing status · 40% build provenance",
-              "transparency": "50% declared license · 50% OSSF Scorecard",
-              "maintenance": "60% last-push freshness · 40% commit activity",
-              "adoption": "Log-scaled stars · package downloads"
-            } %}
-            {% if row.category_comparison %}
-            {% set cc = row.category_comparison %}
-            <p class="metric-legend">
-              <span class="lg-item"><span class="lg-bar" aria-hidden="true"></span>{{ row.name }}</span>
-              <span class="lg-item"><span class="lg-tick" aria-hidden="true"></span>{{ cc.category }} average ({{ cc.peers }} agents)</span>
-            </p>
-            <div class="metric-list" aria-label="HVTrust dimensions for {{ row.name }} compared with the {{ cc.category }} average">
-              {% for d in cc.dimensions %}
-              <div class="metric-row is-compare">
-                <div class="metric-name"><strong>{{ d.label }}</strong><span class="metric-sub">{{ dim_subs.get(d.key, "") }}</span></div>
-                <div class="metric-track">
-                  <div class="metric-fill" style="--fill:{{ d.pct }}%;--bar:var(--accent);"></div>
-                  <span class="metric-avg" style="--avg:{{ d.avg_pct }}%" aria-hidden="true"></span>
-                </div>
-                <div class="metric-value">{{ d.value }} <span>/ {{ d.max }}</span></div>
-                <div class="metric-delta is-{{ d.direction }}">
-                  <span class="d-glyph" aria-hidden="true">{% if d.direction == "above" %}▲{% elif d.direction == "below" %}▼{% else %}•{% endif %}</span>
-                  {% if d.direction == "level" %}in line with avg {{ d.avg }}{% else %}{{ d.delta | abs }} {{ d.direction }} avg {{ d.avg }}{% endif %}
-                </div>
-              </div>
-              {% endfor %}
-            </div>
-            {% else %}
-            <div class="metric-list" aria-label="HVTrust dimensions for {{ row.name }}">
-              {% for key, label, val, mx in [
-                ("safety", "Safety / Integrity", row.trust_breakdown.safety, 25),
-                ("identity", "Identity / Provenance", row.trust_breakdown.identity, 18),
-                ("transparency", "Transparency", row.trust_breakdown.transparency, 17),
-                ("maintenance", "Maintenance", row.trust_breakdown.maintenance, 20),
-                ("adoption", "Adoption", row.trust_breakdown.adoption, 20)
-              ] %}
-              <div class="metric-row">
-                <div class="metric-name"><strong>{{ label }}</strong><span class="metric-sub">{{ dim_subs.get(key, "") }}</span></div>
-                <div class="metric-track"><div class="metric-fill" style="--fill:{{ (val / mx * 100) | round(1) }}%;--bar:var(--accent);"></div></div>
-                <div class="metric-value">{{ val }} <span>/ {{ mx }}</span></div>
-              </div>
-              {% endfor %}
-            </div>
-            {% endif %}
-          </div>
           <div class="metric-section">
             <div class="metric-section-title">
               <h3>Activity Inputs</h3>
@@ -1292,7 +1395,7 @@
           btn.classList.toggle("is-saved", saved);
           // Mirror the server-rendered label ("Track <name>") so the button does
           // not silently shorten itself the moment this runs.
-          btn.textContent = saved ? "Tracking ✓" : ("Track " + btn.dataset.watchName);
+          btn.textContent = saved ? "Tracking ✓" : (btn.dataset.watchLabel || ("Track " + btn.dataset.watchName));
         };
         btn.addEventListener("click", () => {
           const items = loadWatchlist();
@@ -1327,6 +1430,7 @@
             // compare bubble, so this link is just the tool: it only advertises
             // a count once the tray actually holds something.
             copen.textContent = n ? ("Compare (" + n + ") →") : "Open compare tool";
+            copen.hidden = !n;
           }
         };
         cbtn.addEventListener("click", () => {
@@ -1351,6 +1455,18 @@
       };
       window.addEventListener("hashchange", openTarget);
       openTarget();
+    })();
+  </script>
+  <script>
+    // "signals checked 3 h ago": pages are static and edge-cached, so relative
+    // time is computed here from the ISO stamp; without JS the date stays.
+    (function () {
+      var el = document.querySelector(".vfresh[data-fetched]");
+      if (!el) return;
+      var t = Date.parse(el.getAttribute("data-fetched"));
+      if (isNaN(t)) return;
+      var h = Math.max(0, Math.round((Date.now() - t) / 3600000));
+      el.textContent = "signals checked " + (h < 1 ? "within the hour" : h < 48 ? h + " h ago" : Math.round(h / 24) + " days ago");
     })();
   </script>
 </body>
