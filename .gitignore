@@ -101,3 +101,14 @@ ga_data.json
 # would not reach the image, but it would still transit to Railway's builder.
 /railway
 /railway.pub
+
+# Discovery / roster-curation working files, written to the repo root by
+# discover_agents.py, discover_recent.py, discover_skills.py and
+# build_skill_rows.py. Proposals only — agents.json is the roster of record.
+/candidates.json
+/candidates-shortlist.json
+/agents-shortlist.json
+/recent-candidates.json
+/skills-candidates.json
+/skills-shortlist.json
+/skills.json
