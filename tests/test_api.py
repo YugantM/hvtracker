@@ -899,3 +899,25 @@ def test_responses_are_gzipped_on_the_origin_hop(client):
     # Cache-Control is set by _cache_headers, which now runs *inside* the gzip
     # layer — the headers it writes must still reach the client.
     assert client.get("/").headers["Cache-Control"] == app_module._HTML_CACHE
+
+
+def test_homepage_renders_top_rows_and_defers_the_rest(client):
+    """Plan 2.5: the homepage ships only the top BOARD_SSR_ROWS rows; every
+    other row comes from /data/board-rest.json, rendered from the same row
+    partial, with no overlap and no row lost. Fetching it is a page asset,
+    not machine use of the data surface."""
+    import html as _html
+    import re as _re
+    import fetch_and_build as fab
+    row_slug = r'data-slug="([^"]+)"\s+data-rank='
+    page = client.get("/").text
+    inline = _re.findall(row_slug, page)
+    rest_url = _html.unescape(_re.search(r'data-rest="([^"]+)"', page).group(1))
+    before = client.get("/healthz").json()["machine_usage"]["data_json"]
+    rest = client.get(rest_url)
+    assert rest.status_code == 200
+    deferred = _re.findall(row_slug, rest.json()["html"])
+    assert len(inline) == fab.BOARD_SSR_ROWS
+    assert deferred and rest.json()["count"] == len(deferred)
+    assert not set(inline) & set(deferred)
+    assert client.get("/healthz").json()["machine_usage"]["data_json"] == before

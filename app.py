@@ -408,7 +408,9 @@ def _count_badge(slug: str) -> None:
 # own endpoints. Counting those would let our own site inflate the "machine
 # consumer" numbers it is reporting — the same self-counting mistake the
 # verify feed made. Excluded from machine_usage by path.
-_USAGE_EXCLUDED_PATHS = frozenset({"/api/v1/usage"})
+# The homepage's own deferred board rows are a page asset fetched by people
+# searching the leaderboard, not machine use of the data surface.
+_USAGE_EXCLUDED_PATHS = frozenset({"/api/v1/usage", "/data/board-rest.json"})
 
 # Daily snapshots are the registry's irreplaceable asset: one 4MB file per day
 # holding every row with all 62 fields, including trust_breakdown and
