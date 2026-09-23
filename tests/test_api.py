@@ -614,6 +614,9 @@ def test_startup_prefers_pending_over_commit_repair(monkeypatch):
                 kicked.append(self._args[0])
 
     monkeypatch.setattr(app.threading, "Thread", FakeThread)
+    # The suite disables real boot refreshes; this test fakes the thread, so
+    # it opts back in to observe which mode would be kicked.
+    monkeypatch.setenv("HVT_BOOT_REFRESH", "1")
 
     app._scheduler = None
     app.startup()

@@ -2629,6 +2629,22 @@ def _scheduled_jobs() -> dict[str, str | None]:
     return out
 
 
+def _kick_boot_refresh(mode: str, fingerprint: str) -> None:
+    """Start a boot-time refresh in the background.
+
+    HVT_BOOT_REFRESH=0 skips it; the test suite sets that in conftest. Under
+    pytest these threads ran real render subprocesses and scorecard pulls that
+    outlived the tests: they rewrote the repo's scorecard-cache.json, raced
+    module reloads ("release unlocked lock") and swallowed pytest's summary
+    line. Tests that exercise the branch choice fake the thread and opt back in.
+    """
+    if os.environ.get("HVT_BOOT_REFRESH", "1") == "0":
+        print(f"[startup] boot refresh ({mode}) skipped: HVT_BOOT_REFRESH=0", flush=True)
+        return
+    threading.Thread(target=_refresh_and_record, args=(mode, fingerprint, "startup"),
+                     daemon=True).start()
+
+
 def _startup():
     _start_scheduler()
     _sync_prebuilt_to_volume()
@@ -2677,7 +2693,7 @@ def _startup():
     # If the volume has no site yet, build one in the background so the service
     # comes up immediately and the site appears shortly after.
     if not os.path.isfile(DATA_PATH):
-        threading.Thread(target=_refresh_and_record, args=("full", fingerprint, "startup"), daemon=True).start()
+        _kick_boot_refresh("full", fingerprint)
         print("[startup] no data.json on volume — kicked off initial full build")
     elif os.environ.get("DISABLE_SCHEDULER") != "1" and _has_pending_signal_rows():
         # Pending must outrank repair-commits: ~10 rows legitimately sit at
@@ -2686,7 +2702,7 @@ def _startup():
         # every boot — with repair first, freshly added agents could never get
         # their first signal refresh from a restart. The pending refresh fetches
         # commit counts for its rows anyway; repair runs on the next boot.
-        threading.Thread(target=_refresh_and_record, args=("pending", fingerprint, "startup"), daemon=True).start()
+        _kick_boot_refresh("pending", fingerprint)
         print("[startup] detected provisional rows — kicked off pending refresh")
     elif os.environ.get("DISABLE_SCHEDULER") != "1" and _has_missing_commit_rows():
         # Same DISABLE_SCHEDULER guard as the pending branch above. Without it
@@ -2694,7 +2710,7 @@ def _startup():
         # subprocess that outlived the suite in 403-retry loops (and raced
         # pytest's own summary line out of the log). No production effect:
         # DISABLE_SCHEDULER is set only by the tests and docker-compose.
-        threading.Thread(target=_refresh_and_record, args=("repair-commits", fingerprint, "startup"), daemon=True).start()
+        _kick_boot_refresh("repair-commits", fingerprint)
         print("[startup] detected rows with missing commit counts — kicked off targeted repair refresh")
     elif seeded > 0 or stored_fingerprint != fingerprint or agents_changed:
         # Re-render when:
@@ -2702,7 +2718,7 @@ def _startup():
         #     had a site rendered without them, or
         #   - templates/assets changed in the image, or
         #   - agents.json content changed since last deploy (DB resync above)
-        threading.Thread(target=_refresh_and_record, args=("render", fingerprint, "startup"), daemon=True).start()
+        _kick_boot_refresh("render", fingerprint)
         if seeded > 0:
             print("[startup] history seeded into existing volume — kicked off render-only rebuild")
         elif stored_fingerprint != fingerprint:
