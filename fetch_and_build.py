@@ -2175,6 +2175,20 @@ def health_score(stars: int, days_since: int, recent_commits: int, forks: int) -
     return round(c["stars"] + c["freshness"] + c["activity"] + c["community"], 1)
 
 
+def clip_description(text: str, limit: int = 300) -> str:
+    """Repo description for display: whole, or cut at a word with an ellipsis.
+
+    It used to be text[:120] — mid-word, no ellipsis — so 138 agents (the #1
+    and #2 ranked among them) showed descriptions like "...to help you b" on
+    their pages, in JSON-LD and in the API. Tables clamp visually with CSS.
+    """
+    text = text or ""
+    if len(text) <= limit:
+        return text
+    cut = text[: limit - 1].rsplit(" ", 1)[0].rstrip(" ,;:-—–")
+    return f"{cut}…"
+
+
 def slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
@@ -5654,13 +5668,19 @@ def refresh_runtime_signals(rows: list[dict], agent_configs: list[dict], label: 
         row, agent = target
         repo_id = agent["repo"]
         fallback_desc = row.get("description") or ""
-        repo_desc = fallback_desc
+        # The detectors below scan at most the first 120 characters here, as
+        # they always have — a scoring input, deliberately unchanged. What is
+        # stored for display is the full description, clipped at a word.
+        repo_desc = fallback_desc[:120]
+        display_desc = fallback_desc
         ref = "HEAD"
         repo_full_name = None
         try:
             repo = get_repo(repo_id)
             ref = repo.get("default_branch") or "HEAD"
-            repo_desc = (repo.get("description") or fallback_desc)[:120]
+            raw_desc = repo.get("description") or fallback_desc
+            repo_desc = raw_desc[:120]
+            display_desc = clip_description(raw_desc)
             repo_full_name = repo.get("full_name")
         except Exception:
             pass
@@ -5674,7 +5694,7 @@ def refresh_runtime_signals(rows: list[dict], agent_configs: list[dict], label: 
             crate_package=agent.get("crate_package", ""),
             tracked_repo_canonical=repo_full_name,
         )
-        return repo_id, mcp, ext, tooling, drift, repo_desc or None
+        return repo_id, mcp, ext, tooling, drift, display_desc or None
 
     refreshed = 0
     with ThreadPoolExecutor(max_workers=10) as pool:
@@ -6126,7 +6146,7 @@ def main() -> None:
             "commits_low_confidence": commits_low_confidence,
             "score": score,
             "score_class": score_class(score),
-            "description": (repo.get("description") or "")[:120],
+            "description": clip_description(repo.get("description") or ""),
             "language": repo.get("language") or "",
             "open_issues": repo.get("open_issues_count", 0),
             "archived": repo.get("archived", False),
