@@ -77,6 +77,10 @@ RUN chown -R hvt:hvt /app /data
 COPY entrypoint.sh /app/entrypoint.sh
 
 ENV OUTPUT_DIR=/data/site
+# Unbuffered stdout: without it the web process's print() lines sat in an 8 KB
+# buffer and reached Railway late and out of order, which hid the 22 Sep boot
+# where the scheduler never started.
+ENV PYTHONUNBUFFERED=1
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
