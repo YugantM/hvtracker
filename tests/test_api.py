@@ -65,6 +65,8 @@ def test_healthz(client):
     assert j["scheduler_running"] is False
     assert j["scheduler_error"] is None
     assert j["scheduled_jobs"] == {}
+    # Linux /proc only; None elsewhere (e.g. macOS dev machines).
+    assert j["process_rss_mb"] is None or j["process_rss_mb"] > 0
     assert client.head("/healthz").status_code == 200
 
 
