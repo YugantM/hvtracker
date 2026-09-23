@@ -9,8 +9,6 @@ import json
 import os
 import shutil
 import tempfile
-import types
-import sys
 
 import pytest
 
@@ -532,15 +530,9 @@ def test_startup_keeps_scheduler_alive(monkeypatch):
         def shutdown(self, wait=False):
             self.shutdown_called = True
 
-    fake_bg = types.ModuleType("apscheduler.schedulers.background")
-    fake_bg.BackgroundScheduler = FakeScheduler
-    fake_sched = types.ModuleType("apscheduler.schedulers")
-    fake_sched.background = fake_bg
-    fake_ap = types.ModuleType("apscheduler")
-    fake_ap.schedulers = fake_sched
-    monkeypatch.setitem(sys.modules, "apscheduler", fake_ap)
-    monkeypatch.setitem(sys.modules, "apscheduler.schedulers", fake_sched)
-    monkeypatch.setitem(sys.modules, "apscheduler.schedulers.background", fake_bg)
+    # app imports BackgroundScheduler at module load (so boot can't race a
+    # lazy import), so the fake replaces app's own binding.
+    monkeypatch.setattr(app, "BackgroundScheduler", FakeScheduler)
     monkeypatch.delenv("DISABLE_SCHEDULER", raising=False)
 
     monkeypatch.setattr(app, "_seed_history_into_volume", lambda: 0)
@@ -566,7 +558,9 @@ def test_startup_keeps_scheduler_alive(monkeypatch):
     assert "refresh" in jobs and "signals-refresh" in jobs
     assert all(callable(j["func"]) and j["trigger"] == "cron" for j in jobs.values())
     assert jobs["refresh"]["hour"] == "*/2"
-    assert jobs["signals-refresh"]["minute"] is not None
+    # Default signals cadence is 6h, on the hour field (minute="*/360" is invalid).
+    assert jobs["signals-refresh"]["hour"] == "*/6"
+    assert jobs["signals-refresh"]["minute"] == 30
 
     app.shutdown()
     assert app._scheduler is None
@@ -594,15 +588,9 @@ def test_startup_prefers_pending_over_commit_repair(monkeypatch):
         def shutdown(self, wait=False):
             pass
 
-    fake_bg = types.ModuleType("apscheduler.schedulers.background")
-    fake_bg.BackgroundScheduler = FakeScheduler
-    fake_sched = types.ModuleType("apscheduler.schedulers")
-    fake_sched.background = fake_bg
-    fake_ap = types.ModuleType("apscheduler")
-    fake_ap.schedulers = fake_sched
-    monkeypatch.setitem(sys.modules, "apscheduler", fake_ap)
-    monkeypatch.setitem(sys.modules, "apscheduler.schedulers", fake_sched)
-    monkeypatch.setitem(sys.modules, "apscheduler.schedulers.background", fake_bg)
+    # app imports BackgroundScheduler at module load (so boot can't race a
+    # lazy import), so the fake replaces app's own binding.
+    monkeypatch.setattr(app, "BackgroundScheduler", FakeScheduler)
     monkeypatch.delenv("DISABLE_SCHEDULER", raising=False)
 
     monkeypatch.setattr(app, "_seed_history_into_volume", lambda: 0)
