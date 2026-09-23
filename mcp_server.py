@@ -917,6 +917,7 @@ def _get_history_index() -> dict:
         _HISTORY_PUBLIC_DAYS,
         _HISTORY_PUBLIC_FIELDS,
         _PARTIAL_SNAPSHOT_DATES,
+        _snapshot_is_degraded,
     )
     hist_dir = os.path.join(OUTPUT_DIR, "output", "history")
     if not os.path.isdir(hist_dir):
@@ -943,6 +944,8 @@ def _get_history_index() -> dict:
             with open(os.path.join(hist_dir, fn), encoding="utf-8") as f:
                 snap = json.load(f)
         except (OSError, json.JSONDecodeError):
+            continue
+        if _snapshot_is_degraded(snap):
             continue
         mv = snap.get("methodology_version")
         for a in snap.get("agents", []):
