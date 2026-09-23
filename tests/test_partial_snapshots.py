@@ -28,11 +28,13 @@ def test_partial_snapshot_date_is_never_read_back(tmp_path):
 
 
 def test_provisional_prior_rows_have_no_previous_rank(tmp_path):
-    _write(tmp_path, "2026-09-20", [
-        {"repo": "o/real", "rank": 3},
+    # One provisional row in ten: a normal board (a mostly-provisional one is
+    # skipped entirely — see test_degraded_board_is_never_read_back).
+    real = [{"repo": f"o/real{i}", "rank": i} for i in range(1, 10)]
+    _write(tmp_path, "2026-09-20", real + [
         {"repo": "O/Prov", "rank": 900, "pending_signals": True},
     ])
-    assert fb.load_previous_ranks(str(tmp_path)) == {"o/real": 3}
+    assert fb.load_previous_ranks(str(tmp_path)) == {a["repo"]: a["rank"] for a in real}
     assert fb.load_previous_pending(str(tmp_path)) == {"o/prov"}
 
 
@@ -83,3 +85,30 @@ def test_web_process_copy_of_partial_dates_matches_the_generator():
     # the public history API must skip exactly the days the site skips.
     import app
     assert app._PARTIAL_SNAPSHOT_DATES == fb.PARTIAL_SNAPSHOT_DATES
+
+
+def _board(total, pending):
+    return {"agents": [{"repo": f"o/r{i}", "rank": i + 1, "pending_signals": i < pending}
+                       for i in range(total)]}
+
+
+def test_degraded_board_is_never_read_back(tmp_path):
+    # 2026-09-22: 1,241 of 1,682 rows provisional. Real agents ranked high that
+    # day only because most of the board scored low, so comparing against it
+    # showed fake drops (Composio "−128") the next day.
+    assert fb.snapshot_is_degraded(_board(1682, 1241))
+    assert not fb.snapshot_is_degraded(_board(1682, 1))       # 20 Sep: healthy
+    assert not fb.snapshot_is_degraded(_board(1454, 148))     # a big roster add
+    for date, snap in (("2026-01-01", _board(10, 0)), ("2026-01-02", _board(10, 9))):
+        (tmp_path / f"{date}.json").write_text(json.dumps(snap))
+    assert [s["_date"] for s in fb.load_history(str(tmp_path))] == ["2026-01-01"]
+    prior = fb._load_prior_snapshot(str(tmp_path))
+    assert not any(a["pending_signals"] for a in prior["agents"])
+
+
+def test_web_process_degraded_rule_matches_the_generator():
+    import app
+    assert app._DEGRADED_PENDING_SHARE == fb.DEGRADED_PENDING_SHARE
+    for total, pending in ((1682, 1241), (1682, 1), (10, 2), (10, 3), (0, 0)):
+        snap = _board(total, pending)
+        assert app._snapshot_is_degraded(snap) == fb.snapshot_is_degraded(snap)

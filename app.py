@@ -979,6 +979,17 @@ _HISTORY_PUBLIC_DAYS = 90
 # fetch_and_build.PARTIAL_SNAPSHOT_DATES — inlined to keep the generator out
 # of the web process; tests/test_partial_snapshots.py keeps the two equal.
 _PARTIAL_SNAPSHOT_DATES = frozenset({"2026-09-21"})
+# Mirrors fetch_and_build.snapshot_is_degraded (same test pins them): a board
+# with >20% provisional rows (2026-09-22) is never served as history.
+_DEGRADED_PENDING_SHARE = 0.2
+
+
+def _snapshot_is_degraded(snap: dict) -> bool:
+    agents = snap.get("agents") or []
+    if not agents:
+        return False
+    pending = sum(1 for a in agents if a.get("pending_signals"))
+    return pending > _DEGRADED_PENDING_SHARE * len(agents)
 # Per-day public fields — the subset already public on the agent page and
 # the CC BY 4.0 dataset export. NOT the full snapshot row.
 _HISTORY_PUBLIC_FIELDS = (

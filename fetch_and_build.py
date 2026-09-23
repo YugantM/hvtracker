@@ -2594,8 +2594,26 @@ def agent_correction_url(row: dict) -> str:
 PARTIAL_SNAPSHOT_DATES = frozenset({"2026-09-21"})
 
 
+# A board where more than this share of rows is provisional isn't comparable:
+# the 2026-09-22 render rebuilt 1,241 of 1,682 rows provisionally, which
+# pushed every real agent up the ranks for a day (Composio "−128" the next day).
+DEGRADED_PENDING_SHARE = 0.2
+
+
+def snapshot_is_degraded(snap: dict) -> bool:
+    """True when too many rows were provisional for the day to count as history."""
+    agents = snap.get("agents") or []
+    if not agents:
+        return False
+    pending = sum(1 for a in agents if a.get("pending_signals"))
+    return pending > DEGRADED_PENDING_SHARE * len(agents)
+
+
 def _load_prior_snapshot(history_dir: str) -> dict | None:
-    """Return the most recent usable history snapshot older than today, or None."""
+    """Return the most recent usable history snapshot older than today, or None.
+
+    Skips partial days (PARTIAL_SNAPSHOT_DATES) and degraded boards.
+    """
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     try:
         candidates = sorted(
@@ -2604,10 +2622,12 @@ def _load_prior_snapshot(history_dir: str) -> dict | None:
              and f[:-5] not in PARTIAL_SNAPSHOT_DATES],
             reverse=True,
         )
-        if not candidates:
-            return None
-        with open(os.path.join(history_dir, candidates[0]), encoding="utf-8") as f:
-            return json.load(f)
+        for name in candidates:
+            with open(os.path.join(history_dir, name), encoding="utf-8") as f:
+                snap = json.load(f)
+            if not snapshot_is_degraded(snap):
+                return snap
+        return None
     except Exception:
         return None
 
@@ -2866,8 +2886,10 @@ def load_history(history_dir: str) -> list[dict]:
             if re.match(r"\d{4}-\d{2}-\d{2}\.json$", f) and f[:-5] not in PARTIAL_SNAPSHOT_DATES:
                 with open(os.path.join(history_dir, f), encoding="utf-8") as fh:
                     snap = json.load(fh)
-                    snap["_date"] = f[:-5]
-                    snapshots.append(snap)
+                if snapshot_is_degraded(snap):
+                    continue  # kept on disk, never read back as history
+                snap["_date"] = f[:-5]
+                snapshots.append(snap)
     except Exception:
         pass
     return snapshots
