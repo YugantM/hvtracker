@@ -404,8 +404,8 @@ def test_agent_page_has_related_agents_strip(client):
     neighbours — >=3 internal agent links for a mid-category agent."""
     import re as _re
     html = client.get("/agents/haystack/").text
-    assert "Ranked neighbours in" in html
-    strip = html.split("Ranked neighbours in", 1)[1]
+    assert 'class="neighbours"' in html
+    strip = html.split('class="neighbours"', 1)[1]
     links = _re.findall(r'href="/agents/([a-z0-9-]+)/"', strip)
     neighbours = [s for s in links if s != "haystack"]
     assert len(set(neighbours)) >= 3
