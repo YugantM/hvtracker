@@ -755,16 +755,18 @@ def compare_agents(a: str, b: str) -> CompareAgentsResult:
                    f"{lo['name']} at {lo['trust_score']} (grade {lo['evidence_grade']}).")
 
     # Published compare pages use canonical alphabetical slug order; only
-    # link one that actually exists on this deployment.
+    # link one that actually exists on this deployment. They are rendered
+    # into OUTPUT_DIR (the volume) — BASE_DIR is the image, which only ships
+    # compare/index.html, so looking there made compare_url always null.
     import os as _os
 
-    from app import BASE_DIR
+    from app import OUTPUT_DIR
     slug_a = (ra.get("profile_url") or "").rstrip("/").rsplit("/", 1)[-1]
     slug_b = (rb.get("profile_url") or "").rstrip("/").rsplit("/", 1)[-1]
     first, second = sorted([slug_a, slug_b])
     pair = f"{first}-vs-{second}"
     compare_url = (f"https://hvtracker.net/compare/{pair}/"
-                   if _os.path.isdir(_os.path.join(BASE_DIR, "compare", pair))
+                   if _os.path.isdir(_os.path.join(OUTPUT_DIR, "compare", pair))
                    else None)
     return {"a": ra, "b": rb, "verdict": verdict, "compare_url": compare_url}
 

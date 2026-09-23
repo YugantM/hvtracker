@@ -86,6 +86,16 @@ def test_compare_agents_verdict_and_profiles():
     assert r["compare_url"] is None
 
 
+def test_compare_agents_links_a_published_pair_from_the_volume(monkeypatch, tmp_path):
+    # Compare pages are rendered into OUTPUT_DIR (the volume); the image
+    # (BASE_DIR) only ships compare/index.html. Looking in BASE_DIR made
+    # compare_url null in production for every pair.
+    (tmp_path / "compare" / "aipass-vs-langgraph").mkdir(parents=True)
+    monkeypatch.setattr(app, "OUTPUT_DIR", str(tmp_path))
+    r = mcp_server.compare_agents("LangGraph", "aipass")
+    assert r["compare_url"] == "https://hvtracker.net/compare/aipass-vs-langgraph/"
+
+
 def test_compare_agents_untracked_side_is_graceful():
     r = mcp_server.compare_agents("LangGraph", "not-a-real-agent-xyz")
     assert r["b"]["tracked"] is False
