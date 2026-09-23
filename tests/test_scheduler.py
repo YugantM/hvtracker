@@ -73,3 +73,22 @@ def test_start_scheduler_respects_disable_flag(app_module):
     app_module._start_scheduler()
     assert app_module._scheduler is None
     assert app_module._scheduler_error is None
+
+
+def test_boot_refresh_switch(app_module, monkeypatch):
+    started = []
+
+    class FakeThread:
+        def __init__(self, target=None, args=(), daemon=None):
+            self._args = args
+
+        def start(self):
+            started.append(self._args[0])
+
+    monkeypatch.setattr(app_module.threading, "Thread", FakeThread)
+    monkeypatch.setenv("HVT_BOOT_REFRESH", "0")
+    app_module._kick_boot_refresh("render", "fp")
+    assert started == []  # the suite's default: no real refreshes under pytest
+    monkeypatch.setenv("HVT_BOOT_REFRESH", "1")
+    app_module._kick_boot_refresh("render", "fp")
+    assert started == ["render"]
