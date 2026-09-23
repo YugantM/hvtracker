@@ -57,9 +57,14 @@ jobs:
         if: steps.check.outputs.state == 'alert' || steps.check.outputs.state == 'error'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Passed through env, never pasted into the script: inlined inside
+          # double quotes, "$14.42 (cap $15)" had bash expand $1 and $1 again,
+          # so the issue read "4.42 (cap 5)". Also keeps step output out of
+          # the shell's parser entirely.
+          REPORT: ${{ steps.check.outputs.report }}
         run: |
           run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-          body=$'Railway projected spend crossed the alert threshold (the $15 Hobby cap STOPS the services).\n\n```\n'"${{ steps.check.outputs.report }}"$'\n```\n\nRun: '"$run_url"
+          body=$(printf 'Railway projected spend crossed the alert threshold (the $15 Hobby cap STOPS the services).\n\n```\n%s\n```\n\nRun: %s\n' "$REPORT" "$run_url")
           gh label create bill-alert --repo "$GITHUB_REPOSITORY" --color B60205 --description "Railway spend approaching the cap" 2>/dev/null || true
           existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label bill-alert --json number --jq '.[0].number')
           if [ -n "$existing" ]; then
