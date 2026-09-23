@@ -65,8 +65,8 @@
     .hero { padding:24px 0; border-bottom:1px solid var(--border); }
     h1 { font-size:26px; font-weight:700; margin-bottom:4px; }
     .hero .subtitle { font-size:13px; color:var(--muted); }
-    .hero .seo-intro { margin-top:12px; font-size:13px; color:var(--muted); line-height:1.7; max-width:640px; }
-    .hero .seo-intro strong { color:var(--text); }
+    .seo-intro { margin-top:12px; font-size:13px; color:var(--muted); line-height:1.7; max-width:640px; }
+    .seo-intro strong { color:var(--text); }
 
     .stats-bar { display:flex; gap:20px; padding:12px 0; border-bottom:1px solid var(--border); flex-wrap:wrap; font-family:var(--font-mono); }
     .stat { }
@@ -103,11 +103,48 @@
     .cat-pill:hover { color:var(--accent); text-decoration:none; }
     .cat-pill.active { color:var(--accent); font-weight:600; }
 
+    /* Plan 2.6: podium, grade mix, filters, and the first 50 rows expanded.
+       Every row stays in the HTML for search; the rest open 50 at a time. */
+    .podium { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; margin:16px 0 4px; }
+    .pod { border:1px solid var(--border); background:var(--surface); border-radius:10px; padding:12px 14px; min-width:0; }
+    .pod-rank { font-family:var(--font-mono); font-size:11px; color:var(--muted); }
+    .pod-name { display:block; margin:4px 0 8px; font-weight:700; font-size:15px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .pod-line { display:flex; align-items:baseline; gap:8px; font-family:var(--font-mono); }
+    .pod-score { font-size:20px; font-weight:700; font-variant-numeric:tabular-nums; }
+    .pod-stars { margin-left:auto; font-size:12px; color:var(--muted); }
+    .gmix { margin:18px 0 6px; }
+    .gmix-head { display:flex; justify-content:space-between; gap:10px; font-family:var(--font-mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
+    .gmix-bar { display:flex; height:12px; border-radius:6px; overflow:hidden; background:var(--border); }
+    .gmix-bar span { display:block; min-width:2px; }
+    .gm-A { background:#2f6846; } .gm-B { background:#2c5282; } .gm-C { background:#8b6914; } .gm-D { background:#57524c; }
+    .gm-P { background:repeating-linear-gradient(135deg, #57524c 0 3px, transparent 3px 6px); opacity:.55; }
+    .gmix-key { display:flex; gap:14px; flex-wrap:wrap; margin-top:6px; font-family:var(--font-mono); font-size:11.5px; color:var(--muted); }
+    .gmix-key i { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:5px; vertical-align:-1px; }
+    .cat-filters { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:16px 0 0; }
+    .cat-filters input[type=search] { flex:1 1 240px; min-width:0; height:40px; padding:0 12px; font:inherit; font-size:14px; border:1px solid var(--line-strong, var(--border)); border-radius:8px; background:var(--bg); color:var(--text); }
+    .fchip { height:40px; min-width:40px; padding:0 12px; font-family:var(--font-mono); font-size:12.5px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); cursor:pointer; }
+    .fchip[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .cat-filters select { height:40px; padding:0 8px; font:inherit; font-size:13px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); }
+    .cat-count { font-family:var(--font-mono); font-size:11.5px; color:var(--muted); margin-top:8px; }
+    .cat-table.is-collapsed tr.is-more { display:none; }
+    .grade.grade-pending { color:var(--muted); border:1px dashed var(--border); background:transparent; font-weight:600; }
+    .show-more { display:block; margin:12px auto 0; height:44px; padding:0 18px; font-family:var(--font-mono); font-size:13px; border:1px solid var(--accent); border-radius:8px; background:var(--bg); color:var(--accent); cursor:pointer; }
+    .show-more:hover { background:var(--accent); color:#fff; }
+    .cat-about { margin-top:22px; border-top:1px solid var(--border); }
+    .cat-about h2 { font-size:15px; font-weight:600; margin:16px 0 4px; }
+
     footer { padding:20px 0; margin-top:16px; border-top:1px solid var(--border); font-size:12px; color:var(--muted); text-align:center; }
     footer a { color:var(--accent); }
 
     @media (max-width:600px) {
       h1 { font-size:18px; }
+      .podium { grid-template-columns:1fr; gap:6px; }
+      .pod { display:flex; align-items:center; gap:10px; padding:8px 12px; }
+      .pod-rank { flex:none; }
+      .pod-name { flex:1; margin:0; font-size:14px; }
+      .pod-score { font-size:16px; }
+      .pod-stars, .pod-rank-long { display:none; }
+      .cat-table th:nth-child(5), .cat-table td:nth-child(5) { display:none; }
       .stats-bar { gap:12px; }
       td, th { padding:6px 4px; }
       .name-cell .desc { max-width:180px; }
@@ -131,10 +168,80 @@
   {% include "_site_header.html.j2" %}
   <main class="page" id="main">
 
+    {% set scored = agents | rejectattr("pending_signals") | list %}
+    {% set n = agents | length %}
     <section class="hero">
       <h1>{{ category }}</h1>
-      <p class="subtitle">{{ agents|length }} {{ item_plural|default('agents') }} tracked &middot; Open-source-first, with limited public GitHub comparators &middot; Ranked by trust score &middot; Updated {{ updated }}</p>
+      <p class="subtitle">{{ n }} {{ item_plural|default('agents') }} tracked &middot; ranked by trust score &middot; Updated {{ updated }}{% if scored|length >= 3 %} &middot; the three strongest right now:{% endif %}</p>
+      {% if scored|length >= 3 %}
+      <div class="podium">
+        {% for a in scored[:3] %}
+        <div class="pod">
+          <span class="pod-rank">#{{ a.category_rank }}<span class="pod-rank-long"> in category</span></span>
+          <a class="pod-name" href="/agents/{{ a.slug }}/">{{ a.name }}</a>
+          <div class="pod-line"><span class="pod-score">{{ a.trust_score }}</span><span class="grade grade-{{ a.evidence_grade }}">{{ a.evidence_grade }}</span><span class="pod-stars">{{ a.stars_fmt }} &#9733;</span></div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% set pend_n = n - scored|length %}
+      <div class="gmix">
+        <div class="gmix-head"><span>Grade mix</span><span>{{ n }} {{ item_plural|default('agents') }}</span></div>
+        <div class="gmix-bar" role="img" aria-label="Grade mix: {% for g in 'ABCD' %}{{ scored | selectattr('evidence_grade', 'equalto', g) | list | length }} {{ g }}{{ ', ' }}{% endfor %}{{ pend_n }} awaiting a first full check">
+          {% for g in 'ABCD' %}{% set c = scored | selectattr('evidence_grade', 'equalto', g) | list | length %}{% if c %}<span class="gm-{{ g }}" style="width:{{ (c * 100 / n) | round(2) }}%"></span>{% endif %}{% endfor %}
+          {% if pend_n %}<span class="gm-P" style="width:{{ (pend_n * 100 / n) | round(2) }}%"></span>{% endif %}
+        </div>
+        <div class="gmix-key">
+          {% for g in 'ABCD' %}<span><i class="gm-{{ g }}"></i>{{ scored | selectattr('evidence_grade', 'equalto', g) | list | length }} {{ g }}</span>{% endfor %}
+          {% if pend_n %}<span><i class="gm-P"></i>{{ pend_n }} provisional, awaiting a first full check</span>{% endif %}
+        </div>
+      </div>
+      <div class="cat-filters" role="search">
+        <input type="search" id="catSearch" placeholder="Search {{ n }} {{ category }}…" aria-label="Search {{ category }}">
+        {% for g in 'ABCD' %}<button type="button" class="fchip" data-grade="{{ g }}" aria-pressed="false">{{ g }}</button>{% endfor %}
+        <button type="button" class="fchip" id="catProv" aria-pressed="false">Has provenance</button>
+        <select id="catSort" aria-label="Sort">
+          <option value="rank">Sort: Trust</option>
+          <option value="stars">Sort: Stars</option>
+          <option value="push">Sort: Last push</option>
+        </select>
+      </div>
+      <p class="cat-count" id="catCount" aria-live="polite"></p>
+    </section>
 
+    <table class="cat-table is-collapsed" id="catTable">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Agent</th>
+          <th scope="col">Trust</th>
+          <th scope="col">Stars</th>
+          <th scope="col">Language</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in agents %}
+        <tr{% if loop.index > 50 %} class="is-more"{% endif %} data-g="{% if a.pending_signals %}P{% else %}{{ a.evidence_grade }}{% endif %}" data-p="{{ 1 if a.has_provenance else 0 }}" data-r="{{ a.category_rank or 9999 }}" data-s="{{ a.stars or 0 }}" data-d="{{ a.days_ago if a.days_ago is not none else 9999 }}" data-q="{{ (a.name ~ ' ' ~ (a.repo or '') ~ ' ' ~ (a.description or '')) | lower }}">
+          <td class="rank-cell">{{ a.category_rank }}</td>
+          <td class="name-cell">
+            <a href="/agents/{{ a.slug }}/">{{ a.name }}</a>
+            {% if a.pending_signals %}<span class="grade grade-pending" title="Provisional: awaiting a first full signal check">pending</span>{% else %}<span class="grade grade-{{ a.evidence_grade }}">{{ a.evidence_grade }}</span>{% endif %}
+            <span class="state-chip state-{{ a.display_listing_status }}">{{ a.display_status_label }}</span>
+            {% if a.description %}<span class="desc">{{ a.description }}</span>{% endif %}
+          </td>
+          <td class="score-cell {% if a.trust_score >= 60 %}score-hi{% elif a.trust_score >= 35 %}score-mid{% else %}score-lo{% endif %}">{{ a.trust_score }}</td>
+          <td class="stars-cell">{{ a.stars_fmt }}</td>
+          <td class="lang-cell">{{ a.language or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <noscript><style>.cat-table.is-collapsed tr.is-more { display:table-row; } .cat-filters, .show-more { display:none; }</style></noscript>
+    {% if n > 50 %}<button type="button" class="show-more" id="catMore">Show the next 50 of {{ n }}</button>{% endif %}
+    <p style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:6px;">Grade = trust band: A ≥ 80, B ≥ 65, C ≥ 50, D &lt; 50 — <a href="/methodology/" style="color:var(--accent);">methodology</a></p>
+
+    <section class="cat-about">
+      <h2>About {{ category }}</h2>
       <div class="seo-intro">
         <p>HVTracker independently evaluates <strong>{{ agents|length }} {{ category|lower }}</strong> using daily signals from GitHub, package registries, and security databases. The category is open-source-first, with a limited set of public GitHub-hosted proprietary or source-available comparators when they are important ecosystem reference points.
         Each {{ item_noun|default('agent') }} is scored on activity, adoption, transparency, safety, and identity.
@@ -150,7 +257,6 @@
         </p>
       </div>
     </section>
-
     <div class="stats-bar">
       <div class="stat">
         <div class="num">{{ agents|length }}</div>
@@ -176,34 +282,6 @@
       {% endif %}
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Agent</th>
-          <th scope="col">Trust</th>
-          <th scope="col">Stars</th>
-          <th scope="col">Language</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for a in agents %}
-        <tr>
-          <td class="rank-cell">{{ a.category_rank }}</td>
-          <td class="name-cell">
-            <a href="/agents/{{ a.slug }}/">{{ a.name }}</a>
-            <span class="grade grade-{{ a.evidence_grade }}">{{ a.evidence_grade }}</span>
-            <span class="state-chip state-{{ a.display_listing_status }}">{{ a.display_status_label }}</span>
-            {% if a.description %}<span class="desc">{{ a.description }}</span>{% endif %}
-          </td>
-          <td class="score-cell {% if a.trust_score >= 60 %}score-hi{% elif a.trust_score >= 35 %}score-mid{% else %}score-lo{% endif %}">{{ a.trust_score }}</td>
-          <td class="stars-cell">{{ a.stars_fmt }}</td>
-          <td class="lang-cell">{{ a.language or '—' }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <p style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:6px;">Grade = trust band: A ≥ 80, B ≥ 65, C ≥ 50, D &lt; 50 — <a href="/methodology/" style="color:var(--accent);">methodology</a></p>
 
     {% if comparisons %}
     <nav class="cat-nav">
@@ -245,5 +323,52 @@
       <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">GitHub</a>
     </footer>
   </main>
+  <script>
+  (function () {
+    var table = document.getElementById("catTable");
+    if (!table) return;
+    var body = table.tBodies[0], rows = Array.prototype.slice.call(body.rows);
+    var q = document.getElementById("catSearch"), sort = document.getElementById("catSort");
+    var prov = document.getElementById("catProv"), more = document.getElementById("catMore");
+    var count = document.getElementById("catCount");
+    var chips = document.querySelectorAll(".fchip[data-grade]");
+    var shown = 50, grades = {};
+    table.classList.remove("is-collapsed");
+    function apply() {
+      var term = q.value.trim().toLowerCase(), wantProv = prov.getAttribute("aria-pressed") === "true";
+      var anyGrade = Object.keys(grades).length > 0, filtering = term || wantProv || anyGrade, visible = 0, matched = 0;
+      rows.forEach(function (tr) {
+        var ok = (!term || tr.dataset.q.indexOf(term) !== -1) && (!wantProv || tr.dataset.p === "1") && (!anyGrade || grades[tr.dataset.g]);
+        if (ok) matched++;
+        var show = ok && (filtering || matched <= shown);
+        tr.style.display = show ? "" : "none";
+        if (show) visible++;
+      });
+      if (more) {
+        more.hidden = filtering || shown >= rows.length;
+        more.textContent = "Show the next " + Math.min(50, rows.length - shown) + " of " + rows.length;
+      }
+      count.textContent = filtering ? matched + " of " + rows.length + " match" : "Showing " + visible + " of " + rows.length;
+    }
+    q.addEventListener("input", apply);
+    prov.addEventListener("click", function () { prov.setAttribute("aria-pressed", prov.getAttribute("aria-pressed") !== "true"); apply(); });
+    Array.prototype.forEach.call(chips, function (c) {
+      c.addEventListener("click", function () {
+        var on = c.getAttribute("aria-pressed") !== "true";
+        c.setAttribute("aria-pressed", on);
+        if (on) grades[c.dataset.grade] = 1; else delete grades[c.dataset.grade];
+        apply();
+      });
+    });
+    sort.addEventListener("change", function () {
+      var k = sort.value, key = k === "stars" ? "s" : k === "push" ? "d" : "r", dir = k === "stars" ? -1 : 1;
+      rows.sort(function (a, b) { return dir * (Number(a.dataset[key]) - Number(b.dataset[key])) || Number(a.dataset.r) - Number(b.dataset.r); });
+      rows.forEach(function (tr) { body.appendChild(tr); });
+      apply();
+    });
+    if (more) more.addEventListener("click", function () { shown += 50; apply(); });
+    apply();
+  })();
+  </script>
 </body>
 </html>
