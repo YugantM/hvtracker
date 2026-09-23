@@ -46,7 +46,44 @@
     .cmp-actions a.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
     .cmp-actions a:hover { border-color: var(--accent); text-decoration: none; }
     .cmp-note { font-size: 13px; color: var(--muted); line-height: 1.6; padding: 14px 0; border-top: 1px solid var(--border); }
-    @media (max-width: 640px) { .cmp-hero h1 { font-size: 23px; } table.cmp { font-size: 13px; } }
+    /* Decision view (plan 2.4): verdict, a "choose this if" card per side,
+       then bars for only the dimensions that differ. */
+    .dv-verdict { margin: 16px 0 18px; font-size: 17px; line-height: 1.55; font-weight: 500; max-width: 760px; }
+    .dv-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .dv-card { border: 1px solid var(--border); background: var(--surface); border-radius: 10px; padding: 16px; min-width: 0; }
+    .dv-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+    .dv-head a { font-size: 18px; font-weight: 700; color: var(--text); }
+    .dv-score { margin-left: auto; font-family: var(--font-mono); font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .dv-meta { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+    .dv-choose { margin: 12px 0 8px; font-size: 14.5px; font-weight: 600; }
+    .dv-choose.is-none { font-weight: 400; color: var(--muted); }
+    .dv-points { list-style: none; display: grid; gap: 7px; }
+    .dv-points li { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 8px; font-size: 13.5px; line-height: 1.45; }
+    .dv-delta { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+    .dv-diff { margin: 26px 0 8px; }
+    .dv-diff h2, .dv-evidence-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
+    .dv-cols, .dv-row { display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px; gap: 12px; align-items: center; }
+    .dv-cols { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+    .dv-cols span:last-child, .dv-row .dv-b { text-align: right; }
+    .dv-row { padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .dv-row .dv-a, .dv-row .dv-b { font-family: var(--font-mono); font-size: 14px; font-variant-numeric: tabular-nums; }
+    .dv-row .is-lead { font-weight: 700; color: var(--accent); }
+    .dv-mid { min-width: 0; }
+    .dv-label { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--muted); margin-bottom: 5px; }
+    .dv-label b { font-family: var(--font-mono); font-size: 11.5px; color: var(--accent); white-space: nowrap; }
+    .dv-track { position: relative; height: 8px; background: var(--border); border-radius: 4px; }
+    .dv-track::after { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--text); }
+    .dv-fill { position: absolute; top: 0; bottom: 0; background: var(--accent); }
+    .dv-fill.to-a { right: 50%; border-radius: 4px 0 0 4px; }
+    .dv-fill.to-b { left: 50%; border-radius: 0 4px 4px 0; }
+    .dv-same { font-size: 13px; color: var(--muted); padding: 10px 0; }
+    .dv-same a { color: var(--accent); }
+    .dv-how { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 24px 0 12px; max-width: 760px; }
+    @media (max-width: 640px) {
+      .cmp-hero h1 { font-size: 23px; } table.cmp { font-size: 13px; }
+      .dv-cards { grid-template-columns: 1fr; }
+      .dv-cols, .dv-row { grid-template-columns: 48px minmax(0, 1fr) 48px; gap: 8px; }
+    }
   </style>
   <script type="application/ld+json">
   {
@@ -121,14 +158,64 @@
   {% include "_site_header.html.j2" %}
   <main class="page" id="main">
     <div class="cmp-crumb"><a href="/">Registry</a> &rsaquo; <a href="/compare/">Compare</a> &rsaquo; {{ a.name }} vs {{ b.name }}</div>
+    {% set intro %}An independent, evidence-based trust comparison of {{ a.name }} and {{ b.name }}, two {{ category.name }} projects in the HVTracker registry. Scores come from public, checkable signals — supply-chain provenance, OSSF Scorecard, maintenance, and adoption — not popularity.{% endset %}
+    {% if decision %}
+    <div class="cmp-hero" style="border-bottom:none;padding-bottom:0">
+      <h1>{{ a.name }} vs {{ b.name }}</h1>
+      <p class="dv-verdict">{{ decision.verdict }}{% if coverage_caveat %} {{ coverage_caveat }}{% endif %}</p>
+    </div>
+
+    <div class="dv-cards">
+      {% for s in decision.sides %}{% set r = s.row %}
+      <section class="dv-card" aria-label="{{ r.name }}">
+        <div class="dv-head">
+          <span class="badge grade-{{ r.evidence_grade }}">{{ r.evidence_grade }}</span>
+          <a href="/agents/{{ r.slug }}/">{{ r.name }}</a>
+          <span class="dv-score">{{ r.trust_score }}</span>
+        </div>
+        <p class="dv-meta">{{ r.repo }} · #{{ r.rank }} overall{% if r.category_rank %} · #{{ r.category_rank }} {{ category.name }}{% endif %}{% if r.coverage_grade %} · coverage {{ r.coverage_grade }} ({{ r.signal_types }}/5){% endif %}</p>
+        {% if s.choose_if %}
+        <p class="dv-choose">{{ s.choose_if }}</p>
+        <ul class="dv-points">
+          {% for p in s.points %}<li><span class="dv-delta">{{ p.delta }}</span><span>{{ p.text }}</span></li>{% endfor %}
+        </ul>
+        {% else %}
+        <p class="dv-choose is-none">{{ r.name }} doesn't lead on any scored dimension in this pair.</p>
+        {% endif %}
+      </section>
+      {% endfor %}
+    </div>
+
+    {% if decision.diffs %}
+    <section class="dv-diff">
+      <h2>Where they differ</h2>
+      <div class="dv-cols" aria-hidden="true"><span>{{ a.name }}</span><span></span><span>{{ b.name }}</span></div>
+      {% for d in decision.diffs %}
+      <div class="dv-row">
+        <span class="dv-a{% if d.lead == 'a' %} is-lead{% endif %}">{{ d.a }}</span>
+        <div class="dv-mid">
+          <div class="dv-label"><span>{{ d.label }}</span><b>{{ (a if d.lead == 'a' else b).name }} {{ d.delta }}</b></div>
+          <div class="dv-track" aria-hidden="true"><i class="dv-fill to-{{ d.lead }}" style="width:{{ d.pct / 2 }}%"></i></div>
+        </div>
+        <span class="dv-b{% if d.lead == 'b' %} is-lead{% endif %}">{{ d.b }}</span>
+      </div>
+      {% endfor %}
+      <p class="dv-same">{% if decision.same %}{{ decision.same | length }} dimension{{ "s" if decision.same | length > 1 }} identical: {% for x in decision.same %}{{ x.label }} {{ x.value }}{{ " · " if not loop.last }}{% endfor %} · {% endif %}<a href="#evidence">Full evidence table</a></p>
+    </section>
+    {% endif %}
+
+    <p class="dv-how">{{ intro }}</p>
+    <h2 class="dv-evidence-title" id="evidence">Full evidence</h2>
+    {% else %}
     <div class="cmp-hero">
       <h1>{{ a.name }} vs {{ b.name }}</h1>
-      <p>An independent, evidence-based trust comparison of {{ a.name }} and {{ b.name }}, two {{ category.name }} projects in the HVTracker registry. Scores come from public, checkable signals — supply-chain provenance, OSSF Scorecard, maintenance, and adoption — not popularity.</p>
+      <p>{{ intro }}</p>
     </div>
 
     <div class="cmp-verdict">
       {% if lead_name %}<strong>{{ lead_name }}</strong> leads on trust — {{ lead_score }}/100 (Grade {{ lead_grade }}) vs {{ trail_score }}/100 (Grade {{ trail_grade }}), a {{ gap }}-point gap.{% else %}{{ a.name }} and {{ b.name }} are tied on HVTrust at {{ a.trust_score }}/100.{% endif %}{% if coverage_caveat %} {{ coverage_caveat }}{% endif %} Full breakdown below.
     </div>
+    {% endif %}
 
     <table class="cmp">
       <thead>
