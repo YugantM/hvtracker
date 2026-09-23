@@ -18,6 +18,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
 from html import escape
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
 from fastapi import FastAPI, Form, Request
 from fastapi.middleware.gzip import GZipMiddleware
@@ -211,6 +212,7 @@ import auth as _auth  # noqa: E402
 app.include_router(_auth.router)
 
 _scheduler = None
+_scheduler_error: str | None = None
 _refresh_lock = threading.Lock()
 
 
@@ -856,6 +858,9 @@ def healthz():
         "last_refresh_succeeded": refresh_status.get("last_succeeded"),
         "last_refresh_mode": refresh_status.get("last_mode"),
         "last_refresh_error": refresh_status.get("last_error"),
+        "scheduler_running": bool(_scheduler is not None and _scheduler.running),
+        "scheduler_error": _scheduler_error,
+        "scheduled_jobs": _scheduled_jobs(),
         "machine_usage": {"since": _USAGE_SINCE, **_usage_counters},
         "badge_fetches": {
             "since": _USAGE_SINCE,
@@ -2530,8 +2535,102 @@ def _refresh_verify_feed():
     print(f"[scheduler] verify feed refresh complete: {refreshed} repo(s)")
 
 
+def _signals_cron(minutes: int) -> dict:
+    """Cron fields for the signals refresh.
+
+    The cron `minute` field only spans 0-59, so `minute="*/360"` raises
+    ValueError at add_job — at startup, that takes the whole app down.
+    Sub-hour cadences keep the minute step; hourly and slower ones step the
+    hour and fire at :30, clear of the 2h batch's :00 slot.
+    """
+    if minutes < 60:
+        return {"minute": f"*/{minutes}"}
+    return {"hour": f"*/{max(1, minutes // 60)}", "minute": 30}
+
+
+def _start_scheduler() -> None:
+    """Start the refresh scheduler.
+
+    Called first in _startup, before any boot-time refresh thread, so nothing
+    can race or skip it. On the 22 Sep 12:52 UTC boot the scheduler never
+    started and the site served day-old data as "ok"; a failure is now
+    recorded and surfaced in /healthz instead of passing silently.
+    """
+    global _scheduler, _scheduler_error
+    if os.environ.get("DISABLE_SCHEDULER") == "1" or _scheduler is not None:
+        return
+    try:
+        scheduler = BackgroundScheduler(timezone="UTC")
+        scheduler.add_job(
+            lambda: _refresh_and_record("auto", _compute_render_fingerprint(), "scheduler"),
+            "cron",
+            hour="*/2",
+            id="refresh",
+            max_instances=1,
+            coalesce=True,
+        )
+        # GitHub-signal refresh (stars/forks/commits → HVTrust/rank) for the
+        # whole registry. Every run re-renders the entire site in a subprocess,
+        # and those renders were ~73% of the Railway memory bill at the old
+        # 30-minute cadence (1.14 GB avg with it, 0.31 GB without). Trust
+        # signals don't move on a 30-minute scale, so the default is 6 hours;
+        # the 2h "auto" batch still handles the heavier per-repo signals.
+        # Tunable via SIGNALS_REFRESH_MIN.
+        signals_min = max(5, int(os.environ.get("SIGNALS_REFRESH_MIN", "360")))
+        scheduler.add_job(
+            lambda: _refresh_and_record("signals", _compute_render_fingerprint(), "scheduler"),
+            "cron",
+            id="signals-refresh",
+            max_instances=1,
+            coalesce=True,
+            **_signals_cron(signals_min),
+        )
+        # Persist the in-memory machine-usage rollup. Runs regardless of
+        # db.enabled() — usage.flush falls back to the volume JSON — and is
+        # cheap: one upsert per (hour, channel) touched since the last run.
+        scheduler.add_job(
+            usage.flush,
+            "cron",
+            minute="*",
+            id="usage-flush",
+            max_instances=1,
+            coalesce=True,
+        )
+        if db.enabled():
+            scheduler.add_job(
+                _refresh_verify_feed,
+                "cron",
+                hour=4,
+                id="verify-feed-refresh",
+                max_instances=1,
+                coalesce=True,
+            )
+        scheduler.start()
+        _scheduler = scheduler
+        _scheduler_error = None
+        print(f"[startup] scheduler started (signals every {signals_min}m, full batch every 2h)",
+              flush=True)
+    except Exception as e:  # never let a scheduler problem take the site down
+        import traceback
+        _scheduler_error = f"{type(e).__name__}: {e}"
+        print(f"[startup] SCHEDULER FAILED TO START — no refreshes will run: {_scheduler_error}",
+              flush=True)
+        traceback.print_exc()
+
+
+def _scheduled_jobs() -> dict[str, str | None]:
+    """Next run time per scheduled job, for /healthz."""
+    if _scheduler is None:
+        return {}
+    out: dict[str, str | None] = {}
+    for job in _scheduler.get_jobs():
+        nrt = getattr(job, "next_run_time", None)
+        out[job.id] = nrt.isoformat() if nrt else None
+    return out
+
+
 def _startup():
-    global _scheduler
+    _start_scheduler()
     _sync_prebuilt_to_volume()
     seeded = _seed_history_into_volume()
     fingerprint = _compute_render_fingerprint()
@@ -2610,55 +2709,6 @@ def _startup():
             print("[startup] template/assets fingerprint changed — kicked off render-only rebuild")
         else:
             print("[startup] agents.json changed — kicked off render-only rebuild")
-
-    if os.environ.get("DISABLE_SCHEDULER") != "1":
-        from apscheduler.schedulers.background import BackgroundScheduler
-        if _scheduler is None:
-            _scheduler = BackgroundScheduler(timezone="UTC")
-            _scheduler.add_job(
-                lambda: _refresh_and_record("auto", _compute_render_fingerprint(), "scheduler"),
-                "cron",
-                hour="*/2",
-                id="refresh",
-                max_instances=1,
-                coalesce=True,
-            )
-            # Fast, frequent GitHub-signal refresh (stars/forks/commits → HVTrust
-            # /rank) for the whole registry. Cheap via GraphQL, so it can run
-            # often without exhausting rate limits — this is what keeps the
-            # leaderboard dynamic. The 2h "auto" batch still handles the heavier
-            # PyPI/discovery/OSSF signals. Tunable via SIGNALS_REFRESH_MIN.
-            signals_min = max(5, int(os.environ.get("SIGNALS_REFRESH_MIN", "30")))
-            _scheduler.add_job(
-                lambda: _refresh_and_record("signals", _compute_render_fingerprint(), "scheduler"),
-                "cron",
-                minute=f"*/{signals_min}",
-                id="signals-refresh",
-                max_instances=1,
-                coalesce=True,
-            )
-            # Persist the in-memory machine-usage rollup. Runs regardless of
-            # db.enabled() — usage.flush falls back to the volume JSON — and is
-            # cheap: one upsert per (hour, channel) touched since the last run.
-            _scheduler.add_job(
-                usage.flush,
-                "cron",
-                minute="*",
-                id="usage-flush",
-                max_instances=1,
-                coalesce=True,
-            )
-            if db.enabled():
-                _scheduler.add_job(
-                    _refresh_verify_feed,
-                    "cron",
-                    hour=4,
-                    id="verify-feed-refresh",
-                    max_instances=1,
-                    coalesce=True,
-                )
-            _scheduler.start()
-        print(f"[startup] scheduler started (signals every {signals_min}m, full batch every 2h)")
 
 
 def _shutdown():

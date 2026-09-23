@@ -62,6 +62,11 @@ def test_healthz(client):
     if j["data_age_seconds"] is not None:
         assert isinstance(j["data_age_seconds"], int)
         assert j["data_age_seconds"] >= 0
+    # Scheduler state is reported so a dead scheduler is visible, not silent.
+    # The fixture sets DISABLE_SCHEDULER=1, so nothing is running here.
+    assert j["scheduler_running"] is False
+    assert j["scheduler_error"] is None
+    assert j["scheduled_jobs"] == {}
     assert client.head("/healthz").status_code == 200
 
 
