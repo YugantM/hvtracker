@@ -2863,8 +2863,8 @@ def seed_history_into_output_root(base_dir: str, script_dir: str) -> int:
     """Copy baked history snapshots into the active output root when missing.
 
     In Docker deploys, prior daily snapshots live in ``<base_dir>/seed/history``.
-    Build-time render-only output goes to a different ``script_dir`` (for example
-    ``/app/prebuilt``), so without this seed step the renderer sees an empty
+    Render output goes to a different ``script_dir`` (the volume, or a temp
+    OUTPUT_DIR in tests), so without this seed step the renderer sees an empty
     ``output/history`` directory and marks every agent as NEW.
     """
     if script_dir == base_dir:

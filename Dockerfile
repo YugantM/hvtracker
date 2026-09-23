@@ -68,10 +68,6 @@ COPY data/render_state.json data/render_state.json
 COPY seed/history/ /app/seed/history/
 RUN test -n "$(find /app/seed/history -name '*.json' -print -quit)"
 
-# Ship the exact prebuilt site snapshot from the workspace. This keeps
-# emergency hotfix deploys aligned with the verified local container state.
-COPY prebuilt/ /app/prebuilt/
-
 RUN chown -R hvt:hvt /app /data
 
 COPY entrypoint.sh /app/entrypoint.sh

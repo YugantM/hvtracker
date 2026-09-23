@@ -155,7 +155,6 @@ HONEYPOT_HTML = '<div style="position:absolute;left:-9999px;top:-9999px" aria-hi
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.environ.get("OUTPUT_DIR", BASE_DIR)
-PREBUILT_DIR = os.path.join(BASE_DIR, "prebuilt")
 
 
 def _asset_ver(name: str) -> str:
@@ -2424,32 +2423,6 @@ def _seed_history_into_volume() -> int:
     return copied
 
 
-def _sync_prebuilt_to_volume() -> bool:
-    """Copy the build-time rendered site into the volume so fresh HTML is
-    served immediately on first boot. Once a volume has live data, do not
-    copy prebuilt output over it; startup/render jobs will update generated
-    files without downgrading fresher leaderboard data."""
-    import shutil
-    if not os.path.isdir(PREBUILT_DIR) or PREBUILT_DIR == OUTPUT_DIR:
-        return False
-    if os.path.isfile(DATA_PATH):
-        print("[startup] existing volume data found — skipped prebuilt sync")
-        return False
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    copied = 0
-    for root, dirs, files in os.walk(PREBUILT_DIR):
-        rel = os.path.relpath(root, PREBUILT_DIR)
-        dest = os.path.join(OUTPUT_DIR, rel)
-        os.makedirs(dest, exist_ok=True)
-        for f in files:
-            if f == ".agents_hash":
-                continue
-            shutil.copy2(os.path.join(root, f), os.path.join(dest, f))
-            copied += 1
-    print(f"[startup] synced {copied} pre-rendered files from image → volume")
-    return copied > 0
-
-
 def _has_missing_commit_rows() -> bool:
     """Detect rows whose 4-week commit count needs (re)fetching, so startup
     kicks the repair-commits refresh. Must match fetch_and_build's
@@ -2628,7 +2601,6 @@ def _scheduled_jobs() -> dict[str, str | None]:
 
 def _startup():
     _start_scheduler()
-    _sync_prebuilt_to_volume()
     seeded = _seed_history_into_volume()
     fingerprint = _compute_render_fingerprint()
     stored_fingerprint = _read_render_fingerprint()
