@@ -41,6 +41,16 @@ if TOKEN:
 METHODOLOGY_VERSION = "v4.3"  # runtime signals count declared evidence only (dep sections, shipped plugin paths, named credentials)
 DATA_SCHEMA_VERSION = "v0.1"
 
+# Listing classes share the scoring pipeline but NOT the rank space. "agent" is
+# the original board and stays the default for any row without an explicit
+# class, so existing rosters keep their exact ranks. "skill" covers skill
+# definitions and plugin bundles an agent executes: same evidence signals, but
+# ranked among themselves because the trust_score bands are calibrated on
+# agent-shaped evidence — a small skill repo legitimately scores in the 13-24
+# band pre-scan, which would read as a failing agent on a shared board.
+LISTING_CLASSES = ("agent", "skill")
+DEFAULT_LISTING_CLASS = "agent"
+
 
 def _github_retry_delay(resp: requests.Response | None, attempt: int) -> float:
     """Best-effort backoff for transient GitHub API failures."""
@@ -2066,6 +2076,82 @@ def _rank_sort_key(row: dict) -> tuple:
     )
 
 
+def listing_class(row: dict) -> str:
+    """Which rank space a row belongs to. Rows with no class are agents.
+
+    The registry lists more than one kind of artifact. Agents are the original
+    board; skills (skill definitions and plugin bundles an agent executes) are
+    scored on the same evidence but ranked among themselves — see
+    `LISTING_CLASSES` and the per-class rank block in main().
+    """
+    cls = row.get("class") or DEFAULT_LISTING_CLASS
+    return cls if cls in LISTING_CLASSES else DEFAULT_LISTING_CLASS
+
+
+def group_by_class(rows: list[dict]) -> dict[str, list[dict]]:
+    """Partition rows into per-class rank spaces, preserving input order."""
+    groups: dict[str, list[dict]] = {}
+    for row in rows:
+        groups.setdefault(listing_class(row), []).append(row)
+    return groups
+
+
+def apply_listing_classes(rows: list[dict], agents: list[dict]) -> None:
+    """Re-apply each row's listing class from the roster, in place.
+
+    Must run on EVERY render, not just when a row is created. Rows are built
+    field-by-field — `provisional_agent_row` and the fetch path both copy only
+    the config keys they name — so a row loaded from the render_state cache
+    carries no `class` at all. Without this it silently defaults to "agent" and
+    every skill rejoins the agent board, which is the one outcome the separate
+    rank space exists to prevent.
+    """
+    class_map = {a["repo"].lower(): a.get("class", "") for a in agents if a.get("class")}
+    for row in rows:
+        row["class"] = class_map.get(row.get("repo", "").lower(), DEFAULT_LISTING_CLASS)
+
+
+def assign_ranks(rows: list[dict]) -> list[dict]:
+    """Sort `rows` and assign rank / display_rank WITHIN each listing class.
+
+    Ranking is trust-first, breaking ties with hard-to-fake evidence BEFORE
+    popularity: trust_score → confidence → OSSF Scorecard → signed-commit ratio
+    → momentum → stars → slug. Popularity is retained (it still separates
+    equal-evidence ties) but reaching #1 among tied scores requires real audit
+    posture, not a star farm.
+
+    Each class is ranked among itself, so introducing or growing one class never
+    moves a rank in another — the property that keeps skills off the agent
+    board. Mutates and returns `rows` (sorted globally by the same comparator).
+    """
+    rows.sort(key=_rank_sort_key, reverse=True)
+
+    for class_rows in group_by_class(rows).values():
+        for i, row in enumerate(class_rows, 1):
+            row["rank"] = i
+            row["rank_v2"] = i
+            row["trust_score_v2"] = row["trust_score"]
+
+        # Shared display rank for rows whose live trust_score is exactly equal:
+        # they legitimately tie, so the leaderboard shows the same "=N" for each
+        # rather than manufacturing a rank difference the score doesn't support.
+        # The strict `rank` above is unchanged (deltas/movers/sparklines use it).
+        tie_start = 0
+        for i, row in enumerate(class_rows):
+            if i == 0 or row["trust_score"] != class_rows[i - 1]["trust_score"]:
+                tie_start = i + 1
+            row["display_rank"] = tie_start
+        tie_counts: dict[int, int] = {}
+        for row in class_rows:
+            tie_counts[row["display_rank"]] = tie_counts.get(row["display_rank"], 0) + 1
+        for row in class_rows:
+            row["is_tied"] = tie_counts[row["display_rank"]] > 1
+
+    for row in rows:
+        row["listing_class"] = listing_class(row)
+    return rows
+
+
 def score_components(stars: int, days_since: int, recent_commits: int, forks: int) -> dict:
     """Compute the four score components. Reused by the leaderboard and profile pages."""
     stars_score = min(30, math.log1p(stars) / math.log1p(100_000) * 30)
@@ -2207,6 +2293,95 @@ def agent_review_insights(row: dict) -> dict:
         "strongest": strongest,
         "weakest": weakest,
         "improvement": improvement,
+    }
+
+
+def agent_compare_targets(row: dict, related: list[dict], published: list[dict]) -> list[dict]:
+    """Up to 3 head-to-head suggestions for the sticky compare bubble.
+
+    Targets are the agent's category neighbours, so the suggestion is always a
+    like-for-like matchup. `/compare/<a>-vs-<b>/` serves the static page when one
+    was generated and otherwise the compare tool with both agents preselected
+    (app.py compare_pair), so every target is a working link either way.
+
+    Pairs without a generated page are served noindex, so they carry rel=nofollow
+    — linking 400+ agent pages at them would otherwise spend crawl budget on URLs
+    that can never index (the #193 crawl-waste lesson).
+    """
+    published_urls = {c.get("url") for c in (published or [])}
+    targets = []
+    for peer in (related or [])[:3]:
+        slug_a, slug_b = sorted([row["slug"], peer["slug"]])
+        url = f"/compare/{slug_a}-vs-{slug_b}/"
+        peer_score = peer.get("trust_score") or 0
+        targets.append({
+            "name": peer["name"],
+            "slug": peer["slug"],
+            "url": url,
+            "score": peer_score,
+            # Positive = the peer scores higher than the agent being viewed.
+            "delta": round(peer_score - (row.get("trust_score") or 0), 1),
+            "published": url in published_urls,
+        })
+    return targets
+
+
+def category_dimension_averages(peers: list[dict]) -> dict:
+    """Mean of each trust dimension (and the overall score) across a category.
+
+    `peers` is every listed row in the category INCLUDING the agent itself, so
+    the average is the category's, not a leave-one-out baseline — the agent page
+    reads "vs the Workflow Platforms average", and that average must be the same
+    number on every page in the category.
+    """
+    n = max(len(peers), 1)
+    avgs = {}
+    for key, (_, _max) in TRUST_DIMENSIONS.items():
+        avgs[key] = sum((p.get("trust_breakdown") or {}).get(key, 0) or 0 for p in peers) / n
+    avgs["trust_score"] = sum(p.get("trust_score") or 0 for p in peers) / n
+    return avgs
+
+
+def agent_category_comparison(row: dict, peers: list[dict]) -> dict | None:
+    """Per-dimension comparison of one agent against its category average.
+
+    Returns None when the category is too small for an average to mean anything
+    (a 2-agent category makes every agent "above" or "below" by construction).
+    """
+    if not peers or len(peers) < 4:
+        return None
+    avgs = category_dimension_averages(peers)
+    breakdown = row.get("trust_breakdown") or {}
+    dims = []
+    for key, (label, max_score) in TRUST_DIMENSIONS.items():
+        value = breakdown.get(key, 0) or 0
+        avg = avgs[key]
+        delta = value - avg
+        dims.append({
+            "key": key,
+            "label": label,
+            "value": round(value, 1),
+            "max": max_score,
+            "avg": round(avg, 1),
+            "delta": round(delta, 1),
+            # Bars and the average tick are positioned as % of the dimension max.
+            "pct": round(value / max_score * 100, 1) if max_score else 0,
+            "avg_pct": round(avg / max_score * 100, 1) if max_score else 0,
+            # A dimension within 0.5pt of the mean is "in line" — below that the
+            # delta is noise and an up/down arrow would overstate it.
+            "direction": "above" if delta >= 0.5 else ("below" if delta <= -0.5 else "level"),
+        })
+    score = row.get("trust_score") or 0
+    score_delta = score - avgs["trust_score"]
+    return {
+        "category": row.get("category") or "",
+        "peers": len(peers),
+        "dimensions": dims,
+        "score": round(score, 1),
+        "score_avg": round(avgs["trust_score"], 1),
+        "score_delta": round(score_delta, 1),
+        "score_direction": "above" if score_delta >= 0.5 else ("below" if score_delta <= -0.5 else "level"),
+        "ahead_of": sum(1 for p in peers if (p.get("trust_score") or 0) < score),
     }
 
 
@@ -2425,21 +2600,104 @@ def load_previous_ranks(history_dir: str) -> dict[str, int]:
         return {}
 
 
-def load_previous_downloads(history_dir: str) -> dict[str, tuple[int, str]]:
-    """Load previous download counts for use as fallback on PyPI 429."""
-    prev = _load_prior_snapshot(history_dir)
-    if not prev:
-        return {}
+def load_previous_downloads(
+    history_dir: str, lookback_days: int = 14
+) -> dict[str, tuple[int, str]]:
+    """Last-known-good download counts, used as a fallback when a fetch fails.
+
+    Scans back through up to ``lookback_days`` recent snapshots (newest first)
+    and keeps each repo's most-recent NON-None value. Reading only the
+    immediately-prior snapshot loses the fallback exactly when it is needed: a
+    failed fetch writes None, so after even one bad day the "previous" value is
+    already None and the score craters with nothing to fall back to. That is
+    what kept vercel/ai pinned at 70.0 (rank 2 -> 226) for days after
+    2026-09-03 — npm rate-limiting nulled ~91 packages, and every recent
+    snapshot already held None. Bounded so a genuinely dead package (fetch
+    failing two weeks straight) eventually drops to None rather than serving
+    stale data forever.
+    """
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     try:
-        result = {}
-        for a in prev.get("agents", []):
-            dl = a.get("weekly_downloads")
-            src = a.get("dl_source", "")
-            if dl is not None:
-                result[a["repo"].lower()] = (dl, src)
-        return result
-    except (KeyError, TypeError):
+        candidates = sorted(
+            [f for f in os.listdir(history_dir)
+             if re.match(r"\d{4}-\d{2}-\d{2}\.json$", f) and f[:-5] < today],
+            reverse=True,
+        )[:lookback_days]
+    except OSError:
         return {}
+    result: dict[str, tuple[int, str]] = {}
+    for fname in candidates:
+        try:
+            with open(os.path.join(history_dir, fname), encoding="utf-8") as f:
+                snap = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            continue
+        for a in snap.get("agents", []):
+            repo = a.get("repo")
+            dl = a.get("weekly_downloads")
+            if not repo or dl is None:
+                continue
+            key = repo.lower()
+            if key not in result:  # newest-first iteration → first hit wins
+                result[key] = (dl, a.get("dl_source", ""))
+    return result
+
+
+def resolve_row_downloads(
+    row: dict, prev_downloads: dict[str, tuple[int, str]]
+) -> str | None:
+    """Combine this run's per-source download counts into weekly_downloads /
+    dl_source, mutating `row`. Sources: npm_dl, crate_dl, docker_pulls,
+    vscode_installs, pypi_dl (each None when absent or its fetch failed).
+
+    If EVERY source is empty this run but the repo previously reported
+    downloads, retain the last-known-good value: a transient fetch failure
+    (rate-limit/outage on any provider) must not null a real number and crater
+    the adoption dimension + confidence. prev_downloads holds only repos that
+    HAD a value, so GitHub-only agents (legitimately no downloads) stay None.
+
+    Returns "live" if a value was summed from live sources, "cached" if the
+    fallback fired, or None if the repo has no downloads at all.
+    """
+    dl_parts = []
+    for key, src in (
+        ("npm_dl", "npm"),
+        ("crate_dl", "crates.io"),
+        ("docker_pulls", "docker"),
+        ("vscode_installs", "vscode"),
+        ("pypi_dl", "pypi"),
+    ):
+        if row.get(key) is not None:
+            dl_parts.append((src, row[key]))
+    if dl_parts:
+        row["weekly_downloads"] = sum(dl for _, dl in dl_parts)
+        row["dl_source"] = "+".join(src for src, _ in dl_parts)
+        return "live"
+    cached = prev_downloads.get(row["repo"].lower())
+    if cached:
+        row["weekly_downloads"], row["dl_source"] = cached
+        return "cached"
+    return None
+
+
+def og_card_signature(row: dict, total: int, gen_src_hash: str) -> str:
+    """Content hash of everything an OG share card renders, so the build can
+    skip regenerating a card whose inputs are unchanged.
+
+    Must list EVERY field generate() in generate_og_card.py reads (name,
+    description, repo, trust_score, evidence_grade, stars_fmt, weekly_commits,
+    category, trust_breakdown, rank) plus `total` (the "of N" denominator) and
+    `gen_src_hash` (a hash of generate_og_card.py itself, so any layout change
+    invalidates every card). A field the card shows but this omits would serve
+    a stale card — keep this in lockstep with generate().
+    """
+    payload = json.dumps([
+        gen_src_hash, row.get("name"), row.get("description"), row.get("repo"),
+        row.get("trust_score"), row.get("evidence_grade"), row.get("stars_fmt"),
+        row.get("weekly_commits"), row.get("category"),
+        row.get("trust_breakdown"), row.get("rank"), total,
+    ], sort_keys=True, default=str)
+    return hashlib.md5(payload.encode()).hexdigest()
 
 
 def check_board_invariants(rows: list[dict], prior_snapshot: dict | None) -> list[str]:
@@ -2494,6 +2752,38 @@ def check_board_invariants(rows: list[dict], prior_snapshot: dict | None) -> lis
                 "possible mass delisting or fetch failure"
             )
     return violations
+
+
+def summarize_fetch_rotation(rows: list[dict]) -> dict:
+    """Report how far behind the heavy per-repo fetch rotation is.
+
+    The 2h batch refreshes 1/6 of the board by ``full_fetched_at``, so a healthy
+    board's oldest stamp is under ~12h and ``never_fetched`` drains to 0. The
+    rotation froze on the same alphabetical sixth for weeks without anyone
+    noticing because nothing measured it — every downstream field just kept
+    serving its last-known value. Surfacing it in data/build_report.json makes
+    the next stall a two-second check instead of an archaeology session.
+    """
+    now = datetime.now(timezone.utc)
+    never = 0
+    ages: list[float] = []
+    for row in rows:
+        stamp = row.get("full_fetched_at")
+        if not stamp:
+            never += 1
+            continue
+        try:
+            fetched = datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+        except (TypeError, ValueError):
+            never += 1
+            continue
+        ages.append((now - fetched).total_seconds() / 3600)
+    return {
+        "total_rows": len(rows),
+        "never_fetched": never,
+        "fetched_last_24h": sum(1 for a in ages if a <= 24),
+        "stalest_age_hours": round(max(ages), 1) if ages else None,
+    }
 
 
 def load_cached_commit_counts(data_path: str, history_dir: str) -> dict[str, int]:
@@ -3949,10 +4239,12 @@ def build_ecosystem_pages(rows: list[dict]) -> list[dict]:
         pages.append({
             "slug": slug,
             "provider": provider,
-            "title": f"Projects Using {provider} — Trust-Ranked",
+            "title": f"{len(agents)} AI Agents Using {provider} — Ranked by Trust Score",
             "description": (
-                f"{len(agents)} open-source AI agent projects that integrate {provider}, "
-                f"ranked by evidence-based HVTrust scores."
+                f"Compare {len(agents)} open-source AI agents that integrate {provider}, "
+                f"ranked by independent HVTrust scores and A–D grades from public, "
+                f"checkable signals — provenance, OSSF Scorecard, maintenance, and adoption. "
+                f"See which are safe to use."
             ),
             "agents": agents,
             "faq_answer": faq_answer,
@@ -4792,8 +5084,15 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>HVTracker — Data Endpoints</title>
+  <title>Free AI Agent Dataset &amp; JSON API — Trust Scores for {len(data_output["agents"])} Agents | HVTracker</title>
+  <!-- Ranked ~13 with 526 impressions and zero clicks: the page shipped no
+       meta description and no canonical, so Google had no snippet to show. -->
+  <meta name="description" content="Free, machine-readable trust data for {len(data_output["agents"])} open-source AI agents: JSON endpoints, per-agent history, quarterly CSV exports and an MCP server. CC BY 4.0, no key required.">
+  <link rel="canonical" href="https://hvtracker.net/data/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
@@ -5045,10 +5344,20 @@ def select_batch(agents: list[dict], batch_num: int, total_batches: int) -> list
 
 
 def load_signals_staleness(data_path: str) -> dict[str, str]:
-    """Map repo → when its GitHub signals were last fetched (ISO ``signals_fetched_at``).
+    """Map repo → when the heavy batch last fetched it (ISO ``full_fetched_at``).
 
     Agents missing from data.json (newly added) or lacking the stamp map to an
     empty string, which sorts first → treated as the most stale.
+
+    Deliberately keyed on ``full_fetched_at`` (written only by the full per-repo
+    fetch) and NOT on ``signals_fetched_at``: the 30-minute GraphQL refresh
+    restamps the latter on every row, so ordering by it would flatten to a
+    permanent tie. It must also be a field data.json publishes — batch mode
+    carries non-batch rows forward from data.json's whitelist
+    (``merge_batch_into_data``), so an unpublished key is gone by the next
+    cycle. That is exactly how this rotation silently froze: the stamp existed
+    on the row, the whitelist dropped it, every agent tied on "", and the
+    secondary sort handed the same alphabetical sixth to every batch for weeks.
     """
     try:
         with open(data_path, encoding="utf-8") as f:
@@ -5056,7 +5365,7 @@ def load_signals_staleness(data_path: str) -> dict[str, str]:
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
     return {
-        a["repo"].lower(): a.get("signals_fetched_at") or ""
+        a["repo"].lower(): a.get("full_fetched_at") or ""
         for a in existing.get("agents", [])
         if a.get("repo")
     }
@@ -5768,6 +6077,11 @@ def main() -> None:
             "category": category,
             "repo": repo_id,
             "signals_fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            # Written ONLY here, by the full per-repo fetch (downloads, HN,
+            # signed commits, provenance, all four runtime-trust fields) —
+            # never by the light GraphQL signals refresh. select_stale_batch
+            # rotates on this stamp, so it has to mean "heavily fetched".
+            "full_fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "url": repo["html_url"],
             "stars": repo["stargazers_count"],
             "stars_fmt": fmt_num(repo["stargazers_count"]),
@@ -5915,32 +6229,13 @@ def main() -> None:
         print("\nFetching PyPI downloads (serial, with cached fallback on 429)...")
         for row in rows:
             pypi_pkg = row.get("pypi_package", "")
-            repo_key = row["repo"].lower()
-            dl_parts = []
-            if row.get("npm_dl") is not None:
-                dl_parts.append(("npm", row["npm_dl"]))
-            if row.get("crate_dl") is not None:
-                dl_parts.append(("crates.io", row["crate_dl"]))
-            if row.get("docker_pulls") is not None:
-                dl_parts.append(("docker", row["docker_pulls"]))
-            if row.get("vscode_installs") is not None:
-                dl_parts.append(("vscode", row["vscode_installs"]))
             if pypi_pkg:
-                pypi_dl = fetch_pypi_downloads(pypi_pkg)
-                if pypi_dl is not None:
-                    dl_parts.append(("pypi", pypi_dl))
-                else:
-                    # 429 or error — use last known good value from previous run
-                    cached = prev_downloads.get(repo_key)
-                    if cached:
-                        cached_count, cached_src = cached
-                        row["weekly_downloads"] = cached_count
-                        row["dl_source"] = cached_src
-                        print(f"  dl {row['repo']:<45} {cached_count:,} ({cached_src}) [cached fallback]")
-                        continue
-            if dl_parts:
-                row["weekly_downloads"] = sum(dl for _, dl in dl_parts)
-                row["dl_source"] = "+".join(src for src, _ in dl_parts)
+                # None on 429/error; resolve_row_downloads falls back to cache.
+                row["pypi_dl"] = fetch_pypi_downloads(pypi_pkg)
+            origin = resolve_row_downloads(row, prev_downloads)
+            if origin == "cached":
+                print(f"  dl {row['repo']:<45} {row['weekly_downloads']:,} ({row['dl_source']}) [cached fallback]")
+            elif origin == "live":
                 print(f"  dl {row['repo']:<45} {row['weekly_downloads']:,} ({row['dl_source']})")
 
         # Fetch PyPI provenance serially (pypi.org Simple API, ~1 req/s to be safe)
@@ -6087,6 +6382,7 @@ def main() -> None:
     # `repo` as the tracking/join key while showing the corrected slug.
     _display_repo_map = {a["repo"].lower(): a.get("display_repo", "") for a in all_agents if a.get("display_repo")}
     _source_note_map = {a["repo"].lower(): a.get("source_note", "") for a in all_agents if a.get("source_note")}
+    apply_listing_classes(rows, all_agents)
 
     # Re-apply the latest OSSF scan to every carried-forward agent (cache-only,
     # no API) so scores stay fresh each cycle instead of only the slice that was
@@ -6207,31 +6503,7 @@ def main() -> None:
         else:
             row["evidence_grade"] = "D"
 
-    # Rank by HVTrust (trust-first, runtime-calibrated), then break ties with
-    # hard-to-fake evidence BEFORE popularity: confidence → OSSF Scorecard →
-    # signed-commit ratio → momentum → stars → slug. Popularity is retained
-    # (it still separates equal-evidence ties) but reaching #1 among tied
-    # scores now requires real audit posture, not a star farm.
-    rows.sort(key=_rank_sort_key, reverse=True)
-    for i, row in enumerate(rows, 1):
-        row["rank"] = i
-        row["rank_v2"] = i
-        row["trust_score_v2"] = row["trust_score"]
-
-    # Shared display rank for agents whose live trust_score is exactly equal:
-    # they legitimately tie, so the leaderboard shows the same "=N" for each
-    # rather than manufacturing a rank difference the score doesn't support.
-    # The strict `rank` above is unchanged (deltas/movers/sparklines rely on it).
-    tie_start = 0
-    for i, row in enumerate(rows):
-        if i == 0 or row["trust_score"] != rows[i - 1]["trust_score"]:
-            tie_start = i + 1
-        row["display_rank"] = tie_start
-    tie_counts: dict[int, int] = {}
-    for row in rows:
-        tie_counts[row["display_rank"]] = tie_counts.get(row["display_rank"], 0) + 1
-    for row in rows:
-        row["is_tied"] = tie_counts[row["display_rank"]] > 1
+    assign_ranks(rows)
 
     # Pre-calibration baseline rank, preserved for the leaderboard's
     # compare-to-pre-calibration view — no longer live/authoritative anywhere.
@@ -6316,12 +6588,19 @@ def main() -> None:
     compare_by_slug = {}        # agent slug -> [{name, url}] for agent pages
     compare_by_cat = {}         # cat slug   -> [{a, b, url}] for category pages
     for _cm in categories:
+        # Must match the top-8 rule used when rendering the pair pages below —
+        # otherwise the extra pages exist with no internal links pointing at
+        # them, and Google has no path to crawl them.
         _top = sorted(
             [r for r in rows if r.get("category") == _cm["name"]],
             key=lambda x: x.get("category_rank") or 9999,
-        )[:3]
+        )[:8]
         for _a, _b in itertools.combinations(_top, 2):
-            _url = f"/compare/{_a['slug']}-vs-{_b['slug']}/"
+            # Canonical pair URL is alphabetical — that is where the static page
+            # is written and what app.py redirects to. Building it in rank order
+            # made every internal compare link a 301 to its own canonical URL.
+            _lo, _hi = sorted([_a["slug"], _b["slug"]])
+            _url = f"/compare/{_lo}-vs-{_hi}/"
             compare_by_slug.setdefault(_a["slug"], []).append({"name": _b["name"], "url": _url})
             compare_by_slug.setdefault(_b["slug"], []).append({"name": _a["name"], "url": _url})
             compare_by_cat.setdefault(_cm["slug"], []).append({"a": _a["name"], "b": _b["name"], "url": _url})
@@ -6337,6 +6616,12 @@ def main() -> None:
                 "repo": r["repo"],
                 "display_repo": r.get("display_repo", ""),
                 "url": r["url"],
+                # Published so consumers can tell the classes apart — `rank` is
+                # per-class, so a skill's #12 is not comparable with an agent's.
+                # This payload is a field whitelist: without the key here the
+                # class is dropped on the way out and /api/v1/agents (which
+                # defaults a missing class to "agent") serves skills too.
+                "listing_class": r.get("listing_class", DEFAULT_LISTING_CLASS),
                 "rank": r["rank"],
                 "previous_rank": r["previous_rank"],
                 "rank_delta": r["rank_delta"],
@@ -6368,6 +6653,9 @@ def main() -> None:
                 "scorecard_checks": r.get("scorecard_checks", {}),
                 "scorecard_scanned_at": r.get("scorecard_scanned_at"),
                 "slug": r.get("slug"),
+                # Must be published: batch mode carries non-batch rows forward
+                # from data.json, so an unpublished stamp resets the rotation.
+                "full_fetched_at": r.get("full_fetched_at"),
                 "source_note": r.get("source_note", ""),
                 "public_actions": r.get("public_actions"),
                 "mcp_server_support": r.get("mcp_server_support", {"status": "none", "confidence": None, "evidence": []}),
@@ -6533,6 +6821,7 @@ def main() -> None:
         "fingerprint_agent_count": len(fp_agents),
         "board_invariant_violations": invariant_violations,
         "board_invariant_violation_count": len(invariant_violations),
+        "fetch_rotation": summarize_fetch_rotation(rows),
     }
     report_path = os.path.join(script_dir, "data", "build_report.json")
     os.makedirs(os.path.dirname(report_path), exist_ok=True)
@@ -6565,9 +6854,18 @@ def main() -> None:
     else:
         env.globals["auth_js_hash"] = ""
 
-    movers = compute_movers(history, {r["repo"].lower(): r["slug"] for r in rows}, rows=rows, limit=12)
-    movers_page = compute_movers_page_data(rows, history)
-    newly_added = compute_newly_added(rows, history)
+    # The homepage IS the agent board, so everything on it is agent-scoped: a
+    # separate rank space would otherwise show two rows both ranked "#1", and
+    # a 148-row skill batch would flood movers and "newly added". Skills reach
+    # the public site through their own category page (see LISTING_CLASSES).
+    agent_rows = [r for r in rows if listing_class(r) == "agent"]
+    class_totals = {cls: len(group) for cls, group in group_by_class(rows).items()}
+
+    movers = compute_movers(
+        history, {r["repo"].lower(): r["slug"] for r in agent_rows}, rows=agent_rows, limit=12
+    )
+    movers_page = compute_movers_page_data(agent_rows, history)
+    newly_added = compute_newly_added(agent_rows, history)
     use_case_pages = build_use_case_pages(rows)
     ecosystem_pages = build_ecosystem_pages(rows)
     org_pages = build_org_pages(rows)
@@ -6624,17 +6922,26 @@ def main() -> None:
         if event.get("date", "") >= recent_change_window_start
     )
     registry_summary = {
-        "active_count": len(rows),
-        "warning_count": sum(1 for r in rows if r.get("has_warning")),
+        "active_count": len(agent_rows),
+        "warning_count": sum(1 for r in agent_rows if r.get("has_warning")),
         "legacy_count": len(legacy_rows),
-        "provenance_count": sum(1 for r in rows if r.get("has_provenance")),
-        "fresh_count": sum(1 for r in rows if (r.get("days_ago") or 9999) <= 14),
-        "stale_count": sum(1 for r in rows if (r.get("days_ago") or 0) > 90),
+        "provenance_count": sum(1 for r in agent_rows if r.get("has_provenance")),
+        "fresh_count": sum(1 for r in agent_rows if (r.get("days_ago") or 9999) <= 14),
+        "stale_count": sum(1 for r in agent_rows if (r.get("days_ago") or 0) > 90),
         "recent_change_count": recent_change_count,
+        "skill_count": len(rows) - len(agent_rows),
     }
-    warning_rows = [r for r in rows if r.get("has_warning")][:6]
+    warning_rows = [r for r in agent_rows if r.get("has_warning")][:6]
 
     tmpl = env.get_template("template.html")
+    # Skill rows ARE in the homepage DOM so the "Agent Skills" category tab
+    # filters to something (it earned a tab by size, and shipped empty when the
+    # rows were withheld). The Global view still selects only agent categories,
+    # so the default board is unchanged and per-class ranks never sit
+    # side-by-side. `total` stays the AGENT count: it feeds the title, meta
+    # description and JSON-LD, and those must not churn (#114).
+    skill_rows = [r for r in rows if listing_class(r) != "agent"]
+    skill_categories = sorted({r.get("category", "") for r in skill_rows} - {""})
     _ADOPTERS = [
         ("lightrag", "HKUDS/LightRAG", "Simple, fast retrieval-augmented generation"),
         ("composio", "ComposioHQ/composio", "Tooling and context management for AI agents"),
@@ -6660,10 +6967,12 @@ def main() -> None:
         })
     html = tmpl.render(
         adopters=adopters,
-        rows=rows,
+        rows=agent_rows + skill_rows,
+        skill_count=len(skill_rows),
+        skill_categories=skill_categories,
         legacy_rows=legacy_rows,
         updated=now_str,
-        total=len(rows),
+        total=len(agent_rows),
         categories=categories,
         movers=movers,
         newly_added=newly_added,
@@ -6675,7 +6984,7 @@ def main() -> None:
     out_path = os.path.join(script_dir, "index.html")
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"Built index.html with {len(rows)} agents.")
+    print(f"Built index.html with {len(agent_rows)} agents.")
 
     # Score Lab was retired when the runtime calibration it previewed became
     # the production score (methodology v4.0) — the per-field adjustment rules
@@ -6725,6 +7034,12 @@ def main() -> None:
         row["remediation_steps"] = agent_remediation_steps(row)
         row["safety_qa"] = agent_safety_qa(row)
         row["correction_url"] = agent_correction_url(row)
+        # How this agent sits against its category on each trust dimension.
+        # by_cat holds listed rows only, so legacy rows get None and the
+        # template simply omits the comparison block.
+        row["category_comparison"] = agent_category_comparison(
+            row, by_cat.get(row.get("category", ""), [])
+        )
     for row in rows:
         repo_key = row["repo"].lower()
         points = sparkline_data.get(repo_key, [])
@@ -6734,8 +7049,10 @@ def main() -> None:
         row["event_chart_svg"] = render_event_timeline_svg(events)
         slug_dir = os.path.join(agents_dir, row["slug"])
         os.makedirs(slug_dir, exist_ok=True)
+        row_related = related_agents(row, cat_sorted_rows)
+        row_comparisons = compare_by_slug.get(row["slug"], [])
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(agent_tmpl.render(row=row, total=len(rows), updated=now_str, events=events, drift_events=filter_drift_events(events), methodology_version=METHODOLOGY_VERSION, comparisons=compare_by_slug.get(row['slug'], []), provider_slugs=provider_slug_map, related=related_agents(row, cat_sorted_rows)))
+            f.write(agent_tmpl.render(row=row, total=class_totals[listing_class(row)], updated=now_str, events=events, drift_events=filter_drift_events(events), methodology_version=METHODOLOGY_VERSION, comparisons=row_comparisons, provider_slugs=provider_slug_map, related=row_related, compare_targets=agent_compare_targets(row, row_related, row_comparisons)))
 
     print(f"Built {len(rows)} active agent profile pages under agents/.")
 
@@ -6747,26 +7064,64 @@ def main() -> None:
     else:
         try:
             from generate_og_card import generate as generate_og, generate_site_card
+            # Content-hash gate: regenerate a card only when its inputs change.
+            # The 2h batch re-fetches ~1/6 of the board, so most cards are
+            # byte-identical to last render — regenerating all ~1,700 PIL images
+            # every run was pure waste (render CPU/time + memory peak). The
+            # signature covers every field generate() reads PLUS a hash of
+            # generate_og_card.py itself, so any layout change auto-busts every
+            # card with no manual version bump. Sigs persist on the volume next
+            # to render_state.json; a missing card forces regen even if its sig
+            # matches. Only successfully-written cards get a recorded sig.
+            og_sig_path = os.path.join(script_dir, "data", "og_card_sigs.json")
+            try:
+                with open(og_sig_path, encoding="utf-8") as _f:
+                    og_sigs = json.load(_f)
+            except (FileNotFoundError, json.JSONDecodeError, OSError):
+                og_sigs = {}
+            try:
+                with open(os.path.join(base_dir, "generate_og_card.py"), "rb") as _f:
+                    gen_src_hash = hashlib.md5(_f.read()).hexdigest()[:12]
+            except OSError:
+                gen_src_hash = "0"
+
             og_count = 0
+            og_skipped = 0
+            new_sigs: dict[str, str] = {}
             for row in rows:
                 slug_dir = os.path.join(agents_dir, row["slug"])
                 og_path = os.path.join(slug_dir, "og.png")
+                # Rows don't carry a board-size field, so without this the
+                # card's "Rank #N of M" falls back to a stale hardcoded 196.
+                # M is the row's OWN class size — rank is per-class, so a
+                # skill ranked #12 is "#12 of 148", never "of 1,454".
+                total = class_totals[listing_class(row)]
+                sig = og_card_signature(row, total, gen_src_hash)
+                new_sigs[row["slug"]] = sig
+                if og_sigs.get(row["slug"]) == sig and os.path.isfile(og_path):
+                    og_skipped += 1
+                    continue
                 try:
-                    # Rows don't carry a board-size field, so without this the
-                    # card's "Rank #N of M" falls back to a stale hardcoded 196.
-                    generate_og({**row, "total": len(rows)}, og_path)
+                    generate_og({**row, "total": total}, og_path)
                     og_count += 1
                 except Exception as e:
                     print(f"  WARN: OG card failed for {row['slug']}: {e}")
+                    new_sigs.pop(row["slug"], None)  # retry next render
+            try:
+                os.makedirs(os.path.dirname(og_sig_path), exist_ok=True)
+                with open(og_sig_path, "w", encoding="utf-8") as _f:
+                    json.dump(new_sigs, _f)
+            except OSError as e:
+                print(f"  WARN: could not write og_card_sigs.json: {e}")
+            print(f"OG cards: {og_count} regenerated, {og_skipped} unchanged (skipped).")
             try:
                 generate_site_card(
                     os.path.join(script_dir, "og-v2.png"),
-                    total=len(rows),
+                    total=len(agent_rows),
                     categories=len(categories),
                 )
             except Exception as e:
                 print(f"  WARN: Site OG card failed: {e}")
-            print(f"Generated {og_count} agent OG cards.")
         except ImportError:
             print("WARN: generate_og_card not available — skipping OG cards.")
 
@@ -6792,10 +7147,16 @@ def main() -> None:
         cat_dir = os.path.join(categories_dir, cat_slug)
         os.makedirs(cat_dir, exist_ok=True)
         with open(os.path.join(cat_dir, "index.html"), "w", encoding="utf-8") as f:
+            # A category holds one listing class, so its copy takes that
+            # class's noun — a skills category calling its rows "agents" is
+            # just wrong on the page.
+            _cat_class = listing_class(cat_agents[0])
             f.write(cat_tmpl.render(
                 category=cat_name,
                 slug=cat_slug,
                 agents=cat_agents,
+                item_noun=_cat_class,
+                item_plural=_cat_class + "s",
                 all_categories=all_cat_meta,
                 updated=now_str,
                 avg_trust=avg_trust,
@@ -7061,7 +7422,7 @@ def main() -> None:
                  for lbl, k in (("Safety / integrity", "safety"), ("Identity & provenance", "identity"),
                                 ("Transparency", "transparency"), ("Maintenance", "maintenance"), ("Adoption", "adoption"))]
         _ctx = {"a": _a, "b": _b, "category": _cm, "metrics": _metrics, "dims": _dims,
-                "caps": compare_capability_rows(_a, _b),
+                "caps": compare_capability_rows(_a, _b), "total": len(rows),
                 "updated": now_str, "methodology_version": METHODOLOGY_VERSION,
                 "lead_name": None, "lead_score": None, "lead_grade": None, "trail_score": None, "trail_grade": None, "gap": None,
                 "coverage_caveat": None}
@@ -7077,9 +7438,16 @@ def main() -> None:
             f.write(compare_pair_tmpl.render(**_ctx))
         compare_pair_urls.append(f"https://hvtracker.net/compare/{_a['slug']}-vs-{_b['slug']}/")
 
+    # Top-8 per category = 28 pairs each (~450 pages) rather than top-3's 3.
+    # Compare pages are the best-converting surface after agent profiles
+    # (1.38% CTR vs 1.60%) and were the most under-built: 67 pages for 468
+    # agents. The top 8 of a category are the set a reader actually chooses
+    # between, so every pair is a comparison someone plausibly searches for;
+    # widening further would start pairing agents nobody weighs against
+    # each other. Pairs persist via seo_state, so this only ever adds URLs.
     for _cm in categories:
         _top = sorted([r for r in rows if r.get("category") == _cm["name"]],
-                      key=lambda x: x.get("category_rank") or 9999)[:3]
+                      key=lambda x: x.get("category_rank") or 9999)[:8]
         for _x, _y in _it.combinations(_top, 2):
             # Canonical (alphabetical) slug order so the dir/URL/canonical match
             # app.py's /compare/<a>-vs-<b>/ routing (which 301s to alpha order).
@@ -7304,8 +7672,8 @@ def main() -> None:
         snapshot_posts=snapshot_posts,
         quarterly_reports=quarterly_reports,
         categories=categories,
-        total=len(rows),
-        top_agent=rows[0],
+        total=len(agent_rows),
+        top_agent=agent_rows[0],
         blog_schema_json=json.dumps(blog_schema, ensure_ascii=False),
         updated=now_str,
     )
@@ -7369,14 +7737,51 @@ def main() -> None:
     for article in blog_articles:
         sitemap_urls.append((f"https://hvtracker.net/blog/{article['slug']}/", "0.8", "weekly"))
     for row in rows:
+        # Skill pages are served noindex (§2a crawl-budget freeze), so keep them
+        # out of the sitemap and IndexNow — advertising URLs we ask Google not to
+        # index sends a mixed signal and wastes crawl budget on the tail.
+        if listing_class(row) == "skill":
+            continue
         sitemap_urls.append((f"https://hvtracker.net/agents/{row['slug']}/", "0.8", "daily"))
     # Legacy entries have their public /agents/<slug>/ page deleted
     # (remove_legacy_public_artifacts); they MUST NOT appear in the sitemap or
     # Google crawls them as 404s.
-    # Static comparison pages /compare/<a>-vs-<b>/ now serve crawlable content
-    # (generated above), so each pair belongs in the sitemap alongside the tool.
+    # Static comparison pages /compare/<a>-vs-<b>/ are all generated above and
+    # stay reachable, but the sitemap only ADVERTISES the ones worth crawl
+    # budget. GSC showed ~815 of ~1,118 compare pages earned zero impressions in
+    # 3 months while Googlebot's budget is ~347 req/day and falling — advertising
+    # the untested tail just spends discovery crawls on pages that never index.
+    # So: proven pairs (>=1 impression ever, in compare_sitemap_allow.txt) are
+    # always listed; the rest are released COMPARE_SITEMAP_WAVE at a time in
+    # deterministic generation order (top-ranked categories first). Held-back
+    # pairs stay live and get discovered via internal links, not the sitemap.
+    def _norm_pair(_p):
+        _a, _sep, _b = _p.partition("-vs-")
+        return _p if not _b else "-vs-".join(sorted((_a, _b)))
+    _allow_path = os.path.join(base_dir, "compare_sitemap_allow.txt")
+    try:
+        with open(_allow_path, encoding="utf-8") as _f:
+            _compare_proven = {_norm_pair(_l.strip()) for _l in _f if _l.strip()}
+    except OSError:
+        _compare_proven = set()
+    _wave = int(os.environ.get("COMPARE_SITEMAP_WAVE", "150"))
+    _wave_used = 0
+    _cmp_listed = _cmp_proven_hit = 0
     for _cu in compare_pair_urls:
-        sitemap_urls.append((_cu, "0.7", "weekly"))
+        _pair = _norm_pair(_cu.rstrip("/").rsplit("/compare/", 1)[-1])
+        if _pair in _compare_proven:
+            sitemap_urls.append((_cu, "0.7", "weekly"))
+            _cmp_listed += 1
+            _cmp_proven_hit += 1
+        elif _wave_used < _wave:
+            sitemap_urls.append((_cu, "0.5", "weekly"))
+            _cmp_listed += 1
+            _wave_used += 1
+        # else: generated + internally linked, but held out of the sitemap
+    print(f"Compare sitemap: {_cmp_listed} listed "
+          f"({_cmp_proven_hit} proven + {_wave_used} wave) of "
+          f"{len(compare_pair_urls)} generated; "
+          f"{len(compare_pair_urls) - _cmp_listed} held back.")
     sitemap_urls += [
         ("https://hvtracker.net/compare/", "0.7", "daily"),
         ("https://hvtracker.net/changelog/", "0.6", "weekly"),
@@ -7651,9 +8056,9 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
 
     # Build /badges/ — Badge for Maintainers page
     badges_html = env.get_template("badges.html.j2").render(
-        top_repos=rows[:12],
-        sample=rows[0],
-        total=len(rows),
+        top_repos=agent_rows[:12],
+        sample=agent_rows[0],
+        total=len(agent_rows),
         updated=now_str,
     )
     badges_dir = os.path.join(script_dir, "badges")

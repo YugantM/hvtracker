@@ -20,6 +20,7 @@ from html import escape
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Form, Request
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
@@ -224,6 +225,12 @@ _refresh_lock = threading.Lock()
 # fill in the gaps.
 _HTML_CACHE = "public, max-age=300, s-maxage=900, stale-while-revalidate=86400"
 _JSON_CACHE = "public, max-age=600, s-maxage=1800, stale-while-revalidate=86400"
+# Static images/fonts (OG share cards, logos, favicons). Without a header these
+# ship `cf-cache-status: BYPASS` and every social unfurl / crawler fetch of a
+# ~50-60KB card hits Railway. Per-agent OG cards regenerate when a score moves,
+# so a 1-day edge TTL (stale-while-revalidate serves instantly, revalidates in
+# the background) keeps them fresh enough while cutting origin egress to ~zero.
+_ASSET_CACHE = "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800"
 
 
 _CSP = (
@@ -355,15 +362,23 @@ def _path_needs_trailing_slash(path: str) -> bool:
 def _canonical_redirect_target(request: Request) -> str | None:
     scheme = _external_scheme(request)
     host = _external_host(request)
-    path = request.url.path or "/"
+    orig_path = request.url.path or "/"
+    # Collapse repeated slashes: /agents/composio// currently 200s (StaticFiles
+    # resolves the doubled path) and Google indexes it as a duplicate of the
+    # single-slash canonical. Redirect to the collapsed path so each page has
+    # exactly one crawlable URL. Query string is untouched. The "already
+    # canonical" guards below compare the target against orig_path (not the
+    # collapsed path), or a doubled-slash URL would match itself and never
+    # redirect.
+    path = re.sub(r"/{2,}", "/", orig_path) if "//" in orig_path else orig_path
     target_path = f"{path}/" if _path_needs_trailing_slash(path) else path
     if host in _LOCAL_HOSTS:
-        if target_path == path:
+        if target_path == orig_path:
             return None
         query = request.url.query
         suffix = f"?{query}" if query else ""
         return f"{request.url.scheme}://{request.headers.get('host', host)}{target_path}{suffix}"
-    if scheme == "https" and host == _CANONICAL_HOST and target_path == path:
+    if scheme == "https" and host == _CANONICAL_HOST and target_path == orig_path:
         return None
     query = request.url.query
     suffix = f"?{query}" if query else ""
@@ -393,6 +408,23 @@ def _count_badge(slug: str) -> None:
 # consumer" numbers it is reporting — the same self-counting mistake the
 # verify feed made. Excluded from machine_usage by path.
 _USAGE_EXCLUDED_PATHS = frozenset({"/api/v1/usage"})
+
+# Daily snapshots are the registry's irreplaceable asset: one 4MB file per day
+# holding every row with all 62 fields, including trust_breakdown and
+# scorecard_checks — the scoring internals, not just the published scores. They
+# were never deliberately published; the catch-all StaticFiles mount over
+# OUTPUT_DIR simply exposed them, and the date-based filenames make the whole
+# corpus enumerable with a loop. The site itself reads these from DISK, never
+# over HTTP, so refusing them here costs nothing.
+#
+# The curated public history surface stays open and unaffected:
+# GET /api/v1/agents/<slug>/history (90-day window, whitelisted fields).
+_PRIVATE_SNAPSHOT_PREFIXES = ("/output/history/", "/output/history")
+
+
+def _is_private_snapshot_path(path: str) -> bool:
+    """True for raw daily-snapshot paths, which must not be served publicly."""
+    return path.startswith(_PRIVATE_SNAPSHOT_PREFIXES[0]) or path == _PRIVATE_SNAPSHOT_PREFIXES[1]
 
 
 def _count_machine_usage(path: str) -> None:
@@ -425,6 +457,9 @@ async def _cache_headers(request, call_next):
         retired = _retired_response(path)
         if retired is not None:
             return retired
+        if _is_private_snapshot_path(path):
+            # 404, not 403: don't confirm that a given date's snapshot exists.
+            return Response("Not Found", status_code=404, media_type="text/plain")
 
     if path == "/mcp" and request.method == "POST":
         if not _mcp_enabled():
@@ -473,7 +508,24 @@ async def _cache_headers(request, call_next):
         response.headers["Cache-Control"] = _HTML_CACHE
     elif path in ("",) or path == "/":
         response.headers["Cache-Control"] = _HTML_CACHE
+    elif path.endswith((".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg",
+                        ".ico", ".woff2", ".woff", ".ttf")):
+        # OG cards, logos, favicons, fonts — without this they're BYPASS.
+        response.headers["Cache-Control"] = _ASSET_CACHE
     return response
+
+
+# Compress on the way out. Cloudflare compresses for visitors, so the site
+# always *looked* fine, but nothing compressed the origin->edge hop and Railway
+# bills that hop uncompressed: the homepage left the container at 6.4MB instead
+# of 0.54MB, and with /data/latest.json (9.0MB raw) the two accounted for ~94%
+# of a ~98GB/month egress bill. StaticFiles never compresses on its own.
+# Registered LAST so it is the outermost middleware (add_middleware inserts at
+# index 0 and the stack is built inside-out), which puts it around both
+# _cache_headers and the StaticFiles mount.
+# compresslevel=6, not the library default of 9: measured on the real homepage,
+# 9 costs 2.1x the CPU of 6 to gain 6.6% (30.6ms/538KB vs 65.3ms/503KB).
+app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=6)
 
 # ---- data.json access (mtime-cached) -------------------------------------
 
@@ -889,10 +941,24 @@ def api_v1_graph():
 
 @app.get("/api/v1/agents")
 def api_v1_agents():
+    """The agent board. Agent-class rows only — see the note below.
+
+    The v1 stability promise is that fields are add-only. Returning a second
+    listing class here would change *which rows* the endpoint serves, not just
+    their fields, and this is the dominant machine channel (the MCP server
+    pulls and caches this board). Skills have their own rank space, so their
+    `rank` is not comparable with an agent's anyway. The complete multi-class
+    snapshot stays available at /data/latest.json.
+    """
     if not os.path.isfile(DATA_PATH):
         return JSONResponse({"error": "data not built yet"}, status_code=503)
     with open(DATA_PATH, encoding="utf-8") as f:
         data = json.load(f)
+    rows = data.get("agents")
+    if isinstance(rows, list):
+        data = {**data, "agents": [
+            r for r in rows if (r.get("listing_class") or "agent") == "agent"
+        ]}
     return JSONResponse(data, headers={
         "Cache-Control": _API_V1_CACHE,
         "Access-Control-Allow-Origin": _API_V1_CORS,
@@ -1058,7 +1124,13 @@ def api_v1_usage(hours: int = 24):
     machine_usage itself so the page cannot inflate what it reports.
     """
     hours = max(1, min(int(hours or 24), 168))
-    return JSONResponse(usage.snapshot(hours), headers={
+    # Copy: snapshot() hands back its own cached dict, and this response is
+    # per-request. The header widget on every page reads freshness AND activity
+    # from this one small, edge-cached response — it previously pulled the
+    # multi-megabyte /data/latest.json just to read this string.
+    payload = dict(usage.snapshot(hours))
+    payload["data_updated"] = load_data().get("updated")
+    return JSONResponse(payload, headers={
         # Short edge TTL: enough to absorb many viewers polling at once while
         # still feeling live. Matches the client poll interval.
         "Cache-Control": "public, max-age=10, s-maxage=10",
@@ -1219,13 +1291,21 @@ def favicon_svg():
     return FileResponse(os.path.join(BASE_DIR, "favicon.svg"), media_type="image/svg+xml")
 
 
-# Browsers auto-request these regardless of <link> tags; point them at the SVG
-# so they stop 404ing.
+# Crawlers auto-request these regardless of <link> tags, and Bing's favicon
+# fetcher in particular wants a real file at the root /favicon.ico convention —
+# a 301 to a different format is a known way to end up with a blank globe in the
+# results. Raster sources come from scripts/generate_favicons.py.
 @app.get("/favicon.ico")
+def favicon_ico():
+    return FileResponse(os.path.join(BASE_DIR, "favicon.ico"), media_type="image/x-icon")
+
+
 @app.get("/apple-touch-icon.png")
 @app.get("/apple-touch-icon-precomposed.png")
-def favicon_compat():
-    return RedirectResponse("/favicon.svg", status_code=301)
+def apple_touch_icon():
+    return FileResponse(
+        os.path.join(BASE_DIR, "apple-touch-icon.png"), media_type="image/png"
+    )
 
 
 @app.get("/haystack-logo.png")
@@ -1393,7 +1473,9 @@ def _marketing_page(
   <meta name="twitter:description" content="{escape(description)}">
   <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
   <meta name="twitter:image:alt" content="HVTracker AI trust registry preview">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/static/site.css">
   <style>
     :root {{
@@ -2507,7 +2589,12 @@ def _startup():
         # commit counts for its rows anyway; repair runs on the next boot.
         threading.Thread(target=_refresh_and_record, args=("pending", fingerprint, "startup"), daemon=True).start()
         print("[startup] detected provisional rows — kicked off pending refresh")
-    elif _has_missing_commit_rows():
+    elif os.environ.get("DISABLE_SCHEDULER") != "1" and _has_missing_commit_rows():
+        # Same DISABLE_SCHEDULER guard as the pending branch above. Without it
+        # pytest on a roster-add branch spawned a real, un-tokened fetch
+        # subprocess that outlived the suite in 403-retry loops (and raced
+        # pytest's own summary line out of the log). No production effect:
+        # DISABLE_SCHEDULER is set only by the tests and docker-compose.
         threading.Thread(target=_refresh_and_record, args=("repair-commits", fingerprint, "startup"), daemon=True).start()
         print("[startup] detected rows with missing commit counts — kicked off targeted repair refresh")
     elif seeded > 0 or stored_fingerprint != fingerprint or agents_changed:

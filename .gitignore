@@ -95,3 +95,9 @@ client_secret*.json
 ga_credentials.json
 ga_token.json
 ga_data.json
+
+# SSH keypair for `railway ssh` (see CLAUDE.md). Never commit, and never let it
+# into the `railway up` upload context — Dockerfile COPYs by filename so it
+# would not reach the image, but it would still transit to Railway's builder.
+/railway
+/railway.pub

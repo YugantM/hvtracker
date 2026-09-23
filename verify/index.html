@@ -104,7 +104,7 @@
 
     <a class="live-strip" id="live-strip" href="/live/" hidden>
       <span class="live-dot"></span>
-      <span><strong id="live-strip-n">—</strong> trust checks answered for AI agents in the last 24h</span>
+      <span><strong id="live-strip-n">—</strong><span id="live-strip-label"> trust checks answered for AI agents in the last 24h</span></span>
       <span class="go">see it live →</span>
     </a>
 
@@ -223,9 +223,15 @@
       function loadLiveStrip() {
         fetch('/api/v1/usage').then(function (r) { return r.json(); })
           .then(function (d) {
-            var n = d && d.window && d.window.tool_calls;
-            if (!n) return;  // nothing to brag about yet — leave it hidden
+            var w = (d && d.window) || {};
+            // Prefer answered tool calls; fall back to raw machine requests so
+            // the strip still shows real traffic before the first tool call of
+            // the day lands. Hidden only when both are genuinely zero.
+            var n = w.tool_calls || 0, label = ' trust checks answered for AI agents in the last 24h';
+            if (!n) { n = w.requests || 0; label = ' machine requests served in the last 24h'; }
+            if (!n) return;
             document.getElementById('live-strip-n').textContent = Number(n).toLocaleString();
+            document.getElementById('live-strip-label').textContent = label;
             document.getElementById('live-strip').hidden = false;
           })
           .catch(function () {});

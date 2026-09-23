@@ -71,21 +71,104 @@ REVIEWED_REJECTED = {
         "2026-07-14 owner: rejected — editor for running many Claude Code/Codex "
         "instances; supervisory harness"
     ),
+    # 2026-08-10 sweep. The 2026-08-06 batch (635557e5) reviewed 269 candidates
+    # and recorded its ~228 declines only in the commit message, so this sweep
+    # re-proposed all of them. Recording decisions here is the mechanism that
+    # stops that; see docs/research/new-listing-candidates-2026-08-10.md.
+    "generalaction/emdash": (
+        "2026-08-10 rejected — desktop app running Claude Code/Codex/OpenCode "
+        "in git worktrees; the #180 supervisory-harness class"
+    ),
+    "firerpa/lamda": (
+        "2026-08-10 rejected — Android automation/reverse-engineering framework "
+        "(frida, mitmproxy, ADB); agent support is incidental, predates agents"
+    ),
+    "bhouston/mycoder": (
+        "2026-08-10 rejected — real coding agent with its own tool system, but "
+        "214 days since last push; fails the activity requirement"
+    ),
+    "nikmcfly/mirofish-offline": (
+        "2026-08-10 rejected — self-declared fork of 666ghj/MiroFish; the "
+        "upstream is the canonical candidate and is now listed"
+    ),
+    "tastyeffectco/sandboxd": (
+        "2026-08-10 rejected — self-hosted AI app builder whose coding agent "
+        "does the work; the rubric excludes general UI app builders"
+    ),
+    # Adoption signals that do not survive inspection. Both would have entered
+    # the leaderboard on stars they did not earn.
+    "sv-number/mcp-server": (
+        "2026-08-10 rejected — 492 stars on a 3-day-old repo with 0 forks, 0 "
+        "watchers, 0 issues, 1 contributor and 71 KB of code; inorganic"
+    ),
+    "keon/browser-control": (
+        "2026-08-10 rejected — repo created 2016-12-21 with zero commits before "
+        "2025; the 3,127 stars belong to the repo's previous life, not this code"
+    ),
+    # 2026-08-26 discovery sweep — README-read verdicts (see agents-shortlist.json).
+    "makecindy/cindy": (
+        "2026-08-26 rejected — harness wrapper; README: 'the first supported "
+        "harnesses are Claude Code and Codex', the wrapped CLI does the work. "
+        "Same class as iofficeai/aionui (#180)"
+    ),
+    "simonlin1212/vibe-research": (
+        "2026-08-26 rejected — serves agents, isn't one; README says it 'never "
+        "recommends' and 'leaves an interface to plug in your own AI'. A trading "
+        "data dashboard, not an agent"
+    ),
+    "tsingyuai/growth-lab": (
+        "2026-08-26 not an agent — its own product model is 'Codex/Claude Code = "
+        "Runtime, Skill = method'; a Skills+client bundle running ON an external "
+        "runtime. Skill-class candidate, not the agent board"
+    ),
+    "pingdotgg/t3code": (
+        "2026-08-27 owner ruling (hold the boundary) — README: 'an agent harness "
+        "control surface', a mobile/web/desktop app to CONTROL Claude Code/Codex/"
+        "Cursor/Grok Build/OpenCode on your machine. Control-surface class with no "
+        "agent logic of its own; same boundary as aionui/cmux/cindy. Direct "
+        "analogs getpaseo/paseo, nanmicoder/cc-haha, milisp/codexia are the same class"
+    ),
 }
 
 # Topics to query (one request each)
+# GitHub topics are exact strings: `topic:ai-agent` does not match a repo
+# tagged `ai-agents`. That single missing plural made
+# deepseek-ai/deepseek-harness — 130k stars, MIT, first-party — unreachable by
+# every sweep, because its topics are ai-agents/cordis/dsh/dsh-plugin and its
+# description ("DeepSeek Harness: Everything is a Plugin.") matches no keyword
+# either. Measured 2026-08-16: the additions below reach 536 novel repos the
+# original list could not see. Add plurals whenever you add a singular.
 TOPICS = [
     "ai-agent",
+    "ai-agents",
     "coding-agent",
+    "coding-agents",
     "llm-agent",
+    "llm-agents",
     "autonomous-agent",
+    "autonomous-agents",
     "ai-coding-assistant",
     "agent-framework",
+    "ai-agent-framework",
+    "agent-harness",
+    "agent-orchestration",
     "multi-agent",
+    "multi-agent-systems",
     "agentic",
+    "agent-tools",
+    "agent-memory",
+    "mcp",
     "mcp-server",
     "mcp-servers",
+    "mcp-client",
+    "mcp-tools",
     "model-context-protocol",
+    "claude-code",
+    # Vendor-ecosystem topics. A first-party launch spawns its own tag before
+    # it adopts the generic ones — dsh/dsh-plugin appeared with the DeepSeek
+    # Harness release and held 46 repos within three days.
+    "dsh",
+    "dsh-plugin",
 ]
 
 # Keyword searches (description field)
@@ -94,6 +177,8 @@ KEYWORDS = [
     '"coding agent" in:description',
     '"autonomous agent" in:description',
     '"MCP server" in:description',
+    '"agent harness" in:description',
+    '"harness" in:description',
 ]
 
 MIN_STARS = 500

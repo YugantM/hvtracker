@@ -43,6 +43,10 @@ COPY agents.json template.html ./
 COPY --from=builder /build/scorecard-cache.json ./scorecard-cache.json
 COPY templates/ templates/
 COPY docs/import-candidates.json docs/import-candidates.json
+# Read by fetch_and_build.py at render time (compare-sitemap allowlist); without
+# it the render falls back to an empty allowlist and holds every compare pair
+# out of the sitemap.
+COPY compare_sitemap_allow.txt compare_sitemap_allow.txt
 COPY compare/index.html compare/index.html
 COPY verify/index.html verify/index.html
 COPY live/index.html live/index.html
@@ -51,7 +55,7 @@ COPY static/ static/
 COPY blog_static/ blog_static/
 COPY changelog/ changelog/
 COPY .well-known/ .well-known/
-COPY .nojekyll robots.txt analytics.js auth.js og-v2.png og-verify.png og-provenance.png og-mcp.png og-scan.png favicon.svg hex-bg.svg haystack-logo.png aipass-logo.png composio-logo.svg lightrag-logo.png threadplane-logo.png ./
+COPY .nojekyll robots.txt analytics.js auth.js og-v2.png og-verify.png og-provenance.png og-mcp.png og-scan.png favicon.svg favicon.ico apple-touch-icon.png hex-bg.svg haystack-logo.png aipass-logo.png composio-logo.svg lightrag-logo.png threadplane-logo.png ./
 # Homepage adopter-card avatars, served by the /adopters/{slug}.png route.
 COPY adopters/ adopters/
 # render_state.json — baked into the image so that newly-listed agents added

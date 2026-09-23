@@ -79,3 +79,65 @@ def test_published_pillar_maxes_match_what_scoring_can_emit():
         assert breakdown[key] == published_max, (
             f"{key}: scoring tops out at {breakdown[key]} but we publish / {published_max}")
     assert sum(mx for _lbl, mx in fab.TRUST_DIMENSIONS.values()) == 100
+
+
+def _render_pair(a, b):
+    """Render the real compare template so the shipped JSON-LD is what's tested."""
+    import os
+    from jinja2 import Environment, FileSystemLoader
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    env = Environment(loader=FileSystemLoader([os.path.join(root, "templates"), root]))
+    return env.get_template("compare_pair.html.j2").render(
+        a=a, b=b, category={"name": "Research & data", "slug": "research-data"},
+        metrics=[], dims=[], caps=[], total=418, updated="2026-08-10",
+        methodology_version="4.2", css_hash="abc", related=[],
+        lead_name=None, lead_score=None, lead_grade=None, trail_score=None,
+        trail_grade=None, gap=None, coverage_caveat=None)
+
+
+def _pair_row(**kw):
+    row = {"name": "Docling", "slug": "docling", "category": "Research & data",
+           "url": "https://github.com/docling-project/docling",
+           "description": "Document parsing toolkit", "trust_score": 88.6,
+           "evidence_grade": "A", "rank": 12, "coverage_grade": "B",
+           "stars_fmt": "1.2k", "trust_breakdown": {}, "license_spdx": "MIT"}
+    row.update(kw)
+    return row
+
+
+def _ld_blocks(html):
+    import json
+    import re
+    return [json.loads(m) for m in re.findall(
+        r'<script type="application/ld\+json">\s*(.*?)\s*</script>', html, re.S)]
+
+
+def test_pair_structured_data_survives_hostile_strings():
+    """Names really do carry ampersands ("Weights & Biases Weave", "MITRE
+    ATT&CK") and a description could carry a quote; the JSON-LD must still
+    parse rather than silently breaking the whole block."""
+    a = _pair_row(name="Weights & Biases Weave", slug="weights-biases-weave",
+                  description='Ships a "tracing" client & <hooks>')
+    b = _pair_row(name="MITRE ATT&CK", slug="mitre-attack", trust_score=74.2,
+                  evidence_grade="B", rank=99)
+    types = {b_["@type"]: b_ for b_ in _ld_blocks(_render_pair(a, b))}
+
+    assert "BreadcrumbList" in types, "breadcrumbs must survive the addition"
+    items = [e["item"] for e in types["ItemList"]["itemListElement"]]
+    assert [i["name"] for i in items] == ["Weights & Biases Weave", "MITRE ATT&CK"]
+    assert items[0]["description"] == 'Ships a "tracing" client & <hooks>'
+    assert [i["review"]["reviewRating"]["ratingValue"] for i in items] == [88.6, 74.2]
+    assert items[1]["review"]["url"] == "https://hvtracker.net/agents/mitre-attack/"
+
+
+def test_pair_structured_data_omits_review_for_unscored_rows():
+    """Provisional rows have no trust_score yet — emitting a rating of null (or
+    0) would be a false claim about the project."""
+    html = _render_pair(_pair_row(), _pair_row(name="New Agent", slug="new-agent",
+                                               trust_score=None, evidence_grade=None,
+                                               rank=None, description=None))
+    items = [e["item"] for e in
+             {b["@type"]: b for b in _ld_blocks(html)}["ItemList"]["itemListElement"]]
+    assert "review" in items[0]
+    assert "review" not in items[1], "unscored row must not carry a rating"
+    assert "description" not in items[1]

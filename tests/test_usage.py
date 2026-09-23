@@ -130,3 +130,22 @@ def test_hourly_series_is_zero_filled_across_the_window(tmp_path):
     assert [h["bucket"] for h in hourly] == sorted(h["bucket"] for h in hourly)
     assert hourly[-1]["tool_calls"] == 1, "current hour is last"
     assert all(h["tool_calls"] == 0 for h in hourly[:-1])
+
+
+def test_counting_since_reports_oldest_bucket(tmp_path):
+    """The page says when counting began, so totals aren't read as all history."""
+    _reset(tmp_path)
+    assert _fresh_snapshot()["counting_since"] is None  # nothing recorded yet
+    usage.bump("mcp", 2)
+    usage.flush()
+    since = _fresh_snapshot()["counting_since"]
+    assert since is not None and len(since) == 10 and since.count("-") == 2
+
+
+def test_hourly_series_carries_both_series(tmp_path):
+    """The chart plots requests and tool calls, so both must be per-hour."""
+    _reset(tmp_path)
+    usage.bump("mcp", 5)
+    usage.record_tool_call("search_agents")
+    last = _fresh_snapshot()["window"]["hourly"][-1]
+    assert last["requests"] == 5 and last["tool_calls"] == 1

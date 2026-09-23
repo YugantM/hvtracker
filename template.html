@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AI trust registry for open-source AI agent projects. Independent trust scores across activity, adoption, transparency, safety, and provenance using public, checkable signals.">
-  <title>AI Trust Registry For Open-Source AI Agent Projects | HVTracker</title>
+  {% include "_head_icons.html.j2" %}
+  <meta name="description" content="Independent trust scores and A–D grades for {{ total }} open-source AI agents, from public, checkable signals — supply-chain provenance, OSSF Scorecard, maintenance, and adoption. Check if an agent is safe.">
+  <title>{{ total }} AI Agents Ranked by Trust Score &amp; Grade | HVTracker</title>
   <meta name="google-site-verification" content="s2YUWbGP7cJsI6HUCKRX9YCtbVJVyA1Q1_jsNWj1RHc">
   <!-- Bing Webmaster Tools (also indexes for DuckDuckGo): paste token from bing.com/webmasters, then uncomment. -->
   <!-- <meta name="msvalidate.01" content="REPLACE_WITH_BING_TOKEN"> -->
   <link rel="canonical" href="https://hvtracker.net/">
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="alternate" type="application/feed+json" title="HVTracker — JSON Feed" href="/feed.json">
   <meta property="og:type" content="website">
   <meta property="og:title" content="AI Trust Registry — {{ total }} Open-Source AI Agent Projects | HVTracker">
@@ -232,11 +232,24 @@
     .dot-aging  { background: var(--amber); }
     .dot-stale  { background: #999; }
 
-    .cat-tabs { display: flex; gap: 0; flex-wrap: wrap; margin: 12px 0 0; border-bottom: 1px solid var(--border); }
+    /* Horizontal scroll strip: all categories fit on one line and scroll
+       instead of wrapping into a tall multi-row block. */
+    .cat-tabs {
+      display: flex; gap: 0; flex-wrap: nowrap; margin: 12px 0 0;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto; overflow-y: hidden;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+      -webkit-overflow-scrolling: touch;
+    }
+    .cat-tabs::-webkit-scrollbar { height: 6px; }
+    .cat-tabs::-webkit-scrollbar-track { background: transparent; }
+    .cat-tabs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .cat-tabs::-webkit-scrollbar-thumb:hover { background: var(--muted-2); }
     .cat-tabs + .table-wrap { margin-top: 0; }
     .cat-tab {
       appearance: none; cursor: pointer; background: none; border: none;
       border-bottom: 2px solid transparent; padding: 8px 14px; margin-bottom: -1px;
+      flex: 0 0 auto; white-space: nowrap;
       font-family: var(--font-sans); font-size: 12px; font-weight: 500; color: var(--muted);
       transition: color .15s, border-color .15s;
     }
@@ -245,6 +258,8 @@
     .cat-tab.special { color: var(--amber); margin: 0 4px 0 8px; }
     .cat-tab.special.active { color: var(--amber); border-bottom-color: var(--amber); }
     .cat-tab-badge { font-family: var(--font-mono); font-size: 11px; margin-left: 4px; color: inherit; }
+    .cat-tab-count { font-family: var(--font-mono); font-size: 11px; margin-left: 5px; color: var(--muted-2); }
+    .cat-tab.active .cat-tab-count { color: inherit; }
 
     .table-wrap { overflow-x: auto; border-top: 2px solid var(--text); }
 
@@ -573,7 +588,7 @@
 
     <section class="intro" aria-labelledby="intro-title">
       <h1 id="intro-title">AI Trust Registry for open-source AI agent projects.</h1>
-      <p>Independent trust scores for {{ total }} open-source AI agent projects, based on public, checkable signals across activity, adoption, transparency, safety, and provenance. How every point is earned is documented in the <a href="/methodology/" style="color:var(--accent);">methodology →</a></p>
+      <p>Independent trust scores for {{ total }} open-source AI agent projects{% if skill_count %} and <a href="/categories/agent-skills/" style="color:var(--accent);">{{ skill_count }} agent skills</a>{% endif %}, based on public, checkable signals across activity, adoption, transparency, safety, and provenance. How every point is earned is documented in the <a href="/methodology/" style="color:var(--accent);">methodology →</a></p>
       <div class="tool-strip" role="group" aria-label="Trust tools">
         <a href="/verify/" class="tool-chip home-verify-cta">
           <strong>Verify your agent or MCP server &rarr;</strong>
@@ -586,7 +601,7 @@
       </div>
       <a class="home-live" id="home-live" href="/live/" hidden>
         <span class="live-dot"></span>
-        <span><strong id="home-live-n">—</strong> trust checks answered for AI agents in the last 24h</span>
+        <span><strong id="home-live-n">—</strong><span id="home-live-label"> trust checks answered for AI agents in the last 24h</span></span>
         <span class="home-live-go">see it live &rarr;</span>
       </a>
       <div class="stats-bar" role="group" aria-label="Registry snapshot">
@@ -727,8 +742,12 @@
 
     <div class="cat-tabs" id="catTabs" role="group" aria-label="Category presets">
       <button class="cat-tab active" data-tab="__all__" aria-pressed="true">Global</button>
-      {% for cat in categories[:5] %}
-      <button class="cat-tab" data-tab="{{ cat.name }}" aria-pressed="false">{{ cat.name }}</button>
+      {# Every category gets a tab, biggest first — the strip scrolls
+         horizontally rather than wrapping, so the bar tracks what the registry
+         actually holds instead of a hand-fixed order. MCP Servers is the
+         largest and lands immediately after Global. #}
+      {% for cat in (categories|sort(attribute='count', reverse=true)) %}
+      <button class="cat-tab" data-tab="{{ cat.name }}" aria-pressed="false">{{ cat.name }} <span class="cat-tab-count">{{ cat.count }}</span></button>
       {% endfor %}
       {% if newly_added %}
       <button class="cat-tab special" data-tab="__new__" aria-pressed="false">Newly added <span class="cat-tab-badge">{{ newly_added|length }}</span></button>
@@ -950,8 +969,14 @@
       const catAllCb = document.getElementById("catAll");
       const catCbs = Array.from(document.querySelectorAll(".cat-cb"));
       const clearBtn = document.getElementById("catClear");
-      const totalCats = catCbs.length;
-      let selectedCats = new Set(catCbs.map(cb => cb.value));
+      // Categories holding a non-agent listing class (skills). Their rows are
+      // in the DOM so their tab works, but "Global" means every AGENT category
+      // — a skill ranked #3 in its own space must never sit next to an agent
+      // ranked #3 in the default board.
+      const skillCats = new Set({{ skill_categories|default([])|tojson }});
+      const defaultCats = catCbs.map(cb => cb.value).filter(v => !skillCats.has(v));
+      const totalCats = defaultCats.length;
+      let selectedCats = new Set(defaultCats);
       let selectedLicense = "all";
       let selectedTrust = new Set();
       let selectedSpecialTab = "__all__";
@@ -1014,7 +1039,7 @@
           const tab = t.dataset.tab;
           selectedSpecialTab = tab === "__new__" ? "__new__" : "__all__";
           selectedCats = tab === "__all__" || tab === "__new__"
-            ? new Set(catCbs.map(cb => cb.value))
+            ? new Set(defaultCats)
             : new Set([tab]);
           syncUI();
           updateFilterUrl();
@@ -1156,7 +1181,7 @@
       }
       if (urlParams.get("tab") === "new") {
         selectedSpecialTab = "__new__";
-        selectedCats = new Set(catCbs.map(cb => cb.value));
+        selectedCats = new Set(defaultCats);
       }
       if (urlParams.get("compare") === "historical") rankMode = "historical";
 
@@ -1222,7 +1247,11 @@
           const cat = row.dataset.category || "";
           const lic = row.dataset.license_type || "unlicensed";
           const matchesSearch = !searchTerm || name.includes(searchTerm) || repo.includes(searchTerm) || cat.toLowerCase().includes(searchTerm);
-          const matchesCat = allSelected || selectedCats.has(cat);
+          // Membership only — no `allSelected ||` shortcut. "Global" selects
+          // every AGENT category, so short-circuiting on "all selected" would
+          // wave skill rows through and float their per-class #1-#8 to the top
+          // of the default board.
+          const matchesCat = selectedCats.has(cat);
           const matchesLic = selectedLicense === "all" || lic === selectedLicense;
           const matchesTrust = matchesTrustFilters(row);
           const matchesNew = selectedSpecialTab !== "__new__" || row.dataset.newlyAdded === "1";
@@ -1482,7 +1511,7 @@
 
       clearBtn.addEventListener("click", () => {
         selectedSpecialTab = "__all__";
-        selectedCats = new Set(catCbs.map(cb => cb.value));
+        selectedCats = new Set(defaultCats);
         selectedLicense = "all";
         selectedTrust = new Set();
         licRadios.forEach(r => { r.checked = r.value === "all"; });
@@ -1589,9 +1618,14 @@
       fetch("/api/v1/usage")
         .then(function (r) { return r.json(); })
         .then(function (d) {
-          var n = d && d.window && d.window.tool_calls;
+          var w = (d && d.window) || {};
+          // Fall back to raw machine requests so the strip shows real traffic
+          // before the day's first tool call; hidden only if both are zero.
+          var n = w.tool_calls || 0, label = " trust checks answered for AI agents in the last 24h";
+          if (!n) { n = w.requests || 0; label = " machine requests served in the last 24h"; }
           if (!n) return;
           document.getElementById("home-live-n").textContent = Number(n).toLocaleString();
+          document.getElementById("home-live-label").textContent = label;
           document.getElementById("home-live").hidden = false;
         })
         .catch(function () {});

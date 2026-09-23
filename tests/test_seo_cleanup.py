@@ -13,7 +13,9 @@ changes agent pages), then once more after doctoring seo_state.json with
 sentinel dates and a fabricated below-top-3 pair.
 """
 import glob
+import re
 import importlib
+import itertools
 import json
 import os
 import shutil
@@ -87,8 +89,13 @@ def site():
         with open(os.path.join(tmp, "data", "render_state.json"), encoding="utf-8") as f:
             rows = json.load(f)["rows"]
 
-    # Fabricate a persisted pair no current top-3 combination produces:
-    # category leader vs the category's #4.
+    # Fabricate a persisted pair the current generation rule does NOT produce,
+    # so the re-render can only keep it via seo_state persistence.
+    #
+    # Derived from the published set rather than a fixed rank index: this used
+    # to hardcode "leader vs #4", which silently stopped fabricating anything
+    # the moment the rule widened past top-3 (every such pair became published,
+    # so there was nothing left to test persistence with).
     published = {tuple(p) for p in state1.get("published_compare_pairs", [])}
     by_cat = defaultdict(list)
     for r in rows:
@@ -97,12 +104,14 @@ def site():
     fabricated = None
     for rs in by_cat.values():
         rs.sort(key=lambda x: x.get("category_rank") or 9999)
-        if len(rs) >= 4:
-            pair = tuple(sorted((rs[0]["slug"], rs[3]["slug"])))
+        for a, b in itertools.combinations(rs, 2):
+            pair = tuple(sorted((a["slug"], b["slug"])))
             if pair not in published:
                 fabricated = pair
                 break
-    assert fabricated, "need a category with >=4 agents to fabricate a pair"
+        if fabricated:
+            break
+    assert fabricated, "need one same-category pair outside the current generation rule"
 
     doctored = json.loads(json.dumps(state1))
     doctored["published_compare_pairs"].append(list(fabricated))
@@ -144,13 +153,35 @@ def client(site):
         yield c
 
 
-def test_persisted_pair_survives_rank_shuffle(site):
+def test_persisted_pair_survives_rank_shuffle(site, client):
     a, b = site["fabricated"]
     page = os.path.join(site["tmp"], "compare", f"{a}-vs-{b}", "index.html")
     assert os.path.isfile(page), "persisted pair was not re-rendered"
+    # The invariant is anti-404, not sitemap membership: a rank shuffle must
+    # never make an already-indexed compare URL 404. The page stays rendered
+    # and serves 200 even when the crawl-budget policy holds it OUT of the
+    # sitemap (see test_compare_sitemap_prunes_unproven) — the fabricated pair
+    # has no impressions, so it is reachable via internal links, not the
+    # sitemap. Sitemap presence is asserted for proven/wave pairs, not here.
+    r = client.get(f"/compare/{a}-vs-{b}/", follow_redirects=False)
+    assert r.status_code == 200
+
+
+def test_compare_sitemap_prunes_unproven(site):
+    """Crawl-budget policy: the sitemap advertises far fewer compare pairs than
+    are generated on disk — proven pairs (compare_sitemap_allow.txt) plus a
+    bounded wave — while every generated pair stays on disk (reachable)."""
+    compare_root = os.path.join(site["tmp"], "compare")
+    on_disk = {d for d in os.listdir(compare_root)
+               if "-vs-" in d and os.path.isdir(os.path.join(compare_root, d))}
     with open(os.path.join(site["tmp"], "sitemap.xml"), encoding="utf-8") as f:
         sitemap = f.read()
-    assert f"https://hvtracker.net/compare/{a}-vs-{b}/" in sitemap
+    in_sitemap = set(re.findall(r"/compare/([a-z0-9.-]+-vs-[a-z0-9.-]+)/", sitemap))
+    # Something is generated and something is advertised...
+    assert on_disk and in_sitemap
+    # ...but the sitemap is a strict, meaningfully smaller subset of disk.
+    assert in_sitemap <= on_disk
+    assert len(in_sitemap) < len(on_disk)
 
 
 def test_published_pairs_grow_monotonically(site):
@@ -201,6 +232,17 @@ def test_retired_section_redirects(client):
     r = client.get("/org/i-am-bee/", follow_redirects=False)
     assert r.status_code == 301
     assert r.headers["location"] == "/org/"
+
+
+def test_double_slash_collapses_to_canonical(site, client):
+    # /agents/<slug>// used to serve 200 (a duplicate of the single-slash
+    # canonical). It must 301 to the collapsed path so each page has one URL.
+    slug = site["fabricated"][0]  # a real agent slug present in this render
+    r = client.get(f"/agents/{slug}//", follow_redirects=False)
+    assert r.status_code == 301
+    assert r.headers["location"] == f"https://hvtracker.net/agents/{slug}/"
+    # A single trailing slash is already canonical and must NOT redirect.
+    assert client.get(f"/agents/{slug}/", follow_redirects=False).status_code == 200
 
 
 def test_retired_agent_pages_are_410(client):

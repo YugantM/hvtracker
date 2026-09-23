@@ -272,6 +272,17 @@ def usage_totals() -> dict[str, int] | None:
         return {row[0]: int(row[1] or 0) for row in cur.fetchall()}
 
 
+def usage_oldest_bucket() -> str | None:
+    """Timestamp of the earliest rollup bucket, for the "counting since" line."""
+    if not enabled():
+        return None
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute("SELECT to_char(MIN(bucket), 'YYYY-MM-DD\"T\"HH24:00:00\"Z\"') "
+                    "FROM usage_hourly")
+        row = cur.fetchone()
+        return row[0] if row else None
+
+
 def usage_series(hours: int = 24) -> list[dict] | None:
     """Per-hour counts for the last `hours`, oldest first. None when disabled."""
     if not enabled():
