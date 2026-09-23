@@ -639,8 +639,21 @@ def test_robots_txt_blocks_crawl_waste(client):
     for rule in ("Disallow: /auth/", "Disallow: /track/",
                  "Disallow: /login", "Disallow: /data/agents/"):
         assert rule in star_group
-    # AI-crawler groups keep their own Allow: / and inherit no * rules.
-    assert "User-agent: GPTBot\nAllow: /" in r.text
+    # AI crawlers share ONE group (consecutive User-agent lines): welcome to
+    # all content, but they skip the crawl traps a `*` rule can't reach them for.
+    ai_group = r.text.split("User-agent: GPTBot")[1].split("Sitemap:")[0]
+    for ua in ("OAI-SearchBot", "ClaudeBot", "PerplexityBot", "Google-Extended", "CCBot"):
+        assert f"User-agent: {ua}" in ai_group
+    rules = [ln for ln in ai_group.splitlines() if ln and not ln.startswith(("#", "User-agent:"))]
+    assert rules[0] == "Allow: /"
+    for rule in ("Disallow: /auth/", "Disallow: /track/", "Disallow: /login",
+                 "Disallow: /compare/?a=", "Disallow: /badge/"):
+        assert rule in rules
+    # Per-agent JSON stays citable for assistants.
+    assert "Disallow: /data/agents/" not in rules
+    # No rule lines between the User-agent lines — otherwise it's many groups.
+    ua_lines = [i for i, ln in enumerate(ai_group.splitlines()) if ln.startswith("User-agent:")]
+    assert ua_lines == list(range(ua_lines[0], ua_lines[0] + len(ua_lines)))
 
 
 def test_compare_fallback_is_noindex_but_static_pairs_index(client):
