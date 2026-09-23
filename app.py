@@ -975,6 +975,11 @@ def api_v1_agents():
 # surface per docs/open-core.md ("90-day public history: Yes ... Extended
 # history: paid"); this endpoint never serves beyond it.
 _HISTORY_PUBLIC_DAYS = 90
+# Snapshots never served as history: 2026-09-21 holds 441 rows ranked among
+# themselves (production briefly ran main's stale roster). Mirrors
+# fetch_and_build.PARTIAL_SNAPSHOT_DATES — inlined to keep the generator out
+# of the web process; tests/test_partial_snapshots.py keeps the two equal.
+_PARTIAL_SNAPSHOT_DATES = frozenset({"2026-09-21"})
 # Per-day public fields — the subset already public on the agent page and
 # the CC BY 4.0 dataset export. NOT the full snapshot row.
 _HISTORY_PUBLIC_FIELDS = (
@@ -995,35 +1000,10 @@ def api_v1_agent_history(slug: str):
         return JSONResponse({"error": "agent not found"}, status_code=404,
                             headers={"Access-Control-Allow-Origin": _API_V1_CORS})
     repo_key = (agent.get("repo") or "").lower()
-    hist_dir = os.path.join(OUTPUT_DIR, "output", "history")
-    cutoff = (datetime.now(timezone.utc).date()
-              - timedelta(days=_HISTORY_PUBLIC_DAYS - 1)).isoformat()
-
-    entries = []
-    if os.path.isdir(hist_dir):
-        for fn in sorted(os.listdir(hist_dir)):
-            if not (len(fn) == 15 and fn.endswith(".json")):
-                continue
-            date_str = fn[:-5]
-            if date_str < cutoff:
-                continue  # outside the public window
-            try:
-                with open(os.path.join(hist_dir, fn), encoding="utf-8") as f:
-                    snap = json.load(f)
-            except (OSError, json.JSONDecodeError):
-                continue
-            mv = snap.get("methodology_version")
-            for a in snap.get("agents", []):
-                if (a.get("repo") or "").lower() != repo_key:
-                    continue
-                point = {"date": date_str}
-                for k in _HISTORY_PUBLIC_FIELDS:
-                    if k == "methodology_version":
-                        point[k] = a.get(k, mv)
-                    elif k in a:
-                        point[k] = a[k]
-                entries.append(point)
-                break
+    # The shared, mtime-cached index behind the MCP get_agent_history tool.
+    # This endpoint used to re-parse every daily snapshot (~5 MB each, up to
+    # 90) on every request: ~4 s per call, and /api/* isn't edge-cached.
+    entries = mcp_server._get_history_index().get(repo_key, [])
 
     return JSONResponse({
         "slug": agent.get("slug"),

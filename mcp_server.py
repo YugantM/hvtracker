@@ -912,7 +912,12 @@ def _get_history_index() -> dict:
     cached by the history dir's mtime."""
     import os
 
-    from app import OUTPUT_DIR, _HISTORY_PUBLIC_DAYS, _HISTORY_PUBLIC_FIELDS
+    from app import (
+        OUTPUT_DIR,
+        _HISTORY_PUBLIC_DAYS,
+        _HISTORY_PUBLIC_FIELDS,
+        _PARTIAL_SNAPSHOT_DATES,
+    )
     hist_dir = os.path.join(OUTPUT_DIR, "output", "history")
     if not os.path.isdir(hist_dir):
         return {}
@@ -932,7 +937,7 @@ def _get_history_index() -> dict:
         if not (len(fn) == 15 and fn.endswith(".json")):
             continue
         date_str = fn[:-5]
-        if date_str < cutoff:
+        if date_str < cutoff or date_str in _PARTIAL_SNAPSHOT_DATES:
             continue
         try:
             with open(os.path.join(hist_dir, fn), encoding="utf-8") as f:

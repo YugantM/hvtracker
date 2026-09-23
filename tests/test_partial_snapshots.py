@@ -76,3 +76,10 @@ def test_board_churn_still_fires_for_real_rows():
              "agents": [{"repo": f"o/r{i}", "rank": i} for i in range(1, 41)]}
     rows = [{"repo": f"o/r{i}", "rank": 41 - i, "trust_score": 50.0} for i in range(1, 41)]
     assert any("mass churn" in v for v in fb.check_board_invariants(rows, prior))
+
+
+def test_web_process_copy_of_partial_dates_matches_the_generator():
+    # app.py inlines the list to keep fetch_and_build out of the web process;
+    # the public history API must skip exactly the days the site skips.
+    import app
+    assert app._PARTIAL_SNAPSHOT_DATES == fb.PARTIAL_SNAPSHOT_DATES
