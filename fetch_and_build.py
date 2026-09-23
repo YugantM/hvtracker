@@ -4490,6 +4490,148 @@ def compare_coverage_caveat(lead_row: dict, trail_row: dict) -> str | None:
             f"(coverage {lg} vs {tg}) — its score rests on fewer independent signal types.")
 
 
+# How a lead on each trust dimension reads in a sentence ("X leads on …",
+# "Choose X if … matters most").
+_DIM_PHRASE = {
+    "safety": "supply-chain integrity",
+    "identity": "provenance",
+    "transparency": "transparency",
+    "maintenance": "maintenance",
+    "adoption": "adoption",
+}
+# Scale for the runtime-calibration bar: the adjustment spans about -10..+6.
+_CALIBRATION_SCALE = 10.0
+# Leads smaller than this still get a bar, but are not offered as a reason to
+# choose one side.
+_DECISIVE_LEAD = 0.5
+
+
+def _and_join(items: list[str]) -> str:
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
+
+
+def _fmt_count(v) -> str:
+    if v >= 1_000_000:
+        return f"{v / 1_000_000:.1f}M"
+    if v >= 1000:
+        return f"{v / 1000:.1f}k".replace(".0k", "k")
+    return str(v)
+
+
+def _dim_evidence(key: str, me: dict, other: dict) -> str:
+    """The concrete signal behind a dimension lead, e.g. '15.3M weekly
+    downloads against 58k'. Only a signal that favours `me` is cited; empty
+    when none explains the lead on its own."""
+    if key == "adoption":
+        md, od = me.get("weekly_downloads"), other.get("weekly_downloads")
+        if md and od and md > od:
+            return f"{_fmt_count(md)} weekly downloads against {_fmt_count(od)}"
+        ms, os_ = me.get("stars"), other.get("stars")
+        if ms and os_ and ms > os_:
+            return f"{_fmt_count(ms)} GitHub stars against {_fmt_count(os_)}"
+    if key in ("safety", "transparency"):
+        ms, os_ = me.get("signed_commits_pct"), other.get("signed_commits_pct")
+        if key == "safety" and ms is not None and os_ is not None and ms > os_:
+            return f"{ms}% of recent commits signed, against {os_}%"
+        ms, os_ = me.get("scorecard_score"), other.get("scorecard_score")
+        if ms is not None and os_ is not None and ms > os_:
+            return f"OSSF Scorecard {ms:.1f} against {os_:.1f}"
+        if key == "transparency" and me.get("license_spdx") and not other.get("license_spdx"):
+            return f"{me['license_spdx']} license, against none declared"
+    if key in ("identity", "safety") and me.get("has_provenance") and not other.get("has_provenance"):
+        return "package provenance attested, against none"
+    if key == "maintenance":
+        md, od = me.get("days_ago"), other.get("days_ago")
+        if md is not None and od is not None and md < od:
+            ago = lambda d: "today" if d == 0 else f"{d}d ago"  # noqa: E731
+            return f"last push {ago(md)}, against {ago(od)}"
+    return ""
+
+
+def compare_decision(a: dict, b: dict) -> dict | None:
+    """Decision view for a static compare pair (plan 2.4): a one-line verdict,
+    a "choose this if" case for each side built only from where it actually
+    leads, and the dimensions that differ (identical ones folded into one
+    line). None when either side has no score yet."""
+    a_s, b_s = a.get("trust_score"), b.get("trust_score")
+    if a_s is None or b_s is None:
+        return None
+    abk, bbk = a.get("trust_breakdown") or {}, b.get("trust_breakdown") or {}
+
+    diffs, same = [], []
+    leads = {"a": [], "b": []}  # (delta, key, point) per side
+    for key, (label, mx) in TRUST_DIMENSIONS.items():
+        av, bv = abk.get(key), bbk.get(key)
+        if av is None or bv is None:
+            continue
+        delta = round(av - bv, 1)
+        if abs(delta) < 0.1:
+            same.append({"label": label.split(" /")[0], "value": f"{av:.1f}"})
+            continue
+        side, me, other = ("a", a, b) if delta > 0 else ("b", b, a)
+        diffs.append({"label": label, "a": f"{av:.1f}", "b": f"{bv:.1f}", "lead": side,
+                      "delta": f"+{abs(delta):.1f}", "pct": round(min(100.0, abs(delta) / mx * 100), 1)})
+        if abs(delta) < _DECISIVE_LEAD:
+            continue
+        evidence = _dim_evidence(key, me, other)
+        leads[side].append((abs(delta), key, {
+            "delta": f"+{abs(delta):.1f}",
+            "text": f"{label}: {evidence}" if evidence else label}))
+
+    aa, ba = a.get("trust_v2_adjustment"), b.get("trust_v2_adjustment")
+    if aa is not None and ba is not None and round(aa - ba, 1) != 0:
+        delta = round(aa - ba, 1)
+        side = "a" if delta > 0 else "b"
+        diffs.append({"label": "Runtime calibration", "a": f"{aa:+.1f}", "b": f"{ba:+.1f}", "lead": side,
+                      "delta": f"+{abs(delta):.1f}",
+                      "pct": round(min(100.0, abs(delta) / _CALIBRATION_SCALE * 100), 1)})
+
+    ag, bg = a.get("coverage_grade"), b.get("coverage_grade")
+    broader = None
+    if ag and bg and _GRADE_VAL.get(ag, 0) != _GRADE_VAL.get(bg, 0):
+        broader = "a" if _GRADE_VAL.get(ag, 0) > _GRADE_VAL.get(bg, 0) else "b"
+
+    sides = []
+    for side, me, other in (("a", a, b), ("b", b, a)):
+        ranked = sorted(leads[side], key=lambda t: -t[0])
+        points = [p for _d, _k, p in ranked]
+        phrases = [_DIM_PHRASE[k] for _d, k, _p in ranked]
+        if broader == side:
+            points.append({
+                "delta": f"{me['coverage_grade']} vs {other['coverage_grade']}",
+                "text": (f"Evidence coverage: {me.get('signal_types')} of 5 independent signal types, "
+                         f"against {other.get('signal_types')}")})
+        top = phrases[:2] or (["breadth of evidence"] if broader == side else [])
+        choose_if = (f"Choose {me['name']} if {_and_join(top)} "
+                     f"{'matter' if len(top) > 1 else 'matters'} most.") if top else None
+        sides.append({"row": me, "choose_if": choose_if, "points": points[:4],
+                      "phrases": phrases, "broader": broader == side})
+
+    gap = round(abs(a_s - b_s), 1)
+    ga, gb = a.get("evidence_grade"), b.get("evidence_grade")
+    if gap == 0:
+        verdict = f"Both score {a_s:.1f}/100, so choose on what you weigh most."
+    elif ga == gb and gap < 5:
+        verdict = f"Both are Grade {ga} and {gap} points apart, so choose on what you weigh most."
+    else:
+        hi, lo = (a, b) if a_s > b_s else (b, a)
+        verdict = (f"{hi['name']} leads on trust: {hi['trust_score']:.1f}/100 (Grade {hi.get('evidence_grade')}) "
+                   f"against {lo['trust_score']:.1f}/100 (Grade {lo.get('evidence_grade')}), a {gap}-point gap.")
+    clauses = []
+    for s in sides:
+        bits = []
+        if s["phrases"]:
+            bits.append(f"leads on {_and_join(s['phrases'][:2])}")
+        if s["broader"]:
+            bits.append("rests on broader evidence")
+        if bits:
+            glue = ", and " if " and " in bits[0] else " and "
+            clauses.append(f"{s['row']['name']} {glue.join(bits)}")
+    if clauses:
+        verdict += " " + "; ".join(clauses) + "."
+    return {"verdict": verdict, "sides": sides, "diffs": diffs, "same": same}
+
+
 EXPORT_CSV_FIELDS = [
     "rank", "display_rank", "slug", "name", "repo", "category",
     "trust_score", "evidence_grade", "coverage_grade", "trust_confidence",
@@ -7504,7 +7646,7 @@ def main() -> None:
                  for lbl, k in (("Safety / integrity", "safety"), ("Identity & provenance", "identity"),
                                 ("Transparency", "transparency"), ("Maintenance", "maintenance"), ("Adoption", "adoption"))]
         _ctx = {"a": _a, "b": _b, "category": _cm, "metrics": _metrics, "dims": _dims,
-                "caps": compare_capability_rows(_a, _b), "total": len(rows),
+                "caps": compare_capability_rows(_a, _b), "decision": compare_decision(_a, _b), "total": len(rows),
                 "updated": now_str, "methodology_version": METHODOLOGY_VERSION,
                 "lead_name": None, "lead_score": None, "lead_grade": None, "trail_score": None, "trail_grade": None, "gap": None,
                 "coverage_caveat": None}

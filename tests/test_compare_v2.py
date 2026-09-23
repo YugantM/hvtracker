@@ -81,7 +81,7 @@ def test_published_pillar_maxes_match_what_scoring_can_emit():
     assert sum(mx for _lbl, mx in fab.TRUST_DIMENSIONS.values()) == 100
 
 
-def _render_pair(a, b):
+def _render_pair(a, b, decision=None):
     """Render the real compare template so the shipped JSON-LD is what's tested."""
     import os
     from jinja2 import Environment, FileSystemLoader
@@ -92,7 +92,7 @@ def _render_pair(a, b):
         metrics=[], dims=[], caps=[], total=418, updated="2026-08-10",
         methodology_version="4.2", css_hash="abc", related=[],
         lead_name=None, lead_score=None, lead_grade=None, trail_score=None,
-        trail_grade=None, gap=None, coverage_caveat=None)
+        trail_grade=None, gap=None, coverage_caveat=None, decision=decision)
 
 
 def _pair_row(**kw):
@@ -141,3 +141,59 @@ def test_pair_structured_data_omits_review_for_unscored_rows():
     assert "review" in items[0]
     assert "review" not in items[1], "unscored row must not carry a rating"
     assert "description" not in items[1]
+
+
+def _dv_row(name, score, grade, bk, **kw):
+    row = {"name": name, "slug": name.lower(), "trust_score": score, "evidence_grade": grade,
+           "trust_breakdown": bk}
+    row.update(kw)
+    return row
+
+
+_BK = {"safety": 15.0, "identity": 18.0, "transparency": 13.6, "maintenance": 19.9, "adoption": 20.0}
+
+
+def test_decision_verdict_close_same_grade_vs_clear_gap():
+    a = _dv_row("Codex", 90.0, "A", _BK)
+    b = _dv_row("Qwen", 87.9, "A", dict(_BK, safety=18.2, adoption=17.0))
+    assert fab.compare_decision(a, b)["verdict"].startswith(
+        "Both are Grade A and 2.1 points apart, so choose on what you weigh most.")
+    c = _dv_row("Low", 62.0, "C", dict(_BK, adoption=2.0))
+    assert fab.compare_decision(a, c)["verdict"].startswith(
+        "Codex leads on trust: 90.0/100 (Grade A) against 62.0/100 (Grade C), a 28.0-point gap.")
+
+
+def test_decision_folds_identical_dimensions_and_skips_tiny_leads():
+    a = _dv_row("A", 80.0, "A", _BK)
+    b = _dv_row("B", 79.9, "B", dict(_BK, maintenance=19.8, adoption=18.0))
+    d = fab.compare_decision(a, b)
+    assert [x["label"] for x in d["same"]] == ["Safety", "Identity", "Transparency"]
+    # Maintenance differs by 0.1: it gets a bar, but it is not a reason to choose.
+    assert [x["label"] for x in d["diffs"]] == ["Maintenance", "Adoption"]
+    assert d["sides"][0]["choose_if"] == "Choose A if adoption matters most."
+    assert d["sides"][1]["choose_if"] is None
+
+
+def test_decision_evidence_only_cites_signals_that_favour_the_leader():
+    """Composio led adoption on stars while having FEWER downloads — the
+    point must cite stars, never "41.9k downloads against 214.2k"."""
+    a = _dv_row("Composio", 74.6, "B", dict(_BK, adoption=16.9),
+                weekly_downloads=41_900, stars=30_300)
+    b = _dv_row("mcp-proxy", 73.7, "B", dict(_BK, adoption=15.4),
+                weekly_downloads=214_200, stars=2_800)
+    point = fab.compare_decision(a, b)["sides"][0]["points"][0]
+    assert point == {"delta": "+1.5", "text": "Adoption: 30.3k GitHub stars against 2.8k"}
+
+
+def test_decision_needs_both_scores():
+    assert fab.compare_decision(_dv_row("A", 80.0, "A", _BK), _dv_row("B", None, None, {})) is None
+
+
+def test_decision_view_renders_above_the_evidence_table():
+    a = _pair_row(name="Codex", slug="codex", trust_breakdown=_BK, repo="openai/codex")
+    b = _pair_row(name="Qwen", slug="qwen", trust_score=87.9, repo="QwenLM/qwen-code",
+                  trust_breakdown=dict(_BK, safety=18.2, adoption=17.0))
+    html = _render_pair(a, b, decision=fab.compare_decision(a, b))
+    assert html.index("Choose Codex if") < html.index('id="evidence"') < html.index('<table class="cmp">')
+    assert "Where they differ" in html
+    assert len(_ld_blocks(html)) == 2  # both JSON-LD blocks still parse
