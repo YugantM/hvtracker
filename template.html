@@ -518,6 +518,7 @@
     .adopter-card:hover { border-color: var(--accent-warm); }
     .adopter-head { display: flex; align-items: center; gap: 9px; min-width: 0; }
     .adopter-avatar { width: 34px; height: 34px; border-radius: 6px; flex: none; border: 1px solid var(--border); object-fit: cover; background: var(--bg); }
+    .adopter-mono { display: inline-flex; align-items: center; justify-content: center; font: 700 14px var(--font-mono); color: var(--muted); }
     .adopter-repo { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.2; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
     .adopter-owner { color: var(--muted); font-weight: 400; }
     .adopter-desc { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
@@ -799,12 +800,12 @@
     </section>
 
     <section class="adopters" aria-label="Projects carrying the HVTracker badge">
-      <div class="featured-footer-label">Projects carrying the HVTracker badge</div>
+      <div class="featured-footer-label">Projects carrying the HVTracker badge · <a href="/adopters/">All adopters &rarr;</a></div>
       <div class="adopter-grid">
         {% for a in adopters | default([]) %}
         <a class="adopter-card" href="/agents/{{ a.slug }}/" title="{{ a.name }} trust scorecard">
           <span class="adopter-head">
-            <img class="adopter-avatar" src="/adopters/{{ a.slug }}.png?v=20260917" alt="" width="34" height="34" loading="lazy" decoding="async">
+            {% if a.avatar %}<img class="adopter-avatar" src="/adopters/{{ a.slug }}.png?v=20260917" alt="" width="34" height="34" loading="lazy" decoding="async">{% else %}<span class="adopter-avatar adopter-mono" aria-hidden="true">{{ a.display_name[:1] | upper }}</span>{% endif %}
             <span class="adopter-repo"><span class="adopter-owner">{{ a.owner }}/</span>{{ a.name }}</span>
           </span>
           <span class="adopter-desc">{{ a.desc }}</span>

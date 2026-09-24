@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-auto">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% include "_head_icons.html.j2" %}
+  <meta name="google-site-verification" content="s2YUWbGP7cJsI6HUCKRX9YCtbVJVyA1Q1_jsNWj1RHc">
+  <title>Projects Publishing Their HVTrust Score | HVTracker</title>
+  <meta name="description" content="{{ adopters|length }} open-source AI projects, including {{ adopters[0].display_name }} and {{ adopters[1].display_name }}, embed the HVTrust badge in their README: a live, independent trust score that links straight to the evidence.">
+  <link rel="canonical" href="https://hvtracker.net/adopters/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Projects Publishing Their HVTrust Score | HVTracker">
+  <meta property="og:description" content="Open-source AI projects that show a live, independent HVTrust score in their own README.">
+  <meta property="og:url" content="https://hvtracker.net/adopters/">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Badges", "item": "https://hvtracker.net/badges/" },
+      { "@type": "ListItem", "position": 3, "name": "Adopters" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Projects publishing their HVTrust score",
+    "numberOfItems": {{ adopters|length }},
+    "itemListElement": [
+      {%- for a in adopters %}
+      { "@type": "ListItem", "position": {{ loop.index }}, "name": {{ a.display_name | tojson }}, "url": "https://hvtracker.net/agents/{{ a.slug }}/" }{{ "," if not loop.last }}
+      {%- endfor %}
+    ]
+  }
+  </script>
+  <link rel="stylesheet" href="/static/site.css?v={{ css_hash }}">
+  <style>
+    .page { max-width: 900px; padding: 0 24px 52px; }
+    .ad-hero { padding: 28px 0 8px; }
+    .ad-hero h1 { font-size: 30px; line-height: 1.15; letter-spacing: -.4px; }
+    .ad-hero p { color: var(--muted); font-size: 16px; line-height: 1.6; margin-top: 10px; max-width: 680px; }
+    .ad-note { margin: 16px 0 22px; padding: 12px 14px; border-left: 3px solid var(--accent); background: var(--surface); font-size: 14px; line-height: 1.55; max-width: 720px; }
+    .ad-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .ad-card { border: 1px solid var(--border); background: var(--card); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .ad-head { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .ad-avatar, .ad-mono { width: 38px; height: 38px; border-radius: 8px; flex: none; }
+    .ad-mono { display: inline-flex; align-items: center; justify-content: center; background: var(--surface); border: 1px solid var(--border); font: 700 16px var(--font-mono); color: var(--muted); }
+    .ad-name { font-weight: 700; font-size: 15px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ad-owner { display: block; font: 12px var(--font-mono); color: var(--muted); }
+    .ad-desc { font-size: 13.5px; line-height: 1.45; color: var(--muted); }
+    .ad-score { display: flex; align-items: baseline; gap: 8px; font-family: var(--font-mono); }
+    .ad-score b { font-size: 20px; font-variant-numeric: tabular-nums; }
+    .ad-rank { margin-left: auto; font-size: 12px; color: var(--muted); }
+    .ad-links { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; margin-top: auto; }
+    .ad-links a { color: var(--accent); }
+    .ad-add { margin-top: 34px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .ad-add h2 { font-size: 18px; margin-bottom: 8px; }
+    .ad-add p { color: var(--muted); font-size: 14.5px; line-height: 1.6; max-width: 680px; }
+    .ad-add pre { margin: 12px 0; padding: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; overflow-x: auto; font: 13px var(--font-mono); }
+    @media (max-width: 640px) { .ad-hero h1 { font-size: 24px; } }
+  </style>
+</head>
+<body data-page-type="adopters">
+  {% include "_site_header.html.j2" %}
+  <main class="page" id="main">
+    <section class="ad-hero">
+      <h1>Projects that publish their HVTrust score</h1>
+      <p>These {{ adopters|length }} open-source projects embed the HVTrust badge in their own README, so anyone evaluating them sees a live, independent trust score that links straight to the evidence behind it.</p>
+    </section>
+    <p class="ad-note"><strong>Adopting the badge doesn't change a score.</strong> Every project, adopter or not, is scored by the same <a href="/methodology/">public methodology</a> from checkable signals, and a badge only links to the live result. We re-check each README weekly and remove a project from this page when its badge comes down.</p>
+
+    <div class="ad-grid">
+      {% for a in adopters %}
+      <article class="ad-card">
+        <div class="ad-head">
+          {% if a.avatar %}<img class="ad-avatar" src="/adopters/{{ a.slug }}.png?v=20260917" alt="" width="38" height="38" loading="lazy" decoding="async">{% else %}<span class="ad-mono" aria-hidden="true">{{ a.display_name[:1] | upper }}</span>{% endif %}
+          <div style="min-width:0">
+            <div class="ad-name">{{ a.display_name }}</div>
+            <span class="ad-owner">{{ a.repo }}</span>
+          </div>
+        </div>
+        <div class="ad-desc">{{ a.desc }}</div>
+        {% if a.trust_score is not none %}
+        <div class="ad-score"><b>{{ a.trust_score }}</b><span class="badge grade-{{ a.evidence_grade }}">{{ a.evidence_grade }}</span>{% if a.rank %}<span class="ad-rank">#{{ a.rank }} overall</span>{% endif %}</div>
+        {% endif %}
+        <div class="ad-links">
+          <a href="/agents/{{ a.slug }}/">Trust profile &rarr;</a>
+          <a href="https://github.com/{{ a.repo }}#readme" target="_blank" rel="noopener noreferrer">Badge in their README &#8599;</a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+
+    <section class="ad-add">
+      <h2>Add yours</h2>
+      <p>Any tracked project can embed its badge. It updates with every refresh and links to the full evidence, so readers can check the score themselves. Replace <code>&lt;slug&gt;</code> with your project's slug from its HVTracker URL.</p>
+      <pre><code>[![HVTrust](https://hvtracker.net/badge/&lt;slug&gt;.svg)](https://hvtracker.net/agents/&lt;slug&gt;/)</code></pre>
+      <p><a href="/badges/">Badge styles, grade and trend variants &rarr;</a></p>
+    </section>
+
+    <footer>
+      <a href="/">Registry</a> · <a href="/badges/">Badges</a> · <a href="/methodology/">Methodology</a> · Updated {{ updated }}
+    </footer>
+  </main>
+</body>
+</html>

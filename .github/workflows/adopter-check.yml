@@ -1,0 +1,67 @@
+name: Badge adopter check
+
+# The homepage and /adopters/ claim these projects embed the HVTrust badge.
+# Weekly, confirm each README still does; open (or update) an
+# `adopter-badge` issue when one drops it, and close it once the list is true.
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.3
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Check adopter READMEs
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          out=$(python scripts/check_adopters.py); code=$?
+          echo "$out"
+          {
+            echo "report<<EOF"
+            echo "$out"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          if [ $code -eq 2 ]; then echo "state=alert" >> "$GITHUB_OUTPUT";
+          elif [ $code -eq 0 ]; then echo "state=ok" >> "$GITHUB_OUTPUT";
+          else echo "state=error" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Open or update adopter-badge issue
+        if: steps.check.outputs.state == 'alert'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Through env, never pasted into the script (see bill-monitor.yml).
+          REPORT: ${{ steps.check.outputs.report }}
+        run: |
+          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          body=$(printf 'A project listed as a badge adopter no longer embeds the HVTrust badge, so the homepage and /adopters/ now overstate it.\n\n```\n%s\n```\n\nRun: %s\n' "$REPORT" "$run_url")
+          gh label create adopter-badge --repo "$GITHUB_REPOSITORY" --color FBCA04 --description "Listed adopter dropped the badge" 2>/dev/null || true
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label adopter-badge --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "A listed badge adopter dropped the badge" --label adopter-badge --body "$body"
+          fi
+
+      - name: Close adopter-badge issue when the list is true
+        if: steps.check.outputs.state == 'ok'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label adopter-badge --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue close "$existing" --repo "$GITHUB_REPOSITORY" --comment "Every listed adopter embeds the badge again."
+          fi
