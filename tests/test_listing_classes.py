@@ -142,7 +142,7 @@ def test_listing_class_is_published_on_every_row():
     assert sum(1 for r in rows if r["listing_class"] == "skill") == 3
 
 
-def _render_agent_page(listing_class):
+def _render_agent_page(listing_class, seo_indexed=False):
     """Render the real agent.html.j2 against a fully-populated row, so the
     §2a noindex conditional is exercised end-to-end, not just source-grepped."""
     import json
@@ -165,6 +165,7 @@ def _render_agent_page(listing_class):
     row["rank_history"] = []
     row["event_chart_svg"] = ""
     row["listing_class"] = listing_class
+    row["seo_indexed"] = seo_indexed
     return env.get_template("agent.html.j2").render(
         row=row, total=1, updated="", events=[], drift_events=[],
         methodology_version="v4.3", comparisons=[], provider_slugs={}, related=[],
@@ -193,3 +194,27 @@ def test_skills_are_excluded_from_the_sitemap_loop():
         "skill rows are no longer skipped before the /agents/ sitemap append — "
         "noindexed skill pages would be re-advertised to Google"
     )
+
+
+def test_indexed_skill_cohort_is_picked_once_and_kept_while_listed():
+    """Decision 4: the top skills (fully checked only) are picked once; after
+    that the cohort ignores daily rank moves and only loses delisted skills."""
+    skills = _skills(5)
+    skills[0]["pending_signals"] = True
+    rows = fab.assign_ranks(_agents(3) + skills)
+    first = fab.select_indexed_skills(None, rows, size=2)
+    by_rank = sorted((r for r in rows if r["listing_class"] == "skill" and not r.get("pending_signals")),
+                     key=lambda r: r["rank"])
+    assert first == {r["slug"] for r in by_rank[:2]}
+    assert not any(r["slug"] in first for r in _agents(3))
+    # Ranks reshuffle: the cohort does not.
+    assert fab.select_indexed_skills(sorted(first), list(reversed(rows)), size=2) == first
+    # A skill that leaves the board leaves the cohort.
+    gone = sorted(first)[0]
+    kept = [r for r in rows if r["slug"] != gone]
+    assert fab.select_indexed_skills(sorted(first), kept, size=2) == first - {gone}
+
+
+def test_cohort_skill_pages_are_indexable():
+    html = _render_agent_page("skill", seo_indexed=True)
+    assert "noindex" not in html
