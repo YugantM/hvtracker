@@ -1,0 +1,70 @@
+name: Search position watch
+
+# Weekly: Search Console average position for the last complete week. Opens
+# (or updates) a `search-position` issue when it drifts worse than 12, which
+# would mean the September 2026 re-rating is reverting; closes it on recovery.
+# Needs the GSC_SERVICE_ACCOUNT_JSON secret (read-only service account on the
+# Search Console property); without it the job just reports "not configured".
+
+on:
+  schedule:
+    - cron: "41 7 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.3
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet google-auth requests
+
+      - name: Check average position
+        id: check
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set +e
+          out=$(python scripts/position_watch.py); code=$?
+          echo "$out"
+          {
+            echo "report<<EOF"
+            echo "$out"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          if [ $code -eq 2 ]; then echo "state=alert" >> "$GITHUB_OUTPUT";
+          elif [ $code -eq 0 ]; then echo "state=ok" >> "$GITHUB_OUTPUT";
+          else echo "state=error" >> "$GITHUB_OUTPUT"; exit 1; fi
+
+      - name: Open or update search-position issue
+        if: steps.check.outputs.state == 'alert'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Through env, never pasted into the script (see bill-monitor.yml).
+          REPORT: ${{ steps.check.outputs.report }}
+        run: |
+          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          body=$(printf 'Search Console average position has drifted past 12.\n\n```\n%s\n```\n\nRun: %s\n' "$REPORT" "$run_url")
+          gh label create search-position --repo "$GITHUB_REPOSITORY" --color 5319E7 --description "Average search position regressed" 2>/dev/null || true
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label search-position --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "Search position regressed past 12" --label search-position --body "$body"
+          fi
+
+      - name: Close search-position issue on recovery
+        if: steps.check.outputs.state == 'ok'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label search-position --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue close "$existing" --repo "$GITHUB_REPOSITORY" --comment "Recovered: average position is back under 12."
+          fi
