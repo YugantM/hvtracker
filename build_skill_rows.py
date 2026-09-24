@@ -13,6 +13,7 @@ import json
 import os
 import re
 import time
+from urllib.parse import quote
 
 import requests
 from dotenv import load_dotenv
@@ -48,8 +49,28 @@ def get_file(repo: str, path: str) -> str | None:
         return None
 
 
+def is_published(kind: str, name: str) -> bool:
+    """Whether the registry actually serves this package.
+
+    A manifest name is only what the package WOULD be called. 47 roster ids
+    (2026-09-24) named packages that were never published, or were unpublished,
+    so each listing counted a downloads signal that could never arrive and
+    scored at 2/3 confidence instead of "no package, not applicable".
+    """
+    url = (f"https://registry.npmjs.org/{quote(name, safe='@')}" if kind == "npm"
+           else f"https://pypi.org/pypi/{name}/json")
+    try:
+        r = requests.get(url, timeout=20)
+        if r.status_code != 200:
+            return False
+        # npm keeps a 200 tombstone for unpublished packages, without dist-tags.
+        return kind != "npm" or bool(r.json().get("dist-tags"))
+    except Exception:
+        return False
+
+
 def resolve_packages(repo: str) -> dict:
-    """Real npm / PyPI identifiers, only when actually publishable."""
+    """Real npm / PyPI identifiers, only when actually published."""
     out = {}
 
     pkg = get_file(repo, "package.json")
@@ -58,7 +79,7 @@ def resolve_packages(repo: str) -> dict:
             data = json.loads(pkg)
             name = data.get("name")
             # A private or unnamed manifest publishes nothing — no downloads signal.
-            if name and not data.get("private"):
+            if name and not data.get("private") and is_published("npm", name):
                 out["npm_package"] = name
         except Exception:
             pass
@@ -66,7 +87,7 @@ def resolve_packages(repo: str) -> dict:
     pyproject = get_file(repo, "pyproject.toml")
     if pyproject:
         m = re.search(r'(?m)^\s*name\s*=\s*["\']([^"\']+)["\']', pyproject)
-        if m:
+        if m and is_published("pypi", m.group(1)):
             out["pypi_package"] = m.group(1)
 
     return out
