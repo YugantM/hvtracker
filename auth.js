@@ -233,6 +233,14 @@
       ".hvt-notif-item{display:grid;gap:2px;padding:10px 12px;border-bottom:1px solid var(--border,#eee);text-decoration:none;color:var(--text,#1f1b17)}" +
       ".hvt-notif-item:hover{background:#f4f1eb}.hvt-notif-item.is-unread{background:#fbf6ee}" +
       ".hvt-notif-name{font-weight:700}.hvt-notif-detail{color:#4a443d}.hvt-notif-date{color:#6f665d;font-size:10px}" +
+      // Dark mode (site.css tokens): the light values above are literal, so
+      // override only under a dark system setting and leave light untouched.
+      "@media (prefers-color-scheme:dark){" +
+      ".hvt-auth-btn,.hvt-bell,.hvt-auth-pop{background:var(--card)}" +
+      ".hvt-auth-item:hover,.hvt-notif-item:hover{background:var(--surface)}.hvt-notif-item.is-unread{background:var(--row-hover)}" +
+      ".hvt-auth-muted,.hvt-notif-head,.hvt-notif-empty,.hvt-notif-date{color:var(--muted)}.hvt-notif-detail{color:var(--text)}" +
+      "#hvt-compare-tray,.hvt-bell-count{color:var(--on-accent)}" +
+      "}" +
       "";
     document.head.appendChild(s);
   }
