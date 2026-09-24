@@ -921,3 +921,16 @@ def test_homepage_renders_top_rows_and_defers_the_rest(client):
     assert deferred and rest.json()["count"] == len(deferred)
     assert not set(inline) & set(deferred)
     assert client.get("/healthz").json()["machine_usage"]["data_json"] == before
+
+
+def test_api_cache_on_the_volume_is_never_served(client):
+    """Plan 3.5: the refresh subprocess caches API responses under
+    OUTPUT_DIR/.cache/api (replacing Redis); the site must not serve them."""
+    import app as app_module
+    assert app_module._refresh_cache_dir() == os.path.join(os.environ["OUTPUT_DIR"], ".cache", "api")
+    os.makedirs(app_module._refresh_cache_dir(), exist_ok=True)
+    with open(os.path.join(app_module._refresh_cache_dir(), "x.json"), "w") as f:
+        f.write("{}")
+    assert client.get("/.cache/api/x.json").status_code == 404
+    assert client.get("/.cache").status_code == 404
+    assert client.get("/healthz").json()["api_cache_entries"] >= 1
