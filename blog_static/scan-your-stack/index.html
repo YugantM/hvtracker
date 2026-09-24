@@ -50,9 +50,7 @@
   }
   </script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="/static/site.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -65,15 +63,6 @@
     a { color:var(--accent); text-decoration:none; }
     a:hover { text-decoration:underline; }
     .page { max-width:760px; margin:0 auto; padding:0 20px; background:var(--bg); min-height:100vh; }
-    .site-header { position:sticky; top:0; z-index:100; background:var(--bg); border-bottom:1px solid var(--border); }
-    .site-header-inner { max-width:1200px; margin:0 auto; padding:14px 20px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
-    .logo { font-family:var(--font-mono); font-size:20px; font-weight:700; color:var(--text); }
-    .logo span { color:var(--accent); }
-    .site-nav { margin-left:24px; font-family:var(--font-mono); font-size:11px; display:flex; gap:6px; flex-wrap:wrap; }
-    .site-nav a { color:var(--muted); padding:5px 10px; border:1px solid transparent; }
-    .site-nav a:hover { color:var(--text); border-color:var(--border); background:var(--surface); text-decoration:none; }
-    .site-status { font:11px var(--font-mono); color:var(--muted); margin-left:auto; white-space:nowrap; }
-    .live-dot { display:inline-block; width:7px; height:7px; border-radius:999px; background:var(--green, var(--fresh)); margin-right:6px; vertical-align:middle; box-shadow:0 0 0 3px color-mix(in srgb, var(--green, var(--fresh)) 18%, transparent); }
     article { padding:36px 0 48px; }
     h1 { font-size:34px; font-weight:700; line-height:1.15; margin-bottom:12px; }
     .meta { font-size:13px; color:var(--muted); margin-bottom:32px; font-family:var(--font-mono); }
@@ -126,35 +115,9 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TZ8921LR0K');</script>
   <script defer src="/analytics.js"></script>
-  <script defer src="/static/site-status.js"></script>
-<style>
-.nav-group{position:relative}
-.nav-trigger{font:inherit;cursor:pointer;color:var(--muted);padding:5px 8px;border:1px solid transparent;background:none;white-space:nowrap}
-.nav-trigger::after{content:" \25BE";opacity:.55;font-size:9px}
-.nav-group:hover>.nav-trigger,.nav-group:focus-within>.nav-trigger{color:var(--text);border-color:var(--border);background:var(--surface)}
-.nav-panel{display:none;position:absolute;top:100%;left:0;z-index:200;margin-top:4px;flex-direction:column;min-width:150px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px;box-shadow:0 6px 20px rgba(0,0,0,.12)}
-.nav-group:hover>.nav-panel,.nav-group:focus-within>.nav-panel{display:flex}
-.nav-panel a{color:var(--muted);padding:6px 10px;border-radius:4px;border:0;white-space:nowrap}
-.nav-panel a:hover{color:var(--text);background:var(--surface);text-decoration:none}
-@media(max-width:900px){.nav-group:hover>.nav-panel,.nav-group:focus-within>.nav-panel{position:static;box-shadow:none;border:0;padding:2px 0 2px 12px;margin-top:0;min-width:0}}
-</style>
 </head>
 <body data-page-type="blog_article">
-  <header class="site-header">
-    <div class="site-header-inner">
-      <a href="/" class="logo">HV<span>Tracker</span></a>
-      <nav class="site-nav" aria-label="Site">
-        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a></div></div>
-        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/scan/">Scan stack</a><a href="/methodology">Methodology</a><a href="/badges/">Badges</a></div></div>
-        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
-        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
-        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
-      </nav>
-      <div class="site-status" data-updated="">
-        <span class="live-dot"></span>updated <span class="site-status-value"></span>
-      </div>
-    </div>
-  </header>
+  <!--#site-header-->
   <div class="page">
     <article>
       <h1>Scan Your Stack: Verify, Now for Every Dependency at Once</h1>
