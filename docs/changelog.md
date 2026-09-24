@@ -681,6 +681,41 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   the bill-alert text ("4.42 (cap 5)" → "$14.42 (cap $15)"). Plan and UI
   mockups: https://claude.ai/artifact/KfF5N95t1Y114J1nABMjfe
 
+- **Phase 1 guardrails (#229–#237), DEPLOYED 2026-09-23 20:34 UTC**
+  (deployment c3a10342, `main` @ #236/#237). #229 robots: AI crawlers share
+  one group that skips the crawl traps. #230 freshness monitor (GH Actions,
+  every 3 h) opens an issue on stale data or a dead scheduler. #231
+  `scripts/predeploy_check.py` (image has every runtime module + BASE_DIR
+  path; roster ≥ live catalog). #232 history API serves the shared cached
+  index and skips partial days. #233 prebuilt/ and dead files removed. #234
+  CLAUDE.md trimmed to a bootstrap; history moved here. #235 no real boot
+  refreshes under pytest (HVT_BOOT_REFRESH=0). #236 degraded boards (>20%
+  provisional rows) are skipped in deltas like partial days. #237
+  descriptions stop being cut mid-word at 120 characters.
+- **Phase 2 UI/UX (#238–#245), merged 2026-09-24, NOT yet deployed.**
+  #238 polish (hidden-attribute fix, agent-page live pill dropped, calibration
+  toggle moved to methodology). #239 agent page verdict card (verdict + four
+  signal facts, score seal with ranks/coverage/freshness, neighbours drawn
+  relative, "where the score comes from" moved up) and an honest PROVISIONAL
+  state for pending_signals rows (no grade, rank or review rating; says what is
+  still missing); also fixed a pre-existing ~530 px mobile overflow on every
+  agent page. #240 compare decision view (`compare_decision()`: verdict,
+  "choose X if" cards built only from real leads, diverging bars for what
+  differs). #241 category pages (podium, grade mix with provisional hatched,
+  filters/sort, first 50 rows expanded, all rows kept in HTML). #242 57 px
+  mobile header with a Menu sheet (progressive; all four header copies), 44 px
+  touch targets, load motion off under reduced-motion. #243 homepage board
+  first: top 100 rows inline, the rest from `/data/board-rest.json` rendered
+  from the same `_board_row` partial (6.3 MB → 402 KB, ~50.9k → 3.5k nodes;
+  excluded from machine_usage). #244 decision-4 SEO test: a FIXED cohort of
+  100 skill pages indexable (persisted in seo_state `indexed_skills`; measure
+  in GSC at 28 days). #245 dark mode following the system, opt-in per
+  audited page (`<html class="theme-auto">`: home, agent, compare, category,
+  methodology); grade colours pinned to literal hex; new tokens `--on-accent`,
+  `--card`, `--hairline`, `--row-hover`. LESSON: a blanket dark palette would
+  have broken every page that redefines `:root` with light-only values (all
+  hand-written blog posts) — opt pages in only after a contrast audit.
+
 ## Entries recorded only in the old AGENTS.md
 
 - UI/UX fix batches DEPLOYED 2026-07-23 (owner-approved): #198 (P0 bugs —
