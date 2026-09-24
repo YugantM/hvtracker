@@ -1723,21 +1723,24 @@ def classify_license(repo_id: str, spdx_id: str | None) -> str:
     return "unlicensed" if not found_file else "open"
 
 
-def normalize_license_type(row: dict) -> str:
+def normalize_license_type(row: dict, offline: bool = False) -> str:
     """Keep cached rows consistent with the detected GitHub SPDX license.
 
     Respects license_override (from agents.json) as authoritative.
-    Always reclassifies non-overridden agents to pick up marker improvements.
+    Reclassifies non-overridden agents to pick up marker improvements, except
+    when `offline` (render-only): there it keeps the row's stored
+    classification. classify_license reads up to five LICENSE URLs per repo on
+    a cache miss, so render-only, which promises no API calls, was spending
+    ~4.5 minutes per render on network requests for the ~1,450 rows GitHub
+    reports no license for.
     """
     if row.get("license_override"):
         return row["license_override"]
     spdx_id = row.get("license_spdx")
     if spdx_id and spdx_id != "NOASSERTION":
         return "open"
-    # Always reclassify — the cache key bump (license_type_v2) ensures fresh
-    # results on full runs.  On render-only runs classify_license will use
-    # the Redis cache (which may be empty → returns unlicensed), but that's
-    # acceptable since overrides cover the known-wrong cases.
+    if offline:
+        return row.get("license_type") or "unlicensed"
     return classify_license(row.get("repo", ""), spdx_id)
 
 
@@ -3016,6 +3019,28 @@ def seed_history_into_output_root(base_dir: str, script_dir: str) -> int:
     if copied:
         print(f"Seeded {copied} history snapshot(s) into output root")
     return copied
+
+
+SITE_HEADER_MARKER = "<!--#site-header-->"
+
+
+def fill_site_header(path: str, env, updated: str) -> bool:
+    """Replace a hand-written page's <!--#site-header--> slot with the shared
+    header partial, so blog posts and /changelog/ can't drift from it (they
+    each carried a hand-copied header with a stale nav before). Only ever
+    touches the OUTPUT copy; the source keeps its marker."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            html = f.read()
+    except OSError:
+        return False
+    if SITE_HEADER_MARKER not in html:
+        return False
+    html = html.replace(SITE_HEADER_MARKER,
+                        env.get_template("_site_header.html.j2").render(updated=updated), 1)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(html)
+    return True
 
 
 def prune_stale_page_dirs(parent_dir: str, keep_slugs: set[str], label: str) -> int:
@@ -6765,7 +6790,7 @@ def main() -> None:
         source_note_override = _source_note_map.get(repo_key)
         if source_note_override:
             row["source_note"] = source_note_override
-        row["license_type"] = normalize_license_type(row)
+        row["license_type"] = normalize_license_type(row, offline=render_only)
         # Always recompute freshness from the absolute last_push date so the
         # color coding (and the maintenance dimension) stay correct even when
         # rendering from a cached snapshot — cached days_ago would drift stale.
@@ -7234,7 +7259,7 @@ def main() -> None:
     for lr in legacy_rows:
         if not lr.get("license_override"):
             lr["license_override"] = _override_map.get(lr.get("repo", "").lower(), "")
-        lr["license_type"] = normalize_license_type(lr)
+        lr["license_type"] = normalize_license_type(lr, offline=render_only)
         dl = lr.get("weekly_downloads")
         lr["downloads_fmt"] = f"{dl:,}" if dl is not None else "—"
         lr["score_breakdown"] = score_components(
@@ -7421,6 +7446,9 @@ def main() -> None:
     # dominate the cost of a fast leaderboard update.
     if signals_only:
         print("SIGNALS-ONLY: skipping OG card regeneration.")
+    elif os.environ.get("HVT_SKIP_OG_CARDS") == "1":
+        # Tests: ~1,700 PIL cards per render (~90s) that no test looks at.
+        print("HVT_SKIP_OG_CARDS=1: skipping OG card regeneration.")
     else:
         try:
             from generate_og_card import generate as generate_og, generate_site_card
@@ -7859,9 +7887,13 @@ def main() -> None:
             dst = os.path.join(blog_dir, article_dir)
             if os.path.isdir(src):
                 shutil.copytree(src, dst, dirs_exist_ok=True)
+                fill_site_header(os.path.join(dst, "index.html"), env, now_str)
                 copied += 1
         if copied:
             print(f"Copied {copied} hand-written blog articles from blog_static/.")
+    # /changelog/ is hand-written too; copied into the output root at startup.
+    if script_dir != base_dir:
+        fill_site_header(os.path.join(script_dir, "changelog", "index.html"), env, now_str)
     else:
         print(f"[warn] blog_static/ not found at {blog_static_dir}")
 

@@ -654,30 +654,27 @@ def load_manual_candidates() -> list[dict]:
     return items
 
 
+_HEADER_ENV = None
+SITE_HEADER_MARKER = "<!--#site-header-->"
+
+
 def _site_header_html(updated: str) -> str:
-    # Same grouped-dropdown nav as templates/_site_header.html.j2 and the
-    # homepage, so the header is identical on marketing/account/login pages too.
-    return f"""<header class="site-header">
-    <div class="site-header-inner">
-      <a href="/" class="logo">HV<span>Tracker</span></a>
-      <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
-      <nav class="site-nav" id="site-nav" aria-label="Site">
-        <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a><a href="/trends/">Trends</a></div></div>
-        <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/scan/">Scan stack</a><a href="/methodology/">Methodology</a><a href="/badges/">Badges</a></div></div>
-        <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/capabilities/">Capabilities</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
-        <div class="nav-group"><button type="button" class="nav-trigger">Developers</button><div class="nav-panel"><a href="/data/">Data &amp; API</a><a href="/spec/">Specs</a></div></div>
-        <div class="nav-group"><button type="button" class="nav-trigger">About</button><div class="nav-panel"><a href="/roadmap/">Roadmap</a><a href="/submit/">Submit</a><a href="/correct/">Corrections</a><a href="/alerts/">Alerts</a><a href="/sponsor/">Sponsor</a></div></div>
-      </nav>
-      <div class="site-header-right">
-        <div class="site-status" data-updated="{updated}">
-          <span class="live-dot"></span>updated <span class="site-status-value">{updated}</span>
-        </div>
-        <div id="hvt-auth-slot" class="hvt-auth-slot"></div>
-      </div>
-    </div>
-  </header>
-  <script>(function(){{var b=document.querySelector(".nav-toggle");if(!b)return;document.documentElement.classList.add("nav-js");function s(o){{b.setAttribute("aria-expanded",o);b.parentNode.classList.toggle("nav-open",o)}}b.addEventListener("click",function(){{s(b.getAttribute("aria-expanded")!=="true")}});document.addEventListener("keydown",function(e){{if(e.key==="Escape")s(false)}})}})();</script>
-  <script defer src="/auth.js?v={_AUTH_JS_VER}"></script>"""
+    """The site header, rendered from templates/_site_header.html.j2: the same
+    partial every generated page includes, so marketing/login pages and the
+    hand-written tools (/scan/, /verify/, /live/, /compare/) can't drift from
+    it (they each carried a hand-copied header with stale links before)."""
+    global _HEADER_ENV
+    if _HEADER_ENV is None:
+        from jinja2 import Environment, FileSystemLoader
+        _HEADER_ENV = Environment(loader=FileSystemLoader(os.path.join(BASE_DIR, "templates")),
+                                  autoescape=True)
+    return _HEADER_ENV.get_template("_site_header.html.j2").render(
+        updated=updated, auth_js_hash=_AUTH_JS_VER)
+
+
+def _with_site_header(html: str) -> str:
+    """Fill a hand-written page's <!--#site-header--> slot."""
+    return html.replace(SITE_HEADER_MARKER, _site_header_html(""), 1)
 
 
 def _runtime_git_sha() -> str | None:
@@ -1201,7 +1198,7 @@ def scan_tool():
     if not os.path.isfile(SCAN_TOOL_PATH):
         return HTMLResponse("<p>Scan tool is not available yet.</p>", status_code=503)
     with open(SCAN_TOOL_PATH, encoding="utf-8") as f:
-        return HTMLResponse(f.read())
+        return HTMLResponse(_with_site_header(f.read()))
 
 
 @app.api_route("/compare", methods=["GET", "HEAD"], response_class=HTMLResponse)
@@ -1210,7 +1207,7 @@ def compare_tool():
     if not os.path.isfile(COMPARE_TOOL_PATH):
         return HTMLResponse("<p>Compare tool is not available yet.</p>", status_code=503)
     with open(COMPARE_TOOL_PATH, encoding="utf-8") as f:
-        return HTMLResponse(f.read())
+        return HTMLResponse(_with_site_header(f.read()))
 
 
 @app.api_route("/compare/{pair}", methods=["GET", "HEAD"], include_in_schema=False)
@@ -1256,7 +1253,7 @@ def verify_tool():
     if not os.path.isfile(VERIFY_TOOL_PATH):
         return HTMLResponse("<p>Verify tool is not available yet.</p>", status_code=503)
     with open(VERIFY_TOOL_PATH, encoding="utf-8") as f:
-        return HTMLResponse(f.read())
+        return HTMLResponse(_with_site_header(f.read()))
 
 
 @app.api_route("/live", methods=["GET", "HEAD"], response_class=HTMLResponse)
@@ -1268,7 +1265,7 @@ def live_usage_page():
     if not os.path.isfile(LIVE_PAGE_PATH):
         return HTMLResponse("<p>Live usage page is not available yet.</p>", status_code=503)
     with open(LIVE_PAGE_PATH, encoding="utf-8") as f:
-        return HTMLResponse(f.read())
+        return HTMLResponse(_with_site_header(f.read()))
 
 
 @app.get("/og-v2.png")
