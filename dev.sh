@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Full local dev environment — Postgres, Redis, scheduler, hot-reload.
+# Full local dev environment — Postgres, scheduler, hot-reload.
 # Usage:
 #   ./dev.sh              Start the full stack on http://localhost:8000
 #   ./dev.sh --rebuild    Re-render templates before starting (no API calls)
-#   ./dev.sh --stop       Stop local Postgres and Redis
+#   ./dev.sh --stop       Stop local Postgres
 
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -18,7 +18,6 @@ DB_NAME="hvtracker_dev"
 if [[ "${1:-}" == "--stop" ]]; then
   echo "→ Stopping local services…"
   "$PG_BIN/pg_ctl" -D "$PG_DATA" stop 2>/dev/null && echo "  Postgres stopped" || echo "  Postgres was not running"
-  brew services stop redis 2>/dev/null && echo "  Redis stopped" || echo "  Redis was not running"
   exit 0
 fi
 
@@ -33,16 +32,8 @@ fi
   "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" | grep -q 1 \
   || "$PG_BIN/psql" -p "$PG_PORT" -d postgres -c "CREATE DATABASE $DB_NAME"
 
-# ── Start Redis ──────────────────────────────────────────────────────────────
-if ! redis-cli ping &>/dev/null; then
-  echo "→ Starting Redis…"
-  brew services start redis
-  sleep 1
-fi
-
 # ── Environment ──────────────────────────────────────────────────────────────
 export DATABASE_URL="postgresql://localhost:${PG_PORT}/${DB_NAME}"
-export REDIS_URL="redis://localhost:6379"
 export GITHUB_TOKEN="${GITHUB_TOKEN:-$(grep -s GITHUB_TOKEN .env 2>/dev/null | cut -d= -f2 || true)}"
 export OUTPUT_DIR="$PWD"
 
@@ -55,7 +46,6 @@ fi
 
 echo "→ Full dev stack on http://localhost:8000"
 echo "  Postgres: localhost:$PG_PORT/$DB_NAME"
-echo "  Redis:    localhost:6379"
 echo "  Scheduler: enabled (2h cron)"
 echo "  GITHUB_TOKEN: ${GITHUB_TOKEN:+set}${GITHUB_TOKEN:-NOT SET (fetches will fail)}"
 echo "  Press Ctrl-C to stop the server (services keep running; use ./dev.sh --stop)"

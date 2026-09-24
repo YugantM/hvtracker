@@ -423,11 +423,15 @@ _USAGE_EXCLUDED_PATHS = frozenset({"/api/v1/usage", "/data/board-rest.json"})
 # The curated public history surface stays open and unaffected:
 # GET /api/v1/agents/<slug>/history (90-day window, whitelisted fields).
 _PRIVATE_SNAPSHOT_PREFIXES = ("/output/history/", "/output/history")
+# The generator's API-response cache lives on the volume beside the site
+# (see _refresh_cache_dir); it is never meant to be served.
+_PRIVATE_CACHE_PREFIX = "/.cache"
 
 
 def _is_private_snapshot_path(path: str) -> bool:
-    """True for raw daily-snapshot paths, which must not be served publicly."""
-    return path.startswith(_PRIVATE_SNAPSHOT_PREFIXES[0]) or path == _PRIVATE_SNAPSHOT_PREFIXES[1]
+    """True for raw daily-snapshot and cache paths, which must not be served publicly."""
+    return (path.startswith(_PRIVATE_SNAPSHOT_PREFIXES[0]) or path == _PRIVATE_SNAPSHOT_PREFIXES[1]
+            or path == _PRIVATE_CACHE_PREFIX or path.startswith(_PRIVATE_CACHE_PREFIX + "/"))
 
 
 def _count_machine_usage(path: str) -> None:
@@ -865,6 +869,7 @@ def healthz():
         "scheduler_error": _scheduler_error,
         "scheduled_jobs": _scheduled_jobs(),
         "process_rss_mb": _process_rss_mb(),
+        "api_cache_entries": _api_cache_entries(),
         "machine_usage": {"since": _USAGE_SINCE, **_usage_counters},
         "badge_fetches": {
             "since": _USAGE_SINCE,
@@ -2314,8 +2319,10 @@ def _refresh(mode: str) -> bool:
             cwd=BASE_DIR,
             # Stream the child's render logs live into the service log (piped
             # stdout is otherwise fully buffered until exit — useless for
-            # watching a deploy's first render on Railway).
-            env={**os.environ, "PYTHONUNBUFFERED": "1"},
+            # watching a deploy's first render on Railway). HVT_CACHE_DIR turns
+            # on cache.py's on-volume API cache for the child (replaced Redis).
+            env={**os.environ, "PYTHONUNBUFFERED": "1",
+                 "HVT_CACHE_DIR": os.environ.get("HVT_CACHE_DIR") or _refresh_cache_dir()},
         )
         return True
     except Exception as e:  # never let a build error kill the scheduler thread
@@ -2323,6 +2330,22 @@ def _refresh(mode: str) -> bool:
         print(f"[scheduler] refresh ({mode}) failed: {e}")
         traceback.print_exc()
         return False
+
+
+def _api_cache_entries() -> int | None:
+    """Files in the refresh subprocess's API cache (None before the first
+    cached fetch) — the only way to see the cache working without SSH."""
+    try:
+        return len(os.listdir(os.environ.get("HVT_CACHE_DIR") or _refresh_cache_dir()))
+    except OSError:
+        return None
+
+
+def _refresh_cache_dir() -> str:
+    """Where the refresh subprocess keeps its API-response cache: on the
+    volume (survives restarts and deploys), under a path the middleware
+    refuses to serve."""
+    return os.path.join(OUTPUT_DIR, ".cache", "api")
 
 
 def _compute_render_fingerprint() -> str:
