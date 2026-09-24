@@ -197,3 +197,31 @@ def test_decision_view_renders_above_the_evidence_table():
     assert html.index("Choose Codex if") < html.index('id="evidence"') < html.index('<table class="cmp">')
     assert "Where they differ" in html
     assert len(_ld_blocks(html)) == 2  # both JSON-LD blocks still parse
+
+
+def test_ctr_test_overrides_only_touch_logged_pairs():
+    """Plan 3.1: titles change only for entries in CTR_TEST_COMPARE (logged in
+    docs/ctr-tests.md); every other pair keeps the templated title (#114)."""
+    lite = _pair_row(name="LiteLLM", slug="litellm", trust_score=77.8, evidence_grade="B")
+    vllm = _pair_row(name="vLLM", slug="vllm", trust_score=81.4, evidence_grade="A")
+    for x, y in ((lite, vllm), (vllm, lite)):
+        o = fab.ctr_test_override(x, y)
+        assert o["title"] == "LiteLLM vs vLLM: AI Gateway vs Inference Engine | HVTracker"
+        assert f"{x['name']} {x['trust_score']}/100 (Grade {x['evidence_grade']})" in o["description"]
+    html = _render_pair(lite, vllm)
+    assert "AI agent trust comparison" in html  # no override passed -> templated title
+    import re as _re
+    over = fab.ctr_test_override(lite, vllm)
+    from jinja2 import Environment, FileSystemLoader
+    import os
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    env = Environment(loader=FileSystemLoader([os.path.join(root, "templates"), root]), autoescape=True)
+    page = env.get_template("compare_pair.html.j2").render(
+        a=lite, b=vllm, category={"name": "LLM Gateways & Infra", "slug": "llm-gateways-infra"},
+        metrics=[], dims=[], caps=[], total=1, updated="", methodology_version="4.3",
+        css_hash="x", related=[], lead_name=None, coverage_caveat=None, decision=None,
+        seo_override=over)
+    assert _re.search(r"<title>LiteLLM vs vLLM: AI Gateway vs Inference Engine \| HVTracker</title>", page)
+    other = _pair_row(name="Other", slug="other")
+    assert fab.ctr_test_override(lite, other) is None
+    assert all(tuple(sorted(k)) == k for k in fab.CTR_TEST_COMPARE)
