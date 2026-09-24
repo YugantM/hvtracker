@@ -715,6 +715,28 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   `--card`, `--hairline`, `--row-hover`. LESSON: a blanket dark palette would
   have broken every page that redefines `:root` with light-only values (all
   hand-written blog posts) — opt pages in only after a contrast audit.
+- **Phase 2 DEPLOYED 2026-09-24 06:10 UTC** (deployment a0f590d3, `main` @
+  #246). Verified live: healthz ok, build_report clean, homepage 100 inline
+  rows + board-rest.json, verdict card, compare decision view, category
+  podium, provisional "Grade pending", 100/354 skills in the sitemap.
+- **Phase 3 growth/durability (#247–#252), merged 2026-09-24, NOT yet
+  deployed.** #247 CTR test batch 1: per-URL title/description overrides
+  (`CTR_TEST_COMPARE`) for litellm-vs-vllm and hindsight-vs-mem0 only, with
+  baseline, control group and check dates in `docs/ctr-tests.md` — the one
+  sanctioned path for title changes; `/capabilities/` deliberately excluded
+  (its queries are other sites' repo names). #248 `/adopters/` page +
+  weekly `adopter-check` workflow; NVIDIA/SkillSpector removed (dropped the
+  badge 2026-09-17, the homepage still claimed it), mcp-hangar added.
+  #249 Haystack case study (blog, 4 surfaces). #250 Zenodo DOI prep:
+  `scripts/package_dataset.py`, `docs/zenodo-dataset.md`, CITATION.cff —
+  owner deposits 2026-Q3 from 1 Oct. #251 weekly `position-watch` workflow
+  (alerts if avg position > 12; needs the GSC_SERVICE_ACCOUNT_JSON secret).
+  #252 Redis retired in code (owner decision 3.5: keep accounts/Postgres):
+  `cache.py` is an on-volume file cache (`OUTPUT_DIR/.cache/api`, 404'd
+  publicly, `api_cache_entries` in /healthz); after deploy, confirm the
+  count climbs, then remove REDIS_URL and delete the Redis service.
+  Measured bill split this cycle: web ~$11.5 · Redis ~$1.55 · Postgres
+  ~$0.62 per 30 days.
 
 ## Entries recorded only in the old AGENTS.md
 
