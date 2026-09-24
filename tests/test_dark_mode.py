@@ -53,3 +53,12 @@ def test_hand_written_pages_have_no_light_only_page_background():
     for p in glob.glob(os.path.join(ROOT, "blog_static", "*", "index.html")) + [os.path.join(ROOT, "changelog", "index.html")]:
         html = open(p, encoding="utf-8").read()
         assert not re.search(r"\.page\s*\{[^}]*background:\s*#f4f1eb", html), os.path.relpath(p, ROOT)
+
+
+def test_auth_widget_styles_have_a_dark_override():
+    """auth.js injects the header sign-in / account / notification styles with
+    literal light values; dark mode must override them (live 'Sign in' button
+    was light text on white before this)."""
+    js = _read("auth.js")
+    dark = js[js.index("@media (prefers-color-scheme:dark){"):]
+    assert ".hvt-auth-btn,.hvt-bell,.hvt-auth-pop{background:var(--card)}" in dark
