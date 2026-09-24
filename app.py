@@ -1483,13 +1483,8 @@ def _marketing_page(
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/static/site.css">
   <style>
-    :root {{
-      --paper:#f4f1eb; --paper-2:#ece4d6; --ink:#1f1b17; --muted:#6f665d;
-      --line:#d5cbbc; --line-strong:#b9aa96; --lobster:#c67c6d;
-      --lobster-soft:rgba(198,124,109,.14); --blue-strong:#7f9cbd; --green:#2f6846;
-      --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
-      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
-    }}
+    /* Palette and fonts come from site.css. This page used to redefine them
+       with older, paler values (--lobster #c67c6d read at 2.5-2.9:1). */
     * {{ box-sizing:border-box; margin:0; padding:0; }}
     body {{
       min-height:100vh; color:var(--ink); font:15px/1.65 var(--font-sans);
@@ -1497,7 +1492,6 @@ def _marketing_page(
     }}
     a {{ color:inherit; text-decoration:none; }}
     a:hover {{ text-decoration:underline; }}
-    .logo span {{ color:var(--lobster); }}
     .page {{ max-width:1120px; margin:0 auto; padding:24px 24px 48px; background:var(--paper); min-height:100vh; }}
     .shell {{
       max-width:780px; margin:0 auto;
