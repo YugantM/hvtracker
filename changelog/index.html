@@ -71,6 +71,19 @@
 
     footer { margin-top: 40px; text-align: center; font-size: 12px; color: var(--muted); }
     footer a { color: var(--accent); }
+  
+    /* Dark mode: follows the system, matching static/site.css (this page
+       carries its own palette instead of linking it). */
+    @media (prefers-color-scheme: dark) {
+      html:root {
+        color-scheme: dark;
+        --bg:#15171b; --surface:#1e2126; --surface-2:#262a31; --border:#33373f;
+        --text:#e7e4de; --muted:#aaa49b; --accent:#8fb3dc; --accent-dim:#6f93bd;
+        --accent-lt:rgba(143,179,220,.12); --accent-warm:#e0977f; --on-accent:#0f1216;
+        --green:#74c08f; --red:#e3897f; --amber:#d9b75e; --fresh:#74c08f; --stale:#8e887f;
+        --mocha:#d9b75e; --mocha-lt:rgba(217,183,94,.14);
+      }
+    }
   </style>
   <!-- opt out: localStorage.setItem('hvt_notrack','1') -->
   <script>

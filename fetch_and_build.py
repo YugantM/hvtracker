@@ -3334,9 +3334,9 @@ def render_trend_chart_svg(days: list[dict], series: list[dict], *,
     for v in (y_min, y_max / 2, y_max):
         y = _y(v)
         parts.append(f'<line x1="{pad_l}" y1="{y:.1f}" x2="{width - pad_r}" y2="{y:.1f}" '
-                     'stroke="#d8d2c8" stroke-width="1"/>')
+                     'style="stroke:var(--border,#d8d2c8)" stroke-width="1"/>')
         parts.append(f'<text x="{pad_l - 6}" y="{y + 4:.1f}" text-anchor="end" '
-                     f'font-size="10" fill="#6f665d" font-family="monospace">{v:.0f}</text>')
+                     f'font-size="10" style="fill:var(--muted,#6f665d)" font-family="monospace">{v:.0f}</text>')
     # month ticks
     seen_months = set()
     for i, d in enumerate(days):
@@ -3344,13 +3344,13 @@ def render_trend_chart_svg(days: list[dict], series: list[dict], *,
         if month not in seen_months:
             seen_months.add(month)
             parts.append(f'<text x="{_x(i):.1f}" y="{height - 8}" text-anchor="middle" '
-                         f'font-size="10" fill="#6f665d" font-family="monospace">{d["date"][5:7]}/{d["date"][2:4]}</text>')
+                         f'font-size="10" style="fill:var(--muted,#6f665d)" font-family="monospace">{d["date"][5:7]}/{d["date"][2:4]}</text>')
     # era markers
     for i in sorted(era_idx):
         x = _x(i)
         parts.append(f'<line x1="{x:.1f}" y1="{pad_t}" x2="{x:.1f}" y2="{pad_t + plot_h}" '
-                     'stroke="#9b3c3c" stroke-width="1" stroke-dasharray="4,3"/>')
-        parts.append(f'<text x="{x + 3:.1f}" y="{pad_t + 10}" font-size="9" fill="#9b3c3c" '
+                     'style="stroke:var(--red,#9b3c3c)" stroke-width="1" stroke-dasharray="4,3"/>')
+        parts.append(f'<text x="{x + 3:.1f}" y="{pad_t + 10}" font-size="9" style="fill:var(--red,#9b3c3c)" '
                      f'font-family="monospace">{days[i].get("methodology_version") or ""}</text>')
     # series polylines, broken at gaps (and eras when requested)
     for s in series:
@@ -3616,10 +3616,10 @@ def render_bar_chart_svg(items: list[dict], label_key: str, value_key: str,
         label = escape(str(item.get(label_key, ""))[:32])
         display = f"{raw_value:+.0f}" if raw_value < 0 else f"{raw_value:.0f}"
         rows.append(
-            f'<text x="0" y="{y + 14}" fill="#1a1a1a" font-size="12" font-family="Hanken Grotesk, sans-serif">{label}</text>'
+            f'<text x="0" y="{y + 14}" style="fill:var(--text,#1a1a1a)" font-size="12" font-family="Hanken Grotesk, sans-serif">{label}</text>'
             f'<rect x="{label_w}" y="{y}" width="{inner_w}" height="18" rx="4" fill="rgba(0,0,0,0.04)"/>'
             f'<rect x="{label_w}" y="{y}" width="{bar_w}" height="18" rx="4" fill="url(#{grad_id})"/>'
-            f'<text x="{width - value_w}" y="{y + 14}" fill="#6b6560" font-size="11" font-family="IBM Plex Mono, monospace">{escape(display)}</text>'
+            f'<text x="{width - value_w}" y="{y + 14}" style="fill:var(--muted,#6b6560)" font-size="11" font-family="IBM Plex Mono, monospace">{escape(display)}</text>'
         )
     return (
         f'<svg class="insight-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img">'
@@ -3704,7 +3704,7 @@ def render_diverging_bar_svg(items: list[dict], label_key: str, value_key: str,
         else:
             bx = center_x - bar_w
         rows.append(
-            f'<text x="{label_w - 8:.0f}" y="{y + 13}" text-anchor="end" fill="#1a1a1a" font-size="11.5" '
+            f'<text x="{label_w - 8:.0f}" y="{y + 13}" text-anchor="end" style="fill:var(--text,#1a1a1a)" font-size="11.5" '
             f'font-family="Hanken Grotesk, sans-serif">{label}</text>'
             f'<rect x="{bx:.1f}" y="{y}" width="{bar_w:.1f}" height="18" rx="4" fill="{color}" opacity="0.82"/>'
             f'<text x="{width - value_w + 4:.0f}" y="{y + 13}" fill="{color}" font-size="11" '
@@ -3795,7 +3795,7 @@ def render_radial_bar_svg(agents: list[dict], width: int = 720, height: int = 43
         labels.append(
             f'<text x="{legend_x}" y="{ly + 12}" fill="{color}" font-size="10" font-weight="700" '
             f'font-family="IBM Plex Mono, monospace">{index + 1}</text>'
-            f'<text x="{legend_x + 20}" y="{ly + 12}" fill="#1a1a1a" font-size="11" '
+            f'<text x="{legend_x + 20}" y="{ly + 12}" style="fill:var(--text,#1a1a1a)" font-size="11" '
             f'font-family="Hanken Grotesk, sans-serif" opacity="{0.95 if index < 8 else 0.6}">{name}</text>'
         )
 
@@ -3806,7 +3806,7 @@ def render_radial_bar_svg(agents: list[dict], width: int = 720, height: int = 43
         gx = legend_x + i * 52
         grade_legend.append(
             f'<circle cx="{gx}" cy="{grade_y}" r="3.5" fill="{color}" opacity="0.8"/>'
-            f'<text x="{gx + 7}" y="{grade_y + 3.5}" fill="#6b6560" font-size="9" '
+            f'<text x="{gx + 7}" y="{grade_y + 3.5}" style="fill:var(--muted,#6b6560)" font-size="9" '
             f'font-family="IBM Plex Mono, monospace">{grade}</text>'
         )
 
@@ -3901,7 +3901,7 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
             legend_items.append(
                 f'<text x="{lx:.1f}" y="{ly:.1f}" fill="{color}" font-size="10" font-weight="700" '
                 f'font-family="IBM Plex Mono, monospace">{index + 1}</text>'
-                f'<text x="{lx + 16:.1f}" y="{ly:.1f}" fill="#1a1a1a" font-size="10" '
+                f'<text x="{lx + 16:.1f}" y="{ly:.1f}" style="fill:var(--text,#1a1a1a)" font-size="10" '
                 f'font-family="IBM Plex Mono, monospace">{name}</text>'
             )
 
@@ -3909,7 +3909,7 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
     for pct in (0, 25, 50, 75, 100):
         y = sy(y_min + (y_max - y_min) * pct / 100)
         grid.append(f'<line x1="{left}" y1="{y:.1f}" x2="{width - right}" y2="{y:.1f}" stroke="rgba(0,0,0,.06)"/>')
-        grid.append(f'<text x="{left - 12}" y="{y + 4:.1f}" text-anchor="end" fill="#7f8a99" font-size="10" font-family="IBM Plex Mono, monospace">{pct}</text>')
+        grid.append(f'<text x="{left - 12}" y="{y + 4:.1f}" text-anchor="end" style="fill:var(--muted,#7f8a99)" font-size="10" font-family="IBM Plex Mono, monospace">{pct}</text>')
     for pct in (0, 25, 50, 75, 100):
         value = x_min + (x_max - x_min) * pct / 100
         x = sx(value)
@@ -3920,9 +3920,9 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
     )
     q_labels = (
         '<text x="{right_x}" y="{q1_y}" text-anchor="end" fill="#2f6846" font-size="11" font-family="IBM Plex Mono, monospace">{q1}</text>'
-        '<text x="{left_x}" y="{top_y}" fill="#2c5282" font-size="11" font-family="IBM Plex Mono, monospace">{q2}</text>'
+        '<text x="{left_x}" y="{top_y}" style="fill:var(--series,#2c5282)" font-size="11" font-family="IBM Plex Mono, monospace">{q2}</text>'
         '<text x="{right_x}" y="{bottom_y}" text-anchor="end" fill="#8b6914" font-size="11" font-family="IBM Plex Mono, monospace">{q3}</text>'
-        '<text x="{left_x}" y="{bottom_y}" fill="#6b6560" font-size="11" font-family="IBM Plex Mono, monospace">{q4}</text>'
+        '<text x="{left_x}" y="{bottom_y}" style="fill:var(--muted,#6b6560)" font-size="11" font-family="IBM Plex Mono, monospace">{q4}</text>'
     ).format(
         right_x=width - right - 12,
         left_x=left + 12,
@@ -3950,8 +3950,8 @@ def render_quadrant_scatter_svg(items: list[dict], x_key: str, y_key: str,
         f'<g filter="url(#dotGlow)">{"".join(dots)}</g>{"".join(marker_labels)}'
         f'<rect x="{left}" y="{height - 101}" width="{plot_w}" height="65" rx="10" fill="rgba(7,10,14,.42)" stroke="rgba(0,0,0,.08)"/>'
         + "".join(legend_items) +
-        f'<text x="{left + plot_w / 2:.1f}" y="{height - 24}" text-anchor="middle" fill="#6b6560" font-size="11" font-family="IBM Plex Mono, monospace">{escape(x_label)}</text>'
-        f'<text transform="translate(20 {top + plot_h / 2:.1f}) rotate(-90)" text-anchor="middle" fill="#6b6560" font-size="11" font-family="IBM Plex Mono, monospace">{escape(y_label)}</text>'
+        f'<text x="{left + plot_w / 2:.1f}" y="{height - 24}" text-anchor="middle" style="fill:var(--muted,#6b6560)" font-size="11" font-family="IBM Plex Mono, monospace">{escape(x_label)}</text>'
+        f'<text transform="translate(20 {top + plot_h / 2:.1f}) rotate(-90)" text-anchor="middle" style="fill:var(--muted,#6b6560)" font-size="11" font-family="IBM Plex Mono, monospace">{escape(y_label)}</text>'
         '</svg>'
     )
 
@@ -3990,8 +3990,8 @@ def render_radar_svg(metrics: list[dict], width: int = 430, height: int = 430,
         label = escape(str(metric.get("label", ""))[:18])
         value = round(pct * 100)
         labels.append(
-            f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" fill="#1a1a1a" font-size="11" font-family="Hanken Grotesk, sans-serif">{label}</text>'
-            f'<text x="{lx:.1f}" y="{ly + 14:.1f}" text-anchor="{anchor}" fill="#2c5282" font-size="10" font-family="IBM Plex Mono, monospace">{value}%</text>'
+            f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" style="fill:var(--text,#1a1a1a)" font-size="11" font-family="Hanken Grotesk, sans-serif">{label}</text>'
+            f'<text x="{lx:.1f}" y="{ly + 14:.1f}" text-anchor="{anchor}" style="fill:var(--series,#2c5282)" font-size="10" font-family="IBM Plex Mono, monospace">{value}%</text>'
         )
 
     return (
@@ -4003,7 +4003,7 @@ def render_radar_svg(metrics: list[dict], width: int = 430, height: int = 430,
         f'<rect x="0" y="0" width="{width}" height="{height}" rx="16" fill="rgba(0,0,0,.02)" stroke="rgba(0,0,0,.10)" stroke-width="1"/>'
         + "".join(levels) + "".join(spokes) +
         f'<polygon points="{" ".join(area_pts)}" fill="url(#radarFill)" opacity=".28" stroke="url(#radarFill)" stroke-width="2.2" filter="url(#radarGlow)"/>'
-        f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="3" fill="#1a1a1a" opacity=".75"/>'
+        f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="3" style="fill:var(--text,#1a1a1a)" opacity=".75"/>'
         + "".join(labels) +
         '</svg>'
     )
@@ -4132,9 +4132,9 @@ def render_stacked_radar_svg(agents: list[dict], mode: str = "trust",
         short_label = escape(str(label)[:18])
         value = round(avg_pcts[i] * 100)
         labels.append(
-            f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" fill="#1a1a1a" '
+            f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" style="fill:var(--text,#1a1a1a)" '
             f'font-size="10" font-family="Hanken Grotesk, sans-serif">{short_label}</text>'
-            f'<text x="{lx:.1f}" y="{ly + 12:.1f}" text-anchor="{anchor}" fill="#2c5282" '
+            f'<text x="{lx:.1f}" y="{ly + 12:.1f}" text-anchor="{anchor}" style="fill:var(--series,#2c5282)" '
             f'font-size="9" font-family="IBM Plex Mono, monospace">{value}%</text>'
         )
 
@@ -4148,7 +4148,7 @@ def render_stacked_radar_svg(agents: list[dict], mode: str = "trust",
         + "".join(polys)
         + f'<polygon points="{avg_pts}" fill="{color}" opacity="0.12" '
         f'stroke="{color}" stroke-width="1.2" stroke-opacity="0.55" filter="url(#sGlow)"/>'
-        f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="2" fill="#1a1a1a" opacity=".6"/>'
+        f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="2" style="fill:var(--text,#1a1a1a)" opacity=".6"/>'
         + "".join(labels) +
         '</svg>'
     )
@@ -5405,14 +5405,14 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
     :root{{--bg:#f4f1eb;--surface:#eae6de;--border:#d4cfc5;--text:#1a1a1a;--muted:#6b6560;--accent:#26405e;--accent-warm:#b05a3a;--font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif}}
     body{{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.6;min-height:100vh}}
     a{{color:var(--accent);text-decoration:none}}a:hover{{text-decoration:underline}}
-    .page{{max-width:800px;margin:0 auto;padding:24px 24px 48px;background:#f4f1eb;min-height:100vh}}
+    .page{{max-width:800px;margin:0 auto;padding:24px 24px 48px;background:var(--bg);min-height:100vh}}
     .logo{{font-family:var(--font-mono);font-size:20px;font-weight:700}}.logo span{{color:var(--accent-warm)}}
     h1{{font-size:26px;font-weight:700;margin:20px 0 8px}}
     h2{{font-family:var(--font-mono);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}}
     p{{margin-bottom:14px;color:var(--muted);font-size:14px}}p strong{{color:var(--text)}}
     code{{font-family:var(--font-mono);font-size:12px;background:var(--surface);padding:1px 5px;color:var(--text)}}
     ul{{list-style:none;margin:0 0 20px}}
-    li{{padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.06);font-size:14px}}
+    li{{padding:8px 0;border-bottom:1px solid var(--hairline);font-size:14px}}
     li a{{font-family:var(--font-mono);font-size:12px;color:var(--accent);border:1px solid var(--border);padding:3px 8px;margin-right:8px}}
     li a:hover{{border-color:var(--accent-warm);color:var(--accent-warm);text-decoration:none}}
     footer{{margin-top:32px;padding-top:16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);text-align:center}}
