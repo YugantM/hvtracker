@@ -2669,6 +2669,43 @@ def snapshot_is_degraded(snap: dict) -> bool:
     return pending > DEGRADED_PENDING_SHARE * len(agents)
 
 
+# Repo renames: {old "owner/name" lowercased: current "owner/name"}, built from
+# agents.json entries' `previous_repos` at the start of every run (main). Rows
+# are keyed by repo everywhere (cached rows, history snapshots, the previous
+# latest.json), so without this a rename reads as a brand-new provisional
+# agent: "Grade pending" and a wiped rank history until data re-accumulates.
+REPO_RENAMES: dict[str, str] = {}
+
+
+def repo_renames(agents: list[dict]) -> dict[str, str]:
+    return {old.lower(): a["repo"] for a in agents
+            for old in (a.get("previous_repos") or []) if a.get("repo")}
+
+
+def apply_repo_renames(rows: list[dict], renames: dict[str, str] | None = None) -> int:
+    """Point rows that still carry a previous repo name at the current one."""
+    renames = REPO_RENAMES if renames is None else renames
+    changed = 0
+    for r in rows:
+        new = renames.get((r.get("repo") or "").lower())
+        if new and r.get("repo") != new:
+            old = r["repo"]
+            r["repo"] = new
+            if r.get("url") == f"https://github.com/{old}":
+                r["url"] = f"https://github.com/{new}"
+            changed += 1
+    return changed
+
+
+def _load_snapshot(path: str) -> dict:
+    """Read one history snapshot with repo renames applied."""
+    with open(path, encoding="utf-8") as f:
+        snap = json.load(f)
+    if REPO_RENAMES:
+        apply_repo_renames(snap.get("agents") or [])
+    return snap
+
+
 def _load_prior_snapshot(history_dir: str) -> dict | None:
     """Return the most recent usable history snapshot older than today, or None.
 
@@ -2683,8 +2720,7 @@ def _load_prior_snapshot(history_dir: str) -> dict | None:
             reverse=True,
         )
         for name in candidates:
-            with open(os.path.join(history_dir, name), encoding="utf-8") as f:
-                snap = json.load(f)
+            snap = _load_snapshot(os.path.join(history_dir, name))
             if not snapshot_is_degraded(snap):
                 return snap
         return None
@@ -2745,8 +2781,7 @@ def load_previous_downloads(
     result: dict[str, tuple[int, str]] = {}
     for fname in candidates:
         try:
-            with open(os.path.join(history_dir, fname), encoding="utf-8") as f:
-                snap = json.load(f)
+            snap = _load_snapshot(os.path.join(history_dir, fname))
         except (OSError, json.JSONDecodeError):
             continue
         for a in snap.get("agents", []):
@@ -2917,6 +2952,7 @@ def load_cached_commit_counts(data_path: str, history_dir: str) -> dict[str, int
     try:
         with open(data_path, encoding="utf-8") as f:
             current = json.load(f)
+        apply_repo_renames(current.get("agents") or [])
         for a in current.get("agents", []):
             commits = a.get("weekly_commits")
             if commits is not None and a.get("repo"):
@@ -2944,8 +2980,7 @@ def load_history(history_dir: str) -> list[dict]:
     try:
         for f in sorted(os.listdir(history_dir)):
             if re.match(r"\d{4}-\d{2}-\d{2}\.json$", f) and f[:-5] not in PARTIAL_SNAPSHOT_DATES:
-                with open(os.path.join(history_dir, f), encoding="utf-8") as fh:
-                    snap = json.load(fh)
+                snap = _load_snapshot(os.path.join(history_dir, f))
                 if snapshot_is_degraded(snap):
                     continue  # kept on disk, never read back as history
                 snap["_date"] = f[:-5]
@@ -5272,8 +5307,7 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
         if date_str < cutoff:
             continue
         try:
-            with open(os.path.join(history_dir, fname), encoding="utf-8") as f:
-                snap = json.load(f)
+            snap = _load_snapshot(os.path.join(history_dir, fname))
             history_by_date[date_str] = {a["repo"].lower(): a for a in snap.get("agents", [])}
             methodology_by_date[date_str] = snap.get("methodology_version")
         except Exception:
@@ -5605,8 +5639,7 @@ def compute_trust_trends(history_dir: str, today_agents: dict[str, dict]) -> dic
         return {}
 
     try:
-        with open(os.path.join(history_dir, best_date), encoding="utf-8") as f:
-            snap = json.load(f)
+        snap = _load_snapshot(os.path.join(history_dir, best_date))
         old_agents = {a["repo"].lower(): a for a in snap.get("agents", [])}
     except Exception:
         return {}
@@ -5723,6 +5756,7 @@ def merge_batch_into_data(data_path: str, fresh_rows: list[dict]) -> list[dict]:
         old_agents = existing.get("agents", [])
     except (FileNotFoundError, json.JSONDecodeError):
         old_agents = []
+    apply_repo_renames(old_agents)
 
     fresh_keys = {r["repo"].lower() for r in fresh_rows}
     # Keep old entries that weren't in this batch
@@ -5782,6 +5816,7 @@ def load_existing_agents_map(data_path: str) -> dict[str, dict]:
     try:
         with open(data_path, encoding="utf-8") as f:
             existing = json.load(f)
+        apply_repo_renames(existing.get("agents") or [])
         return {
             a["repo"].lower(): a
             for a in existing.get("agents", [])
@@ -6197,6 +6232,8 @@ def main() -> None:
             seen_names.add(name_key)
         deduped.append(a)
     agents = deduped
+    REPO_RENAMES.clear()
+    REPO_RENAMES.update(repo_renames(agents))
 
     # Split active vs legacy agents — legacy entries are fetched but rendered separately
     legacy_agents = [
@@ -6440,6 +6477,9 @@ def main() -> None:
             _state = json.load(_f)
         rows = _state["rows"]
         legacy_rows = _state["legacy_rows"]
+        renamed = apply_repo_renames(rows) + apply_repo_renames(legacy_rows)
+        if renamed:
+            print(f"RENDER-ONLY: carried {renamed} row(s) over to a renamed repo")
         # Prune cached rows for agents removed from agents.json
         valid_repos = {a["repo"].lower() for a in all_agents + legacy_agents}
         before = len(rows)
@@ -6639,6 +6679,7 @@ def main() -> None:
             try:
                 with open(render_state_path, encoding="utf-8") as _f:
                     legacy_rows = json.load(_f).get("legacy_rows", []) or []
+                apply_repo_renames(legacy_rows)
                 if legacy_rows:
                     print(f"Batch merge: carried forward {len(legacy_rows)} legacy row(s) from prior render")
             except (OSError, json.JSONDecodeError):
