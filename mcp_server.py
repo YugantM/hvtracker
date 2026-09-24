@@ -913,6 +913,7 @@ def _get_history_index() -> dict:
     import os
 
     from app import (
+        BASE_DIR,
         OUTPUT_DIR,
         _HISTORY_PUBLIC_DAYS,
         _HISTORY_PUBLIC_FIELDS,
@@ -931,6 +932,14 @@ def _get_history_index() -> dict:
 
     import json
     from datetime import datetime, timedelta, timezone
+    # A renamed repo's older snapshots carry its previous name; key them under
+    # the current one so its history stays continuous (roster previous_repos).
+    try:
+        with open(os.path.join(BASE_DIR, "agents.json"), encoding="utf-8") as f:
+            renames = {old.lower(): a["repo"].lower() for a in json.load(f)
+                       for old in (a.get("previous_repos") or [])}
+    except (OSError, ValueError, KeyError):
+        renames = {}
     cutoff = (datetime.now(timezone.utc).date()
               - timedelta(days=_HISTORY_PUBLIC_DAYS - 1)).isoformat()
     index: dict[str, list] = {}
@@ -952,6 +961,7 @@ def _get_history_index() -> dict:
             repo_key = (a.get("repo") or "").lower()
             if not repo_key:
                 continue
+            repo_key = renames.get(repo_key, repo_key)
             point = {"date": date_str}
             for k in _HISTORY_PUBLIC_FIELDS:
                 if k == "methodology_version":
