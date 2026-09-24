@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="theme-auto">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -233,7 +233,7 @@
       padding:9px 14px; border-radius:6px; border:1px solid var(--accent); background:transparent; color:var(--accent);
       font:600 13px/1 var(--font-sans); }
     .cmp-bubble > summary::-webkit-details-marker { display:none; }
-    .cmp-bubble > summary:hover, .cmp-bubble[open] > summary { background:var(--accent); color:#fff; }
+    .cmp-bubble > summary:hover, .cmp-bubble[open] > summary { background:var(--accent); color:var(--on-accent); }
     .cmp-bubble > summary:focus-visible { outline:2px solid var(--text); outline-offset:2px; }
     .cmp-bubble-icon { font-size:15px; }
     .cmp-bubble[open] > summary { box-shadow:none; }
@@ -299,7 +299,7 @@
     .prov-no { color:var(--muted-2); }
     .prov-sub { font-size:12px; color:var(--muted); margin-top:2px; }
     .sc-checks { margin-top:8px; display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:4px 14px; font-family:var(--font-mono); font-size:12px; }
-    .sc-check { display:flex; justify-content:space-between; padding:2px 0; border-bottom:1px solid rgba(0,0,0,0.06); }
+    .sc-check { display:flex; justify-content:space-between; padding:2px 0; border-bottom:1px solid var(--hairline); }
     .sc-check-name { color:var(--muted); }
     .sc-check-val { font-weight:600; }
 
@@ -308,7 +308,7 @@
     .links a:hover { color:var(--accent); border-color:var(--accent); text-decoration:none; }
     .compare-link { font-family:var(--font-mono); font-size:12px; padding:6px 12px; border:1px solid var(--accent); color:var(--accent); font-weight:600; background:none; cursor:pointer; }
     .compare-link:hover { color:var(--text); text-decoration:none; }
-    .compare-link.is-saved { color:#fff; background:var(--accent); }
+    .compare-link.is-saved { color:var(--on-accent); background:var(--accent); }
     .secondary-link { font-family:var(--font-mono); font-size:12px; padding:6px 12px; border:1px solid var(--border); color:var(--muted); background:none; cursor:pointer; }
     .secondary-link:hover { color:var(--text); border-color:var(--text); text-decoration:none; }
     /* Saved states for the hero .btn toggles. Both selectors outrank the shared
@@ -317,7 +317,7 @@
     .watch-button.is-saved,
     .watch-button.is-saved:hover { color:var(--green); border-color:var(--green); background:none; }
     #compareToggle.is-saved,
-    #compareToggle.is-saved:hover { color:#fff; background:var(--accent); border-color:var(--accent); }
+    #compareToggle.is-saved:hover { color:var(--on-accent); background:var(--accent); border-color:var(--accent); }
 
     .review-card { padding:16px 0; margin:0; border-bottom:1px solid var(--border); }
     .review-grid { display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:10px; }
@@ -338,7 +338,7 @@
     .warning-list-item { font-size:12px; color:var(--muted); line-height:1.5; }
     .recent-changes { margin:12px 0 0; }
     .recent-change-list { display:grid; gap:8px; }
-    .recent-change-item { display:grid; grid-template-columns:80px minmax(0, 1fr); gap:10px; padding:8px 0; border-bottom:1px solid rgba(0,0,0,0.06); align-items:start; }
+    .recent-change-item { display:grid; grid-template-columns:80px minmax(0, 1fr); gap:10px; padding:8px 0; border-bottom:1px solid var(--hairline); align-items:start; }
     .recent-change-date { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
     .recent-change-body { min-width:0; }
     .recent-change-badge { font-family:var(--font-mono); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); margin-bottom:4px; display:inline-block; }
@@ -359,7 +359,7 @@
 
     .safety-qa { padding:18px 0; border-top:1px solid var(--border); }
     .safety-qa .qa-summary { padding:10px 12px; margin-bottom:14px; border-left:3px solid var(--accent); background:var(--surface); font-size:13px; line-height:1.6; }
-    .safety-qa details { padding:8px 0; border-bottom:1px solid rgba(0,0,0,0.06); }
+    .safety-qa details { padding:8px 0; border-bottom:1px solid var(--hairline); }
     .safety-qa details:last-of-type { border-bottom:none; }
     .safety-qa summary { cursor:pointer; font-size:13px; font-weight:600; padding:4px 0; list-style:none; }
     .safety-qa summary::-webkit-details-marker { display:none; }
@@ -399,6 +399,15 @@
     .runtime-roadmap { margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; }
     .runtime-roadmap li { list-style:none; padding:5px 9px; border:1px solid #c5ddd8; font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#47635d; background:rgba(255,255,255,0.58); }
     .runtime-roadmap li.live { color:#1f6b52; border-color:rgba(31,107,82,0.25); }
+    @media (prefers-color-scheme: dark) {
+      html.theme-auto .runtime-soon .rt-card { border-color:#2e4b45; background:rgba(80,180,160,0.07); color:#a3c9bf; box-shadow:none; }
+      html.theme-auto .runtime-kicker, html.theme-auto .runtime-panel, html.theme-auto .runtime-provider,
+      html.theme-auto .runtime-roadmap li, html.theme-auto .runtime-status { border-color:#2e4b45; background:rgba(255,255,255,0.04); }
+      html.theme-auto .runtime-kicker, html.theme-auto .runtime-panel-title, html.theme-auto .runtime-status.neutral,
+      html.theme-auto .runtime-provider { color:#8fd1c1; }
+      html.theme-auto .runtime-status.positive, html.theme-auto .runtime-roadmap li.live { color:#7fcf9f; }
+      html.theme-auto .runtime-roadmap li { color:#a3c9bf; }
+    }
     .timeline-scroll { max-height:360px; overflow-y:auto; padding-right:6px; margin-top:10px; }
     .timeline-scroll::-webkit-scrollbar { width:8px; }
     .timeline-scroll::-webkit-scrollbar-thumb { background:rgba(0,0,0,0.12); border-radius:999px; }
@@ -420,7 +429,7 @@
 
     .siblings { padding:18px 0; border-top:1px solid var(--border); }
     .siblings ul { list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:6px 14px; }
-    .siblings li a { display:flex; align-items:baseline; gap:6px; padding:6px 0; border-bottom:1px solid rgba(0,0,0,0.06); }
+    .siblings li a { display:flex; align-items:baseline; gap:6px; padding:6px 0; border-bottom:1px solid var(--hairline); }
     .siblings li a:hover { text-decoration:none; color:var(--accent); }
     .siblings .sib-rank { font-family:var(--font-mono); font-size:11px; color:var(--muted); min-width:24px; text-align:right; }
     .siblings .sib-name { flex:1; font-weight:500; font-size:12px; }
@@ -1458,6 +1467,22 @@
     })();
   </script>
   <script>
+    // Seal score counts up alongside the ring draw (site.css); the final value
+    // is already in the markup, so no-JS and reduced-motion readers see it.
+    (function () {
+      var el = document.querySelector(".vseal-num");
+      if (!el || !window.requestAnimationFrame) return;
+      if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      var end = parseFloat(el.textContent), t0 = null;
+      if (!(end > 0)) return;
+      function step(t) {
+        if (t0 === null) t0 = t;
+        var k = Math.min(1, (t - t0) / 900), eased = 1 - Math.pow(1 - k, 3);
+        el.textContent = (end * eased).toFixed(1);
+        if (k < 1) requestAnimationFrame(step); else el.textContent = end.toFixed(1);
+      }
+      requestAnimationFrame(step);
+    })();
     // "signals checked 3 h ago": pages are static and edge-cached, so relative
     // time is computed here from the ISO stamp; without JS the date stays.
     (function () {
