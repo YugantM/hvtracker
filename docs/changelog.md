@@ -744,6 +744,20 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   Measured bill split this cycle: web ~$11.5 · Redis ~$1.55 · Postgres
   ~$0.62 per 30 days.
 
+- **2026-09-24 afternoon, DEPLOYED** (3f7d6250 @ aa4ad1d9, then 2b05ffec @
+  97b226f7; 459 tests + render + validate green). #257 retired six listings
+  whose repos 404 (ProductClank, DEVONthink MCP, Thunderbit MCP Server +
+  three skills): 410 Gone live, board 1,682 -> 1,676. #219 (external,
+  Threadplane maintainer) + #258: roster `previous_repos` keeps score and
+  history across GitHub renames (render_state, all history readers,
+  latest.json, MCP index); Threadplane live on cacheplane/threadplane, Grade
+  A, 91-day history intact, never provisional. #259 + #260: dark mode on
+  every page (site.css `html:root`; inline chart SVGs, /data/, /scan/,
+  /verify/, capability tags, auth cards, all 15 hand-written posts,
+  /changelog/, and the auth.js header widget). Live dark audit: 16/16 pages
+  clean. Pre-existing, not fixed: app marketing pages override `--lobster`
+  with the old light #c67c6d (2.5-2.9:1 in LIGHT mode).
+
 ## Entries recorded only in the old AGENTS.md
 
 - UI/UX fix batches DEPLOYED 2026-07-23 (owner-approved): #198 (P0 bugs —
