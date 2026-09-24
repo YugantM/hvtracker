@@ -112,6 +112,7 @@
   --on-accent: #fff;
   --card: #fff;
   --hairline: rgba(0, 0, 0, .06);
+  --row-hover: #ddd8ce;
 }
 
 /* ---- Dark mode ----------------------------------------------------------
@@ -132,6 +133,7 @@
     --line: #33373f; --line-strong: #4b5059;
     --lobster: #e0977f; --moss: #9cc690; --blue-strong: #8fb3dc;
     --hairline: rgba(255, 255, 255, .08);
+    --row-hover: #262a31;
   }
 }
 

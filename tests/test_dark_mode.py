@@ -4,7 +4,7 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-AUDITED = ["templates/agent.html.j2", "templates/compare_pair.html.j2",
+AUDITED = ["template.html", "templates/agent.html.j2", "templates/compare_pair.html.j2",
            "templates/category.html.j2", "templates/methodology.html.j2"]
 
 
