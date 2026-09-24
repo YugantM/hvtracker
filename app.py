@@ -654,7 +654,8 @@ def _site_header_html(updated: str) -> str:
     return f"""<header class="site-header">
     <div class="site-header-inner">
       <a href="/" class="logo">HV<span>Tracker</span></a>
-      <nav class="site-nav" aria-label="Site">
+      <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
+      <nav class="site-nav" id="site-nav" aria-label="Site">
         <div class="nav-group"><button type="button" class="nav-trigger">Registry</button><div class="nav-panel"><a href="/">Leaderboard</a><a href="/compare/">Compare</a><a href="/movers/">Movers</a><a href="/changes/">Changes</a><a href="/trends/">Trends</a></div></div>
         <div class="nav-group"><button type="button" class="nav-trigger">Trust</button><div class="nav-panel"><a href="/verify/">Verify</a><a href="/scan/">Scan stack</a><a href="/methodology/">Methodology</a><a href="/badges/">Badges</a></div></div>
         <div class="nav-group"><button type="button" class="nav-trigger">Ecosystem</button><div class="nav-panel"><a href="/ecosystem/">Providers</a><a href="/capabilities/">Capabilities</a><a href="/org/">Organizations</a><a href="/use-cases/">Use cases</a><a href="/blog/">Blog</a></div></div>
@@ -669,6 +670,7 @@ def _site_header_html(updated: str) -> str:
       </div>
     </div>
   </header>
+  <script>(function(){{var b=document.querySelector(".nav-toggle");if(!b)return;document.documentElement.classList.add("nav-js");function s(o){{b.setAttribute("aria-expanded",o);b.parentNode.classList.toggle("nav-open",o)}}b.addEventListener("click",function(){{s(b.getAttribute("aria-expanded")!=="true")}});document.addEventListener("keydown",function(e){{if(e.key==="Escape")s(false)}})}})();</script>
   <script defer src="/auth.js?v={_AUTH_JS_VER}"></script>"""
 
 
