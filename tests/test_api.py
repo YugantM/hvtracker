@@ -252,6 +252,7 @@ def test_handwritten_feed_items_have_stable_dates(client):
     (master plan 0.6) — a fresh render's feed must carry their real publish
     dates, byte-identical across renders."""
     expected = {
+        "haystack-trust-case-study": "2026-09-24T00:00:00Z",
         "calibration-fix-and-coverage-grade": "2026-07-06T00:00:00Z",
         "scan-your-stack": "2026-06-23T00:00:00Z",
         "mcp-server-launch": "2026-06-21T00:00:00Z",
