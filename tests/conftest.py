@@ -10,3 +10,7 @@ if ROOT not in sys.path:
 # lifespan) otherwise spawns render subprocesses and scorecard pulls that
 # outlive the tests and write into the repo. See app._kick_boot_refresh.
 os.environ.setdefault("HVT_BOOT_REFRESH", "0")
+
+# Full-site renders in the API/SEO fixtures don't need the ~1,700 share-card
+# PNGs (the OG signature logic has its own unit tests).
+os.environ.setdefault("HVT_SKIP_OG_CARDS", "1")

@@ -1723,21 +1723,24 @@ def classify_license(repo_id: str, spdx_id: str | None) -> str:
     return "unlicensed" if not found_file else "open"
 
 
-def normalize_license_type(row: dict) -> str:
+def normalize_license_type(row: dict, offline: bool = False) -> str:
     """Keep cached rows consistent with the detected GitHub SPDX license.
 
     Respects license_override (from agents.json) as authoritative.
-    Always reclassifies non-overridden agents to pick up marker improvements.
+    Reclassifies non-overridden agents to pick up marker improvements, except
+    when `offline` (render-only): there it keeps the row's stored
+    classification. classify_license reads up to five LICENSE URLs per repo on
+    a cache miss, so render-only, which promises no API calls, was spending
+    ~4.5 minutes per render on network requests for the ~1,450 rows GitHub
+    reports no license for.
     """
     if row.get("license_override"):
         return row["license_override"]
     spdx_id = row.get("license_spdx")
     if spdx_id and spdx_id != "NOASSERTION":
         return "open"
-    # Always reclassify — the cache key bump (license_type_v2) ensures fresh
-    # results on full runs.  On render-only runs classify_license will use
-    # the Redis cache (which may be empty → returns unlicensed), but that's
-    # acceptable since overrides cover the known-wrong cases.
+    if offline:
+        return row.get("license_type") or "unlicensed"
     return classify_license(row.get("repo", ""), spdx_id)
 
 
@@ -6765,7 +6768,7 @@ def main() -> None:
         source_note_override = _source_note_map.get(repo_key)
         if source_note_override:
             row["source_note"] = source_note_override
-        row["license_type"] = normalize_license_type(row)
+        row["license_type"] = normalize_license_type(row, offline=render_only)
         # Always recompute freshness from the absolute last_push date so the
         # color coding (and the maintenance dimension) stay correct even when
         # rendering from a cached snapshot — cached days_ago would drift stale.
@@ -7234,7 +7237,7 @@ def main() -> None:
     for lr in legacy_rows:
         if not lr.get("license_override"):
             lr["license_override"] = _override_map.get(lr.get("repo", "").lower(), "")
-        lr["license_type"] = normalize_license_type(lr)
+        lr["license_type"] = normalize_license_type(lr, offline=render_only)
         dl = lr.get("weekly_downloads")
         lr["downloads_fmt"] = f"{dl:,}" if dl is not None else "—"
         lr["score_breakdown"] = score_components(
@@ -7421,6 +7424,9 @@ def main() -> None:
     # dominate the cost of a fast leaderboard update.
     if signals_only:
         print("SIGNALS-ONLY: skipping OG card regeneration.")
+    elif os.environ.get("HVT_SKIP_OG_CARDS") == "1":
+        # Tests: ~1,700 PIL cards per render (~90s) that no test looks at.
+        print("HVT_SKIP_OG_CARDS=1: skipping OG card regeneration.")
     else:
         try:
             from generate_og_card import generate as generate_og, generate_site_card
