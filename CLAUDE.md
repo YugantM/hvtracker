@@ -90,6 +90,8 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
 
 ## Now / next
 - Active plan (phases, decisions, UI mockups):
-  https://claude.ai/artifact/KfF5N95t1Y114J1nABMjfe — Phase 0 done and deployed
-  2026-09-23; Phase 1 (guardrails) in progress; then Phase 2 (UI/UX), Phase 3
-  (growth/durability).
+  https://claude.ai/artifact/KfF5N95t1Y114J1nABMjfe — Phases 0–1 deployed
+  2026-09-23; Phase 2 (UI/UX, #238–#245) merged 2026-09-24, deploy pending the
+  owner's go; then Phase 3 (growth/durability). Details: docs/changelog.md.
+- Dark mode is opt-in per page (`<html class="theme-auto">`); audit contrast
+  before opting a page in. Grade colours are literal hex, never tokens.
