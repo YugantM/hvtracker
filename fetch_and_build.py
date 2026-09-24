@@ -8047,6 +8047,7 @@ def main() -> None:
     sitemap_urls.append(("https://hvtracker.net/blog/you-are-not-installing-what-you-think/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/state-of-ai-agent-supply-chain-trust-2026/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/calibration-fix-and-coverage-grade/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/haystack-trust-case-study/", "0.9", "weekly"))
     for _p in snapshot_posts:
         sitemap_urls.append((f"https://hvtracker.net/blog/{_p['slug']}/", "0.7", "monthly"))
     for _p in quarterly_reports:
@@ -8215,6 +8216,14 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
         }
         for _p in quarterly_reports
     ] + [
+        {
+            "id": "https://hvtracker.net/blog/haystack-trust-case-study",
+            "url": "https://hvtracker.net/blog/haystack-trust-case-study/",
+            "title": "Case Study: How Haystack Earns the Top HVTrust Score",
+            "content_text": "Haystack is #1 of 1,328 tracked projects and Grade A on every day of the last 90. Where its 96.5 comes from, the gaps that remain, and why it publishes the badge.",
+            "date_modified": "2026-09-24T00:00:00Z",
+            "tags": ["Case study", "Supply chain trust", "Badges"],
+        },
         {
             "id": "https://hvtracker.net/blog/calibration-fix-and-coverage-grade",
             "url": "https://hvtracker.net/blog/calibration-fix-and-coverage-grade/",
