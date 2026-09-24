@@ -62,3 +62,14 @@ def test_auth_widget_styles_have_a_dark_override():
     js = _read("auth.js")
     dark = js[js.index("@media (prefers-color-scheme:dark){"):]
     assert ".hvt-auth-btn,.hvt-bell,.hvt-auth-pop{background:var(--card)}" in dark
+
+
+def test_marketing_pages_take_their_palette_from_site_css():
+    """app.py's _marketing_page used to redefine --lobster/--muted/... with
+    older, paler values (the orange labels read at 2.5-2.9:1 in light mode)."""
+    import inspect
+    import app
+    src = inspect.getsource(app._marketing_page)
+    head = src[src.index("<style>"):src.index("</style>")]
+    for token in ("--lobster:", "--muted:", "--blue-strong:", "--paper:", "--ink:"):
+        assert token not in head, token
