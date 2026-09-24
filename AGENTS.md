@@ -90,8 +90,11 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
 
 ## Now / next
 - Active plan (phases, decisions, UI mockups):
-  https://claude.ai/artifact/KfF5N95t1Y114J1nABMjfe — Phases 0–1 deployed
-  2026-09-23; Phase 2 (UI/UX, #238–#245) merged 2026-09-24, deploy pending the
-  owner's go; then Phase 3 (growth/durability). Details: docs/changelog.md.
+  https://claude.ai/artifact/KfF5N95t1Y114J1nABMjfe — Phases 0–2 deployed
+  (Phase 2: 2026-09-24); Phase 3 (#247–#252) merged, deploy pending the
+  owner's go. Details: docs/changelog.md.
+- Titles/meta descriptions change ONLY via a logged CTR batch
+  (`CTR_TEST_COMPARE` + docs/ctr-tests.md). Badge adopters live in
+  `BADGE_ADOPTERS`, verified weekly by scripts/check_adopters.py.
 - Dark mode is opt-in per page (`<html class="theme-auto">`); audit contrast
   before opting a page in. Grade colours are literal hex, never tokens.
