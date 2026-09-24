@@ -90,9 +90,9 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
 
 ## Now / next
 - Active plan (phases, decisions, UI mockups):
-  https://claude.ai/artifact/KfF5N95t1Y114J1nABMjfe — Phases 0–2 deployed
-  (Phase 2: 2026-09-24); Phase 3 (#247–#252) merged, deploy pending the
-  owner's go. Details: docs/changelog.md.
+  https://claude.ai/artifact/KfF5N95t1Y114J1nABMjfe — Phases 0–3 deployed
+  (Phase 3: 2026-09-24). Open owner items and check dates: docs/changelog.md
+  and docs/ctr-tests.md.
 - Titles/meta descriptions change ONLY via a logged CTR batch
   (`CTR_TEST_COMPARE` + docs/ctr-tests.md). Badge adopters live in
   `BADGE_ADOPTERS`, verified weekly by scripts/check_adopters.py.
