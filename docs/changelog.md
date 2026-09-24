@@ -757,6 +757,24 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   /changelog/, and the auth.js header widget). Live dark audit: 16/16 pages
   clean. Pre-existing, not fixed: app marketing pages override `--lobster`
   with the old light #c67c6d (2.5-2.9:1 in LIGHT mode).
+- **Week batch (#262–#265), DEPLOYED 2026-09-24 16:38 UTC** (dcc2d250 @
+  05fb650e; 477 tests + render + validate green on combined main). #262:
+  hand-written posts and /changelog/ fill `<!--#site-header-->` from the
+  shared partial (verified live: nav-toggle on blog + /scan/ /verify/ /live/).
+  #263: app marketing pages (/submit/ /correct/ /alerts/) no longer override
+  `--lobster` with the pale #c67c6d. #264: `--render-only` is offline
+  (licence classification no longer calls GitHub ~7,600×), suite 27 min →
+  19 s; #263's one CI failure was that network flake. #265: the 19 Sep
+  confidence flap. data.json's whitelist dropped `docker_image`/
+  `vscode_extension`, so a Docker-only agent was 2/3 in the build that
+  fetched it and 2/2 after; and `fetch_docker_pulls` sent `docker.io/…:tag`
+  / `ghcr.io/…` refs to the Hub verbatim (5 of 91 ever resolved).
+  `docker_hub_repo()` normalises refs; non-Hub registries count as not
+  applicable; both fields are published so config and data move together
+  (verified live: all 1,676 rows carry the keys, the nine flap agents hold
+  1.0, no dip). Evidence gate vs live: 33 rise (32 Docker pull counts + Continue's VS Code
+  installs), none fall, 7 grades up, bystanders ≤5 ranks — lands as the 2 h
+  rotation reaches each row (≤12 h). Roster: postgres-mcp image corrected.
 
 ## Entries recorded only in the old AGENTS.md
 
