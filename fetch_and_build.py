@@ -3021,6 +3021,28 @@ def seed_history_into_output_root(base_dir: str, script_dir: str) -> int:
     return copied
 
 
+SITE_HEADER_MARKER = "<!--#site-header-->"
+
+
+def fill_site_header(path: str, env, updated: str) -> bool:
+    """Replace a hand-written page's <!--#site-header--> slot with the shared
+    header partial, so blog posts and /changelog/ can't drift from it (they
+    each carried a hand-copied header with a stale nav before). Only ever
+    touches the OUTPUT copy; the source keeps its marker."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            html = f.read()
+    except OSError:
+        return False
+    if SITE_HEADER_MARKER not in html:
+        return False
+    html = html.replace(SITE_HEADER_MARKER,
+                        env.get_template("_site_header.html.j2").render(updated=updated), 1)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(html)
+    return True
+
+
 def prune_stale_page_dirs(parent_dir: str, keep_slugs: set[str], label: str) -> int:
     """Remove generated page subdirectories the current render did not produce.
 
@@ -7865,9 +7887,13 @@ def main() -> None:
             dst = os.path.join(blog_dir, article_dir)
             if os.path.isdir(src):
                 shutil.copytree(src, dst, dirs_exist_ok=True)
+                fill_site_header(os.path.join(dst, "index.html"), env, now_str)
                 copied += 1
         if copied:
             print(f"Copied {copied} hand-written blog articles from blog_static/.")
+    # /changelog/ is hand-written too; copied into the output root at startup.
+    if script_dir != base_dir:
+        fill_site_header(os.path.join(script_dir, "changelog", "index.html"), env, now_str)
     else:
         print(f"[warn] blog_static/ not found at {blog_static_dir}")
 
