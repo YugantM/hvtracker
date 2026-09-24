@@ -106,6 +106,35 @@
   --blue-soft: rgba(167,191,217,.18);
   --stale: #6f6a61;
   --muted-2: #6e675f;
+  /* Text on an --accent fill, and the raised "card" background (inputs,
+     panels). Separate tokens so dark mode can use a light accent for links
+     while fills keep readable text. */
+  --on-accent: #fff;
+  --card: #fff;
+  --hairline: rgba(0, 0, 0, .06);
+  --row-hover: #ddd8ce;
+}
+
+/* ---- Dark mode ----------------------------------------------------------
+   Follows the system setting, but only on pages that opt in with
+   <html class="theme-auto"> after an audit: several templates and every
+   hand-written blog post redefine the palette with light-only values, and a
+   blanket switch would give them light-on-light text. `html.theme-auto`
+   (0,1,1) outranks the page-level `:root` overrides some templates carry.
+   Grade colours are invariant and pinned below, so they don't move. */
+@media (prefers-color-scheme: dark) {
+  html.theme-auto {
+    color-scheme: dark;
+    --bg: #15171b; --surface: #1e2126; --border: #33373f; --card: #1b1e23;
+    --text: #e7e4de; --muted: #aaa49b; --muted-2: #8e887f; --stale: #8e887f;
+    --accent: #8fb3dc; --on-accent: #0f1216; --accent-warm: #e0977f;
+    --green: #74c08f; --red: #e3897f; --amber: #d9b75e; --aging: #d9b75e;
+    --paper: #15171b; --paper-2: #1e2126; --ink: #e7e4de;
+    --line: #33373f; --line-strong: #4b5059;
+    --lobster: #e0977f; --moss: #9cc690; --blue-strong: #8fb3dc;
+    --hairline: rgba(255, 255, 255, .08);
+    --row-hover: #262a31;
+  }
 }
 
 body {
@@ -183,10 +212,12 @@ main blockquote a:not([class]):hover {
 
 .evidence-badge { display: inline-block; font-family: var(--font-mono); font-size: 11px; font-weight: 700; width: 20px; text-align: center; padding: 1px 0; border-radius: 3px; letter-spacing: .02em; }
 .badge { display: inline-block; font-family: var(--font-mono); font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 4px; letter-spacing: .02em; }
-.grade-A { color: #fff; background: var(--green); }
+/* Grade colours are a design invariant (B = #2c5282): literal hex, never
+   tokens, so no theme can shift them. */
+.grade-A { color: #fff; background: #2f6846; }
 .grade-B { color: #fff; background: #2c5282; }
-.grade-C { color: #fff; background: var(--amber); }
-.grade-D { color: #fff; background: var(--muted); }
+.grade-C { color: #fff; background: #8b6914; }
+.grade-D { color: #fff; background: #57524c; }
 
 footer { padding: 24px 0 36px; margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; text-align: center; font-size: 12px; color: var(--muted); }
 footer a { color: var(--accent); }
@@ -286,13 +317,13 @@ a:hover { text-underline-offset: 3px; text-decoration-thickness: 1px; }
 .btn:hover { text-decoration: none; }
 .btn:active { transform: translateY(1px); }
 
-.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-.btn-primary:hover { filter: brightness(1.12); color: #fff; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn-primary:hover { filter: brightness(1.12); color: var(--on-accent); }
 
 /* Saved/active states stay with the page that owns the toggle (agent page
    styles compare vs. track differently), so no .is-saved rule lives here. */
 .btn-secondary { border-color: var(--accent); color: var(--accent); }
-.btn-secondary:hover { background: var(--accent); color: #fff; }
+.btn-secondary:hover { background: var(--accent); color: var(--on-accent); }
 
 .btn-tertiary {
   padding: 9px 4px; color: var(--muted); font-weight: 400;
