@@ -11,7 +11,7 @@ control group (all other `/compare/` pages) over the same windows. A test
 "wins" if its CTR rises by more than the control's at a similar position.
 Revert a loser by deleting its entry.
 
-## Batch 1 — deployed with Phase 3 (check 14 days after deploy, then at 28)
+## Batch 1 — deployed 2026-09-24 08:48 UTC (deployment 93273d1c); check 2026-10-08, then 2026-10-22
 
 Baseline window: 2026-08-24 → 2026-09-21 (28 days).
 

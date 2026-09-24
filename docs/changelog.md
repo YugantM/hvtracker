@@ -719,8 +719,13 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   #246). Verified live: healthz ok, build_report clean, homepage 100 inline
   rows + board-rest.json, verdict card, compare decision view, category
   podium, provisional "Grade pending", 100/354 skills in the sitemap.
-- **Phase 3 growth/durability (#247–#252), merged 2026-09-24, NOT yet
-  deployed.** #247 CTR test batch 1: per-URL title/description overrides
+- **Phase 3 growth/durability (#247–#252, #254), DEPLOYED 2026-09-24 08:48
+  UTC** (deployment 93273d1c, `main` @ c157d312; 453 tests, render, validate
+  green). Verified live: /adopters/ 7 cards, SkillSpector gone from the home
+  strip, /.cache 404, only the two logged compare titles changed, case study
+  on all 4 surfaces, build_report clean, api_cache_entries 0→89 on the
+  startup refresh (file cache working; Redis service not yet deleted). #254
+  trimmed the case study's unverified "no commercial relationship" clause. #247 CTR test batch 1: per-URL title/description overrides
   (`CTR_TEST_COMPARE`) for litellm-vs-vllm and hindsight-vs-mem0 only, with
   baseline, control group and check dates in `docs/ctr-tests.md` — the one
   sanctioned path for title changes; `/capabilities/` deliberately excluded
