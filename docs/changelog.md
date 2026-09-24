@@ -724,7 +724,8 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   green). Verified live: /adopters/ 7 cards, SkillSpector gone from the home
   strip, /.cache 404, only the two logged compare titles changed, case study
   on all 4 surfaces, build_report clean, api_cache_entries 0→89 on the
-  startup refresh (file cache working; Redis service not yet deleted). #254
+  startup refresh (file cache working). Redis retired the same day: REDIS_URL
+  removed from web, Redis service deleted (~$1.55/30d saved); #184 closed. #254
   trimmed the case study's unverified "no commercial relationship" clause. #247 CTR test batch 1: per-URL title/description overrides
   (`CTR_TEST_COMPARE`) for litellm-vs-vllm and hindsight-vs-mem0 only, with
   baseline, control group and check dates in `docs/ctr-tests.md` — the one
