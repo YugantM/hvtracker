@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   {% include "_head_icons.html.j2" %}
   <meta name="google-site-verification" content="s2YUWbGP7cJsI6HUCKRX9YCtbVJVyA1Q1_jsNWj1RHc">
-  <title>{{ a.name }} vs {{ b.name }}: AI agent trust comparison | HVTracker</title>
-  <meta name="description" content="{{ a.name }} scores {{ a.trust_score }}/100 (Grade {{ a.evidence_grade }}), {{ b.name }} scores {{ b.trust_score }}/100 (Grade {{ b.evidence_grade }}). Compared on provenance, OSSF Scorecard, MCP support, maintenance, and downloads — public, checkable evidence, not hype.">
+  {# seo_override: plan 3.1 CTR-test entries only (CTR_TEST_COMPARE) #}
+  <title>{% if seo_override %}{{ seo_override.title }}{% else %}{{ a.name }} vs {{ b.name }}: AI agent trust comparison | HVTracker{% endif %}</title>
+  <meta name="description" content="{% if seo_override %}{{ seo_override.description }}{% else %}{{ a.name }} scores {{ a.trust_score }}/100 (Grade {{ a.evidence_grade }}), {{ b.name }} scores {{ b.trust_score }}/100 (Grade {{ b.evidence_grade }}). Compared on provenance, OSSF Scorecard, MCP support, maintenance, and downloads — public, checkable evidence, not hype.{% endif %}">
   <link rel="canonical" href="https://hvtracker.net/compare/{{ a.slug }}-vs-{{ b.slug }}/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="{{ a.name }} vs {{ b.name }} — AI agent trust comparison">
@@ -54,6 +55,8 @@
     .dv-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
     .dv-head a { font-size: 18px; font-weight: 700; color: var(--text); }
     .dv-score { margin-left: auto; font-family: var(--font-mono); font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .dv-what { margin-top: 6px; font-size: 13.5px; line-height: 1.45; color: var(--text);
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .dv-meta { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
     .dv-choose { margin: 12px 0 8px; font-size: 14.5px; font-weight: 600; }
     .dv-choose.is-none { font-weight: 400; color: var(--muted); }
@@ -173,6 +176,7 @@
           <a href="/agents/{{ r.slug }}/">{{ r.name }}</a>
           <span class="dv-score">{{ r.trust_score }}</span>
         </div>
+        {% if r.description %}<p class="dv-what">{{ r.description }}</p>{% endif %}
         <p class="dv-meta">{{ r.repo }} · #{{ r.rank }} overall{% if r.category_rank %} · #{{ r.category_rank }} {{ category.name }}{% endif %}{% if r.coverage_grade %} · coverage {{ r.coverage_grade }} ({{ r.signal_types }}/5){% endif %}</p>
         {% if s.choose_if %}
         <p class="dv-choose">{{ s.choose_if }}</p>

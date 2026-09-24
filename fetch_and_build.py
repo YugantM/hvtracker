@@ -4512,6 +4512,40 @@ def compare_coverage_caveat(lead_row: dict, trail_row: dict) -> str | None:
             f"(coverage {lg} vs {tg}) — its score rests on fewer independent signal types.")
 
 
+# Plan 3.1: one small, measured CTR batch. Per-URL <title>/meta-description
+# overrides for page-1 compare pages whose templated title ("AI agent trust
+# comparison") misses what the searcher asks. Keyed by the sorted slug pair so
+# either URL order resolves to the same entry. Every entry is logged in
+# docs/ctr-tests.md with its GSC baseline and a 14-day check date; nothing else
+# on the site may change titles outside such a batch (#114).
+# Fields: {a}/{b} names, {a_score}/{b_score}, {a_grade}/{b_grade}.
+CTR_TEST_COMPARE = {
+    ("litellm", "vllm"): {
+        "title": "LiteLLM vs vLLM: AI Gateway vs Inference Engine | HVTracker",
+        "description": ("LiteLLM is an AI gateway that calls 100+ LLM APIs in one format; vLLM is a "
+                        "high-throughput inference and serving engine, and teams often run both. "
+                        "Trust: {a} {a_score}/100 (Grade {a_grade}), {b} {b_score}/100 (Grade {b_grade})."),
+    },
+    ("hindsight", "mem0"): {
+        "title": "Hindsight vs Mem0: Which Agent Memory Layer to Trust? | HVTracker",
+        "description": ("Hindsight and Mem0 both give AI agents long-term memory. {a} scores "
+                        "{a_score}/100 (Grade {a_grade}), {b} {b_score}/100 (Grade {b_grade}): see "
+                        "which leads on supply-chain integrity, maintenance and adoption."),
+    },
+}
+
+
+def ctr_test_override(a: dict, b: dict) -> dict | None:
+    """The CTR-test title/description for this pair, filled with live scores."""
+    entry = CTR_TEST_COMPARE.get(tuple(sorted((a.get("slug", ""), b.get("slug", "")))))
+    if not entry:
+        return None
+    fields = {"a": a.get("name", ""), "b": b.get("name", ""),
+              "a_score": a.get("trust_score"), "b_score": b.get("trust_score"),
+              "a_grade": a.get("evidence_grade"), "b_grade": b.get("evidence_grade")}
+    return {k: v.format(**fields) for k, v in entry.items()}
+
+
 # How a lead on each trust dimension reads in a sentence ("X leads on …",
 # "Choose X if … matters most").
 _DIM_PHRASE = {
@@ -7691,7 +7725,7 @@ def main() -> None:
                  for lbl, k in (("Safety / integrity", "safety"), ("Identity & provenance", "identity"),
                                 ("Transparency", "transparency"), ("Maintenance", "maintenance"), ("Adoption", "adoption"))]
         _ctx = {"a": _a, "b": _b, "category": _cm, "metrics": _metrics, "dims": _dims,
-                "caps": compare_capability_rows(_a, _b), "decision": compare_decision(_a, _b), "total": len(rows),
+                "caps": compare_capability_rows(_a, _b), "decision": compare_decision(_a, _b), "seo_override": ctr_test_override(_a, _b), "total": len(rows),
                 "updated": now_str, "methodology_version": METHODOLOGY_VERSION,
                 "lead_name": None, "lead_score": None, "lead_grade": None, "trail_score": None, "trail_grade": None, "gap": None,
                 "coverage_caveat": None}
