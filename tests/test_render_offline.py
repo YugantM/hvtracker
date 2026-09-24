@@ -6,8 +6,6 @@ without a GitHub SPDX id, on every render. That made a "no API calls" render
 take ~4.5 minutes and was most of the test suite's 27-minute runtime."""
 import inspect
 
-import pytest
-
 import fetch_and_build as fab
 
 
