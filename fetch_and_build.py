@@ -1635,6 +1635,35 @@ def fetch_crate_downloads(crate_name: str) -> int | None:
         return None
 
 
+_DOCKER_HUB_REGISTRIES = {"docker.io", "index.docker.io", "registry-1.docker.io", "registry.hub.docker.com"}
+
+
+def docker_hub_repo(image: str | None) -> str | None:
+    """The Docker Hub "namespace/name" behind an image reference, or None when
+    the image lives on another registry.
+
+    The roster writes images the way `docker pull` accepts them —
+    `docker.io/armlimited/arm-mcp:2.4.0`, `ghcr.io/org/app:v1`, `n8nio/n8n` —
+    but the Docker Hub API wants bare `namespace/name`. Only Docker Hub
+    publishes a pull count, so any other registry (ghcr.io, quay.io, …) has no
+    download signal to read, the same as a project that ships no package.
+    """
+    ref = (image or "").strip().split("@", 1)[0]
+    if not ref:
+        return None
+    parts = ref.split("/")
+    if len(parts) > 1 and ("." in parts[0] or ":" in parts[0] or parts[0] == "localhost"):
+        if parts[0].lower() not in _DOCKER_HUB_REGISTRIES:
+            return None
+        parts = parts[1:]
+    parts[-1] = parts[-1].split(":", 1)[0]
+    if len(parts) == 1:
+        parts = ["library", parts[0]]
+    if len(parts) != 2 or not all(parts):
+        return None
+    return "/".join(parts).lower()
+
+
 @cache.cached("docker_pulls", ttl=86400, skip_none=True)
 def fetch_docker_pulls(image: str) -> int | None:
     """Fetch cumulative pull count from Docker Hub.
@@ -1642,7 +1671,10 @@ def fetch_docker_pulls(image: str) -> int | None:
     Returns the lifetime pull count (not weekly). The adoption formula uses
     log scale so cumulative is acceptable — it measures distribution reach.
     """
-    url = f"https://hub.docker.com/v2/repositories/{quote(image, safe='/')}/"
+    hub_repo = docker_hub_repo(image)
+    if not hub_repo:
+        return None
+    url = f"https://hub.docker.com/v2/repositories/{quote(hub_repo, safe='/')}/"
     try:
         r = requests.get(url, timeout=10)
         if r.status_code == 200:
@@ -1918,11 +1950,14 @@ def compute_trust_score(row: dict) -> dict:
     # that ships no package) is not the same as "unverified".
     applicable = 1   # GitHub repo data — always applicable and present
     present = 1
+    # A Docker image only counts when it is on Docker Hub: no other registry
+    # publishes a pull count, so a ghcr.io image has no download signal to be
+    # missing (the 2026-09-19 flap came from counting it as missing).
     if (
         row.get("npm_package")
         or row.get("pypi_package")
         or row.get("crate_package")
-        or row.get("docker_image")
+        or docker_hub_repo(row.get("docker_image"))
         or row.get("vscode_extension")
     ):
         applicable += 1
@@ -7026,6 +7061,12 @@ def main() -> None:
                 "npm_package": r.get("npm_package", ""),
                 "crate_package": r.get("crate_package", ""),
                 "pypi_package": r.get("pypi_package", ""),
+                # Must be published: batch mode carries non-batch rows forward
+                # from data.json, and trust confidence reads these — dropping
+                # them made a package count only in the render that fetched it
+                # (confidence 1.0 <-> 0.67 flap, 2026-09-19).
+                "docker_image": r.get("docker_image", ""),
+                "vscode_extension": r.get("vscode_extension", ""),
                 "weekly_downloads": r.get("weekly_downloads"),
                 "dl_source": r.get("dl_source", ""),
                 "hn_mentions_30d": r.get("hn_mentions_30d"),
@@ -7157,7 +7198,7 @@ def main() -> None:
             r.get("pypi_package")
             or r.get("npm_package")
             or r.get("crate_package")
-            or r.get("docker_image")
+            or docker_hub_repo(r.get("docker_image"))
             or r.get("vscode_extension")
         ) and r.get("weekly_downloads") is None
     ]
