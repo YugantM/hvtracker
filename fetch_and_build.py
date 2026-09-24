@@ -2272,6 +2272,44 @@ def score_class(s: float) -> str:
     return "score-low"
 
 
+# Projects whose own README embeds the HVTrust badge. The homepage strip and
+# /adopters/ make that claim publicly, so every entry must be verifiable:
+# scripts/check_adopters.py (weekly workflow) confirms each README still
+# carries a hvtracker.net/badge/ link and opens an issue when one drops it.
+# NVIDIA/SkillSpector was removed after its 2026-09-17 README cleanup deleted
+# the badge; forks and vendored copies of adopters are not listed.
+BADGE_ADOPTERS = [
+    ("lightrag", "HKUDS/LightRAG", "Simple, fast retrieval-augmented generation"),
+    ("composio", "ComposioHQ/composio", "Tooling and context management for AI agents"),
+    ("haystack", "deepset-ai/haystack", "Open-source AI orchestration framework"),
+    ("aipass", "AIOSAI/AIPass", "Persistent workspace for AI agents"),
+    ("reversecore-mcp", "sjkim1127/Reversecore_MCP", "Security-first MCP server for reverse engineering"),
+    ("threadplane", "cacheplane/threadplane", "Open-source thread-plane for agents"),
+    ("mcp-hangar", "mcp-hangar/mcp-hangar", "Policy enforcement plane for MCP calls"),
+]
+
+
+def build_adopters(rows: list[dict]) -> list[dict]:
+    """BADGE_ADOPTERS joined with their live rows (score, grade, rank, stars).
+    `avatar` is False when adopters/<slug>.png isn't shipped; pages then show a
+    monogram instead of a broken image."""
+    by_slug = {r.get("slug"): r for r in rows}
+    here = os.path.dirname(os.path.abspath(__file__))
+    out = []
+    for slug, repo, desc in BADGE_ADOPTERS:
+        r = by_slug.get(slug, {})
+        owner, _, name = repo.partition("/")
+        out.append({
+            "slug": slug, "owner": owner, "name": name, "repo": repo, "desc": desc,
+            "display_name": r.get("name") or name,
+            "stars_fmt": r.get("stars_fmt") if (r.get("stars") or 0) > 0 else "",
+            "trust_score": r.get("trust_score"), "evidence_grade": r.get("evidence_grade"),
+            "rank": r.get("rank"), "listed": bool(r),
+            "avatar": os.path.isfile(os.path.join(here, "adopters", f"{slug}.png")),
+        })
+    return out
+
+
 # Homepage rows rendered inline; the rest load from data/board-rest.json.
 BOARD_SSR_ROWS = 100
 
@@ -7222,29 +7260,7 @@ def main() -> None:
     # description and JSON-LD, and those must not churn (#114).
     skill_rows = [r for r in rows if listing_class(r) != "agent"]
     skill_categories = sorted({r.get("category", "") for r in skill_rows} - {""})
-    _ADOPTERS = [
-        ("lightrag", "HKUDS/LightRAG", "Simple, fast retrieval-augmented generation"),
-        ("composio", "ComposioHQ/composio", "Tooling and context management for AI agents"),
-        ("haystack", "deepset-ai/haystack", "Open-source AI orchestration framework"),
-        ("skillspector", "NVIDIA/SkillSpector", "Security scanner for AI agent skills"),
-        ("aipass", "AIOSAI/AIPass", "Persistent workspace for AI agents"),
-        ("reversecore-mcp", "sjkim1127/Reversecore_MCP", "Security-first MCP server for reverse engineering"),
-        ("threadplane", "cacheplane/threadplane", "Open-source thread-plane for agents"),
-    ]
-    _adopter_rows = {r["slug"]: r for r in rows}
-    adopters = []
-    for _slug, _repo, _desc in _ADOPTERS:
-        _r = _adopter_rows.get(_slug, {})
-        _stars = _r.get("stars", 0) or 0
-        _owner, _, _name = _repo.partition("/")
-        adopters.append({
-            "slug": _slug,
-            "owner": _owner,
-            "name": _name,
-            "repo": _repo,
-            "desc": _desc,
-            "stars_fmt": _r.get("stars_fmt") if _stars > 0 else "",
-        })
+    adopters = build_adopters(rows)
     # The homepage server-renders only the top BOARD_SSR_ROWS rows (the default
     # Global view's first pages); every other row goes to data/board-rest.json,
     # rendered from the same _board_row partial, and the page inserts it on the
@@ -7998,6 +8014,7 @@ def main() -> None:
         ("https://hvtracker.net/changes/", "0.8", "weekly"),
         ("https://hvtracker.net/use-cases/", "0.8", "daily"),
         ("https://hvtracker.net/badges/", "0.6", "weekly"),
+        ("https://hvtracker.net/adopters/", "0.6", "weekly"),
         ("https://hvtracker.net/roadmap/", "0.5", "weekly"),
         ("https://hvtracker.net/spec/", "0.4", "monthly"),
     ]
@@ -8371,6 +8388,13 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
     with open(os.path.join(badges_dir, "index.html"), "w", encoding="utf-8") as f:
         f.write(badges_html)
     print("Built badges/index.html (Badge for Maintainers).")
+
+    # /adopters/ — projects whose README embeds the badge (plan 3.2).
+    adopters_dir = os.path.join(script_dir, "adopters")
+    os.makedirs(adopters_dir, exist_ok=True)
+    with open(os.path.join(adopters_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(env.get_template("adopters.html.j2").render(adopters=build_adopters(rows), updated=now_str))
+    print(f"Built adopters/index.html ({len(BADGE_ADOPTERS)} adopters).")
 
     # Build /roadmap/ — public roadmap (P2 Runtime Trust direction)
     roadmap_html = env.get_template("roadmap.html.j2").render(updated=now_str)
