@@ -2253,6 +2253,9 @@ def score_class(s: float) -> str:
     return "score-low"
 
 
+# Homepage rows rendered inline; the rest load from data/board-rest.json.
+BOARD_SSR_ROWS = 100
+
 TRUST_DIMENSIONS = {
     "safety": ("Safety / Integrity", 25),
     "identity": ("Identity / Provenance", 18),
@@ -7189,9 +7192,23 @@ def main() -> None:
             "desc": _desc,
             "stars_fmt": _r.get("stars_fmt") if _stars > 0 else "",
         })
+    # The homepage server-renders only the top BOARD_SSR_ROWS rows (the default
+    # Global view's first pages); every other row goes to data/board-rest.json,
+    # rendered from the same _board_row partial, and the page inserts it on the
+    # first search/filter/sort/page. 1,682 rows made a 6.3 MB page of ~50k
+    # nodes for 15 visible rows.
+    board_rows = agent_rows + skill_rows
+    newly_repos = {a.get("repo") for a in (newly_added or [])}
+    rest_html = env.get_template("_board_rows.html.j2").render(
+        rows=board_rows[BOARD_SSR_ROWS:], newly_repos=newly_repos)
+    with open(os.path.join(script_dir, "data", "board-rest.json"), "w", encoding="utf-8") as _f:
+        json.dump({"count": max(0, len(board_rows) - BOARD_SSR_ROWS), "html": rest_html}, _f,
+                  ensure_ascii=False, separators=(",", ":"))
     html = tmpl.render(
         adopters=adopters,
-        rows=agent_rows + skill_rows,
+        rows=board_rows,
+        board_ssr_rows=BOARD_SSR_ROWS,
+        newly_repos=newly_repos,
         skill_count=len(skill_rows),
         skill_categories=skill_categories,
         legacy_rows=legacy_rows,
