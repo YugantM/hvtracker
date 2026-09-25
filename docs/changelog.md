@@ -775,6 +775,24 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   1.0, no dip). Evidence gate vs live: 33 rise (32 Docker pull counts + Continue's VS Code
   installs), none fall, 7 grades up, bystanders ≤5 ranks — lands as the 2 h
   rotation reaches each row (≤12 h). Roster: postgres-mcp image corrected.
+- **#267 + #268, DEPLOYED 2026-09-25 08:39 UTC** (27de6608 @ c3a88686;
+  480 tests + render + validate green). Verifying #265 live the evening
+  before: all 13 Hub-image agents refetched by the 18:00/20:00 batches had
+  real pull counts (SigNoz 57.8->64.3, Teamwork 54.4->60.3, ZenML
+  51.6->57.5), 16 ghcr rows refetched with no dip. #267: the GA bot regex in
+  `_marketing_page` had invalid escapes (`\/`, `\d`) — SyntaxWarning at every
+  boot on Python 3.12; doubled backslashes, byte-identical HTML; boot log now
+  has 0 SyntaxWarnings. #268: build_report `package_failures` held 47 ids no
+  registry serves (44 404 + 3 npm unpublished tombstones; the one real one,
+  AynOps, was a pypistats 429). `build_skill_rows.resolve_packages` took
+  manifest names on faith; now `is_published()` checks the registry. 46
+  listings (39 skills, 7 agents) were at confidence 2/3-3/4 instead of
+  "no package, not applicable". Gate: all 46 rise, none fall; agents
+  bystanders <=5 ranks; skills board reorders (mean |Δrank| 23.8 — those
+  skills sat at ranks 257-350); board-wide ~7.9 < 15 tripwire. Rows carry
+  their old ids until next fetch, so rises land over the 10:00-20:00 UTC
+  batches. Open editorial call (owner): some of these publish under other
+  ids (Mastra: `@mastra/core`, `mastra`) — only dead ids were removed.
 
 ## Entries recorded only in the old AGENTS.md
 
