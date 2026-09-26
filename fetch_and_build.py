@@ -2095,6 +2095,79 @@ def compute_trust_score_v2(row: dict) -> dict:
     }
 
 
+def grade_for_score(ts: float) -> str:
+    """Evidence grade from the trust score band, so grade agrees with rank."""
+    if ts >= 80:
+        return "A"
+    if ts >= 65:
+        return "B"
+    if ts >= 50:
+        return "C"
+    return "D"
+
+
+def what_if_score(row: dict, **changes) -> float:
+    """The trust_score this row would get with `changes` applied: the same two
+    calls main() makes, on a copy, so it can never disagree with the live score."""
+    r = {**row, **changes}
+    r["trust_score"] = compute_trust_score(r)["trust_score"]
+    return compute_trust_score_v2(r)["trust_score_v2"]
+
+
+def _improvement_candidates(row: dict) -> list[tuple[str, str, str, dict, str]]:
+    """(key, action, detail, changes, how-to link) for each signal a maintainer
+    can change. Popularity and activity are left out: they are not a to-do."""
+    out = []
+    if not row.get("has_provenance") and (row.get("npm_package") or row.get("pypi_package")):
+        npm = bool(row.get("npm_package"))
+        out.append(("provenance", "Publish build provenance for its packages",
+                    "npm publish --provenance from CI" if npm else "PyPI Trusted Publishing attestations",
+                    {"has_provenance": True},
+                    "https://docs.npmjs.com/generating-provenance-statements" if npm
+                    else "https://docs.pypi.org/attestations/producing-attestations/"))
+    sc = row.get("scorecard_score")
+    if sc is None or sc < 9:
+        checks = row.get("scorecard_checks") or {}
+        weak = sorted((v, k) for k, v in checks.items() if isinstance(v, (int, float)) and 0 <= v < 7)
+        detail = ("lowest checks: " + ", ".join(f"{k} {v}" for v, k in weak[:3])) if weak else \
+            ("no OSSF Scorecard result yet" if sc is None else f"{sc} / 10 today")
+        out.append(("scorecard", f"Raise the OSSF Scorecard {'to' if sc is None else f'from {sc} to'} 9.0",
+                    detail, {"scorecard_score": 9.0}, "https://github.com/ossf/scorecard#checks"))
+    sr = row.get("signed_commits_ratio")
+    if sr is None or sr < 0.95:
+        out.append(("signing", "Sign every commit",
+                    "not measured yet" if sr is None else f"{round(sr * 100)}% signed today",
+                    {"signed_commits_ratio": 1.0},
+                    "https://docs.github.com/en/authentication/managing-commit-signature-verification"))
+    if not row.get("license_spdx"):
+        out.append(("license", "Declare an open-source license", "no license GitHub recognises",
+                    {"license_spdx": "MIT"}, "https://choosealicense.com/"))
+    return out
+
+
+def score_improvements(row: dict, peer_scores: list | None = None, limit: int = 3) -> list[dict]:
+    """The few changes that would raise this row's score most, each worked out
+    alone: +points, the resulting score and grade, and where it would then
+    rank among `peer_scores` (its category). Empty for provisional rows, and
+    for any row whose live score the function does not reproduce."""
+    ts = row.get("trust_score")
+    if row.get("pending_signals") or ts is None or abs(what_if_score(row) - ts) > 0.05:
+        return []
+    peers = [p for p in (peer_scores or []) if isinstance(p, (int, float))]
+    out = []
+    for key, action, detail, changes, link in _improvement_candidates(row):
+        new = round(what_if_score(row, **changes), 1)
+        gain = round(new - ts, 1)
+        if gain < 0.5:
+            continue
+        out.append({"key": key, "action": action, "detail": detail, "gain": gain, "score": new,
+                    "grade": grade_for_score(new), "link": link,
+                    "category_rank": 1 + sum(1 for p in peers if p > new) if peers else None,
+                    "category_size": len(peers) or None})
+    out.sort(key=lambda i: -i["gain"])
+    return out[:limit]
+
+
 def _rank_sort_key(row: dict) -> tuple:
     """Evidence-first ranking comparator (use with reverse=True).
 
@@ -6904,15 +6977,7 @@ def main() -> None:
         row["trust_v2_breakdown"] = trust_v2["trust_v2_breakdown"]
 
         # Evidence grade — based on trust score band so grade agrees with rank
-        ts = row["trust_score"]
-        if ts >= 80:
-            row["evidence_grade"] = "A"
-        elif ts >= 65:
-            row["evidence_grade"] = "B"
-        elif ts >= 50:
-            row["evidence_grade"] = "C"
-        else:
-            row["evidence_grade"] = "D"
+        row["evidence_grade"] = grade_for_score(row["trust_score"])
 
     assign_ranks(rows)
 
@@ -6939,6 +7004,12 @@ def main() -> None:
         cat_agents.sort(key=_rank_sort_key, reverse=True)
         for j, row in enumerate(cat_agents, 1):
             row["category_rank"] = j
+    # "How X could raise its score" on agent pages: what-ifs through the live
+    # scoring function, placed against the category's current scores.
+    for cat_agents in cat_groups.values():
+        peer_scores = [r.get("trust_score") for r in cat_agents]
+        for row in cat_agents:
+            row["improvements"] = score_improvements(row, peer_scores)
 
     # Compute rank deltas
     now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
