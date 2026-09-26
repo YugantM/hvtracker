@@ -133,6 +133,21 @@
     .vseal-grade { margin-top:6px; font-family:var(--font-mono); font-size:12px; }
     .vseal-rank { margin:9px 0 0; font-family:var(--font-mono); font-size:11.5px; line-height:1.65; color:var(--muted); }
     .vseal-rank b { color:var(--text); font-weight:600; }
+    /* Known advisories (OSV) against the release people install: shown, not
+       scored. Critical/high get the banner; every level gets the list. */
+    .vadv { border:1px solid color-mix(in srgb, var(--red) 45%, transparent); border-left:4px solid var(--red);
+      background:color-mix(in srgb, var(--red) 7%, var(--bg)); border-radius:6px; padding:10px 14px; margin:0 0 14px; max-width:600px; font-size:13.5px; }
+    .vadv p { margin:0 0 4px; }
+    .vadv-head { display:flex; align-items:center; gap:8px; font-weight:700; color:var(--red); font-size:14px; }
+    .vadv-meta { font-family:var(--font-mono); font-size:11.5px; color:var(--muted); }
+    .sev { font-family:var(--font-mono); font-size:10.5px; font-weight:700; letter-spacing:.03em; border-radius:3px; padding:1px 6px; white-space:nowrap;
+      border:1px solid currentColor; }
+    .sev-CRITICAL, .sev-HIGH { color:var(--red); } .sev-MODERATE { color:var(--amber); } .sev-LOW, .sev-none { color:var(--muted); }
+    .vseal-note { margin:8px 0 0; padding-top:8px; border-top:1px dashed var(--border); font-size:11.5px; line-height:1.45; color:var(--muted); }
+    .adv-list { list-style:none; margin:0; padding:0; border-top:1px solid var(--border); }
+    .adv-list li { display:grid; grid-template-columns:86px minmax(0,1fr); gap:4px 12px; padding:10px 0; border-bottom:1px solid var(--border); font-size:14px; }
+    .adv-list .adv-sum { color:var(--text); }
+    .adv-list .adv-meta { grid-column:2; font-family:var(--font-mono); font-size:11.5px; color:var(--muted); }
     .vfresh { display:inline-flex; align-items:center; gap:6px; margin-top:10px; font-family:var(--font-mono); font-size:11px;
       color:var(--green); border:1px solid color-mix(in srgb, var(--green) 40%, transparent); border-radius:20px; padding:2px 9px; }
     @media (max-width: 700px) {
@@ -505,6 +520,8 @@
       {% set sc = row.scorecard_score %}
       {% set sig = row.signed_commits_pct %}
       {% set dago = row.days_ago %}
+      {% set adv = row.advisories if (row.advisories is mapping and row.advisories.found is defined) else none %}
+      {% set adv_n = (adv.found | length) if adv else 0 %}
       <div class="vcard{% if pend %} is-provisional{% endif %}">
         <div class="vcard-main">
           {% if pend %}
@@ -528,8 +545,16 @@
             {% endfor %}
           </div>
           {% else %}
-          <p class="vcard-verdict"><strong>Is {{ row.name }} safe?</strong> {{ row.review_insights.verdict }}</p>
-          <div class="vfacts" role="list" aria-label="Key trust signals">
+          {% if adv_n and adv.worst in ("CRITICAL", "HIGH") %}
+          {% set top = adv.found[0] %}
+          <div class="vadv" role="note">
+            <p class="vadv-head"><span class="sev sev-{{ top.severity }}">{{ top.severity }}</span>{% if adv_n == 1 %}Unfixed advisory{% else %}{{ adv_n }} unfixed advisories{% endif %} in the release you'd install</p>
+            <p>{{ top.summary }}{% if not top.summary.endswith(".") %}.{% endif %} It affects {{ top.package }} {{ top.version }}, the latest published release.</p>
+            <p class="vadv-meta"><a href="https://osv.dev/vulnerability/{{ top.id }}" rel="noopener">{{ top.id }}</a>{% for a in top.aliases if a.startswith("CVE-") %} · {{ a }}{% endfor %} · published {{ top.published }}{% if adv_n > 1 %} · <a href="#advisories">all {{ adv_n }}</a>{% endif %}</p>
+          </div>
+          {% endif %}
+          <p class="vcard-verdict"><strong>Is {{ row.name }} safe?</strong> {{ row.review_insights.verdict }}{% if adv_n %} {% if adv_n == 1 %}One published advisory affects{% else %}{{ adv_n }} published advisories affect{% endif %} its latest release.{% endif %}</p>
+          <div class="vfacts{% if adv %} is-5{% endif %}" role="list" aria-label="Key trust signals">
             <div class="vfact" role="listitem">
               <span class="vfact-label"><span class="vdot {% if sc is none %}gap{% elif sc >= 7 %}ok{% elif sc >= 4 %}part{% else %}gap{% endif %}" aria-hidden="true"></span>OSSF Scorecard</span>
               <span class="vfact-value">{% if sc is none %}No result{% else %}{{ sc }} / 10{% endif %}</span>
@@ -546,6 +571,12 @@
               <span class="vfact-label"><span class="vdot {% if dago is none %}part{% elif dago <= 30 %}ok{% elif dago <= 180 %}part{% else %}gap{% endif %}" aria-hidden="true"></span>Last push</span>
               <span class="vfact-value">{% if dago is none %}Unknown{% elif dago == 0 %}today{% elif dago == 1 %}yesterday{% else %}{{ dago }}d ago{% endif %}</span>
             </div>
+            {% if adv %}
+            <div class="vfact" role="listitem">
+              <span class="vfact-label"><span class="vdot {% if not adv_n %}ok{% elif adv.worst in ('CRITICAL', 'HIGH') %}gap{% else %}part{% endif %}" aria-hidden="true"></span>Advisories</span>
+              <span class="vfact-value">{% if not adv_n %}None known{% elif adv_n == 1 %}1 {{ (adv.worst or "unrated") | lower }}{% elif adv.worst %}{{ adv_n }}, worst {{ adv.worst | lower }}{% else %}{{ adv_n }} unrated{% endif %}</span>
+            </div>
+            {% endif %}
           </div>
           {% endif %}
           <div class="hero-actions">
@@ -610,6 +641,7 @@
             {% if row.category_rank and row.category %}<br><b>#{{ row.category_rank }}</b> in {{ row.category }}{% endif %}
             {% if row.coverage_grade %}<br>Coverage <b>{{ row.coverage_grade }}</b> · {{ row.signal_types }}/5 signals{% endif %}
           </p>
+          {% if adv_n %}<p class="vseal-note">The score doesn't include advisories yet. <a href="/methodology/#advisories">Why</a></p>{% endif %}
           {% if row.full_fetched_at %}<span class="vfresh" data-fetched="{{ row.full_fetched_at }}" title="When HVTracker last fetched this agent's full signal set">signals checked {{ row.full_fetched_at[:10] }}</span>{% endif %}
         </aside>
         {% endif %}
@@ -621,8 +653,24 @@
         The public evidence: {% if row.has_provenance %}its packages ship with cryptographic provenance{% else %}no package-provenance attestation found{% endif %};
         {% if row.scorecard_score is not none %}OSSF Scorecard rates its supply-chain practices {{ row.scorecard_score }}/10{% else %}no OSSF Scorecard result yet{% endif %};
         {% if row.signed_commits_pct is not none and row.signed_commits_pct > 0 %}{{ row.signed_commits_pct }}% of recent commits are signed{% else %}recent commits are unsigned{% endif %};
-        last pushed {{ row.last_push }}. Every point is earned from checkable signals — never paid placement. <a href="/methodology/">How scoring works →</a>
+        {% if adv %}{% if adv_n %}{{ adv_n }} published advisor{{ "y affects" if adv_n == 1 else "ies affect" }} its latest release{% else %}no published advisory affects its latest release{% endif %} ({{ adv.checked | map(attribute="name") | join(", ") }});
+        {% endif %}last pushed {{ row.last_push }}. Every point is earned from checkable signals — never paid placement. <a href="/methodology/">How scoring works →</a>
       </p>
+      {% if adv_n %}
+      <section class="provenance" id="advisories">
+        <h2 class="section-title">Known advisories</h2>
+        <p style="font-size:14px;color:var(--muted);max-width:680px">Published advisories (from <a href="https://osv.dev/">OSV</a>) that affect the release you'd install today{% for c in adv.checked %}{% if loop.first %}: {% else %}, {% endif %}{{ c.name }} {{ c.version }}{% endfor %}. They are shown for your review and are not yet part of the HVTrust score. Checked {{ adv.checked_at[:10] }}.</p>
+        <ul class="adv-list">
+          {% for it in adv.found %}
+          <li>
+            <span><span class="sev sev-{{ it.severity or 'none' }}">{{ it.severity or "UNRATED" }}</span></span>
+            <span class="adv-sum">{{ it.summary }}</span>
+            <span class="adv-meta"><a href="https://osv.dev/vulnerability/{{ it.id }}" rel="noopener">{{ it.id }}</a>{% for a in it.aliases if a.startswith("CVE-") %} · {{ a }}{% endfor %} · {{ it.package }} {{ it.version }} · published {{ it.published }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
       {% endif %}
       {% if row.warning_reasons %}
       <div class="warning-banner">
