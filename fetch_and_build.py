@@ -2950,8 +2950,8 @@ def check_board_invariants(rows: list[dict], prior_snapshot: dict | None) -> lis
 def summarize_fetch_rotation(rows: list[dict]) -> dict:
     """Report how far behind the heavy per-repo fetch rotation is.
 
-    The 2h batch refreshes 1/6 of the board by ``full_fetched_at``, so a healthy
-    board's oldest stamp is under ~12h and ``never_fetched`` drains to 0. The
+    The 4h batch refreshes 1/6 of the board by ``full_fetched_at``, so a healthy
+    board's oldest stamp is under ~24h and ``never_fetched`` drains to 0. The
     rotation froze on the same alphabetical sixth for weeks without anyone
     noticing because nothing measured it — every downstream field just kept
     serving its last-known value. Surfacing it in data/build_report.json makes
@@ -6007,6 +6007,15 @@ def refresh_github_signals(rows: list[dict], label: str = "SIGNALS") -> int:
     return updated
 
 
+def refresh_carried_signals(rows: list[dict], fresh_keys: set[str], legacy_rows: list[dict]) -> int:
+    """GitHub-signal refresh for every row a batch run carried forward rather
+    than fetched in full. The batch runs every 4 h and carries this pass, so
+    stars/commits stay current without a separate signals job and the extra
+    whole-site render that came with it."""
+    carried = [r for r in rows if (r.get("repo") or "").lower() not in fresh_keys]
+    return refresh_github_signals(carried + legacy_rows, "BATCH-SIGNALS")
+
+
 def refresh_runtime_signals(rows: list[dict], agent_configs: list[dict], label: str = "RUNTIME-ONLY") -> int:
     """Refresh runtime-trust discovery fields on cached rows."""
     row_map = {r.get("repo", "").lower(): r for r in rows if r.get("repo")}
@@ -6758,6 +6767,9 @@ def main() -> None:
         if reclassified:
             print(f"Batch merge: reclassified {reclassified} row(s) as legacy from agents.json")
         print(f"\nMerged incremental refresh: {len(rows)} total agents ({len(rows) - len(old_agents)} refreshed, {len(old_agents)} carried forward)")
+        if batch:
+            # Batch 1 fetched the legacy rows in full; any other batch carried them.
+            refresh_carried_signals(rows, fresh_keys, legacy_rows if batch_num != 1 else [])
 
     if not render_only and not runtime_only and not repair_commits:
         repaired_count = repair_missing_commit_counts(rows, cached_commit_counts)

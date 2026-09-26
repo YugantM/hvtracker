@@ -537,6 +537,7 @@ def test_startup_keeps_scheduler_alive(monkeypatch):
     # lazy import), so the fake replaces app's own binding.
     monkeypatch.setattr(app, "BackgroundScheduler", FakeScheduler)
     monkeypatch.delenv("DISABLE_SCHEDULER", raising=False)
+    monkeypatch.delenv("SIGNALS_REFRESH_MIN", raising=False)
 
     monkeypatch.setattr(app, "_seed_history_into_volume", lambda: 0)
     monkeypatch.setattr(app, "_compute_render_fingerprint", lambda: "fp")
@@ -557,13 +558,10 @@ def test_startup_keeps_scheduler_alive(monkeypatch):
     assert app._scheduler is not None
     assert app._scheduler.started is True
     jobs = {j["id"]: j for j in app._scheduler.jobs}
-    # The 2h full batch and the frequent GitHub-signal refresh.
-    assert "refresh" in jobs and "signals-refresh" in jobs
+    # One refresh every 4h (batch + GitHub signals); no standalone signals job.
+    assert "refresh" in jobs and "signals-refresh" not in jobs
     assert all(callable(j["func"]) and j["trigger"] == "cron" for j in jobs.values())
-    assert jobs["refresh"]["hour"] == "*/2"
-    # Default signals cadence is 6h, on the hour field (minute="*/360" is invalid).
-    assert jobs["signals-refresh"]["hour"] == "*/6"
-    assert jobs["signals-refresh"]["minute"] == 30
+    assert jobs["refresh"]["hour"] == "*/4"
 
     app.shutdown()
     assert app._scheduler is None
