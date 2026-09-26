@@ -537,6 +537,7 @@ def test_startup_keeps_scheduler_alive(monkeypatch):
     # lazy import), so the fake replaces app's own binding.
     monkeypatch.setattr(app, "BackgroundScheduler", FakeScheduler)
     monkeypatch.delenv("DISABLE_SCHEDULER", raising=False)
+    monkeypatch.delenv("SIGNALS_REFRESH_MIN", raising=False)
 
     monkeypatch.setattr(app, "_seed_history_into_volume", lambda: 0)
     monkeypatch.setattr(app, "_compute_render_fingerprint", lambda: "fp")
