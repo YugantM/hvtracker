@@ -227,6 +227,39 @@ footer a { color: var(--accent); }
 
 .nav-toggle { display: none; }
 
+/* Header search (every page but the homepage, whose leaderboard search is the
+   primary control). static/search.js fills #hdr-results from
+   /data/search-index.json; without JS the form lands on /?q=. */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.hdr-search { position: relative; }
+.hdr-search-form { display: flex; align-items: center; }
+.hdr-search input {
+  width: 200px; height: 32px; padding: 0 30px 0 10px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--card); color: var(--text); font: 13px var(--font-sans);
+}
+.hdr-search input::placeholder { color: var(--muted-2); }
+.hdr-search input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.hdr-search input::-webkit-search-cancel-button { display: none; }
+.hdr-kbd { position: absolute; right: 8px; font: 11px var(--font-mono); color: var(--muted-2); border: 1px solid var(--border); border-radius: 3px; padding: 0 5px; pointer-events: none; }
+.hdr-search input:focus + .hdr-kbd { display: none; }
+.hdr-results {
+  position: absolute; right: 0; top: calc(100% + 6px); width: 400px; max-width: calc(100vw - 32px); z-index: 300;
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 14px 34px -14px rgba(0,0,0,.35); overflow: hidden;
+}
+.hdr-results a { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 12px; color: var(--text); border-bottom: 1px solid var(--border); font-size: 13px; }
+.hdr-results a:hover, .hdr-results a[aria-selected="true"] { background: var(--surface); text-decoration: none; }
+.hdr-results .r-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.hdr-results .r-sub { font-size: 11.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.hdr-results .r-score { font: 600 12.5px var(--font-mono); font-variant-numeric: tabular-nums; }
+.hdr-results .badge { padding: 1px 0; width: 22px; text-align: center; font-size: 11px; }
+.hdr-results .r-pend { color: var(--muted); border: 1px dashed var(--line-strong); }
+.hdr-results .r-empty, .hdr-results .r-foot { padding: 9px 12px; font-size: 12px; color: var(--muted); }
+.hdr-results .r-foot { font-family: var(--font-mono); font-size: 11px; display: flex; gap: 12px; border-top: 1px solid var(--border); }
+.hdr-search-btn { display: none; }
+/* Room for the nav: the "updated" stamp (also in every footer) yields first. */
+@media (max-width: 1240px) { .hdr-search ~ .site-status { display: none; } }
+@media (max-width: 1100px) { .hdr-search input { width: 150px; } }
+
 @media (max-width: 900px) {
   .site-header-inner { grid-template-columns: 1fr; gap: 4px; }
   .site-nav { justify-self: start; flex-wrap: wrap; }
@@ -252,6 +285,14 @@ footer a { color: var(--accent); }
   html.nav-js .nav-toggle::before { content: "\2630"; font-size: 15px; }
   html.nav-js .nav-toggle[aria-expanded="true"]::before { content: "\2715"; }
   html.nav-js .site-nav { display: none; }
+  html.nav-js .hdr-search { display: none; }
+  html.nav-js .hdr-search-btn {
+    display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); cursor: pointer;
+  }
+  html.nav-js .search-open .hdr-search { display: block; position: absolute; left: 16px; right: 16px; top: 100%; padding: 8px 0 10px; background: var(--bg); }
+  html.nav-js .search-open .hdr-search input, html.nav-js .search-open .hdr-search input:focus { width: 100%; height: 44px; font-size: 16px; }
+  html.nav-js .search-open .hdr-results { left: 0; right: 0; width: auto; max-width: none; }
   html.nav-js .nav-open .site-nav {
     display: grid; grid-column: 1 / -1; grid-row: 2; justify-self: stretch; grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 4px 16px; padding: 4px 0 12px; max-height: calc(100vh - 64px); overflow-y: auto;

@@ -410,7 +410,7 @@ def _count_badge(slug: str) -> None:
 # verify feed made. Excluded from machine_usage by path.
 # The homepage's own deferred board rows are a page asset fetched by people
 # searching the leaderboard, not machine use of the data surface.
-_USAGE_EXCLUDED_PATHS = frozenset({"/api/v1/usage", "/data/board-rest.json"})
+_USAGE_EXCLUDED_PATHS = frozenset({"/api/v1/usage", "/data/board-rest.json", "/data/search-index.json"})
 
 # Daily snapshots are the registry's irreplaceable asset: one 4MB file per day
 # holding every row with all 62 fields, including trust_breakdown and
