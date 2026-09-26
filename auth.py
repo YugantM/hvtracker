@@ -79,10 +79,22 @@ def _unsign(token: str) -> dict | None:
         return None
 
 
+# A readable companion to the HttpOnly session: it carries nothing but "a
+# session exists", so auth.js can skip /api/me for everyone else (nearly all
+# visitors) instead of making an uncached origin request on every page view.
+SIGNED_IN_HINT = "hvt_signed_in"
+
+
+def _set_signed_in_hint(resp: Response) -> None:
+    resp.set_cookie(SIGNED_IN_HINT, "1", max_age=SESSION_TTL, httponly=False,
+                    samesite="lax", secure=IS_PROD, path="/")
+
+
 def _set_session(resp: Response, user_id: int) -> None:
     token = _sign({"uid": int(user_id), "exp": int(time.time()) + SESSION_TTL})
     resp.set_cookie(SESSION_COOKIE, token, max_age=SESSION_TTL, httponly=True,
                     samesite="lax", secure=IS_PROD, path="/")
+    _set_signed_in_hint(resp)
 
 
 def current_user(request: Request) -> dict | None:
@@ -295,6 +307,7 @@ def logout(next: str = Form("/")):
     # 303 so a form POST (account page) and a fetch (header menu) both end on a GET.
     resp = RedirectResponse(_safe_next(next), status_code=303)
     resp.delete_cookie(SESSION_COOKIE, path="/")
+    resp.delete_cookie(SIGNED_IN_HINT, path="/")
     return resp
 
 
@@ -368,7 +381,11 @@ def _provider_buttons(next_path: str) -> str:
 def login_page(request: Request, next: str = "/", error: str = ""):
     from app import _marketing_page  # lazy: avoids circular import at module load
     if current_user(request):
-        return RedirectResponse(_safe_next(next) if next != "/" else "/account/", status_code=302)
+        # Sessions from before the hint cookie existed pick it up here: their
+        # header shows "Sign in" until one click brings them back signed in.
+        resp = RedirectResponse(_safe_next(next) if next != "/" else "/account/", status_code=302)
+        _set_signed_in_hint(resp)
+        return resp
     nxt = escape(_safe_next(next))
     err_html = (f'<p class="auth-error">{escape(_LOGIN_ERRORS[error])}</p>'
                 if error in _LOGIN_ERRORS else "")
@@ -577,14 +594,19 @@ def account_page(request: Request):
 def api_me(request: Request):
     user = current_user(request)
     if not user:
-        return JSONResponse({
+        resp = JSONResponse({
             "logged_in": False,
             "providers": [p for p, ok in (("github", GITHUB_CLIENT_ID), ("google", GOOGLE_CLIENT_ID)) if ok],
             "dev_login": DEV_AUTH,
         })
-    return JSONResponse({"logged_in": True, "user": {
+        if request.cookies.get(SIGNED_IN_HINT):  # the session expired: stop asking
+            resp.delete_cookie(SIGNED_IN_HINT, path="/")
+        return resp
+    resp = JSONResponse({"logged_in": True, "user": {
         "login": user.get("login"), "name": user.get("name"), "avatar_url": user.get("avatar_url"),
     }})
+    _set_signed_in_hint(resp)
+    return resp
 
 
 @router.get("/api/watchlist")
