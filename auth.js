@@ -100,9 +100,16 @@
   injectStyles();
   var slot = document.getElementById("hvt-auth-slot");
 
-  api("/api/me").then(function (me) {
-    if (me.logged_in) renderLoggedIn(me.user); else renderLoggedOut(me);
-  }).catch(function () { /* auth disabled — leave the public UI untouched */ });
+  // Only a browser with a session carries the hvt_signed_in hint (set beside
+  // the HttpOnly session cookie, cleared at sign-out). Everyone else gets the
+  // Sign in link without an uncached round trip to /api/me.
+  if (/(?:^|;\s*)hvt_signed_in=1(?:;|$)/.test(document.cookie)) {
+    api("/api/me").then(function (me) {
+      if (me.logged_in) renderLoggedIn(me.user); else renderLoggedOut(me);
+    }).catch(function () { /* auth disabled — leave the public UI untouched */ });
+  } else {
+    renderLoggedOut({ providers: ["github"] });
+  }
 
   initAccountPage();
   renderCompareTray();
