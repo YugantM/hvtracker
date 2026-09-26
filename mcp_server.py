@@ -63,6 +63,19 @@ CAPABILITIES_SCHEMA = {
                  "plugin_system", "drift_status"],
 }
 
+# Known advisories (OSV) against the latest release; shown, not scored.
+ADVISORIES_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "checked": {"type": "array", "items": {"type": "string"}},
+        "count": {"type": "integer"},
+        "worst": {"type": ["string", "null"]},
+        "advisories": {"type": "array", "items": {"type": "object"}},
+        "scored": {"type": "boolean"},
+    },
+    "required": ["checked", "count", "worst", "advisories", "scored"],
+}
+
 CHECK_AGENT_TRUST_OUTPUT_SCHEMA = {
     "type": "object",
     "properties": {
@@ -77,6 +90,7 @@ CHECK_AGENT_TRUST_OUTPUT_SCHEMA = {
         "has_provenance": {"type": ["boolean", "null"]},
         "scorecard_score": {"type": ["number", "null"]},
         "coverage_grade": {"type": ["string", "null"]},
+        "advisories": {**ADVISORIES_SCHEMA, "type": ["object", "null"]},
         "capabilities": {**CAPABILITIES_SCHEMA, "type": ["object", "null"]},
         "credential_url": {"type": ["string", "null"]},
         "profile_url": {"type": ["string", "null"]},
@@ -112,6 +126,7 @@ VERIFY_MCP_SERVER_OUTPUT_SCHEMA = {
         "submit_url": {"type": ["string", "null"]},
         "mcp_server_support": {"type": ["string", "null"]},
         "tool_permissions": {"type": "array", "items": {"type": "string"}},
+        "advisories": {**ADVISORIES_SCHEMA, "type": ["object", "null"]},
     },
     "required": [
         "server",
@@ -145,6 +160,14 @@ class Capabilities(TypedDict):
     drift_status: str
 
 
+class AdvisorySummary(TypedDict):
+    checked: list[str]
+    count: int
+    worst: str | None
+    advisories: list[dict]
+    scored: bool
+
+
 class AgentProfile(TypedDict):
     tracked: bool
     name: str | None
@@ -156,6 +179,7 @@ class AgentProfile(TypedDict):
     has_provenance: bool | None
     scorecard_score: float | None
     coverage_grade: str | None
+    advisories: AdvisorySummary | None
     capabilities: Capabilities
     credential_url: str
     profile_url: str
@@ -173,6 +197,7 @@ class CheckAgentTrustResult(TypedDict):
     has_provenance: NotRequired[bool | None]
     scorecard_score: NotRequired[float | None]
     coverage_grade: NotRequired[str | None]
+    advisories: NotRequired[AdvisorySummary | None]
     capabilities: NotRequired[Capabilities | None]
     credential_url: NotRequired[str | None]
     profile_url: NotRequired[str | None]
@@ -200,6 +225,7 @@ class VerifyMcpServerResult(TypedDict):
     submit_url: NotRequired[str | None]
     mcp_server_support: str | None
     tool_permissions: list[str]
+    advisories: NotRequired[AdvisorySummary | None]
 
 
 class AgentSearchResult(TypedDict):
@@ -663,6 +689,7 @@ def _profile(a: dict) -> AgentProfile:
         "has_provenance": a.get("has_provenance"),
         "scorecard_score": a.get("scorecard_score"),
         "coverage_grade": a.get("coverage_grade"),
+        "advisories": mcp_trust.advisory_summary(a),
         "capabilities": {
             "mcp_status": mcp_support.get("status") or "none",
             "provider_count": len(ext.get("providers") or []),
