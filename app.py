@@ -428,6 +428,21 @@ _PRIVATE_SNAPSHOT_PREFIXES = ("/output/history/", "/output/history")
 _PRIVATE_CACHE_PREFIX = "/.cache"
 
 
+_PUBLIC_SNAPSHOT_RE = re.compile(r"^/data/history/(\d{4}-\d{2}-\d{2})\.json$")
+
+
+def _is_expired_public_snapshot(path: str) -> bool:
+    """/data/history/<date>.json copies older than the public 90-day window.
+    The same window as /api/v1/agents/<slug>/history and the open-core plan
+    (extended history is the reserved future tier); the files stay on disk,
+    and the quarterly CC BY export remains the path to the full series."""
+    m = _PUBLIC_SNAPSHOT_RE.match(path)
+    if not m:
+        return False
+    cutoff = (datetime.now(timezone.utc).date() - timedelta(days=_HISTORY_PUBLIC_DAYS - 1)).isoformat()
+    return m.group(1) < cutoff
+
+
 def _is_private_snapshot_path(path: str) -> bool:
     """True for raw daily-snapshot and cache paths, which must not be served publicly."""
     return (path.startswith(_PRIVATE_SNAPSHOT_PREFIXES[0]) or path == _PRIVATE_SNAPSHOT_PREFIXES[1]
@@ -464,7 +479,7 @@ async def _cache_headers(request, call_next):
         retired = _retired_response(path)
         if retired is not None:
             return retired
-        if _is_private_snapshot_path(path):
+        if _is_private_snapshot_path(path) or _is_expired_public_snapshot(path):
             # 404, not 403: don't confirm that a given date's snapshot exists.
             return Response("Not Found", status_code=404, media_type="text/plain")
 

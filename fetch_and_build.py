@@ -5542,7 +5542,7 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
     <h2>Core</h2>
     <ul>
       <li><a href="/data/latest.json">/data/latest.json</a> Full current snapshot (all agents, all fields)</li>
-      <li><a href="/data/history/{today_utc}.json">/data/history/YYYY-MM-DD.json</a> Daily snapshots (e.g. <a href="/data/history/{today_utc}.json">{today_utc}</a>)</li>
+      <li><a href="/data/history/{today_utc}.json">/data/history/YYYY-MM-DD.json</a> Daily snapshots, last 90 days (e.g. <a href="/data/history/{today_utc}.json">{today_utc}</a>; the full series is in the quarterly export)</li>
     </ul>
 
     <h2>Signal Subsets</h2>

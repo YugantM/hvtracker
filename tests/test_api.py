@@ -868,6 +868,25 @@ def test_raw_daily_snapshots_are_not_publicly_served(client):
     assert r.status_code == 200
 
 
+def test_public_daily_copies_are_served_for_90_days_only(client):
+    """/data/history/<date>.json used to serve every full daily copy back to
+    June; the history API and the open-core plan cap public history at 90
+    days (extended history is the reserved tier). Older copies stay on disk."""
+    from datetime import date, timedelta
+
+    import app as app_module
+    today = date.today()
+    old = (today - timedelta(days=120)).isoformat()
+    edge_old = (today - timedelta(days=90)).isoformat()
+    edge_new = (today - timedelta(days=89)).isoformat()
+    assert app_module._is_expired_public_snapshot(f"/data/history/{old}.json")
+    assert app_module._is_expired_public_snapshot(f"/data/history/{edge_old}.json")
+    assert not app_module._is_expired_public_snapshot(f"/data/history/{edge_new}.json")
+    assert not app_module._is_expired_public_snapshot(f"/data/history/{today.isoformat()}.json")
+    assert not app_module._is_expired_public_snapshot("/data/history/")
+    assert client.get(f"/data/history/{old}.json").status_code == 404
+
+
 def test_responses_are_gzipped_on_the_origin_hop(client):
     """Everything large must leave the container compressed.
 
