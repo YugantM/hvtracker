@@ -2,7 +2,7 @@
 
 Serves the pre-generated static site from the volume, exposes a dynamic JSON
 API and live SVG badges sourced from data.json, accepts agent submissions /
-corrections into Postgres, and runs the 2-hourly refresh in-process.
+corrections into Postgres, and runs the 4-hourly refresh in-process.
 """
 from __future__ import annotations
 
@@ -2524,7 +2524,7 @@ def _signals_cron(minutes: int) -> dict:
     The cron `minute` field only spans 0-59, so `minute="*/360"` raises
     ValueError at add_job — at startup, that takes the whole app down.
     Sub-hour cadences keep the minute step; hourly and slower ones step the
-    hour and fire at :30, clear of the 2h batch's :00 slot.
+    hour and fire at :30, clear of the batch's :00 slot.
     """
     if minutes < 60:
         return {"minute": f"*/{minutes}"}
@@ -2544,30 +2544,32 @@ def _start_scheduler() -> None:
         return
     try:
         scheduler = BackgroundScheduler(timezone="UTC")
+        # One job, one whole-site render every 4 h: the stalest sixth of the
+        # board gets a full fetch (so every row daily) and every other row a
+        # GitHub-signal refresh (stars/commits, ≤4 h old). Renders are most of
+        # the Railway memory bill; a separate 6-hourly signals job used to add
+        # four more a day.
         scheduler.add_job(
             lambda: _refresh_and_record("auto", _compute_render_fingerprint(), "scheduler"),
             "cron",
-            hour="*/2",
+            hour="*/4",
             id="refresh",
             max_instances=1,
             coalesce=True,
         )
-        # GitHub-signal refresh (stars/forks/commits → HVTrust/rank) for the
-        # whole registry. Every run re-renders the entire site in a subprocess,
-        # and those renders were ~73% of the Railway memory bill at the old
-        # 30-minute cadence (1.14 GB avg with it, 0.31 GB without). Trust
-        # signals don't move on a 30-minute scale, so the default is 6 hours;
-        # the 2h "auto" batch still handles the heavier per-repo signals.
-        # Tunable via SIGNALS_REFRESH_MIN.
-        signals_min = max(5, int(os.environ.get("SIGNALS_REFRESH_MIN", "360")))
-        scheduler.add_job(
-            lambda: _refresh_and_record("signals", _compute_render_fingerprint(), "scheduler"),
-            "cron",
-            id="signals-refresh",
-            max_instances=1,
-            coalesce=True,
-            **_signals_cron(signals_min),
-        )
+        # The standalone signals refresh stays available as an opt-in
+        # (SIGNALS_REFRESH_MIN) without a deploy, but is off by default.
+        signals_min = None
+        if os.environ.get("SIGNALS_REFRESH_MIN"):
+            signals_min = max(5, int(os.environ["SIGNALS_REFRESH_MIN"]))
+            scheduler.add_job(
+                lambda: _refresh_and_record("signals", _compute_render_fingerprint(), "scheduler"),
+                "cron",
+                id="signals-refresh",
+                max_instances=1,
+                coalesce=True,
+                **_signals_cron(signals_min),
+            )
         # Persist the in-memory machine-usage rollup. Runs regardless of
         # db.enabled() — usage.flush falls back to the volume JSON — and is
         # cheap: one upsert per (hour, channel) touched since the last run.
@@ -2591,8 +2593,8 @@ def _start_scheduler() -> None:
         scheduler.start()
         _scheduler = scheduler
         _scheduler_error = None
-        print(f"[startup] scheduler started (signals every {signals_min}m, full batch every 2h)",
-              flush=True)
+        extra = f", extra signals every {signals_min}m" if signals_min else ""
+        print(f"[startup] scheduler started (batch + signals every 4h{extra})", flush=True)
     except Exception as e:  # never let a scheduler problem take the site down
         import traceback
         _scheduler_error = f"{type(e).__name__}: {e}"

@@ -40,7 +40,7 @@
       {
         "@type": "Question",
         "name": "How often is HVTracker data updated?",
-        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker data is refreshed automatically throughout the day. The Railway production job currently runs about every 30 minutes and rebuilds the leaderboard, agent profiles, public JSON endpoints, and historical snapshots." }
+        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker data is refreshed automatically every 4 hours. Each run re-fetches the stalest sixth of the registry in full, so every project is fully re-checked daily, refreshes GitHub signals for all of them, and rebuilds the leaderboard, agent profiles, public JSON endpoints, and historical snapshots." }
       }
     ]
   }
@@ -416,7 +416,7 @@ print("verified:", cred["subject"]["repo"], "=", cred["trust_score"])</code></pr
 
       <section id="updates">
         <h2>How Often Data Updates</h2>
-        <p>HVTracker is currently refreshed on Railway about every 30 minutes. Each successful run regenerates the leaderboard, agent pages, public JSON endpoints, <code>feed.json</code>, <code>sitemap.xml</code>, and a dated history snapshot. Some upstream APIs refresh more slowly than the site itself, so not every signal moves on every run.</p>
+        <p>HVTracker is refreshed every 4 hours. Each run fully re-fetches the stalest sixth of the registry (so every project daily), refreshes GitHub signals such as stars and commit activity for all of them, and regenerates the leaderboard, agent pages, public JSON endpoints, <code>feed.json</code>, <code>sitemap.xml</code>, and a dated history snapshot. Some upstream APIs refresh more slowly than the site itself, so not every signal moves on every run.</p>
       </section>
 
       <section id="limitations">
