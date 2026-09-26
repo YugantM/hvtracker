@@ -4323,6 +4323,16 @@ def compute_movers_page_data(rows: list[dict], history: list[dict]) -> dict:
     }
 
 
+def build_search_index(rows: list[dict]) -> dict:
+    """The header search on every page (static/search.js): one compact row per
+    listing, fetched (edge-cached) the first time someone focuses the box.
+    Provisional rows carry no grade, as on their pages."""
+    return {"fields": ["name", "slug", "repo", "category", "score", "grade"],
+            "rows": [[r["name"], r["slug"], r["repo"], r.get("category") or "", r.get("trust_score"),
+                      None if r.get("pending_signals") else r.get("evidence_grade")]
+                     for r in rows]}
+
+
 def build_use_case_pages(rows: list[dict]) -> list[dict]:
     """Generate curated, data-backed discovery slices from the current rows."""
     definitions = [
@@ -7380,6 +7390,8 @@ def main() -> None:
     with open(os.path.join(script_dir, "data", "board-rest.json"), "w", encoding="utf-8") as _f:
         json.dump({"count": max(0, len(board_rows) - BOARD_SSR_ROWS), "html": rest_html}, _f,
                   ensure_ascii=False, separators=(",", ":"))
+    with open(os.path.join(script_dir, "data", "search-index.json"), "w", encoding="utf-8") as _f:
+        json.dump(build_search_index(board_rows), _f, ensure_ascii=False, separators=(",", ":"))
     html = tmpl.render(
         adopters=adopters,
         rows=board_rows,
