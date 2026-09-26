@@ -13,6 +13,7 @@ import shutil
 import sys
 import time
 import tomllib
+from collections.abc import Mapping
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
 from html import escape
@@ -2744,12 +2745,18 @@ def _load_snapshot(path: str) -> dict:
     return snap
 
 
-def _load_prior_snapshot(history_dir: str) -> dict | None:
+def _load_prior_snapshot(history_dir: str, days: list[dict] | None = None) -> dict | None:
     """Return the most recent usable history snapshot older than today, or None.
 
-    Skips partial days (PARTIAL_SNAPSHOT_DATES) and degraded boards.
+    Skips partial days (PARTIAL_SNAPSHOT_DATES) and degraded boards. With
+    `days` (load_history_series output) it picks from those instead of
+    parsing the snapshot file again.
     """
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    if days is not None:
+        return next((d for d in reversed(days)
+                     if d["_date"] < today and d["_date"] not in PARTIAL_SNAPSHOT_DATES
+                     and not snapshot_is_degraded(d)), None)
     try:
         candidates = sorted(
             [f for f in os.listdir(history_dir)
@@ -2766,13 +2773,13 @@ def _load_prior_snapshot(history_dir: str) -> dict | None:
         return None
 
 
-def load_previous_ranks(history_dir: str) -> dict[str, int]:
+def load_previous_ranks(history_dir: str, days: list[dict] | None = None) -> dict[str, int]:
     """Load previous rankings from the most recent prior history snapshot.
 
     Rows that were provisional (pending_signals) there are left out: a rank
     computed from a partial signal set is not a position anything moved from.
     """
-    prev = _load_prior_snapshot(history_dir)
+    prev = _load_prior_snapshot(history_dir, days)
     if not prev:
         return {}
     try:
@@ -2782,9 +2789,9 @@ def load_previous_ranks(history_dir: str) -> dict[str, int]:
         return {}
 
 
-def load_previous_pending(history_dir: str) -> set[str]:
+def load_previous_pending(history_dir: str, days: list[dict] | None = None) -> set[str]:
     """Repos that were provisional in the prior snapshot (no comparable rank)."""
-    prev = _load_prior_snapshot(history_dir)
+    prev = _load_prior_snapshot(history_dir, days)
     if not prev:
         return set()
     return {a["repo"].lower() for a in prev.get("agents", [])
@@ -2792,7 +2799,7 @@ def load_previous_pending(history_dir: str) -> set[str]:
 
 
 def load_previous_downloads(
-    history_dir: str, lookback_days: int = 14
+    history_dir: str, lookback_days: int = 14, days: list[dict] | None = None
 ) -> dict[str, tuple[int, str]]:
     """Last-known-good download counts, used as a fallback when a fetch fails.
 
@@ -2808,20 +2815,25 @@ def load_previous_downloads(
     stale data forever.
     """
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    try:
-        candidates = sorted(
-            [f for f in os.listdir(history_dir)
-             if re.match(r"\d{4}-\d{2}-\d{2}\.json$", f) and f[:-5] < today],
-            reverse=True,
-        )[:lookback_days]
-    except OSError:
-        return {}
-    result: dict[str, tuple[int, str]] = {}
-    for fname in candidates:
+    if days is not None:
+        snaps = [d for d in reversed(days) if d["_date"] < today][:lookback_days]
+    else:
         try:
-            snap = _load_snapshot(os.path.join(history_dir, fname))
-        except (OSError, json.JSONDecodeError):
-            continue
+            candidates = sorted(
+                [f for f in os.listdir(history_dir)
+                 if re.match(r"\d{4}-\d{2}-\d{2}\.json$", f) and f[:-5] < today],
+                reverse=True,
+            )[:lookback_days]
+        except OSError:
+            return {}
+        snaps = []
+        for fname in candidates:
+            try:
+                snaps.append(_load_snapshot(os.path.join(history_dir, fname)))
+            except (OSError, json.JSONDecodeError):
+                continue
+    result: dict[str, tuple[int, str]] = {}
+    for snap in snaps:
         for a in snap.get("agents", []):
             repo = a.get("repo")
             dl = a.get("weekly_downloads")
@@ -2979,7 +2991,8 @@ def summarize_fetch_rotation(rows: list[dict]) -> dict:
     }
 
 
-def load_cached_commit_counts(data_path: str, history_dir: str) -> dict[str, int]:
+def load_cached_commit_counts(data_path: str, history_dir: str,
+                              days: list[dict] | None = None) -> dict[str, int]:
     """Load last-known-good commit counts from data.json, then prior history.
 
     This prevents transient GitHub stats/commits API failures from blanking the
@@ -2998,7 +3011,7 @@ def load_cached_commit_counts(data_path: str, history_dir: str) -> dict[str, int
     except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
         pass
 
-    prev = _load_prior_snapshot(history_dir)
+    prev = _load_prior_snapshot(history_dir, days)
     if not prev:
         return result
     try:
@@ -3012,20 +3025,264 @@ def load_cached_commit_counts(data_path: str, history_dir: str) -> dict[str, int
     return result
 
 
-def load_history(history_dir: str) -> list[dict]:
-    """Load all history snapshots sorted chronologically. Returns list of dicts."""
-    snapshots = []
+# History series. Every render used to json.load every daily snapshot in full
+# (123 files, 346 MB): a 2.5 GB render peak against ~0.2 GB with no history,
+# growing ~15 MB with each new day. The readers below only use these fields,
+# so each snapshot is reduced to them once, as columns, in a private per-day
+# cache (<output root>/.cache/history-series/<date>.json), and re-read only
+# when its file changes (today's, or a new day). The snapshots themselves are
+# untouched: they stay the source of truth and any cache file rebuilds from
+# them. A reader that needs another field adds it here and bumps the version.
+HISTORY_SERIES_VERSION = 1
+HISTORY_SERIES_FIELDS = (
+    "repo", "slug", "name", "category", "rank", "score", "trust_score",
+    "pending_signals", "has_provenance", "days_ago", "evidence_grade",
+    "listing_status", "scorecard_score", "stars", "license_spdx", "license_type",
+    "coverage_grade", "trust_confidence", "signed_commits_ratio",
+    "weekly_downloads", "dl_source", "weekly_commits", "methodology_version",
+    "trust_breakdown",
+)
+# Nested objects the readers only ever reach one key of, always through
+# `(row.get(field) or {}).get(key)`.
+HISTORY_SERIES_NESTED = {
+    "mcp_server_support": "status",
+    "external_service_dependencies": "providers",
+    "tool_plugin_surface": "plugin_system",
+    "package_provenance_drift": "status",
+}
+_SERIES_MISSING = object()  # the row had no such key (not the same as None)
+
+
+def _series_entry(snap: dict, sig: list) -> dict:
+    """Reduce one raw snapshot (renames NOT applied) to its cached columns."""
+    agents = snap.get("agents") or []
+    cols: dict[str, list] = {}
+    absent: dict[str, list[int]] = {}
+    for field in (*HISTORY_SERIES_FIELDS, *HISTORY_SERIES_NESTED):
+        key = HISTORY_SERIES_NESTED.get(field)
+        col = []
+        for i, a in enumerate(agents):
+            if field not in a:
+                absent.setdefault(field, []).append(i)
+                col.append(None)
+            elif key is None:
+                col.append(a[field])
+            else:
+                v = a[field]
+                col.append([v[key]] if isinstance(v, dict) and key in v else None)
+        cols[field] = col
+    return {"v": HISTORY_SERIES_VERSION, "sig": sig, "n": len(agents),
+            "methodology_version": snap.get("methodology_version"),
+            "graph_providers": (snap.get("graph_summary") or {}).get("providers"),
+            "cols": cols, "absent": absent}
+
+
+class _HistoryRow(Mapping):
+    """One agent row of a cached day: a read-only view over the day's columns,
+    so the whole history costs column slots rather than ~200k dicts."""
+
+    __slots__ = ("_cols", "_i")
+
+    def __init__(self, cols: dict[str, list], i: int):
+        self._cols = cols
+        self._i = i
+
+    def __getitem__(self, field):
+        col = self._cols.get(field)
+        if col is None:
+            raise KeyError(field)
+        v = col[self._i]
+        if v is _SERIES_MISSING:
+            raise KeyError(field)
+        key = HISTORY_SERIES_NESTED.get(field)
+        if key is not None:
+            return {} if v is None else {key: v[0]}
+        return dict(v) if type(v) is dict else v  # shared across days: hand out a copy
+
+    def __iter__(self):
+        return (f for f, col in self._cols.items() if col[self._i] is not _SERIES_MISSING)
+
+    def __len__(self):
+        return sum(1 for _ in self)
+
+
+def _series_day(date: str, entry: dict, memo: dict) -> dict:
+    """Turn a cached entry into a snapshot-shaped day dict. Values are shared
+    through `memo` (keyed by type, so 1, 1.0 and True stay distinct) and repo
+    renames are applied here, never stored, so a new rename needs no rebuild."""
+    n = entry["n"]
+    cols: dict[str, list] = {}
+    for field, col in entry["cols"].items():
+        nested = field in HISTORY_SERIES_NESTED
+        out = []
+        for v in col:
+            if nested and v is not None:
+                p = v[0]
+                v = (tuple(p) if isinstance(p, list) else p,)
+            try:
+                memo_key = (dict, tuple(sorted(v.items()))) if type(v) is dict else (type(v), v)
+                v = memo.setdefault(memo_key, v)
+            except TypeError:
+                pass
+            out.append(v)
+        cols[field] = out
+    for field, idxs in entry["absent"].items():
+        col = cols[field]
+        for i in idxs:
+            col[i] = _SERIES_MISSING
+    if REPO_RENAMES:
+        repos = cols["repo"]
+        for i, repo in enumerate(repos):
+            if isinstance(repo, str):
+                new = REPO_RENAMES.get(repo.lower())
+                if new and new != repo:
+                    repos[i] = new
+    day = {"_date": date, "methodology_version": entry["methodology_version"],
+           "agents": [_HistoryRow(cols, i) for i in range(n)]}
+    if entry["graph_providers"]:
+        day["graph_summary"] = {"providers": entry["graph_providers"]}
+    return day
+
+
+def load_history_series(history_dir: str, cache_dir: str | None = None) -> list[dict]:
+    """Every dated snapshot, oldest first, as snapshot-shaped day dicts whose
+    rows carry only HISTORY_SERIES_FIELDS. Partial and degraded days are
+    included (load_history filters them). With `cache_dir`, a day is parsed
+    from its snapshot only when the cached copy is missing or its file's size
+    or mtime changed."""
     try:
-        for f in sorted(os.listdir(history_dir)):
-            if re.match(r"\d{4}-\d{2}-\d{2}\.json$", f) and f[:-5] not in PARTIAL_SNAPSHOT_DATES:
-                snap = _load_snapshot(os.path.join(history_dir, f))
-                if snapshot_is_degraded(snap):
-                    continue  # kept on disk, never read back as history
-                snap["_date"] = f[:-5]
-                snapshots.append(snap)
-    except Exception:
-        pass
-    return snapshots
+        names = sorted(f for f in os.listdir(history_dir)
+                       if re.match(r"\d{4}-\d{2}-\d{2}\.json$", f))
+    except OSError:
+        return []
+    if cache_dir:
+        os.makedirs(cache_dir, exist_ok=True)
+    memo: dict = {}
+    days = []
+    for name in names:
+        path = os.path.join(history_dir, name)
+        try:
+            st = os.stat(path)
+        except OSError:
+            continue
+        sig = [st.st_size, st.st_mtime_ns]
+        cache_path = os.path.join(cache_dir, name) if cache_dir else None
+        entry = None
+        if cache_path:
+            try:
+                with open(cache_path, encoding="utf-8") as f:
+                    entry = json.load(f)
+                if entry.get("v") != HISTORY_SERIES_VERSION or entry.get("sig") != sig:
+                    entry = None
+            except (OSError, ValueError):
+                entry = None
+        if entry is None:
+            try:
+                with open(path, encoding="utf-8") as f:
+                    raw = json.dumps(_series_entry(json.load(f), sig),
+                                     separators=(",", ":"), ensure_ascii=False)
+            except (OSError, ValueError, TypeError, AttributeError):
+                continue  # unreadable snapshot: skipped, as before
+            # Round-trip through the string so nothing from the full parse
+            # survives it (retained values would pin its memory).
+            entry = json.loads(raw)
+            if cache_path:
+                _write_series_cache(cache_path, raw)
+        days.append(_series_day(name[:-5], entry, memo))
+    return days
+
+
+def _write_series_cache(cache_path: str, raw: str) -> None:
+    try:
+        tmp = cache_path + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            f.write(raw)
+        os.replace(tmp, cache_path)
+    except OSError as e:  # a full disk costs a re-parse next time, not the render
+        print(f"WARNING: history series cache not written ({cache_path}): {e}")
+
+
+def record_history_series_day(days: list[dict], date: str, snap: dict, path: str,
+                              cache_dir: str) -> None:
+    """After today's snapshot is written, cache it from the in-memory copy
+    and put it in `days`, so neither this render's later readers nor the next
+    render have to parse the file back."""
+    try:
+        st = os.stat(path)
+    except OSError:
+        return
+    raw = json.dumps(_series_entry(snap, [st.st_size, st.st_mtime_ns]),
+                     separators=(",", ":"), ensure_ascii=False)
+    os.makedirs(cache_dir, exist_ok=True)
+    _write_series_cache(os.path.join(cache_dir, f"{date}.json"), raw)
+    day = _series_day(date, json.loads(raw), {})
+    if days and days[-1]["_date"] == date:
+        days[-1] = day
+    else:
+        days.append(day)
+
+
+# Per-day public fields of /api/v1/agents/<slug>/history and the MCP
+# get_agent_history tool. Mirrors app._HISTORY_PUBLIC_FIELDS (a test pins them).
+HISTORY_PUBLIC_DAYS = 90
+HISTORY_PUBLIC_FIELDS = (
+    "rank", "trust_score", "evidence_grade", "coverage_grade",
+    "trust_confidence", "has_provenance", "scorecard_score",
+    "signed_commits_ratio", "stars", "weekly_downloads", "days_ago",
+    "listing_status", "methodology_version",
+)
+
+
+def public_history_path(out_dir: str, repo_key: str) -> str:
+    return os.path.join(out_dir, repo_key.lower().replace("/", "__") + ".json")
+
+
+def write_public_history(days: list[dict], out_dir: str) -> int:
+    """One small file per repo with its public history points (last 90
+    usable days, whitelisted fields), so the web process reads one file per
+    request instead of parsing 90 snapshots into a resident index."""
+    cutoff = (datetime.now(timezone.utc).date()
+              - timedelta(days=HISTORY_PUBLIC_DAYS - 1)).isoformat()
+    points: dict[str, list] = {}
+    for day in usable_history(days):
+        if day["_date"] < cutoff:
+            continue
+        mv = day.get("methodology_version")
+        for a in day["agents"]:
+            repo_key = (a.get("repo") or "").lower()
+            if not repo_key:
+                continue
+            point = {"date": day["_date"]}
+            for k in HISTORY_PUBLIC_FIELDS:
+                if k == "methodology_version":
+                    point[k] = a.get(k, mv)
+                elif k in a:
+                    point[k] = a[k]
+            points.setdefault(repo_key, []).append(point)
+    os.makedirs(out_dir, exist_ok=True)
+    keep = set()
+    for repo_key, pts in points.items():
+        path = public_history_path(out_dir, repo_key)
+        keep.add(os.path.basename(path))
+        tmp = path + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(pts, f, separators=(",", ":"), ensure_ascii=False)
+        os.replace(tmp, path)
+    for name in os.listdir(out_dir):
+        if name not in keep:
+            os.remove(os.path.join(out_dir, name))
+    return len(points)
+
+
+def load_history(history_dir: str, cache_dir: str | None = None) -> list[dict]:
+    """Usable history days, oldest first: partial and degraded days are kept
+    on disk but never read back as history."""
+    return usable_history(load_history_series(history_dir, cache_dir))
+
+
+def usable_history(days: list[dict]) -> list[dict]:
+    return [d for d in days
+            if d["_date"] not in PARTIAL_SNAPSHOT_DATES and not snapshot_is_degraded(d)]
 
 
 def seed_history_into_output_root(base_dir: str, script_dir: str) -> int:
@@ -5326,7 +5583,8 @@ def load_scorecard_cache(script_dir: str) -> dict:
         return {}
 
 
-def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict], history_dir: str, now_str: str) -> dict[str, list[dict]]:
+def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict], history_dir: str, now_str: str,
+                            history_all: list[dict] | None = None) -> dict[str, list[dict]]:
     """Generate stable /data/ endpoint files. Returns per-agent events keyed by repo_lower."""
     data_dir = os.path.join(script_dir, "data")
     os.makedirs(os.path.join(data_dir, "agents"), exist_ok=True)
@@ -5356,20 +5614,19 @@ def generate_data_endpoints(script_dir: str, data_output: dict, rows: list[dict]
     with open(os.path.join(data_dir, "history", f"{today_utc}.json"), "w", encoding="utf-8") as f:
         json.dump({**meta, **data_output}, f, separators=(",", ":"), ensure_ascii=False)
 
-    # Load last 90 days of history for per-agent files
+    # Last 90 days of history (partial days included) for per-agent files
+    if history_all is None:
+        history_all = load_history_series(history_dir)
     history_by_date: dict[str, dict] = {}
     methodology_by_date: dict[str, str | None] = {}
     cutoff = (datetime.now(timezone.utc) - timedelta(days=90)).strftime("%Y-%m-%d")
-    for fname in sorted(os.listdir(history_dir)):
-        if not fname.endswith(".json"):
-            continue
-        date_str = fname[:-5]
+    for day in history_all:
+        date_str = day["_date"]
         if date_str < cutoff:
             continue
         try:
-            snap = _load_snapshot(os.path.join(history_dir, fname))
-            history_by_date[date_str] = {a["repo"].lower(): a for a in snap.get("agents", [])}
-            methodology_by_date[date_str] = snap.get("methodology_version")
+            history_by_date[date_str] = {a["repo"].lower(): a for a in day["agents"]}
+            methodology_by_date[date_str] = day.get("methodology_version")
         except Exception:
             pass
 
@@ -5681,25 +5938,33 @@ def generate_badges(script_dir: str, rows: list[dict],
     print(f"Generated {count * 3} badges under badge/ ({count} agents × 3 badge types).")
 
 
-def compute_trust_trends(history_dir: str, today_agents: dict[str, dict]) -> dict[str, dict]:
+def compute_trust_trends(history_dir: str, today_agents: dict[str, dict],
+                         days: list[dict] | None = None) -> dict[str, dict]:
     """Compute 7-day trust score trends from history snapshots.
 
     Returns {repo_lower: {"trust_trend_7d": float|None, "trust_7d_ago": float|None}}
     """
     target_date = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d")
     # Find the closest snapshot on or before the target date
-    best_date = None
-    for fname in sorted(os.listdir(history_dir)):
-        if not fname.endswith(".json"):
-            continue
-        date_str = fname[:-5]
-        if date_str <= target_date:
-            best_date = fname
-    if not best_date:
-        return {}
-
+    if days is not None:
+        snap = next((d for d in reversed(days) if d["_date"] <= target_date), None)
+        if snap is None:
+            return {}
+    else:
+        best_date = None
+        for fname in sorted(os.listdir(history_dir)):
+            if not fname.endswith(".json"):
+                continue
+            date_str = fname[:-5]
+            if date_str <= target_date:
+                best_date = fname
+        if not best_date:
+            return {}
+        try:
+            snap = _load_snapshot(os.path.join(history_dir, best_date))
+        except Exception:
+            return {}
     try:
-        snap = _load_snapshot(os.path.join(history_dir, best_date))
         old_agents = {a["repo"].lower(): a for a in snap.get("agents", [])}
     except Exception:
         return {}
@@ -6357,12 +6622,13 @@ def main() -> None:
     # calendar day's run — unaffected by manual commits or code pushes during the day.
     history_dir = os.path.join(script_dir, "output", "history")
     os.makedirs(history_dir, exist_ok=True)
-    prev_ranks = load_previous_ranks(history_dir)
-    prev_pending = load_previous_pending(history_dir)
-    prev_downloads = load_previous_downloads(history_dir)
-    cached_commit_counts = load_cached_commit_counts(data_path, history_dir)
+    history_all = load_history_series(history_dir, os.path.join(script_dir, ".cache", "history-series"))
+    history = usable_history(history_all)
+    prev_ranks = load_previous_ranks(history_dir, history_all)
+    prev_pending = load_previous_pending(history_dir, history_all)
+    prev_downloads = load_previous_downloads(history_dir, days=history_all)
+    cached_commit_counts = load_cached_commit_counts(data_path, history_dir, history_all)
     existing_agents_map = load_existing_agents_map(data_path)
-    history = load_history(history_dir)
     sparkline_data = compute_sparklines(history)
 
     def fetch_one(agent: dict) -> dict | None:
@@ -7148,12 +7414,20 @@ def main() -> None:
     print(f"Wrote history snapshot {history_path}.")
     if storage.put_file(f"history/{today_utc}.json", history_path, "application/json"):
         print(f"Archived history snapshot to bucket: history/{today_utc}.json")
+    record_history_series_day(history_all, today_utc, snapshot_output, history_path,
+                              os.path.join(script_dir, ".cache", "history-series"))
+    try:
+        n = write_public_history(history_all, os.path.join(script_dir, ".cache", "history-api"))
+        print(f"Wrote public history for {n} repos.")
+    except OSError as e:  # the API falls back to building its own index
+        print(f"WARNING: public history files not written: {e}")
 
-    agent_events = generate_data_endpoints(script_dir, data_output, rows, history_dir, now_str)
+    agent_events = generate_data_endpoints(script_dir, data_output, rows, history_dir, now_str,
+                                           history_all=history_all)
 
     # ── Trust Trends (7-day delta) ───────────────────────────────────────────
     today_agents_map = {r["repo"].lower(): r for r in rows}
-    trust_trends = compute_trust_trends(history_dir, today_agents_map)
+    trust_trends = compute_trust_trends(history_dir, today_agents_map, history_all)
     for row in rows:
         repo_key = row["repo"].lower()
         trend = trust_trends.get(repo_key, {})
@@ -7210,7 +7484,7 @@ def main() -> None:
     # Board-integrity invariants (master plan 0.3): catch v4.2-class defects
     # (inflation, out-of-range scores, silent mass churn) at render time.
     invariant_violations = check_board_invariants(
-        rows, _load_prior_snapshot(history_dir)
+        rows, _load_prior_snapshot(history_dir, history_all)
     )
     if invariant_violations:
         print("=" * 72, file=sys.stderr)

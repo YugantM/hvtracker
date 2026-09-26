@@ -25,6 +25,8 @@
 *.pem
 __pycache__/
 *.pyc
+# generator caches (API responses, history series) — rebuildable, never committed
+/.cache/
 
 # debug
 npm-debug.log*
