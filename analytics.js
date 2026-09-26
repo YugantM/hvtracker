@@ -5,6 +5,9 @@
     if (localStorage.getItem("hvt_notrack") === "1") return;
   } catch (_) {}
   var ua = navigator.userAgent || "";
+  // Automation (Puppeteer, Playwright, Selenium) sets navigator.webdriver even
+  // when it spoofs a normal Chrome user agent.
+  if (navigator.webdriver) return;
   if (/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)) return;
 
   var ATTRIBUTION_KEY = "hvtracker_attribution_v1";
