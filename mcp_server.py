@@ -907,6 +907,31 @@ def get_leaderboard(category: str = "", limit: int = 10) -> GetLeaderboardResult
 _history_index: dict = {"mtime": None, "data": None}
 
 
+def _history_points(repo_key: str) -> list:
+    """Public history points for one repo, oldest first. Each render writes
+    one small file per repo (fetch_and_build.write_public_history); reading
+    it keeps the web process from parsing 90 snapshots into a resident index.
+    The index below is only the fallback until the first such render."""
+    import json
+    import os
+    from datetime import datetime, timedelta, timezone
+
+    from app import _HISTORY_PUBLIC_DAYS, OUTPUT_DIR
+    api_dir = os.path.join(OUTPUT_DIR, ".cache", "history-api")
+    if not os.path.isdir(api_dir):
+        return _get_history_index().get(repo_key, [])
+    _history_index.update({"mtime": None, "data": None})
+    path = os.path.join(api_dir, repo_key.lower().replace("/", "__") + ".json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            points = json.load(f)
+    except (OSError, ValueError):
+        return []
+    cutoff = (datetime.now(timezone.utc).date()
+              - timedelta(days=_HISTORY_PUBLIC_DAYS - 1)).isoformat()
+    return [p for p in points if p.get("date", "") >= cutoff]
+
+
 def _get_history_index() -> dict:
     """Return {repo_lower: [public points]} for the public history window,
     cached by the history dir's mtime."""
@@ -991,7 +1016,7 @@ def get_agent_history(name_or_repo: str) -> GetAgentHistoryResult:
         return {"tracked": False,
                 "message": "Not in the HVTracker registry; no history to show."}
     repo_key = (agent.get("repo") or "").lower()
-    points = _get_history_index().get(repo_key, [])
+    points = _history_points(repo_key)
     return {
         "tracked": True,
         "slug": agent.get("slug"),
