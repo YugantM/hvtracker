@@ -55,9 +55,10 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
 - `fetch_and_build.py` (~8k lines) — the generator. Grep `def <name>`. Key:
   `compute_trust_score_v2` (IS production trust_score/rank/grade), `assign_ranks`,
   `check_board_invariants`, `compute_movers`, `load_history`/`_load_prior_snapshot`,
-  `derive_agent_events`, `select_stale_batch` (2 h batch rotation), `refresh_argv`.
-- `app.py` — FastAPI serving, /healthz, scheduler (`_start_scheduler`: 2 h batch,
-  signals every `SIGNALS_REFRESH_MIN`=360 min), boot refresh path (`_startup`).
+  `derive_agent_events`, `select_stale_batch` (4 h batch rotation), `refresh_argv`.
+- `app.py` — FastAPI serving, /healthz, scheduler (`_start_scheduler`: one 4 h job =
+  batch + signals; standalone signals only if `SIGNALS_REFRESH_MIN` is set), boot
+  refresh path (`_startup`).
 - `mcp_server.py` — MCP tools (dominant machine channel). `auth.py` — accounts,
   watchlist, notifications (needs DB). `db.py` + `schema.sql` — Postgres layer.
 - `template.html` — homepage. `templates/*.j2` — all other pages. Grade-B color
