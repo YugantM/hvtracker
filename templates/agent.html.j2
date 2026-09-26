@@ -133,6 +133,25 @@
     .vseal-grade { margin-top:6px; font-family:var(--font-mono); font-size:12px; }
     .vseal-rank { margin:9px 0 0; font-family:var(--font-mono); font-size:11.5px; line-height:1.65; color:var(--muted); }
     .vseal-rank b { color:var(--text); font-weight:600; }
+    /* "How X could raise its score": what-ifs through the live scoring
+       function, one change at a time. Aimed at maintainers, readable by anyone. */
+    .imp { margin-top:18px; border:1px solid var(--border); background:var(--surface); border-radius:8px; padding:14px 16px; max-width:760px; }
+    .imp-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 12px; margin:0 0 2px; }
+    .imp-head h2 { font-size:16px; margin:0; }
+    .imp-sub { margin:0 0 8px; font-size:12.5px; color:var(--muted); }
+    .imp-list { list-style:none; margin:0; padding:0; }
+    .imp-list li { display:grid; grid-template-columns:minmax(0,1fr) 56px 190px; gap:4px 12px; align-items:center; padding:9px 0; border-top:1px solid var(--border); font-size:14px; }
+    .imp-list .imp-what a { color:var(--text); font-weight:600; }
+    .imp-list .imp-detail { display:block; font-size:12px; color:var(--muted); font-family:var(--font-mono); }
+    .imp-list .imp-gain { font-family:var(--font-mono); font-weight:700; color:var(--green); text-align:right; }
+    .imp-list .imp-res { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
+    .imp-list .imp-res b { color:var(--text); }
+    .imp-list .badge { padding:1px 6px; font-size:11px; }
+    .imp-actions { display:flex; flex-wrap:wrap; gap:14px; margin-top:10px; font-size:13px; }
+    @media (max-width: 700px) {
+      .imp-list li { grid-template-columns:minmax(0,1fr) auto; }
+      .imp-list .imp-res { grid-column:1 / -1; }
+    }
     .vfresh { display:inline-flex; align-items:center; gap:6px; margin-top:10px; font-family:var(--font-mono); font-size:11px;
       color:var(--green); border:1px solid color-mix(in srgb, var(--green) 40%, transparent); border-radius:20px; padding:2px 9px; }
     @media (max-width: 700px) {
@@ -623,6 +642,22 @@
         {% if row.signed_commits_pct is not none and row.signed_commits_pct > 0 %}{{ row.signed_commits_pct }}% of recent commits are signed{% else %}recent commits are unsigned{% endif %};
         last pushed {{ row.last_push }}. Every point is earned from checkable signals — never paid placement. <a href="/methodology/">How scoring works →</a>
       </p>
+      {% if row.improvements %}
+      <section class="imp" aria-labelledby="imp-title">
+        <div class="imp-head"><h2 id="imp-title">How {{ row.name }} could raise its score</h2></div>
+        <p class="imp-sub">Each line changes one public signal and recomputes with the live scoring function. The gains don't add up exactly, because the score is capped near the top.</p>
+        <ul class="imp-list">
+          {% for i in row.improvements %}
+          <li>
+            <span class="imp-what"><a href="{{ i.link }}" rel="noopener">{{ i.action }}</a><span class="imp-detail">{{ i.detail }}</span></span>
+            <span class="imp-gain">+{{ i.gain }}</span>
+            <span class="imp-res">&rarr; <b>{{ i.score }}</b> <span class="badge grade-{{ i.grade }}">{{ i.grade }}</span>{% if i.category_rank and row.category %} · #{{ i.category_rank }} of {{ i.category_size }}{% endif %}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        <div class="imp-actions"><a href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Already done? Suggest a correction</a><a href="#embed-badge">Add the trust badge</a></div>
+      </section>
+      {% endif %}
       {% endif %}
       {% if row.warning_reasons %}
       <div class="warning-banner">
