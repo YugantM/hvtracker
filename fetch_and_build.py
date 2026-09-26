@@ -1456,6 +1456,27 @@ def fetch_crate_package_metadata(crate_name: str) -> dict | None:
         return None
 
 
+def _package_source_url(source: str, metadata: dict | None) -> str | None:
+    """The source-repo URL a registry entry declares ("npm", "pypi", "crates.io")."""
+    if not metadata:
+        return None
+    if source == "npm":
+        repo_field = metadata.get("repository")
+        value = None
+        if isinstance(repo_field, dict):
+            value = repo_field.get("url")
+        elif isinstance(repo_field, str):
+            value = repo_field
+        return value or metadata.get("homepage")
+    if source == "pypi":
+        info = metadata.get("info", {})
+        project_urls = info.get("project_urls") or {}
+        return (project_urls.get("Source") or project_urls.get("Repository")
+                or project_urls.get("Homepage") or info.get("home_page") or info.get("project_url"))
+    crate = metadata.get("crate", {})
+    return crate.get("repository") or crate.get("homepage")
+
+
 def detect_package_provenance_drift(
     owner_repo: str,
     *,
@@ -1480,40 +1501,12 @@ def detect_package_provenance_drift(
     canonical = (tracked_repo_canonical or "").lower() or None
     checks = []
 
-    if npm_package:
-        repo_value = None
-        if npm_metadata:
-            repo_field = npm_metadata.get("repository")
-            if isinstance(repo_field, dict):
-                repo_value = repo_field.get("url")
-            elif isinstance(repo_field, str):
-                repo_value = repo_field
-            repo_value = repo_value or npm_metadata.get("homepage")
-        normalized = _normalize_github_repo_url(repo_value)
-        checks.append(("npm", npm_package, normalized, repo_value))
-
-    if pypi_package:
-        repo_value = None
-        if pypi_metadata:
-            info = pypi_metadata.get("info", {})
-            project_urls = info.get("project_urls") or {}
-            repo_value = (
-                project_urls.get("Source")
-                or project_urls.get("Repository")
-                or project_urls.get("Homepage")
-                or info.get("home_page")
-                or info.get("project_url")
-            )
-        normalized = _normalize_github_repo_url(repo_value)
-        checks.append(("pypi", pypi_package, normalized, repo_value))
-
-    if crate_package:
-        repo_value = None
-        if crate_metadata:
-            crate = crate_metadata.get("crate", {})
-            repo_value = crate.get("repository") or crate.get("homepage")
-        normalized = _normalize_github_repo_url(repo_value)
-        checks.append(("crates.io", crate_package, normalized, repo_value))
+    for source, package_name, metadata in (("npm", npm_package, npm_metadata),
+                                           ("pypi", pypi_package, pypi_metadata),
+                                           ("crates.io", crate_package, crate_metadata)):
+        if package_name:
+            repo_value = _package_source_url(source, metadata)
+            checks.append((source, package_name, _normalize_github_repo_url(repo_value), repo_value))
 
     expected_owner = expected.split("/", 1)[0]
     evidence: list[str] = []
@@ -1597,6 +1590,127 @@ def fetch_package_provenance_drift(
         crate_metadata=crate_metadata,
         tracked_repo_canonical=tracked_repo_canonical,
     )
+
+
+# Known advisories (OSV.dev: GHSA, PYSEC, RUSTSEC, ...) against the release
+# people install today. Shown, not scored: no trust_score/rank change comes
+# from this until a separate, reviewed scoring slice.
+OSV_QUERY_URL = "https://api.osv.dev/v1/query"
+OSV_ECOSYSTEMS = {"npm": "npm", "pypi": "PyPI", "crates.io": "crates.io"}
+ADVISORY_SEVERITIES = ("CRITICAL", "HIGH", "MODERATE", "LOW")
+
+
+@cache.cached("osv", ttl=21600, skip_none=True)
+def fetch_osv_vulns(ecosystem: str, name: str, version: str) -> list | None:
+    """Full OSV records affecting one package version; None when OSV is unreachable."""
+    try:
+        r = requests.post(OSV_QUERY_URL, timeout=15, json={
+            "package": {"name": name, "ecosystem": ecosystem}, "version": version})
+        if r.status_code != 200:
+            return None
+        return r.json().get("vulns") or []
+    except Exception:
+        return None
+
+
+def _latest_package_version(source: str, metadata: dict | None) -> str | None:
+    if not metadata:
+        return None
+    if source == "npm":
+        return metadata.get("version")
+    if source == "pypi":
+        return (metadata.get("info") or {}).get("version")
+    crate = metadata.get("crate") or {}
+    return crate.get("max_stable_version") or crate.get("newest_version")
+
+
+def _loose_name(name: str) -> str:
+    return re.sub(r"[-_.]+", "-", name.lower().rsplit("/", 1)[-1])
+
+
+def package_is_the_listing(owner_repo: str, canonical: str | None, source_url: str | None,
+                           package_name: str, only_package: bool) -> bool:
+    """Whether a configured package id really is this listing's release, so its
+    advisories may be shown. The registry's declared repo decides when it names
+    one: this repo, its current name after a rename, or the same owner. With no
+    GitHub repo declared, only a listing's sole package named like the repo
+    counts; a second, stale distribution (Open WebUI's 2024 npm id) does not."""
+    expected = owner_repo.lower()
+    declared = _normalize_github_repo_url(source_url)
+    if declared:
+        return (declared == expected or declared.split("/", 1)[0] == expected.split("/", 1)[0]
+                or bool(canonical) and declared == canonical.lower())
+    return only_package and _loose_name(package_name) == _loose_name(expected)
+
+
+def _advisory_item(v: dict, package: str, version: str) -> dict:
+    severity = (v.get("database_specific") or {}).get("severity")
+    severity = severity.upper() if isinstance(severity, str) else None
+    if severity not in ADVISORY_SEVERITIES:
+        severity = None
+    summary = v.get("summary") or (v.get("details") or "").strip().split("\n", 1)[0]
+    return {"id": v["id"], "aliases": sorted(v.get("aliases") or []),
+            "summary": summary[:200], "severity": severity,
+            "published": (v.get("published") or "")[:10], "package": package, "version": version}
+
+
+def _merge_advisory_aliases(items: list[dict]) -> list[dict]:
+    """One entry per issue: a GHSA and its PYSEC/CVE twins are the same advisory.
+    The GHSA id leads (it carries the rated severity); the worst severity wins."""
+    groups: list[dict] = []
+    for it in items:
+        names = {it["id"], *it["aliases"]}
+        group = next((g for g in groups if g["names"] & names), None)
+        if group is None:
+            groups.append({"names": names, "members": [it]})
+        else:
+            group["names"] |= names
+            group["members"].append(it)
+    merged = []
+    for g in groups:
+        lead = min(g["members"], key=lambda it: (not it["id"].startswith("GHSA-"), it["id"]))
+        rated = [it["severity"] for it in g["members"] if it["severity"]]
+        merged.append({**lead,
+                       "aliases": sorted(g["names"] - {lead["id"]}),
+                       "severity": min(rated, key=ADVISORY_SEVERITIES.index) if rated else None})
+    merged.sort(key=lambda it: it["published"], reverse=True)  # newest first within a severity
+    merged.sort(key=lambda it: ADVISORY_SEVERITIES.index(it["severity"]) if it["severity"] else 9)
+    return merged
+
+
+def fetch_known_advisories(owner_repo: str, *, npm_package: str = "", pypi_package: str = "",
+                           crate_package: str = "",
+                           tracked_repo_canonical: str | None = None) -> dict | None:
+    """Advisories affecting the latest release of each of this listing's own
+    packages. None when no configured package can be tied to the listing.
+    {"error": ...} when OSV or a registry could not be read (callers keep the
+    last good value instead of claiming "none known")."""
+    configured = [(src, name) for src, name in (("npm", npm_package), ("pypi", pypi_package),
+                                                ("crates.io", crate_package)) if name]
+    fetchers = {"npm": fetch_npm_package_metadata, "pypi": fetch_pypi_package_metadata,
+                "crates.io": fetch_crate_package_metadata}
+    checked, found = [], []
+    for source, name in configured:
+        metadata = fetchers[source](name)
+        if not package_is_the_listing(owner_repo, tracked_repo_canonical,
+                                      _package_source_url(source, metadata), name,
+                                      only_package=len(configured) == 1):
+            continue
+        version = _latest_package_version(source, metadata)
+        if not version:
+            return {"error": f"no latest version for {source} {name}"}
+        vulns = fetch_osv_vulns(OSV_ECOSYSTEMS[source], name, version)
+        if vulns is None:
+            return {"error": "OSV unreachable"}
+        checked.append({"ecosystem": OSV_ECOSYSTEMS[source], "name": name, "version": version})
+        found += [_advisory_item(v, name, version) for v in vulns if not v.get("withdrawn")]
+    if not checked:
+        return None
+    found = _merge_advisory_aliases(found)
+    rated = [it["severity"] for it in found if it["severity"]]
+    return {"checked": checked, "found": found,
+            "worst": min(rated, key=ADVISORY_SEVERITIES.index) if rated else None,
+            "checked_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
 
 
 @cache.cached("pypi_dl", ttl=21600, skip_none=True)
@@ -6476,6 +6590,17 @@ def main() -> None:
             crate_package=crate_pkg,
             tracked_repo_canonical=repo.get("full_name"),
         )
+        advisories = fetch_known_advisories(
+            repo_id,
+            npm_package=npm_pkg,
+            pypi_package=pypi_pkg,
+            crate_package=crate_pkg,
+            tracked_repo_canonical=repo.get("full_name"),
+        )
+        if advisories is not None and "error" in advisories:
+            # A lookup failure is not "none known": keep the last good result.
+            print(f"WARN {repo_id}: advisories not refreshed ({advisories['error']})", file=sys.stderr)
+            advisories = (existing_row or {}).get("advisories")
         fallback_note = " [cached commits]" if used_cached_commit_count else ""
         print(f"OK  {repo_id:<45} score={score:5.1f}{fallback_note}")
 
@@ -6522,6 +6647,7 @@ def main() -> None:
             "external_service_dependencies": external_service_dependencies,
             "tool_plugin_surface": tool_plugin_surface,
             "package_provenance_drift": package_provenance_drift,
+            "advisories": advisories,
             "signed_commits_ratio": signed_ratio,
             "weekly_downloads": None,  # filled in serial pass below
             "dl_source": "",
@@ -7087,6 +7213,9 @@ def main() -> None:
                 "external_service_dependencies": r.get("external_service_dependencies", {"providers": [], "requires_api_keys": False, "confidence": None, "evidence": []}),
                 "tool_plugin_surface": r.get("tool_plugin_surface", {"plugin_system": "none", "tool_tags": [], "confidence": None, "evidence": []}),
                 "package_provenance_drift": r.get("package_provenance_drift", {"status": "not_applicable", "confidence": None, "summary": "No package source configured", "evidence": []}),
+                # Must be published: batch mode carries non-batch rows forward
+                # from data.json, so an unlisted key would vanish for 5/6 of the board.
+                "advisories": r.get("advisories"),
                 "evidence_grade": r.get("evidence_grade", "D"),
                 "coverage_grade": r.get("coverage_grade", "D"),
                 "signal_coverage": r.get("signal_coverage"),
