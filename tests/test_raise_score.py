@@ -91,3 +91,18 @@ def test_agent_page_card():
     assert 'id="imp-title"' in html and "+13.6" in html and "#1 of 61" in html
     assert 'id="imp-title"' not in _render(pending_signals=False, evidence_grade="A",
                                            trust_score=96.3, improvements=[])
+
+
+def test_page_with_advisories_and_improvements_renders_both_sections():
+    """#272 and #274 insert at the same spot on the agent page; both sections
+    must render, advisories first, each closed before the next opens."""
+    from test_advisories import ADV_CRIT, _page
+    imp = [{"key": "provenance", "action": "Publish build provenance", "detail": "npm --provenance",
+            "link": "https://docs.npmjs.com/generating-provenance-statements", "gain": 13.6,
+            "score": 90.4, "grade": "A", "category_rank": 1, "category_size": 61}]
+    html = _page(advisories=ADV_CRIT, improvements=imp)
+    adv, raise_ = html.find('id="advisories"'), html.find('<section class="imp"')
+    assert 0 < adv < raise_, "advisories section must come before the raise-score section"
+    between = html[adv:raise_]
+    assert between.count("<section") == 0 and between.count("</section>") == 1
+    assert "+13.6" in html and "CVE-2026-88062" in html
