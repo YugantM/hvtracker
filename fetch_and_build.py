@@ -7280,6 +7280,8 @@ def main() -> None:
     # `repo` as the tracking/join key while showing the corrected slug.
     _display_repo_map = {a["repo"].lower(): a.get("display_repo", "") for a in all_agents if a.get("display_repo")}
     _source_note_map = {a["repo"].lower(): a.get("source_note", "") for a in all_agents if a.get("source_note")}
+    # Official product site, when the maintainer asks for it (a correction, e.g. #216).
+    _homepage_map = {a["repo"].lower(): a.get("homepage", "") for a in all_agents if a.get("homepage")}
     apply_listing_classes(rows, all_agents)
 
     # Re-apply the latest OSSF scan to every carried-forward agent (cache-only,
@@ -7312,6 +7314,7 @@ def main() -> None:
         source_note_override = _source_note_map.get(repo_key)
         if source_note_override:
             row["source_note"] = source_note_override
+        row["homepage"] = _homepage_map.get(repo_key, "")
         row["license_type"] = normalize_license_type(row, offline=render_only)
         # Always recompute freshness from the absolute last_push date so the
         # color coding (and the maintenance dimension) stay correct even when
