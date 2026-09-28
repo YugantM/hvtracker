@@ -42,6 +42,7 @@
     "applicationCategory": "{{ row.category }}",
     "operatingSystem": "Cross-platform",
     "url": "{{ row.url }}",
+    {% if row.homepage %}"sameAs": [{{ row.homepage|tojson }}],{% endif %}
     {% if desc %}"description": "{{ desc }}",{% endif %}
     "offers": {
       "@type": "Offer",
@@ -522,6 +523,7 @@
       <h1>{{ row.name }}</h1>
       <div class="repo">
         {% if row.display_repo %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.display_repo }}</a>{% elif row.org_slug_or_none %}<a href="/org/{{ row.org_slug_or_none }}/">{{ row.repo.split('/')[0] }}</a>/<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo.split('/')[1] }}</a>{% else %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>{% endif %}
+        {% if row.homepage %} · <a href="{{ row.homepage }}" target="_blank" rel="noopener noreferrer">{{ row.homepage.split('://', 1)[-1].rstrip('/') }}</a>{% endif %}
       </div>
       {% if desc %}<p class="desc">{{ desc }}</p>{% endif %}
       <div class="badges">
@@ -1357,6 +1359,7 @@
 
     <section class="links">
       <a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">GitHub →</a>
+      {% if row.homepage %}<a href="{{ row.homepage }}" target="_blank" rel="noopener noreferrer">Website →</a>{% endif %}
       {% if row.pypi_package %}<a href="https://pypi.org/project/{{ row.pypi_package }}/" target="_blank" rel="noopener noreferrer">PyPI: {{ row.pypi_package }}</a>{% endif %}
       {% if row.npm_package %}<a href="https://www.npmjs.com/package/{{ row.npm_package }}" target="_blank" rel="noopener noreferrer">npm: {{ row.npm_package }}</a>{% endif %}
     </section>
