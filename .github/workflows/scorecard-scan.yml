@@ -46,7 +46,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.1
 
       # Scheduled runs rotate through shards by UTC hour (hour 0→shard 1 …
       # hour 23→shard 24). A late cron now shifts the shard rather than
@@ -70,7 +70,7 @@ jobs:
           ./scorecard version
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -124,7 +124,7 @@ jobs:
       # next run via the stalest-first queue.
       - name: Upload shard cache
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: scorecard-shard-${{ steps.pick.outputs.shard }}
           path: scorecard-cache.json
@@ -140,10 +140,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.1
 
       - name: Download shard caches
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: shards
           pattern: scorecard-shard-*
