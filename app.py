@@ -1016,10 +1016,10 @@ def api_v1_agent_history(slug: str):
         return JSONResponse({"error": "agent not found"}, status_code=404,
                             headers={"Access-Control-Allow-Origin": _API_V1_CORS})
     repo_key = (agent.get("repo") or "").lower()
-    # The shared, mtime-cached index behind the MCP get_agent_history tool.
-    # This endpoint used to re-parse every daily snapshot (~5 MB each, up to
-    # 90) on every request: ~4 s per call, and /api/* isn't edge-cached.
-    entries = mcp_server._get_history_index().get(repo_key, [])
+    # The per-repo file each render writes, shared with the MCP
+    # get_agent_history tool. This endpoint used to re-parse every daily
+    # snapshot (~5 MB each, up to 90) on every request: ~4 s per call.
+    entries = mcp_server._history_points(repo_key)
 
     return JSONResponse({
         "slug": agent.get("slug"),
