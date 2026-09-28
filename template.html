@@ -586,6 +586,8 @@
   <script defer src="/analytics.js"></script>
 </head>
 <body data-page-type="leaderboard">
+  {# The leaderboard's own search box is the primary control here. #}
+  {% set header_search = false %}
   {% include "_site_header.html.j2" %}
   <main class="page" id="main">
 
