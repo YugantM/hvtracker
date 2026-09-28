@@ -197,7 +197,7 @@ cache.json                                 data/agents/<slug>.json
 2. Public APIs are fetched in parallel where safe and serially where rate limits require it.
 3. HVTrust scores, evidence grades, rank deltas, trust breakdowns, and events are computed.
 4. Static pages, JSON endpoints, badges, specs, feed files, sitemap, and build reports are generated.
-5. Railway serves the generated site from a persistent volume and refreshes it on a 2-hour cadence.
+5. Railway serves the generated site from a persistent volume and refreshes it every 4 hours.
 
 ### Build Modes
 
@@ -295,7 +295,7 @@ Production runs on Railway with:
 
 - FastAPI for health, API, forms, and dynamic badge routes
 - Generated site output stored on a persistent volume
-- A 2-hour scheduler that refreshes one leaderboard batch per run
+- A 4-hour scheduler: each run fully re-fetches the stalest sixth of the board and refreshes GitHub signals for the rest
 
 ---
 

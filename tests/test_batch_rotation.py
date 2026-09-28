@@ -1,4 +1,4 @@
-"""The 2h batch must actually rotate through the whole board.
+"""The batch must actually rotate through the whole board.
 
 Regression for the freeze found via issue #212: `select_stale_batch` ranks
 agents by a `full_fetched_at` stamp read out of data.json, but the stamp was
@@ -126,3 +126,21 @@ def test_rotation_summary_handles_a_board_with_no_stamps():
     assert summary["never_fetched"] == 1
     assert summary["stalest_age_hours"] is None
     assert summary["fetched_last_24h"] == 0
+
+
+def test_batch_refreshes_signals_on_every_row_it_carried(monkeypatch):
+    """The 4-hourly batch replaces the standalone signals job, so the rows it
+    did not fetch in full (and carried legacy rows) must get the GitHub-signal
+    pass; the freshly fetched ones already have current signals."""
+    seen = []
+    monkeypatch.setattr(fab, "refresh_github_signals",
+                        lambda rows, label="": seen.extend(r["repo"] for r in rows) or len(rows))
+    rows = [{"repo": "o/Fresh"}, {"repo": "o/carried"}, {"repo": "o/provisional", "pending_signals": True}]
+    legacy = [{"repo": "o/legacy"}]
+    assert fab.refresh_carried_signals(rows, {"o/fresh"}, legacy) == 3
+    assert seen == ["o/carried", "o/provisional", "o/legacy"]
+
+
+def test_batch_mode_calls_the_carried_signals_pass():
+    import inspect
+    assert "refresh_carried_signals(rows, fresh_keys" in inspect.getsource(fab.main)

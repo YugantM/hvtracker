@@ -50,10 +50,19 @@ def test_start_scheduler_registers_every_job(app_module, monkeypatch):
     assert app_module._scheduler_error is None
     assert app_module._scheduler is not None and app_module._scheduler.running
     jobs = {job.id: job for job in app_module._scheduler.get_jobs()}
-    assert {"refresh", "signals-refresh", "usage-flush"} <= set(jobs)
-    # Default signals cadence is 6 hours, expressed on the hour field.
-    assert "hour='*/6'" in str(jobs["signals-refresh"].trigger)
+    assert {"refresh", "usage-flush"} <= set(jobs)
+    # One refresh (batch + signals) every 4 hours; no separate signals render.
+    assert "hour='*/4'" in str(jobs["refresh"].trigger)
+    assert "signals-refresh" not in jobs
     assert set(app_module._scheduled_jobs()) == set(jobs)
+
+
+def test_standalone_signals_refresh_is_opt_in(app_module, monkeypatch):
+    monkeypatch.delenv("DISABLE_SCHEDULER", raising=False)
+    monkeypatch.setenv("SIGNALS_REFRESH_MIN", "360")
+    app_module._start_scheduler()
+    jobs = {job.id: job for job in app_module._scheduler.get_jobs()}
+    assert "hour='*/6'" in str(jobs["signals-refresh"].trigger)
 
 
 def test_start_scheduler_failure_is_recorded_not_raised(app_module, monkeypatch):
