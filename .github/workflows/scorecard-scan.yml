@@ -154,10 +154,15 @@ jobs:
           # glob then passes a literal path and the merge crashes (2026-07-11
           # run 29151228066). Nothing to merge = nothing to do; the scan
           # failure already routes to the alert job.
-          if ! ls shards/scorecard-shard-*/scorecard-cache.json >/dev/null 2>&1; then
+          # download-artifact v5+ extracts a lone matching artifact straight
+          # into shards/ (no per-artifact subdirectory), and a run scans one
+          # shard, so find the caches at any depth rather than assume a layout.
+          mapfile -t shard_files < <(find shards -name scorecard-cache.json 2>/dev/null)
+          if [ ${#shard_files[@]} -eq 0 ]; then
             echo "No shard artifacts to merge."
             exit 0
           fi
+          echo "Merging ${#shard_files[@]} shard cache(s): ${shard_files[*]}"
 
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -169,7 +174,7 @@ jobs:
             echo '{"agents":{}}' > base.json
           fi
 
-          python merge_scorecard_shards.py base.json shards/scorecard-shard-*/scorecard-cache.json > merged.json
+          python merge_scorecard_shards.py base.json "${shard_files[@]}" > merged.json
           cp merged.json /tmp/scorecard-cache.json
 
           # Use -B <branch> <start-point> so "data" is unambiguously a branch
