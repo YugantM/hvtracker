@@ -19,6 +19,25 @@ MCP_SUPPORT_STATUS = {"declared", "implemented", "verified", "supported"}
 MIN_SCORE = 40.0
 
 
+def advisory_summary(agent: dict) -> dict | None:
+    """Known advisories (OSV) against the latest release of the agent's own
+    packages, as the generator recorded them. None when no package could be
+    tied to the listing. Shown, not scored: `trusted` does not read this yet."""
+    adv = agent.get("advisories")
+    if not isinstance(adv, dict) or "found" not in adv:
+        return None
+    found = adv.get("found") or []
+    return {
+        "checked": [f"{c.get('ecosystem')}:{c.get('name')}@{c.get('version')}"
+                    for c in adv.get("checked") or []],
+        "count": len(found),
+        "worst": adv.get("worst"),
+        "advisories": [{"id": f.get("id"), "severity": f.get("severity"),
+                        "summary": f.get("summary")} for f in found[:10]],
+        "scored": False,
+    }
+
+
 def evaluate(agent: dict | None, server_id: str) -> dict:
     """Pure pre-connect verdict. `agent` is the resolved HVTracker record or None."""
     if not agent:
@@ -47,6 +66,13 @@ def evaluate(agent: dict | None, server_id: str) -> dict:
     reasons: list[str] = []
     if status in BLOCKED_STATUS:
         reasons.append(f"Listing status '{status}' — do not connect.")
+    advisories = advisory_summary(agent)
+    if advisories and advisories["count"]:
+        n = advisories["count"]
+        ids = ", ".join(a["id"] for a in advisories["advisories"][:3])
+        reasons.append(f"{n} published advisor{'y affects' if n == 1 else 'ies affect'} the latest "
+                       f"release ({(advisories['worst'] or 'unrated').lower()}: {ids}) — review before "
+                       "connecting. Not yet part of the trust score.")
     if agent.get("npm_provenance") or agent.get("pypi_provenance"):
         reasons.append("Build provenance present (published package ties back to source).")
     else:
@@ -79,6 +105,7 @@ def evaluate(agent: dict | None, server_id: str) -> dict:
         "reasons": reasons,
         "mcp_server_support": mcp.get("status"),
         "tool_permissions": tags,
+        "advisories": advisories,
     }
 
 
