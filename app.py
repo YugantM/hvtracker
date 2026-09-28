@@ -392,6 +392,16 @@ def _canonical_redirect_target(request: Request) -> str | None:
 _usage_counters = {"api_v1": 0, "mcp": 0, "data_json": 0, "exports": 0}
 _USAGE_SINCE = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
+# /mcp requests by protocol era: 2026-07-28 clients name the method in an
+# Mcp-Method header; 2025-era clients send none ("legacy"). Shows how fast
+# clients move to the new revision. Unknown header values fold into "other"
+# so arbitrary input can't grow the dict.
+_MCP_METHODS = frozenset({
+    "server/discover", "tools/list", "tools/call", "resources/list",
+    "resources/read", "prompts/list", "subscriptions/listen", "ping",
+})
+_mcp_method_counters: dict[str, int] = {}
+
 # Badge SVG fetches per agent slug. READMEs embed badges via GitHub's camo
 # proxy, which caches the SVG and strips referrers — so GA never sees this
 # reach at all, and each fetch here represents MANY actual README views
@@ -449,7 +459,7 @@ def _is_private_snapshot_path(path: str) -> bool:
             or path == _PRIVATE_CACHE_PREFIX or path.startswith(_PRIVATE_CACHE_PREFIX + "/"))
 
 
-def _count_machine_usage(path: str) -> None:
+def _count_machine_usage(path: str, mcp_method: str | None = None) -> None:
     if path in _USAGE_EXCLUDED_PATHS:
         return
     channel = None
@@ -465,12 +475,15 @@ def _count_machine_usage(path: str) -> None:
         return
     _usage_counters[channel] += 1
     usage.bump(channel)  # durable rollup behind /live/
+    if channel == "mcp":
+        key = mcp_method if mcp_method in _MCP_METHODS else ("other" if mcp_method else "legacy")
+        _mcp_method_counters[key] = _mcp_method_counters.get(key, 0) + 1
 
 
 @app.middleware("http")
 async def _cache_headers(request, call_next):
     path = request.url.path
-    _count_machine_usage(path)
+    _count_machine_usage(path, request.headers.get("mcp-method"))
     if path not in _HEALTHCHECK_PATHS:
         redirect_target = _canonical_redirect_target(request)
         if redirect_target is not None:
@@ -483,6 +496,11 @@ async def _cache_headers(request, call_next):
             # 404, not 403: don't confirm that a given date's snapshot exists.
             return Response("Not Found", status_code=404, media_type="text/plain")
 
+    if path == "/mcp" and request.method == "GET":
+        # A GET opens the optional server-to-client stream, which this
+        # stateless JSON server doesn't offer (the spec allows 405). Under MCP
+        # SDK v2 the request would otherwise hang open until the client gives up.
+        return Response(status_code=405, headers={"Allow": "POST"})
     if path == "/mcp" and request.method == "POST":
         if not _mcp_enabled():
             return JSONResponse(
@@ -882,7 +900,8 @@ def healthz():
         "scheduled_jobs": _scheduled_jobs(),
         "process_rss_mb": _process_rss_mb(),
         "api_cache_entries": _api_cache_entries(),
-        "machine_usage": {"since": _USAGE_SINCE, **_usage_counters},
+        "machine_usage": {"since": _USAGE_SINCE, **_usage_counters,
+                          "mcp_by_method": dict(_mcp_method_counters)},
         "badge_fetches": {
             "since": _USAGE_SINCE,
             "total": sum(_badge_counters.values()),
