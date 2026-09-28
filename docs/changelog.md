@@ -793,6 +793,28 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   their old ids until next fetch, so rises land over the 10:00-20:00 UTC
   batches. Open editorial call (owner): some of these publish under other
   ids (Mastra: `@mastra/core`, `mastra`) — only dead ids were removed.
+- **Phase 6 built 2026-09-28, merged, NOT deployed** (owner: "go for phase
+  6 and wait for my approval to deploy"). October batch #270–#277 rebased,
+  re-gated, merged (#272/#274 agent-page conflict resolved, advisories first,
+  combined-render test). #278 roster `homepage` field (HOL Guard, #216) +
+  daily corrections monitor. #279 MCP server on SDK v2 (2026-07-28 clients
+  got HTTP 400 on v1): dual-era tests over HTTP with the SDK Client, 1 h
+  public cache hint, own serverInfo.version 0.4.0, GET /mcp 405 +
+  subscriptions/listen unregistered (both hang under v2), mcp_by_method
+  counter. #280 runtime deps + ruff 0.16.9 + Pillow floor; #283 cryptography
+  44.0.3 -> 50.0.1 (seven advisories; signatures byte-identical, live
+  credential verifies; pip-audit clean — CI's audit step is continue-on-error).
+  #282 Actions majors — its manual scorecard-scan run caught a silent break:
+  download-artifact v8 extracts a lone shard flat into shards/, the merge glob
+  matched nothing and exited green ("No shard artifacts to merge"), which
+  would have stopped every Scorecard update; merge now uses `find`, re-run
+  pushed data b98ac24..d903d31. #284 advisories skip packages with no release in 365
+  days (AutoGPT's agpt 2023) + docs/advisory-scoring-review-2026-09-28.md
+  (R3 recommended: OmniRoute A->C, Chroma/LobeHub B->C; owner decision).
+  hvtracker-mcp: mcp#2 0.3.1 `mcp<2` hotfix (PyPI installs broken since mcp
+  2.0 on 28 Jul; CI red since 9 Aug, unnoticed) + weekly fresh-install job;
+  mcp#3 0.4.0 on v2. Tags unpublished pending approval. All 9 Dependabot PRs
+  and #152 closed as superseded.
 
 ## Entries recorded only in the old AGENTS.md
 

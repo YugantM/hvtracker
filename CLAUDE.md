@@ -90,10 +90,16 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   the gates before calling anything done.
 
 ## Now / next
-- Active plan (phases, decisions, UI mockups):
-  https://claude.ai/artifact/KfF5N95t1Y114J1nABMjfe — Phases 0–3 deployed
-  (Phase 3: 2026-09-24). Open owner items and check dates: docs/changelog.md
-  and docs/ctr-tests.md.
+- Active plan: Phase 6 https://claude.ai/artifact/DVwRksqt544SfWmEKoLpVu
+  (after October https://claude.ai/artifact/YA7M1zd2FukmHsmP69fM3a and
+  September https://claude.ai/artifact/KfF5N95t1Y114J1nABMjfe, Phases 0–3
+  deployed). As of 2026-09-28 everything through #284 is merged but NOT
+  deployed; PyPI tags v0.3.1/v0.4.0 of hvtracker-mcp unpublished. Open owner
+  items and check dates: docs/changelog.md and docs/ctr-tests.md.
+- MCP server runs SDK v2 (`MCPServer`): serves 2026-07-28 and 2025 clients;
+  GET /mcp is 405 and `subscriptions/listen` is unregistered on purpose
+  (both hang open under v2). Bumping SERVER_VERSION = mirror in
+  YugantM/hvtracker-mcp, tag, re-dispatch publish-mcp-registry.yml.
 - Titles/meta descriptions change ONLY via a logged CTR batch
   (`CTR_TEST_COMPARE` + docs/ctr-tests.md). Badge adopters live in
   `BADGE_ADOPTERS`, verified weekly by scripts/check_adopters.py.
