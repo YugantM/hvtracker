@@ -93,8 +93,17 @@
     .safety-verdict { margin-top:18px; font-size:14px; line-height:1.65; color:var(--text); max-width:680px; }
     .safety-verdict a { color:var(--accent); }
     h1 { font-size:28px; font-weight:700; margin-bottom:4px; }
-    .hero .repo { font-family:var(--font-mono); font-size:12px; color:var(--muted); overflow-wrap:anywhere; }
-    .hero .repo a:hover { color:var(--accent); }
+    .source-links { margin-top:8px; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+    .src-btn { display:inline-flex; align-items:center; gap:7px; padding:6px 11px; border:1px solid var(--border);
+      border-radius:6px; font:600 12.5px/1 var(--font-sans); color:var(--text); text-decoration:none; background:var(--card); }
+    .src-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .src-btn:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+    .src-ico { width:16px; height:16px; flex:none; }
+    /* Site favicons carry their own colours; a light tile keeps dark ones visible in dark mode. */
+    .src-fav { border-radius:3px; background:#fff; padding:1px; box-sizing:content-box; width:14px; height:14px; }
+    .src-by { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
+    .src-by a { color:var(--muted); }
+    .src-by a:hover { color:var(--accent); }
     .hero .desc { margin-top:10px; font-size:15px; color:var(--text); max-width:600px; }
     .hero .badges { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; font-family:var(--font-mono); font-size:12px; }
     .badge { color:var(--muted); }
@@ -521,9 +530,20 @@
 
     <section class="hero">
       <h1>{{ row.name }}</h1>
-      <div class="repo">
-        {% if row.display_repo %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.display_repo }}</a>{% elif row.org_slug_or_none %}<a href="/org/{{ row.org_slug_or_none }}/">{{ row.repo.split('/')[0] }}</a>/<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo.split('/')[1] }}</a>{% else %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>{% endif %}
-        {% if row.homepage %} · <a href="{{ row.homepage }}" target="_blank" rel="noopener noreferrer{% if row.homepage_source == 'github' %} nofollow{% endif %}">{{ row.homepage_label }}</a>{% endif %}
+      {# Where the project lives: its repository and its own website, as two
+      buttons rather than one line of paths. The owner's org page stays linked. #}
+      <div class="source-links">
+        <a class="src-btn" href="{{ row.url }}" target="_blank" rel="noopener noreferrer" title="{{ row.display_repo or row.repo }} on GitHub">
+          <svg class="src-ico" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
+          Repository
+        </a>
+        {% if row.homepage %}
+        <a class="src-btn" href="{{ row.homepage }}" target="_blank" rel="noopener noreferrer{% if row.homepage_source == 'github' %} nofollow{% endif %}" title="{{ row.homepage_label }}">
+          {% if row.homepage_icon_src %}<img class="src-ico src-fav" src="{{ row.homepage_icon_src }}" alt="" width="16" height="16" loading="lazy" decoding="async">{% else %}<svg class="src-ico" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c1.9 1.8 2.9 4 2.9 6.5S9.9 12.7 8 14.5M8 1.5C6.1 3.3 5.1 5.5 5.1 8s1 4.7 2.9 6.5"/></g></svg>{% endif %}
+          Website
+        </a>
+        {% endif %}
+        {% if row.org_slug_or_none and not row.display_repo %}<span class="src-by">by <a href="/org/{{ row.org_slug_or_none }}/">{{ row.repo.split('/')[0] }}</a></span>{% endif %}
       </div>
       {% if desc %}<p class="desc">{{ desc }}</p>{% endif %}
       <div class="badges">
@@ -1359,7 +1379,7 @@
 
     <section class="links">
       <a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">GitHub →</a>
-      {% if row.homepage %}<a href="{{ row.homepage }}" target="_blank" rel="noopener noreferrer{% if row.homepage_source == 'github' %} nofollow{% endif %}">Homepage →</a>{% endif %}
+      {% if row.homepage %}<a href="{{ row.homepage }}" target="_blank" rel="noopener noreferrer{% if row.homepage_source == 'github' %} nofollow{% endif %}">Website →</a>{% endif %}
       {% if row.pypi_package %}<a href="https://pypi.org/project/{{ row.pypi_package }}/" target="_blank" rel="noopener noreferrer">PyPI: {{ row.pypi_package }}</a>{% endif %}
       {% if row.npm_package %}<a href="https://www.npmjs.com/package/{{ row.npm_package }}" target="_blank" rel="noopener noreferrer">npm: {{ row.npm_package }}</a>{% endif %}
     </section>

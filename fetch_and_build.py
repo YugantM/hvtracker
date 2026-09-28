@@ -3,6 +3,7 @@
 
 import csv
 import gzip
+import base64
 import hashlib
 import io
 import json
@@ -17,7 +18,7 @@ from collections.abc import Mapping
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
 from html import escape
-from urllib.parse import quote, urlencode, urlsplit
+from urllib.parse import quote, urlencode, urljoin, urlsplit
 
 import requests
 from dotenv import load_dotenv
@@ -900,6 +901,93 @@ def homepage_is_dead(url: str) -> bool | None:
         return None
 
 
+# Website favicons, fetched during the full per-repo fetch and stored as small
+# PNGs on the output volume, so pages never hot-link ~1,000 third-party hosts
+# (a visitor's IP would reach each of them). Only raster images decoded by
+# Pillow are kept and re-encoded, so no third-party file (an SVG with script,
+# say) is ever served from our domain.
+SITE_ICON_DIR = "site-icons"
+_ICON_UA = {"User-Agent": "Mozilla/5.0 (compatible; HVTracker/1.0; +https://hvtracker.net)"}
+_LINK_TAG = re.compile(r"<link\b[^>]*>", re.I)
+_ATTR = re.compile(r"""([a-zA-Z-]+)\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)""")
+
+
+def _icon_candidates(html: str, base_url: str) -> list[str]:
+    """Icon URLs a page declares, best first (apple-touch-icon and sized PNGs
+    are sharper at 32 px than a 16 px .ico), then /favicon.ico."""
+    found = []
+    for tag in _LINK_TAG.findall(html):
+        attrs = {k.lower(): v.strip("\"'") for k, v in _ATTR.findall(tag)}
+        rel = attrs.get("rel", "").lower()
+        href = attrs.get("href", "")
+        if "icon" not in rel or not href or href.startswith("data:"):
+            continue
+        rank = 0 if "apple-touch-icon" in rel else (1 if "png" in attrs.get("type", "") else 2)
+        found.append((rank, urljoin(base_url, href)))
+    ordered = [u for _, u in sorted(found, key=lambda x: x[0])]
+    ordered.append(urljoin(base_url, "/favicon.ico"))
+    return list(dict.fromkeys(ordered))
+
+
+def _icon_png(data: bytes) -> bytes | None:
+    """A 32x32 PNG from raster icon bytes, or None when it isn't a usable image."""
+    from PIL import Image
+    try:
+        img = Image.open(io.BytesIO(data))
+        if img.width * img.height > 1024 * 1024 or min(img.size) < 8:
+            return None
+        img = img.convert("RGBA")
+        if img.getextrema()[3][1] == 0:  # fully transparent
+            return None
+        img = img.resize((32, 32), Image.LANCZOS)
+        out = io.BytesIO()
+        img.save(out, format="PNG", optimize=True)
+        return out.getvalue()
+    except Exception:
+        return None
+
+
+@cache.cached("site_icon", ttl=7 * 86400, skip_none=True)
+def fetch_site_icon(url: str) -> str | None:
+    """Base64 32x32 PNG of a website's icon, or None (no usable icon, or the
+    site blocks us; the page then shows a generic globe)."""
+    try:
+        r = requests.get(url, headers=_ICON_UA, timeout=8)
+        base, html = r.url, r.text[:262144] if r.ok else ""
+    except Exception:
+        base, html = url, ""
+    for icon_url in _icon_candidates(html, base)[:4]:
+        try:
+            resp = requests.get(icon_url, headers=_ICON_UA, timeout=8, stream=True)
+            if resp.status_code != 200:
+                continue
+            data = resp.raw.read(524288 + 1, decode_content=True)
+            resp.close()
+            if len(data) > 524288:
+                continue
+            png = _icon_png(data)
+            if png:
+                return base64.b64encode(png).decode()
+        except Exception:
+            continue
+    return None
+
+
+def store_site_icon(url: str, out_dir: str) -> str:
+    """Write the website's icon under out_dir/site-icons/ and return its public
+    path ("/site-icons/<hash>.png"), or "" when there is none."""
+    icon = fetch_site_icon(url) if url else None
+    if not icon:
+        return ""
+    name = hashlib.sha1((urlsplit(url).hostname or url).encode()).hexdigest()[:16] + ".png"
+    path = os.path.join(out_dir, SITE_ICON_DIR, name)
+    if not os.path.isfile(path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "wb") as f:
+            f.write(base64.b64decode(icon))
+    return f"/{SITE_ICON_DIR}/{name}"
+
+
 def apply_homepage(row: dict, roster_homepage: str) -> None:
     """Set the profile's homepage: a roster value (set by hand, e.g. #216) wins
     over the one the repo declares on GitHub. `homepage_source` tells the page
@@ -908,6 +996,9 @@ def apply_homepage(row: dict, roster_homepage: str) -> None:
     row["homepage"] = roster_homepage or declared
     row["homepage_source"] = "roster" if roster_homepage else ("github" if declared else "")
     row["homepage_label"] = homepage_label(row["homepage"]) if row["homepage"] else ""
+    # The icon was fetched for one URL; a homepage changed since shows the globe.
+    row["homepage_icon_src"] = (row.get("homepage_icon") or "") \
+        if row["homepage"] and row.get("homepage_icon_for") == row["homepage"] else ""
 
 
 def homepage_label(url: str) -> str:
@@ -7051,6 +7142,8 @@ def main() -> None:
         declared_homepage = usable_homepage(repo.get("homepage"))
         if declared_homepage and homepage_is_dead(declared_homepage):
             declared_homepage = ""
+        shown_homepage = agent.get("homepage") or declared_homepage
+        homepage_icon = store_site_icon(shown_homepage, script_dir) if shown_homepage else ""
         vscode_ext = agent.get("vscode_extension", "")
         vscode_installs = fetch_vscode_installs(vscode_ext) if vscode_ext else None
         mcp_server_support = fetch_mcp_server_support(
@@ -7116,6 +7209,8 @@ def main() -> None:
             "open_issues": repo.get("open_issues_count", 0),
             "archived": repo.get("archived", False),
             "github_homepage": declared_homepage,
+            "homepage_icon": homepage_icon,
+            "homepage_icon_for": shown_homepage if homepage_icon else "",
             "license_spdx": (repo.get("license") or {}).get("spdx_id") or None,
             "license_type": agent.get("license_override") or classify_license(repo_id, (repo.get("license") or {}).get("spdx_id")),
             "license_override": agent.get("license_override") or "",
@@ -7701,6 +7796,8 @@ def main() -> None:
                 # Carried-forward rows come back from this whitelist; without it the
                 # declared homepage would vanish in every build that didn't fetch the row.
                 "github_homepage": r.get("github_homepage", ""),
+                "homepage_icon": r.get("homepage_icon", ""),
+                "homepage_icon_for": r.get("homepage_icon_for", ""),
                 "public_actions": r.get("public_actions"),
                 "mcp_server_support": r.get("mcp_server_support", {"status": "none", "confidence": None, "evidence": []}),
                 "external_service_dependencies": r.get("external_service_dependencies", {"providers": [], "requires_api_keys": False, "confidence": None, "evidence": []}),
