@@ -208,20 +208,20 @@ EXPECTED_TOOLS = {
 def test_tools_registered_with_input_schemas():
     tools = {t.name: t for t in asyncio.run(mcp_server.mcp.list_tools())}
     assert set(tools) == EXPECTED_TOOLS
-    assert "name_or_repo" in tools["check_agent_trust"].inputSchema["properties"]
-    assert "server" in tools["verify_mcp_server"].inputSchema["properties"]
-    check_schema = tools["check_agent_trust"].outputSchema["properties"]
+    assert "name_or_repo" in tools["check_agent_trust"].input_schema["properties"]
+    assert "server" in tools["verify_mcp_server"].input_schema["properties"]
+    check_schema = tools["check_agent_trust"].output_schema["properties"]
     assert {"type": "null"} in check_schema["profile_url"]["anyOf"]
     assert {"type": "null"} in check_schema["message"]["anyOf"]
     assert {"type": "null"} in check_schema["submit_url"]["anyOf"]
-    verify_schema = tools["verify_mcp_server"].outputSchema["properties"]
+    verify_schema = tools["verify_mcp_server"].output_schema["properties"]
     assert {"type": "null"} in verify_schema["submit_url"]["anyOf"]
     for tool in tools.values():
-        assert tool.outputSchema
-        assert tool.outputSchema["type"] == "object"
-        assert tool.annotations.readOnlyHint is True
-        assert tool.annotations.destructiveHint is False
-        assert tool.annotations.idempotentHint is True
+        assert tool.output_schema
+        assert tool.output_schema["type"] == "object"
+        assert tool.annotations.read_only_hint is True
+        assert tool.annotations.destructive_hint is False
+        assert tool.annotations.idempotent_hint is True
 
 
 def test_streamable_http_serves_mcp_exact_path_without_redirect(monkeypatch):
@@ -327,3 +327,86 @@ def test_every_exposed_tool_records_usage(tmp_path):
         if "usage.record_tool_call" in inspect.getsource(fn):
             counted.add(name)
     assert counted == EXPECTED_TOOLS, f"not counted: {EXPECTED_TOOLS - counted}"
+
+
+# ---- protocol eras (MCP SDK v2) ----------------------------------------------
+# Before SDK v2 the hosted server answered every 2026-07-28 request with HTTP
+# 400 "Unsupported protocol version"; only clients that fell back to the 2025
+# initialize handshake got through. These drive the real app over HTTP with
+# the SDK's own client, once per era, so the headers and envelope are exactly
+# what a real client sends.
+
+async def _session(mode):
+    import httpx2
+    from mcp import Client
+    from mcp.client.streamable_http import streamable_http_client
+
+    app._install_mcp_route()
+    http = httpx2.AsyncClient(transport=httpx2.ASGITransport(app=app.app),
+                              base_url="https://hvtracker.net")
+    async with mcp_server.mcp.session_manager.run():
+        async with Client(streamable_http_client("https://hvtracker.net/mcp", http_client=http),
+                          mode=mode) as client:
+            tools = await client.list_tools()
+            result = await client.call_tool("check_agent_trust", {"name_or_repo": "langchain-ai/langgraph"})
+            return tools, result
+
+
+@pytest.mark.parametrize("mode", ["2026-07-28", "legacy"])
+def test_both_protocol_eras_list_and_call_tools(mode):
+    tools, result = asyncio.run(_session(mode))
+    assert {t.name for t in tools.tools} == EXPECTED_TOOLS
+    assert not result.is_error
+    assert result.structured_content["tracked"] is True
+    assert result.structured_content["name"] == "LangGraph"
+
+
+def test_tool_list_carries_a_public_cache_hint_in_2026_07_28():
+    tools, _ = asyncio.run(_session("2026-07-28"))
+    assert tools.ttl_ms == 3_600_000 and tools.cache_scope == "public"
+
+
+def test_server_reports_its_own_version_not_the_sdks():
+    assert mcp_server.mcp.version == mcp_server.SERVER_VERSION
+
+
+# Long-lived streams: nothing here changes at runtime, so neither the legacy
+# GET stream nor 2026-07-28 subscriptions/listen is offered. Under SDK v2 both
+# otherwise hang open forever; each check runs under a timeout so a regression
+# fails instead of stalling the suite.
+
+_META_2026 = {"io.modelcontextprotocol/protocolVersion": "2026-07-28",
+              "io.modelcontextprotocol/clientCapabilities": {}}
+
+
+async def _raw(method, http_method="POST", params=None, **headers):
+    import httpx2
+
+    app._install_mcp_route()
+    http = httpx2.AsyncClient(transport=httpx2.ASGITransport(app=app.app),
+                              base_url="https://hvtracker.net")
+    async with mcp_server.mcp.session_manager.run():
+        if http_method == "GET":
+            return await asyncio.wait_for(http.get("/mcp", headers=headers), timeout=5)
+        body = {"jsonrpc": "2.0", "id": 1, "method": method,
+                "params": {**(params or {}), "_meta": _META_2026}}
+        headers = {"Content-Type": "application/json",
+                   "Accept": "application/json, text/event-stream",
+                   "MCP-Protocol-Version": "2026-07-28", "Mcp-Method": method, **headers}
+        return await asyncio.wait_for(http.post("/mcp", headers=headers, json=body), timeout=5)
+
+
+def test_get_mcp_is_refused_immediately():
+    for headers in ({}, {"Accept": "text/event-stream"}):
+        r = asyncio.run(_raw(None, "GET", **headers))
+        assert r.status_code == 405 and r.headers["allow"] == "POST"
+
+
+def test_discover_does_not_advertise_list_changes():
+    caps = asyncio.run(_raw("server/discover")).json()["result"]["capabilities"]
+    assert caps["tools"].get("listChanged") is False
+
+
+def test_subscriptions_listen_fails_fast():
+    r = asyncio.run(_raw("subscriptions/listen", params={"notifications": {"toolsListChanged": True}}))
+    assert r.json()["error"]["code"] == -32601  # method not found

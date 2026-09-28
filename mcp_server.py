@@ -13,15 +13,16 @@ import at module load.
 """
 from typing import NotRequired, TypedDict
 
-from mcp.types import ToolAnnotations
-from mcp.server.fastmcp import FastMCP
+from mcp.server.caching import CacheHint
+from mcp.server.mcpserver import MCPServer
 from mcp.server.transport_security import TransportSecuritySettings
+from mcp.types import ToolAnnotations
 
 import mcp_trust
 import usage
 
 SERVER_DISPLAY_NAME = "HVTracker MCP"
-SERVER_VERSION = "0.3.0"
+SERVER_VERSION = "0.4.0"
 SERVER_DESCRIPTION = (
     "Pre-connect trust checks for AI agents, frameworks, packages, and MCP "
     "servers using HVTracker's public trust registry."
@@ -620,33 +621,55 @@ def server_card() -> dict:
     }
 
 
-# Stateless + JSON responses: no per-session state to keep, simplest to mount
-# behind the existing app's middleware. app.py registers the SDK route directly
-# so POST /mcp is handled without a redirect to /mcp/.
-# session_manager is run by app.py's lifespan.
+# MCP SDK v2 serves the 2026-07-28 protocol revision (stateless, no handshake)
+# and every 2025 revision from this one server. Before v2, a 2026-07-28 request
+# got HTTP 400 "Unsupported protocol version" and only clients that fell back
+# to the old initialize handshake got through.
 #
-# DNS-rebinding protection guards *localhost* MCP servers from malicious web
-# pages; it would reject legitimate clients hitting the public hvtracker.net
-# host, so it's disabled for this read-only public API.
-mcp = FastMCP(
+# The tool list only changes on deploy, so tools/list and server/discover
+# carry a public one-hour freshness hint: clients may reuse the answer instead
+# of re-asking before every call (stateless mode otherwise costs two or three
+# requests per real tool call).
+TOOL_LIST_CACHE = CacheHint(ttl_ms=3_600_000, scope="public")
+
+mcp = MCPServer(
     "hvtracker",
     instructions=SERVER_DESCRIPTION,
     website_url=SERVER_HOMEPAGE,
-    stateless_http=True,
-    json_response=True,
-    streamable_http_path="/mcp",
-    transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False),
+    version=SERVER_VERSION,
+    cache_hints={"tools/list": TOOL_LIST_CACHE, "server/discover": TOOL_LIST_CACHE},
 )
+
+# At 2026-07-28 change notifications ride `subscriptions/listen` streams, and v2
+# advertises listChanged/subscribe exactly while that method is served. Nothing
+# here changes at runtime, so a listen stream would only hold a connection open
+# forever (measured: it never returns). Unregister it: discover then says
+# listChanged:false and a stray listen fails fast with method-not-found. There
+# is no public switch in SDK 2.2; test_mcp locks this so an SDK change surfaces.
+mcp._lowlevel_server._request_handlers.pop("subscriptions/listen")
 
 
 def fresh_streamable_http_app():
-    """Build a Streamable HTTP app with a fresh SDK session manager."""
-    # The MCP SDK's StreamableHTTPSessionManager is intentionally single-use.
-    # FastAPI test clients and reload-style processes can start lifespan more
-    # than once in the same interpreter, so app.py reinstalls this route on
-    # startup with a fresh manager.
-    mcp._session_manager = None
-    return mcp.streamable_http_app()
+    """Build the Streamable HTTP app, which also creates a fresh session manager.
+
+    The SDK's session manager is single-use, and FastAPI test clients and
+    reload-style processes can start lifespan more than once in the same
+    interpreter, so app.py reinstalls this route on startup; each call here
+    builds a new manager.
+
+    Stateless + JSON responses: no per-session state to keep, simplest to mount
+    behind the existing app's middleware. DNS-rebinding protection guards
+    *localhost* MCP servers from malicious web pages; it would reject legitimate
+    clients hitting the public hvtracker.net host, so it's disabled for this
+    read-only public API. (v2 turns it on by default for a localhost host, so it
+    has to stay explicit.)
+    """
+    return mcp.streamable_http_app(
+        streamable_http_path="/mcp",
+        stateless_http=True,
+        json_response=True,
+        transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False),
+    )
 
 
 def _resolve_agent(query: str) -> dict | None:

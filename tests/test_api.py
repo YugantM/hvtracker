@@ -301,6 +301,20 @@ def test_machine_usage_counters(client):
     assert "since" in after
 
 
+def test_mcp_requests_counted_by_protocol_era(client):
+    """/mcp requests are split by the 2026-07-28 Mcp-Method header; 2025-era
+    requests carry none and count as legacy. Unknown values fold into other."""
+    before = client.get("/healthz").json()["machine_usage"]["mcp_by_method"]
+    client.get("/mcp", headers={"Mcp-Method": "tools/call"})
+    client.get("/mcp")
+    client.get("/mcp", headers={"Mcp-Method": "x" * 40})
+    after = client.get("/healthz").json()["machine_usage"]["mcp_by_method"]
+    # raw request counting: a canonical 301 + its follow-up may both count
+    for key in ("tools/call", "legacy", "other"):
+        assert after.get(key, 0) > before.get(key, 0), key
+    assert "x" * 40 not in after
+
+
 def test_badge_fetch_counters(client):
     """Badge SVG fetches are counted per slug and exposed via healthz —
     READMEs embed badges through GitHub's camo proxy (no referrer, no JS),
