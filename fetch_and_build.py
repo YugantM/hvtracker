@@ -17,7 +17,7 @@ from collections.abc import Mapping
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
 from html import escape
-from urllib.parse import quote, urlencode
+from urllib.parse import quote, urlencode, urlsplit
 
 import requests
 from dotenv import load_dotenv
@@ -149,6 +149,7 @@ _GQL_BASE_FIELDS = """
   isArchived
   pushedAt
   description
+  homepageUrl
   primaryLanguage { name }
   licenseInfo { spdxId }
   issues(states: OPEN) { totalCount }"""
@@ -184,6 +185,7 @@ def _gql_normalize(node: dict, with_signatures: bool = True) -> dict:
         "forks_count": node.get("forkCount") or 0,
         "pushed_at": node.get("pushedAt"),
         "description": node.get("description"),
+        "homepage": node.get("homepageUrl"),
         "language": (node.get("primaryLanguage") or {}).get("name"),
         "open_issues_count": (node.get("issues") or {}).get("totalCount", 0),
         "archived": bool(node.get("isArchived")),
@@ -838,6 +840,83 @@ def _is_external_service_manifest_path(path: str) -> bool:
 
 def _is_tool_plugin_manifest_path(path: str) -> bool:
     return path.rsplit("/", 1)[-1] in _TOOL_PLUGIN_MANIFEST_FILES
+
+
+# A repo's declared homepage (GitHub's "Website" field) is shown on its
+# profile, except where it isn't a homepage: a link back to GitHub (the page
+# already links the repo), a package-registry page, a social or chat link, or
+# a third-party directory's listing of the project.
+_NOT_HOMEPAGE_HOSTS = (
+    "github.com", "npmjs.com", "pypi.org", "crates.io", "hub.docker.com",
+    "marketplace.visualstudio.com", "pkg.go.dev",
+    "twitter.com", "x.com", "discord.gg", "discord.com", "t.me", "linkedin.com",
+    "youtube.com", "youtu.be", "reddit.com", "bit.ly", "tinyurl.com", "t.co",
+)
+# Directories: a listing page is not the project's site, but a directory's own
+# root is (vercel-labs/skills -> skills.sh).
+_DIRECTORY_HOSTS = ("deepwiki.com", "glama.ai", "skills.sh", "smithery.ai", "mcp.so")
+
+
+def _host_is(host: str, domains) -> bool:
+    return any(host == d or host.endswith("." + d) for d in domains)
+
+
+def usable_homepage(value: str | None) -> str:
+    """The declared homepage as a safe http(s) URL, or "" when it isn't one."""
+    url = (value or "").strip()
+    if not url or len(url) > 300 or any(c.isspace() for c in url):
+        return ""
+    if "://" not in url:
+        url = "https://" + url  # GitHub accepts bare domains ("waku.one")
+    try:
+        parts = urlsplit(url)
+    except ValueError:
+        return ""
+    host = (parts.hostname or "").lower()
+    if parts.scheme not in ("http", "https") or "." not in host or host == "localhost" \
+            or host.replace(".", "").isdigit():
+        return ""
+    if _host_is(host, _NOT_HOMEPAGE_HOSTS):
+        return ""
+    if _host_is(host, _DIRECTORY_HOSTS) and parts.path.strip("/"):
+        return ""
+    return url
+
+
+@cache.cached("homepage_dead", ttl=7 * 86400, skip_none=True)
+def homepage_is_dead(url: str) -> bool | None:
+    """True only when a homepage is definitively gone: its domain doesn't
+    resolve, or it answers 404/410 (Sweep, Plandex and Mentat had shut down).
+    Refused connections, TLS errors, timeouts and bot blocks may be temporary
+    or regional, so they return None ("not known dead") and the link stays."""
+    try:
+        r = requests.get(url, timeout=8, allow_redirects=True, stream=True,
+                         headers={"User-Agent": "Mozilla/5.0 (compatible; HVTracker/1.0; +https://hvtracker.net)"})
+        r.close()
+        return r.status_code in (404, 410)
+    except requests.exceptions.ConnectionError as e:
+        return True if "NameResolution" in str(e) or "nodename nor servname" in str(e) else None
+    except Exception:
+        return None
+
+
+def apply_homepage(row: dict, roster_homepage: str) -> None:
+    """Set the profile's homepage: a roster value (set by hand, e.g. #216) wins
+    over the one the repo declares on GitHub. `homepage_source` tells the page
+    which one it is (declared links get rel=nofollow: unreviewed, owner-editable)."""
+    declared = row.get("github_homepage") or ""
+    row["homepage"] = roster_homepage or declared
+    row["homepage_source"] = "roster" if roster_homepage else ("github" if declared else "")
+    row["homepage_label"] = homepage_label(row["homepage"]) if row["homepage"] else ""
+
+
+def homepage_label(url: str) -> str:
+    """Short link text: host + path without query ("hol.org/guard"), or just the
+    host when that runs long (a 162-character Medium article URL -> "medium.com")."""
+    parts = urlsplit(url)
+    host = (parts.hostname or "").removeprefix("www.")
+    label = host + parts.path.rstrip("/")
+    return label if len(label) <= 40 else host
 
 
 def _normalize_github_repo_url(value: str | None) -> str | None:
@@ -6969,6 +7048,9 @@ def main() -> None:
         signed_ratio = fetch_signed_commit_ratio(repo_id)
         docker_img = agent.get("docker_image", "")
         docker_pulls = fetch_docker_pulls(docker_img) if docker_img else None
+        declared_homepage = usable_homepage(repo.get("homepage"))
+        if declared_homepage and homepage_is_dead(declared_homepage):
+            declared_homepage = ""
         vscode_ext = agent.get("vscode_extension", "")
         vscode_installs = fetch_vscode_installs(vscode_ext) if vscode_ext else None
         mcp_server_support = fetch_mcp_server_support(
@@ -7033,6 +7115,7 @@ def main() -> None:
             "language": repo.get("language") or "",
             "open_issues": repo.get("open_issues_count", 0),
             "archived": repo.get("archived", False),
+            "github_homepage": declared_homepage,
             "license_spdx": (repo.get("license") or {}).get("spdx_id") or None,
             "license_type": agent.get("license_override") or classify_license(repo_id, (repo.get("license") or {}).get("spdx_id")),
             "license_override": agent.get("license_override") or "",
@@ -7325,7 +7408,7 @@ def main() -> None:
     # `repo` as the tracking/join key while showing the corrected slug.
     _display_repo_map = {a["repo"].lower(): a.get("display_repo", "") for a in all_agents if a.get("display_repo")}
     _source_note_map = {a["repo"].lower(): a.get("source_note", "") for a in all_agents if a.get("source_note")}
-    # Official product site, when the maintainer asks for it (a correction, e.g. #216).
+    # Official product site set by hand (a correction, e.g. #216); overrides the declared one.
     _homepage_map = {a["repo"].lower(): a.get("homepage", "") for a in all_agents if a.get("homepage")}
     apply_listing_classes(rows, all_agents)
 
@@ -7359,7 +7442,7 @@ def main() -> None:
         source_note_override = _source_note_map.get(repo_key)
         if source_note_override:
             row["source_note"] = source_note_override
-        row["homepage"] = _homepage_map.get(repo_key, "")
+        apply_homepage(row, _homepage_map.get(repo_key, ""))
         row["license_type"] = normalize_license_type(row, offline=render_only)
         # Always recompute freshness from the absolute last_push date so the
         # color coding (and the maintenance dimension) stay correct even when
@@ -7615,6 +7698,9 @@ def main() -> None:
                 # from data.json, so an unpublished stamp resets the rotation.
                 "full_fetched_at": r.get("full_fetched_at"),
                 "source_note": r.get("source_note", ""),
+                # Carried-forward rows come back from this whitelist; without it the
+                # declared homepage would vanish in every build that didn't fetch the row.
+                "github_homepage": r.get("github_homepage", ""),
                 "public_actions": r.get("public_actions"),
                 "mcp_server_support": r.get("mcp_server_support", {"status": "none", "confidence": None, "evidence": []}),
                 "external_service_dependencies": r.get("external_service_dependencies", {"providers": [], "requires_api_keys": False, "confidence": None, "evidence": []}),

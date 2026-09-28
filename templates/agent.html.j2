@@ -93,7 +93,7 @@
     .safety-verdict { margin-top:18px; font-size:14px; line-height:1.65; color:var(--text); max-width:680px; }
     .safety-verdict a { color:var(--accent); }
     h1 { font-size:28px; font-weight:700; margin-bottom:4px; }
-    .hero .repo { font-family:var(--font-mono); font-size:12px; color:var(--muted); }
+    .hero .repo { font-family:var(--font-mono); font-size:12px; color:var(--muted); overflow-wrap:anywhere; }
     .hero .repo a:hover { color:var(--accent); }
     .hero .desc { margin-top:10px; font-size:15px; color:var(--text); max-width:600px; }
     .hero .badges { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; font-family:var(--font-mono); font-size:12px; }
@@ -523,7 +523,7 @@
       <h1>{{ row.name }}</h1>
       <div class="repo">
         {% if row.display_repo %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.display_repo }}</a>{% elif row.org_slug_or_none %}<a href="/org/{{ row.org_slug_or_none }}/">{{ row.repo.split('/')[0] }}</a>/<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo.split('/')[1] }}</a>{% else %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.repo }}</a>{% endif %}
-        {% if row.homepage %} · <a href="{{ row.homepage }}" target="_blank" rel="noopener noreferrer">{{ row.homepage.split('://', 1)[-1].rstrip('/') }}</a>{% endif %}
+        {% if row.homepage %} · <a href="{{ row.homepage }}" target="_blank" rel="noopener noreferrer{% if row.homepage_source == 'github' %} nofollow{% endif %}">{{ row.homepage_label }}</a>{% endif %}
       </div>
       {% if desc %}<p class="desc">{{ desc }}</p>{% endif %}
       <div class="badges">
@@ -1359,7 +1359,7 @@
 
     <section class="links">
       <a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">GitHub →</a>
-      {% if row.homepage %}<a href="{{ row.homepage }}" target="_blank" rel="noopener noreferrer">Website →</a>{% endif %}
+      {% if row.homepage %}<a href="{{ row.homepage }}" target="_blank" rel="noopener noreferrer{% if row.homepage_source == 'github' %} nofollow{% endif %}">Homepage →</a>{% endif %}
       {% if row.pypi_package %}<a href="https://pypi.org/project/{{ row.pypi_package }}/" target="_blank" rel="noopener noreferrer">PyPI: {{ row.pypi_package }}</a>{% endif %}
       {% if row.npm_package %}<a href="https://www.npmjs.com/package/{{ row.npm_package }}" target="_blank" rel="noopener noreferrer">npm: {{ row.npm_package }}</a>{% endif %}
     </section>
