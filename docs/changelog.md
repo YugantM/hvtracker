@@ -815,6 +815,20 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   2.0 on 28 Jul; CI red since 9 Aug, unnoticed) + weekly fresh-install job;
   mcp#3 0.4.0 on v2. Tags unpublished pending approval. All 9 Dependabot PRs
   and #152 closed as superseded.
+- **October batch + Phase 6 DEPLOYED 2026-09-28 13:36 UTC** (2b955d87 @
+  e272e068, owner-instructed; everything merged since 25 Sep, #270–#286).
+  Boot clean (0 tracebacks/SyntaxWarnings); "[startup] scheduler started
+  (batch + signals every 4h)" — one refresh job, next 16:00 UTC. Verified
+  live: MCP 2026-07-28 server/discover 200 (ttlMs 3600000, listChanged
+  false), tools/list 8, tools/call works; 2025 initialize -> 2025-11-25,
+  serverInfo 0.4.0; GET /mcp 405; healthz machine_usage.mcp_by_method; HOL
+  Guard homepage + sameAs; Composio raise-score section; header search +
+  search-index.json 200; /data/history/2026-06-01.json 404 (90-day window);
+  auth.js signed-in hint; analytics.js webdriver guard; build_report
+  invariants []. Declared homepages (#286) and OSV advisories (#272/#284)
+  fill in as rows get their daily full fetch (whole board within ~24 h).
+  Still open: publish hvtracker-mcp v0.4.0 (owner OK), reply on #216,
+  advisory-scoring decision (R3), bill check ~1 Oct, CTR readout 8 Oct.
 
 ## Entries recorded only in the old AGENTS.md
 
