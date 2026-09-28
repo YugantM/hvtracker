@@ -1599,6 +1599,10 @@ def fetch_package_provenance_drift(
 OSV_QUERY_URL = "https://api.osv.dev/v1/query"
 OSV_ECOSYSTEMS = {"npm": "npm", "pypi": "PyPI", "crates.io": "crates.io"}
 ADVISORY_SEVERITIES = ("CRITICAL", "HIGH", "MODERATE", "LOW")
+# A package whose latest release is older than this is not "the release you'd
+# install today": AutoGPT's roster id is agpt 0.2.2 (April 2023) while the
+# project ships from its repo, so its 2023 advisories must not read as current.
+ADVISORY_STALE_DAYS = 365
 
 
 @cache.cached("osv", ttl=21600, skip_none=True)
@@ -1612,6 +1616,43 @@ def fetch_osv_vulns(ecosystem: str, name: str, version: str) -> list | None:
         return r.json().get("vulns") or []
     except Exception:
         return None
+
+
+@cache.cached("npm_publish_time", ttl=86400, skip_none=True)
+def fetch_npm_publish_time(package_name: str, version: str) -> str | None:
+    """When one npm version was published (the /latest manifest carries no date)."""
+    try:
+        r = requests.get(f"https://registry.npmjs.org/{quote(package_name, safe='@/')}", timeout=15)
+        if r.status_code != 200:
+            return None
+        return (r.json().get("time") or {}).get(version)
+    except Exception:
+        return None
+
+
+def _release_date(source: str, name: str, version: str, metadata: dict | None) -> str | None:
+    """ISO date the given version was released, or None when the registry doesn't say."""
+    if source == "npm":
+        return fetch_npm_publish_time(name, version)
+    if source == "pypi":
+        files = ((metadata or {}).get("releases") or {}).get(version) or []
+        return files[0].get("upload_time_iso_8601") or files[0].get("upload_time") if files else None
+    for v in (metadata or {}).get("versions") or []:
+        if v.get("num") == version:
+            return v.get("created_at")
+    return None
+
+
+def _is_stale_release(released: str | None) -> bool:
+    if not released:
+        return False  # unknown: keep showing advisories (fail toward the warning)
+    try:
+        when = datetime.fromisoformat(released.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    if when.tzinfo is None:
+        when = when.replace(tzinfo=timezone.utc)
+    return datetime.now(timezone.utc) - when > timedelta(days=ADVISORY_STALE_DAYS)
 
 
 def _latest_package_version(source: str, metadata: dict | None) -> str | None:
@@ -1683,7 +1724,8 @@ def fetch_known_advisories(owner_repo: str, *, npm_package: str = "", pypi_packa
                            crate_package: str = "",
                            tracked_repo_canonical: str | None = None) -> dict | None:
     """Advisories affecting the latest release of each of this listing's own
-    packages. None when no configured package can be tied to the listing.
+    packages. None when no configured package can be tied to the listing, or
+    when the only ones with advisories haven't released in ADVISORY_STALE_DAYS.
     {"error": ...} when OSV or a registry could not be read (callers keep the
     last good value instead of claiming "none known")."""
     configured = [(src, name) for src, name in (("npm", npm_package), ("pypi", pypi_package),
@@ -1703,8 +1745,11 @@ def fetch_known_advisories(owner_repo: str, *, npm_package: str = "", pypi_packa
         vulns = fetch_osv_vulns(OSV_ECOSYSTEMS[source], name, version)
         if vulns is None:
             return {"error": "OSV unreachable"}
+        live = [v for v in vulns if not v.get("withdrawn")]
+        if live and _is_stale_release(_release_date(source, name, version, metadata)):
+            continue  # an abandoned side package, not what people install
         checked.append({"ecosystem": OSV_ECOSYSTEMS[source], "name": name, "version": version})
-        found += [_advisory_item(v, name, version) for v in vulns if not v.get("withdrawn")]
+        found += [_advisory_item(v, name, version) for v in live]
     if not checked:
         return None
     found = _merge_advisory_aliases(found)

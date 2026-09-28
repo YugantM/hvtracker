@@ -29,6 +29,7 @@ def registries(monkeypatch):
     monkeypatch.setattr(fb, "fetch_pypi_package_metadata", lambda n: meta.get(("pypi", n)))
     monkeypatch.setattr(fb, "fetch_crate_package_metadata", lambda n: meta.get(("crates.io", n)))
     monkeypatch.setattr(fb, "fetch_osv_vulns", lambda eco, n, v: osv.get((eco, n, v), []))
+    monkeypatch.setattr(fb, "fetch_npm_publish_time", lambda n, v: meta.get(("npm-time", n, v)))
     return meta, osv
 
 
@@ -55,6 +56,31 @@ def test_critical_advisory_on_the_current_release(registries):
     assert res["checked"] == [{"ecosystem": "npm", "name": "omniroute", "version": "3.8.50"}]
     assert [f["id"] for f in res["found"]] == ["GHSA-crit"]  # withdrawn record dropped
     assert res["worst"] == "CRITICAL"
+
+
+def test_advisories_on_a_long_abandoned_package_do_not_count(registries):
+    """AutoGPT's roster id is agpt 0.2.2, last released April 2023; the project
+    ships from its repo. A critical there is not in "the release you'd install"."""
+    meta, osv = registries
+    meta[("pypi", "agpt")] = {"info": {"version": "0.2.2", "project_urls": {
+        "Homepage": "https://github.com/Significant-Gravitas/Auto-GPT"}},
+        "releases": {"0.2.2": [{"upload_time_iso_8601": "2023-04-21T10:00:00Z"}]}}
+    osv[("PyPI", "agpt", "0.2.2")] = [CRIT]
+    assert fb.fetch_known_advisories("Significant-Gravitas/Auto-GPT", pypi_package="agpt") is None
+
+
+def test_recent_and_undated_releases_still_count(registries):
+    meta, osv = registries
+    meta[("npm", "omniroute")] = {"version": "3.8.50",
+                                  "repository": {"url": "git+https://github.com/diegosouzapw/OmniRoute.git"}}
+    osv[("npm", "omniroute", "3.8.50")] = [CRIT]
+    # No publish time known: fail toward showing the warning.
+    assert fb.fetch_known_advisories("diegosouzapw/OmniRoute", npm_package="omniroute")["worst"] == "CRITICAL"
+    meta[("npm-time", "omniroute", "3.8.50")] = "2020-01-01T00:00:00.000Z"
+    assert fb.fetch_known_advisories("diegosouzapw/OmniRoute", npm_package="omniroute") is None
+    from datetime import datetime, timezone
+    meta[("npm-time", "omniroute", "3.8.50")] = datetime.now(timezone.utc).isoformat()
+    assert fb.fetch_known_advisories("diegosouzapw/OmniRoute", npm_package="omniroute")["worst"] == "CRITICAL"
 
 
 def test_alias_twins_count_once_and_keep_the_ghsa_severity(registries):

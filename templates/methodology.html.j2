@@ -318,7 +318,7 @@
           <div id="advisories">
             <dt>Known advisories (shown, not scored)</dt>
             <dd>For each package a project publishes, HVTracker reads the latest release from npm, PyPI or crates.io and asks <a href="https://osv.dev/">OSV</a> which published advisories (GitHub Security Advisories, PyPA, RustSec and others) affect that exact version. Records that describe the same issue under several IDs count once. The agent page lists them with severity and a link to each advisory.</dd>
-            <dd>A package counts only when its registry entry points to the project's repository (or, if it names none, when it is the project's only package and shares its name), so a stale or unrelated package never puts someone else's advisories on a page.</dd>
+            <dd>A package counts only when its registry entry points to the project's repository (or, if it names none, when it is the project's only package and shares its name), so a stale or unrelated package never puts someone else's advisories on a page. A package whose latest release is more than a year old doesn't count either: an abandoned side package is not what people install today.</dd>
             <dd class="limitation">Advisories do not change HVTrust, grades or rank yet. Folding them into the score is a separate change that will be reviewed for its effect on the board first, as every scoring change is.</dd>
           </div>
           <div>
