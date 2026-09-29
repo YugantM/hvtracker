@@ -402,6 +402,10 @@ _MCP_METHODS = frozenset({
     "resources/read", "prompts/list", "subscriptions/listen", "ping",
 })
 _mcp_method_counters: dict[str, int] = {}
+# What the "other" bucket actually holds: the first 20 distinct unknown method
+# names (truncated), so a flood of junk headers can't grow it without bound.
+_MCP_OTHER_LIMIT = 20
+_mcp_other_methods: dict[str, int] = {}
 
 # Badge SVG fetches per agent slug. READMEs embed badges via GitHub's camo
 # proxy, which caches the SVG and strips referrers — so GA never sees this
@@ -479,6 +483,10 @@ def _count_machine_usage(path: str, mcp_method: str | None = None) -> None:
     if channel == "mcp":
         key = mcp_method if mcp_method in _MCP_METHODS else ("other" if mcp_method else "legacy")
         _mcp_method_counters[key] = _mcp_method_counters.get(key, 0) + 1
+        if key == "other":
+            name = mcp_method[:40]
+            if name in _mcp_other_methods or len(_mcp_other_methods) < _MCP_OTHER_LIMIT:
+                _mcp_other_methods[name] = _mcp_other_methods.get(name, 0) + 1
 
 
 @app.middleware("http")
@@ -902,7 +910,8 @@ def healthz():
         "process_rss_mb": _process_rss_mb(),
         "api_cache_entries": _api_cache_entries(),
         "machine_usage": {"since": _USAGE_SINCE, **_usage_counters,
-                          "mcp_by_method": dict(_mcp_method_counters)},
+                          "mcp_by_method": dict(_mcp_method_counters),
+                          "mcp_other_methods": dict(_mcp_other_methods)},
         "badge_fetches": {
             "since": _USAGE_SINCE,
             "total": sum(_badge_counters.values()),
