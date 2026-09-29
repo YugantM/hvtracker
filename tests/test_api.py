@@ -313,6 +313,16 @@ def test_mcp_requests_counted_by_protocol_era(client):
     for key in ("tools/call", "legacy", "other"):
         assert after.get(key, 0) > before.get(key, 0), key
     assert "x" * 40 not in after
+    other = client.get("/healthz").json()["machine_usage"]["mcp_other_methods"]
+    assert other.get("x" * 40, 0) >= 1          # recorded, truncated to 40 chars
+
+
+def test_unknown_mcp_methods_are_capped(client, monkeypatch):
+    import app as app_module
+    monkeypatch.setattr(app_module, "_mcp_other_methods", {f"m{i}": 1 for i in range(20)})
+    client.get("/mcp", headers={"Mcp-Method": "brand-new/method"})
+    other = client.get("/healthz").json()["machine_usage"]["mcp_other_methods"]
+    assert "brand-new/method" not in other and len(other) == 20
 
 
 def test_badge_fetch_counters(client):
@@ -843,8 +853,8 @@ def test_live_page_is_served(client):
     # Structure, not prose — the headline wording has changed twice already.
     # Both figures must be present: the headline count and the tool-call
     # breakdown beneath it, so one can never silently replace the other.
-    assert 'id="odo-req"' in r.text        # headline: machine requests
-    assert 'id="odo"' in r.text            # secondary: answered tool calls
+    assert 'id="odo-req"' in r.text        # headline: answered tool calls
+    assert 'id="odo"' in r.text            # secondary: machine requests (mostly handshakes)
     assert "machine requests" in r.text and "tool calls" in r.text
 
 
