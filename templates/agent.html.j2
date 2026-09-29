@@ -682,7 +682,9 @@
             {% if row.category_rank and row.category %}<br><b>#{{ row.category_rank }}</b> in {{ row.category }}{% endif %}
             {% if row.coverage_grade %}<br>Coverage <b>{{ row.coverage_grade }}</b> · {{ row.signal_types }}/5 signals{% endif %}
           </p>
-          {% if adv_n %}<p class="vseal-note">The score doesn't include advisories yet. <a href="/methodology/#advisories">Why</a></p>{% endif %}
+          {% if row.trust_advisory_cap %}<p class="vseal-note">Capped at Grade {{ row.evidence_grade }} by an unfixed {{ row.trust_advisory_cap.worst|lower }} advisory: {{ row.trust_advisory_cap.uncapped }} without it. <a href="/methodology/#advisories">How</a></p>
+          {% elif adv_n and adv.worst in ("CRITICAL", "HIGH") %}<p class="vseal-note">An unfixed {{ adv.worst|lower }} advisory caps this score at {{ "64.9" if adv.worst == "CRITICAL" else "79.9" }}; it is already below that. <a href="/methodology/#advisories">How</a></p>
+          {% elif adv_n %}<p class="vseal-note">Moderate and low advisories are shown, not scored. <a href="/methodology/#advisories">Why</a></p>{% endif %}
           {% if row.full_fetched_at %}<span class="vfresh" data-fetched="{{ row.full_fetched_at }}" title="When HVTracker last fetched this agent's full signal set">signals checked {{ row.full_fetched_at[:10] }}</span>{% endif %}
         </aside>
         {% endif %}
@@ -700,7 +702,7 @@
       {% if adv_n %}
       <section class="provenance" id="advisories">
         <h2 class="section-title">Known advisories</h2>
-        <p style="font-size:14px;color:var(--muted);max-width:680px">Published advisories (from <a href="https://osv.dev/">OSV</a>) that affect the release you'd install today{% for c in adv.checked %}{% if loop.first %}: {% else %}, {% endif %}{{ c.name }} {{ c.version }}{% endfor %}. They are shown for your review and are not yet part of the HVTrust score. Checked {{ adv.checked_at[:10] }}.</p>
+        <p style="font-size:14px;color:var(--muted);max-width:680px">Published advisories (from <a href="https://osv.dev/">OSV</a>) that affect the release you'd install today{% for c in adv.checked %}{% if loop.first %}: {% else %}, {% endif %}{{ c.name }} {{ c.version }}{% endfor %}. An unfixed critical advisory caps the HVTrust score at 64.9 (Grade C) and a high one at 79.9 (Grade B), until a fixed release ships; moderate, low and unrated ones are shown, not scored. Checked {{ adv.checked_at[:10] }}.</p>
         <ul class="adv-list">
           {% for it in adv.found %}
           <li>

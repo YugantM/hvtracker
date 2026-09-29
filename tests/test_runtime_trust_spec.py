@@ -89,4 +89,4 @@ def test_rank_sort_key_puts_evidence_before_popularity():
 def test_advertised_in_well_known():
     with open(os.path.join(ROOT, ".well-known", "hvtracker.json")) as f:
         wk = json.load(f)
-    assert wk["specs"]["runtime_trust"] == "https://hvtracker.net/spec/runtime-trust/v0.2"
+    assert wk["specs"]["runtime_trust"] == "https://hvtracker.net/spec/runtime-trust/v0.3"
