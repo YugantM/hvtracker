@@ -271,7 +271,8 @@ _HEALTHCHECK_PATHS = {"/healthz", "/healthz/"}
 # generated pages left on the prod volume can never shadow these.
 _RETIRED_REDIRECTS = {
     "/score-lab/": "/methodology/#runtime-calibration",
-    "/spec/runtime-trust/v0.1/": "/spec/runtime-trust/v0.2/",
+    "/spec/runtime-trust/v0.1/": "/spec/runtime-trust/v0.3/",
+    "/spec/runtime-trust/v0.2/": "/spec/runtime-trust/v0.3/",
     "/org/i-am-bee/": "/org/",
     "/use-cases/recently-active/": "/use-cases/",
 }

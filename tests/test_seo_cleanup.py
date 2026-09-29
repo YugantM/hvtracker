@@ -228,7 +228,7 @@ def test_retired_section_redirects(client):
     assert r.headers["location"] == "/methodology/#runtime-calibration"
     r = client.get("/spec/runtime-trust/v0.1/", follow_redirects=False)
     assert r.status_code == 301
-    assert r.headers["location"] == "/spec/runtime-trust/v0.2/"
+    assert r.headers["location"] == "/spec/runtime-trust/v0.3/"
     r = client.get("/org/i-am-bee/", follow_redirects=False)
     assert r.status_code == 301
     assert r.headers["location"] == "/org/"

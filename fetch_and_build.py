@@ -40,7 +40,7 @@ HEADERS = {
 if TOKEN:
     HEADERS["Authorization"] = f"Bearer {TOKEN}"
 
-METHODOLOGY_VERSION = "v4.3"  # runtime signals count declared evidence only (dep sections, shipped plugin paths, named credentials)
+METHODOLOGY_VERSION = "v4.4"  # an unfixed critical advisory caps the score at 64.9 (Grade C), a high one at 79.9 (Grade B)
 DATA_SCHEMA_VERSION = "v0.1"
 
 # Listing classes share the scoring pipeline but NOT the rank space. "agent" is
@@ -2367,6 +2367,21 @@ def _headroom_factor(base: float) -> float:
     return min(1.0, max(0.0, (100.0 - base) / 20.0))
 
 
+# v4.4 (docs/advisory-scoring-review-2026-09-28.md, rule R3, owner-approved):
+# the highest score a listing can hold while its latest release carries an
+# unfixed advisory of this severity.
+ADVISORY_CEILINGS = {"CRITICAL": 64.9, "HIGH": 79.9}
+
+
+def advisory_worst(row: dict) -> str | None:
+    """Worst severity among advisories affecting the listing's latest release,
+    or None (no advisories, not checked, or the check failed)."""
+    adv = row.get("advisories")
+    if not isinstance(adv, dict) or not adv.get("found"):
+        return None
+    return adv.get("worst")
+
+
 def compute_trust_score_v2(row: dict) -> dict:
     """Production runtime-trust calibration: base score + a bounded runtime
     adjustment (headroom-scaled positives, absolute penalties). This IS the
@@ -2417,11 +2432,24 @@ def compute_trust_score_v2(row: dict) -> dict:
     factor = _headroom_factor(base)
     effective_adjustment = round(positive * factor + negative, 1)
     score_v2 = max(0.0, min(100.0, round(base + effective_adjustment, 1)))
+
+    # Advisory ceiling (v4.4): a published advisory that affects the release
+    # people install today, with no fixed version shipped, caps the score —
+    # critical at the top of Grade C, high at the top of Grade B. It is a gate,
+    # not an adjustment: nothing else in the score can outweigh it, and it lifts
+    # on the next fetch after a fix ships. Moderate/low/unrated stay shown only.
+    worst = advisory_worst(row)
+    ceiling = ADVISORY_CEILINGS.get(worst)
+    advisory_cap = None
+    if ceiling is not None and score_v2 > ceiling:
+        advisory_cap = {"worst": worst, "ceiling": ceiling, "uncapped": score_v2}
+        score_v2 = ceiling
     return {
         "trust_score_v2": score_v2,
         "trust_v2_adjustment": effective_adjustment,
         "trust_v2_headroom_factor": round(factor, 2),
         "trust_v2_breakdown": breakdown,
+        "trust_v2_advisory_cap": advisory_cap,
     }
 
 
@@ -2463,6 +2491,13 @@ def _improvement_candidates(row: dict) -> list[tuple[str, str, str, dict, str]]:
             ("no OSSF Scorecard result yet" if sc is None else f"{sc} / 10 today")
         out.append(("scorecard", f"Raise the OSSF Scorecard {'to' if sc is None else f'from {sc} to'} 9.0",
                     detail, {"scorecard_score": 9.0}, "https://github.com/ossf/scorecard#checks"))
+    worst = advisory_worst(row)
+    if worst in ADVISORY_CEILINGS:
+        lead = next((f for f in (row.get("advisories") or {}).get("found", []) if f.get("severity") == worst), {})
+        out.append(("advisory", f"Ship a fix for the {worst.lower()} advisory",
+                    lead.get("id") or f"{worst.lower()} advisory on the latest release",
+                    {"advisories": None},
+                    f"https://osv.dev/vulnerability/{lead['id']}" if lead.get("id") else "https://osv.dev/"))
     sr = row.get("signed_commits_ratio")
     if sr is None or sr < 0.95:
         out.append(("signing", "Sign every commit",
@@ -7615,6 +7650,7 @@ def main() -> None:
         row["trust_score"] = trust_v2["trust_score_v2"]
         row["trust_v2_adjustment"] = trust_v2["trust_v2_adjustment"]
         row["trust_v2_breakdown"] = trust_v2["trust_v2_breakdown"]
+        row["trust_advisory_cap"] = trust_v2["trust_v2_advisory_cap"]
 
         # Evidence grade — based on trust score band so grade agrees with rank
         row["evidence_grade"] = grade_for_score(row["trust_score"])

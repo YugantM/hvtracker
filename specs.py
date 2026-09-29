@@ -993,16 +993,17 @@ BUILD_REPORT_V01 = {
 RUNTIME_TRUST_V01 = {
     "title": "Runtime Trust Signals",
     "slug": "runtime-trust",
-    "version": "v0.2",
-    "date": "2026-07-05",
+    "version": "v0.3",
+    "date": "2026-09-29",
     "status": "Active",
     "authors": ["HVTracker"],
     "abstract": (
         "How HVTracker discovers runtime-trust signals — MCP server support, "
         "external service dependencies, tool/plugin surface, and package "
         "provenance drift — and how they calibrate the production trust score: "
-        "a headroom-scaled bonus with absolute penalties, and an evidence-first "
-        "tie-break. Live in the production rank since methodology v4.0."
+        "a headroom-scaled bonus with absolute penalties, an evidence-first "
+        "tie-break, and (v4.4) a ceiling for unfixed critical and high advisories. "
+        "Live in the production rank since methodology v4.0."
     ),
     "sections": [
         {"id": "s1", "num": "1", "title": "Purpose"},
@@ -1020,7 +1021,7 @@ RUNTIME_TRUST_V01 = {
 
 <h2 id="s2">2. Status: Live in the Production Rank</h2>
 <p>Since methodology v4.0 (2026-07-02), the runtime-calibrated score in &sect;4 <strong>is</strong> the production <code>trust_score</code>/<code>rank</code>/<code>evidence_grade</code> — on the leaderboard, agent pages, the <code>/data</code> API, badges, and signed credentials. Promotion followed the evidence gate in &sect;6 (an upset review); the pre-calibration baseline stays visible on the leaderboard for comparison.</p>
-<p>v4.1 (2026-07-05) added a soft ceiling and an evidence-first tie-break (&sect;4). No change ships as a silent reweight: every adjustment is documented here and in the <a href="/methodology/#runtime-calibration">methodology</a>.</p>
+<p>v4.1 (2026-07-05) added a soft ceiling and an evidence-first tie-break (&sect;4). v4.4 (2026-09-29) added the advisory ceiling (&sect;4). No change ships as a silent reweight: every adjustment is documented here and in the <a href="/methodology/#runtime-calibration">methodology</a>.</p>
 
 <h2 id="s3">3. Runtime Discovery Fields</h2>
 <p>Each tracked agent carries four runtime fields, discovered by static analysis of the repository and its published package metadata. Every field reports a <code>status</code>, a <code>confidence</code> (<code>high</code> / <code>medium</code> / <code>low</code>), and an <code>evidence</code> array of human-readable findings, so any consumer can audit why a value was assigned.</p>
@@ -1052,6 +1053,7 @@ RUNTIME_TRUST_V01 = {
 </table>
 <p><strong>Soft ceiling (v4.1).</strong> The <em>positive</em> terms above are scaled by remaining headroom — <code>factor = min(1, (100 &minus; base) / 20)</code>, i.e. full effect at base &le; 80, phasing to zero at base 100 — before being added. <em>Penalties are not scaled.</em> This prevents bonuses from clamping multiple strong agents onto an identical 100.0.</p>
 <p><strong>Tie-break (v4.1).</strong> Agents with an exactly equal score are ordered by hardest-to-fake evidence first: <code>trust_confidence</code> &rarr; OSSF <code>scorecard_score</code> &rarr; <code>signed_commits_ratio</code> &rarr; activity/momentum &rarr; stars &rarr; slug. They share a rank (<code>=N</code>) on the leaderboard.</p>
+<p><strong>Advisory ceiling (v4.4).</strong> After the adjustment, a published advisory that affects the latest release of a package tied to the listing (released within the last year), with no fixed version shipped, caps the score: <code>CRITICAL</code> at 64.9 (the top of Grade C) and <code>HIGH</code> at 79.9 (the top of Grade B). <code>MODERATE</code>, <code>LOW</code> and unrated advisories do not change the score. The ceiling is a gate, not an adjustment: nothing in the table above can outweigh it, and it lifts on the next check after a fixed release ships. Advisories come from OSV; the record behind a cap is published as <code>advisories</code> and the cap as <code>trust_advisory_cap</code>.</p>
 <p>Each agent publishes <code>trust_score</code>, the net <code>trust_v2_adjustment</code>, the applied <code>trust_v2_headroom_factor</code>, and a per-dimension <code>trust_v2_breakdown</code>, so every point of difference from the base score is attributable.</p>
 
 <h2 id="s5">5. Data Access</h2>

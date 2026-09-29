@@ -152,14 +152,14 @@ def _page(**row):
     return _render(pending_signals=False, evidence_grade="A", trust_score=93.3, **row)
 
 
-def test_page_shows_banner_fact_list_and_unchanged_score():
-    html = _page(advisories=ADV_CRIT)
+def test_page_shows_banner_fact_list_and_capped_score_note():
+    html = _page(advisories=ADV_CRIT, trust_advisory_cap={"worst": "CRITICAL", "ceiling": 64.9, "uncapped": 93.3})
     assert 'class="vadv"' in html and "in the release you'd install" in html
     assert "It affects omniroute 3.8.50, the latest published release." in html
     assert "One published advisory affects its latest release." in html
     assert 'class="vfacts is-5"' in html and "1 critical" in html
     assert 'id="advisories"' in html and "CVE-2026-88062" in html
-    assert "The score doesn't include advisories yet." in html
+    assert "by an unfixed critical advisory: 93.3 without it." in html
     assert ">93.3<" in html and "Grade A" in html
 
 
