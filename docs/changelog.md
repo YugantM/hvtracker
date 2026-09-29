@@ -864,7 +864,14 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   and because the service has a volume Railway stops the old container before
   starting the new one; container start 15:29:14, uvicorn 15:30:38, first
   healthcheck 15:32:37, traffic ~15:34:50. The earlier deploy today took
-  ~2 min end to end.
+  ~2 min end to end. Cause: Railway incident "API degradation causing slow or
+  stuck deployments" (https://status.railway.com/incident/YYTG8I10, 15:29-19:15
+  UTC; Hobby deploys were paused while the queue drained).
+- **Newly added tab next to Global DEPLOYED 2026-09-29 21:14 UTC** (e6f03359 @
+  21f4e606, #299; owner-instructed after the Railway incident cleared). The tab
+  had rendered after all 18 category tabs, off-screen at the end of the
+  scrolling strip. Verified live after the boot refresh: Global, Newly added,
+  MCP Servers. Outage ~1.5 min (21:12:23-21:14:00). build_report invariants [].
 
 ## Entries recorded only in the old AGENTS.md
 
