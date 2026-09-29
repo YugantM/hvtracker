@@ -128,6 +128,75 @@ REVIEWED_REJECTED = {
         "agent logic of its own; same boundary as aionui/cmux/cindy. Direct "
         "analogs getpaseo/paseo, nanmicoder/cc-haha, milisp/codexia are the same class"
     ),
+    # 2026-09-29 first-batch pre-screen (docs/research/new-listing-candidates-2026-09-29.md).
+    "anywhere-labs/dsh-desktop": (
+        "2026-09-29 owner: rejected — desktop wrapper around DeepSeek Harness; "
+        "the wrapped runtime is the agent (iofficeai/aionui)"
+    ),
+    "dataelement/dsh-desktop": (
+        "2026-09-29 owner: rejected — desktop wrapper around DeepSeek Harness; "
+        "the wrapped runtime is the agent (iofficeai/aionui)"
+    ),
+    "zhu1090093659/dsh-web": (
+        "2026-09-29 owner: rejected — web wrapper around DeepSeek Harness; "
+        "the wrapped runtime is the agent (iofficeai/aionui)"
+    ),
+    "dsh-tauri/deepseek-harness-desktop": (
+        "2026-09-29 owner: rejected — desktop wrapper around DeepSeek Harness; "
+        "the wrapped runtime is the agent (iofficeai/aionui)"
+    ),
+    "meteornox/deepseek-balance-whale-widget": (
+        "2026-09-29 owner: rejected — balance widget for DeepSeek Harness, "
+        "not an agent (iofficeai/aionui)"
+    ),
+    "yjh051108/dsh-routing-suite": (
+        "2026-09-29 owner: rejected — routing presets for DeepSeek Harness, not an agent"
+    ),
+    "xiaobright/dsh-anchored-standard": (
+        "2026-09-29 owner: rejected — prompt/config standard for DeepSeek Harness, not an agent"
+    ),
+    "chuspeeism/dashi-taskboard": (
+        "2026-09-29 owner: rejected — task panel dispatching to Codex/DeepSeek "
+        "Harness (bloopai/vibe-kanban)"
+    ),
+    "lidge-jun/opencodex": (
+        "2026-09-29 owner: rejected — provider proxy for coding-agent CLIs; "
+        "serves agents, isn't one (simonlin1212/vibe-research)"
+    ),
+    "miuuyy/codex-chatgpt-web": (
+        "2026-09-29 owner: rejected — provider proxy for coding-agent CLIs; "
+        "serves agents, isn't one (simonlin1212/vibe-research)"
+    ),
+    "xiaoduoya/codex-with-chatgpt": (
+        "2026-09-29 owner: rejected — provider proxy for coding-agent CLIs; "
+        "serves agents, isn't one (simonlin1212/vibe-research)"
+    ),
+    "wang2122/sprix-sage-router": (
+        "2026-09-29 owner: rejected — model router for coding-agent CLIs; "
+        "serves agents, isn't one (simonlin1212/vibe-research)"
+    ),
+    "shengjidaguai-china/goutoujunshi": (
+        "2026-09-29 owner: rejected — a prompt persona for Codex, not an agent"
+    ),
+    "shy3130/tick-stock-panel": (
+        "2026-09-29 owner: rejected — stock workbench, not an agent"
+    ),
+    "hithink-tech/financial-api": (
+        "2026-09-29 owner: rejected — market-data API, not an agent"
+    ),
+    "jub0t/concat": (
+        "2026-09-29 owner: rejected — video editor; MCP support is incidental "
+        "(firerpa/lamda)"
+    ),
+    "jakubantalik/thinking-orbs": (
+        "2026-09-29 owner: rejected — UI loading components, not an agent"
+    ),
+    "alephaitech/workbuddyguide": (
+        "2026-09-29 owner: rejected — a usage guide, not an agent"
+    ),
+    "buchidonggua/dg-ai-notes": (
+        "2026-09-29 owner: rejected — personal notes, not an agent"
+    ),
 }
 
 # Topics to query (one request each)

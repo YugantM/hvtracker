@@ -104,3 +104,33 @@ Approved repos are added with pre-seeded Scorecard scans (the add-agent
 runbook), in one PR, with the rank-churn evidence gate. Rejected ones go into
 `REVIEWED_REJECTED`. From now on a "New listing candidates" issue opens every
 Monday (`.github/workflows/discovery-report.yml`).
+
+## Outcome (owner, 29 Sep)
+
+Owner: approve A, reject C. B (closer look) stays open.
+
+- **Added (26)** after the README and inorganic-stars checks. Packages are
+  recorded only when the registry entry points back at the repo, so
+  `google/artemis` is listed without the `artemis` PyPI package (that name
+  belongs to Artemis-xyz).
+- **Held (4)**, back to the owner with evidence:
+  - `fuxicodex/Fuxi`: LICENSE reads "Proprietary. All rights reserved.", so
+    the rubric's license check fails.
+  - `Player-YN/BrowserKitten`: 2,882 stars vs 10 forks, 4 contributors,
+    20 commits.
+  - `ScrapeCreators/social-media-research-skills`: 2,938 stars vs 37 forks,
+    2 contributors, 7 commits.
+  - `internet-court/internet-court-skill`: 6,302 stars, 1 contributor,
+    4 commits; MIT covers only its own parts.
+- **Rejected (19)**: all of section C, now in `REVIEWED_REJECTED`.
+
+Rank-churn gate: the 26 rows, scored in a pending-only run, were inserted into
+the live board of 29 Sep and re-ranked (the comparator reproduces live ranks
+exactly: 0 mismatches). No row in the top 100 of either class moves; the top 216
+agents are unchanged. Two new rows land mid-board (`hypit-ai/hypit` 75.6 at
+#217 and `Human-Agent-Society/reef` 73.7 at #253), so most agents below them
+move 2 places. The other 24 enter at Grade D with 0.5–0.67 confidence (young
+repos, no packages, no Scorecard yet), which moves the tail by up to 18 places.
+Mean |Δrank| is about 2, well under the invariant's 15. Scorecard scans reach
+the new rows within a day of deploy, because the scan uses the live roster and
+takes the stalest repos first.
