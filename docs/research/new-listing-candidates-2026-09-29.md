@@ -113,7 +113,7 @@ Owner: approve A, reject C. B (closer look) stays open.
   recorded only when the registry entry points back at the repo, so
   `google/artemis` is listed without the `artemis` PyPI package (that name
   belongs to Artemis-xyz).
-- **Held (4)**, back to the owner with evidence:
+- **Held (4), then rejected by the owner** (also in `REVIEWED_REJECTED`):
   - `fuxicodex/Fuxi`: LICENSE reads "Proprietary. All rights reserved.", so
     the rubric's license check fails.
   - `Player-YN/BrowserKitten`: 2,882 stars vs 10 forks, 4 contributors,

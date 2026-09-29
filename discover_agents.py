@@ -197,6 +197,23 @@ REVIEWED_REJECTED = {
     "buchidonggua/dg-ai-notes": (
         "2026-09-29 owner: rejected — personal notes, not an agent"
     ),
+    # Held from the approved batch pending the owner's call, then rejected.
+    "fuxicodex/fuxi": (
+        "2026-09-29 owner: rejected — LICENSE reads 'Proprietary. All rights "
+        "reserved.'; fails the license rule"
+    ),
+    "player-yn/browserkitten": (
+        "2026-09-29 owner: rejected — 2,882 stars vs 10 forks, 4 contributors, "
+        "20 commits; inorganic (sv-number/mcp-server)"
+    ),
+    "scrapecreators/social-media-research-skills": (
+        "2026-09-29 owner: rejected — 2,938 stars vs 37 forks, 2 contributors, "
+        "7 commits; inorganic (sv-number/mcp-server)"
+    ),
+    "internet-court/internet-court-skill": (
+        "2026-09-29 owner: rejected — 6,302 stars, 1 contributor, 4 commits; "
+        "inorganic (sv-number/mcp-server); MIT covers only its own parts"
+    ),
 }
 
 # Topics to query (one request each)
