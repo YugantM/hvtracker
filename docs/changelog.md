@@ -840,6 +840,15 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   build_report invariants []. Measured for planning: MCP 109,482 requests vs
   2,183 tool calls since 9 Aug (2%); 16 tool calls in the last 24 h; ~13% of
   /mcp requests since the v2 deploy use the 2026-07-28 protocol.
+- **R3 advisory ceiling + /live/ tool calls DEPLOYED 2026-09-29 14:18 UTC**
+  (c2abb264 @ e421379d, #290–#293; owner-instructed). Methodology v4.4 live:
+  unfixed CRITICAL advisories cap the score at 64.9 (Grade C), HIGH at 79.9.
+  Verified live: OmniRoute 64.9 (#60, seal note "93.4 without it"), Chroma
+  64.9 (#483), LobeHub 64.9 (#63), matching the merge-day gate; /live/
+  headline counts tool calls; healthz machine_usage.mcp_other_methods present
+  (empty so far); badges page links the Marketplace listing. Boot
+  repair-commits refresh finished 14:21 UTC; next 4-hour refresh 16:00 UTC.
+  build_report invariants [], package_failures 1.
 
 ## Entries recorded only in the old AGENTS.md
 
