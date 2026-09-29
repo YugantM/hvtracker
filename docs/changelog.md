@@ -829,6 +829,17 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   fill in as rows get their daily full fetch (whole board within ~24 h).
   Still open: publish hvtracker-mcp v0.4.0 (owner OK), reply on #216,
   advisory-scoring decision (R3), bill check ~1 Oct, CTR readout 8 Oct.
+- **Repository/Website buttons DEPLOYED 2026-09-29 06:53 UTC** (2337e313 @
+  12e2dcf6, #288; owner-instructed). Hero shows [GitHub mark] Repository and
+  [site favicon] Website buttons; favicons fetched in the full fetch, stored as
+  32x32 PNGs under /site-icons/ (672 of 977 live homepages had a usable one in a
+  test run). Verified live: buttons on HOL Guard/Langflow/E2B (globe until each
+  row's next full fetch brings its favicon). Fill-in from the 28 Sep deploy at
+  06:55 UTC: 1,116 of 1,676 rows full-fetched, 644 declared homepages,
+  advisories checked on 543 (Chroma, LobeHub critical; Aider low).
+  build_report invariants []. Measured for planning: MCP 109,482 requests vs
+  2,183 tool calls since 9 Aug (2%); 16 tool calls in the last 24 h; ~13% of
+  /mcp requests since the v2 deploy use the 2026-07-28 protocol.
 
 ## Entries recorded only in the old AGENTS.md
 
