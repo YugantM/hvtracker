@@ -849,6 +849,22 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   (empty so far); badges page links the Marketplace listing. Boot
   repair-commits refresh finished 14:21 UTC; next 4-hour refresh 16:00 UTC.
   build_report invariants [], package_failures 1.
+- **Listing batch 1 DEPLOYED 2026-09-29 15:36 UTC** (26886893 @ f7811721,
+  #296/#297; owner-instructed). Board 1,676 -> 1,702 (catalog 1,731): 26 new
+  listings (18 agents/MCP/tools, 8 skills); 23 rejections added to
+  REVIEWED_REJECTED (19 from the pre-screen + 4 held: Fuxi proprietary
+  license, three inorganic-star profiles). The new rows stayed provisional
+  through the boot repair-commits refresh (it only targets rows already in
+  data.json) and were scored by the 16:00 batch, matching the merge-day gate
+  (hypit 75.6 #217; the rest Grade D at 0.5-0.67 confidence pending
+  Scorecard) except reef: pypistats returned 429, and a new row has no prior
+  downloads value to carry, so it sits at 47.7 until its next full fetch.
+  build_report invariants []. OUTAGE ~6.5 min (15:28-15:34:50): the build
+  landed on an uncached builder (queue ~6 min, 0 cached layers, slow push),
+  and because the service has a volume Railway stops the old container before
+  starting the new one; container start 15:29:14, uvicorn 15:30:38, first
+  healthcheck 15:32:37, traffic ~15:34:50. The earlier deploy today took
+  ~2 min end to end.
 
 ## Entries recorded only in the old AGENTS.md
 
