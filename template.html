@@ -686,16 +686,17 @@
 
     <div class="cat-tabs" id="catTabs" role="group" aria-label="Category presets">
       <button class="cat-tab active" data-tab="__all__" aria-pressed="true">Global</button>
-      {# Every category gets a tab, biggest first — the strip scrolls
-         horizontally rather than wrapping, so the bar tracks what the registry
-         actually holds instead of a hand-fixed order. MCP Servers is the
-         largest and lands immediately after Global. #}
-      {% for cat in (categories|sort(attribute='count', reverse=true)) %}
-      <button class="cat-tab" data-tab="{{ cat.name }}" aria-pressed="false">{{ cat.name }} <span class="cat-tab-count">{{ cat.count }}</span></button>
-      {% endfor %}
+      {# Newly added sits next to Global: at the end of the scrolling strip it
+         was off-screen, so new listings went unseen. #}
       {% if newly_added %}
       <button class="cat-tab special" data-tab="__new__" aria-pressed="false">Newly added <span class="cat-tab-badge">{{ newly_added|length }}</span></button>
       {% endif %}
+      {# Every category gets a tab, biggest first — the strip scrolls
+         horizontally rather than wrapping, so the bar tracks what the registry
+         actually holds instead of a hand-fixed order. #}
+      {% for cat in (categories|sort(attribute='count', reverse=true)) %}
+      <button class="cat-tab" data-tab="{{ cat.name }}" aria-pressed="false">{{ cat.name }} <span class="cat-tab-count">{{ cat.count }}</span></button>
+      {% endfor %}
     </div>
 
     <noscript><p style="font-family:var(--font-mono);font-size:12px;color:var(--muted);padding:8px 0;">JavaScript is disabled — showing the top {{ board_ssr_rows }} of {{ total }}. Every agent is listed on its <a href="#categories">category page</a>.</p></noscript>
