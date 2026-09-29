@@ -182,6 +182,10 @@ KEYWORDS = [
 ]
 
 MIN_STARS = 500
+# Every search returns only the top 100 by stars, so on a big topic that page
+# is all long-established repos and a three-month-old project never surfaces.
+# Each query therefore also runs restricted to repos created in this window.
+RECENT_DAYS = 120
 SLEEP_BETWEEN = 3  # seconds between API calls (Search API: 30 req/min)
 OUTPUT_PATH = "candidates.json"
 
@@ -260,26 +264,17 @@ def main() -> None:
 
     seen: dict[str, dict] = {}  # full_name.lower() -> repo dict
 
-    # Topic searches
-    for topic in TOPICS:
-        query = f"topic:{topic}"
-        print(f"Searching topic:{topic} ...", end=" ", flush=True)
-        items = search_repos(query)
-        new = sum(1 for it in items if it["full_name"].lower() not in seen)
-        for it in items:
-            seen.setdefault(it["full_name"].lower(), it)
-        print(f"{len(items)} results, {new} new")
-        time.sleep(SLEEP_BETWEEN)
-
-    # Keyword searches
-    for kw in KEYWORDS:
-        print(f"Searching {kw!r} ...", end=" ", flush=True)
-        items = search_repos(kw)
-        new = sum(1 for it in items if it["full_name"].lower() not in seen)
-        for it in items:
-            seen.setdefault(it["full_name"].lower(), it)
-        print(f"{len(items)} results, {new} new")
-        time.sleep(SLEEP_BETWEEN)
+    recent = (datetime.now(timezone.utc) - timedelta(days=RECENT_DAYS)).strftime("%Y-%m-%d")
+    queries = [f"topic:{t}" for t in TOPICS] + KEYWORDS
+    for base in queries:
+        for query in (base, f"{base} created:>{recent}"):
+            print(f"Searching {query!r} ...", end=" ", flush=True)
+            items = search_repos(query)
+            new = sum(1 for it in items if it["full_name"].lower() not in seen)
+            for it in items:
+                seen.setdefault(it["full_name"].lower(), it)
+            print(f"{len(items)} results, {new} new")
+            time.sleep(SLEEP_BETWEEN)
 
     print(f"\nTotal unique repos found: {len(seen)}")
 
@@ -304,6 +299,7 @@ def main() -> None:
                 "language": repo_dict.get("language") or "",
                 "license": lic.get("spdx_id") or lic.get("name") or "Unknown",
                 "last_push": (repo_dict.get("pushed_at") or "")[:10],
+                "created": (repo_dict.get("created_at") or "")[:10],
                 "topics": repo_dict.get("topics", []),
                 "url": repo_dict.get("html_url", ""),
             })

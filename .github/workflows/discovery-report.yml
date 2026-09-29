@@ -1,0 +1,44 @@
+name: Discovery report
+
+# Phase 7 (7.1): nothing had run discovery since mid-August, and the registry
+# stopped growing while ~112 eligible agent/MCP/skills repos appeared. Weekly:
+# run discover_agents.py, shortlist the recent candidates, and open a
+# "New listing candidates" issue for the owner. Discovery proposes; the owner
+# decides — nothing is added to agents.json automatically.
+
+on:
+  schedule:
+    - cron: "30 7 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: python -m pip install requests python-dotenv
+
+      - name: Run discovery
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python discover_agents.py
+
+      - name: Open this week's candidates issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/discovery_report.py candidates.json > report.md
+          week=$(date -u +%F)
+          gh label create discovery --repo "$GITHUB_REPOSITORY" --color 0E8A16 --description "Weekly new-listing candidates" 2>/dev/null || true
+          previous=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label discovery --json number --jq '.[].number')
+          new=$(gh issue create --repo "$GITHUB_REPOSITORY" --title "New listing candidates — week of $week" --label discovery --body-file report.md)
+          for n in $previous; do
+            gh issue close "$n" --repo "$GITHUB_REPOSITORY" --comment "Superseded by $new"
+          done
