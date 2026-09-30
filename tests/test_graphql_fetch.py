@@ -45,6 +45,9 @@ def test_gql_normalize_maps_rest_shape():
     assert r["license"] == {"spdx_id": "MIT"}
     assert r["default_branch"] == "main"
     assert r["_source"] == "graphql"
+    # The drift and advisory rename guards read full_name; GraphQL returns a
+    # renamed repo's current name here, like REST does.
+    assert r["full_name"] == "owner/repo"
 
 
 def test_gql_normalize_commit_count_and_signed_ratio():
