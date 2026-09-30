@@ -337,13 +337,46 @@
     .chart-legend strong { color:var(--text); font-weight:600; }
 
     .provenance { padding:18px 0; border-top:1px solid var(--border); }
-    .prov-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:12px 20px; }
-    .prov-signal { padding:8px 0; }
     .prov-label { font-family:var(--font-mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px; }
     .prov-value { font-family:var(--font-mono); font-size:16px; font-weight:600; }
-    .prov-yes { color:var(--green); }
-    .prov-no { color:var(--muted-2); }
-    .prov-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+    /* Chain of custody: repo -> review/release -> package -> installed release,
+       one linked step each, then what changed, what backs the score, how to
+       verify it and what it doesn't cover. */
+    .custody { padding:18px 0; border-top:1px solid var(--border); }
+    .custody h3 { font-size:14.5px; margin:0 0 4px; display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; }
+    .custody p { margin:0; font-size:14px; line-height:1.55; max-width:680px; }
+    .custody-lede { color:var(--muted); margin-bottom:14px !important; }
+    .vdot.na { background:var(--muted-2); }
+    .cchain { list-style:none; margin:0; padding:0; max-width:760px; }
+    .cstep { position:relative; display:grid; grid-template-columns:12px minmax(0,1fr); gap:12px; padding:0 0 16px; }
+    .cstep > .vdot { width:12px; height:12px; margin-top:4px; position:relative; z-index:1; }
+    .cstep:not(:last-child)::before { content:""; position:absolute; left:5px; top:18px; bottom:0; width:2px; background:var(--line-strong); }
+    .ctag { font-family:var(--font-mono); font-size:11px; font-weight:600; border:1px solid currentColor; border-radius:3px; padding:0 6px; }
+    .custody .is-ok { color:var(--green); } .custody .is-part { color:var(--amber); } .custody .is-gap { color:var(--red); } .custody .is-na { color:var(--muted); }
+    .cchecks { list-style:none; margin:8px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:2px 16px; font-family:var(--font-mono); font-size:12px; }
+    .cchecks li { display:flex; justify-content:space-between; padding:2px 0; border-bottom:1px solid var(--hairline); color:var(--muted); }
+    .cmore { margin-top:6px; font-size:12.5px; }
+    .cmore summary { cursor:pointer; color:var(--accent); }
+    .cpkgs { list-style:none; margin:4px 0 0; padding:0; }
+    .cpkgs li { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1.3fr) minmax(0,1fr); gap:2px 14px; padding:7px 0; border-bottom:1px solid var(--hairline); font-size:13px; }
+    .cpkg-name a { font-family:var(--font-mono); font-weight:600; color:var(--text); overflow-wrap:anywhere; }
+    .cpkg-reg { font-family:var(--font-mono); font-size:11px; color:var(--muted); }
+    .cnote { margin-top:8px !important; font-size:12.5px !important; color:var(--muted); }
+    .cchanges { margin:6px 0 16px; max-width:760px; }
+    .cchanges ul { list-style:none; margin:0; padding:0; font-size:13.5px; }
+    .cchanges li { padding:4px 0; border-bottom:1px solid var(--hairline); }
+    .cchanges .timeline-date { font-family:var(--font-mono); font-size:12px; color:var(--muted); margin-right:8px; }
+    .cchanges p { color:var(--muted); font-size:13.5px; }
+    .cfoot { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; }
+    .cbox { border:1px solid var(--border); background:var(--surface); border-radius:8px; padding:12px 14px; }
+    .cbox p { font-size:13px; }
+    .cev { list-style:none; margin:6px 0 0; padding:0; font-size:13px; }
+    .cev .is-have span { color:var(--green); } .cev .is-miss { color:var(--muted); }
+    .clinks { display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:8px !important; }
+    @media (max-width: 760px) {
+      .cfoot { grid-template-columns:1fr; }
+      .cpkgs li { grid-template-columns:1fr; }
+    }
     .sc-checks { margin-top:8px; display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:4px 14px; font-family:var(--font-mono); font-size:12px; }
     .sc-check { display:flex; justify-content:space-between; padding:2px 0; border-bottom:1px solid var(--hairline); }
     .sc-check-name { color:var(--muted); }
@@ -749,6 +782,132 @@
       {% endif %}
     </section>
 
+    {% if not pend %}
+    {# Chain of custody: who ships this and whether that changed, link by link
+       from the repo to what a user installs. Content scanners judge what the
+       code says; this is the provenance view no other scorer lays out, so it
+       sits directly under the verdict. #}
+    {% set pkgs = row.custody_packages or [] %}
+    {% set sc_checks = row.scorecard_checks or {} %}
+    {% set custody_types = ["provenance_added", "provenance_removed", "drift_warning_raised", "drift_warning_cleared", "license_changed", "scorecard_added", "scorecard_removed"] %}
+    {% set custody_events = events | selectattr("type", "in", custody_types) | list %}
+    <section class="custody" id="chain-of-custody" aria-labelledby="custody-title">
+      <h2 class="section-title" id="custody-title">Chain of custody</h2>
+      <p class="custody-lede">Scanners check what the code says. This traces who ships {{ row.name }} and whether that has changed: from the source repository, through how changes are reviewed and released, to the {% if pkgs %}package you install{% else %}code you run{% endif %}.</p>
+      <ol class="cchain">
+        {% set st = "na" if sig is none else ("ok" if sig >= 80 else ("part" if sig >= 20 else "gap")) %}
+        <li class="cstep">
+          <span class="vdot {{ st }}" aria-hidden="true"></span>
+          <div class="cstep-body">
+            <h3>Source <span class="ctag is-{{ st }}">{% if sig is none %}Signatures unknown{% elif sig >= 80 %}Signed{% elif sig > 0 %}Partly signed{% else %}Unsigned{% endif %}</span></h3>
+            <p><a href="{{ row.url }}" rel="noopener">github.com/{{ row.display_repo or row.repo }}</a>{% if row.license_spdx %}, {{ row.license_spdx }}{% endif %}, last pushed {{ row.last_push }}.
+            {% if sig is none %}Commit signatures could not be read.{% elif sig >= 80 %}{{ sig }}% of the last 100 commits carry a verified signature, so changes trace to a verified account.{% elif sig > 0 %}{{ sig }}% of the last 100 commits carry a verified signature; the rest can't be tied to a verified identity.{% else %}None of the last 100 commits carry a verified signature, so no change traces to a verified identity.{% endif %}</p>
+          </div>
+        </li>
+        {% set st = "gap" if sc is none else ("ok" if sc >= 7 else ("part" if sc >= 4 else "gap")) %}
+        <li class="cstep">
+          <span class="vdot {{ st }}" aria-hidden="true"></span>
+          <div class="cstep-body">
+            <h3>Review and release <span class="ctag is-{{ st }}">{% if sc is none %}Not checked{% elif sc >= 7 %}Strong{% elif sc >= 4 %}Mixed{% else %}Weak{% endif %}</span></h3>
+            {% if sc is none %}
+            <p>No OpenSSF Scorecard result yet, so branch protection, code review and release signing are unverified.</p>
+            {% else %}
+            <p>OpenSSF Scorecard rates the repository's practices {{ row.scorecard_fmt or sc }}/10{% if row.scorecard_scanned_fmt %} (scanned {{ row.scorecard_scanned_fmt }}{% if row.scorecard_is_stale %}, refresh pending{% endif %}){% endif %}. The checks that decide who can get a change released:</p>
+            <ul class="cchecks">
+              {% for name in ["Code-Review", "Branch-Protection", "Signed-Releases", "Dangerous-Workflow", "Token-Permissions", "Pinned-Dependencies"] if sc_checks[name] is defined %}
+              {% set v = sc_checks[name] %}
+              <li><span>{{ name | replace("-", " ") }}</span><b class="is-{% if v < 0 %}na{% elif v >= 7 %}ok{% elif v >= 4 %}part{% else %}gap{% endif %}">{% if v < 0 %}n/a{% else %}{{ v }}{% endif %}</b></li>
+              {% endfor %}
+            </ul>
+            {% if sc_checks %}
+            <details class="cmore">
+              <summary>All {{ sc_checks | length }} Scorecard checks</summary>
+              <div class="sc-checks">
+                {% for check_name, check_score in sc_checks.items() %}
+                <div class="sc-check">
+                  <span class="sc-check-name">{{ check_name }}</span>
+                  <span class="sc-check-val" style="color:{% if check_score >= 7 %}var(--green){% elif check_score >= 4 %}var(--aging){% else %}var(--muted){% endif %}">{{ check_score }}</span>
+                </div>
+                {% endfor %}
+              </div>
+            </details>
+            {% endif %}
+            {% endif %}
+          </div>
+        </li>
+        {% set bad = pkgs | selectattr("source", "equalto", "mismatch") | list %}
+        {% set linked = pkgs | selectattr("source", "equalto", "match") | list %}
+        {% set attested = pkgs | selectattr("attested") | list %}
+        {% set st = "na" if not pkgs else ("gap" if bad else ("ok" if linked | length == pkgs | length and attested | length == pkgs | length else "part")) %}
+        <li class="cstep">
+          <span class="vdot {{ st }}" aria-hidden="true"></span>
+          <div class="cstep-body">
+            <h3>Published packages <span class="ctag is-{{ st }}">{% if not pkgs %}None{% elif bad %}Source mismatch{% elif st == "ok" %}Linked and attested{% elif attested %}Partly attested{% elif linked %}Linked, not attested{% else %}Not linked{% endif %}</span></h3>
+            {% if not pkgs %}
+            <p>{% if row.docker_image %}Distributed as the container image {{ row.docker_image }}; HVTracker doesn't check that registry's source link yet.{% elif row.vscode_extension %}Distributed as the VS Code extension {{ row.vscode_extension }}; HVTracker doesn't check marketplace source links yet.{% else %}No registry package. {{ row.name }} is used from its repository, so what you run is whatever you check out: pin a release tag or commit.{% endif %}</p>
+            {% else %}
+            <ul class="cpkgs">
+              {% for p in pkgs %}
+              <li>
+                <span class="cpkg-name"><span class="cpkg-reg">{{ p.registry }}</span> <a href="{{ p.url }}" rel="noopener">{{ p.name }}</a></span>
+                <span class="cpkg-fact is-{% if p.source == 'match' %}ok{% elif p.source == 'mismatch' %}gap{% else %}part{% endif %}">{% if p.source == "match" %}Source link points back to this repo{% elif p.source == "mismatch" %}Source link points to {{ p.points_to }}, not this repo{% elif p.source == "same_owner" %}Source link points to {{ p.points_to }}, same owner{% elif p.source == "renamed" %}Source link points to this repo's current name{% elif p.source == "missing" %}No source link declared{% elif p.source == "unparseable" %}Source link isn't a GitHub repo{% else %}Source link not checked yet{% endif %}</span>
+                <span class="cpkg-fact is-{% if p.attested %}ok{% elif p.attested is none %}na{% else %}part{% endif %}">{% if p.attested %}Build provenance attested{% elif p.attested is none %}Attestation not checked on this registry{% else %}No build attestation{% endif %}</span>
+              </li>
+              {% endfor %}
+            </ul>
+            {% if bad %}<p class="cnote">A package whose source link names another repository may belong to a different project, or the project may have moved. HVTracker treats it as a mismatch until that is confirmed. <a href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Know which? Suggest a correction</a></p>
+            {% elif not attested %}<p class="cnote">Without a build attestation, nothing proves the published files were built from this repository.</p>{% endif %}
+            {% endif %}
+          </div>
+        </li>
+        {% if adv and adv.checked %}
+        {% set st = "ok" if not adv_n else ("gap" if adv.worst in ("CRITICAL", "HIGH") else "part") %}
+        <li class="cstep">
+          <span class="vdot {{ st }}" aria-hidden="true"></span>
+          <div class="cstep-body">
+            <h3>What you install today <span class="ctag is-{{ st }}">{% if not adv_n %}No known advisories{% elif adv_n == 1 %}1 advisory{% else %}{{ adv_n }} advisories{% endif %}</span></h3>
+            <p>Latest release{{ "s" if adv.checked | length > 1 }} checked: {% for c in adv.checked %}{{ c.name }} {{ c.version }}{% if not loop.last %}, {% endif %}{% endfor %}. {% if adv_n %}<a href="#advisories">{{ adv_n }} published advisor{{ "y affects" if adv_n == 1 else "ies affect" }} it</a>{% else %}No published advisory affects it{% endif %} (OSV, checked {{ adv.checked_at[:10] }}).</p>
+          </div>
+        </li>
+        {% endif %}
+      </ol>
+
+      <div class="cchanges">
+        <h3>Changes to this chain</h3>
+        {% if custody_events %}
+        <ul>
+          {% for e in (custody_events | reverse | list)[:6] %}
+          <li><span class="timeline-date">{{ e.date }}</span> {{ e.detail }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p>No change to package provenance, package source links, Scorecard coverage or license in HVTracker's daily snapshots of {{ row.name }}.</p>
+        {% endif %}
+      </div>
+
+      <div class="cfoot">
+        <div class="cbox">
+          <h3>Evidence behind this score</h3>
+          <p>Coverage <b>{{ row.coverage_grade }}</b>: {{ row.signal_types }} of 5 independent evidence types found.</p>
+          <ul class="cev">
+            {% for label, present in row.evidence_types or [] %}
+            <li class="{{ 'is-have' if present else 'is-miss' }}"><span aria-hidden="true">{{ "✓" if present else "–" }}</span> {{ label }}{% if not present %} <span class="sr-only">(missing)</span>{% endif %}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="cbox">
+          <h3>Verify this score yourself</h3>
+          <p>Every build re-issues {{ row.name }}&rsquo;s score as an Ed25519-signed credential, valid for 7 days. You can check it offline against HVTracker&rsquo;s published key; if anyone changes a number after signing, verification fails.</p>
+          <p class="clinks"><a href="/data/agents/{{ row.slug }}.json">Signed credential (JSON)</a> <a href="/methodology/#verify-yourself">How to verify</a></p>
+        </div>
+        <div class="cbox">
+          <h3>What this score doesn&rsquo;t check</h3>
+          <p>It covers who ships the code, not what the code does. It doesn&rsquo;t read {% if row.listing_class == "skill" %}the skill&rsquo;s instructions{% else %}tool descriptions or prompts{% endif %} for injected instructions, watch runtime behaviour, or find bugs nobody has disclosed yet. For that, run a content scanner before you {% if row.listing_class == "skill" %}install it, such as <a href="https://github.com/cisco-ai-defense/skill-scanner" rel="noopener">Cisco Skill Scanner</a>.{% else %}connect it, such as <a href="https://github.com/cisco-ai-defense/mcp-scanner" rel="noopener">Cisco MCP Scanner</a> or <a href="https://github.com/snyk/agent-scan" rel="noopener">Snyk Agent Scan</a>.{% endif %}</p>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
     {% if related %}
     {# Neighbours drawn relative to this agent: each bar is a score, the tick is
        this agent's, and the gap is written out, so "is the click worth it?" is
@@ -1023,51 +1182,6 @@
     </section>
     {% endif %}
 
-    <section class="provenance">
-      <h2 class="section-title">Supply Chain Trust</h2>
-      <div class="prov-grid">
-        <div class="prov-signal">
-          <div class="prov-label">Package Provenance</div>
-          {% if row.has_provenance %}
-          <div class="prov-value prov-yes">Verified</div>
-          <div class="prov-sub">{{ row.provenance_sources|join(', ') }} attestation</div>
-          {% else %}
-          <div class="prov-value prov-no">None</div>
-          <div class="prov-sub">No package attestations found</div>
-          {% endif %}
-        </div>
-        <div class="prov-signal">
-          <div class="prov-label">OSSF Scorecard</div>
-          {% if row.scorecard_fmt %}
-          <div class="prov-value" style="color:var(--accent);">{{ row.scorecard_fmt }} / 10</div>
-          <div class="prov-sub">OpenSSF Scorecard{% if row.scorecard_scanned_fmt %} · scanned {{ row.scorecard_scanned_fmt }}{% if row.scorecard_is_stale %} <span style="color:var(--amber);">(refresh pending)</span>{% endif %}{% endif %}</div>
-          {% else %}
-          <div class="prov-value prov-no">—</div>
-          <div class="prov-sub">Not available</div>
-          {% endif %}
-        </div>
-        <div class="prov-signal">
-          <div class="prov-label">Signed Commits</div>
-          {% if row.signed_commits_pct is not none %}
-          <div class="prov-value {% if row.signed_commits_pct >= 50 %}prov-yes{% elif row.signed_commits_pct > 0 %}{% else %}prov-no{% endif %}" style="{% if row.signed_commits_pct > 0 and row.signed_commits_pct < 50 %}color:var(--amber);{% endif %}">{{ row.signed_commits_pct }}%</div>
-          <div class="prov-sub">of last 100 commits verified</div>
-          {% else %}
-          <div class="prov-value prov-no">—</div>
-          <div class="prov-sub">Unable to query</div>
-          {% endif %}
-        </div>
-      </div>
-      {% if row.scorecard_checks %}
-      <div class="sc-checks">
-        {% for check_name, check_score in row.scorecard_checks.items() %}
-        <div class="sc-check">
-          <span class="sc-check-name">{{ check_name }}</span>
-          <span class="sc-check-val" style="color:{% if check_score >= 7 %}var(--green){% elif check_score >= 4 %}var(--aging){% else %}var(--muted){% endif %}">{{ check_score }}</span>
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
-    </section>
 
     {% if row.safety_qa %}
     <section class="safety-qa">

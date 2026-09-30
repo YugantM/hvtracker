@@ -2354,6 +2354,19 @@ def coverage_grade(signal_types: int) -> str:
     return "D"      # mostly GitHub-only / thin
 
 
+def evidence_types(row: dict) -> list[tuple[str, bool]]:
+    """The five independent evidence types, each with whether this row has it.
+    `signal_types` (and so coverage_grade) counts the present ones; the profile
+    page lists both, so readers see which evidence is missing."""
+    return [
+        ("GitHub repository data", True),
+        ("Package downloads", row.get("weekly_downloads") is not None),
+        ("Supply-chain checks", row.get("scorecard_score") is not None or bool(row.get("has_provenance"))),
+        ("Public actions", bool(row.get("public_actions"))),
+        ("Community mentions", row.get("hn_mentions_30d") is not None),
+    ]
+
+
 def _headroom_factor(base: float) -> float:
     """Scale positive runtime bonuses down as the base score nears the 100
     ceiling: full effect at/below 80, phasing linearly to zero at 100.
@@ -3120,6 +3133,57 @@ def agent_correction_url(row: dict) -> str:
         "title": f"[Correction] {row['name']}",
         "body": correction_body,
     })
+
+
+_PACKAGE_PAGES = {
+    "npm": "https://www.npmjs.com/package/{}",
+    "PyPI": "https://pypi.org/project/{}/",
+    "crates.io": "https://crates.io/crates/{}",
+}
+
+
+def custody_packages(row: dict) -> list[dict]:
+    """One entry per published package, for the profile's chain of custody:
+    where the registry's source link points, and whether the build is attested.
+
+    Reads the per-package evidence lines detect_package_provenance_drift wrote
+    (one per package, prefixed "<registry> package '<name>'") rather than
+    refetching. `source` is match / mismatch / same_owner / renamed / missing /
+    unparseable, or unchecked when the drift check has not run yet. `attested`
+    is None where the registry has no attestation HVTracker checks (crates.io).
+    """
+    evidence = (row.get("package_provenance_drift") or {}).get("evidence") or []
+    out = []
+    for label, prefix, name, attested in (
+        ("npm", "npm", row.get("npm_package"), bool(row.get("npm_provenance"))),
+        ("PyPI", "pypi", row.get("pypi_package"), bool(row.get("pypi_provenance"))),
+        ("crates.io", "crates.io", row.get("crate_package"), None),
+    ):
+        if not name:
+            continue
+        line = next((e for e in evidence if e.startswith(f"{prefix} package '{name}' ")), "")
+        m = re.search(r" points to ([\w.-]+/[\w.-]+)", line)
+        if not line:
+            source = "unchecked"
+        elif "points to the tracked repo" in line:
+            source = "match"
+        elif "does not expose a source repo URL" in line:
+            source = "missing"
+        elif "(same owner as" in line:
+            source = "same_owner"
+        elif "after a rename/transfer" in line:
+            source = "renamed"
+        elif m:
+            source = "mismatch"
+        else:
+            source = "unparseable"
+        out.append({
+            "registry": label, "name": name,
+            "url": _PACKAGE_PAGES[label].format(quote(name, safe="@/")),
+            "source": source, "points_to": m.group(1) if m else None,
+            "attested": attested,
+        })
+    return out
 
 
 # Daily snapshots written while production briefly ran `main`'s stale 464-row
@@ -7607,15 +7671,7 @@ def main() -> None:
         row["signed_commits_pct"] = round(sr * 100) if sr is not None else None
 
         # Evidence grade: how many independent signal types does this agent have?
-        signal_types = 1  # GitHub repo data always present
-        if row.get("weekly_downloads") is not None:
-            signal_types += 1
-        if row.get("scorecard_score") is not None or row.get("has_provenance"):
-            signal_types += 1
-        if row.get("public_actions"):
-            signal_types += 1
-        if row.get("hn_mentions_30d") is not None:
-            signal_types += 1
+        signal_types = sum(1 for _, present in evidence_types(row) if present)
         row["signal_coverage"] = round(signal_types / 5, 2)
         row["signal_types"] = signal_types
         # Evidence-coverage grade: independent-signal breadth, NOT the trust
@@ -8225,6 +8281,8 @@ def main() -> None:
         row["remediation_steps"] = agent_remediation_steps(row)
         row["safety_qa"] = agent_safety_qa(row)
         row["correction_url"] = agent_correction_url(row)
+        row["custody_packages"] = custody_packages(row)
+        row["evidence_types"] = evidence_types(row)
         # How this agent sits against its category on each trust dimension.
         # by_cat holds listed rows only, so legacy rows get None and the
         # template simply omits the comparison block.
