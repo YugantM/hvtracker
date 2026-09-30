@@ -182,6 +182,9 @@ def _gql_normalize(node: dict, with_signatures: bool = True) -> dict:
     tgt = (node.get("defaultBranchRef") or {}).get("target") or {}
     result = {
         "html_url": node.get("url"),
+        # GraphQL resolves a renamed/transferred repo to its current name, as
+        # REST's full_name does; the drift and advisory checks rely on it.
+        "full_name": node.get("nameWithOwner"),
         "stargazers_count": node.get("stargazerCount") or 0,
         "forks_count": node.get("forkCount") or 0,
         "pushed_at": node.get("pushedAt"),
@@ -1658,6 +1661,7 @@ def detect_package_provenance_drift(
     crate_package: str = "",
     crate_metadata: dict | None = None,
     tracked_repo_canonical: str | None = None,
+    resolve_repo=None,
 ) -> dict:
     """Compare published package source metadata to the tracked GitHub repo.
 
@@ -1667,6 +1671,11 @@ def detect_package_provenance_drift(
     stale `owner_repo` we have on file, that confirms a legitimate rename, not
     drift -- e.g. a project transferred from an individual's account to a
     company org still resolves through the same GitHub redirect.
+
+    `resolve_repo(owner_repo) -> current name | None` covers the other side: a
+    package that still names an old home of the repo (MetaGPT's PyPI entry says
+    geekan/metagpt, which GitHub redirects to FoundationAgents/MetaGPT). It is
+    called only for would-be mismatches.
     """
     expected = owner_repo.lower()
     canonical = (tracked_repo_canonical or "").lower() or None
@@ -1703,6 +1712,9 @@ def detect_package_provenance_drift(
             # confirmed by GitHub's own redirect, not evidence of hijack.
             unknown_count += 1
             evidence.append(f"{source} package '{package_name}' points to {normalized}, the tracked repo's current name after a rename/transfer (not treated as drift)")
+        elif normalized and resolve_repo and (resolve_repo(normalized) or "").lower() in {expected, canonical}:
+            unknown_count += 1
+            evidence.append(f"{source} package '{package_name}' points to {normalized}, which GitHub redirects to the tracked repo after a rename/transfer (not treated as drift)")
         elif normalized:
             mismatch_count += 1
             evidence.append(f"{source} package '{package_name}' points to {normalized}, not {expected}")
@@ -1760,7 +1772,22 @@ def fetch_package_provenance_drift(
         crate_package=crate_package,
         crate_metadata=crate_metadata,
         tracked_repo_canonical=tracked_repo_canonical,
+        resolve_repo=_current_repo_name,
     )
+
+
+def _current_repo_name(owner_repo: str) -> str | None:
+    """GitHub's current owner/name for a repo, following renames and transfers;
+    None when it doesn't resolve (deleted, private, or a lookup error). One
+    attempt: most targets that reach here are other projects' repos, often
+    deleted, and a transient miss only leaves the existing warning in place."""
+    cached = _gql_repo_cache.get(owner_repo.lower())
+    if cached is not None:
+        return cached.get("full_name")
+    try:
+        return _github_get(f"{GITHUB_API}/repos/{owner_repo}", timeout=15, attempts=1).json().get("full_name")
+    except Exception:
+        return None
 
 
 # Known advisories (OSV.dev: GHSA, PYSEC, RUSTSEC, ...) against the release

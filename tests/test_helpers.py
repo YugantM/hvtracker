@@ -685,6 +685,43 @@ def test_detect_package_provenance_drift_repo_transfer_is_not_a_warning():
     assert unrelated_mismatch["status"] == "warning"
 
 
+def test_detect_package_provenance_drift_package_names_an_old_repo_home():
+    """A package may still name the repo's previous home (MetaGPT's PyPI entry
+    says geekan/metagpt, which GitHub redirects to FoundationAgents/MetaGPT).
+    The resolver follows that redirect; it runs only for would-be mismatches,
+    and an unresolvable target still warns."""
+    calls = []
+
+    def resolve(repo):
+        calls.append(repo)
+        return {"geekan/metagpt": "FoundationAgents/MetaGPT"}.get(repo)
+
+    moved = fb.detect_package_provenance_drift(
+        "FoundationAgents/MetaGPT",
+        pypi_package="metagpt",
+        pypi_metadata={"info": {"project_urls": {"Source": "https://github.com/geekan/MetaGPT"}}},
+        resolve_repo=resolve,
+    )
+    assert moved["status"] == "unknown"
+    assert "redirects to the tracked repo after a rename/transfer" in moved["evidence"][0]
+
+    squatted = fb.detect_package_provenance_drift(
+        "Nagi-ovo/voyager",
+        npm_package="voyager",
+        npm_metadata={"repository": "https://github.com/wieden-kennedy/voyager"},
+        resolve_repo=resolve,
+    )
+    assert squatted["status"] == "warning"
+
+    fb.detect_package_provenance_drift(
+        "acme/tool",
+        npm_package="tool",
+        npm_metadata={"repository": "https://github.com/acme/tool"},
+        resolve_repo=resolve,
+    )
+    assert calls == ["geekan/metagpt", "wieden-kennedy/voyager"]
+
+
 def test_normalize_github_repo_url_variants():
     assert fb._normalize_github_repo_url("git+https://github.com/OpenAI/Codex.git") == "openai/codex"
     assert fb._normalize_github_repo_url("git@github.com:OpenAI/Codex.git") == "openai/codex"
