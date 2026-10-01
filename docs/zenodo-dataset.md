@@ -13,9 +13,9 @@ can cite a fixed version and the citation becomes a durable referring link.
    .venv/bin/python scripts/package_dataset.py 2026-Q3
    ```
 
-   Use the repo's venv: the python.org `python3` on this Mac has no CA
-   certificates and fails every HTTPS download with
-   `CERTIFICATE_VERIFY_FAILED`.
+   If a python.org `python3` fails with `CERTIFICATE_VERIFY_FAILED`, it has
+   no CA bundle yet: run `open "/Applications/Python 3.13/Install
+   Certificates.command"` once, or use the repo's `.venv/bin/python`.
 
    This downloads the frozen export, checks the JSON and CSV agree, and writes
    `dist/hvtrust-2026-Q3/` (data, README with the data dictionary,
