@@ -27,7 +27,9 @@ can cite a fixed version and the citation becomes a durable referring link.
    licence CC BY 4.0, title, description, keywords, related identifiers;
    add yourself as a creator if you want personal credit) → Publish.
    Later quarters: use **New version** on the first record, so every quarter
-   shares one concept DOI.
+   shares one concept DOI. First record: 2026-Q3,
+   https://zenodo.org/records/23084548 (DOI 10.5281/zenodo.23084548; concept
+   DOI 10.5281/zenodo.23084547, which always resolves to the latest quarter).
 
 3. Record the DOI where readers look: add it to the export section of the
    `/data-api/` page (`app.py`, the `curl -sO …exports/…` block) and as a

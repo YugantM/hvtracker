@@ -2207,6 +2207,7 @@ def data_api_page():
       <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>curl -sO https://hvtracker.net/data/exports/hvtrust-QUARTER_LABEL.json.gz
 curl -sO https://hvtracker.net/data/exports/hvtrust-QUARTER_LABEL.csv</code></pre>
       <p style='margin-top:12px;color:var(--muted);font-size:13px'>Filename pattern: <code>hvtrust-&lt;year&gt;-Q&lt;n&gt;</code>. Past quarters stay at their end-of-quarter state.</p>
+      <p style='margin-top:8px;color:var(--muted);font-size:13px'>Ended quarters are archived on Zenodo with a DOI, so a citation always points at a fixed copy: 2026-Q3 is <a href='https://doi.org/10.5281/zenodo.23084548'>doi:10.5281/zenodo.23084548</a> (every quarter: <a href='https://doi.org/10.5281/zenodo.23084547'>10.5281/zenodo.23084547</a>). Agents and skills are ranked on separate boards, each from 1; the <code>listing_class</code> column says which (the archived 2026-Q3 copy adds it).</p>
     </div>
     <div class='card'>
       <h2>MCP server — trust layer for agents</h2>
