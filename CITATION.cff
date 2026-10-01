@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use HVTracker's scores or data, please cite it as below. Quarterly dataset exports have their own DOIs; see docs/zenodo-dataset.md."
+message: "If you use HVTracker's scores or data, please cite it as below. Quarterly dataset exports have their own DOIs, listed under references."
 title: "HVTracker: independent trust scores for open-source AI agent projects"
 type: software
 authors:
@@ -12,3 +12,13 @@ keywords:
   - software supply chain
   - open source security
   - trust scores
+references:
+  - type: dataset
+    title: "HVTrust quarterly export 2026-Q3: trust scores for open-source AI agent projects"
+    authors:
+      - name: "HVTracker"
+    version: "2026-Q3"
+    date-released: "2026-10-01"
+    doi: "10.5281/zenodo.23084548"
+    url: "https://zenodo.org/records/23084548"
+    license: CC-BY-4.0
