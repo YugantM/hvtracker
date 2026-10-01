@@ -214,6 +214,25 @@ REVIEWED_REJECTED = {
         "2026-09-29 owner: rejected — 6,302 stars, 1 contributor, 4 commits; "
         "inorganic (sv-number/mcp-server); MIT covers only its own parts"
     ),
+    # 29 Sep pre-screen, section B ("closer look"), decided 1 Oct.
+    "spinabot/brigade": (
+        "2026-10-01 owner: rejected — +2,550 stars (8,442 -> 10,994) in two days "
+        "against 58 forks and 6 watchers; inorganic (player-yn/browserkitten)"
+    ),
+    "tutti-os/tutti": (
+        "2026-10-01 owner: rejected — the open-source edition connects existing "
+        "agents (Claude Code/Codex/Hermes); collaboration is in the closed VM "
+        "edition. Supervisory harness (pingdotgg/t3code, generalaction/emdash)"
+    ),
+    "yc-software/qm": (
+        "2026-10-01 owner: rejected — 'Pi, OpenCode, Codex, and Claude Code all "
+        "drive the same core': the plugged-in harness is the agent (makecindy/cindy). "
+        "Strongest case if the harness boundary is ever widened"
+    ),
+    "genspark-ai/genoffice": (
+        "2026-10-01 owner: rejected — an office suite whose agent, skill and MCP "
+        "server are features of the app (jub0t/concat)"
+    ),
 }
 
 # Topics to query (one request each)
