@@ -134,3 +134,22 @@ repos, no packages, no Scorecard yet), which moves the tail by up to 18 places.
 Mean |Δrank| is about 2, well under the invariant's 15. Scorecard scans reach
 the new rows within a day of deploy, because the scan uses the live roster and
 takes the stalest repos first.
+
+## Outcome for B (owner, 1 Oct)
+
+Owner approved the recommendation:
+- Added (6): trycompai/crm (Research & Data), yetone/cumora (Multi-Agent
+  Systems; its own agent loop is `server/src/agents/turn.ts`), deeplethe/utopia
+  (Memory & Knowledge), tigerless-labs/cost-xray (Observability & Evaluation),
+  and two skills: img2threejs/img2threejs and
+  Tiger3807861189/J-Space-Cognition-Suite. None gets a verified package id.
+- trailhq/Graft (approved) turned out to be listed already as NanoNets/Graft:
+  NanoNets/Graft and nanonets/context-graph-engine both redirect to
+  trailhq/Graft. Discovery's duplicate check doesn't follow renames, so the
+  roster row moves to trailhq/Graft with `previous_repos: [NanoNets/Graft]`
+  (score and history carry over), and discovery stops proposing it.
+- Rejected (4): spinabot/brigade (inorganic star velocity), tutti-os/tutti and
+  yc-software/qm (harness class), genspark-ai/genoffice (an app's agent
+  features, the jub0t/concat precedent).
+- GitHub no longer lists stargazers (REST 404, GraphQL empty), so the
+  inorganic-stars check is now star velocity plus the forks-to-stars ratio.
