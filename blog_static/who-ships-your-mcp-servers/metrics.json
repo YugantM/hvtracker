@@ -1,0 +1,130 @@
+{
+  "frame": {
+    "servers": 37220,
+    "source": {
+      "remote_only": 8251,
+      "repository": 28139,
+      "package_only": 768,
+      "nothing_declared": 62
+    },
+    "namespace": {
+      "domain": 12602,
+      "github_same_owner": 21784,
+      "github_no_repo": 2230,
+      "github_other_owner": 604
+    }
+  },
+  "remote_only": {
+    "k": 8251,
+    "n": 37220,
+    "share": 0.2217,
+    "ci95": [
+      0.2175,
+      0.2259
+    ]
+  },
+  "no_auditable_source": {
+    "k": 8313,
+    "n": 37220,
+    "share": 0.2233,
+    "ci95": [
+      0.2191,
+      0.2276
+    ]
+  },
+  "github_namespace_other_owner": {
+    "k": 604,
+    "n": 22388,
+    "share": 0.027,
+    "ci95": [
+      0.0249,
+      0.0292
+    ]
+  },
+  "sample": {
+    "servers": 1000,
+    "seed": 20260930,
+    "packages_checked": 357,
+    "packages_unpublished": 2,
+    "repos": 650
+  },
+  "package_links": {
+    "no_repo_declared": 11,
+    "match": 303,
+    "missing": 32,
+    "same_owner": 7,
+    "other_repo": 4
+  },
+  "package_links_back": {
+    "k": 303,
+    "n": 357,
+    "share": 0.8487,
+    "ci95": [
+      0.8079,
+      0.8822
+    ]
+  },
+  "package_link_names_other_repo": {
+    "k": 4,
+    "n": 357,
+    "share": 0.0112,
+    "ci95": [
+      0.0044,
+      0.0285
+    ]
+  },
+  "package_attested": {
+    "k": 100,
+    "n": 357,
+    "share": 0.2801,
+    "ci95": [
+      0.2361,
+      0.3288
+    ]
+  },
+  "public_scorecard": {
+    "k": 6,
+    "n": 650,
+    "share": 0.0092,
+    "ci95": [
+      0.0042,
+      0.02
+    ]
+  },
+  "repo_resolves": {
+    "k": 530,
+    "n": 650,
+    "share": 0.8154,
+    "ci95": [
+      0.7837,
+      0.8433
+    ]
+  },
+  "repo_archived": {
+    "k": 11,
+    "n": 530,
+    "share": 0.0208,
+    "ci95": [
+      0.0116,
+      0.0368
+    ]
+  },
+  "repo_fork": {
+    "k": 1,
+    "n": 530,
+    "share": 0.0019,
+    "ci95": [
+      0.0003,
+      0.0106
+    ]
+  },
+  "repo_pushed_90d": {
+    "k": 432,
+    "n": 530,
+    "share": 0.8151,
+    "ci95": [
+      0.7798,
+      0.8458
+    ]
+  }
+}

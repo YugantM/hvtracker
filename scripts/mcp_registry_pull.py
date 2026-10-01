@@ -33,7 +33,7 @@ import urllib.request
 
 API = "https://registry.modelcontextprotocol.io/v0/servers"
 FIELDS = ["name", "repo_url", "repo_source", "package_registries",
-          "remote_only", "status", "published_at"]
+          "remote_only", "status", "published_at", "packages"]
 
 
 def fetch(params: dict, retries: int = 3) -> dict:
@@ -53,7 +53,9 @@ def fetch(params: dict, retries: int = 3) -> dict:
 
 
 def flatten(entry: dict) -> dict:
-    """One CSV row per server, matching the 2026-08-06 pull's schema exactly."""
+    """One CSV row per server: the 2026-08-06 pull's columns, plus `packages`
+    ("npm:name|pypi:name", for the provenance study's source-link and
+    attestation checks)."""
     srv = entry.get("server") or {}
     meta = (entry.get("_meta") or {}).get(
         "io.modelcontextprotocol.registry/official", {})
@@ -71,6 +73,8 @@ def flatten(entry: dict) -> dict:
         "remote_only": "yes" if (srv.get("remotes") and not repo_url and not pkgs) else "",
         "status": meta.get("status") or "",
         "published_at": (meta.get("publishedAt") or "")[:10],
+        "packages": "|".join(sorted({f'{p.get("registryType")}:{p.get("identifier")}'
+                                     for p in pkgs if p.get("registryType") and p.get("identifier")})),
     }
 
 
