@@ -9012,6 +9012,7 @@ def main() -> None:
     sitemap_urls.append(("https://hvtracker.net/blog/state-of-ai-agent-supply-chain-trust-2026/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/calibration-fix-and-coverage-grade/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/haystack-trust-case-study/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/who-ships-your-mcp-servers/", "0.9", "weekly"))
     for _p in snapshot_posts:
         sitemap_urls.append((f"https://hvtracker.net/blog/{_p['slug']}/", "0.7", "monthly"))
     for _p in quarterly_reports:
@@ -9180,6 +9181,14 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
         }
         for _p in quarterly_reports
     ] + [
+        {
+            "id": "https://hvtracker.net/blog/who-ships-your-mcp-servers",
+            "url": "https://hvtracker.net/blog/who-ships-your-mcp-servers/",
+            "title": "Who Ships Your MCP Servers? 37,220 Registry Entries Traced to Their Source",
+            "content_text": "We traced every active server in the official MCP registry to its source. 30% have no public source code: 22% are a bare URL, and 1 in 5 declared repositories doesn't exist publicly. Only 28% of their packages are attested and 0.9% of their repositories have a public OpenSSF Scorecard.",
+            "date_modified": "2026-10-01T00:00:00Z",
+            "tags": ["MCP", "Provenance", "Research"],
+        },
         {
             "id": "https://hvtracker.net/blog/haystack-trust-case-study",
             "url": "https://hvtracker.net/blog/haystack-trust-case-study/",
