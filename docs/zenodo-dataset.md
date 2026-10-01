@@ -10,8 +10,12 @@ can cite a fixed version and the citation becomes a durable referring link.
 1. Package it:
 
    ```bash
-   python scripts/package_dataset.py 2026-Q3
+   .venv/bin/python scripts/package_dataset.py 2026-Q3
    ```
+
+   Use the repo's venv: the python.org `python3` on this Mac has no CA
+   certificates and fails every HTTPS download with
+   `CERTIFICATE_VERIFY_FAILED`.
 
    This downloads the frozen export, checks the JSON and CSV agree, and writes
    `dist/hvtrust-2026-Q3/` (data, README with the data dictionary,
