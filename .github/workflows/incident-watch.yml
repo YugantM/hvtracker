@@ -1,0 +1,37 @@
+name: Incident watch
+
+# Opens an `incident-watch` issue when a critical or high advisory published
+# in the last 14 days affects a listed project, with the response checklist and a draft X post
+# (docs/incident-playbook.md). One issue per advisory, never repeated: the
+# script skips any advisory an existing issue (open or closed) already names.
+
+on:
+  schedule:
+    - cron: "41 7 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Open issues for new critical/high advisories
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create incident-watch --repo "$GITHUB_REPOSITORY" --color B60205 --description "Advisory on a listed project: page + X post" 2>/dev/null || true
+          gh issue list --repo "$GITHUB_REPOSITORY" --label incident-watch --state all --limit 1000 --json title --jq '.[].title' > seen.txt
+          python scripts/check_incidents.py < seen.txt > new.json
+          jq -c '.[]' new.json | while read -r item; do
+            gh issue create --repo "$GITHUB_REPOSITORY" --label incident-watch \
+              --title "$(jq -r .title <<<"$item")" --body "$(jq -r .body <<<"$item")"
+          done
+          echo "opened $(jq length new.json) issue(s)"
