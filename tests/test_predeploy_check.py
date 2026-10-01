@@ -38,3 +38,8 @@ def test_gap_detection_catches_a_missing_copy(tmp_path):
     (tmp_path / "Dockerfile").write_text(
         "FROM python\nCOPY app.py ./\nCOPY avatars/ avatars/\n")
     assert pc.image_gaps(str(tmp_path)) == ["module helper.py", "file assets/logo.png"]
+    # A file fetched in a build stage counts once a --from COPY lands it.
+    (tmp_path / "Dockerfile").write_text(
+        "FROM python\nCOPY app.py helper.py ./\nCOPY avatars/ avatars/\n"
+        "COPY --from=builder /build/assets/logo.png ./assets/logo.png\n")
+    assert pc.image_gaps(str(tmp_path)) == []

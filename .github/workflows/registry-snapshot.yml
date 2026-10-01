@@ -1,0 +1,57 @@
+name: MCP registry snapshot
+
+# Pulls the official MCP registry (v0.1), keeps the entries whose source repo
+# is on the roster, and pushes mcp-registry-snapshot.json to the `data` branch.
+# The app pulls it before every refresh and serves it under /registry/ with
+# HVTrust added (Phase 9). Runs before the 04:00 UTC refresh. No GitHub quota:
+# the registry is its own API.
+
+on:
+  schedule:
+    - cron: "23 3 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+
+      - name: Pull the registry
+        env:
+          # Read-only GraphQL lookups of repo owners' profile websites (the
+          # feed's publisher check for domain-namespaced entries).
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/registry_snapshot.py --out /tmp/mcp-registry-snapshot.json
+
+      - name: Push to the data branch
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # The hourly Scorecard scan pushes to `data` too; retry on a race.
+          # -B data origin/data: a bare `git checkout data` is ambiguous with
+          # the tracked data/ directory (see scorecard-scan.yml).
+          for attempt in 1 2 3; do
+            git fetch origin data
+            git checkout -B data origin/data
+            cp /tmp/mcp-registry-snapshot.json mcp-registry-snapshot.json
+            git add mcp-registry-snapshot.json
+            if git diff --cached --quiet; then
+              echo "Snapshot unchanged."
+              exit 0
+            fi
+            git commit -q -m "chore: update MCP registry snapshot $(date -u '+%Y-%m-%d')"
+            if git push origin data; then
+              exit 0
+            fi
+            echo "Push raced another update; retrying ($attempt)."
+            sleep $((attempt * 10))
+          done
+          exit 1

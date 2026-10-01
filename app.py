@@ -188,6 +188,13 @@ SCORECARD_CACHE_URL = os.environ.get(
     "https://raw.githubusercontent.com/YugantM/hvtracker/data/scorecard-cache.json",
 )
 SCORECARD_CACHE_PATH = os.path.join(BASE_DIR, "scorecard-cache.json")
+# The /registry/ feed's snapshot of official MCP registry entries, refreshed
+# daily on the `data` branch by .github/workflows/registry-snapshot.yml.
+REGISTRY_SNAPSHOT_URL = os.environ.get(
+    "REGISTRY_SNAPSHOT_URL",
+    "https://raw.githubusercontent.com/YugantM/hvtracker/data/mcp-registry-snapshot.json",
+)
+REGISTRY_SNAPSHOT_PATH = os.path.join(BASE_DIR, "mcp-registry-snapshot.json")
 
 @asynccontextmanager
 async def _lifespan(_app):
@@ -390,7 +397,7 @@ def _canonical_redirect_target(request: Request) -> str | None:
 # ---- machine-surface usage counters (master plan 1.2) ---------------------
 # In-memory since last process start — enough to establish the API/MCP usage
 # baseline KPI without any storage. Exposed in /healthz as machine_usage.
-_usage_counters = {"api_v1": 0, "mcp": 0, "data_json": 0, "exports": 0}
+_usage_counters = {"api_v1": 0, "mcp": 0, "data_json": 0, "exports": 0, "registry": 0}
 _USAGE_SINCE = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 # /mcp requests by protocol era: 2026-07-28 clients name the method in an
@@ -474,6 +481,8 @@ def _count_machine_usage(path: str, mcp_method: str | None = None) -> None:
         channel = "mcp"
     elif path.startswith("/data/exports/"):
         channel = "exports"
+    elif path.startswith("/registry/") and "/v0.1/" in path:
+        channel = "registry"
     elif path.startswith("/data/") and path.endswith(".json"):
         channel = "data_json"
     if channel is None:
@@ -1312,6 +1321,131 @@ def live_usage_page():
         return HTMLResponse(_with_site_header(f.read()))
 
 
+# ---- MCP registry feed (Phase 9) -------------------------------------------
+# A subregistry of the official MCP registry (v0.1 API): the entries whose
+# source repo HVTracker scores, with HVTrust under server._meta. Each policy is
+# its own base URL, so an admin points Copilot's "MCP Registry URL" at e.g.
+# https://hvtracker.net/registry/grade-b and "Registry only" admits exactly
+# that list. Copilot appends /v0.1/... itself and needs these CORS headers.
+_REGISTRY_CORS = {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, OPTIONS",
+                  "Access-Control-Allow-Headers": "Authorization, Content-Type"}
+_registry_cache: dict = {"mtime": None, "doc": None}
+
+
+def _registry_entries(policy: str) -> list[dict] | None:
+    """Entries in `policy`, from data/registry.json (written each render); None
+    for an unknown policy."""
+    import fetch_and_build
+    if policy != "all" and policy not in fetch_and_build.REGISTRY_POLICIES:
+        return None
+    path = os.path.join(OUTPUT_DIR, "data", "registry.json")
+    try:
+        mtime = os.path.getmtime(path)
+        if _registry_cache["mtime"] != mtime:
+            with open(path, encoding="utf-8") as f:
+                _registry_cache.update(mtime=mtime, doc=json.load(f))
+    except (OSError, ValueError):
+        return []
+    return [e for e in _registry_cache["doc"].get("entries", []) if policy in e["policies"]]
+
+
+def _registry_json(body: dict, status: int = 200) -> JSONResponse:
+    return JSONResponse(body, status_code=status,
+                        headers={**_REGISTRY_CORS, "Cache-Control": "public, max-age=300, s-maxage=900"})
+
+
+@app.get("/registry/{policy}/v0.1/servers")
+def registry_servers(policy: str, cursor: str = "", limit: int = 30, search: str = "",
+                     updated_since: str = "", version: str = ""):
+    entries = _registry_entries(policy)
+    if entries is None:
+        return _registry_json({"error": f"Unknown registry '{policy}'"}, 404)
+    if updated_since:
+        try:
+            since = datetime.fromisoformat(updated_since)
+        except ValueError:
+            return _registry_json({"error": "updated_since must be an RFC 3339 timestamp"}, 400)
+        if since.tzinfo is None:
+            since = since.replace(tzinfo=timezone.utc)
+        entries = [e for e in entries if e["updated_at"] and datetime.fromisoformat(e["updated_at"]) >= since]
+    if search:
+        entries = [e for e in entries if search.lower() in e["name"].lower()]
+    if version and version != "latest":
+        entries = [e for e in entries if e["version"] == version]
+    if cursor:  # opaque to clients: the last name of the previous page
+        entries = [e for e in entries if e["name"] > cursor]
+    page = entries[:max(1, min(limit, 100))]
+    metadata = {"count": len(page)}
+    if len(entries) > len(page):
+        metadata["nextCursor"] = page[-1]["name"]
+    return _registry_json({"servers": [e["entry"] for e in page], "metadata": metadata})
+
+
+def _registry_entry(policy: str, server_name: str) -> dict | None:
+    return next((e for e in _registry_entries(policy) or [] if e["name"] == server_name), None)
+
+
+@app.get("/registry/{policy}/v0.1/servers/{server_name:path}/versions/{version}")
+def registry_server_version(policy: str, server_name: str, version: str):
+    e = _registry_entry(policy, server_name)
+    if not e or version not in ("latest", e["version"]):
+        return _registry_json({"error": "Server not found"}, 404)
+    return _registry_json(e["entry"])
+
+
+@app.get("/registry/{policy}/v0.1/servers/{server_name:path}/versions")
+def registry_server_versions(policy: str, server_name: str):
+    """We mirror each server's latest version only."""
+    e = _registry_entry(policy, server_name)
+    if not e:
+        return _registry_json({"error": "Server not found"}, 404)
+    return _registry_json({"servers": [e["entry"]], "metadata": {"count": 1}})
+
+
+@app.options("/registry/{rest:path}")
+def registry_preflight(rest: str):
+    return Response(status_code=204, headers=_REGISTRY_CORS)
+
+
+@app.get("/registry", response_class=HTMLResponse)
+@app.get("/registry/", response_class=HTMLResponse, include_in_schema=False)
+def registry_page():
+    counts = {p: len(_registry_entries(p) or []) for p in ("all", "grade-a", "grade-b", "grade-c")}
+    pulled = (_registry_cache.get("doc") or {}).get("snapshot_pulled_at") or "not yet"
+    rows = "".join(
+        f"<tr><td style='word-break:break-all'><code>https://hvtracker.net/registry/{p}</code></td><td>{escape(what)}</td>"
+        f"<td style='text-align:right;font-family:var(--font-mono)'>{counts[p]:,}</td></tr>"
+        for p, what in (("grade-a", "Grade A only"), ("grade-b", "Grade A or B"),
+                        ("grade-c", "Grade A to C"), ("all", "Every entry we score, any grade")))
+    body = f"""
+    <div class='card' style='min-width:0'>
+      <h2>Base URLs</h2>
+      <p>Each URL is a complete registry implementing the official MCP Registry API v0.1. Point a client at the base URL; it appends <code>/v0.1/servers</code> itself.</p>
+      <div style='overflow-x:auto'><table style='width:100%;border-collapse:collapse;font-size:14px;margin-top:8px'>
+        <thead><tr><th style='text-align:left'>Base URL</th><th style='text-align:left'>Admits</th><th style='text-align:right'>Servers</th></tr></thead>
+        <tbody>{rows}</tbody>
+      </table></div>
+      <p style='margin-top:10px;color:var(--muted);font-size:13px'>The graded lists admit an entry only when its publisher is tied to the repository we scored: an <code>io.github.&lt;owner&gt;</code> namespace that matches the repository owner (the registry verifies it by GitHub login), or a domain namespace (verified by DNS) that matches the repository's homepage or its owner's GitHub profile website, both of which only the owner can set. An entry anyone else publishes pointing at a well-scored repository doesn't inherit its grade. Provisional and review-flagged projects are left out too. <code>all</code> keeps every entry and says which check each one passed.</p>
+    </div>
+    <div class='card' style='min-width:0'>
+      <h2>Use it with GitHub Copilot</h2>
+      <p>Enterprise: <strong>Settings → AI controls → MCP → MCP Registry URL</strong>. Organization: <strong>Settings → Copilot → Policies → MCP Registry URL</strong>. Paste a base URL above with no <code>/v0.1</code> suffix, then choose <strong>Registry only</strong> to admit just that list, or <strong>Allow all</strong> to show it as recommendations. Copilot matches servers by their registry name, so a developer's locally configured server must use the same name as its registry entry. See <a href='https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-mcp-usage/configure-mcp-registry'>GitHub's guide</a>.</p>
+      <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>curl -s "https://hvtracker.net/registry/grade-b/v0.1/servers?limit=3"
+curl -s "https://hvtracker.net/registry/all/v0.1/servers/io.github.github%2Fgithub-mcp-server/versions/latest"</code></pre>
+    </div>
+    <div class='card' style='min-width:0'>
+      <h2>What each entry carries</h2>
+      <p>The official registry entry unchanged, plus <code>server._meta["net.hvtracker/trust"]</code>: <code>trust_score</code>, <code>grade</code>, <code>coverage_grade</code>, <code>rank</code>, <code>board</code>, <code>provisional</code>, <code>scored_repo</code>, <code>publisher_verified</code> and <code>publisher_check</code>, <code>known_advisory</code> (worst unfixed severity), <code>package_source</code> (does the package link back to the repository), and links to the <code>profile</code> and the signed <code>credential</code>.</p>
+      <p style='color:var(--muted);font-size:13px'>Limits: the score is the source repository's provenance (who ships it and whether that changed), not a scan of what the server does, so pair it with a content scanner. Servers that share one repository share its score. We mirror each server's latest version. Registry entries refresh daily (last pull: {escape(str(pulled))}); scores refresh every 4 hours. Copilot's own enforcement matches names only, which GitHub documents as bypassable by editing local configuration.</p>
+    </div>"""
+    return HTMLResponse(_marketing_page(
+        "MCP registry feed with trust scores — HVTracker", "Registry",
+        "An MCP registry that only admits servers you can trace", body,
+        description="Official MCP Registry entries for the servers HVTracker scores, with HVTrust in _meta and grade-filtered base URLs for GitHub Copilot's Registry only policy.",
+        path="/registry/",
+        lede="The official MCP Registry entries for the servers HVTracker scores, with each one's trust score attached, as registries your MCP client or GitHub Copilot can point at directly."))
+
+
 @app.get("/og-v2.png")
 def og_v2():
     return FileResponse(os.path.join(BASE_DIR, "og-v2.png"), media_type="image/png")
@@ -1493,6 +1627,7 @@ def _marketing_page(
     description: str = "HVTracker validates demand for alerts, data access, sponsorship, submissions, and corrections before building heavier workflows.",
     path: str = "/",
     noindex: bool = False,
+    lede: str = "HVTracker is still early, so these pages are intentionally lightweight. The goal is to validate who wants alerts, data access, and sponsorship before building heavier workflows.",
 ) -> str:
     canonical = f"https://hvtracker.net{path}"
     robots_meta = '\n  <meta name="robots" content="noindex">' if noindex else ""
@@ -1609,7 +1744,7 @@ def _marketing_page(
       <section class="hero">
         <div class="eyebrow">{escape(eyebrow)}</div>
         <h1>{escape(heading)}</h1>
-        <p class="lede">HVTracker is still early, so these pages are intentionally lightweight. The goal is to validate who wants alerts, data access, and sponsorship before building heavier workflows.</p>
+        <p class="lede">{escape(lede)}</p>
       </section>
       <section class="content">
         {body_html}
@@ -2210,6 +2345,10 @@ curl -sO https://hvtracker.net/data/exports/hvtrust-QUARTER_LABEL.csv</code></pr
       <p style='margin-top:8px;color:var(--muted);font-size:13px'>Ended quarters are archived on Zenodo with a DOI, so a citation always points at a fixed copy: 2026-Q3 is <a href='https://doi.org/10.5281/zenodo.23084548'>doi:10.5281/zenodo.23084548</a> (every quarter: <a href='https://doi.org/10.5281/zenodo.23084547'>10.5281/zenodo.23084547</a>). Agents and skills are ranked on separate boards, each from 1; the <code>listing_class</code> column says which (the archived 2026-Q3 copy adds it).</p>
     </div>
     <div class='card'>
+      <h2>MCP registry feed</h2>
+      <p>The official MCP Registry entries for every server we score, served as a v0.1 registry with HVTrust in <code>_meta</code>, plus Grade A, B and C allowlists for GitHub Copilot's <em>Registry only</em> policy. <a href='/registry/'>Base URLs and setup →</a></p>
+    </div>
+    <div class='card'>
       <h2>MCP server — trust layer for agents</h2>
       <p>Add HVTracker as a <a href='https://modelcontextprotocol.io'>Model Context Protocol</a> server so a coding agent can check supply-chain trust <em>before</em> installing a dependency or connecting to an MCP server. Streamable HTTP, no auth, no install.</p>
       <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>{
@@ -2329,6 +2468,29 @@ def _pull_scorecard_cache() -> bool:
         return False
 
 
+def _pull_registry_snapshot() -> bool:
+    """Refresh the MCP registry snapshot from the `data` branch before a
+    render. Best-effort like the scorecard pull: a failure keeps the current
+    file, and an empty or malformed one is never written over it."""
+    import urllib.request
+    try:
+        with urllib.request.urlopen(REGISTRY_SNAPSHOT_URL, timeout=20) as resp:
+            raw = resp.read()
+        servers = json.loads(raw).get("servers")
+        if not isinstance(servers, list) or not servers:
+            print("[registry] data-branch snapshot has no servers — keeping the current one")
+            return False
+        tmp = REGISTRY_SNAPSHOT_PATH + ".tmp"
+        with open(tmp, "wb") as f:
+            f.write(raw)
+        os.replace(tmp, REGISTRY_SNAPSHOT_PATH)
+        print(f"[registry] pulled data-branch snapshot: {len(servers)} entries")
+        return True
+    except Exception as e:
+        print(f"[registry] data-branch snapshot pull failed ({e}) — keeping the current one")
+        return False
+
+
 def _refresh(mode: str) -> bool:
     """Run a refresh cycle. Returns True on success, False on failure.
 
@@ -2348,6 +2510,7 @@ def _refresh(mode: str) -> bool:
         # fresh scores reach the live site on each deploy/restart, not just on a
         # GitHub-signal refresh cycle.
         _pull_scorecard_cache()
+        _pull_registry_snapshot()
         subprocess.run(
             [sys.executable, os.path.join(BASE_DIR, "fetch_and_build.py"),
              *fetch_and_build.refresh_argv(mode)],

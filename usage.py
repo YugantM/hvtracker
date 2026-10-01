@@ -31,7 +31,7 @@ import db
 
 # Channels tracked for raw requests. MCP tool calls are stored in the same
 # rollup under a "tool:<name>" channel so one table serves both.
-REQUEST_CHANNELS = ("mcp", "api_v1", "data_json", "exports")
+REQUEST_CHANNELS = ("mcp", "api_v1", "data_json", "exports", "registry")
 TOOL_PREFIX = "tool:"
 
 # How many recent tool calls the live feed shows. Tool name + timestamp only.

@@ -60,6 +60,9 @@ linkedin_carousel.js
 /feed.json
 /llms.txt
 /data.json
+# MCP registry snapshot: lives on the `data` branch, pulled at build and runtime
+/mcp-registry-snapshot.json
+
 # Keep render_state.json (seed for render-only tests/CI) but ignore other data/* artifacts
 /data/*
 !/data/render_state.json

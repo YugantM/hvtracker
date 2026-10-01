@@ -19,6 +19,11 @@ COPY scorecard-cache.json ./scorecard-cache.json
 RUN curl -sfL https://raw.githubusercontent.com/YugantM/hvtracker/data/scorecard-cache.json -o /tmp/sc.json \
     && mv /tmp/sc.json scorecard-cache.json \
     || echo "Using seed scorecard-cache.json (data branch fetch failed)"
+# MCP registry snapshot for the /registry/ feed (data branch, refreshed daily by
+# registry-snapshot.yml and re-pulled before every refresh). No seed in git: an
+# empty one only means the feed is empty until the first runtime pull.
+RUN curl -sfL https://raw.githubusercontent.com/YugantM/hvtracker/data/mcp-registry-snapshot.json -o mcp-registry-snapshot.json \
+    || echo '{"servers":[]}' > mcp-registry-snapshot.json
 
 # ---- runtime ----------------------------------------------------------------
 FROM python:3.12-slim
@@ -41,6 +46,7 @@ COPY signing.py mcp_trust.py open_lookup.py verify_log.py mcp_server.py auth.py 
 # Generator inputs: curated seed, scorecard cache, and templates/assets
 COPY agents.json template.html ./
 COPY --from=builder /build/scorecard-cache.json ./scorecard-cache.json
+COPY --from=builder /build/mcp-registry-snapshot.json ./mcp-registry-snapshot.json
 COPY templates/ templates/
 COPY docs/import-candidates.json docs/import-candidates.json
 # Read by fetch_and_build.py at render time (compare-sitemap allowlist); without

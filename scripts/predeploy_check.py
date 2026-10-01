@@ -52,13 +52,17 @@ def runtime_modules(root: str) -> set[str]:
 
 
 def _copy_sources(root: str) -> list[str]:
-    """Source paths of every plain (non --from) COPY line in the Dockerfile."""
+    """Paths the Dockerfile puts in the image, relative to the app root: the
+    sources of every plain COPY line, and the destination of a `COPY
+    --from=<stage>` line (a file built or fetched in an earlier stage)."""
     sources: list[str] = []
     with open(os.path.join(root, "Dockerfile"), encoding="utf-8") as f:
         for line in f:
             parts = line.split()
             if len(parts) >= 3 and parts[0] == "COPY" and not parts[1].startswith("--"):
                 sources += [p.rstrip("/") for p in parts[1:-1]]
+            elif len(parts) >= 4 and parts[0] == "COPY" and parts[1].startswith("--from="):
+                sources.append(parts[-1].removeprefix("./").rstrip("/"))
     return sources
 
 
