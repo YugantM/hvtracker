@@ -892,7 +892,8 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   sample.csv + metrics.json CC BY 4.0). Owner: no X thread or emails; the post
   and the Q3 quarterly report are the outreach. Verified live: custody tags on
   garak/haystack/composio, post + CSV + index card + sitemap + feed, policy
-  log; build_report invariants []. Outage ~1 min. Scheduled task
+  log; build_report invariants []. Downtime not measured (healthz answered
+  6 s after SUCCESS). Scheduled task
   hvtracker-competitor-watch (monthly, writes ~/hv_marketing/watch/). Open:
   #305 roster package fix (gated, needs its own deploy yes); Zenodo DOI for
   Q3 + the study files (owner); CTR batch 2 readout 8 Oct.
