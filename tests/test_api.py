@@ -372,7 +372,7 @@ def test_dataset_export_serves(client):
     assert r.status_code == 200
     r = client.get(f"/data/exports/hvtrust-{label}.csv")
     assert r.status_code == 200
-    assert r.text.startswith("rank,")
+    assert r.text.startswith("listing_class,rank,")
     # docs page advertises the current quarter's stable URL
     r = client.get("/data-api/")
     assert f"hvtrust-{label}" in r.text
