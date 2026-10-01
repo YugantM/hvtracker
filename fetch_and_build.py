@@ -5706,6 +5706,96 @@ def write_dataset_export(script_dir: str, rows: list[dict],
     return label
 
 
+# MCP registry feed (Phase 9): official registry entries whose source repo we
+# score, re-served under /registry/<policy>/v0.1/ with HVTrust in `_meta`.
+# scripts/registry_snapshot.py writes the snapshot (daily, `data` branch).
+REGISTRY_SNAPSHOT = "mcp-registry-snapshot.json"
+REGISTRY_META_KEY = "net.hvtracker/trust"
+REGISTRY_POLICIES = {"grade-a": {"A"}, "grade-b": {"A", "B"}, "grade-c": {"A", "B", "C"}}
+
+
+def registry_publisher_check(server_name: str, entry_repo: str, row: dict,
+                             owner_site: str = "") -> str | None:
+    """How the registry entry's publisher is tied to the repo we scored, or
+    None. Our score is the repo's, but allowlists match by entry name, so an
+    entry anyone publishes pointing at a well-scored repo must not inherit it.
+    io.github.<owner> is verified by GitHub login. A reverse-DNS namespace is
+    verified by DNS, and counts when the repo's homepage or its owner's GitHub
+    profile website is on that domain: both are set by the repo owner, so
+    another publisher can't manufacture the tie."""
+    ns = server_name.split("/", 1)[0].lower()
+    owners = {entry_repo.split("/", 1)[0], row["repo"].split("/", 1)[0].lower()}
+    if ns.startswith("io.github."):
+        return "github-namespace-owner" if ns[len("io.github."):] in owners else None
+    domain = ".".join(reversed(ns.split(".")))
+    for check, url in (("domain-homepage", row.get("homepage") or row.get("github_homepage")),
+                       ("domain-owner-website", owner_site)):
+        url = url or ""
+        host = (urlsplit(url if "//" in url else "https://" + url).hostname or "").lower() if url else ""
+        if host and (host == domain or host.endswith("." + domain)):
+            return check
+    return None
+
+
+def build_registry_feed(base_dir: str, script_dir: str, rows: list[dict]) -> int:
+    """Write data/registry.json: each snapshot entry with HVTrust added to
+    server._meta and the policies (allowlists) it belongs to. `all` takes every
+    entry; grade-* only those whose publisher is tied to the repo, whose row is
+    listed (not provisional, no open review flag) and graded at least that."""
+    try:
+        with open(os.path.join(base_dir, REGISTRY_SNAPSHOT), encoding="utf-8") as f:
+            snap = json.load(f)
+    except (OSError, ValueError):
+        print(f"{REGISTRY_SNAPSHOT} not found — registry feed not written this run.")
+        return 0
+    by_repo = {r["repo"].lower(): r for r in rows}
+    entries = []
+    for e in snap.get("servers") or []:
+        server = e["server"]
+        entry_repo = _normalize_github_repo_url((server.get("repository") or {}).get("url")) or ""
+        row = by_repo.get(REPO_RENAMES.get(entry_repo, entry_repo).lower())
+        if not row:
+            continue
+        check = registry_publisher_check(server["name"], entry_repo, row,
+                                         (snap.get("owner_sites") or {}).get(entry_repo.split("/", 1)[0], ""))
+        provisional = bool(row.get("pending_signals"))
+        grade = row.get("evidence_grade")
+        trust = {
+            "trust_score": None if provisional else row.get("trust_score"),
+            "grade": None if provisional else grade,
+            "coverage_grade": row.get("coverage_grade"),
+            "rank": row.get("rank"),
+            "board": listing_class(row),
+            "provisional": provisional,
+            "scored_repo": row["repo"],
+            "publisher_verified": check is not None,
+            "publisher_check": check,
+            "known_advisory": advisory_worst(row),
+            "package_source": (row.get("package_provenance_drift") or {}).get("status"),
+            "profile": f"https://hvtracker.net/agents/{row['slug']}/",
+            "credential": f"https://hvtracker.net/data/agents/{row['slug']}.json",
+            "methodology": METHODOLOGY_VERSION,
+        }
+        listed = row.get("listing_status") == "listed" and not provisional
+        policies = ["all"] + [p for p, grades in REGISTRY_POLICIES.items()
+                              if check and listed and grade in grades]
+        official = (e.get("_meta") or {}).get("io.modelcontextprotocol.registry/official") or {}
+        entries.append({
+            "name": server["name"], "version": server.get("version"),
+            "updated_at": official.get("updatedAt") or "", "policies": policies,
+            "entry": {"server": {**server, "_meta": {**(server.get("_meta") or {}), REGISTRY_META_KEY: trust}},
+                      "_meta": e.get("_meta") or {}},
+        })
+    entries.sort(key=lambda x: x["name"])
+    doc = {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+           "snapshot_pulled_at": snap.get("pulled_at"), "count": len(entries), "entries": entries}
+    with open(os.path.join(script_dir, "data", "registry.json"), "w", encoding="utf-8") as f:
+        json.dump(doc, f, ensure_ascii=False, separators=(",", ":"))
+    counts = {p: sum(1 for x in entries if p in x["policies"]) for p in ["all", *REGISTRY_POLICIES]}
+    print(f"Wrote registry feed: {counts}")
+    return len(entries)
+
+
 def build_org_pages(rows: list[dict]) -> list[dict]:
     """Build org pages for GitHub owners with >=2 tracked projects."""
     owner_map: dict[str, list[dict]] = {}
@@ -8056,6 +8146,7 @@ def main() -> None:
 
     # Quarterly public dataset export (master plan 1.6) — rows are final here.
     write_dataset_export(script_dir, rows)
+    build_registry_feed(base_dir, script_dir, rows)
 
     # Board-integrity invariants (master plan 0.3): catch v4.2-class defects
     # (inflation, out-of-range scores, silent mass churn) at render time.
@@ -8998,6 +9089,7 @@ def main() -> None:
     sitemap_urls.append(("https://hvtracker.net/capabilities/", "0.8", "daily"))
     sitemap_urls.append(("https://hvtracker.net/trends/", "0.8", "daily"))
     sitemap_urls.append(("https://hvtracker.net/correct/", "0.5", "monthly"))
+    sitemap_urls.append(("https://hvtracker.net/registry/", "0.7", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/ecosystem/", "0.8", "daily"))
     for page in ecosystem_pages:
         sitemap_urls.append((f"https://hvtracker.net/ecosystem/{page['slug']}/", "0.8", "daily"))
