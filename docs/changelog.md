@@ -872,6 +872,31 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   had rendered after all 18 category tabs, off-screen at the end of the
   scrolling strip. Verified live after the boot refresh: Global, Newly added,
   MCP Servers. Outage ~1.5 min (21:12:23-21:14:00). build_report invariants [].
+- **Phase 8 "Citable provenance" DEPLOYED 2026-10-01 13:46 UTC** (635b7af2 @
+  740970b7, #301-#304; owner-approved). Approved 30 Sep after the competitor
+  report (AgentSeal copies the "Is X Safe? Score N/100" template at 7x MCP
+  coverage); the owner skipped the 5 Oct bill check (bill already under
+  forecast) and asked for profile pages unlike the rivals'. #301: "Chain of
+  custody" under the verdict on every scored profile (source signatures ->
+  review/release Scorecard checks -> each package's source link and attestation
+  -> OSV on the installed release; changes, evidence types, offline
+  verification, what the score doesn't check), replacing Supply Chain Trust.
+  #302: GraphQL never set full_name, so the T3.1 rename guard was dead; fixed,
+  and package targets are resolved through GitHub redirects (gate: 11 rows +5,
+  Superagent D->C, 0 top-100 moves; rows update at their next full fetch, so
+  e.g. Garak still showed "Source mismatch" right after deploy). #303: daily
+  incident-watch issues (critical/high OSV advisory <= 14 days old, draft X
+  post; docs/incident-playbook.md). #304: /blog/who-ships-your-mcp-servers/
+  (37,220 active registry servers: 22.2% remote-only, 18.5% of declared repos
+  404, 30.2% no public source, 0.9% public Scorecard, 28% of packages attested;
+  sample.csv + metrics.json CC BY 4.0). Owner: no X thread or emails; the post
+  and the Q3 quarterly report are the outreach. Verified live: custody tags on
+  garak/haystack/composio, post + CSV + index card + sitemap + feed, policy
+  log; build_report invariants []. Downtime not measured (healthz answered
+  6 s after SUCCESS). Scheduled task
+  hvtracker-competitor-watch (monthly, writes ~/hv_marketing/watch/). Open:
+  #305 roster package fix (gated, needs its own deploy yes); Zenodo DOI for
+  Q3 + the study files (owner); CTR batch 2 readout 8 Oct.
 
 ## Entries recorded only in the old AGENTS.md
 

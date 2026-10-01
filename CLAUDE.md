@@ -90,12 +90,12 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   the gates before calling anything done.
 
 ## Now / next
-- Active plan: Phase 6 https://claude.ai/artifact/DVwRksqt544SfWmEKoLpVu
-  (after October https://claude.ai/artifact/YA7M1zd2FukmHsmP69fM3a and
-  September https://claude.ai/artifact/KfF5N95t1Y114J1nABMjfe, Phases 0–3
-  deployed). Phase 6 + October batch DEPLOYED 2026-09-28 13:36 UTC (#270–#286);
-  hvtracker-mcp v0.4.0 not yet published. Open owner items and check dates:
-  docs/changelog.md and docs/ctr-tests.md.
+- Active: Phase 8 "Citable provenance" (provenance study, chain-of-custody
+  profiles, incident watch) DEPLOYED 2026-10-01 (#301–#304); the registry
+  feed is Phase 9 and reuses scripts/provenance_study.py's registry→repo
+  join. Earlier plans: Phase 7 https://claude.ai/artifact/92fZ6PMrVQUbPbrxQp7B8a,
+  Phase 6 https://claude.ai/artifact/DVwRksqt544SfWmEKoLpVu. Open owner items
+  and check dates: docs/changelog.md and docs/ctr-tests.md.
 - MCP server runs SDK v2 (`MCPServer`): serves 2026-07-28 and 2025 clients;
   GET /mcp is 405 and `subscriptions/listen` is unregistered on purpose
   (both hang open under v2). Bumping SERVER_VERSION = mirror in
