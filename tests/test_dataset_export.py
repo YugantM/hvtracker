@@ -60,6 +60,16 @@ def test_export_writes_json_and_csv(tmp_path):
     assert set(fab.EXPORT_CSV_FIELDS) == set(rows[0].keys())
 
 
+def test_each_board_keeps_its_own_ranks_and_says_which_it_is(tmp_path):
+    skill = dict(_row("s", 1), **{"class": "skill", "category": "Agent Skills"})
+    fab.write_dataset_export(str(tmp_path), [skill, _row("b", 2), _row("a", 1)],
+                             now=datetime(2026, 10, 7, tzinfo=timezone.utc))
+    with open(tmp_path / "data" / "exports" / "hvtrust-2026-Q4.csv", encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+    assert [(r["listing_class"], r["rank"], r["slug"]) for r in rows] == [
+        ("agent", "1", "a"), ("agent", "2", "b"), ("skill", "1", "s")]
+
+
 def test_export_is_none_safe(tmp_path):
     bare = {"slug": "bare", "name": "Bare", "repo": "org/bare", "rank": None}
     fab.write_dataset_export(str(tmp_path), [bare],

@@ -25,8 +25,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE = "https://hvtracker.net/data/exports"
 
 FIELDS = {
-    "rank": "Position on the agent board by HVTrust score (1 = highest).",
-    "display_rank": "Rank as shown on the site; tied scores share a rank.",
+    "listing_class": "Which board the project is ranked on: agent or skill. Each board has its own rank sequence.",
+    "rank": "Position on its board (see listing_class) by HVTrust score, 1 = highest; each board starts at 1.",
+    "display_rank": "Rank as shown on the site: like rank, but tied scores share a number.",
     "slug": "Stable identifier; the project's page is https://hvtracker.net/agents/<slug>/.",
     "name": "Project name.",
     "repo": "GitHub repository (owner/name).",
@@ -50,14 +51,31 @@ FIELDS = {
 }
 
 
+def backfill_listing_class(records):
+    """2026-Q3 was exported before records carried their board. Skills are
+    exactly the "Agent Skills" category; prove it by requiring every board's
+    ranks to run 1..N without gaps, and refuse to package otherwise."""
+    for r in records:
+        r.setdefault("listing_class", "skill" if r.get("category") == "Agent Skills" else "agent")
+    for cls in ("agent", "skill"):
+        ranks = sorted(int(r["rank"]) for r in records if r["listing_class"] == cls)
+        if ranks != list(range(1, len(ranks) + 1)):
+            raise SystemExit(f"{cls} ranks aren't 1..{len(ranks)}; the board can't be derived from category.")
+    records.sort(key=lambda r: (r["listing_class"] != "agent", int(r["rank"])))
+
+
 def fetch(url):
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (hvtracker dataset packager)"})
     with urllib.request.urlopen(req, timeout=60) as r:
         return r.read()
 
 
-def readme(label, doc):
+def readme(label, doc, derived=False):
     rows = "\n".join(f"| `{k}` | {v} |" for k, v in FIELDS.items())
+    note = ("\n- Packaging note: the site's export of this quarter has no `listing_class` field, so "
+            "agent and skill ranks both start at 1 there. It was added here (skills are exactly the "
+            "\"Agent Skills\" category; every board's ranks were checked to run 1..N) and rows are "
+            "ordered by board, then rank. Every other value is unchanged.") if derived else ""
     cite = f"{BASE}/hvtrust-{label}.json.gz"  # Zenodo shows the DOI beside it
     return f"""# HVTrust quarterly export {label}
 
@@ -72,7 +90,7 @@ https://hvtracker.net at the end of {label}.
   checkable signals: OpenSSF Scorecard, package provenance, signed commits,
   licence, maintenance and adoption. Nothing is self-reported and no
   placement is paid.
-- Licence: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- Licence: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/){note}
 
 ## Cite
 
@@ -86,7 +104,7 @@ HVTracker ({label[:4]}). *HVTrust quarterly export {label}* [Data set]. {cite}
 """
 
 
-def zenodo(label, doc):
+def zenodo(label, doc, derived=False):
     return {
         "upload_type": "dataset",
         "title": f"HVTrust quarterly export {label}: trust scores for open-source AI agent projects",
@@ -103,7 +121,8 @@ def zenodo(label, doc):
                      "MCP", "trust scores"],
         "related_identifiers": [
             {"identifier": "https://hvtracker.net/methodology/", "relation": "isDocumentedBy", "resource_type": "publication"},
-            {"identifier": f"{BASE}/hvtrust-{label}.json.gz", "relation": "isIdenticalTo", "resource_type": "dataset"},
+            {"identifier": f"{BASE}/hvtrust-{label}.json.gz",
+             "relation": "isDerivedFrom" if derived else "isIdenticalTo", "resource_type": "dataset"},
         ],
         "version": label,
     }
@@ -125,6 +144,16 @@ def main(label, out_root=ROOT):
     csv_rows = list(csv.DictReader(io.StringIO(csv_bytes.decode("utf-8"))))
     if len(csv_rows) != doc["count"] or len(doc["agents"]) != doc["count"]:
         raise SystemExit(f"JSON ({doc['count']}) and CSV ({len(csv_rows)}) disagree; re-fetch later.")
+    derived = "listing_class" not in doc["agents"][0]
+    if derived:
+        backfill_listing_class(doc["agents"])
+        backfill_listing_class(csv_rows)
+        raw = gzip.compress(json.dumps(doc, separators=(",", ":"), ensure_ascii=False).encode("utf-8"))
+        buf = io.StringIO()
+        writer = csv.DictWriter(buf, fieldnames=list(FIELDS))
+        writer.writeheader()
+        writer.writerows(csv_rows)
+        csv_bytes = buf.getvalue().encode("utf-8")
     out = os.path.join(out_root, "dist", f"hvtrust-{label}")
     os.makedirs(out, exist_ok=True)
     with open(os.path.join(out, f"hvtrust-{label}.json.gz"), "wb") as f:
@@ -132,9 +161,9 @@ def main(label, out_root=ROOT):
     with open(os.path.join(out, f"hvtrust-{label}.csv"), "wb") as f:
         f.write(csv_bytes)
     with open(os.path.join(out, "README.md"), "w", encoding="utf-8") as f:
-        f.write(readme(label, doc))
+        f.write(readme(label, doc, derived))
     with open(os.path.join(out, ".zenodo.json"), "w", encoding="utf-8") as f:
-        json.dump(zenodo(label, doc), f, indent=2)
+        json.dump(zenodo(label, doc, derived), f, indent=2)
     zip_path = shutil.make_archive(out, "zip", out)
     print(f"{doc['count']} projects -> {out}\n{zip_path}")
 
