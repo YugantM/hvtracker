@@ -897,6 +897,27 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   hvtracker-competitor-watch (monthly, writes ~/hv_marketing/watch/). Open:
   #305 roster package fix (gated, needs its own deploy yes); Zenodo DOI for
   Q3 + the study files (owner); CTR batch 2 readout 8 Oct.
+- **Roster fix + dataset fixes + listing batch 2 DEPLOYED 2026-10-01 15:10 UTC**
+  (931e1351 @ 469d9ac6, #305 #307 #308 #309 #310; owner: "approve as
+  recommended and deploy together"). #305 drops 10 package ids that belong
+  to other projects (policy log 2026-10-01; the 09-30 "15 are real" line is
+  corrected). #308: exports carry `listing_class` (Q4 header verified live).
+  The owner had caught ranks 1-359 appearing twice in the Q3 CSV; the
+  Zenodo copy (DOI 10.5281/zenodo.23084548, #309) was packaged with the
+  column backfilled. #310 batch 2 from the 29 Sep section B: added trycompai/crm,
+  yetone/cumora, deeplethe/utopia, tigerless-labs/cost-xray and skills
+  img2threejs and J-Space Cognition Suite; rejected spinabot/brigade,
+  tutti-os/tutti, yc-software/qm and genspark-ai/genoffice. trailhq/Graft was
+  approved but turned out to be the already-listed NanoNets/Graft (redirect),
+  so the row moved to trailhq/Graft via previous_repos. Boot DB sync "synced
+  1737, pruned 1" (the old Graft key); score 64.8 and rank #484 carried over.
+  Gate: the 6 enter at Grade D, no top-100 moves, max |drank| 4. Verified
+  live: Q4 export header, /data-api/ DOI, policy log, board 1,708,
+  invariants []. The 6 new rows were provisional until the 16:00 batch. #302
+  and #305 data changes land per row at its next full fetch (~24 h; e.g.
+  voyager still showed npm `voyager` right after deploy). GitHub no longer
+  lists stargazers (REST 404, GraphQL empty), so the inorganic-stars check is
+  now star velocity plus the forks ratio.
 
 ## Entries recorded only in the old AGENTS.md
 
