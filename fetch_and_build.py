@@ -5617,7 +5617,7 @@ def compare_decision(a: dict, b: dict) -> dict | None:
 
 
 EXPORT_CSV_FIELDS = [
-    "rank", "display_rank", "slug", "name", "repo", "category",
+    "listing_class", "rank", "display_rank", "slug", "name", "repo", "category",
     "trust_score", "evidence_grade", "coverage_grade", "trust_confidence",
     "stars", "weekly_downloads", "license_spdx", "has_provenance",
     "scorecard_score", "signed_commits_ratio", "mcp_status",
@@ -5644,13 +5644,17 @@ def write_dataset_export(script_dir: str, rows: list[dict],
     export_dir = os.path.join(script_dir, "data", "exports")
     os.makedirs(export_dir, exist_ok=True)
 
+    # Each listing class is its own board with its own rank sequence from 1,
+    # so the class travels with the rank and boards are listed one after
+    # another (the 2026-Q3 export lacked it: ranks 1-359 appeared twice).
     records = []
-    for r in sorted(rows, key=lambda x: x.get("rank") or 9999):
+    for r in sorted(rows, key=lambda x: (LISTING_CLASSES.index(listing_class(x)), x.get("rank") or 9999)):
         mcp = r.get("mcp_server_support") or {}
         ext = r.get("external_service_dependencies") or {}
         tooling = r.get("tool_plugin_surface") or {}
         drift = r.get("package_provenance_drift") or {}
         records.append({
+            "listing_class": listing_class(r),
             "rank": r.get("rank"),
             "display_rank": r.get("display_rank") or r.get("rank"),
             "slug": r.get("slug"),
