@@ -1889,7 +1889,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "chopratejas/headroom",
+    "repo": "headroomlabs-ai/headroom",
+    "previous_repos": [
+      "chopratejas/headroom"
+    ],
     "name": "Headroom",
     "category": "LLM Gateways & Infra",
     "pypi_package": "headroom-ai",
@@ -11806,15 +11809,6 @@
     "category": "Agent Skills",
     "listing_status": "listed",
     "tracking_mode": "direct",
-    "class": "skill"
-  },
-  {
-    "repo": "headroomlabs-ai/headroom",
-    "name": "Headroomlabs Headroom",
-    "category": "Agent Skills",
-    "listing_status": "listed",
-    "tracking_mode": "direct",
-    "pypi_package": "headroom-ai",
     "class": "skill"
   },
   {

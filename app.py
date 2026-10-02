@@ -282,6 +282,8 @@ _RETIRED_REDIRECTS = {
     "/spec/runtime-trust/v0.2/": "/spec/runtime-trust/v0.3/",
     "/org/i-am-bee/": "/org/",
     "/use-cases/recently-active/": "/use-cases/",
+    # Duplicate listing merged into the original via previous_repos.
+    "/agents/headroomlabs-headroom/": "/agents/headroom/",
 }
 # Agents hard-deleted from agents.json (never in data/retired.json, which only
 # carries `legacy` rows the renderer delisted).
