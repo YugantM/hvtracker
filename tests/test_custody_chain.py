@@ -133,3 +133,16 @@ def test_provisional_rows_have_no_custody_section():
     html = _render(pending_signals=True, last_push="pending", days_ago=999)
     assert 'class="custody"' not in html
     assert "Supply Chain Trust" not in html
+
+
+def test_owasp_line_is_on_every_profile_without_redating_it():
+    html = _render()
+    custody = _custody(html)
+    assert "ASI04 Agentic Supply Chain Vulnerabilities" in custody and "/methodology/#owasp" in custody
+    assert "AST02" not in custody
+    assert "AST02 Supply Chain Compromise" in _custody(_render(listing_class="skill"))
+    # Sitewide boilerplate, not this page's evidence: it sits in a lastmod:skip
+    # region, so adding or editing it never re-dates the URL in the sitemap.
+    edited = html.replace("These are the checks for OWASP", "Reworded boilerplate")
+    assert edited != html
+    assert fab.lastmod_fingerprint(html.encode(), "") == fab.lastmod_fingerprint(edited.encode(), "")

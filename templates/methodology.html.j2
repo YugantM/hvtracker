@@ -161,6 +161,11 @@
       margin: 0;
     }
     ul.bullets li { margin-bottom: 10px; }
+    /* The verify-yourself sample has 90-character lines; scroll the block, not the page. */
+    pre { max-width: 100%; overflow-x: auto; }
+    #owasp table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 14px; display: block; overflow-x: auto; }
+    #owasp th, #owasp td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+    #owasp th { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
     ul.bullets li:last-child { margin-bottom: 0; }
 
     .changelog {
@@ -354,6 +359,21 @@
         </dl>
       </section>
 
+      <section id="owasp">
+        <h2>How HVTrust Maps To OWASP</h2>
+        <p>HVTrust measures supply-chain provenance: who ships a project and whether that has changed. In OWASP's agentic risk lists that is one risk family, not all of them. Here is what the score covers and what it leaves to other tools.</p>
+        <table>
+          <thead><tr><th>OWASP risk</th><th>What HVTrust checks</th><th>Coverage</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/" target="_blank" rel="noopener">ASI04 Agentic Supply Chain Vulnerabilities</a></td><td>Build provenance attestations, whether each package's source link points back to the repository, signed commits, the OpenSSF Scorecard checks that govern releases (code review, branch protection, signed releases, pinned dependencies, token permissions), and unfixed advisories in the release you'd install</td><td>Covered: this is what the score measures</td></tr>
+            <tr><td><a href="https://github.com/OWASP/www-project-agentic-skills-top-10" target="_blank" rel="noopener">AST02 Supply Chain Compromise</a> (skills)</td><td>The same checks, applied to skills; OWASP's listed mitigation is registry transparency and provenance tracking</td><td>Covered</td></tr>
+            <tr><td><a href="https://github.com/OWASP/www-project-agentic-skills-top-10" target="_blank" rel="noopener">AST07 Update Drift</a> (skills)</td><td>Daily snapshots flag provenance gained or lost, a package source link that stops pointing at the repository, and license or Scorecard changes, on each profile's chain of custody</td><td>Partly: no hash check of the copy you installed, so pin versions as well</td></tr>
+            <tr><td>AST01 Malicious Skills</td><td>Publisher and provenance signals only (a new publisher, no attestation, a package that names another repository)</td><td>Partly: no scan of what the skill tells the agent to do</td></tr>
+            <tr><td>ASI01 Agent Goal Hijack, ASI02 Tool Misuse, ASI05 Unexpected Code Execution, ASI06 Memory &amp; Context Poisoning</td><td>Nothing: these depend on what the code and tool descriptions say and how they behave at runtime</td><td>Not covered: use a content scanner and least-privilege credentials</td></tr>
+          </tbody>
+        </table>
+      </section>
+
       <section id="runtime-calibration">
         <h2>Runtime-Trust Calibration</h2>
         <p>Runtime-trust fields answer a different question from supply-chain trust: what can this agent reach, depend on, or expose when it runs? As of {{ methodology_version }}, these fields contribute a <strong>bounded adjustment on top of the base score</strong> — they are part of the production HVTrust rank, not a separate preview. Each field's evidence is public on the agent's profile page, and the full detection rules are specified in <a href="/spec/runtime-trust/v0.3/">the runtime-trust spec</a>.</p>
@@ -440,6 +460,16 @@ print("verified:", cred["subject"]["repo"], "=", cred["trust_score"])</code></pr
           <li><strong>AI-agent surface signals are static.</strong> MCP, provider, tool, and drift fields are inferred from public docs/manifests and can miss hidden integrations or private deployment details.</li>
           <li><strong>No qualitative review yet.</strong> HVTracker does not currently score documentation quality, API stability, model/provider compatibility, benchmark performance, or real-world adoption.</li>
           <li><strong>No formal SLSA level.</strong> HVTracker displays observable provenance and Scorecard signals but does not claim an authoritative SLSA build level.</li>
+        </ul>
+      </section>
+
+      <section id="independence">
+        <h2>Independence</h2>
+        <ul class="bullets">
+          <li><strong>Scores aren't for sale.</strong> No payment buys a score, grade, rank or listing, and none changes on request: only public evidence moves a number (see <a href="#corrections">corrections</a>).</li>
+          <li><strong>The data is open.</strong> Every score and the signals behind it are public under CC BY 4.0: per-project JSON, the <a href="/data-api/">API</a>, and quarterly exports archived with a DOI (<a href="https://doi.org/10.5281/zenodo.23084547">10.5281/zenodo.23084547</a>).</li>
+          <li><strong>The method is versioned and public.</strong> This page is methodology {{ methodology_version }}; every rule change is logged below with the evidence check it shipped with, and the code that computes each score is <a href="https://github.com/YugantM/hvtracker" target="_blank" rel="noopener">on GitHub</a>.</li>
+          <li><strong>Every score is verifiable.</strong> Each one is issued as a signed credential you can <a href="#verify-yourself">check offline</a>, so a number can't be quietly changed after the fact.</li>
         </ul>
       </section>
 
