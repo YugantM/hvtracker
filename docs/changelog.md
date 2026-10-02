@@ -932,6 +932,21 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   CORS + OPTIONS 204; single-server lookups with encoded names; /registry/
   guide linked from /data-api/ and the sitemap; usage channel "registry"
   counting (baseline: 7, all from the deploy checks); invariants [].
+- **hv_marketing sessions' batch DEPLOYED 2026-10-02 08:31 UTC** (a1ce580e @
+  935ecbfb, #314-#317; owner: "deploy"). Opened by the hv_marketing sessions
+  ("GitHub issue #711", "Pages not indexed in Google Analytics"), reviewed and
+  merged in this session after confirming neither session was running; the
+  combined main passed every gate. #314: sitemap lastmod fingerprint masks
+  numbers and rank-driven regions (fp v2; the first render keeps stored
+  dates, so 2,087 URLs still read 2026-10-02 from the morning's old-fingerprint
+  refreshes; check on 3 Oct that only changed pages move). #315: no /data/
+  JSON in the sitemap (0 of 2,137). #316: listing batches paused until the
+  batch 1-2 pages are indexed. #317: the duplicate Headroom listing is merged
+  (row moved to headroomlabs-ai/headroom via previous_repos; the skill
+  duplicate is gone; /agents/headroomlabs-headroom/ 301s; Headroom stays 74.0,
+  #247). predeploy_check flagged 1736 < 1737: that is the intended merge.
+  Every live board row is still covered by the roster (current or previous
+  name), and boot "synced 1736, pruned 1". Invariants [].
 
 ## Entries recorded only in the old AGENTS.md
 
