@@ -24,13 +24,16 @@ Milestone history lives in `docs/changelog.md` — record new milestones there.
 
 ## Gates — every PR, all green
 ```
-python -m pytest && python fetch_and_build.py --render-only && python tests/validate_html.py
+./scripts/gates.sh
 ```
-- CI runs pytest, `ruff check .`, compileall, pip-audit, shellcheck on PRs;
-  the render + validate_html smoke runs only on `main` — run it locally for
-  generator/template changes.
-- `--render-only` churns tracked artifacts; restore before committing:
-  `git checkout -- data/render_state.json og-v2.png`
+- Runs ruff → pytest → `--render-only` → `validate_html.py` with the `.venv`
+  interpreter (bare `python` isn't on PATH; system `python3` lacks the deps),
+  then restores the artifacts the render churns (`data/render_state.json`,
+  `og-v2.png`, `scorecard-cache.json`) unless they were already dirty.
+- CI runs the same on every PR (the render smoke too, unless MCP-only), plus
+  compileall, pip-audit and shellcheck.
+- A local render reports a board-churn invariant violation by design; check
+  production's `/data/build_report.json`, not the local one.
 - Tests need no Postgres (`db.py` falls back to `agents.json`); conftest sets
   `HVT_BOOT_REFRESH=0` so app startup never spawns real refreshes under pytest.
 - `tests/test_predeploy_check.py` fails the PR if a runtime module or
