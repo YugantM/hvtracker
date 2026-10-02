@@ -89,6 +89,14 @@ python -m pytest && python fetch_and_build.py --render-only && python tests/vali
   the gates before calling anything done.
 
 ## Now / next
+- **Listing batches PAUSED (2026-10-02, owner).** Google recrawls only ~27
+  sitemap URLs/day. A URL Inspection sweep on 2026-10-01 found 143 of 1,893
+  sitemap URLs never crawled ("URL is unknown" / "Discovered – currently not
+  indexed"), 22 of them from listing batches 1–2 (#296, #310); new rows only
+  lengthen that queue. Resume when the batch 1–2 agent pages show as indexed
+  in GSC URL Inspection and under ~2% of sitemap URLs are uncrawled (sweep:
+  ~/hv_marketing/data/indexing-2026-10-01/inspect_bulk.py). Roster removals
+  and fixes are not paused.
 - Active plan (phases, decisions, UI mockups):
   https://claude.ai/artifact/KfF5N95t1Y114J1nABMjfe — Phases 0–3 deployed
   (Phase 3: 2026-09-24). Open owner items and check dates: docs/changelog.md
