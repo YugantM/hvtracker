@@ -793,7 +793,10 @@
     {% set custody_events = events | selectattr("type", "in", custody_types) | list %}
     <section class="custody" id="chain-of-custody" aria-labelledby="custody-title">
       <h2 class="section-title" id="custody-title">Chain of custody</h2>
-      <p class="custody-lede">Scanners check what the code says. This traces who ships {{ row.name }} and whether that has changed: from the source repository, through how changes are reviewed and released, to the {% if pkgs %}package you install{% else %}code you run{% endif %}.</p>
+      <p class="custody-lede">Scanners check what the code says. This traces who ships {{ row.name }} and whether that has changed: from the source repository, through how changes are reviewed and released, to the {% if pkgs %}package you install{% else %}code you run{% endif %}.
+      {# lastmod:skip — the same sentence on every profile; adding it is not a
+         change to this page's own evidence, so it mustn't re-date 1,700 URLs #}
+      <!--lastmod:skip-->These are the checks for OWASP <a href="/methodology/#owasp">ASI04 Agentic Supply Chain Vulnerabilities</a>{% if row.listing_class == "skill" %} and, for skills, AST02 Supply Chain Compromise{% endif %}.<!--/lastmod:skip--></p>
       <ol class="cchain">
         {% set st = "na" if sig is none else ("ok" if sig >= 80 else ("part" if sig >= 20 else "gap")) %}
         <li class="cstep">
