@@ -918,6 +918,20 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   voyager still showed npm `voyager` right after deploy). GitHub no longer
   lists stargazers (REST 404, GraphQL empty), so the inorganic-stars check is
   now star velocity plus the forks ratio.
+- **Phase 9 MCP registry feed DEPLOYED 2026-10-02 07:15 UTC** (48d7a373 @
+  ca469be5, #312; owner: "deploy"). A v0.1 subregistry of the official MCP
+  registry at /registry/{all,grade-a,grade-b,grade-c}, with HVTrust under
+  server._meta["net.hvtracker/trust"]. It works as a GitHub Copilot "MCP Registry URL"
+  (Copilot appends /v0.1/ and needs the CORS headers sent). Graded lists
+  admit an entry only when its publisher is tied to the repo
+  (io.github.<owner> = repo owner, or a domain namespace on the repo homepage
+  or the owner's GitHub profile website), so republishes such as
+  ai.smithery/* can't inherit a repo's grade. registry-snapshot.yml (daily
+  03:23 UTC) puts mcp-registry-snapshot.json on `data`; the app pulled it at
+  boot ("961 entries"). Verified live: A 81, A/B 299, A-C 700, all 958;
+  CORS + OPTIONS 204; single-server lookups with encoded names; /registry/
+  guide linked from /data-api/ and the sitemap; usage channel "registry"
+  counting (baseline: 7, all from the deploy checks); invariants [].
 
 ## Entries recorded only in the old AGENTS.md
 
