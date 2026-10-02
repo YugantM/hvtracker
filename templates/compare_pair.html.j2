@@ -180,9 +180,9 @@
         <p class="dv-meta">{{ r.repo }} · #{{ r.rank }} overall{% if r.category_rank %} · #{{ r.category_rank }} {{ category.name }}{% endif %}{% if r.coverage_grade %} · coverage {{ r.coverage_grade }} ({{ r.signal_types }}/5){% endif %}</p>
         {% if s.choose_if %}
         <p class="dv-choose">{{ s.choose_if }}</p>
-        <ul class="dv-points">
+        <!--lastmod:skip--><ul class="dv-points">
           {% for p in s.points %}<li><span class="dv-delta">{{ p.delta }}</span><span>{{ p.text }}</span></li>{% endfor %}
-        </ul>
+        </ul><!--/lastmod:skip-->
         {% else %}
         <p class="dv-choose is-none">{{ r.name }} doesn't lead on any scored dimension in this pair.</p>
         {% endif %}
@@ -221,6 +221,9 @@
     </div>
     {% endif %}
 
+    {# lastmod:skip — the evidence table restates the cards above row by row, and
+       its per-row "lead" flips daily on recency (lastmod_fingerprint) #}
+    <!--lastmod:skip-->
     <table class="cmp">
       <thead>
         <tr>
@@ -263,6 +266,7 @@
         {% endfor %}
       </tbody>
     </table>
+    <!--/lastmod:skip-->
 
     <div class="cmp-actions">
       <a class="primary" href="/compare/?a={{ a.slug }},{{ b.slug }}">Open in the live compare tool &rarr;</a>

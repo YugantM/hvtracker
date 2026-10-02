@@ -2631,6 +2631,30 @@ def select_indexed_skills(prior, rows: list[dict], size: int = SKILL_INDEX_COHOR
     return {r["slug"] for r in ranked[:size]}
 
 
+# Sitemap <lastmod> fingerprint. Bump LASTMOD_FP_VERSION whenever the
+# normalization below changes, so stored hashes are re-keyed without
+# re-stamping every URL (see _sitemap_lastmod).
+LASTMOD_FP_VERSION = 2
+LASTMOD_SKIP_RE = re.compile(rb"<!--lastmod:skip-->.*?<!--/lastmod:skip-->", re.S)
+_LASTMOD_NUMBER_RE = re.compile(rb"\d+(?:[.,]\d+)*")
+
+
+def lastmod_fingerprint(content: bytes, now_str: str) -> str:
+    """Hash of a rendered page that ignores what a daily data refresh changes.
+
+    Every refresh moves stars, downloads, scores, ranks and "N days ago" on
+    every data-driven page, so hashing raw output re-stamped 2,093 of 2,140
+    sitemap URLs each day and taught Google to ignore lastmod (GSC sweep
+    2026-10-01). Numbers are masked, and rank-driven regions the templates
+    wrap in <!--lastmod:skip--> are dropped. Text changes still count: a grade
+    letter, a robots tag, a verdict, a new section.
+    """
+    content = content.replace(now_str.encode("utf-8"), b"")
+    content = LASTMOD_SKIP_RE.sub(b"", content)
+    content = _LASTMOD_NUMBER_RE.sub(b"#", content)
+    return hashlib.sha256(content).hexdigest()
+
+
 def apply_listing_classes(rows: list[dict], agents: list[dict]) -> None:
     """Re-apply each row's listing class from the roster, in place.
 
@@ -9507,11 +9531,11 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
 
     # sitemap.xml — written last so every listed page already exists on disk.
     # Honest per-URL <lastmod>: fingerprint each page's rendered output
-    # (normalized to drop the per-render "updated" timestamp) and only advance
-    # the date when content actually changed. Stamping every URL "today" on
-    # every render taught Google to ignore lastmod entirely (GSC cleanup).
+    # (lastmod_fingerprint drops the timestamp, numbers and rank-driven
+    # regions) and only advance the date when content actually changed.
+    # Stamping every URL "today" on every render taught Google to ignore
+    # lastmod entirely (GSC cleanup).
     _lastmod_state = seo_state.setdefault("sitemap_lastmod", {})
-    _now_str_bytes = now_str.encode("utf-8")
 
     def _sitemap_lastmod(_loc):
         _path = _loc[len("https://hvtracker.net"):] or "/"
@@ -9524,10 +9548,14 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
                 _content = _f.read()
         except OSError:
             return _prev["date"] if isinstance(_prev, dict) and "date" in _prev else today_iso
-        _h = hashlib.sha256(_content.replace(_now_str_bytes, b"")).hexdigest()
+        _h = lastmod_fingerprint(_content, now_str)
         if isinstance(_prev, dict) and _prev.get("hash") == _h:
             return _prev["date"]
-        _lastmod_state[_loc] = {"hash": _h, "date": today_iso}
+        if isinstance(_prev, dict) and "date" in _prev and _prev.get("fp") != LASTMOD_FP_VERSION:
+            # The fingerprint changed, not the page: re-key, keep the date.
+            _lastmod_state[_loc] = {"hash": _h, "date": _prev["date"], "fp": LASTMOD_FP_VERSION}
+            return _prev["date"]
+        _lastmod_state[_loc] = {"hash": _h, "date": today_iso, "fp": LASTMOD_FP_VERSION}
         return today_iso
 
     sitemap_lines = ['<?xml version="1.0" encoding="UTF-8"?>',

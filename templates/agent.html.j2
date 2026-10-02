@@ -914,6 +914,8 @@
        answered before the click. This agent sits in the list at its own rank. #}
     {% set nb = related | list %}
     {% if row.category_rank and not pend %}{% set nb = (nb + [row]) | sort(attribute="category_rank") %}{% endif %}
+    {# lastmod:skip — rank-driven list; reorders on every refresh (lastmod_fingerprint) #}
+    <!--lastmod:skip-->
     <section class="neighbours">
       <h2 class="section-title">How {{ row.name }} compares in <a href="/categories/{{ row.category_slug }}/" style="color:inherit">{{ row.category }}</a></h2>
       <ol class="nb-list">
@@ -932,6 +934,7 @@
       </ol>
       <p class="nb-note">Bars show each HVTrust score; the tick marks {{ row.name }}&rsquo;s {{ row.trust_score }}.</p>
     </section>
+    <!--/lastmod:skip-->
     {% endif %}
 
     {% if row.trust_breakdown is defined %}
@@ -1558,6 +1561,7 @@
     </details>
 
     {% if row.siblings %}
+    <!--lastmod:skip-->
     <section class="siblings">
       <h2 class="section-title">Other agents in {{ row.category }}</h2>
       <ul>
@@ -1572,6 +1576,7 @@
         {% endfor %}
       </ul>
     </section>
+    <!--/lastmod:skip-->
     {% endif %}
 
     <section class="terminal-note" style="padding:18px 20px;font-size:12px;color:var(--muted);line-height:1.7;">
