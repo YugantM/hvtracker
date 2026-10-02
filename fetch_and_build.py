@@ -3301,6 +3301,25 @@ def apply_repo_renames(rows: list[dict], renames: dict[str, str] | None = None) 
     return changed
 
 
+def scorecard_cache_entry(cache: dict, repo: str, cache_by_lower: dict) -> dict | None:
+    """The cached OSSF scan for `repo`, else the one under a previous name.
+
+    Scans are keyed by roster name, so right after a rename the new name has
+    none until the hourly scanner reaches it. Falling back to the same repo's
+    scan under its old name keeps the full fetch from setting the score to
+    None (the public API has no result for most of these repos), which would
+    strip the listing's Scorecard for a day. `cache_by_lower` is the cache
+    keyed by lowercased repo.
+    """
+    hit = cache.get(repo)
+    if hit:
+        return hit
+    for old, new in REPO_RENAMES.items():
+        if new.lower() == repo.lower() and old in cache_by_lower:
+            return cache_by_lower[old]
+    return None
+
+
 def carry_scorecards_over_renames(cache: dict, renames: dict[str, str] | None = None) -> int:
     """Replace a merged duplicate's older OSSF scan with the listing's own.
 
@@ -7657,9 +7676,10 @@ def main() -> None:
         cache_hits = 0
         api_hits = 0
         stale_threshold = datetime.now(timezone.utc) - timedelta(hours=48)
+        cache_by_lower = {k.lower(): v for k, v in scorecard_cache.items()}
         for row in rows:
             repo_key = row["repo"]
-            cached = scorecard_cache.get(repo_key)
+            cached = scorecard_cache_entry(scorecard_cache, repo_key, cache_by_lower)
             cache_is_fresh = False
             if cached:
                 try:

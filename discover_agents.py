@@ -352,15 +352,35 @@ def passes_eligibility(repo: dict) -> bool:
     return True
 
 
-def load_existing_repos() -> set[str]:
-    """Return set of lowercase repo paths already in agents.json."""
+LIVE_BOARD_URL = "https://hvtracker.net/data.json"
+
+
+def load_existing_repos(live_board_url: str = LIVE_BOARD_URL) -> set[str]:
+    """Lowercase repo paths already tracked, under every name they go by.
+
+    Search returns a repo under its current GitHub name, so matching roster
+    keys alone re-proposed renamed repos as new listings: NanoNets/Graft,
+    chopratejas/headroom, imartinez/privateGPT and nowork-studio/NotFair were
+    each listed twice. This also counts each roster row's previous_repos and
+    the current name the live board resolved for it (its `url`), which covers
+    a rename the roster hasn't recorded yet."""
+    existing: set[str] = set()
     try:
         with open("agents.json") as f:
             agents = json.load(f)
-        return {a["repo"].lower() for a in agents}
+        existing |= {name.lower() for a in agents for name in [a["repo"], *(a.get("previous_repos") or [])]}
     except Exception as e:
         print(f"WARN: could not load agents.json: {e}")
-        return set()
+    try:
+        resp = requests.get(live_board_url, headers={"User-Agent": "Mozilla/5.0 (hvtracker-discovery)"},
+                            timeout=60)
+        resp.raise_for_status()
+        rows = resp.json()["agents"]
+        existing |= {r["url"].lower().rstrip("/").removeprefix("https://github.com/")
+                     for r in rows if (r.get("url") or "").lower().startswith("https://github.com/")}
+    except Exception as e:
+        print(f"WARN: could not read the live board ({e}); matching roster names only")
+    return existing
 
 
 def main() -> None:

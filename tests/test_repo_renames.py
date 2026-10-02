@@ -117,3 +117,37 @@ def test_a_plain_rename_gets_no_scan_from_its_previous_name(renames):
     cache = {"CachePlane/Angular-Agent-Framework": {"score": 7.8, "scanned_at": "2026-09-22T15:24:31Z"}}
     assert fab.carry_scorecards_over_renames(cache) == 0
     assert NEW not in cache
+
+
+def test_a_renamed_row_falls_back_to_the_scan_under_its_old_name(renames):
+    scan = {"score": 7.8, "scanned_at": "2026-09-22T10:00:00Z"}
+    cache = {"CachePlane/Angular-Agent-Framework": scan}
+    by_lower = {k.lower(): v for k, v in cache.items()}
+    assert fab.scorecard_cache_entry(cache, NEW, by_lower) is scan
+    own = {"score": 8.2, "scanned_at": "2026-10-02T10:00:00Z"}
+    cache[NEW] = own  # once the scanner reaches the new name, that scan wins
+    assert fab.scorecard_cache_entry(cache, NEW, by_lower) is own
+    assert fab.scorecard_cache_entry(cache, "o/other", by_lower) is None
+
+
+def test_discovery_knows_a_repo_under_every_name(tmp_path, monkeypatch):
+    import discover_agents
+
+    class Board:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"agents": [{"repo": "o/old-name", "url": "https://github.com/New-Owner/New-Name"}]}
+
+    (tmp_path / "agents.json").write_text(json.dumps(
+        [{"repo": NEW, "previous_repos": [OLD]}, {"repo": "o/old-name"}]))
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(discover_agents.requests, "get", lambda *a, **k: Board())
+    known = discover_agents.load_existing_repos()
+    assert {NEW, OLD, "o/old-name", "new-owner/new-name"} <= known
+
+    def down(*a, **k):
+        raise OSError("offline")
+    monkeypatch.setattr(discover_agents.requests, "get", down)
+    assert {NEW, OLD, "o/old-name"} <= discover_agents.load_existing_repos()
