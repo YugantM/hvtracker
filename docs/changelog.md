@@ -947,6 +947,20 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   #247). predeploy_check flagged 1736 < 1737: that is the intended merge.
   Every live board row is still covered by the roster (current or previous
   name), and boot "synced 1736, pruned 1". Invariants [].
+- **Roster rename sweep DEPLOYED 2026-10-02 10:49 UTC** (4bb85793 @ 7ba777cc,
+  #320; owner: "deploy"). 47 listings moved to their current GitHub names via
+  previous_repos (google/A2A -> a2aproject/A2A, LibreChat -> LibreChat-AI, ...);
+  2 duplicates merged: privategpt absorbs zylon-ai-privategpt, notfair absorbs
+  notfair-plugin, both 301. Discovery's duplicate check now matches previous
+  names and live-board urls; a renamed row falls back to its old name's
+  Scorecard scan instead of None. Gate: 0 score changes, max |drank| 1, no
+  top-100 moves. predeploy_check flagged 1734 < 1736 (the intended merges;
+  every live row still covered). Boot: "synced 1734, pruned 47" (47, not the
+  49 predicted: the originals moved onto the duplicates' names, so those keys
+  stayed). Verified: board 1,705, 0 stale repo keys, PrivateGPT #671 and
+  NotFair #204 as gated, Scorecards kept, 0 provisional rows, invariants [].
+  Registry snapshot re-run after deploy: 981 entries (from 961), now that
+  renamed repos match their registry entries.
 
 ## Entries recorded only in the old AGENTS.md
 
