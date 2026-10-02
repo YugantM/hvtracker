@@ -3274,9 +3274,17 @@ def repo_renames(agents: list[dict]) -> dict[str, str]:
 
 
 def apply_repo_renames(rows: list[dict], renames: dict[str, str] | None = None) -> int:
-    """Point rows that still carry a previous repo name at the current one."""
+    """Point rows that still carry a previous repo name at the current one.
+
+    A row already under the current name beside one carried over from a
+    previous name is a duplicate listing of the same repo (it was listed twice
+    before the merge, e.g. Headroom as chopratejas/headroom and
+    headroomlabs-ai/headroom): it is dropped from `rows` in place, so the
+    carried-over row keeps the listing's history.
+    """
     renames = REPO_RENAMES if renames is None else renames
     changed = 0
+    carried: set[int] = set()
     for r in rows:
         new = renames.get((r.get("repo") or "").lower())
         if new and r.get("repo") != new:
@@ -3284,8 +3292,34 @@ def apply_repo_renames(rows: list[dict], renames: dict[str, str] | None = None) 
             r["repo"] = new
             if r.get("url") == f"https://github.com/{old}":
                 r["url"] = f"https://github.com/{new}"
+            carried.add(id(r))
             changed += 1
+    if carried:
+        targets = {r["repo"].lower() for r in rows if id(r) in carried}
+        rows[:] = [r for r in rows
+                   if id(r) in carried or (r.get("repo") or "").lower() not in targets]
     return changed
+
+
+def carry_scorecards_over_renames(cache: dict, renames: dict[str, str] | None = None) -> int:
+    """Replace a merged duplicate's older OSSF scan with the listing's own.
+
+    The scanner keys scans by roster name, so a repo listed twice (under a
+    previous name and its current one) has a scan under each, and after the
+    merge the one under the current name is the duplicate's, possibly older.
+    A current name with no scan is left alone: cache hits overwrite a row's
+    value regardless of age, and those rows hold a fresher API score.
+    """
+    renames = REPO_RENAMES if renames is None else renames
+    by_lower = {k.lower(): k for k in cache}
+    carried = 0
+    for old, new in renames.items():
+        scan = cache.get(by_lower.get(old, ""))
+        current = cache.get(new)
+        if scan and current and (scan.get("scanned_at") or "") > (current.get("scanned_at") or ""):
+            cache[new] = scan
+            carried += 1
+    return carried
 
 
 def _load_snapshot(path: str) -> dict:
@@ -3682,15 +3716,22 @@ def _series_day(date: str, entry: dict, memo: dict) -> dict:
         col = cols[field]
         for i in idxs:
             col[i] = _SERIES_MISSING
+    keep = range(n)
     if REPO_RENAMES:
         repos = cols["repo"]
+        carried: set[int] = set()
         for i, repo in enumerate(repos):
             if isinstance(repo, str):
                 new = REPO_RENAMES.get(repo.lower())
                 if new and new != repo:
                     repos[i] = new
+                    carried.add(i)
+        if carried:  # drop duplicate listings, as apply_repo_renames does
+            targets = {repos[i].lower() for i in carried}
+            keep = [i for i in range(n) if i in carried
+                    or not (isinstance(repos[i], str) and repos[i].lower() in targets)]
     day = {"_date": date, "methodology_version": entry["methodology_version"],
-           "agents": [_HistoryRow(cols, i) for i in range(n)]}
+           "agents": [_HistoryRow(cols, i) for i in keep]}
     if entry["graph_providers"]:
         day["graph_summary"] = {"providers": entry["graph_providers"]}
     return day
@@ -7224,6 +7265,7 @@ def main() -> None:
     agents = deduped
     REPO_RENAMES.clear()
     REPO_RENAMES.update(repo_renames(agents))
+    carry_scorecards_over_renames(scorecard_cache)
 
     # Split active vs legacy agents — legacy entries are fetched but rendered separately
     legacy_agents = [

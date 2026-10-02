@@ -1032,9 +1032,14 @@ def _get_history_index() -> dict:
         if _snapshot_is_degraded(snap):
             continue
         mv = snap.get("methodology_version")
-        for a in snap.get("agents", []):
+        agents = snap.get("agents", [])
+        # A row already under the current name beside one under a previous
+        # name is a duplicate listing that the rename merged: skip it.
+        merged = {renames[k] for k in ((a.get("repo") or "").lower() for a in agents)
+                  if k in renames}
+        for a in agents:
             repo_key = (a.get("repo") or "").lower()
-            if not repo_key:
+            if not repo_key or repo_key in merged:
                 continue
             repo_key = renames.get(repo_key, repo_key)
             point = {"date": date_str}
