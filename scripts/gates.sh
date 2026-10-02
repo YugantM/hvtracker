@@ -13,10 +13,15 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+# A worktree has no .venv of its own; the main checkout's is one level above
+# the shared .git directory.
+main_venv="$(cd "$(git rev-parse --git-common-dir)/.." && pwd)/.venv/bin/python"
 if [ -n "${VIRTUAL_ENV:-}" ] && [ -x "$VIRTUAL_ENV/bin/python" ]; then
   PY="$VIRTUAL_ENV/bin/python"
 elif [ -x .venv/bin/python ]; then
   PY=.venv/bin/python
+elif [ -x "$main_venv" ]; then
+  PY="$main_venv"
 else
   PY=python3
 fi
