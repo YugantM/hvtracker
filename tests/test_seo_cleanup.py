@@ -238,9 +238,11 @@ def test_retired_section_redirects(client):
     r = client.get("/org/i-am-bee/", follow_redirects=False)
     assert r.status_code == 301
     assert r.headers["location"] == "/org/"
-    r = client.get("/agents/headroomlabs-headroom/", follow_redirects=False)
-    assert r.status_code == 301
-    assert r.headers["location"] == "/agents/headroom/"
+    for dup, original in (("headroomlabs-headroom", "headroom"), ("zylon-ai-privategpt", "privategpt"),
+                          ("notfair-plugin", "notfair")):
+        r = client.get(f"/agents/{dup}/", follow_redirects=False)
+        assert r.status_code == 301
+        assert r.headers["location"] == f"/agents/{original}/"
 
 
 def test_double_slash_collapses_to_canonical(site, client):

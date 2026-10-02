@@ -790,7 +790,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "firebase/genkit",
+    "repo": "genkit-ai/genkit",
+    "previous_repos": [
+      "firebase/genkit"
+    ],
     "name": "Google Genkit",
     "category": "Agent Frameworks",
     "hn_search_term": "genkit",
@@ -826,7 +829,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "BrainBlend-AI/atomic-agents",
+    "repo": "Eigenwise/atomic-agents",
+    "previous_repos": [
+      "BrainBlend-AI/atomic-agents"
+    ],
     "name": "Atomic Agents",
     "category": "Agent Frameworks",
     "hn_search_term": "atomic-agents",
@@ -853,7 +859,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "dagworks-inc/burr",
+    "repo": "apache/burr",
+    "previous_repos": [
+      "dagworks-inc/burr"
+    ],
     "name": "Burr",
     "category": "Agent Frameworks",
     "hn_search_term": "dagworks burr",
@@ -862,7 +871,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "PrefectHQ/ControlFlow",
+    "repo": "prefect-archive/ControlFlow",
+    "previous_repos": [
+      "PrefectHQ/ControlFlow"
+    ],
     "name": "ControlFlow",
     "category": "Agent Frameworks",
     "hn_search_term": "controlflow prefect",
@@ -1095,7 +1107,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "homanp/superagent",
+    "repo": "superagent-ai/superagent",
+    "previous_repos": [
+      "homanp/superagent"
+    ],
     "name": "Superagent",
     "category": "Workflow Platforms",
     "hn_search_term": "superagent homanp",
@@ -1153,7 +1168,10 @@
     "npm_package": "open-webui"
   },
   {
-    "repo": "danny-avila/LibreChat",
+    "repo": "LibreChat-AI/LibreChat",
+    "previous_repos": [
+      "danny-avila/LibreChat"
+    ],
     "name": "LibreChat",
     "category": "UI & App Builders",
     "hn_search_term": "librechat",
@@ -1162,7 +1180,10 @@
     "docker_image": "librechat/librechat"
   },
   {
-    "repo": "QuivrHQ/quivr",
+    "repo": "The-Vibe-Company/quivr",
+    "previous_repos": [
+      "QuivrHQ/quivr"
+    ],
     "name": "Quivr",
     "category": "Memory & Knowledge",
     "hn_search_term": "quivr",
@@ -1171,7 +1192,10 @@
     "pypi_package": "quivr-core"
   },
   {
-    "repo": "imartinez/privateGPT",
+    "repo": "zylon-ai/private-gpt",
+    "previous_repos": [
+      "imartinez/privateGPT"
+    ],
     "name": "PrivateGPT",
     "category": "Memory & Knowledge",
     "hn_search_term": "privategpt",
@@ -1307,7 +1331,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "explodinggradients/ragas",
+    "repo": "vibrantlabsai/ragas",
+    "previous_repos": [
+      "explodinggradients/ragas"
+    ],
     "name": "Ragas",
     "category": "Observability & Evaluation",
     "hn_search_term": "ragas",
@@ -1372,7 +1399,10 @@
     "npm_package": "@langwatch/server"
   },
   {
-    "repo": "NVIDIA/NeMo-Guardrails",
+    "repo": "NVIDIA-NeMo/Guardrails",
+    "previous_repos": [
+      "NVIDIA/NeMo-Guardrails"
+    ],
     "name": "NeMo Guardrails",
     "category": "Security & Guardrails",
     "hn_search_term": "nemo guardrails",
@@ -1389,7 +1419,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "leondz/garak",
+    "repo": "NVIDIA/garak",
+    "previous_repos": [
+      "leondz/garak"
+    ],
     "name": "Garak",
     "category": "Security & Guardrails",
     "hn_search_term": "garak llm",
@@ -1433,7 +1466,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "google/A2A",
+    "repo": "a2aproject/A2A",
+    "previous_repos": [
+      "google/A2A"
+    ],
     "display_repo": "a2aproject/A2A",
     "name": "A2A / Agent2Agent Protocol",
     "category": "Protocols & Tool Integration",
@@ -1733,7 +1769,10 @@
     "npm_package": "nocobase"
   },
   {
-    "repo": "pewdiepie-archdaemon/odysseus",
+    "repo": "odysseus-dev/odysseus",
+    "previous_repos": [
+      "pewdiepie-archdaemon/odysseus"
+    ],
     "name": "Odysseus",
     "category": "UI & App Builders",
     "hn_search_term": "odysseus",
@@ -2651,7 +2690,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "OpenBB-finance/OpenBB",
+    "repo": "openbq-org/OpenBB",
+    "previous_repos": [
+      "OpenBB-finance/OpenBB"
+    ],
     "name": "OpenBB",
     "category": "Research & Data",
     "listing_status": "listed",
@@ -2798,7 +2840,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "unicity-astrid/astrid",
+    "repo": "astrid-runtime/astrid",
+    "previous_repos": [
+      "unicity-astrid/astrid"
+    ],
     "name": "Astrid",
     "category": "Agent Frameworks",
     "listing_status": "listed",
@@ -2819,7 +2864,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "cacheplane/dawnai",
+    "repo": "cacheplane/b4run",
+    "previous_repos": [
+      "cacheplane/dawnai"
+    ],
     "name": "DawnAI",
     "category": "Agent Frameworks",
     "npm_package": "@dawn-ai/cli",
@@ -2917,7 +2965,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "ahujasid/blender-mcp",
+    "repo": "ahujasid/mcp-for-blender",
+    "previous_repos": [
+      "ahujasid/blender-mcp"
+    ],
     "name": "Blender MCP",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -3009,7 +3060,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "getsentry/sentry-mcp",
+    "repo": "getsentry/toolkit",
+    "previous_repos": [
+      "getsentry/sentry-mcp"
+    ],
     "name": "Sentry MCP",
     "category": "MCP Servers",
     "npm_package": "@sentry/mcp-server",
@@ -3275,7 +3329,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "getsentry/XcodeBuildMCP",
+    "repo": "getsentry/MobileBuildMCP",
+    "previous_repos": [
+      "getsentry/XcodeBuildMCP"
+    ],
     "name": "XcodeBuildMCP",
     "category": "MCP Servers",
     "npm_package": "xcodebuildmcp",
@@ -3775,7 +3832,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "GCWing/BitFun",
+    "repo": "GCWing/OpenBitFun",
+    "previous_repos": [
+      "GCWing/BitFun"
+    ],
     "name": "BitFun",
     "category": "Agent Frameworks",
     "listing_status": "listed",
@@ -4132,7 +4192,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "Dryxio/auto-re-agent",
+    "repo": "Dryxio/reagent",
+    "previous_repos": [
+      "Dryxio/auto-re-agent"
+    ],
     "name": "auto-re-agent",
     "category": "Security & Guardrails",
     "listing_status": "listed",
@@ -4400,7 +4463,10 @@
     "npm_package": "mcp-searxng"
   },
   {
-    "repo": "SylphxAI/pdf-reader-mcp",
+    "repo": "SylphxAI/anymd",
+    "previous_repos": [
+      "SylphxAI/pdf-reader-mcp"
+    ],
     "name": "PDF Reader MCP",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -5076,7 +5142,10 @@
     "npm_package": "cesium-mcp-dev"
   },
   {
-    "repo": "king-of-the-grackles/reddit-research-mcp",
+    "repo": "dialog-tools/reddit-research-mcp",
+    "previous_repos": [
+      "king-of-the-grackles/reddit-research-mcp"
+    ],
     "name": "Reddit Research MCP",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -5300,7 +5369,10 @@
     "pypi_package": "keboola-mcp-server"
   },
   {
-    "repo": "DIDA-AI/Dida-RollingGo-Hotel-MCP-Global",
+    "repo": "DIDA-AI/Dida-Hotel-MCP-Global",
+    "previous_repos": [
+      "DIDA-AI/Dida-RollingGo-Hotel-MCP-Global"
+    ],
     "name": "Dida RollingGo Hotel MCP Global",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -5720,7 +5792,10 @@
     "npm_package": "mcp-abap-abap-adt-api"
   },
   {
-    "repo": "wyre-technology/autotask-mcp",
+    "repo": "WYRE-AI/autotask-mcp",
+    "previous_repos": [
+      "wyre-technology/autotask-mcp"
+    ],
     "name": "Autotask",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -6571,7 +6646,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "PSU3D0/spreadsheet-mcp",
+    "repo": "PSU3D0/agent-spreadsheet",
+    "previous_repos": [
+      "PSU3D0/spreadsheet-mcp"
+    ],
     "name": "spreadsheet-kit MCP",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -6941,7 +7019,10 @@
     "npm_package": "@arikusi/deepseek-mcp-server"
   },
   {
-    "repo": "wyre-technology/ninjaone-mcp",
+    "repo": "WYRE-AI/ninjaone-mcp",
+    "previous_repos": [
+      "wyre-technology/ninjaone-mcp"
+    ],
     "name": "NinjaOne",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -6982,7 +7063,10 @@
     "npm_package": "@mnemoverse/mcp-memory-server"
   },
   {
-    "repo": "n24q02m/wet-mcp",
+    "repo": "n24q02m/wet",
+    "previous_repos": [
+      "n24q02m/wet-mcp"
+    ],
     "name": "Wet MCP",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -7062,7 +7146,10 @@
     "tracking_mode": "direct"
   },
   {
-    "repo": "wyre-technology/connectwise-manage-mcp",
+    "repo": "WYRE-AI/connectwise-manage-mcp",
+    "previous_repos": [
+      "wyre-technology/connectwise-manage-mcp"
+    ],
     "name": "ConnectWise Manage",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -7317,7 +7404,10 @@
     "docker_image": "devsaurus/chromadb-remote-mcp:latest"
   },
   {
-    "repo": "wyre-technology/itglue-mcp",
+    "repo": "WYRE-AI/itglue-mcp",
+    "previous_repos": [
+      "wyre-technology/itglue-mcp"
+    ],
     "name": "IT Glue",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -7661,7 +7751,10 @@
     "docker_image": "docker.io/writenotenow/db-mcp:v1.0.2"
   },
   {
-    "repo": "glidermcp/glidermcp.com",
+    "repo": "glidermcp/glidermcp",
+    "previous_repos": [
+      "glidermcp/glidermcp.com"
+    ],
     "name": "Glidermcp Com",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -8136,7 +8229,10 @@
     "pypi_package": "uk-legal-mcp"
   },
   {
-    "repo": "sh3ll3x3c/native-devtools-mcp",
+    "repo": "vectora-foundry/native-devtools-mcp",
+    "previous_repos": [
+      "sh3ll3x3c/native-devtools-mcp"
+    ],
     "name": "Native DevTools",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -8947,7 +9043,10 @@
     "npm_package": "cli2mcp"
   },
   {
-    "repo": "1102tools/federal-contracting-mcps",
+    "repo": "1102tools-dev/federal-contracting-mcps",
+    "previous_repos": [
+      "1102tools/federal-contracting-mcps"
+    ],
     "name": "BLS OEWS",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -10169,7 +10268,10 @@
     "npm_package": "meigen"
   },
   {
-    "repo": "irinabuht12-oss/google-meta-ads-ga4-mcp",
+    "repo": "irinabuht12-oss/google-ads-meta-ads-mcp",
+    "previous_repos": [
+      "irinabuht12-oss/google-meta-ads-ga4-mcp"
+    ],
     "name": "Google/Meta Ads + GA4 MCP",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -10482,7 +10584,10 @@
     "class": "skill"
   },
   {
-    "repo": "opensquilla/opensquilla",
+    "repo": "TokenRhythm/opensquilla",
+    "previous_repos": [
+      "opensquilla/opensquilla"
+    ],
     "name": "Opensquilla",
     "category": "Agent Skills",
     "listing_status": "listed",
@@ -10508,7 +10613,10 @@
     "class": "skill"
   },
   {
-    "repo": "worldwonderer/oh-story-claudecode",
+    "repo": "zenstory-ai/oh-story-claudecode",
+    "previous_repos": [
+      "worldwonderer/oh-story-claudecode"
+    ],
     "name": "Oh Story Claudecode",
     "category": "Agent Skills",
     "listing_status": "listed",
@@ -11095,7 +11203,10 @@
     "class": "skill"
   },
   {
-    "repo": "SamurAIGPT/Generative-Media-Skills",
+    "repo": "Anil-matcha/open-dots",
+    "previous_repos": [
+      "SamurAIGPT/Generative-Media-Skills"
+    ],
     "name": "Generative Media Skills",
     "category": "Agent Skills",
     "listing_status": "listed",
@@ -11136,7 +11247,10 @@
     "class": "skill"
   },
   {
-    "repo": "nowork-studio/NotFair",
+    "repo": "nowork-studio/notfair-plugin",
+    "previous_repos": [
+      "nowork-studio/NotFair"
+    ],
     "name": "NotFair",
     "category": "Agent Skills",
     "listing_status": "listed",
@@ -11233,7 +11347,10 @@
     "class": "skill"
   },
   {
-    "repo": "FrancyJGLisboa/agent-skill-creator",
+    "repo": "FrancyJGLisboa/agent-skills-platform",
+    "previous_repos": [
+      "FrancyJGLisboa/agent-skill-creator"
+    ],
     "name": "Agent Skill Creator",
     "category": "Agent Skills",
     "listing_status": "listed",
@@ -11458,7 +11575,10 @@
     "class": "skill"
   },
   {
-    "repo": "worldwonderer/novel-to-game",
+    "repo": "zenstory-ai/novel-to-game",
+    "previous_repos": [
+      "worldwonderer/novel-to-game"
+    ],
     "name": "Novel To Game",
     "category": "Agent Skills",
     "listing_status": "listed",
@@ -11704,7 +11824,10 @@
     "class": "skill"
   },
   {
-    "repo": "zhu1090093659/dsh-web-ui",
+    "repo": "zhu1090093659/dsh-web",
+    "previous_repos": [
+      "zhu1090093659/dsh-web-ui"
+    ],
     "name": "DSH Web UI",
     "category": "Agent Skills",
     "listing_status": "listed",
@@ -11812,7 +11935,10 @@
     "class": "skill"
   },
   {
-    "repo": "santifer/career-ops",
+    "repo": "career-ops-hq/career-ops",
+    "previous_repos": [
+      "santifer/career-ops"
+    ],
     "name": "Career Ops",
     "category": "Agent Skills",
     "listing_status": "listed",
@@ -11853,7 +11979,10 @@
     "class": "skill"
   },
   {
-    "repo": "amruthpillai/reactive-resume",
+    "repo": "reactive-resume/reactive-resume",
+    "previous_repos": [
+      "amruthpillai/reactive-resume"
+    ],
     "name": "Reactive Resume",
     "category": "Agent Skills",
     "listing_status": "listed",
@@ -11953,7 +12082,10 @@
     "class": "skill"
   },
   {
-    "repo": "Nagi-ovo/voyager",
+    "repo": "voyager-crew/voyager",
+    "previous_repos": [
+      "Nagi-ovo/voyager"
+    ],
     "name": "Voyager",
     "category": "Agent Skills",
     "listing_status": "listed",
@@ -12135,14 +12267,6 @@
     "class": "skill"
   },
   {
-    "repo": "nowork-studio/notfair-plugin",
-    "name": "Notfair Plugin",
-    "category": "Agent Skills",
-    "listing_status": "listed",
-    "tracking_mode": "direct",
-    "class": "skill"
-  },
-  {
     "repo": "google-antigravity/antigravity-sdk-python",
     "name": "Antigravity Sdk Python",
     "category": "Agent Skills",
@@ -12236,7 +12360,10 @@
     "class": "skill"
   },
   {
-    "repo": "Eronred/aso-skills",
+    "repo": "appeeky/aso-skills",
+    "previous_repos": [
+      "Eronred/aso-skills"
+    ],
     "name": "Aso Skills",
     "category": "Agent Skills",
     "listing_status": "listed",
@@ -12513,7 +12640,10 @@
     "class": "skill"
   },
   {
-    "repo": "worldwonderer/video-recap-skills",
+    "repo": "zenstory-ai/video-recap-skills",
+    "previous_repos": [
+      "worldwonderer/video-recap-skills"
+    ],
     "name": "Video Recap Skills",
     "category": "Agent Skills",
     "listing_status": "listed",
@@ -13443,14 +13573,6 @@
     "pypi_package": "swarms"
   },
   {
-    "repo": "zylon-ai/private-gpt",
-    "name": "zylon-ai \u00b7 PrivateGPT",
-    "category": "Agent Frameworks",
-    "listing_status": "listed",
-    "tracking_mode": "direct",
-    "class": "agent"
-  },
-  {
     "repo": "Agents365-ai/drawio-skill",
     "name": "drawio-skill",
     "category": "Agent Skills",
@@ -13507,7 +13629,10 @@
     "class": "agent"
   },
   {
-    "repo": "feder-cr/AIHawk",
+    "repo": "feder-cr/invisible_playwright_mcp",
+    "previous_repos": [
+      "feder-cr/AIHawk"
+    ],
     "name": "AIHawk",
     "category": "Browser & Computer Use",
     "listing_status": "listed",
