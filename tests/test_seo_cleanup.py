@@ -53,9 +53,6 @@ VOLATILE_LOCS = {
     "https://hvtracker.net/",
     "https://hvtracker.net/changes/",
     "https://hvtracker.net/data/",
-    "https://hvtracker.net/data/latest.json",
-    "https://hvtracker.net/data/signals/scorecard.json",
-    "https://hvtracker.net/data/signals/provenance.json",
 }
 
 
@@ -182,6 +179,15 @@ def test_compare_sitemap_prunes_unproven(site):
     # ...but the sitemap is a strict, meaningfully smaller subset of disk.
     assert in_sitemap <= on_disk
     assert len(in_sitemap) < len(on_disk)
+
+
+def test_sitemap_lists_pages_not_json_feeds(site):
+    """The /data/ JSON feeds never index (GSC: crawled, not indexed), so the
+    sitemap must not spend crawl budget advertising them."""
+    with open(os.path.join(site["tmp"], "sitemap.xml"), encoding="utf-8") as f:
+        sitemap = f.read()
+    assert "<loc>https://hvtracker.net/data/</loc>" in sitemap
+    assert not re.findall(r"<loc>[^<]*\.json</loc>", sitemap)
 
 
 def test_published_pairs_grow_monotonically(site):

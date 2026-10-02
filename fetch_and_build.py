@@ -9170,9 +9170,10 @@ def main() -> None:
         ("https://hvtracker.net/compare/", "0.7", "daily"),
         ("https://hvtracker.net/changelog/", "0.6", "weekly"),
         ("https://hvtracker.net/data/", "0.6", "daily"),
-        ("https://hvtracker.net/data/latest.json", "0.7", "daily"),
-        ("https://hvtracker.net/data/signals/scorecard.json", "0.5", "daily"),
-        ("https://hvtracker.net/data/signals/provenance.json", "0.5", "daily"),
+        # The JSON feeds stay linked from /data/ and llms.txt for machines but
+        # are not advertised: on 2026-10-01 GSC still had all three as
+        # "Crawled - currently not indexed" (last crawled June-July), and
+        # latest.json is ~9 MB per fetch.
     ]
     # sitemap.xml itself is written at the END of main(): its per-URL
     # <lastmod> fingerprints the rendered files, and methodology/badges/
