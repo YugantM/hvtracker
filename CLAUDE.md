@@ -115,5 +115,11 @@ Milestone history lives in `docs/changelog.md` — record new milestones there.
 - Titles/meta descriptions change ONLY via a logged CTR batch
   (`CTR_TEST_COMPARE` + docs/ctr-tests.md). Badge adopters live in
   `BADGE_ADOPTERS`, verified weekly by scripts/check_adopters.py.
+- Sitemap `<lastmod>` comes from a per-page content fingerprint (#314). Any
+  edit that changes every page of a type (a template line, sitewide markup)
+  re-dates all of them unless you also bump `LASTMOD_FP_VERSION`, whose
+  migration re-keys stored hashes on the first render and keeps the dates.
+  Wrapping new text in `<!--lastmod:skip-->` is not enough: the change of
+  surrounding whitespace counts (that re-dated 1,445 profiles on 3 Oct, #322).
 - Dark mode is opt-in per page (`<html class="theme-auto">`); audit contrast
   before opting a page in. Grade colours are literal hex, never tokens.

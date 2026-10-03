@@ -961,6 +961,21 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   NotFair #204 as gated, Scorecards kept, 0 provisional rows, invariants [].
   Registry snapshot re-run after deploy: 981 entries (from 961), now that
   renamed repos match their registry entries.
+- **OWASP mapping + independence DEPLOYED 2026-10-03 21:27 UTC** (423565d2 @
+  5e156223, #322; owner: "deploy"). /methodology/#owasp (ASI04, AST02 covered;
+  AST07, AST01 partly; ASI01/02/05/06 not covered), /methodology/#independence,
+  one OWASP line in every profile's chain-of-custody intro, and a fix for the
+  methodology code sample that widened the page on phones. Verified live;
+  invariants []. MISTAKE: the profile line was meant to sit in a
+  lastmod:skip region so it wouldn't re-date profiles, but adding the region
+  also changed the whitespace around it, so all 1,445 agent URLs took
+  2026-10-03 once. Not reverted, because a second template change would
+  re-date them again. Rule added to CLAUDE.md: bump LASTMOD_FP_VERSION with any
+  sitewide template edit, so the first render re-keys hashes and keeps dates.
+  Same-day checks: all 50 renamed rows (#320 sweep plus the 3 earlier renames)
+  had a full refresh and kept their Scorecard (the old-name fallback works);
+  outside the profile re-date, sitemap dates moved for 7 of 55 blog URLs,
+  0 of 10 specs and 17 of 131 org pages.
 
 ## Entries recorded only in the old AGENTS.md
 
