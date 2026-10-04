@@ -5547,6 +5547,22 @@ CTR_TEST_COMPARE = {
 }
 
 
+# Phase 10 (A2): the same logged title/description tests for profile and
+# category pages, keyed by profile slug and category slug. Empty until a batch
+# is approved and logged in docs/ctr-tests.md; with no entry a page renders
+# exactly as before, so adding this mechanism changes no title and re-dates no
+# sitemap URL. Fields: profiles {name} {score} {grade} {rank} {total}
+# {category}; categories {category} {count} {top3}.
+CTR_TEST_AGENT: dict[str, dict] = {}
+CTR_TEST_CATEGORY: dict[str, dict] = {}
+
+
+def ctr_test_page_override(tests: dict, key: str, **fields) -> dict | None:
+    """The logged CTR-test title/description for one page, filled with live values."""
+    entry = tests.get(key)
+    return {k: v.format(**fields) for k, v in entry.items()} if entry else None
+
+
 def ctr_test_override(a: dict, b: dict) -> dict | None:
     """The CTR-test title/description for this pair, filled with live scores."""
     entry = CTR_TEST_COMPARE.get(tuple(sorted((a.get("slug", ""), b.get("slug", "")))))
@@ -8509,7 +8525,11 @@ def main() -> None:
         row_related = related_agents(row, cat_sorted_rows)
         row_comparisons = compare_by_slug.get(row["slug"], [])
         with open(os.path.join(slug_dir, "index.html"), "w", encoding="utf-8") as f:
-            f.write(agent_tmpl.render(row=row, total=class_totals[listing_class(row)], updated=now_str, events=events, drift_events=filter_drift_events(events), methodology_version=METHODOLOGY_VERSION, comparisons=row_comparisons, provider_slugs=provider_slug_map, related=row_related, compare_targets=agent_compare_targets(row, row_related, row_comparisons)))
+            seo_override = ctr_test_page_override(
+                CTR_TEST_AGENT, row["slug"], name=row["name"], score=row.get("trust_score"),
+                grade=row.get("evidence_grade"), rank=row.get("rank"),
+                total=class_totals[listing_class(row)], category=row.get("category"))
+            f.write(agent_tmpl.render(row=row, total=class_totals[listing_class(row)], updated=now_str, events=events, drift_events=filter_drift_events(events), methodology_version=METHODOLOGY_VERSION, comparisons=row_comparisons, provider_slugs=provider_slug_map, related=row_related, compare_targets=agent_compare_targets(row, row_related, row_comparisons), seo_override=seo_override))
 
     print(f"Built {len(rows)} active agent profile pages under agents/.")
 
@@ -8625,6 +8645,9 @@ def main() -> None:
                 warning_count=warning_count,
                 top3_names=", ".join(top3),
                 comparisons=compare_by_cat.get(cat_slug, []),
+                seo_override=ctr_test_page_override(
+                    CTR_TEST_CATEGORY, cat_slug, category=cat_name, count=len(cat_agents),
+                    top3=", ".join(top3)),
             ))
     print(f"Built {len(all_cat_meta)} category pages under categories/.")
     prune_stale_page_dirs(categories_dir, {c["slug"] for c in all_cat_meta}, "categories")

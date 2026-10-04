@@ -11,7 +11,7 @@ import fetch_and_build as fab
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-def _render(events=(), **overrides):
+def _render(events=(), seo_override=None, **overrides):
     env = Environment(
         loader=FileSystemLoader([os.path.join(ROOT, "templates"), ROOT]),
         autoescape=True,
@@ -35,6 +35,7 @@ def _render(events=(), **overrides):
     return env.get_template("agent.html.j2").render(
         row=row, total=1, updated="", events=list(events), drift_events=[],
         methodology_version="v4.4", comparisons=[], provider_slugs={}, related=[],
+        seo_override=seo_override,
     )
 
 

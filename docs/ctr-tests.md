@@ -11,6 +11,18 @@ control group (all other `/compare/` pages) over the same windows. A test
 "wins" if its CTR rises by more than the control's at a similar position.
 Revert a loser by deleting its entry.
 
+## Profile and category pages (Phase 10, from 2026-10-04)
+
+`CTR_TEST_AGENT` (keyed by profile slug) and `CTR_TEST_CATEGORY` (keyed by
+category slug) in `fetch_and_build.py` take the same kind of logged
+title/description override as `CTR_TEST_COMPARE`. Fields: profiles `{name}`
+`{score}` `{grade}` `{rank}` `{total}` `{category}`; categories `{category}`
+`{count}` `{top3}`. With no entry a page renders byte for byte as before
+(checked: 0 of 3,260 pages changed). A test fails if any key lacks a mention in
+this file, so every entry needs a batch section below with its baseline,
+control group and check dates. Before merging a batch, run
+`python scripts/lastmod_diff.py`: only the tested pages may show a new date.
+
 ## Batch 1 — deployed 2026-09-24 08:48 UTC (deployment 93273d1c); check 2026-10-08, then 2026-10-22
 
 Baseline window: 2026-08-24 → 2026-09-21 (28 days).
