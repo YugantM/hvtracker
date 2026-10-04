@@ -12,8 +12,8 @@
      Decision 4 (Sep 2026): a fixed cohort of 100 skills (row.seo_indexed) is
      indexable as a test — see select_indexed_skills. #}
   {% if row.listing_class == 'skill' and not row.seo_indexed %}<meta name="robots" content="noindex, follow">{% endif %}
-  <title>Is {{ row.name }} Safe? Trust Score &amp; Safety Signals | HVTracker</title>
-  <meta name="description" content="Is {{ row.name }} safe? It scores {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}) on HVTracker — an independent trust score from supply-chain provenance, OSSF Scorecard, maintenance, and adoption signals.">
+  <title>{% if seo_override %}{{ seo_override.title }}{% else %}Is {{ row.name }} Safe? Trust Score &amp; Safety Signals | HVTracker{% endif %}</title>
+  <meta name="description" content="{% if seo_override %}{{ seo_override.description }}{% else %}Is {{ row.name }} safe? It scores {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}) on HVTracker — an independent trust score from supply-chain provenance, OSSF Scorecard, maintenance, and adoption signals.{% endif %}">
   <link rel="canonical" href="https://hvtracker.net/agents/{{ row.slug }}/">
 
   <meta property="og:type" content="website">

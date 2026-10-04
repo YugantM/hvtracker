@@ -101,6 +101,10 @@ Milestone history lives in `docs/changelog.md` — record new milestones there.
   in GSC URL Inspection and under ~2% of sitemap URLs are uncrawled (sweep:
   ~/hv_marketing/data/indexing-2026-10-01/inspect_bulk.py). Roster removals
   and fixes are not paused.
+- Active: Phase 10 "turn impressions into clicks" (approved 2026-10-04, runs to
+  15 Nov) https://claude.ai/artifact/CoU1ktL5ejKEffo9wv5snh: logged title
+  tests on profiles and categories (CTR_TEST_AGENT / CTR_TEST_CATEGORY), a
+  monthly provenance post, and indexing hygiene against the #316 pause.
 - Phase 9 MCP registry feed DEPLOYED 2026-10-02 (#312): /registry/<policy>
   v0.1 subregistry, publisher-tie rule for graded allowlists, daily
   registry-snapshot.yml → `data` branch. Watch the "registry" channel on
@@ -120,6 +124,9 @@ Milestone history lives in `docs/changelog.md` — record new milestones there.
   re-dates all of them unless you also bump `LASTMOD_FP_VERSION`, whose
   migration re-keys stored hashes on the first render and keeps the dates.
   Wrapping new text in `<!--lastmod:skip-->` is not enough: the change of
-  surrounding whitespace counts (that re-dated 1,445 profiles on 3 Oct, #322).
+  surrounding whitespace counts (that re-dated 1,445 profiles on 3 Oct, #322),
+  and so does a Jinja comment on its own line (no trim_blocks). Before merging
+  a template change, run `python scripts/lastmod_diff.py`, which reports how
+  many pages of each type would get a new date.
 - Dark mode is opt-in per page (`<html class="theme-auto">`); audit contrast
   before opting a page in. Grade colours are literal hex, never tokens.
