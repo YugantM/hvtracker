@@ -2204,7 +2204,6 @@ def sponsor_page():
         <h2 style='margin-top:10px'>Low-noise ways to partner</h2>
         <ul>
           <li>Category or report sponsorships</li>
-          <li>Supported compare pages for relevant buyers</li>
           <li>Launch-week or research sponsorships</li>
         </ul>
       </div>
