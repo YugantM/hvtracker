@@ -43,10 +43,10 @@ def test_profile_keeps_its_title_without_an_entry_and_takes_one_with_it():
 
 def _render_category(**extra):
     env = Environment(loader=FileSystemLoader([os.path.join(ROOT, "templates"), ROOT]), autoescape=True)
-    return env.get_template("category.html.j2").render(
-        category="Coding Agents", slug="coding-agents", agents=[cat_row(1)], item_noun="agent",
-        item_plural="agents", all_categories=[], updated="", avg_trust=70, total_stars="1k",
-        grade_a_count=0, warning_count=0, top3_names="Agent 1", comparisons=[], **extra)
+    return env.get_template("category.html.j2").render(**{
+        "category": "Coding Agents", "slug": "coding-agents", "agents": [cat_row(1)], "item_noun": "agent",
+        "item_plural": "agents", "all_categories": [], "updated": "", "avg_trust": 70, "total_stars": "1k",
+        "grade_a_count": 0, "warning_count": 0, "top3_names": "Agent 1", "comparisons": [], **extra})
 
 
 def test_category_keeps_its_title_without_an_entry_and_takes_one_with_it():

@@ -38,12 +38,12 @@
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "{{ row.name }}",
-    "applicationCategory": "{{ row.category }}",
+    "name": {{ row.name|tojson }},
+    "applicationCategory": {{ row.category|tojson }},
     "operatingSystem": "Cross-platform",
     "url": "{{ row.url }}",
     {% if row.homepage %}"sameAs": [{{ row.homepage|tojson }}],{% endif %}
-    {% if desc %}"description": "{{ desc }}",{% endif %}
+    {% if desc %}"description": {{ desc|tojson }},{% endif %}
     "offers": {
       "@type": "Offer",
       "price": "0",
@@ -53,7 +53,7 @@
       "@type": "Review",
       "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net/" },
       "url": "https://hvtracker.net/agents/{{ row.slug }}/",
-      "reviewBody": "Evidence-based trust review of {{ row.name }}: HVTrust {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}), ranked #{{ row.rank }} of {{ total }} tracked open-source AI agent projects, from public supply-chain, transparency, maintenance, and adoption signals.",
+      "reviewBody": "Evidence-based trust review of {{ (row.name|tojson)[1:-1] }}: HVTrust {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}), ranked #{{ row.rank }} of {{ total }} tracked open-source AI agent projects, from public supply-chain, transparency, maintenance, and adoption signals.",
       "reviewRating": {
         "@type": "Rating",
         "ratingValue": {{ row.trust_score }},
@@ -70,13 +70,13 @@
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "Is {{ row.name }} safe to use?",
-        "acceptedAnswer": { "@type": "Answer", "text": "{% if pend %}{{ row.name }} is newly listed and still being checked: its HVTrust score is provisional until the first full signal fetch completes, so no grade has been assigned yet.{% else %}{{ row.name }} has an HVTrust score of {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}), ranked #{{ row.rank }} of {{ total }} tracked AI agent projects. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals.{% endif %}" }
+        "name": "Is {{ (row.name|tojson)[1:-1] }} safe to use?",
+        "acceptedAnswer": { "@type": "Answer", "text": "{% if pend %}{{ (row.name|tojson)[1:-1] }} is newly listed and still being checked: its HVTrust score is provisional until the first full signal fetch completes, so no grade has been assigned yet.{% else %}{{ (row.name|tojson)[1:-1] }} has an HVTrust score of {{ row.trust_score }}/100 (Grade {{ row.evidence_grade }}), ranked #{{ row.rank }} of {{ total }} tracked AI agent projects. This score reflects verifiable supply-chain integrity, transparency, maintenance, and adoption signals.{% endif %}" }
       },
       {
         "@type": "Question",
-        "name": "What is the trust score for {{ row.name }}?",
-        "acceptedAnswer": { "@type": "Answer", "text": "{{ row.name }} scores {{ row.trust_score }}/100 on HVTracker's evidence-weighted HVTrust scale. It has {{ row.stars_fmt }} GitHub stars and is categorized under {{ row.category }}." }
+        "name": "What is the trust score for {{ (row.name|tojson)[1:-1] }}?",
+        "acceptedAnswer": { "@type": "Answer", "text": "{{ (row.name|tojson)[1:-1] }} scores {{ row.trust_score }}/100 on HVTracker's evidence-weighted HVTrust scale. It has {{ row.stars_fmt }} GitHub stars and is categorized under {{ (row.category|tojson)[1:-1] }}." }
       }
     ]
   }
@@ -551,8 +551,8 @@
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
-      { "@type": "ListItem", "position": 2, "name": "{{ row.category }}", "item": "https://hvtracker.net/categories/{{ row.category_slug }}/" },
-      { "@type": "ListItem", "position": 3, "name": "{{ row.name }}", "item": "https://hvtracker.net/agents/{{ row.slug }}/" }
+      { "@type": "ListItem", "position": 2, "name": {{ row.category|tojson }}, "item": "https://hvtracker.net/categories/{{ row.category_slug }}/" },
+      { "@type": "ListItem", "position": 3, "name": {{ row.name|tojson }}, "item": "https://hvtracker.net/agents/{{ row.slug }}/" }
     ]
   }
   </script>
