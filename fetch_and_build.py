@@ -2634,9 +2634,11 @@ def select_indexed_skills(prior, rows: list[dict], size: int = SKILL_INDEX_COHOR
 # Sitemap <lastmod> fingerprint. Bump LASTMOD_FP_VERSION whenever the
 # normalization below changes, or a template edit changes markup on many pages
 # without changing what they say (3: JSON-LD values JSON-encoded instead of
-# HTML-escaped), so stored hashes are re-keyed without re-stamping every URL
-# (see _sitemap_lastmod).
-LASTMOD_FP_VERSION = 3
+# HTML-escaped; 4: profile compare tray, rank arrows, rank-move events, push
+# recency, category-average markers and grade projections wrapped in
+# lastmod:skip), so stored hashes are re-keyed without re-stamping every URL
+# (see lastmod_entry).
+LASTMOD_FP_VERSION = 4
 LASTMOD_SKIP_RE = re.compile(rb"<!--lastmod:skip-->.*?<!--/lastmod:skip-->", re.S)
 _LASTMOD_NUMBER_RE = re.compile(rb"\d+(?:[.,]\d+)*")
 
@@ -2655,6 +2657,21 @@ def lastmod_fingerprint(content: bytes, now_str: str) -> str:
     content = LASTMOD_SKIP_RE.sub(b"", content)
     content = _LASTMOD_NUMBER_RE.sub(b"#", content)
     return hashlib.sha256(content).hexdigest()
+
+
+def lastmod_entry(prev, fingerprint: str, today: str) -> dict:
+    """A page's stored sitemap_lastmod entry after this render.
+
+    The date advances only when the fingerprint changed under the current
+    LASTMOD_FP_VERSION. An entry from an older version is re-keyed with its
+    date kept. An unchanged page takes the current version too, so the
+    migration lasts exactly one render: before, an unchanged page kept its old
+    version and its next real change was mistaken for a migration.
+    """
+    if isinstance(prev, dict) and "date" in prev and (
+            prev.get("hash") == fingerprint or prev.get("fp") != LASTMOD_FP_VERSION):
+        return {"hash": fingerprint, "date": prev["date"], "fp": LASTMOD_FP_VERSION}
+    return {"hash": fingerprint, "date": today, "fp": LASTMOD_FP_VERSION}
 
 
 def apply_listing_classes(rows: list[dict], agents: list[dict]) -> None:
@@ -9635,15 +9652,8 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
                 _content = _f.read()
         except OSError:
             return _prev["date"] if isinstance(_prev, dict) and "date" in _prev else today_iso
-        _h = lastmod_fingerprint(_content, now_str)
-        if isinstance(_prev, dict) and _prev.get("hash") == _h:
-            return _prev["date"]
-        if isinstance(_prev, dict) and "date" in _prev and _prev.get("fp") != LASTMOD_FP_VERSION:
-            # The fingerprint changed, not the page: re-key, keep the date.
-            _lastmod_state[_loc] = {"hash": _h, "date": _prev["date"], "fp": LASTMOD_FP_VERSION}
-            return _prev["date"]
-        _lastmod_state[_loc] = {"hash": _h, "date": today_iso, "fp": LASTMOD_FP_VERSION}
-        return today_iso
+        _lastmod_state[_loc] = lastmod_entry(_prev, lastmod_fingerprint(_content, now_str), today_iso)
+        return _lastmod_state[_loc]["date"]
 
     sitemap_lines = ['<?xml version="1.0" encoding="UTF-8"?>',
                      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']

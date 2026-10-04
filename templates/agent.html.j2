@@ -643,7 +643,7 @@
             </div>
             <div class="vfact" role="listitem">
               <span class="vfact-label"><span class="vdot {% if dago is none %}part{% elif dago <= 30 %}ok{% elif dago <= 180 %}part{% else %}gap{% endif %}" aria-hidden="true"></span>Last push</span>
-              <span class="vfact-value">{% if dago is none %}Unknown{% elif dago == 0 %}today{% elif dago == 1 %}yesterday{% else %}{{ dago }}d ago{% endif %}</span>
+              <span class="vfact-value"><!--lastmod:skip-->{% if dago is none %}Unknown{% elif dago == 0 %}today{% elif dago == 1 %}yesterday{% else %}{{ dago }}d ago{% endif %}<!--/lastmod:skip--></span>
             </div>
             {% if adv %}
             <div class="vfact" role="listitem">
@@ -659,7 +659,7 @@
             {# Sticky compare prompt. A <details> so open/close is native — no JS, no
             extra requests. Closed it is a single pill; the score gap on each row is
             the hook, since "scores 15 higher" is the thing worth a click. #}
-            <details class="cmp-bubble">
+            <!--lastmod:skip--><details class="cmp-bubble">
             <summary aria-label="Compare {{ row.name }} with similar agents">
             <span class="cmp-bubble-icon" aria-hidden="true">&#8646;</span>
             <span class="cmp-bubble-label">Compare {{ row.name }}</span>
@@ -680,7 +680,7 @@
             </ul>
             <a class="cmp-bubble-all" href="/compare/?a={{ row.slug }}">Pick any agent to compare &rarr;</a>
             </div>
-            </details>
+            </details><!--/lastmod:skip-->
             {% endif %}
             <button class="btn btn-tertiary" id="compareToggle" type="button" data-cmp-slug="{{ row.slug }}" data-cmp-name="{{ row.name }}" data-cmp-repo="{{ row.repo }}">Add to compare</button>
             {# Appears only once the compare tray holds something (see script). #}
@@ -711,7 +711,7 @@
           </svg>
           <div class="vseal-grade"><span class="badge grade-{{ g }}">Grade {{ g }}</span></div>
           <p class="vseal-rank">
-            <b>#{{ row.rank }}</b> of {{ total }} overall{% if row.rank_delta %} <span class="{{ row.rank_delta_class }}">{{ row.rank_delta_display }}</span>{% endif %}
+            <b>#{{ row.rank }}</b> of {{ total }} overall{% if row.rank_delta %}<!--lastmod:skip--> <span class="{{ row.rank_delta_class }}">{{ row.rank_delta_display }}</span><!--/lastmod:skip-->{% endif %}
             {% if row.category_rank and row.category %}<br><b>#{{ row.category_rank }}</b> in {{ row.category }}{% endif %}
             {% if row.coverage_grade %}<br>Coverage <b>{{ row.coverage_grade }}</b> · {{ row.signal_types }}/5 signals{% endif %}
           </p>
@@ -756,7 +756,7 @@
           <li>
             <span class="imp-what"><a href="{{ i.link }}" rel="noopener">{{ i.action }}</a><span class="imp-detail">{{ i.detail }}</span></span>
             <span class="imp-gain">+{{ i.gain }}</span>
-            <span class="imp-res">&rarr; <b>{{ i.score }}</b> <span class="badge grade-{{ i.grade }}">{{ i.grade }}</span>{% if i.category_rank and row.category %} · #{{ i.category_rank }} of {{ i.category_size }}{% endif %}</span>
+            <!--lastmod:skip--><span class="imp-res">&rarr; <b>{{ i.score }}</b> <span class="badge grade-{{ i.grade }}">{{ i.grade }}</span>{% if i.category_rank and row.category %} · #{{ i.category_rank }} of {{ i.category_size }}{% endif %}</span><!--/lastmod:skip-->
           </li>
           {% endfor %}
         </ul>
@@ -826,7 +826,7 @@
             <details class="cmore">
               <summary>All {{ sc_checks | length }} Scorecard checks</summary>
               <div class="sc-checks">
-                {% for check_name, check_score in sc_checks.items() %}
+                {% for check_name, check_score in sc_checks | dictsort %}
                 <div class="sc-check">
                   <span class="sc-check-name">{{ check_name }}</span>
                   <span class="sc-check-val" style="color:{% if check_score >= 7 %}var(--green){% elif check_score >= 4 %}var(--aging){% else %}var(--muted){% endif %}">{{ check_score }}</span>
@@ -974,10 +974,10 @@
                   <span class="metric-avg" style="--avg:{{ d.avg_pct }}%" aria-hidden="true"></span>
                 </div>
                 <div class="metric-value">{{ d.value }} <span>/ {{ d.max }}</span></div>
-                <div class="metric-delta is-{{ d.direction }}">
+                <!--lastmod:skip--><div class="metric-delta is-{{ d.direction }}">
                   <span class="d-glyph" aria-hidden="true">{% if d.direction == "above" %}▲{% elif d.direction == "below" %}▼{% else %}•{% endif %}</span>
                   {% if d.direction == "level" %}in line with avg {{ d.avg }}{% else %}{{ d.delta | abs }} {{ d.direction }} avg {{ d.avg }}{% endif %}
-                </div>
+                </div><!--/lastmod:skip-->
               </div>
               {% endfor %}
             </div>
@@ -1020,7 +1020,7 @@
       <div class="recent-changes">
         <div class="review-kicker">Recent Changes</div>
         <div class="recent-change-list">
-          {% for e in row.recent_events[-3:]|reverse %}
+          {% for e in row.recent_events[-3:]|reverse %}{% set rank_move = e.type == "rank_changed" %}{% if rank_move %}<!--lastmod:skip-->{% endif %}
           <div class="recent-change-item">
             <div class="recent-change-date">{{ e.date }}</div>
             <div class="recent-change-body">
@@ -1028,7 +1028,7 @@
               <div class="recent-change-detail">{{ e.detail }}</div>
             </div>
           </div>
-          {% endfor %}
+          {% if rank_move %}<!--/lastmod:skip-->{% endif %}{% endfor %}
         </div>
       </div>
       {% endif %}
@@ -1091,7 +1091,7 @@
       <strong>Signals refreshed</strong>
       <span class="meta">{{ updated }}</span>
       <span class="meta">·</span>
-      <span class="meta">Repo last pushed {% if row.days_ago == 0 %}today{% elif row.days_ago == 1 %}yesterday{% else %}{{ row.days_ago }} days ago{% endif %}{% if is_stale %} — may be stale{% endif %}</span>
+      <span class="meta">Repo last pushed <!--lastmod:skip-->{% if row.days_ago == 0 %}today{% elif row.days_ago == 1 %}yesterday{% else %}{{ row.days_ago }} days ago{% endif %}<!--/lastmod:skip-->{% if is_stale %} — may be stale{% endif %}</span>
     </div>
 
     {% if row.sparkline_svg %}
@@ -1120,11 +1120,11 @@
           <div class="stat-label">Forks</div>
           <div class="stat-value">{{ row.forks_fmt }}</div>
         </div>
-        <div class="{{ row.freshness_class }}">
+        <!--lastmod:skip--><div class="{{ row.freshness_class }}">
           <div class="stat-label">Last Push</div>
           <div class="stat-value"><span class="fresh-dot"></span>{{ row.last_push }}</div>
           <div class="stat-sub">{% if row.days_ago == 0 %}today{% elif row.days_ago == 1 %}yesterday{% else %}{{ row.days_ago }} days ago{% endif %}</div>
-        </div>
+        </div><!--/lastmod:skip-->
         <div>
           <div class="stat-label">Commits (4 wk)</div>
           <div class="stat-value">{% if row.weekly_commits is not none %}{{ row.weekly_commits }}{% else %}—{% endif %}{% if row.commits_low_confidence %}<span tabindex="0" title="Recent push detected; GitHub's commit stats cache may be stale, so this 4-week count could be temporarily under-reported." style="color:var(--amber);font-size:13px;margin-left:3px;cursor:help;">?</span>{% endif %}</div>
@@ -1144,7 +1144,7 @@
         </div>
         <div>
           <div class="stat-label">Rank Change</div>
-          <div class="stat-value">{{ row.rank_delta_display }}</div>
+          <div class="stat-value"><!--lastmod:skip-->{{ row.rank_delta_display }}<!--/lastmod:skip--></div>
           {% if row.previous_rank %}<div class="stat-sub">was #{{ row.previous_rank }}</div>{% endif %}
         </div>
       </div>
@@ -1210,7 +1210,7 @@
       </details>
       <details>
         <summary>Is {{ row.name }} actively maintained?</summary>
-        <div class="qa-answer">{{ row.safety_qa.maintenance_answer }}</div>
+        <div class="qa-answer"><!--lastmod:skip-->{{ row.safety_qa.maintenance_answer }}<!--/lastmod:skip--></div>
       </details>
       <details>
         <summary>What license does {{ row.name }} use?</summary>
@@ -1484,7 +1484,7 @@
       {% endif %}
       <div class="timeline-scroll">
         <div class="timeline-event-list">
-        {% for e in events|reverse %}
+        {% for e in events|reverse %}{% set rank_move = e.type == "rank_changed" %}{% if rank_move %}<!--lastmod:skip-->{% endif %}
         <div class="timeline-event">
           <span class="timeline-date">{{ e.date }}</span>
           <div class="timeline-body">
@@ -1492,7 +1492,7 @@
             <div class="timeline-detail">{{ e.detail }}</div>
           </div>
         </div>
-        {% endfor %}
+        {% if rank_move %}<!--/lastmod:skip-->{% endif %}{% endfor %}
         </div>
       </div>
       </div>
