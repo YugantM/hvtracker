@@ -120,6 +120,12 @@ def test_growth_pages_render(client):
     assert client.get("/track/not-a-real-agent").status_code == 404
 
 
+def test_sponsor_page_does_not_sell_comparisons(client):
+    # Scores aren't for sale (independence statement, #322), so sponsors can't
+    # buy a compare page; the offer was dropped on 4 Oct 2026.
+    assert "compare page" not in client.get("/sponsor").text.lower()
+
+
 def test_submit_validation_rejects_bad_repo(client):
     # No DB configured, so a valid repo would raise; we only assert the
     # owner/name validation guard fires before any DB call.
