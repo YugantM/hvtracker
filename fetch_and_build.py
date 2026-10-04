@@ -2632,9 +2632,11 @@ def select_indexed_skills(prior, rows: list[dict], size: int = SKILL_INDEX_COHOR
 
 
 # Sitemap <lastmod> fingerprint. Bump LASTMOD_FP_VERSION whenever the
-# normalization below changes, so stored hashes are re-keyed without
-# re-stamping every URL (see _sitemap_lastmod).
-LASTMOD_FP_VERSION = 2
+# normalization below changes, or a template edit changes markup on many pages
+# without changing what they say (3: JSON-LD values JSON-encoded instead of
+# HTML-escaped), so stored hashes are re-keyed without re-stamping every URL
+# (see _sitemap_lastmod).
+LASTMOD_FP_VERSION = 3
 LASTMOD_SKIP_RE = re.compile(rb"<!--lastmod:skip-->.*?<!--/lastmod:skip-->", re.S)
 _LASTMOD_NUMBER_RE = re.compile(rb"\d+(?:[.,]\d+)*")
 

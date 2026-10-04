@@ -94,7 +94,7 @@
       {
         "@type": "Question",
         "name": "What is the most trustworthy open-source AI agent?",
-        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker ranks open-source AI agent projects by the HVTrust score, an evidence-weighted measure of trust rather than popularity. The current top-ranked project is {{ rows[0].name }} with an HVTrust score of {{ rows[0].trust_score }}/100. See the full registry at hvtracker.net." }
+        "acceptedAnswer": { "@type": "Answer", "text": "HVTracker ranks open-source AI agent projects by the HVTrust score, an evidence-weighted measure of trust rather than popularity. The current top-ranked project is {{ (rows[0].name|tojson)[1:-1] }} with an HVTrust score of {{ rows[0].trust_score }}/100. See the full registry at hvtracker.net." }
       },
       {
         "@type": "Question",

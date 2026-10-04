@@ -23,8 +23,8 @@
   {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": "Best AI {{ category }}",
-    "description": "{{ agents|length }} {{ category|lower }} ranked by independent trust scores on HVTracker. Open-source-first, with limited public GitHub comparators where relevant.",
+    "name": "Best AI {{ (category|tojson)[1:-1] }}",
+    "description": "{{ agents|length }} {{ (category|lower|tojson)[1:-1] }} ranked by independent trust scores on HVTracker. Open-source-first, with limited public GitHub comparators where relevant.",
     "url": "https://hvtracker.net/categories/{{ slug }}/",
     "isPartOf": {
       "@type": "WebSite",
@@ -39,7 +39,7 @@
         {
           "@type": "ListItem",
           "position": {{ loop.index }},
-          "name": "{{ a.name }}",
+          "name": {{ a.name|tojson }},
           "url": "https://hvtracker.net/agents/{{ a.slug }}/"
         }{% if not loop.last %},{% endif %}
         {% endfor %}
@@ -53,7 +53,7 @@
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
-      { "@type": "ListItem", "position": 2, "name": "{{ category }}" }
+      { "@type": "ListItem", "position": 2, "name": {{ category|tojson }} }
     ]
   }
   </script>

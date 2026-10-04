@@ -78,7 +78,7 @@
     "numberOfItems": {{ matrix.stats.total }},
     "itemListElement": [
       {% for agent in matrix.agents[:25] %}
-      { "@type": "ListItem", "position": {{ loop.index }}, "url": "https://hvtracker.net/agents/{{ agent.slug }}/", "name": "{{ agent.name }}" }{% if not loop.last %},{% endif %}
+      { "@type": "ListItem", "position": {{ loop.index }}, "url": "https://hvtracker.net/agents/{{ agent.slug }}/", "name": {{ agent.name|tojson }} }{% if not loop.last %},{% endif %}
       {% endfor %}
     ]
   }

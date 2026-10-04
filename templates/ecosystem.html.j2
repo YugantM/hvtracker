@@ -61,7 +61,7 @@
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
       { "@type": "ListItem", "position": 2, "name": "Ecosystem", "item": "https://hvtracker.net/ecosystem/" },
-      { "@type": "ListItem", "position": 3, "name": "{{ page.title }}" }
+      { "@type": "ListItem", "position": 3, "name": {{ page.title|tojson }} }
     ]
   }
   </script>
@@ -70,11 +70,11 @@
   {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": "{{ page.title }}",
+    "name": {{ page.title|tojson }},
     "numberOfItems": {{ page.agents|length }},
     "itemListElement": [
       {% for agent in page.agents[:25] %}
-      { "@type": "ListItem", "position": {{ loop.index }}, "url": "https://hvtracker.net/agents/{{ agent.slug }}/", "name": "{{ agent.name }}" }{% if not loop.last %},{% endif %}
+      { "@type": "ListItem", "position": {{ loop.index }}, "url": "https://hvtracker.net/agents/{{ agent.slug }}/", "name": {{ agent.name|tojson }} }{% if not loop.last %},{% endif %}
       {% endfor %}
     ]
   }
@@ -86,10 +86,10 @@
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "Which open-source AI projects use {{ page.provider }}?",
+        "name": "Which open-source AI projects use {{ (page.provider|tojson)[1:-1] }}?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "{{ page.faq_answer }}"
+          "text": {{ page.faq_answer|tojson }}
         }
       }
     ]
