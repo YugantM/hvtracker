@@ -976,6 +976,21 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   had a full refresh and kept their Scorecard (the old-name fallback works);
   outside the profile re-date, sitemap dates moved for 7 of 55 blog URLs,
   0 of 10 specs and 17 of 131 org pages.
+- **Phase 10 batch DEPLOYED 2026-10-04 21:06 UTC** (601f4142 @ 972346ff,
+  #325-#328; owner: "go ahead and deploy"). #325: logged title/description
+  overrides for profiles and categories (`CTR_TEST_AGENT`,
+  `CTR_TEST_CATEGORY`, both empty, so no page changed) and
+  `scripts/lastmod_diff.py`. #326: JSON-LD text values are JSON-encoded
+  instead of HTML-escaped (330 pages had sent Google "&amp;", mostly the
+  category on 303 profiles). #327: /sponsor no longer offers "supported
+  compare pages" (owner decision). #328: profiles stop re-dating on every
+  refresh (volatile hero, rank-arrow, push-recency and timeline regions in
+  lastmod:skip; Scorecard checks in fixed order; migration stamps unchanged
+  pages). LASTMOD_FP_VERSION went 2 -> 4 in one deploy. Verified: boot
+  repair refresh succeeded 21:08, sitemap dates moved for 0 of 2,136 URLs
+  (snapshot before vs after), a2ui JSON-LD reads "&", /sponsor has no
+  compare offer, invariants [], package_failures 1 (AynOps). Check on 5 Oct
+  that profile dates mostly stay 2026-10-04 after the day's refreshes.
 
 ## Entries recorded only in the old AGENTS.md
 
