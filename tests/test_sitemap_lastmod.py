@@ -45,7 +45,7 @@ def test_real_content_changes_move_fingerprint():
     assert _fp(text="AI pair programming in your terminal.") != base
 
 
-def _profile_fp(*, rank_delta, targets, checks, events, days_ago=6, projected="C", grade="B"):
+def _profile_fp(*, rank_delta, targets, checks, events, days_ago=6, projected="C", grade="B", history_days=5):
     """Fingerprint of a real rendered profile, varying only what a refresh moves."""
     import json
     from jinja2 import Environment, FileSystemLoader
@@ -57,7 +57,7 @@ def _profile_fp(*, rank_delta, targets, checks, events, days_ago=6, projected="C
         rank_delta=rank_delta, rank_delta_class="delta-up" if rank_delta > 0 else "delta-down",
         rank_delta_display=("▲" if rank_delta > 0 else "▼") + str(abs(rank_delta)),
         category_slug=fab.slugify(row.get("category", "")), org_slug_or_none=None,
-        sparkline_svg="", rank_history=[], event_chart_svg="",
+        event_chart_svg="",
         days_ago=days_ago, freshness_class="fresh" if days_ago <= 1 else "recent",
         improvements=[{"link": "/methodology/", "action": "Publish provenance", "detail": "",
                        "gain": 4.2, "score": 70.1, "grade": projected}],
@@ -66,6 +66,9 @@ def _profile_fp(*, rank_delta, targets, checks, events, days_ago=6, projected="C
     row["remediation_steps"] = fab.agent_remediation_steps(row)
     row["safety_qa"] = fab.agent_safety_qa(row)
     row["correction_url"] = fab.agent_correction_url(row)
+    row["rank_history"] = [{"date": f"2026-09-{29 + d:02d}" if d < 2 else f"2026-10-{d - 1:02d}",
+                            "rank": 60 + (d * 7) % 11, "score": 70.0} for d in range(history_days)]
+    row["sparkline_svg"] = fab.render_sparkline_svg(row["rank_history"])
     html = env.get_template("agent.html.j2").render(
         row=row, total=1705, updated=NOW, events=events, drift_events=[],
         methodology_version="v4.3", comparisons=[], provider_slugs={}, related=[],
@@ -81,8 +84,9 @@ def _target(name, delta):
 def test_profile_refresh_noise_keeps_fingerprint():
     """The 4 Oct prod check: between two 4-hourly refreshes 23 of 60 profiles
     re-hashed on the compare tray, the rank arrow, Scorecard check order, new
-    "Rank Moved" events, push recency wording and the projected grade. None
-    of those may move lastmod."""
+    "Rank Moved" events, push recency wording and the projected grade; and at
+    each day boundary every rank sparkline gains a point (5 Oct: all 1,445
+    profiles re-dated). None of those may move lastmod."""
     score_event = fab.make_agent_event("2026-09-20", "trust_score_changed", "HVTrust rose 4 points")
     rank_a = fab.make_agent_event("2026-10-03", "rank_changed", "Rank rose 12 spots (#80 → #68)")
     rank_b = fab.make_agent_event("2026-10-04", "rank_changed", "Rank dropped 11 spots (#68 → #79)")
@@ -92,7 +96,7 @@ def test_profile_refresh_noise_keeps_fingerprint():
     assert _profile_fp(
         rank_delta=-2, targets=[_target("Codex", 1.4), _target("Aider", -3)],
         checks={"CI-Tests": 10, "Code-Review": 7}, events=[score_event, rank_a, rank_b],
-        days_ago=0, projected="B") == base
+        days_ago=0, projected="B", history_days=6) == base
     # A real change still moves it.
     assert _profile_fp(
         rank_delta=3, targets=[_target("Cline", 2.1), _target("Codex", 0)],

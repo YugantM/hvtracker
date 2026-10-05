@@ -1098,7 +1098,7 @@
     <section class="trend">
       <h2 class="section-title">Rank Trend</h2>
       <div class="sparkline-wrap">
-        {{ row.sparkline_svg | safe }}
+        <!--lastmod:skip-->{{ row.sparkline_svg | safe }}<!--/lastmod:skip-->
         <div class="sparkline-labels">
           {% if row.rank_history %}
           <span>{{ row.rank_history[0].date }}</span>
