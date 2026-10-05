@@ -2636,9 +2636,9 @@ def select_indexed_skills(prior, rows: list[dict], size: int = SKILL_INDEX_COHOR
 # without changing what they say (3: JSON-LD values JSON-encoded instead of
 # HTML-escaped; 4: profile compare tray, rank arrows, rank-move events, push
 # recency, category-average markers and grade projections wrapped in
-# lastmod:skip), so stored hashes are re-keyed without re-stamping every URL
-# (see lastmod_entry).
-LASTMOD_FP_VERSION = 4
+# lastmod:skip; 5: the rank sparkline, which gains a point every day), so
+# stored hashes are re-keyed without re-stamping every URL (see lastmod_entry).
+LASTMOD_FP_VERSION = 5
 LASTMOD_SKIP_RE = re.compile(rb"<!--lastmod:skip-->.*?<!--/lastmod:skip-->", re.S)
 _LASTMOD_NUMBER_RE = re.compile(rb"\d+(?:[.,]\d+)*")
 
