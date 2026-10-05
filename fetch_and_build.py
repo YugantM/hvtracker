@@ -2636,9 +2636,10 @@ def select_indexed_skills(prior, rows: list[dict], size: int = SKILL_INDEX_COHOR
 # without changing what they say (3: JSON-LD values JSON-encoded instead of
 # HTML-escaped; 4: profile compare tray, rank arrows, rank-move events, push
 # recency, category-average markers and grade projections wrapped in
-# lastmod:skip; 5: the rank sparkline, which gains a point every day), so
-# stored hashes are re-keyed without re-stamping every URL (see lastmod_entry).
-LASTMOD_FP_VERSION = 5
+# lastmod:skip; 5: the rank sparkline, which gains a point every day; 6: the
+# compare "Where they differ" rows), so stored hashes are re-keyed without
+# re-stamping every URL (see lastmod_entry).
+LASTMOD_FP_VERSION = 6
 LASTMOD_SKIP_RE = re.compile(rb"<!--lastmod:skip-->.*?<!--/lastmod:skip-->", re.S)
 _LASTMOD_NUMBER_RE = re.compile(rb"\d+(?:[.,]\d+)*")
 
@@ -5698,7 +5699,11 @@ def compare_decision(a: dict, b: dict) -> dict | None:
     for side, me, other in (("a", a, b), ("b", b, a)):
         ranked = sorted(leads[side], key=lambda t: -t[0])
         points = [p for _d, _k, p in ranked]
-        phrases = [_DIM_PHRASE[k] for _d, k, _p in ranked]
+        # The two biggest leads make this side's case, named in dimension
+        # order: by size, a near-tie between them swapped the sentence (and
+        # re-dated the page) from one refresh to the next.
+        phrases = [_DIM_PHRASE[k] for k in sorted((k for _d, k, _p in ranked[:2]),
+                                                  key=list(TRUST_DIMENSIONS).index)]
         if broader == side:
             points.append({
                 "delta": f"{me['coverage_grade']} vs {other['coverage_grade']}",

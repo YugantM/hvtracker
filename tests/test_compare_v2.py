@@ -225,3 +225,15 @@ def test_ctr_test_overrides_only_touch_logged_pairs():
     other = _pair_row(name="Other", slug="other")
     assert fab.ctr_test_override(lite, other) is None
     assert all(tuple(sorted(k)) == k for k in fab.CTR_TEST_COMPARE)
+
+
+def test_decision_names_top_leads_in_dimension_order():
+    """A near-tie between a side's two biggest leads must not swap the
+    sentence between refreshes (5 Oct: "integrity and adoption" became
+    "adoption and integrity", re-dating the page)."""
+    b = _dv_row("B", 70.0, "B", dict(_BK, safety=10.0, adoption=15.0))
+    for safety, adoption in ((11.2, 16.1), (11.1, 16.2)):
+        a = _dv_row("A", 80.0, "A", dict(_BK, safety=safety, adoption=adoption))
+        d = fab.compare_decision(a, b)
+        assert d["sides"][0]["choose_if"] == "Choose A if supply-chain integrity and adoption matter most."
+        assert "A leads on supply-chain integrity and adoption" in d["verdict"]
