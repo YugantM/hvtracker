@@ -191,7 +191,10 @@
     </div>
 
     {% if decision.diffs %}
-    <section class="dv-diff">
+    {# lastmod:skip — a dimension whose gap wobbles around zero (maintenance,
+       daily) moves between these rows and the "identical" line; the verdict
+       above still names every decisive lead (lastmod_fingerprint) #}
+    <!--lastmod:skip--><section class="dv-diff">
       <h2>Where they differ</h2>
       <div class="dv-cols" aria-hidden="true"><span>{{ a.name }}</span><span></span><span>{{ b.name }}</span></div>
       {% for d in decision.diffs %}
@@ -205,7 +208,7 @@
       </div>
       {% endfor %}
       <p class="dv-same">{% if decision.same %}{{ decision.same | length }} dimension{{ "s" if decision.same | length > 1 }} identical: {% for x in decision.same %}{{ x.label }} {{ x.value }}{{ " · " if not loop.last }}{% endfor %} · {% endif %}<a href="#evidence">Full evidence table</a></p>
-    </section>
+    </section><!--/lastmod:skip-->
     {% endif %}
 
     <p class="dv-how">{{ intro }}</p>
