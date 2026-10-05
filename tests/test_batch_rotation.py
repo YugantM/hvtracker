@@ -144,3 +144,21 @@ def test_batch_refreshes_signals_on_every_row_it_carried(monkeypatch):
 def test_batch_mode_calls_the_carried_signals_pass():
     import inspect
     assert "refresh_carried_signals(rows, fresh_keys" in inspect.getsource(fab.main)
+
+
+def test_cached_scorecard_never_replaces_a_newer_scan():
+    """A carried row scored from the live API (cache was stale) must keep
+    that scan rather than step back to the older cached one each cycle."""
+    cache = {"o/api": {"score": 4.0, "checks": {"Code-Review": 2}, "scanned_at": "2026-09-20T07:00:00Z"},
+             "o/fresh": {"score": 7.0, "checks": {"Code-Review": 9}, "scanned_at": "2026-10-05T03:00:00Z"}}
+    api_row = {"repo": "o/api", "scorecard_score": 6.0, "scorecard_checks": {"Code-Review": 8},
+               "scorecard_scanned_at": "2026-10-05T08:05:00Z"}
+    stale_row = {"repo": "o/fresh", "scorecard_score": 5.0, "scorecard_checks": {},
+                 "scorecard_scanned_at": "2026-09-30T00:00:00Z"}
+    assert fab.apply_cached_scorecards([api_row, stale_row], cache, set()) == 1
+    assert (api_row["scorecard_score"], api_row["scorecard_scanned_at"]) == (6.0, "2026-10-05T08:05:00Z")
+    assert (stale_row["scorecard_score"], stale_row["scorecard_scanned_at"]) == (7.0, "2026-10-05T03:00:00Z")
+    # Marker-only entries (scan never succeeded) have scanned_at None.
+    marker = {"repo": "o/marker", "scorecard_score": 3.0, "scorecard_scanned_at": "2026-10-01T00:00:00Z"}
+    assert fab.apply_cached_scorecards([marker], {"o/marker": {"scanned_at": None}}, set()) == 0
+    assert marker["scorecard_score"] == 3.0

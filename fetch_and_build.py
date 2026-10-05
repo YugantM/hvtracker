@@ -6811,13 +6811,19 @@ def apply_cached_scorecards(rows: list[dict], scorecard_cache: dict, skip_repos:
     Keeps every agent's OSSF score fresh on each cycle (from the data-branch
     cache, no API calls) instead of only the slice that was re-fetched. Skips
     rows fetched this run (already scored, possibly via API fallback) and never
-    clobbers an existing value with a cache miss.
+    clobbers an existing value with a cache miss or an older scan. A row whose
+    batch fetch fell back to the API (cache older than 48 h) carries a newer
+    scan than the cache; overlaying the cache on the next cycle flipped its
+    profile between the two scans every refresh (seen 5 Oct: "scanned Oct"
+    at 08:17, "scanned Sep" at 12:13).
     """
     applied = 0
     for row in rows:
         if row.get("repo", "").lower() in skip_repos:
             continue
         cached = scorecard_cache.get(row.get("repo", ""))
+        if (row.get("scorecard_scanned_at") or "") > ((cached or {}).get("scanned_at") or ""):
+            continue
         if cached and cached.get("score") is not None:
             row["scorecard_score"] = cached["score"]
             row["scorecard_checks"] = cached.get("checks", {})
