@@ -976,6 +976,29 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   had a full refresh and kept their Scorecard (the old-name fallback works);
   outside the profile re-date, sitemap dates moved for 7 of 55 blog URLs,
   0 of 10 specs and 17 of 131 org pages.
+- **Phase 10 A2 + JSON-LD + profile lastmod DEPLOYED 2026-10-04 21:05 UTC**
+  (601f4142 @ 972346ff, #325-#328; recorded after the fact on 5 Oct).
+  #328 moved the profile hero compare tray, rank arrows, Scorecard check
+  order, "Rank Moved" events, push recency, category-average markers and
+  grade projections into lastmod:skip, and fixed the fp migration (an
+  unchanged page now takes the current version, so its next real change
+  re-dates it). Checked on 5 Oct: across the 08:17 -> 12:13 UTC refresh,
+  3 of 80 live profiles changed fingerprint (all real Scorecard rescans),
+  down from 23 of 60 before #328. But all 1,445 profiles still read
+  2026-10-05: the rank sparkline grows by one point a day (#331).
+- **lastmod day-boundary + compare + Scorecard fixes DEPLOYED 2026-10-05
+  12:44 UTC** (7eea5e09 @ bfa865ca, #331-#333; owner: "go for all the
+  fixes"). #331: the rank sparkline sits in lastmod:skip (fp 5). #332:
+  compare "Where they differ" sits in lastmod:skip, and a side's two biggest
+  leads are named in dimension order, not size order (fp 6); compare pages
+  were re-dating ~40% a day. #333: apply_cached_scorecards never overlays an
+  older cached scan on a newer one (SkillSpector flipped "scanned Oct" /
+  "scanned Sep" between refreshes). Combined main passed every gate;
+  predeploy_check OK (roster 1734 = live). Boot ran repair-commits (12:45 ->
+  12:46); scheduler running; build_report invariants []; markers live on
+  profiles and compare pages; the fp 6 migration kept every stored date.
+  CHECK on 6 Oct after the 00:00 UTC refresh: most profiles should still
+  read 2026-10-05 and compare pages should move far less than ~40% a day.
 
 ## Entries recorded only in the old AGENTS.md
 
