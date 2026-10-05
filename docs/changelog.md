@@ -999,6 +999,18 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   profiles and compare pages; the fp 6 migration kept every stored date.
   CHECK on 6 Oct after the 00:00 UTC refresh: most profiles should still
   read 2026-10-05 and compare pages should move far less than ~40% a day.
+- **Resolver fix DEPLOYED 2026-10-05 14:11 UTC** (3a45a382 @ 8e495601, #335;
+  owner: "do the needful change in the server"). check_agent_trust,
+  scan_stack and /api/v1/mcp/verify took the first board row whose npm/PyPI
+  package, slug or name matched, so "fastmcp" resolved to punkpeye/fastmcp
+  (TypeScript port, npm `fastmcp`) instead of PrefectHQ/fastmcp (slug
+  `fastmcp`). Found while testing the MCP server in Cline. find_agent_by_key
+  now checks slug, then name, then package id, shared by all three surfaces;
+  the npm/PyPI stdio packages resolve via /api/v1/mcp/verify, so no release
+  was needed. Verified live: fastmcp -> PrefectHQ/fastmcp on all three,
+  fastmcp-typescript -> punkpeye/fastmcp; boot repair-commits ok;
+  invariants []. Same day: hvtracker-mcp#5 added llms-install.md (Cline needs
+  `"type": "streamableHttp"`; a bare url falls back to legacy SSE and fails).
 
 ## Entries recorded only in the old AGENTS.md
 
