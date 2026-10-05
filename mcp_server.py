@@ -675,25 +675,12 @@ def fresh_streamable_http_app():
 def _resolve_agent(query: str) -> dict | None:
     """Resolve a name / slug / owner-repo / URL / package to a tracked agent.
 
-    Mirrors the resolution in ``app.api_v1_mcp_verify`` so the MCP tools and the
-    HTTP endpoint agree on what a string maps to.
+    Same resolution as ``/api/v1/mcp/verify`` and ``scan_stack``
+    (``app._resolve_registry_agent``), so every surface agrees on what a
+    string maps to.
     """
-    from app import _normalize_github_repo, find_agent, load_data
-    query = (query or "").strip()
-    if not query:
-        return None
-    repo = _normalize_github_repo(query)
-    agent = find_agent(repo) if repo else None
-    if agent is None:
-        key = query.lower()
-        for a in load_data().get("agents", []):
-            if (a.get("npm_package") or "").lower() == key or \
-               (a.get("pypi_package") or "").lower() == key or \
-               (a.get("slug") or "").lower() == key or \
-               (a.get("name") or "").strip().lower() == key:
-                agent = a
-                break
-    return agent
+    from app import _resolve_registry_agent
+    return _resolve_registry_agent(query)
 
 
 def _profile(a: dict) -> AgentProfile:
