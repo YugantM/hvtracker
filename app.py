@@ -808,24 +808,39 @@ def find_agent_by_slug(slug: str) -> dict | None:
     return None
 
 
+def find_agent_by_key(key: str) -> dict | None:
+    """A tracked agent by exact slug, then exact display name, then npm/PyPI
+    package id. Slugs and names are unique; package ids are not across
+    ecosystems (npm `fastmcp` is punkpeye/fastmcp, PyPI `fastmcp` is
+    PrefectHQ/fastmcp, slug `fastmcp`). A single first-match pass in board
+    order returned whichever ranked higher, so "fastmcp" resolved to the
+    TypeScript port."""
+    key = (key or "").strip().lower()
+    if not key:
+        return None
+    agents = load_data().get("agents", [])
+    for field in ("slug", "name"):
+        for a in agents:
+            if (a.get(field) or "").strip().lower() == key:
+                return a
+    for a in agents:
+        if key in ((a.get("npm_package") or "").lower(), (a.get("pypi_package") or "").lower()):
+            return a
+    return None
+
+
 def _resolve_registry_agent(identifier: str) -> dict | None:
-    """Resolve an identifier to a tracked agent: GitHub repo/URL first, then by
-    npm/pypi package, slug, or display name. Mirrors the resolution used by
-    /api/v1/mcp/verify and the MCP server so all three agree on what a string maps to."""
+    """Resolve an identifier to a tracked agent: GitHub repo/URL first, then
+    find_agent_by_key (slug, display name, npm/pypi package). Shared by
+    /api/v1/mcp/verify, scan_stack and the MCP server so all agree on what a
+    string maps to."""
     identifier = (identifier or "").strip()
     if not identifier:
         return None
     repo = _normalize_github_repo(identifier)
     agent = find_agent(repo) if repo else None
     if agent is None:
-        key = identifier.lower()
-        for a in load_data().get("agents", []):
-            if (a.get("npm_package") or "").lower() == key or \
-               (a.get("pypi_package") or "").lower() == key or \
-               (a.get("slug") or "").lower() == key or \
-               (a.get("name") or "").strip().lower() == key:
-                agent = a
-                break
+        agent = find_agent_by_key(identifier)
     return agent
 
 
@@ -1117,17 +1132,9 @@ def api_v1_mcp_verify(request: Request, server: str = ""):
     if repo:
         agent = find_agent(repo)
     if agent is None:
-        # Resolve by package id, or by the agent's slug / display name — users
-        # naturally type the name they see on the leaderboard ("headroom")
-        # rather than the owner/repo or package id. Names and slugs are unique.
-        key = server.lower()
-        for a in load_data().get("agents", []):
-            if (a.get("npm_package") or "").lower() == key or \
-               (a.get("pypi_package") or "").lower() == key or \
-               (a.get("slug") or "").lower() == key or \
-               (a.get("name") or "").strip().lower() == key:
-                agent = a
-                break
+        # Users naturally type the name they see on the leaderboard
+        # ("headroom") rather than the owner/repo or package id.
+        agent = find_agent_by_key(server)
     if agent is not None:
         verdict = mcp_trust.evaluate(agent, server)
         verdict["attestation"] = mcp_trust.build_attestation(verdict)
