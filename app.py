@@ -1459,7 +1459,13 @@ curl -s "https://hvtracker.net/registry/all/v0.1/servers/io.github.github%2Fgith
 
 @app.get("/og-v2.png")
 def og_v2():
-    return FileResponse(os.path.join(BASE_DIR, "og-v2.png"), media_type="image/png")
+    # Every full render regenerates the site card on the volume with current
+    # totals. Serving the copy baked into the image instead left every social
+    # preview showing June's "272 active projects" until Oct 2026; that copy is
+    # now only the fallback for a volume that hasn't rendered one yet.
+    fresh = os.path.join(OUTPUT_DIR, "og-v2.png")
+    path = fresh if os.path.isfile(fresh) else os.path.join(BASE_DIR, "og-v2.png")
+    return FileResponse(path, media_type="image/png")
 
 
 @app.get("/og-verify.png")
