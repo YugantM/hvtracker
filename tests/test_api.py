@@ -307,6 +307,22 @@ def test_machine_usage_counters(client):
     assert "since" in after
 
 
+def test_agent_record_fetches_have_their_own_channel(client):
+    """Q4 plan G1: /data/agents/<slug>.json carries the signed trust_credential,
+    so fetches of it are counted apart from every other /data/*.json file.
+    Otherwise there is no way to tell whether anyone verifies a record."""
+    before = client.get("/healthz").json()["machine_usage"]
+    client.get("/data/agents/haystack.json")
+    after = client.get("/healthz").json()["machine_usage"]
+    # raw request counting: a canonical 301 + its follow-up may both count
+    assert after["agent_records"] > before["agent_records"]
+    assert after["data_json"] == before["data_json"]
+    # The durable rollup behind /live/ and /api/v1/usage reports the channel too.
+    import usage
+    usage._snapshot_cache = None
+    assert "agent_records" in usage.snapshot()["totals"]["by_channel"]
+
+
 def test_mcp_requests_counted_by_protocol_era(client):
     """/mcp requests are split by the 2026-07-28 Mcp-Method header; 2025-era
     requests carry none and count as legacy. Unknown values fold into other."""

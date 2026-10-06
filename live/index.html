@@ -58,6 +58,8 @@
     .tool-bar { height: 9px; border-radius: 999px; background: color-mix(in srgb, var(--line) 60%, transparent); overflow: hidden; }
     .tool-bar i { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
     .tool-n { font: 12px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+    /* Counts here span 0 to six digits; a fixed column keeps the bars aligned. */
+    #channels .tool-n { min-width: 7ch; text-align: right; }
 
     .feed { display: grid; gap: 6px; }
     .feed-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font-size: 13px; }
@@ -123,6 +125,11 @@
       </section>
 
       <section class="panel">
+        <h2>Requests by surface <span>· since counting began</span></h2>
+        <div class="tools" id="channels"><span class="live-loading">Loading…</span></div>
+      </section>
+
+      <section class="panel">
         <h2>Live calls <span>· tool name and time only</span></h2>
         <div class="feed" id="feed"><span class="live-loading">Loading…</span></div>
       </section>
@@ -139,6 +146,8 @@
         shown beneath it, are raw HTTP hits on <code>/mcp</code>, <code>/api/v1/*</code> and the
         JSON data files. They measure <em>traffic</em>, not work done: about 98% are MCP protocol
         handshakes and directory crawlers listing our tools, so they would overstate real use. Traffic from this page is excluded from both.
+        <code>agent records</code> are fetches of <code>/data/agents/&lt;slug&gt;.json</code>, the file
+        that carries each agent's signed trust credential; until October 2026 they were counted under other data files.
         We record the tool name and the hour — never arguments, IPs, or anything identifying
         who asked. Raw numbers: <a href="/api/v1/usage">/api/v1/usage</a> ·
         <a href="/data/">API docs</a>.
@@ -253,6 +262,25 @@
         }).join('');
       }
 
+      // Fixed order and labels, so a surface with no traffic still shows as 0
+      // instead of disappearing from the list.
+      var CHANNELS = [
+        ['mcp', 'MCP endpoint'], ['api_v1', 'REST API'], ['agent_records', 'agent records'],
+        ['data_json', 'other data files'], ['registry', 'registry feed'], ['exports', 'dataset exports']
+      ];
+      function drawChannels(byChannel) {
+        var el = document.getElementById('channels');
+        byChannel = byChannel || {};
+        var max = Math.max(1, Math.max.apply(null, CHANNELS.map(function (c) { return byChannel[c[0]] || 0; })));
+        el.innerHTML = CHANNELS.map(function (c) {
+          var n = byChannel[c[0]] || 0;
+          var pct = n ? Math.max(2, Math.round((n / max) * 100)) : 0;
+          return '<div class="tool-row"><span class="tool-name">' + esc(c[1]) + '</span>' +
+            '<span class="tool-bar"><i style="width:' + pct + '%"></i></span>' +
+            '<span class="tool-n">' + fmt(n) + '</span></div>';
+        }).join('');
+      }
+
       function drawFeed(calls) {
         var el = document.getElementById('feed');
         if (!calls || !calls.length) { el.innerHTML = '<span class="feed-empty">No calls yet in this window.</span>'; return; }
@@ -283,6 +311,7 @@
             document.getElementById('s-req').textContent = fmt(d.window.requests);
             drawChart(d.window.hourly);
             drawTools(d.window.by_tool);
+            drawChannels(d.totals.by_channel);
             drawFeed(d.recent_calls);
           })
           .catch(function () {

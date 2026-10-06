@@ -401,7 +401,7 @@ def _canonical_redirect_target(request: Request) -> str | None:
 # ---- machine-surface usage counters (master plan 1.2) ---------------------
 # In-memory since last process start — enough to establish the API/MCP usage
 # baseline KPI without any storage. Exposed in /healthz as machine_usage.
-_usage_counters = {"api_v1": 0, "mcp": 0, "data_json": 0, "exports": 0, "registry": 0}
+_usage_counters = {"api_v1": 0, "mcp": 0, "data_json": 0, "agent_records": 0, "exports": 0, "registry": 0}
 _USAGE_SINCE = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 # /mcp requests by protocol era: 2026-07-28 clients name the method in an
@@ -487,6 +487,10 @@ def _count_machine_usage(path: str, mcp_method: str | None = None) -> None:
         channel = "exports"
     elif path.startswith("/registry/") and "/v0.1/" in path:
         channel = "registry"
+    elif path.startswith("/data/agents/") and path.endswith(".json"):
+        # Per-agent records carry the signed trust_credential, so their
+        # fetches are the closest measure of anyone verifying a record.
+        channel = "agent_records"
     elif path.startswith("/data/") and path.endswith(".json"):
         channel = "data_json"
     if channel is None:
