@@ -129,12 +129,9 @@
 
         <p class="note">Badges are plain SVGs served from this site, so they always show your project's current score and grade — there is nothing to update once the badge is in place.</p>
 
-        <div class="snippet-label" style="margin-top:22px">Gate your CI on trust — <a href="https://github.com/marketplace/actions/hvtrust-gate" target="_blank" rel="noopener">HVTrust Gate</a> on GitHub Marketplace</div>
-        <div class="snippet">- uses: YugantM/hvtrust-gate@v1
-  with:
-    targets: "langchain-ai/langgraph, crewai"
-    min-grade: C</div>
-        <p class="note">Fails the job when an AI-agent dependency's evidence-based grade drops below your threshold. No API key; outages never break your build.</p>
+        <div class="snippet-label" style="margin-top:22px">Prefer a CI check to a badge? <a href="https://github.com/marketplace/actions/hvtrust-gate" target="_blank" rel="noopener">HVTrust Gate</a> on GitHub Marketplace</div>
+        <div class="snippet">- uses: YugantM/hvtrust-gate@v1</div>
+        <p class="note">With no configuration it grades the AI agents and MCP servers in your <code>requirements.txt</code>, <code>pyproject.toml</code>, <code>package.json</code> and MCP configs, comments on pull requests that change them, and can fail the job below a grade you choose. No API key; outages never break your build.</p>
       </section>
 
       <section id="top-repos">
