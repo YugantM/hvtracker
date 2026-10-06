@@ -1011,6 +1011,17 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   fastmcp-typescript -> punkpeye/fastmcp; boot repair-commits ok;
   invariants []. Same day: hvtracker-mcp#5 added llms-install.md (Cline needs
   `"type": "streamableHttp"`; a bare url falls back to legacy SSE and fails).
+- **Fresh site OG card DEPLOYED 2026-10-06 07:04 UTC** (03017cd6 @ 128d2faf, #338;
+  owner: "go ahead with other steps"). Every social preview had shown June's card
+  ("272 active projects · 2h · v3"): renders regenerated og-v2.png on the volume, but
+  /og-v2.png served the copy baked into the image, and each render first copied that
+  stale file over the volume one. Now served from OUTPUT_DIR (image copy is only the
+  fallback), not pre-copied, and generate_site_card takes METHODOLOGY_VERSION and the
+  4h refresh. Verified live after the boot repair-commits render: "1346 active projects
+  · 18 categories · 4h · v4.4"; invariants []. Cloudflare caches images up to 24h.
+  Known nit: "Signals tracked:" overlaps the list on the server's font.
+  Same morning: lastmod day-boundary check passed (only 11% of profiles took
+  2026-10-06, was 100%; category/ecosystem list pages still re-date most days).
 
 ## Entries recorded only in the old AGENTS.md
 
