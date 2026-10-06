@@ -44,7 +44,7 @@ COPY --from=builder /opt/venv /opt/venv
 COPY app.py fetch_and_build.py generate_og_card.py specs.py db.py cache.py storage.py schema.sql ./
 COPY signing.py mcp_trust.py open_lookup.py verify_log.py mcp_server.py auth.py usage.py ./
 # Generator inputs: curated seed, scorecard cache, and templates/assets
-COPY agents.json template.html ./
+COPY agents.json template.html safety_facts.json ./
 COPY --from=builder /build/scorecard-cache.json ./scorecard-cache.json
 COPY --from=builder /build/mcp-registry-snapshot.json ./mcp-registry-snapshot.json
 COPY templates/ templates/
