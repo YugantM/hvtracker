@@ -101,6 +101,17 @@ Milestone history lives in `docs/changelog.md` — record new milestones there.
   in GSC URL Inspection and under ~2% of sitemap URLs are uncrawled (sweep:
   ~/hv_marketing/data/indexing-2026-10-01/inspect_bulk.py). Roster removals
   and fixes are not paused.
+- Active: Q4 2026 plan (approved 2026-10-06, runs to 31 Dec)
+  https://claude.ai/artifact/89TFKpJfa8ce92uKowefQk. Positioning: HVTracker is
+  the independent reputation record bound to identities others issue (signed
+  A2A cards, domains, package registries); it does not authenticate agents.
+  Workstreams E–I run alongside Phase 10: curated, sourced, score-neutral
+  hosted-service and access facts on existing profiles (E; list and gaps in
+  docs/research/is-x-safe-question-audit-2026-10-06.md), an A2A Agent Card
+  study run as a GitHub Action, never in the web service (F), identity-bound
+  credentials (G; the `agent_records` usage channel counts credential
+  fetches), allowlist files only if the registry gate fails (H). Hosted-service
+  facts never change scores without a separate evidence gate.
 - Active: Phase 10 "turn impressions into clicks" (approved 2026-10-04, runs to
   15 Nov) https://claude.ai/artifact/CoU1ktL5ejKEffo9wv5snh: logged title
   tests on profiles and categories (CTR_TEST_AGENT / CTR_TEST_CATEGORY), a
