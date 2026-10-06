@@ -1,0 +1,58 @@
+name: A2A Agent Card study
+
+# Q4 plan F1: which public hosts publish an A2A Agent Card, an AI Catalog or an
+# MCP server card, and whether the cards are valid, signed and verifiable.
+# Fetches only public discovery documents, honours robots.txt and rate-limits
+# per host (see scripts/a2a_card_study.py). Runs here, never in the web
+# service, and pushes the result to the `data` branch: a2a-card-study.json
+# (latest) plus a dated copy, so the monthly post can show a trend.
+
+on:
+  schedule:
+    - cron: "41 4 1 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  study:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+
+      - name: Run the study
+        run: python scripts/a2a_card_study.py --out /tmp/a2a-card-study.json
+
+      - name: Push to the data branch
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          day="$(date -u '+%Y-%m-%d')"
+          # -B data origin/data: a bare `git checkout data` is ambiguous with
+          # the tracked data/ directory (see scorecard-scan.yml). The hourly
+          # Scorecard scan pushes to `data` too; retry on a race.
+          for attempt in 1 2 3; do
+            git fetch origin data
+            git checkout -B data origin/data
+            mkdir -p a2a-card-study
+            cp /tmp/a2a-card-study.json a2a-card-study.json
+            cp /tmp/a2a-card-study.json "a2a-card-study/${day}.json"
+            git add a2a-card-study.json "a2a-card-study/${day}.json"
+            if git diff --cached --quiet; then
+              echo "Study unchanged."
+              exit 0
+            fi
+            git commit -q -m "chore: A2A Agent Card study ${day}"
+            if git push origin data; then
+              exit 0
+            fi
+            echo "Push raced another update; retrying ($attempt)."
+            sleep $((attempt * 10))
+          done
+          exit 1
