@@ -270,8 +270,11 @@ def generate(agent_data: dict, output_path: str):
     print(f"Generated OG card: {output_path} ({W}x{H})")
 
 
-def generate_site_card(output_path: str, total: int = 196, categories: int = 15):
-    """Generate the site-level OG card for the homepage."""
+def generate_site_card(output_path: str, total: int = 196, categories: int = 15,
+                       methodology: str = "v4", refresh: str = "4h"):
+    """Generate the site-level OG card for the homepage. The refresh interval
+    and methodology version are passed in rather than hard-coded, so the card
+    can't keep advertising a retired "2h" / "v3"."""
     img = Image.new("RGB", (W, H), hex_rgb(BG))
     draw = ImageDraw.Draw(img)
 
@@ -312,8 +315,8 @@ def generate_site_card(output_path: str, total: int = 196, categories: int = 15)
     stats = [
         (str(total), "active projects", MOSS),
         (str(categories), "categories", LOBSTER),
-        ("2h", "refresh cycle", ACCENT_WARM),
-        ("v3", "methodology", AMBER),
+        (refresh, "refresh cycle", ACCENT_WARM),
+        (methodology, "methodology", AMBER),
     ]
     for i, (val, label, color) in enumerate(stats):
         x = left_x + i * (stat_w + gap)

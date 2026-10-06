@@ -982,3 +982,28 @@ def test_api_cache_on_the_volume_is_never_served(client):
     assert client.get("/.cache/api/x.json").status_code == 404
     assert client.get("/.cache").status_code == 404
     assert client.get("/healthz").json()["api_cache_entries"] >= 1
+
+
+def test_site_og_card_is_the_freshly_rendered_one(client, monkeypatch, tmp_path):
+    """/og-v2.png must serve the card each render writes to OUTPUT_DIR (current
+    totals), not the copy baked into the image, which kept every social preview
+    on June's "272 active projects" until Oct 2026. The image copy remains the
+    fallback for a volume that hasn't rendered a card yet."""
+    import app
+    rendered = tmp_path / "rendered"
+    rendered.mkdir()
+    (rendered / "og-v2.png").write_bytes(b"\x89PNG fresh card from this render")
+    monkeypatch.setattr(app, "OUTPUT_DIR", str(rendered))
+    assert client.get("/og-v2.png").content == b"\x89PNG fresh card from this render"
+
+    monkeypatch.setattr(app, "OUTPUT_DIR", str(tmp_path / "empty"))  # no card rendered yet
+    with open(os.path.join(app.BASE_DIR, "og-v2.png"), "rb") as f:
+        assert client.get("/og-v2.png").content == f.read()
+
+
+def test_site_card_takes_methodology_and_refresh(tmp_path):
+    from PIL import Image
+    from generate_og_card import generate_site_card
+    out = tmp_path / "card.png"
+    generate_site_card(str(out), total=1705, categories=18, methodology="v4.4", refresh="4h")
+    assert Image.open(out).size == (1200, 630)

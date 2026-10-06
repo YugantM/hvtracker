@@ -7249,8 +7249,10 @@ def main() -> None:
     # When writing to a separate output root (the volume), copy the static
     # assets the site references but that aren't generated (OG images, etc.).
     if script_dir != base_dir:
+        # og-v2.png is not copied: each render regenerates it on the volume, and
+        # copying the image's stale one first overwrote the fresh card.
         for asset in (".nojekyll", "robots.txt", "analytics.js", "auth.js",
-                      "og-v2.png", "og-provenance.png", "linkedin_carousel.js"):
+                      "og-provenance.png", "linkedin_carousel.js"):
             src = os.path.join(base_dir, asset)
             if os.path.isfile(src):
                 shutil.copy2(src, os.path.join(script_dir, asset))
@@ -8629,6 +8631,7 @@ def main() -> None:
                     os.path.join(script_dir, "og-v2.png"),
                     total=len(agent_rows),
                     categories=len(categories),
+                    methodology=METHODOLOGY_VERSION,
                 )
             except Exception as e:
                 print(f"  WARN: Site OG card failed: {e}")
