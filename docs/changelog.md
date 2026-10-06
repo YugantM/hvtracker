@@ -1022,6 +1022,13 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   Known nit: "Signals tracked:" overlaps the list on the server's font.
   Same morning: lastmod day-boundary check passed (only 11% of profiles took
   2026-10-06, was 100%; category/ecosystem list pages still re-date most days).
+- **HVTrust Gate mentions DEPLOYED 2026-10-06 07:49 UTC** (3798943a @ b51abf67, #341;
+  owner: "yes do 1 and 2, deploy"). /scan/ ("Run this on every pull request"), /verify/
+  (offers CI next to /scan/) and /badges/ (v1.0 targets snippet replaced with the v1.1
+  zero-config one-liner) now point to YugantM/hvtrust-gate v1.1.0 (released the same
+  morning: zero-config scan and PR comments; Marketplace shows v1.1.0). Body copy only;
+  lastmod_diff: those 3 pages. Verified live after the boot repair-commits render;
+  invariants []. Also: hvtracker-mcp#6 adds a "Check your AI dependencies in CI" section.
 
 ## Entries recorded only in the old AGENTS.md
 
