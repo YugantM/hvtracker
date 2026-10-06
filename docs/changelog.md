@@ -1029,6 +1029,21 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   morning: zero-config scan and PR comments; Marketplace shows v1.1.0). Body copy only;
   lastmod_diff: those 3 pages. Verified live after the boot repair-commits render;
   invariants []. Also: hvtracker-mcp#6 adds a "Check your AI dependencies in CI" section.
+- **Q4 2026 plan approved 2026-10-06** (owner: "approve all six"):
+  https://claude.ai/artifact/89TFKpJfa8ce92uKowefQk. HVTracker aims to be the
+  independent, evidence-based reputation record bound to identities others issue,
+  not an authenticator of agents. Workstreams E–I run alongside Phase 10 (A–D, to
+  15 Nov): E hosted-service and access facts on existing profiles (curated, sourced,
+  score-neutral); F "State of public A2A agents" study (GitHub Action writing to the
+  `data` branch; gate ~14 Dec: 200+ reachable public cards → build a checker in Q1);
+  G identity-bound credentials (G1 usage channel, G2 identifier map, G3
+  trust-credential v0.3); H allowlist files only if the 31 Oct registry gate fails;
+  I AIUC-1 crosswalk (optional). Same night: #343 (G1) MERGED, NOT deployed: fetches
+  of /data/agents/<slug>.json count under a new `agent_records` usage channel (they
+  were inside data_json), and /live/ shows "Requests by surface". #344 (E1 question
+  audit) revises the E2 list by demand (Codex, LiveKit Agents, Freebuff, Kilo Code in
+  for n8n, Daytona, Mem0, Browser Use) and proposes E4, OSV advisory history plus
+  roster package-id fixes, which awaits an owner decision.
 
 ## Entries recorded only in the old AGENTS.md
 
