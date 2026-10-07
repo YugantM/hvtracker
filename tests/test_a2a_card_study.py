@@ -191,8 +191,9 @@ def test_card_urls_from_registry_page():
 
 
 def test_catalog_analysis_counts_trust_manifests():
-    doc = {"entries": [
-        {"identifier": "urn:air:example.com:agent:a", "mediaType": "application/a2a-agent-card+json",
+    # Entries name their media type in `type` (current spec); early drafts used `mediaType`.
+    doc = {"specVersion": "1.0", "entries": [
+        {"identifier": "urn:air:example.com:agent:a", "type": "application/a2a-agent-card+json",
          "url": "https://example.com/a.json",
          "trustManifest": {"identity": "did:web:example.com", "signature": "x..y",
                            "attestations": [{"type": "SOC2-Type2", "uri": "https://example.com/soc2.pdf"}]}},
@@ -200,16 +201,48 @@ def test_catalog_analysis_counts_trust_manifests():
          "url": "https://example.com/mcp/server-card"}]}
     c = st.analyse_catalog(doc)
     assert c["entries"] == 2 and c["lists_a2a"] and c["lists_mcp"]
+    assert c["media_types"] == ["application/a2a-agent-card+json", "application/mcp-server-card+json"]
     assert c["trust_manifests"] == 1 and c["signed_trust_manifests"] == 1
     assert c["attestation_types"] == ["SOC2-Type2"]
-    assert st.analyse_catalog({"not": "a catalog"})["entries"] == 0
+
+
+def test_only_documents_with_an_entries_array_are_catalogs():
+    # 6 Oct's first run counted every JSON object at the path (error bodies,
+    # SPA config) as a catalog: 804 "catalogs", 133 of them not catalogs at all.
+    assert st.analyse_catalog({"error": "not found"}) is None
+    assert st.analyse_catalog(None) is None
+    assert st.analyse_catalog({"specVersion": "1.0", "entries": []})["entries"] == 0
+
+
+def test_board_is_read_with_a_first_party_size_cap(monkeypatch):
+    # The board API returns ~4 MB; the 512 KB third-party cap silently read 0
+    # listings on 6 Oct. It must use the larger cap, and fail loudly.
+    calls = []
+
+    def fake_get(self, url, max_bytes=st.MAX_BYTES):
+        calls.append(max_bytes)
+        return {"status": 200, "json": {"total": 900, "agents": [{"slug": f"a{i}"} for i in range(700)]},
+                "error": None}
+
+    monkeypatch.setattr(st.Fetcher, "get", fake_get)
+    assert len(st.load_board(st.Fetcher())) == 700  # one call; `total` also counts skills
+    assert calls and all(c > st.MAX_BYTES for c in calls)
+
+    monkeypatch.setattr(st.Fetcher, "get", lambda self, url, max_bytes=0: {
+        "status": 403, "json": None, "error": None})
+    try:
+        st.load_board(st.Fetcher())
+    except RuntimeError as e:
+        assert "403" in str(e)
+    else:
+        raise AssertionError("an unreadable board must not read as an empty roster")
 
 
 def test_summary_counts():
     signed = {**st.analyse_card(_card(), "https://a.example.com/.well-known/agent-card.json", None),
               "signed": True, "verified": True, "jku_same_site": True}
     rows = [{"host": "a.example.com", "sources": ["mcp"], "reachable": True, "robots_blocked": [],
-             "card": signed, "legacy_card": None, "catalog": {"lists_a2a": True},
+             "card": signed, "legacy_card": None, "catalog": {"entries": 1, "lists_a2a": True},
              "server_cards_checked": 2, "server_cards_found": 1},
             {"host": "b.example.com", "sources": ["roster"], "reachable": False, "robots_blocked": [],
              "card": None, "legacy_card": None, "catalog": None,

@@ -110,14 +110,15 @@ class Fetcher:
             self._local.session = s
         return s
 
-    def get(self, url: str) -> dict:
-        """{"status", "json", "error", "content_type"}; body capped at MAX_BYTES."""
+    def get(self, url: str, max_bytes: int = MAX_BYTES) -> dict:
+        """{"status", "json", "error", "content_type"}; body capped at max_bytes
+        (MAX_BYTES for third-party hosts; first-party APIs pass a larger cap)."""
         try:
             with self.session.get(url, timeout=TIMEOUT, stream=True, allow_redirects=True) as r:
                 body = b""
                 for chunk in r.iter_content(16384):
                     body += chunk
-                    if len(body) > MAX_BYTES:
+                    if len(body) > max_bytes:
                         return {"status": r.status_code, "json": None, "error": "too large",
                                 "content_type": r.headers.get("content-type", "")}
                 out = {"status": r.status_code, "json": None, "error": None,
@@ -210,23 +211,28 @@ def card_urls_from_html(html: str) -> list[str]:
     return sorted(set(found))
 
 
+# Our own board and the MCP registry return pages far above the 512 KB cap
+# meant for third-party hosts (the board is ~4 MB): 6 Oct's first run read 0
+# listings because the cap rejected the page as "too large".
+FIRST_PARTY_MAX_BYTES = 32 * 1024 * 1024
+
+
 def load_board(fetcher: Fetcher) -> list[dict]:
-    rows, offset = [], 0
-    while True:
-        res = fetcher.get(f"{BOARD_API}?limit=2000&offset={offset}")
-        page = (res.get("json") or {}).get("agents") or []
-        rows += page
-        total = (res.get("json") or {}).get("total") or 0
-        offset += len(page)
-        if not page or offset >= total:
-            return rows
+    """Every agent listing on the live board. /api/v1/agents returns them all in
+    one response (it ignores limit/offset, and its `total` also counts skills)."""
+    res = fetcher.get(BOARD_API, max_bytes=FIRST_PARTY_MAX_BYTES)
+    if res.get("json") is None:
+        raise RuntimeError(f"board API unreadable: {res.get('status')} {res.get('error')}")
+    return res["json"].get("agents") or []
 
 
 def load_mcp_registry(fetcher: Fetcher) -> list[dict]:
     entries, cursor = [], ""
     while True:
         url = f"{MCP_REGISTRY_API}?version=latest&limit=100" + (f"&cursor={requests.utils.quote(cursor)}" if cursor else "")
-        res = fetcher.get(url)
+        res = fetcher.get(url, max_bytes=FIRST_PARTY_MAX_BYTES)
+        if res.get("json") is None:
+            raise RuntimeError(f"MCP registry unreadable: {res.get('status')} {res.get('error')}")
         data = res.get("json") or {}
         servers = data.get("servers") or []
         entries += servers
@@ -535,12 +541,16 @@ def analyse_card(card: dict, card_url: str, fetcher: Fetcher | None) -> dict:
     }
 
 
-def analyse_catalog(doc) -> dict:
+def analyse_catalog(doc) -> dict | None:
     """Entries, media types and Trust Manifest use in an AI Catalog document
-    (https://github.com/Agent-Card/ai-catalog: `entries[]` with `mediaType`)."""
+    (https://github.com/Agent-Card/ai-catalog). None when the JSON isn't a
+    catalog: the spec requires an `entries` array (which may be empty).
+    Entries name their media type in `type`; early drafts used `mediaType`."""
     entries = doc.get("entries") if isinstance(doc, dict) else None
-    entries = [e for e in entries if isinstance(e, dict)] if isinstance(entries, list) else []
-    types = sorted({str(e.get("mediaType") or "?") for e in entries})
+    if not isinstance(entries, list):
+        return None
+    entries = [e for e in entries if isinstance(e, dict)]
+    types = sorted({str(e.get("type") or e.get("mediaType") or "?") for e in entries})
     manifests = [e["trustManifest"] for e in entries if isinstance(e.get("trustManifest"), dict)]
     attestation_types = sorted({str(a.get("type") or "?") for m in manifests
                                 for a in m.get("attestations") or [] if isinstance(a, dict)})
@@ -585,8 +595,8 @@ def probe_host(fetcher: Fetcher, host: str, sources: list[str], remotes: list[st
         if res and looks_like_card(res.get("json")):
             row["legacy_card"] = analyse_card(res["json"], res.get("final_url") or base + LEGACY_CARD_PATH, fetcher)
     res = fetch_if_allowed(base + CATALOG_PATH)
-    if res and isinstance(res.get("json"), dict):
-        row["catalog"] = analyse_catalog(res["json"])
+    if res:
+        row["catalog"] = analyse_catalog(res.get("json"))
     for remote in remotes[:SERVER_CARDS_PER_HOST]:
         parts = urlsplit(remote)
         card = urlunsplit((parts.scheme, parts.netloc, parts.path.rstrip("/") + "/server-card", "", ""))
@@ -639,6 +649,7 @@ def summarise(rows: list[dict], source: str | None = None) -> dict:
         "signed_key_same_site": sum(1 for c in signed if c["jku_same_site"]),
         "signed_verified": sum(1 for c in signed if c["verified"]),
         "ai_catalogs": sum(1 for r in reachable if r["catalog"]),
+        "ai_catalogs_nonempty": sum(1 for r in reachable if r["catalog"] and r["catalog"]["entries"]),
         "ai_catalogs_listing_a2a": sum(1 for r in reachable if r["catalog"] and r["catalog"]["lists_a2a"]),
         "ai_catalogs_with_trust_manifest": sum(1 for r in reachable
                                                if r["catalog"] and r["catalog"].get("trust_manifests")),
