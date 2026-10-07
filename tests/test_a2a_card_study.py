@@ -216,24 +216,38 @@ def test_only_documents_with_an_entries_array_are_catalogs():
 
 def test_board_is_read_with_a_first_party_size_cap(monkeypatch):
     # The board API returns ~4 MB; the 512 KB third-party cap silently read 0
-    # listings on 6 Oct. It must use the larger cap, and fail loudly.
+    # listings on 6 Oct. It must use the larger cap and a longer timeout.
     calls = []
 
-    def fake_get(self, url, max_bytes=st.MAX_BYTES):
-        calls.append(max_bytes)
+    def fake_get(self, url, max_bytes=st.MAX_BYTES, timeout=st.TIMEOUT):
+        calls.append((max_bytes, timeout))
         return {"status": 200, "json": {"total": 900, "agents": [{"slug": f"a{i}"} for i in range(700)]},
                 "error": None}
 
     monkeypatch.setattr(st.Fetcher, "get", fake_get)
     assert len(st.load_board(st.Fetcher())) == 700  # one call; `total` also counts skills
-    assert calls and all(c > st.MAX_BYTES for c in calls)
+    assert calls == [(st.FIRST_PARTY_MAX_BYTES, st.FIRST_PARTY_TIMEOUT)]
 
-    monkeypatch.setattr(st.Fetcher, "get", lambda self, url, max_bytes=0: {
-        "status": 403, "json": None, "error": None})
+
+def test_first_party_reads_retry_then_fail_loudly(monkeypatch):
+    # 7 Oct: one registry page timed out and, with no retry, killed the run.
+    monkeypatch.setattr(st.time, "sleep", lambda s: None)
+    replies = [{"status": None, "json": None, "error": "ReadTimeout"},
+               {"status": 200, "json": {"servers": [{"server": {}}], "metadata": {}}, "error": None}]
+    monkeypatch.setattr(st.Fetcher, "get", lambda self, url, **kw: replies.pop(0))
+    assert len(st.load_mcp_registry(st.Fetcher())) == 1
+
+    tries = []
+
+    def always_down(self, url, **kw):
+        tries.append(url)
+        return {"status": 403, "json": None, "error": None}
+
+    monkeypatch.setattr(st.Fetcher, "get", always_down)
     try:
         st.load_board(st.Fetcher())
     except RuntimeError as e:
-        assert "403" in str(e)
+        assert "403" in str(e) and len(tries) == st.FIRST_PARTY_TRIES
     else:
         raise AssertionError("an unreadable board must not read as an empty roster")
 
