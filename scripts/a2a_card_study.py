@@ -110,11 +110,11 @@ class Fetcher:
             self._local.session = s
         return s
 
-    def get(self, url: str, max_bytes: int = MAX_BYTES) -> dict:
+    def get(self, url: str, max_bytes: int = MAX_BYTES, timeout: float = TIMEOUT) -> dict:
         """{"status", "json", "error", "content_type"}; body capped at max_bytes
         (MAX_BYTES for third-party hosts; first-party APIs pass a larger cap)."""
         try:
-            with self.session.get(url, timeout=TIMEOUT, stream=True, allow_redirects=True) as r:
+            with self.session.get(url, timeout=timeout, stream=True, allow_redirects=True) as r:
                 body = b""
                 for chunk in r.iter_content(16384):
                     body += chunk
@@ -215,25 +215,37 @@ def card_urls_from_html(html: str) -> list[str]:
 # meant for third-party hosts (the board is ~4 MB): 6 Oct's first run read 0
 # listings because the cap rejected the page as "too large".
 FIRST_PARTY_MAX_BYTES = 32 * 1024 * 1024
+# The registry API answers in ~1 s or ~15 s, roughly half each
+# (scripts/mcp_registry_pull.py), and 7 Oct's rerun died on one 10 s timeout.
+# First-party reads get the registry scripts' 60 s and 3 tries.
+FIRST_PARTY_TIMEOUT = 60
+FIRST_PARTY_TRIES = 3
+
+
+def get_first_party(fetcher: Fetcher, url: str, what: str) -> dict:
+    """JSON from our board or the MCP registry, retried; raises when every try
+    fails, so a missing source fails the run instead of shrinking it."""
+    res: dict = {}
+    for attempt in range(FIRST_PARTY_TRIES):
+        res = fetcher.get(url, max_bytes=FIRST_PARTY_MAX_BYTES, timeout=FIRST_PARTY_TIMEOUT)
+        if res.get("json") is not None:
+            return res["json"]
+        if attempt < FIRST_PARTY_TRIES - 1:
+            time.sleep(5 * (attempt + 1))
+    raise RuntimeError(f"{what} unreadable after {FIRST_PARTY_TRIES} tries: {res.get('status')} {res.get('error')}")
 
 
 def load_board(fetcher: Fetcher) -> list[dict]:
     """Every agent listing on the live board. /api/v1/agents returns them all in
     one response (it ignores limit/offset, and its `total` also counts skills)."""
-    res = fetcher.get(BOARD_API, max_bytes=FIRST_PARTY_MAX_BYTES)
-    if res.get("json") is None:
-        raise RuntimeError(f"board API unreadable: {res.get('status')} {res.get('error')}")
-    return res["json"].get("agents") or []
+    return get_first_party(fetcher, BOARD_API, "board API").get("agents") or []
 
 
 def load_mcp_registry(fetcher: Fetcher) -> list[dict]:
     entries, cursor = [], ""
     while True:
         url = f"{MCP_REGISTRY_API}?version=latest&limit=100" + (f"&cursor={requests.utils.quote(cursor)}" if cursor else "")
-        res = fetcher.get(url, max_bytes=FIRST_PARTY_MAX_BYTES)
-        if res.get("json") is None:
-            raise RuntimeError(f"MCP registry unreadable: {res.get('status')} {res.get('error')}")
-        data = res.get("json") or {}
+        data = get_first_party(fetcher, url, "MCP registry")
         servers = data.get("servers") or []
         entries += servers
         cursor = (data.get("metadata") or {}).get("nextCursor") or ""
