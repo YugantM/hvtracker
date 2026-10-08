@@ -79,3 +79,44 @@ def test_empty_watchlist_explains_how_to_start():
     assert auth.watchlist_summary_html([], _index()) == ""
     empty = auth.watchlist_html([], _index())
     assert "Track" in empty and "<ul" not in empty
+
+
+# ---- /account route: tracked confirmation + recent-changes feed ------------
+
+def _account_client(monkeypatch, watch, last_read=None):
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+
+    index = _index()
+    index["climber"]["recent_events"] = [
+        {"date": "2026-10-06", "type": "grade_changed", "label": "Grade",
+         "detail": "Trust grade C → B", "tone": "positive"}]
+    index["faller"]["recent_events"] = [
+        {"date": "2026-09-20", "type": "trust_score_changed", "label": "HVTrust down",
+         "detail": "HVTrust down 4.0pts (44.0 → 40.0)", "tone": "negative"}]
+    marked = []
+    monkeypatch.setattr(auth, "current_user", lambda request: {"id": 5, "login": "u"})
+    monkeypatch.setattr(auth, "_agents_index", lambda: index)
+    monkeypatch.setattr(auth.db, "list_watch", lambda uid: list(watch))
+    monkeypatch.setattr(auth.db, "get_last_read", lambda uid: last_read)
+    monkeypatch.setattr(auth.db, "set_last_read", lambda uid: marked.append(uid))
+    app = FastAPI()
+    app.include_router(auth.router)
+    return TestClient(app), marked
+
+
+def test_account_lists_recent_changes_newest_first_and_marks_them_read(monkeypatch):
+    client, marked = _account_client(monkeypatch, ["faller", "climber"],
+                                     last_read="2026-10-01T00:00:00Z")
+    html = client.get("/account/").text
+    feed = html.split('id="changes"')[1]
+    assert feed.index("Trust grade C → B") < feed.index("HVTrust down 4.0pts")
+    assert feed.count("is-unread") == 1          # only the event after last_read
+    assert marked == [5]
+
+
+def test_account_confirms_a_project_tracked_from_a_link(monkeypatch):
+    client, _ = _account_client(monkeypatch, ["climber"])
+    assert "Now tracking <strong>Climber</strong>" in client.get("/account/?tracked=climber").text
+    # Only for a slug that really is tracked: the query string is user input.
+    assert "Now tracking" not in client.get("/account/?tracked=haystack").text

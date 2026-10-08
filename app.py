@@ -1809,7 +1809,7 @@ def _interest_unavailable() -> HTMLResponse:
 
 
 def _interest_thanks(title: str, message: str, repo: str | None = None) -> HTMLResponse:
-    next_action = "<a class='button secondary' href='/alerts'>View alerts waitlist</a>"
+    next_action = "<a class='button secondary' href='/alerts/'>Trust alerts</a>"
     if repo:
         agent = find_agent(repo)
         if agent:
@@ -2055,160 +2055,76 @@ def correct_post(request: Request, repo: str = Form(...), message: str = Form(..
 
 @app.get("/alerts", response_class=HTMLResponse)
 @app.get("/alerts/", response_class=HTMLResponse, include_in_schema=False)
-def alerts_page():
-    body = """
-    <div class='grid'>
-      <div class='card'>
-        <span class='pill'>Early access</span>
-        <h2 style='margin-top:10px'>What you would get</h2>
-        <ul>
-          <li>Rank-change alerts for agents you care about</li>
-          <li>Trust-score drops and provenance regressions</li>
-          <li>New compare pages and methodology launches</li>
-        </ul>
-      </div>
-      <div class='card'>
-        <span class='pill'>Why this exists</span>
-        <h2 style='margin-top:10px'>This is a fake-door by design</h2>
-        <p>I am validating demand before building accounts, saved watchlists, and alert pipelines. If enough teams ask for the same thing, it gets prioritized.</p>
-      </div>
-    </div>
-    <div class='card'>
-      <h2>Join the alerts waitlist</h2>
-      <p>Leave your email and I will reach out when the first trust alerts are ready.</p>
-      <form method='post' action='/alerts'>
-        <label>Work email
-          <input type='email' name='email' placeholder='you@company.com' required>
-        </label>
-        """ + HONEYPOT_HTML + """
-        <div class='actions'>
-          <button class='button' type='submit'>Join waitlist</button>
-        </div>
-      </form>
-    </div>
-    """
-    return HTMLResponse(_marketing_page("Alerts waitlist — HVTracker", "Growth", "Get trust alerts when agent risk changes.", body, description="Join the HVTracker alerts waitlist for rank changes, trust drops, and provenance regressions.", path="/alerts/"))
-
-
-@app.post("/alerts", response_class=HTMLResponse)
-@app.post("/alerts/", response_class=HTMLResponse, include_in_schema=False)
-def alerts_post(request: Request, email: str = Form(...), role: str = Form(""), agents: str = Form(""),
-                notes: str = Form(""), website: str = Form("")):
-    if website:
-        return HTMLResponse(
-            _marketing_page("Alerts waitlist — HVTracker", "Thanks", "Thanks. I saved your alert request.",
-                "<div class='card'><p class='ok'>Thanks.</p></div>", path="/alerts/"))
-    if _is_rate_limited(request):
-        return HTMLResponse(
-            _marketing_page("Too many requests — HVTracker", "Slow down", "Please wait before submitting again.",
-                "<div class='card'><p>Too many submissions from this address. Try again in a few minutes.</p></div>",
-                path="/alerts/"), status_code=429)
-    over = _check_field_lengths(email=email, notes=notes)
-    if over:
-        return HTMLResponse(
-            _marketing_page("Input too long — HVTracker", "Alerts", over,
-                f"<div class='card'><p>{escape(over)}</p></div>", path="/alerts/"), status_code=400)
-    if not _EMAIL_RE.match(email.strip()):
-        return HTMLResponse(
-            _marketing_page("Invalid email — HVTracker", "Alerts", "Please provide a valid email address.",
-                "<div class='card'><p>That email does not look valid.</p></div>", path="/alerts/"), status_code=400)
-    if not db.enabled():
-        return _interest_unavailable()
-    db.add_interest_signup(
-        "alerts",
-        email.strip().lower(),
-        None,
-        {
-            "role": role.strip(),
-            "agents": agents.strip(),
-            "notes": notes.strip(),
-            "source": "alerts-page",
-        },
-    )
-    return _interest_thanks("Alerts waitlist — HVTracker", "Thanks. I saved your alert request.")
-
-
-@app.get("/track/{slug}", response_class=HTMLResponse)
-@app.get("/track/{slug}/", response_class=HTMLResponse, include_in_schema=False)
-def track_agent_page(slug: str):
-    agent = find_agent_by_slug(slug)
-    if not agent:
-        return HTMLResponse("<p>Agent not found.</p>", status_code=404)
+def alerts_page(request: Request):
+    # Was a waitlist (kind=alerts in interest_signups) until accounts and
+    # tracking were real; the captured rows are kept.
+    if _auth.current_user(request):
+        cta = "<a class='button' href='/account/'>Open your tracked projects</a>"
+    else:
+        cta = "<a class='button' href='/login?next=/account/'>Sign in to start tracking</a>"
     body = f"""
     <div class='grid'>
       <div class='card'>
-        <span class='pill'>{escape(agent['name'])}</span>
-        <h2 style='margin-top:10px'>Track this agent</h2>
-        <p>Use this if you would want a lightweight watchlist for <strong>{escape(agent['name'])}</strong>: trust-score changes, provenance drift, maintenance drops, or comparison updates.</p>
+        <span class='pill'>What you hear about</span>
+        <h2 style='margin-top:10px'>The changes on a tool's public timeline</h2>
+        <ul>
+          <li>Trust grade flips, such as B &rarr; C</li>
+          <li>HVTrust moves of 3 points or more, and rank moves of 10 places or more</li>
+          <li>Package provenance lost, or a provenance-drift warning raised</li>
+          <li>Eligibility warnings</li>
+        </ul>
+        <p>Moves caused by a methodology update are not reported as changes.</p>
       </div>
       <div class='card'>
-        <span class='pill'>Signal first</span>
-        <h2 style='margin-top:10px'>Not a finished product yet</h2>
-        <p>This is intentionally simple. I want to see which agents teams actually care enough about to monitor before building dashboards and login flows.</p>
+        <span class='pill'>How it works</span>
+        <h2 style='margin-top:10px'>Track the tools in your stack</h2>
+        <p>Sign in, then choose <em>Track</em> on any agent, MCP server or skill page, or paste your dependency file into <a href='/scan/'>Scan your stack</a> and choose <em>Watch all</em>.</p>
+        <p>Changes show up in the bell at the top of every page and on your account page. A tool that leaves the registry stays on your list, marked as no longer listed.</p>
       </div>
     </div>
-    <div class='card'>
-      <h2>Join the watchlist queue</h2>
-      <p>When the first tracked-agent workflow is ready, these are the people I will contact first.</p>
-      <form method='post' action='/track/{escape(slug)}'>
-        <label>Work email
-          <input type='email' name='email' placeholder='you@company.com' required>
-        </label>
-        <label>Team or role
-          <input type='text' name='role' placeholder='Security, platform, engineering leadership'>
-        </label>
-        <label>What would make this useful?
-          <textarea name='notes' placeholder='Example: alert me when build provenance disappears, signed-commit coverage drops, or {escape(agent['name'])} falls behind similar tools.'></textarea>
-        </label>
-        """ + HONEYPOT_HTML + f"""
-        <div class='actions'>
-          <button class='button' type='submit'>Track {escape(agent['name'])}</button>
-          <a class='button secondary' href='/agents/{escape(agent["slug"])}'>Back to profile</a>
-        </div>
-      </form>
+    <div class='actions'>
+      {cta}
+      <a class='button secondary' href='/scan/'>Scan your stack</a>
+      <a class='button secondary' href='/changes/'>All recent changes</a>
     </div>
     """
-    return HTMLResponse(_marketing_page(f"Track {agent['name']} — HVTracker", "Watchlist", f"Track {agent['name']} changes before they surprise you.", body, description=f"Track {agent['name']} on HVTracker and get notified when important trust signals move.", path=f"/track/{agent['slug']}/"))
+    return HTMLResponse(_marketing_page(
+        "Trust alerts — HVTracker", "Alerts", "Know when a tool you depend on changes.", body,
+        description="Track AI agents, MCP servers and skills on HVTracker and get notified when their trust grade, HVTrust score or provenance changes.",
+        path="/alerts/",
+        lede="Free. The registry stays fully public; an account only adds tracking and notifications."))
 
 
-@app.post("/track/{slug}", response_class=HTMLResponse)
-@app.post("/track/{slug}/", response_class=HTMLResponse, include_in_schema=False)
-def track_agent_post(request: Request, slug: str, email: str = Form(...), role: str = Form(""),
-                     notes: str = Form(""), website: str = Form("")):
+@app.post("/alerts", include_in_schema=False)
+@app.post("/alerts/", include_in_schema=False)
+def alerts_post():
+    # The old waitlist form, from a page still in someone's cache.
+    return RedirectResponse("/alerts/", status_code=303)
+
+
+@app.get("/track/{slug}", include_in_schema=False)
+@app.get("/track/{slug}/", include_in_schema=False)
+def track_agent(request: Request, slug: str):
+    """Track a project from a link (the profile's "Get email alerts for X").
+
+    Signed in: add it to the account's tracked projects and land on /account.
+    Signed out: sign in, then come back here. robots.txt disallows /track/.
+    """
     agent = find_agent_by_slug(slug)
     if not agent:
         return HTMLResponse("<p>Agent not found.</p>", status_code=404)
-    if website:
-        return HTMLResponse(
-            _marketing_page(f"Track {agent['name']} — HVTracker", "Thanks", f"Thanks. I saved your request to track {agent['name']}.",
-                "<div class='card'><p class='ok'>Thanks.</p></div>", path=f"/track/{agent['slug']}/"))
-    if _is_rate_limited(request):
-        return HTMLResponse(
-            _marketing_page("Too many requests — HVTracker", "Slow down", "Please wait before submitting again.",
-                "<div class='card'><p>Too many submissions from this address. Try again in a few minutes.</p></div>",
-                path=f"/track/{agent['slug']}/"), status_code=429)
-    over = _check_field_lengths(email=email, role=role, notes=notes)
-    if over:
-        return HTMLResponse(
-            _marketing_page("Input too long — HVTracker", "Track", over,
-                f"<div class='card'><p>{escape(over)}</p></div>", path=f"/track/{agent['slug']}/"), status_code=400)
-    if not _EMAIL_RE.match(email.strip()):
-        return HTMLResponse(
-            _marketing_page("Invalid email — HVTracker", "Track", "Please provide a valid email address.",
-                "<div class='card'><p>That email does not look valid.</p></div>", path=f"/track/{agent['slug']}/"), status_code=400)
-    if not db.enabled():
-        return _interest_unavailable()
-    db.add_interest_signup(
-        "track-agent",
-        email.strip().lower(),
-        agent["repo"],
-        {
-            "role": role.strip(),
-            "notes": notes.strip(),
-            "source": f"track:{slug}",
-        },
-    )
-    return _interest_thanks(f"Track {agent['name']} — HVTracker", f"Thanks. I saved your request to track {agent['name']}.", repo=agent["repo"])
+    user = _auth.current_user(request)
+    if not user:
+        return RedirectResponse(f"/login?next=/track/{agent['slug']}/", status_code=302)
+    db.add_watch(user["id"], agent["slug"])
+    return RedirectResponse(f"/account/?tracked={agent['slug']}", status_code=302)
+
+
+@app.post("/track/{slug}", include_in_schema=False)
+@app.post("/track/{slug}/", include_in_schema=False)
+def track_agent_post(slug: str):
+    # The old waitlist form, from a page still in someone's cache.
+    return RedirectResponse(f"/track/{slug}/", status_code=303)
 
 
 @app.get("/sponsor", response_class=HTMLResponse)

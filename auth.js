@@ -109,6 +109,7 @@
     }).catch(function () { /* auth disabled — leave the public UI untouched */ });
   } else {
     renderLoggedOut({ providers: ["github"] });
+    initTrackNudge();
   }
 
   initAccountPage();
@@ -123,6 +124,8 @@
         var slug = btn.getAttribute("data-remove-slug");
         btn.disabled = true; btn.textContent = "Removing…";
         postJSON("/api/watchlist", { action: "remove", slug: slug }).then(function () {
+          // Drop this browser's copy too, or the next session's sync re-adds it.
+          saveLocalWatch(localWatch().filter(function (i) { return (i && i.slug ? i.slug : i) !== slug; }));
           var li = btn.closest("li"); if (li && li.parentNode) li.parentNode.removeChild(li);
           var cnt = document.querySelector("#watchlist .account-count");
           if (cnt) cnt.textContent = Math.max(0, (parseInt(cnt.textContent, 10) || 1) - 1);
@@ -162,6 +165,7 @@
     document.getElementById("hvtLogout").addEventListener("click", logout);
     document.getElementById("hvtBell").addEventListener("click", function (ev) { ev.stopPropagation(); togglePop("hvtNotifPop"); markRead(); });
     syncWatchlist();
+    showServerTrackState();
     loadNotifications();
   }
 
@@ -174,16 +178,60 @@
     f.appendChild(n); document.body.appendChild(f); f.submit();
   }
 
-  // ---- watchlist: merge the anonymous localStorage list into the account once ----
+  // ---- watchlist: this browser's list (the profile Track button and homepage use it) ----
+  function localWatch() {
+    try { var raw = JSON.parse(localStorage.getItem(WATCHLIST_KEY) || "[]"); return Array.isArray(raw) ? raw : []; }
+    catch (e) { return []; }
+  }
+  function saveLocalWatch(items) {
+    try { localStorage.setItem(WATCHLIST_KEY, JSON.stringify(items)); } catch (e) { /* storage blocked */ }
+  }
+
+  // Merge the anonymous localStorage list into the account once per session.
   function syncWatchlist() {
     if (sessionStorage.getItem("hvt_wl_synced")) return;
-    var slugs = [];
-    try {
-      var raw = JSON.parse(localStorage.getItem(WATCHLIST_KEY) || "[]");
-      slugs = (raw || []).map(function (i) { return i && i.slug ? i.slug : i; }).filter(Boolean);
-    } catch (e) { slugs = []; }
+    var slugs = localWatch().map(function (i) { return i && i.slug ? i.slug : i; }).filter(Boolean);
     sessionStorage.setItem("hvt_wl_synced", "1");
     if (slugs.length) postJSON("/api/watchlist", { action: "sync", slugs: slugs }).catch(function () {});
+  }
+
+  // A project tracked on another device (or via /track/ or /scan/) is in the
+  // account but not in this browser's list: show it as tracked here too.
+  function showServerTrackState() {
+    var btn = document.getElementById("watchToggle");
+    if (!btn) return;
+    var slug = btn.getAttribute("data-watch-slug");
+    api("/api/watchlist").then(function (d) {
+      if ((d.slugs || []).indexOf(slug) < 0) return;
+      var items = localWatch();
+      if (!items.some(function (i) { return i && i.slug === slug; })) {
+        saveLocalWatch(items.concat([{ slug: slug, name: btn.getAttribute("data-watch-name"),
+          repo: btn.getAttribute("data-watch-repo") }]));
+      }
+      btn.classList.add("is-saved");
+      btn.textContent = "Tracking ✓";
+    }).catch(function () {});
+  }
+
+  // Signed out, Track saves to this browser only. Say what signing in adds.
+  function initTrackNudge() {
+    var btn = document.getElementById("watchToggle");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      var old = document.getElementById("hvtTrackNudge");
+      if (old) old.parentNode.removeChild(old);
+      if (!btn.classList.contains("is-saved")) return;  // just untracked
+      var slug = btn.getAttribute("data-watch-slug");
+      var p = document.createElement("p");
+      p.id = "hvtTrackNudge";
+      p.className = "hvt-track-nudge";
+      p.innerHTML = "Saved in this browser. <a href=\"/login?next=" + encodeURIComponent("/track/" + slug + "/") +
+        "\">Sign in</a> to be notified when " + esc(btn.getAttribute("data-watch-name") || "it") +
+        "&rsquo;s trust changes, on any device.";
+      var row = btn.closest(".hero-actions") || btn;
+      row.parentNode.insertBefore(p, row.nextSibling);
+      if (typeof window.hvtTrack === "function") window.hvtTrack("track_signin_nudge", { slug: slug });
+    });
   }
 
   // ---- notifications ----
@@ -240,6 +288,7 @@
       ".hvt-notif-item{display:grid;gap:2px;padding:10px 12px;border-bottom:1px solid var(--border,#eee);text-decoration:none;color:var(--text,#1f1b17)}" +
       ".hvt-notif-item:hover{background:#f4f1eb}.hvt-notif-item.is-unread{background:#fbf6ee}" +
       ".hvt-notif-name{font-weight:700}.hvt-notif-detail{color:#4a443d}.hvt-notif-date{color:#6f665d;font-size:10px}" +
+      ".hvt-track-nudge{margin:10px 0 0;font-size:13px;color:var(--muted,#6f665d)}.hvt-track-nudge a{color:var(--accent,#26405e);text-decoration:underline}" +
       // Dark mode (site.css tokens): the light values above are literal, so
       // override only under a dark system setting and leave light untouched.
       "@media (prefers-color-scheme:dark){" +
