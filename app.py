@@ -2077,7 +2077,7 @@ def alerts_page(request: Request):
           <li>Package provenance lost, or a provenance-drift warning raised</li>
           <li>Eligibility warnings</li>
         </ul>
-        <p>Moves caused by a methodology update are not reported as changes.</p>
+        <p style='margin-top:12px'>Moves caused by a methodology update are not reported as changes.</p>
       </div>
       <div class='card'>
         <span class='pill'>How it works</span>

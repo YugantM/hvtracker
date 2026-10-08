@@ -417,7 +417,8 @@ def login_page(request: Request, next: str = "/", error: str = ""):
     return HTMLResponse(_marketing_page(
         "Sign in — HVTracker", "Account", "Sign in or create an account", body,
         description="Sign in to HVTracker to track agents and get trust-change alerts.",
-        path="/login/", noindex=True))
+        path="/login/", noindex=True,
+        lede="Free. The registry stays fully public; an account only adds tracking and notifications."))
 
 
 def _watch_view(slug: str, agent: dict | None) -> dict:
@@ -632,7 +633,7 @@ def account_page(request: Request, tracked: str = "", alerts_status: str = Query
         f'{flash}'
         f'<h3 id="watchlist">Tracked projects <span class="account-count">{len(watch)}</span></h3>'
         f'{summary_html}{watch_html}'
-        '<p class="auth-note">Track your whole stack at once: paste a requirements.txt, '
+        '<p class="auth-note account-hint">Track your whole stack at once: paste a requirements.txt, '
         'package.json or MCP config into <a href="/scan/">Scan your stack</a> and choose '
         '<em>Watch all</em>.</p>'
         '<h3 id="changes">Recent changes</h3>'
