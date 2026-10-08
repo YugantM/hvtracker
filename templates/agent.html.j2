@@ -754,7 +754,7 @@
       {% set sf = row.safety_facts %}
       <section class="imp" id="safety-facts" aria-labelledby="sfacts-title">
         <div class="imp-head"><h2 id="sfacts-title">What {{ row.name }} can reach, and who runs it</h2></div>
-        <p class="imp-sub">Checked {{ sf.checked }}, each with its source. <span class="sev sev-none">PUBLISHER</span> is the company's or project's own statement, which we haven't verified; <span class="sev sev-none">CHECKED</span> is something we observed ourselves. These facts describe the product. They don't change its score.</p>
+        <p class="imp-sub">Checked {{ sf.checked }}, each with its source. <span class="sev sev-none">PUBLISHER</span> is the company's or project's own statement, which we haven't verified; <span class="sev sev-none">CHECKED</span> is something we observed ourselves{% if sf.has_source %}; <span class="sev sev-none">IN CODE</span> is read from the project's source code{% endif %}. These facts describe the product. They don't change its score.</p>
         {% for g in sf.groups %}
         <h3 style="font-size:13px;margin:14px 0 4px">{{ g.heading }}</h3>
         <ul class="adv-list">

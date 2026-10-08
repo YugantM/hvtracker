@@ -4,7 +4,7 @@
     "composio": {
       "checked": "2026-10-06",
       "facts": [
-        {"topic": "operator", "class": "declared", "text": "Run by Sampark Inc, doing business as Composio, under Delaware law.", "source": "https://composio.dev/terms"},
+        {"topic": "operator", "class": "declared", "text": "Run by Sampark Inc, doing business as Composio. Its terms are governed by Delaware law.", "source": "https://composio.dev/terms"},
         {"topic": "access", "class": "declared", "text": "An agent using Composio can act in every app you connect, within the scopes you granted. Composio's own advice is to treat those scopes like production credentials.", "source": "https://docs.composio.dev/docs/security/overview"},
         {"topic": "data", "class": "declared", "text": "Composio's cloud stores the OAuth access and refresh tokens and API keys of the apps you connect, and uses them to call those apps on your behalf. Using your own OAuth app doesn't change that.", "source": "https://docs.composio.dev/docs/security/token-custody"},
         {"topic": "data", "class": "declared", "text": "Those credentials are encrypted at rest (AES-256-GCM) with keys Composio holds by default. Customer-managed keys, a private VPC or self-hosting are enterprise arrangements.", "source": "https://docs.composio.dev/docs/security/token-custody"},
@@ -17,11 +17,12 @@
       "checked": "2026-10-06",
       "facts": [
         {"topic": "operator", "class": "declared", "text": "Made by Cline Bot Inc.", "source": "https://cline.bot/tos"},
-        {"topic": "access", "class": "declared", "text": "Runs in your editor or terminal and can read and edit files, run terminal commands, use a browser and call MCP servers. Each kind of action asks for approval unless you switch on auto-approve for it, and reaching files outside the workspace needs its own setting.", "source": "https://docs.cline.bot/features/auto-approve"},
-        {"topic": "data", "class": "declared", "text": "Prompts and the code it reads go to the model provider you pick (Anthropic, OpenAI, OpenRouter and others), or stay on your machine with a local model through Ollama or LM Studio.", "source": "https://github.com/cline/cline#readme"},
+        {"topic": "access", "class": "declared", "text": "Runs in your editor or terminal and can read and edit files, run terminal commands, use a browser and call MCP servers. Each kind of action has its own auto-approve setting.", "source": "https://docs.cline.bot/features/auto-approve"},
+        {"topic": "access", "class": "source", "text": "In the VS Code extension, reading and editing files, using the browser and calling MCP servers are auto-approved by default; terminal commands ask first.", "source": "https://github.com/cline/cline/blob/main/apps/vscode/src/shared/AutoApprovalSettings.ts"},
+        {"topic": "data", "class": "declared", "text": "Works with the model provider you choose (Anthropic, OpenAI, OpenRouter and others), or with a local model through Ollama or LM Studio.", "source": "https://github.com/cline/cline#readme"},
         {"topic": "data", "class": "declared", "text": "Cline's own telemetry excludes code, file contents and paths, command arguments, conversation content and API keys, and can be turned off in settings.", "source": "https://docs.cline.bot/more-info/telemetry"},
         {"topic": "security", "class": "observed", "text": "cline.bot publishes a security.txt (security@cline.bot), the repository has a SECURITY.md, and GitHub private vulnerability reporting is enabled.", "source": "https://cline.bot/.well-known/security.txt"},
-        {"topic": "security", "class": "observed", "text": "Its maintainers have published 3 security advisories, all in the last 12 months.", "source": "https://github.com/cline/cline/security/advisories"}
+        {"topic": "security", "class": "observed", "text": "Its maintainers have published 3 security advisories (1 critical, 1 high, 1 low), all in the last 12 months.", "source": "https://github.com/cline/cline/security/advisories"}
       ]
     },
     "firecrawl": {
@@ -31,15 +32,15 @@
         {"topic": "data", "class": "declared", "text": "You can run Firecrawl on your own servers instead of using its hosted API.", "source": "https://github.com/firecrawl/firecrawl/blob/main/SELF_HOST.md"},
         {"topic": "security", "class": "declared", "text": "States SOC 2 Type 2. Vulnerability reports go to a Bugcrowd program with safe harbor.", "source": "https://www.firecrawl.dev/security"},
         {"topic": "security", "class": "observed", "text": "firecrawl.dev publishes a security.txt. The repository has no SECURITY.md and GitHub private vulnerability reporting is off.", "source": "https://firecrawl.dev/.well-known/security.txt"},
-        {"topic": "security", "class": "observed", "text": "Its maintainers have published 4 security advisories, 2 of them in the last 12 months.", "source": "https://github.com/firecrawl/firecrawl/security/advisories"}
+        {"topic": "security", "class": "observed", "text": "Its maintainers have published 4 security advisories (1 critical, 3 high), 2 of them in the last 12 months.", "source": "https://github.com/firecrawl/firecrawl/security/advisories"}
       ]
     },
     "dify": {
       "checked": "2026-10-06",
       "facts": [
         {"topic": "operator", "class": "declared", "text": "Run by LangGenius, Inc., a Delaware corporation.", "source": "https://dify.ai/terms"},
-        {"topic": "security", "class": "declared", "text": "States SOC 2 Type II (audited by Sensiba), ISO 27001:2022 (Johanson) and GDPR compliance, as of March 2026. Dify Cloud users can download the reports from the console.", "source": "https://dify.ai/blog/dify-achieves-soc-2-iso-27001-gdpr-compliance-for-the-second-year-running"},
-        {"topic": "security", "class": "observed", "text": "Its maintainers have published 21 security advisories, 14 of them in the last 12 months.", "source": "https://github.com/langgenius/dify/security/advisories"},
+        {"topic": "security", "class": "declared", "text": "States SOC 2 Type II (audited by Sensiba), ISO 27001:2022 (Johanson) and GDPR compliance, as of March 2026.", "source": "https://dify.ai/blog/dify-achieves-soc-2-iso-27001-gdpr-compliance-for-the-second-year-running"},
+        {"topic": "security", "class": "observed", "text": "Its maintainers have published 21 security advisories (8 high, 10 medium, 3 low), 14 of them in the last 12 months.", "source": "https://github.com/langgenius/dify/security/advisories"},
         {"topic": "security", "class": "observed", "text": "The repository has a SECURITY.md and GitHub private vulnerability reporting is enabled. dify.ai serves no security.txt.", "source": "https://github.com/langgenius/dify/security"}
       ]
     },
@@ -55,31 +56,32 @@
     "claude-code": {
       "checked": "2026-10-06",
       "facts": [
-        {"topic": "operator", "class": "observed", "text": "Made by Anthropic. The GitHub repository carries no open-source licence.", "source": "https://github.com/anthropics/claude-code"},
+        {"topic": "operator", "class": "observed", "text": "Made by Anthropic. The repository's licence reserves all rights and puts use under Anthropic's Commercial Terms, so it isn't open source.", "source": "https://github.com/anthropics/claude-code"},
         {"topic": "access", "class": "declared", "text": "Interactive sessions start in Auto mode, where a classifier model approves or blocks actions. In Manual mode it starts read-only and asks before editing files or running commands.", "source": "https://code.claude.com/docs/en/security"},
         {"topic": "access", "class": "declared", "text": "Its file tools ask before reading or writing outside the folder it started in, but a shell command you approve can write anywhere your user account can unless you turn on its sandbox.", "source": "https://code.claude.com/docs/en/security"},
         {"topic": "data", "class": "declared", "text": "Prompts and model output go to Anthropic, or to Bedrock, Google Cloud or Microsoft Foundry if you configure one. Commercial accounts: kept 30 days and not used for training. Consumer accounts: used for training when that setting is on (kept 5 years), otherwise kept 30 days.", "source": "https://code.claude.com/docs/en/data-usage"},
         {"topic": "data", "class": "declared", "text": "Session transcripts are stored on your machine in plain text under ~/.claude/projects/ for 30 days by default. Usage metrics exclude code, prompts and file paths and can be turned off with DISABLE_TELEMETRY=1.", "source": "https://code.claude.com/docs/en/data-usage"},
-        {"topic": "security", "class": "declared", "text": "Anthropic publishes its SOC 2 Type 2 report and ISO 27001 certificate in its trust center, trust.anthropic.com. Vulnerabilities go to a HackerOne program.", "source": "https://code.claude.com/docs/en/security"}
+        {"topic": "security", "class": "declared", "text": "Anthropic publishes its SOC 2 Type 2 report and ISO 27001 certificate in its trust center, trust.anthropic.com. Vulnerabilities go to a HackerOne program.", "source": "https://code.claude.com/docs/en/security"},
+        {"topic": "security", "class": "observed", "text": "Its maintainers have published 33 security advisories (26 high, 4 medium, 3 low), 23 of them in the last 12 months. The repository has a SECURITY.md.", "source": "https://github.com/anthropics/claude-code/security/advisories"}
       ]
     },
     "codex": {
       "checked": "2026-10-06",
       "facts": [
         {"topic": "operator", "class": "observed", "text": "Made by OpenAI. The CLI is open source under Apache-2.0.", "source": "https://github.com/openai/codex"},
-        {"topic": "access", "class": "declared", "text": "In the default Auto preset it reads, edits and runs commands in the working directory without asking. Writes are limited to that workspace, and network access is off unless you enable it.", "source": "https://learn.chatgpt.com/docs/agent-approvals-security"},
+        {"topic": "access", "class": "declared", "text": "In a version-controlled folder it recommends its Auto preset, which reads, edits and runs commands in the working directory without asking. Writes stay in that workspace, and network access is off unless you enable it.", "source": "https://learn.chatgpt.com/docs/agent-approvals-security"},
         {"topic": "access", "class": "declared", "text": "Those limits are enforced by the operating system: Seatbelt on macOS, bwrap with seccomp on Linux, and a WSL2 or native sandbox on Windows.", "source": "https://learn.chatgpt.com/docs/agent-approvals-security"},
         {"topic": "security", "class": "observed", "text": "openai.com's security.txt points to a Bugcrowd program, and the repository has a SECURITY.md.", "source": "https://openai.com/.well-known/security.txt"},
-        {"topic": "security", "class": "observed", "text": "Its maintainers have published 1 security advisory, none in the last 12 months.", "source": "https://github.com/openai/codex/security/advisories"}
+        {"topic": "security", "class": "observed", "text": "Its maintainers have published 1 security advisory (high), in September 2025.", "source": "https://github.com/openai/codex/security/advisories"}
       ]
     },
     "livekit-agents": {
       "checked": "2026-10-06",
       "facts": [
-        {"topic": "operator", "class": "observed", "text": "The Agents framework is open source under Apache-2.0. LiveKit Cloud is the company's hosted service for running it.", "source": "https://github.com/livekit/agents"},
+        {"topic": "operator", "class": "declared", "text": "The Agents framework is open source under Apache-2.0. Agents connect to LiveKit Cloud, the company's hosted service, or to a self-hosted LiveKit server.", "source": "https://github.com/livekit/agents#readme"},
         {"topic": "data", "class": "declared", "text": "LiveKit Cloud doesn't keep media or transcripts by default: recordings are written to your own S3, GCS or Azure bucket, and prompts, audio and completions for AI inference aren't logged.", "source": "https://livekit.com/security"},
         {"topic": "security", "class": "declared", "text": "States SOC 2 Type II, GDPR and CCPA compliance and EU–US Data Privacy Framework certification, and signs HIPAA BAAs on Scale and Enterprise plans. Reports are in its trust center, trust.livekit.io.", "source": "https://livekit.com/security"},
-        {"topic": "security", "class": "observed", "text": "livekit.io publishes a security.txt (security@livekit.io), and GitHub private vulnerability reporting is enabled on the repository. Its maintainers have published 1 security advisory, in the last 12 months.", "source": "https://livekit.io/.well-known/security.txt"}
+        {"topic": "security", "class": "observed", "text": "livekit.io publishes a security.txt (security@livekit.io), and GitHub private vulnerability reporting is enabled on the repository. Its maintainers have published 1 security advisory (medium), in the last 12 months.", "source": "https://livekit.io/.well-known/security.txt"}
       ]
     },
     "freebuff": {
@@ -87,7 +89,7 @@
       "facts": [
         {"topic": "operator", "class": "declared", "text": "Run by Freebuff, Inc., which also operates Codebuff.", "source": "https://freebuff.com/privacy-policy"},
         {"topic": "data", "class": "declared", "text": "It collects prompts, code, files and repository data, which are processed by its own systems and by AI model providers.", "source": "https://freebuff.com/privacy-policy"},
-        {"topic": "data", "class": "declared", "text": "It is free because it shows text ads. Prompts and messages may be analysed to select and measure those ads, including by deriving general interest categories.", "source": "https://freebuff.com/privacy-policy"},
+        {"topic": "data", "class": "declared", "text": "It shows ads: prompts and messages may be analysed to select and measure them, including by deriving general interest categories.", "source": "https://freebuff.com/privacy-policy"},
         {"topic": "data", "class": "declared", "text": "It doesn't train models on your prompts or project data unless it says so before you use that model or feature.", "source": "https://freebuff.com/privacy-policy"},
         {"topic": "security", "class": "observed", "text": "freebuff.com's security.txt lists support@codebuff.com. The repository has a SECURITY.md; GitHub private vulnerability reporting is off.", "source": "https://freebuff.com/.well-known/security.txt"}
       ]

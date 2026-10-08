@@ -2940,7 +2940,8 @@ def load_safety_facts(path: str = SAFETY_FACTS_PATH) -> dict[str, dict]:
                      for f in entry["facts"] if f["topic"] == key]
             if facts:
                 groups.append({"key": key, "heading": heading, "facts": facts})
-        out[slug] = {"checked": entry["checked"], "groups": groups}
+        out[slug] = {"checked": entry["checked"], "groups": groups,
+                     "has_source": any(f["class"] == "source" for f in entry["facts"])}
     return out
 
 

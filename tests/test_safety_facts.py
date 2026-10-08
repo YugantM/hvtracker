@@ -105,5 +105,17 @@ def test_profile_with_facts_shows_each_fact_with_class_and_source(tmp_path):
     assert 'href="https://docs.example.com/token-custody"' in section and ">docs.example.com<" in section
     assert section.count('class="sev sev-none">PUBLISHER<') == 2  # legend + the fact
     assert "Checked 2026-10-06" in section
+    assert "IN CODE" not in section  # the legend names it only on pages that use it
     # Shown, never scored: the facts don't touch the score shown on the page.
     assert f"{row['trust_score']}/100" in html
+
+
+def test_legend_explains_in_code_when_a_fact_uses_it(tmp_path):
+    doc = {"profiles": {"demo": {"checked": "2026-10-08", "facts": [
+        {"topic": "access", "class": "source", "text": "Edits are auto-approved by default.",
+         "source": "https://github.com/example/demo/blob/main/settings.ts"}]}}}
+    path = tmp_path / "facts.json"
+    path.write_text(json.dumps(doc))
+    html = _render(_row(safety_facts=fab.load_safety_facts(str(path))["demo"]))
+    section = html[html.index('id="safety-facts"'):]
+    assert "is read from the project's source code" in section[:section.index("</section>")]
