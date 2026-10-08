@@ -141,7 +141,7 @@ Milestone history lives in `docs/changelog.md` — record new milestones there.
   many pages of each type would get a new date.
 - Dark mode is opt-in per page (`<html class="theme-auto">`); audit contrast
   before opting a page in. Grade colours are literal hex, never tokens.
-- Watchlist alerts (built 2026-10-08, spec docs/mvp-watchlist-alerts-spec.md):
+- Watchlist alerts (DEPLOYED 2026-10-08, spec docs/mvp-watchlist-alerts-spec.md):
   email digests ship dark. Keep `ALERTS_ENABLED` unset until the owner clears
   the product-plan monetization gate. Runbook: docs/alert-emails.md. The
   module is `mailer.py`; a top-level `email.py` would shadow the stdlib.

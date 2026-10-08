@@ -1046,7 +1046,7 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   roster package-id fixes, which awaits an owner decision.
 
 - **Watchlist + alerts MVP built 2026-10-08** (docs/mvp-watchlist-alerts-spec.md
-  §12, runbook docs/alert-emails.md), NOT deployed. #356: `/track/<slug>/` tracks
+  §12, runbook docs/alert-emails.md), deployed the same day (next entry). #356: `/track/<slug>/` tracks
   and lands on `/account` (signed out: via `/login`), `/alerts/` is a real page (no
   waitlist; `interest_signups` rows kept), `/scan/` "Watch all", account
   recent-changes feed, Track state follows the account across devices; the lastmod
@@ -1055,6 +1055,18 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   table, `/verify-email`, `/unsub`), **shipped dark**: email delivery sits behind
   the visa/monetization gate in product-plan-2026-h2, so `ALERTS_ENABLED` stays
   unset until the owner decides.
+- **E2 safety facts + watchlist/alerts DEPLOYED 2026-10-08** in two steps from main
+  (owner: "do all things necessary and deploy"): 4ece58e4 @ 03f0ebfe (#347) live
+  16:47 UTC, then 3519a2aa @ c9e0a465 (#356, #357) live 16:50 UTC. Split because
+  #356's LASTMOD_FP_VERSION 7 migration keeps every stored date: deploying #347 first
+  gave the six pilot profiles not already dated today (Firecrawl, E2B, Claude Code,
+  LiveKit Agents, Freebuff, Kilo Code) a 2026-10-08 lastmod, and the step-2 render then
+  moved 0 of 2,137 sitemap dates. Both boots clean (`[startup]` roster unchanged at
+  1,734, repair-commits render). The schema migration (`users.alert_*`, `alert_events`)
+  applied at startup. Invariants [], package_failures 1. Smoke tests: the new /alerts/
+  (no email mention), /track and /account go to /login, bad verify/unsub tokens return
+  400, a stale waitlist POST returns 303. Email digests stay dark (`ALERTS_ENABLED`
+  unset). The 7 Oct deploy before this one (5e0dad2d: #352, #343) is recorded in #353.
 
 ## Entries recorded only in the old AGENTS.md
 
