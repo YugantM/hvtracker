@@ -8330,6 +8330,15 @@ def main() -> None:
     event_total = sum(len(a.get("recent_events", [])) for a in data_output["agents"])
     print(f"Injected recent_events into latest.json ({event_total} events across agents).")
 
+    # ── Watchlist alert emails (alerts.py; no-op unless ALERTS_ENABLED=1) ────
+    # Recent history rows let a delisted project's event still find its slug.
+    try:
+        import alerts
+        recent = [a for day in history_all[-(alerts.LOOKBACK_DAYS + 2):] for a in day.get("agents", [])]
+        alerts.run(agent_events, rows + legacy_rows + recent, today_utc)
+    except Exception as e:  # alerts must never fail a render
+        print(f"WARNING: watchlist alerts skipped: {type(e).__name__}: {e}")
+
     # ── Build Integrity Report ────────────────────────────────────────────────
     fp_agents = [a["repo"] for a in agents if a.get("fingerprints")]
     failed_repos = set(a["repo"] for a in agents + legacy_agents) - set(r["repo"] for r in rows + legacy_rows)

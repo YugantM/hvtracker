@@ -25,9 +25,10 @@ import urllib.parse
 from html import escape
 
 import requests
-from fastapi import APIRouter, Form, Request, Response
+from fastapi import APIRouter, Form, Query, Request, Response
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
+import alerts
 import db
 
 router = APIRouter()
@@ -416,7 +417,8 @@ def login_page(request: Request, next: str = "/", error: str = ""):
     return HTMLResponse(_marketing_page(
         "Sign in — HVTracker", "Account", "Sign in or create an account", body,
         description="Sign in to HVTracker to track agents and get trust-change alerts.",
-        path="/login/", noindex=True))
+        path="/login/", noindex=True,
+        lede="Free. The registry stays fully public; an account only adds tracking and notifications."))
 
 
 def _watch_view(slug: str, agent: dict | None) -> dict:
@@ -595,7 +597,7 @@ def recent_changes_html(items: list[dict], limit: int = 20) -> str:
 
 @router.get("/account", response_class=HTMLResponse)
 @router.get("/account/", response_class=HTMLResponse, include_in_schema=False)
-def account_page(request: Request, tracked: str = ""):
+def account_page(request: Request, tracked: str = "", alerts_status: str = Query("", alias="alerts")):
     from app import _marketing_page
     user = current_user(request)
     if not user:
@@ -631,11 +633,12 @@ def account_page(request: Request, tracked: str = ""):
         f'{flash}'
         f'<h3 id="watchlist">Tracked projects <span class="account-count">{len(watch)}</span></h3>'
         f'{summary_html}{watch_html}'
-        '<p class="auth-note">Track your whole stack at once: paste a requirements.txt, '
+        '<p class="auth-note account-hint">Track your whole stack at once: paste a requirements.txt, '
         'package.json or MCP config into <a href="/scan/">Scan your stack</a> and choose '
         '<em>Watch all</em>.</p>'
         '<h3 id="changes">Recent changes</h3>'
         f'{recent_changes_html(changes)}'
+        f'{alerts_section_html(user, alerts_status) if alerts.enabled() else ""}'
         "</div>"
     )
     return HTMLResponse(_marketing_page(
@@ -643,6 +646,135 @@ def account_page(request: Request, tracked: str = ""):
         description="Your HVTracker account: tracked projects and settings.",
         path="/account/",
         lede="The projects you track, and what changed on them."))
+
+
+# ------------------------------------------------------- alert emails ----
+# The opt-in, frequency and unsubscribe side of alerts.py. Shown only while
+# alerts.enabled(); the links in already-sent emails keep working regardless.
+
+_CADENCES = (("daily", "Daily digest"), ("weekly", "Weekly digest"), ("off", "Off"))
+_ALERT_STATUS = {
+    "sent": "Check your inbox: the confirmation link is on its way.",
+    "wait": "A confirmation email went out in the last 10 minutes. Check your inbox and spam folder, or try again shortly.",
+    "failed": "The email couldn't be sent just now. Please try again later.",
+    "saved": "Saved.",
+}
+
+
+def alerts_section_html(user: dict, status: str = "") -> str:
+    """/account: opt in to alert emails, or pick how often they come."""
+    note = (f'<p class="auth-note account-flash">{escape(_ALERT_STATUS[status])}</p>'
+            if status in _ALERT_STATUS else "")
+    email, alert_email = user.get("email"), user.get("alert_email")
+    if alert_email:
+        current = user.get("alert_cadence") or "daily"
+        options = "".join(f'<option value="{v}"{" selected" if v == current else ""}>{label}</option>'
+                          for v, label in _CADENCES)
+        lead = ("Alert emails are off. Turn them back on here; they go to"
+                if current == "off" else "Alert emails go to")
+        body = (f'<p class="auth-note">{lead} <strong>{escape(alert_email)}</strong>. '
+                "A digest lists grade flips, HVTrust moves of 3+ points, lost provenance and supply-chain "
+                "warnings on the projects above, and only arrives when something changed.</p>"
+                '<form method="post" action="/account/alerts" class="account-alerts">'
+                '<input type="hidden" name="action" value="cadence">'
+                f'<label class="auth-field">How often<select name="cadence">{options}</select></label>'
+                '<button class="auth-btn auth-btn--ghost" type="submit">Save</button></form>')
+    elif email:
+        body = ('<p class="auth-note">Get an email when a project you track changes grade, loses '
+                "provenance, raises a supply-chain warning or moves 3+ HVTrust points. One digest a day "
+                "at most, and nothing when nothing changed.</p>"
+                '<form method="post" action="/account/alerts" class="account-alerts">'
+                '<input type="hidden" name="action" value="enable">'
+                f'<button class="auth-btn auth-btn--primary" type="submit">Email me at {escape(email)}</button></form>'
+                '<p class="auth-fineprint">We send a confirmation link first. Every email has a one-click unsubscribe.</p>')
+    else:
+        body = ('<p class="auth-note">Your sign-in provider didn\'t share an email address, so alerts '
+                "can't be emailed. Changes still show up above and in the bell.</p>")
+    return f'<h3 id="alerts">Alert emails</h3>{note}{body}'
+
+
+@router.post("/account/alerts")
+def account_alerts(request: Request, action: str = Form(""), cadence: str = Form("")):
+    user = current_user(request)
+    if not user:
+        return RedirectResponse("/login?next=/account/", status_code=303)
+    status = ""
+    if alerts.enabled():
+        if action == "enable" and user.get("email"):
+            if not db.claim_alert_verify_send(user["id"]):
+                status = "wait"
+            else:
+                status = "sent" if alerts.send_verification(user["id"], user["email"]) else "failed"
+        elif action == "cadence" and user.get("alert_email") and cadence in dict(_CADENCES):
+            db.set_alert_cadence(user["id"], cadence)
+            status = "saved"
+    return RedirectResponse(f"/account/?alerts={status}#alerts", status_code=303)
+
+
+def _token_page(title: str, heading: str, body: str, status_code: int = 200) -> HTMLResponse:
+    from app import _marketing_page
+    return HTMLResponse(_marketing_page(f"{title} — HVTracker", "Alert emails", heading, body,
+                                        description=heading, path="/account/", noindex=True,
+                                        lede="Alert emails for the projects you track on HVTracker."),
+                        status_code=status_code)
+
+
+def _bad_link() -> HTMLResponse:
+    return _token_page("Link expired", "This link has expired or isn't valid.",
+                       "<div class='card'><p>Confirmation links work for 48 hours. Request a new one "
+                       "from <a href='/account/#alerts'>your account page</a>.</p></div>", 400)
+
+
+# Opening a link only shows a button; the change happens on POST. Mail
+# scanners fetch links in incoming mail, and must not confirm or unsubscribe.
+@router.get("/verify-email/{token}", response_class=HTMLResponse)
+def verify_email_page(token: str):
+    if not alerts.read_token(token, "verify"):
+        return _bad_link()
+    return _token_page("Confirm alert emails", "Confirm alert emails",
+                       "<div class='card'><p>Confirm that HVTracker should email you when a project you "
+                       "track changes.</p><form method='post'><div class='actions'>"
+                       "<button class='button' type='submit'>Confirm alert emails</button></div></form></div>")
+
+
+@router.post("/verify-email/{token}", response_class=HTMLResponse)
+def verify_email_confirm(token: str):
+    payload = alerts.read_token(token, "verify")
+    user = db.get_user(int(payload["u"])) if payload else None
+    # Bound to the address it was sent to: an account email changed since then
+    # needs a fresh link.
+    if not user or not alerts.email_matches(payload, user.get("email")):
+        return _bad_link()
+    db.confirm_alert_email(user["id"], user["email"])
+    return _token_page("Alert emails on", "Alert emails are on.",
+                       f"<div class='card'><p>Changes on the projects you track will go to "
+                       f"<strong>{escape(user['email'])}</strong>, at most once a day.</p></div>"
+                       "<div class='actions'><a class='button' href='/account/#alerts'>Your account</a></div>")
+
+
+@router.get("/unsub/{token}", response_class=HTMLResponse)
+def unsubscribe_page(token: str):
+    if not alerts.read_token(token, "unsub"):
+        return _token_page("Invalid link", "This unsubscribe link isn't valid.",
+                           "<div class='card'><p>Turn alert emails off from "
+                           "<a href='/account/#alerts'>your account page</a>.</p></div>", 400)
+    return _token_page("Unsubscribe", "Stop alert emails?",
+                       "<div class='card'><p>You'll stop getting emails about the projects you track. "
+                       "They stay tracked, and changes still show up on your account page.</p>"
+                       "<form method='post'><div class='actions'><button class='button' type='submit'>"
+                       "Unsubscribe</button></div></form></div>")
+
+
+@router.post("/unsub/{token}", response_class=HTMLResponse)
+def unsubscribe(token: str):
+    """Also the RFC 8058 one-click target (List-Unsubscribe-Post)."""
+    payload = alerts.read_token(token, "unsub")
+    if not payload:
+        return _token_page("Invalid link", "This unsubscribe link isn't valid.", "", 400)
+    db.set_alert_cadence(int(payload["u"]), "off")
+    return _token_page("Unsubscribed", "You're unsubscribed.",
+                       "<div class='card'><p>No more alert emails. Turn them back on any time from "
+                       "<a href='/account/#alerts'>your account page</a>.</p></div>")
 
 
 # ------------------------------------------------------------------- api ---

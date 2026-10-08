@@ -1045,6 +1045,17 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   for n8n, Daytona, Mem0, Browser Use) and proposes E4, OSV advisory history plus
   roster package-id fixes, which awaits an owner decision.
 
+- **Watchlist + alerts MVP built 2026-10-08** (docs/mvp-watchlist-alerts-spec.md
+  §12, runbook docs/alert-emails.md), NOT deployed. #356: `/track/<slug>/` tracks
+  and lands on `/account` (signed out: via `/login`), `/alerts/` is a real page (no
+  waitlist; `interest_signups` rows kept), `/scan/` "Watch all", account
+  recent-changes feed, Track state follows the account across devices; the lastmod
+  fingerprint ignores `?v=<hash>` on auth.js/site.css (LASTMOD_FP_VERSION 7).
+  Stacked PR: opt-in email digests (`alerts.py`, `mailer.py`, `alert_events`
+  table, `/verify-email`, `/unsub`), **shipped dark**: email delivery sits behind
+  the visa/monetization gate in product-plan-2026-h2, so `ALERTS_ENABLED` stays
+  unset until the owner decides.
+
 ## Entries recorded only in the old AGENTS.md
 
 - UI/UX fix batches DEPLOYED 2026-07-23 (owner-approved): #198 (P0 bugs —

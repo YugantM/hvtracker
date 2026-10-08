@@ -25,6 +25,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
+import alerts
 import db
 import mcp_server
 import usage
@@ -2062,6 +2063,9 @@ def alerts_page(request: Request):
         cta = "<a class='button' href='/account/'>Open your tracked projects</a>"
     else:
         cta = "<a class='button' href='/login?next=/account/'>Sign in to start tracking</a>"
+    email_html = ("\n        <p>Prefer email? Turn on alert emails on your account page: a daily or weekly "
+                  "digest of grade flips, HVTrust moves of 3+ points, lost provenance and supply-chain "
+                  "warnings, sent only when something changed.</p>") if alerts.enabled() else ""
     body = f"""
     <div class='grid'>
       <div class='card'>
@@ -2073,13 +2077,13 @@ def alerts_page(request: Request):
           <li>Package provenance lost, or a provenance-drift warning raised</li>
           <li>Eligibility warnings</li>
         </ul>
-        <p>Moves caused by a methodology update are not reported as changes.</p>
+        <p style='margin-top:12px'>Moves caused by a methodology update are not reported as changes.</p>
       </div>
       <div class='card'>
         <span class='pill'>How it works</span>
         <h2 style='margin-top:10px'>Track the tools in your stack</h2>
         <p>Sign in, then choose <em>Track</em> on any agent, MCP server or skill page, or paste your dependency file into <a href='/scan/'>Scan your stack</a> and choose <em>Watch all</em>.</p>
-        <p>Changes show up in the bell at the top of every page and on your account page. A tool that leaves the registry stays on your list, marked as no longer listed.</p>
+        <p>Changes show up in the bell at the top of every page and on your account page. A tool that leaves the registry stays on your list, marked as no longer listed.</p>{email_html}
       </div>
     </div>
     <div class='actions'>

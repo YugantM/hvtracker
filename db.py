@@ -302,7 +302,8 @@ def usage_series(hours: int = 24) -> list[dict] | None:
 
 # ---- accounts / watchlist (auth.py) ---------------------------------------
 
-_USER_COLS = ["id", "provider", "provider_id", "login", "name", "email", "avatar_url"]
+_USER_COLS = ["id", "provider", "provider_id", "login", "name", "email", "avatar_url",
+              "alert_email", "alert_cadence"]
 
 
 def upsert_user(provider: str, provider_id: str, login: str | None,
@@ -409,3 +410,149 @@ def set_last_read(user_id: int) -> None:
         cur.execute("INSERT INTO notification_reads (user_id, last_read_at) VALUES (%s, now()) "
                     "ON CONFLICT (user_id) DO UPDATE SET last_read_at = now()", (user_id,))
         conn.commit()
+
+
+# ---- watchlist alert emails (alerts.py) -----------------------------------
+
+def alert_subscribers_for(slugs: list[str]) -> list[dict]:
+    """Opted-in watchers of any of `slugs`, one row per (user, slug).
+
+    `since` is the later of when they started watching and when they opted
+    in: changes from before that are never emailed.
+    """
+    if not enabled() or not slugs:
+        return []
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT w.user_id, w.agent_slug, GREATEST(w.created_at, u.alert_email_verified_at)::date "
+            "FROM watchlist w JOIN users u ON u.id = w.user_id "
+            "WHERE w.agent_slug = ANY(%s) AND u.alert_email IS NOT NULL "
+            "AND u.alert_cadence <> 'off'",
+            (list(slugs),),
+        )
+        return [{"user_id": r[0], "slug": r[1], "since": r[2]} for r in cur.fetchall()]
+
+
+def add_alert_events(rows: list[dict]) -> int:
+    """Queue alert rows; one already queued for the same change is skipped.
+
+    Returns how many were new.
+    """
+    if not enabled() or not rows:
+        return 0
+    new = 0
+    with _connect() as conn, conn.cursor() as cur:
+        for r in rows:
+            cur.execute(
+                "INSERT INTO alert_events (user_id, agent_slug, agent_name, kind, event_date, "
+                "detail, change_sig) VALUES (%s, %s, %s, %s, %s, %s, %s) "
+                "ON CONFLICT (user_id, change_sig) DO NOTHING",
+                (r["user_id"], r["slug"], r.get("name"), r["kind"], r["date"],
+                 r["detail"], r["change_sig"]),
+            )
+            new += cur.rowcount
+        conn.commit()
+    return new
+
+
+def pending_alert_digests() -> list[dict]:
+    """Opted-in users with unsent alert rows, each with those rows oldest first."""
+    if not enabled():
+        return []
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT u.id, u.alert_email, u.alert_cadence, u.alert_last_sent_at, "
+            "u.alert_email_verified_at, e.id, e.agent_slug, e.agent_name, e.kind, "
+            "to_char(e.event_date, 'YYYY-MM-DD'), e.detail "
+            "FROM alert_events e JOIN users u ON u.id = e.user_id "
+            "WHERE e.emailed_at IS NULL AND u.alert_email IS NOT NULL "
+            "AND u.alert_cadence <> 'off' ORDER BY u.id, e.event_date, e.id"
+        )
+        out: dict[int, dict] = {}
+        for (uid, email, cadence, last_sent, verified, eid, slug, name, kind,
+             date, detail) in cur.fetchall():
+            d = out.setdefault(uid, {"user_id": uid, "email": email, "cadence": cadence,
+                                     "last_sent_at": last_sent, "verified_at": verified,
+                                     "events": []})
+            d["events"].append({"id": eid, "slug": slug, "name": name, "kind": kind,
+                                "date": date, "detail": detail})
+        return list(out.values())
+
+
+def mark_alerts_emailed(user_id: int, event_ids: list[int]) -> None:
+    if not enabled() or not event_ids:
+        return
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute("UPDATE alert_events SET emailed_at = now() "
+                    "WHERE user_id = %s AND id = ANY(%s)", (user_id, list(event_ids)))
+        cur.execute("UPDATE users SET alert_last_sent_at = now() WHERE id = %s", (user_id,))
+        conn.commit()
+
+
+def set_alert_cadence(user_id: int, cadence: str) -> None:
+    """daily | weekly | off. Turning alerts off drops the unsent queue, so
+    turning them back on later doesn't send stale changes."""
+    if cadence not in ("daily", "weekly", "off"):
+        raise ValueError(cadence)
+    if not enabled():
+        return
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute("UPDATE users SET alert_cadence = %s WHERE id = %s", (cadence, user_id))
+        if cadence == "off":
+            cur.execute("DELETE FROM alert_events WHERE user_id = %s AND emailed_at IS NULL",
+                        (user_id,))
+        conn.commit()
+
+
+def claim_alert_verify_send(user_id: int, min_gap_minutes: int = 10) -> bool:
+    """Record a verification email about to be sent; False if one went out
+    within `min_gap_minutes` (stops the form being used to flood an inbox)."""
+    if not enabled():
+        return False
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE users SET alert_verify_sent_at = now() WHERE id = %s AND "
+            "(alert_verify_sent_at IS NULL OR alert_verify_sent_at < now() - make_interval(mins => %s)) "
+            "RETURNING id",
+            (user_id, min_gap_minutes),
+        )
+        ok = cur.fetchone() is not None
+        conn.commit()
+        return ok
+
+
+def confirm_alert_email(user_id: int, email: str) -> None:
+    """The user proved they read `email`: send digests there from now on."""
+    if not enabled():
+        return
+    with _connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE users SET alert_email = %s, alert_email_verified_at = now(), "
+            "alert_cadence = CASE WHEN alert_cadence = 'off' THEN 'daily' ELSE alert_cadence END "
+            "WHERE id = %s",
+            (email, user_id),
+        )
+        conn.commit()
+
+
+def account_stats(days: int = 7) -> dict | None:
+    """Funnel numbers for scripts/account_stats.py (the spec's success metrics)."""
+    if not enabled():
+        return None
+    queries = {
+        "users": "SELECT count(*) FROM users",
+        "signups": "SELECT count(*) FROM users WHERE created_at > now() - make_interval(days => %s)",
+        "users_watching": "SELECT count(DISTINCT user_id) FROM watchlist",
+        "watch_adds": "SELECT count(*) FROM watchlist WHERE created_at > now() - make_interval(days => %s)",
+        "alert_subscribers": "SELECT count(*) FROM users WHERE alert_email IS NOT NULL AND alert_cadence <> 'off'",
+        "alerts_queued": "SELECT count(*) FROM alert_events WHERE created_at > now() - make_interval(days => %s)",
+        "alerts_emailed": "SELECT count(*) FROM alert_events WHERE emailed_at > now() - make_interval(days => %s)",
+        "digests_sent": "SELECT count(DISTINCT (user_id, emailed_at)) FROM alert_events "
+                        "WHERE emailed_at > now() - make_interval(days => %s)",
+    }
+    out = {"window_days": days}
+    with _connect() as conn, conn.cursor() as cur:
+        for key, sql in queries.items():
+            cur.execute(sql, (days,) if "%s" in sql else ())
+            out[key] = cur.fetchone()[0]
+    return out
