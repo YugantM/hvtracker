@@ -1,6 +1,6 @@
 # MVP spec: Watchlist + Score-Change Alerts ("monitor your stack")
 
-Status: ready to build · Drafted 2026-10-08 · Target repo: `~/hvtracker`
+Status: **built 2026-10-08** (see §12; email ships dark) · Drafted 2026-10-08 · Target repo: `~/hvtracker`
 Owner build session: separate (this file is the handoff).
 
 > Reconcile with `docs/growth-plan.md`, `docs/product-plan-2026-h2.md`, and
@@ -284,3 +284,50 @@ deploy, in-container render; run schema migration on boot via `db.init_schema()`
   refresh re-run sends nothing new; verified-gate blocks unverified sends.
 - Manual: dev-login (`HVT_DEV_AUTH=1`) → watch a tool → simulate a grade drop in a test
   snapshot → assert in-app unread + one email with working unsubscribe.
+
+## 12. Build notes (2026-10-08)
+
+Built as two PRs: watch flows (slices 1, 4, 5), then alert pipeline and email
+(slices 2, 3, 6). Runbook: `docs/alert-emails.md`. Where the build differs from
+this spec, and why:
+
+- **Already existed:** `/api/watchlist` (add/remove/sync), the `/account` list
+  and the header bell, fed by `derive_agent_events` via `latest.json`, with read
+  state. No `/api/v1/watch` was added; the gaps were wired into these.
+- **Change source:** `derive_agent_events`, not `diff_snapshots`.
+  `diff_snapshots` is the weekly window behind `/changes` and ignores
+  methodology cutovers. `derive_agent_events` compares consecutive days,
+  suppresses cutovers, already has grade flips, drift warnings, lost
+  provenance and delisting, and feeds the profile timeline. So an email never
+  says something the page doesn't. (Open decision 4.)
+- **Finished days only:** today's snapshot is rewritten by every 4-hourly
+  render, so a change can appear and vanish within a day. Changes are emailed
+  after their day closes. As a result there is no `instant` cadence. Cadence is
+  `daily` (default) | `weekly` | `off`. (Open decision 2.)
+- **Thresholds:** the timeline's own, HVTrust ≥3 points (not 5), so the email
+  and the page agree.
+- **Schema:** `users.alert_email`, the confirmed address, replaces
+  `email_verified_at`, so a provider email change can't redirect alerts.
+  Unsubscribe and verify links are HMAC-signed tokens, not an `unsub_token`
+  column. Only opted-in watchers get `alert_events` rows.
+- **Module name:** `mailer.py`. A top-level `email.py` would shadow the stdlib
+  `email` package that `requests` imports.
+- **Scanner-safe links:** `GET /verify-email/<t>` and `GET /unsub/<t>` show a
+  button and the `POST` acts. Mail scanners fetch links and must not confirm or
+  unsubscribe. RFC 8058 one-click goes to the same `POST`.
+- **Provider:** Resend over plain `requests`, with an idempotency key per
+  digest. (Open decision 1.)
+- **Ships dark** (owner, 2026-10-08): `product-plan-2026-h2.md` puts hosted
+  alert delivery behind the visa/monetization gate. Nothing sends, and
+  `/account` shows no email option, until `ALERTS_ENABLED=1` and
+  `RESEND_API_KEY` are set.
+- **Watchable types:** one slug space. Agents and skills are rows in
+  `latest.json` (MCP servers are agent rows), and every `/agents/<slug>/` page
+  has the Track button. (Open decision 3.)
+- **Waitlist emails:** not mailed. The consent copy covers one "it's ready"
+  note; sending it is the owner's call (`docs/alert-emails.md`). (Open decision 5.)
+- **Metrics:** `scripts/account_stats.py` (Postgres) plus UTM-tagged digest
+  links and GA events. Open rate isn't tracked (no pixel).
+- **Runbook location:** `docs/alert-emails.md`. `incident-playbook.md` covers
+  security incidents on tracked projects.
+

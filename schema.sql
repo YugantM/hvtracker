@@ -116,5 +116,35 @@ CREATE TABLE IF NOT EXISTS notification_reads (
 );
 
 CREATE INDEX IF NOT EXISTS watchlist_user_idx ON watchlist (user_id);
+-- alerts.py looks up the watchers of each changed project.
+CREATE INDEX IF NOT EXISTS watchlist_slug_idx ON watchlist (agent_slug);
+
+-- ---- Watchlist alert emails (alerts.py, mailer.py) -------------------------
+-- Opt-in per user: alert_email is set only when the user confirms it from a
+-- verification link, and digests go to that address even if the sign-in
+-- provider's email changes later. alert_cadence: daily | weekly | off.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS alert_email TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS alert_email_verified_at TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS alert_cadence TEXT NOT NULL DEFAULT 'daily';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS alert_verify_sent_at TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS alert_last_sent_at TIMESTAMPTZ;
+
+-- The digest outbox: one row per (user, change). change_sig makes a re-run
+-- of the same refresh a no-op; emailed_at lets a crash mid-send resume
+-- without sending anything twice. Only opted-in watchers get rows.
+CREATE TABLE IF NOT EXISTS alert_events (
+    id          BIGSERIAL PRIMARY KEY,
+    user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    agent_slug  TEXT NOT NULL,
+    agent_name  TEXT,
+    kind        TEXT NOT NULL,                  -- derive_agent_events type, e.g. grade_changed
+    event_date  DATE NOT NULL,
+    detail      TEXT NOT NULL,
+    change_sig  TEXT NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    emailed_at  TIMESTAMPTZ,
+    UNIQUE (user_id, change_sig)
+);
+CREATE INDEX IF NOT EXISTS alert_events_pending_idx ON alert_events (user_id) WHERE emailed_at IS NULL;
 -- The "claim your project" feature was removed; its table is no longer created.
 DROP TABLE IF EXISTS claims;

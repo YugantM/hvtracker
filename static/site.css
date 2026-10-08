@@ -451,6 +451,8 @@ a.wl-name:hover { color: var(--accent); }
 .wl-row.is-gone .wl-name { text-decoration: line-through; }
 .wl-changes .wl-row { grid-template-columns: minmax(0,1fr) auto; }
 .wl-row.is-unread { border-left: 3px solid var(--accent); }
+.account form.account-alerts { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; margin: 10px 0 4px; }
+.account-alerts select { padding: 10px 12px; border: 1px solid var(--line); background: var(--card); font: 14px var(--font-sans); color: var(--ink); }
 .account-flash { margin: 14px 0 0; padding: 10px 12px; border: 1px solid var(--line); border-left: 3px solid var(--accent); background: var(--card); color: var(--ink); }
 
 @media (max-width: 620px) {
