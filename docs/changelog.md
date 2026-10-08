@@ -1044,6 +1044,20 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   audit) revises the E2 list by demand (Codex, LiveKit Agents, Freebuff, Kilo Code in
   for n8n, Daytona, Mem0, Browser Use) and proposes E4, OSV advisory history plus
   roster package-id fixes, which awaits an owner decision.
+- **MCP SDK package ids DEPLOYED 2026-10-07 14:58 UTC** (5e0dad2d @ 15f79ca9, #352;
+  owner: "yes merge and deploy it"). npm `@modelcontextprotocol/sdk` on
+  modelcontextprotocol/typescript-sdk and PyPI `mcp` on python-sdk (both registry
+  entries name the tracked repo), so /api/v1/scan, scan_stack, /api/v1/mcp/verify and
+  HVTrust Gate can match the two dependencies nearly every MCP server has. Scoring
+  change, evidence-gated on the live board (recompute matched all 1,705 rows): both go
+  B→A (69.5→94.6, 69.1→93.7; ranks 344→3, 360→6), no other score changes, bystanders
+  max ±2; logged in the methodology policy log. Java/C# SDKs (Maven, NuGet) and MCP
+  Bundles (npm package names no repo) left without ids. The new scores land at each
+  row's next full fetch (both last fetched 08:01 UTC on 10-07). The same deploy took
+  #343 (G1 `agent_records` channel; /live/ "Requests by surface") and #346/#350/#351
+  (A2A study, Actions-only) live. First `railway up` failed at upload (Railway 500);
+  the retry succeeded. Verified: healthz ok, `[startup]` roster sync 1,734, boot
+  repair-commits render, invariants [].
 
 - **Watchlist + alerts MVP built 2026-10-08** (docs/mvp-watchlist-alerts-spec.md
   §12, runbook docs/alert-emails.md), NOT deployed. #356: `/track/<slug>/` tracks
