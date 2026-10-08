@@ -2882,6 +2882,69 @@ TRUST_DIMENSIONS = {
 }
 
 
+# Q4 plan E2/E3: reviewed, sourced safety facts for selected profiles: who runs
+# the product, what it can reach, where data goes and its security practice.
+# They answer what "is X safe?" searchers ask and repo signals can't
+# (docs/research/is-x-safe-question-audit-2026-10-06.md). Facts are shown,
+# never scored, and a profile without an entry renders exactly as before.
+SAFETY_FACTS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "safety_facts.json")
+SAFETY_FACT_TOPICS = (("operator", "Who runs it"), ("access", "What it can reach"),
+                      ("data", "Where your data goes"), ("security", "Security practice"))
+# Evidence class -> the chip shown beside the fact.
+SAFETY_FACT_CLASSES = {"declared": "PUBLISHER", "observed": "CHECKED", "source": "IN CODE"}
+
+
+def safety_fact_problems(doc) -> list[str]:
+    """Why a safety_facts.json document is malformed (an empty list means valid)."""
+    if not isinstance(doc, dict) or not isinstance(doc.get("profiles"), dict):
+        return ["no profiles object"]
+    topics = {t for t, _ in SAFETY_FACT_TOPICS}
+    problems = []
+    for slug, entry in doc["profiles"].items():
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str((entry or {}).get("checked", ""))):
+            problems.append(f"{slug}: checked is not a YYYY-MM-DD date")
+        facts = (entry or {}).get("facts")
+        if not isinstance(facts, list) or not facts:
+            problems.append(f"{slug}: no facts")
+            continue
+        for i, fact in enumerate(facts):
+            where = f"{slug}[{i}]"
+            if fact.get("topic") not in topics:
+                problems.append(f"{where}: unknown topic {fact.get('topic')!r}")
+            if fact.get("class") not in SAFETY_FACT_CLASSES:
+                problems.append(f"{where}: unknown class {fact.get('class')!r}")
+            if not str(fact.get("text") or "").strip():
+                problems.append(f"{where}: empty text")
+            if not str(fact.get("source") or "").startswith("https://"):
+                problems.append(f"{where}: source must be an https URL")
+    return problems
+
+
+def load_safety_facts(path: str = SAFETY_FACTS_PATH) -> dict[str, dict]:
+    """slug -> {"checked", "groups": [{"key", "heading", "facts": [...]}]}, topics in
+    a fixed order. A missing or malformed file yields {} so a bad edit can never
+    break a render; tests/test_safety_facts.py rejects one before it ships."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            doc = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+    if safety_fact_problems(doc):
+        return {}
+    out = {}
+    for slug, entry in doc["profiles"].items():
+        groups = []
+        for key, heading in SAFETY_FACT_TOPICS:
+            facts = [{**f, "label": SAFETY_FACT_CLASSES[f["class"]],
+                      "source_host": (urlsplit(f["source"]).hostname or "").removeprefix("www.")}
+                     for f in entry["facts"] if f["topic"] == key]
+            if facts:
+                groups.append({"key": key, "heading": heading, "facts": facts})
+        out[slug] = {"checked": entry["checked"], "groups": groups,
+                     "has_source": any(f["class"] == "source" for f in entry["facts"])}
+    return out
+
+
 def agent_review_insights(row: dict) -> dict:
     """Summarize the trust score in plain language for agent profile pages."""
     score = row.get("trust_score") or 0
@@ -8529,7 +8592,9 @@ def main() -> None:
     for _lst in cat_sorted_rows.values():
         _lst.sort(key=lambda x: x.get("category_rank") or 9999)
     # Add category_slug so agent pages can link to category pages
+    safety_facts = load_safety_facts()
     for row in rows + legacy_rows:
+        row["safety_facts"] = safety_facts.get(row.get("slug"))
         row["category_slug"] = slugify(row.get("category", "")) if row.get("category") else ""
         owner = row["repo"].split("/")[0].lower()
         row["org_slug_or_none"] = owner if owner in org_slug_set else None

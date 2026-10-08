@@ -747,6 +747,29 @@
         </ul>
       </section>
       {% endif %}
+      {%- if row.safety_facts %}
+      {# Q4 plan E2/E3: reviewed facts from safety_facts.json. Rendered only on
+         pages that have them, with existing styles, so every other profile is
+         byte-for-byte unchanged and keeps its sitemap date. #}
+      {% set sf = row.safety_facts %}
+      <section class="imp" id="safety-facts" aria-labelledby="sfacts-title">
+        <div class="imp-head"><h2 id="sfacts-title">What {{ row.name }} can reach, and who runs it</h2></div>
+        <p class="imp-sub">Checked {{ sf.checked }}, each with its source. <span class="sev sev-none">PUBLISHER</span> is the company's or project's own statement, which we haven't verified; <span class="sev sev-none">CHECKED</span> is something we observed ourselves{% if sf.has_source %}; <span class="sev sev-none">IN CODE</span> is read from the project's source code{% endif %}. These facts describe the product. They don't change its score.</p>
+        {% for g in sf.groups %}
+        <h3 style="font-size:13px;margin:14px 0 4px">{{ g.heading }}</h3>
+        <ul class="adv-list">
+          {% for f in g.facts %}
+          <li>
+            <span><span class="sev sev-none">{{ f.label }}</span></span>
+            <span class="adv-sum">{{ f.text }}</span>
+            <span class="adv-meta"><a href="{{ f.source }}" rel="noopener">{{ f.source_host }}</a></span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endfor %}
+        <div class="imp-actions"><a href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Something wrong or out of date? Suggest a correction</a></div>
+      </section>
+      {%- endif %}
       {% if row.improvements %}
       <section class="imp" aria-labelledby="imp-title">
         <div class="imp-head"><h2 id="imp-title">How {{ row.name }} could raise its score</h2></div>
