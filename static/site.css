@@ -449,6 +449,9 @@ a.wl-name:hover { color: var(--accent); }
   color: var(--lobster); border: 1px solid var(--lobster); border-radius: 3px; padding: 2px 6px; }
 .wl-row.is-gone { opacity: .62; }
 .wl-row.is-gone .wl-name { text-decoration: line-through; }
+.wl-changes .wl-row { grid-template-columns: minmax(0,1fr) auto; }
+.wl-row.is-unread { border-left: 3px solid var(--accent); }
+.account-flash { margin: 14px 0 0; padding: 10px 12px; border: 1px solid var(--line); border-left: 3px solid var(--accent); background: var(--card); color: var(--ink); }
 
 @media (max-width: 620px) {
   .wl-row { grid-template-columns: minmax(0,1fr) auto; row-gap: 8px; }

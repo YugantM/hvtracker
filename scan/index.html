@@ -45,6 +45,13 @@
     .c-score { font-family: var(--font-mono); color: var(--muted); }
     .verify-note { max-width: 820px; margin: 16px auto 0; color: var(--muted); font-size: 12px; border-top: 1px dashed var(--line); padding-top: 12px; }
     .verify-note a { color: var(--accent); }
+    .scan-watch { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 0 0 12px; }
+    .scan-watch button, .scan-table .w-toggle { border: 1px solid var(--line-strong); background: var(--bg); color: var(--text); font: 600 13px var(--font-sans); padding: 7px 12px; border-radius: 8px; cursor: pointer; }
+    .scan-watch button:hover, .scan-table .w-toggle:hover { border-color: var(--accent); color: var(--accent); }
+    .scan-table .w-toggle { font: 12px var(--font-mono); padding: 3px 8px; }
+    .scan-table .w-toggle.is-on { border-color: var(--accent); color: var(--accent); }
+    .scan-watch-note { color: var(--muted); font-size: 13px; }
+    .scan-watch-note a { color: var(--accent); }
     .result-loading, .result-error { color: var(--muted); font-size: 15px; margin-top: 22px; }
     .result-error { color: var(--red); }
   </style>
@@ -70,7 +77,7 @@
         </div>
       </form>
       <div id="result"></div>
-      <p class="verify-note">Registry-only check — matches each item against the curated HVTracker registry; nothing is stored. Need one project in depth, or an untracked repo? Use <a href="/verify/">Verify</a>. Want something tracked continuously? <a href="/submit/">Submit it</a>.</p>
+      <p class="verify-note">Registry-only check — matches each item against the curated HVTracker registry; nothing you paste is stored. Only the projects you choose to watch are saved. Need one project in depth, or an untracked repo? Use <a href="/verify/">Verify</a>. Want something tracked continuously? <a href="/submit/">Submit it</a>.</p>
       <p class="verify-note" style="border-top:none;margin-top:6px;padding-top:0"><strong>Run this on every pull request.</strong> <a href="https://github.com/YugantM/hvtrust-gate">HVTrust Gate</a> is a free GitHub Action that scans your dependency files and comments on pull requests that change them. One line, no API key.</p>
     </div>
   </div>
@@ -121,7 +128,21 @@
           '<div class="s-cell"><strong style="color:var(--amber)">' + (s.tracked - s.trusted) + '</strong><span>tracked, not trusted</span></div>' +
           '<div class="s-cell"><strong style="color:var(--muted)">' + s.untracked + '</strong><span>not tracked</span></div>' +
           '</div>';
-        html += '<table class="scan-table"><thead><tr><th>Dependency</th><th>Verdict</th><th>Grade</th><th>HVTrust</th></tr></thead><tbody>';
+        // One entry per project: an MCP config can name the same server twice
+        // (its key and its repo URL).
+        var seen = {};
+        var watchable = rows.filter(function (r) {
+          if (!r.tracked || !r.slug || seen[r.slug]) return false;
+          return (seen[r.slug] = true);
+        });
+        if (watchable.length) {
+          html += '<div class="scan-watch"><button type="button" id="scan-watch-all">&#9734; Watch all ' +
+            watchable.length + '</button><span class="scan-watch-note" id="scan-watch-note">' +
+            (signedIn ? 'Get notified when their trust changes.'
+                      : 'Get notified when their trust changes. Free; the registry stays public.') + '</span></div>';
+        }
+        html += '<table class="scan-table"><thead><tr><th>Dependency</th><th>Verdict</th><th>Grade</th><th>HVTrust</th>' +
+          (signedIn && watchable.length ? '<th></th>' : '') + '</tr></thead><tbody>';
         rows.forEach(function (r) {
           var p = pill(r);
           var name = r.tracked && r.slug
@@ -133,10 +154,86 @@
             '<td class="c-input">' + name + '</td>' +
             '<td><span class="verdict-pill ' + p[0] + '">' + p[1] + '</span></td>' +
             '<td>' + grade + '</td>' +
-            '<td class="c-score">' + score + '</td></tr>';
+            '<td class="c-score">' + score + '</td>' +
+            (signedIn && watchable.length ? '<td>' + (r.tracked && r.slug
+              ? '<button type="button" class="w-toggle" data-slug="' + esc(r.slug) + '">&#9734; Watch</button>' : '') + '</td>' : '') +
+            '</tr>';
         });
         html += '</tbody></table>';
         out.innerHTML = html;
+        if (watchable.length) initWatch(watchable);
+      }
+
+      // ---- Watch the results (the scan itself stays ephemeral) ----
+      // Signed in: the account's list. Signed out: this browser's list, which
+      // auth.js merges into the account at sign-in.
+      var WATCHLIST_KEY = 'hvtracker_watchlist_v1';
+      var signedIn = /(?:^|;\s*)hvt_signed_in=1(?:;|$)/.test(document.cookie);
+
+      function track(name, params) { if (typeof window.hvtTrack === 'function') window.hvtTrack(name, params); }
+      function postWatch(body) {
+        return fetch('/api/watchlist', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+        }).then(function (r) { return r.ok ? r.json() : Promise.reject(r); });
+      }
+      function saveLocally(items) {
+        var list;
+        try { list = JSON.parse(localStorage.getItem(WATCHLIST_KEY) || '[]'); } catch (e) { list = []; }
+        if (!Array.isArray(list)) list = [];
+        var have = list.map(function (i) { return i && i.slug ? i.slug : i; });
+        // Name from the registry repo, never the pasted text: the homepage
+        // panel renders saved names as HTML.
+        items.forEach(function (r) {
+          if (have.indexOf(r.slug) >= 0) return;
+          have.push(r.slug);
+          list.push({ slug: r.slug, name: (r.resolved || r.slug).split('/').pop(), repo: r.resolved });
+        });
+        try { localStorage.setItem(WATCHLIST_KEY, JSON.stringify(list)); return true; } catch (e) { return false; }
+      }
+
+      function initWatch(watchable) {
+        var all = document.getElementById('scan-watch-all');
+        var note = document.getElementById('scan-watch-note');
+        var toggles = [].slice.call(out.querySelectorAll('.w-toggle'));
+        function mark(slugs) {
+          toggles.forEach(function (b) {
+            var on = slugs.indexOf(b.getAttribute('data-slug')) >= 0;
+            b.classList.toggle('is-on', on);
+            b.innerHTML = on ? '&#9733; Watching' : '&#9734; Watch';
+          });
+        }
+        if (signedIn) {
+          fetch('/api/watchlist', { credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r); })
+            .then(function (d) { mark(d.slugs || []); }).catch(function () {});
+          toggles.forEach(function (b) {
+            b.addEventListener('click', function () {
+              var on = b.classList.contains('is-on');
+              postWatch({ action: on ? 'remove' : 'add', slug: b.getAttribute('data-slug') })
+                .then(function (d) { mark(d.slugs || []); }).catch(function () {});
+            });
+          });
+        }
+        all.addEventListener('click', function () {
+          var slugs = watchable.map(function (r) { return r.slug; });
+          all.disabled = true;
+          track('scan_watch_all', { count: slugs.length, signed_in: signedIn });
+          if (signedIn) {
+            postWatch({ action: 'sync', slugs: slugs }).then(function (d) {
+              mark(d.slugs || []);
+              all.innerHTML = '&#9733; Watching ' + slugs.length;
+              note.innerHTML = 'Added to <a href="/account/">your tracked projects</a>.';
+            }).catch(function () {
+              all.disabled = false;
+              note.textContent = 'Could not save. Your session may have expired: sign in again.';
+            });
+          } else {
+            var nxt = encodeURIComponent('/account/');
+            all.innerHTML = saveLocally(watchable) ? '&#9733; Saved in this browser' : '&#9734; Watch all';
+            note.innerHTML = '<a href="/login?next=' + nxt + '">Sign in</a> to be notified when any of them changes.';
+          }
+        });
       }
 
       function run() {

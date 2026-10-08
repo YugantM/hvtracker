@@ -38,6 +38,18 @@ def test_daily_refresh_noise_keeps_fingerprint():
     assert _fp(now="2026-10-02 08:00 UTC") == base
 
 
+def test_asset_cache_busters_keep_fingerprint():
+    """Editing auth.js or site.css changes the ?v=<hash> in every page's head;
+    the hash's hex letters survive number masking, so it re-dated every URL."""
+    page = '<script defer src="/auth.js?v={a}"></script><link href="/static/site.css?v={c}"><p>{n}</p>'
+
+    def fp(a, c, n="Aider"):
+        return fab.lastmod_fingerprint(page.format(a=a, c=c, n=n).encode("utf-8"), NOW)
+
+    assert fp("3fa9c2be", "ab12cd34") == fp("e0d1f2aa", "ffee0011")
+    assert fp("3fa9c2be", "ab12cd34") != fp("3fa9c2be", "ab12cd34", n="Cline")
+
+
 def test_real_content_changes_move_fingerprint():
     base = _fp()
     assert _fp(grade="A") != base

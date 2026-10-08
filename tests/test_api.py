@@ -115,9 +115,33 @@ def test_growth_pages_render(client):
     assert client.get("/sponsor/").status_code == 200
     assert client.get("/data-api").status_code == 200
     assert client.get("/data-api/").status_code == 200
-    assert client.get("/track/codex").status_code == 200
-    assert client.get("/track/codex/").status_code == 200
     assert client.get("/track/not-a-real-agent").status_code == 404
+
+
+def test_alerts_is_no_longer_a_waitlist(client):
+    page = client.get("/alerts/").text
+    assert "waitlist" not in page.lower() and "<form method='post' action='/alerts'" not in page
+    assert "/login?next=/account/" in page
+    # A stale cached copy of the old form lands back on the page.
+    r = client.post("/alerts/", data={"email": "a@example.com"},
+                    follow_redirects=False, headers=_CANONICAL_HEADERS)
+    assert r.status_code == 303 and r.headers["location"] == "/alerts/"
+
+
+def test_track_link_sends_signed_out_visitors_to_sign_in(client):
+    r = client.get("/track/codex/", follow_redirects=False, headers=_CANONICAL_HEADERS)
+    assert r.status_code == 302
+    assert r.headers["location"] == "/login?next=/track/codex/"
+
+
+def test_track_link_tracks_for_a_signed_in_user(client, monkeypatch):
+    import app as _app
+    added = []
+    monkeypatch.setattr(_app._auth, "current_user", lambda request: {"id": 9})
+    monkeypatch.setattr(_app.db, "add_watch", lambda uid, slug: added.append((uid, slug)))
+    r = client.get("/track/codex/", follow_redirects=False, headers=_CANONICAL_HEADERS)
+    assert r.status_code == 302 and r.headers["location"] == "/account/?tracked=codex"
+    assert added == [(9, "codex")]
 
 
 def test_sponsor_page_does_not_sell_comparisons(client):
@@ -137,14 +161,10 @@ def test_growth_post_routes_fail_gracefully_without_db(client):
     import app as _app
     _app._rate_log.clear()
     for path, payload in (
-        ("/alerts", {"email": "test@example.com"}),
-        ("/alerts/", {"email": "test@example.com"}),
         ("/sponsor", {"name": "Y", "company": "HV", "email": "test@example.com", "message": "Hi"}),
         ("/sponsor/", {"name": "Y", "company": "HV", "email": "test@example.com", "message": "Hi"}),
         ("/data-api", {"email": "test@example.com", "message": "Need access"}),
         ("/data-api/", {"email": "test@example.com", "message": "Need access"}),
-        ("/track/codex", {"email": "test@example.com"}),
-        ("/track/codex/", {"email": "test@example.com"}),
     ):
         _app._rate_log.clear()
         r = client.post(path, data=payload)
@@ -155,7 +175,7 @@ def test_honeypot_blocks_spam(client):
     """POST with honeypot filled returns 200 but writes nothing."""
     import app as _app
     _app._rate_log.clear()
-    r = client.post("/alerts", data={"email": "bot@spam.com", "website": "http://spam.com"})
+    r = client.post("/data-api", data={"email": "bot@spam.com", "message": "x", "website": "http://spam.com"})
     assert r.status_code == 200
     assert "Thanks" in r.text
 
@@ -165,9 +185,9 @@ def test_rate_limit_returns_429(client):
     import app as _app
     _app._rate_log.clear()
     for i in range(5):
-        r = client.post("/alerts", data={"email": f"user{i}@example.com"})
+        r = client.post("/data-api", data={"email": f"user{i}@example.com", "message": "x"})
         assert r.status_code in (200, 503)
-    r = client.post("/alerts", data={"email": "extra@example.com"})
+    r = client.post("/data-api", data={"email": "extra@example.com", "message": "x"})
     assert r.status_code == 429
 
 
@@ -187,14 +207,14 @@ def test_invalid_email_returns_400(client):
     """Invalid email format returns 400."""
     import app as _app
     _app._rate_log.clear()
-    r = client.post("/alerts", data={"email": "not-an-email"})
+    r = client.post("/data-api", data={"email": "not-an-email", "message": "x"})
     assert r.status_code == 400
     assert "email" in r.text.lower()
 
 
 def test_forms_contain_honeypot(client):
     """All form pages include the honeypot field."""
-    for path in ("/submit", "/correct", "/alerts", "/sponsor", "/data-api", "/track/codex"):
+    for path in ("/submit", "/correct", "/sponsor", "/data-api"):
         r = client.get(path)
         assert r.status_code == 200
         assert 'name="website"' in r.text

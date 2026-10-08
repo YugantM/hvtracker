@@ -2637,11 +2637,14 @@ def select_indexed_skills(prior, rows: list[dict], size: int = SKILL_INDEX_COHOR
 # HTML-escaped; 4: profile compare tray, rank arrows, rank-move events, push
 # recency, category-average markers and grade projections wrapped in
 # lastmod:skip; 5: the rank sparkline, which gains a point every day; 6: the
-# compare "Where they differ" rows), so stored hashes are re-keyed without
-# re-stamping every URL (see lastmod_entry).
-LASTMOD_FP_VERSION = 6
+# compare "Where they differ" rows; 7: the ?v=<hash> on auth.js and site.css,
+# whose hex letters survive number masking, so editing either file re-dated
+# every page), so stored hashes are re-keyed without re-stamping every URL
+# (see lastmod_entry).
+LASTMOD_FP_VERSION = 7
 LASTMOD_SKIP_RE = re.compile(rb"<!--lastmod:skip-->.*?<!--/lastmod:skip-->", re.S)
 _LASTMOD_NUMBER_RE = re.compile(rb"\d+(?:[.,]\d+)*")
+_LASTMOD_ASSET_VER_RE = re.compile(rb"(\.(?:js|css))\?v=[0-9a-f]+")
 
 
 def lastmod_fingerprint(content: bytes, now_str: str) -> str:
@@ -2656,6 +2659,7 @@ def lastmod_fingerprint(content: bytes, now_str: str) -> str:
     """
     content = content.replace(now_str.encode("utf-8"), b"")
     content = LASTMOD_SKIP_RE.sub(b"", content)
+    content = _LASTMOD_ASSET_VER_RE.sub(rb"\1", content)
     content = _LASTMOD_NUMBER_RE.sub(b"#", content)
     return hashlib.sha256(content).hexdigest()
 

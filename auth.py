@@ -551,9 +551,51 @@ def watchlist_html(watch: list[str], index: dict) -> str:
     return '<ul class="account-list wl-list">' + "".join(items) + "</ul>"
 
 
+def notification_items(slugs, index: dict, last_read: str | None) -> tuple[list[dict], int]:
+    """Recent events on tracked projects, newest first, and how many are unread.
+
+    Shared by the header bell (/api/notifications) and /account so both show
+    the same changes. Events come from derive_agent_events via latest.json.
+    """
+    last_read = last_read or "0000-00-00"
+    items, unread = [], 0
+    for slug in slugs:
+        row = index.get(slug)
+        if not row:
+            continue
+        for ev in (row.get("recent_events") or []):
+            date = ev.get("date") or ""
+            is_unread = date > last_read[:10]
+            unread += 1 if is_unread else 0
+            items.append({
+                "slug": slug, "name": row.get("name", slug), "date": date,
+                "label": ev.get("label"), "detail": ev.get("detail"),
+                "tone": ev.get("tone", "neutral"), "unread": is_unread,
+            })
+    items.sort(key=lambda x: x["date"], reverse=True)
+    return items, unread
+
+
+def recent_changes_html(items: list[dict], limit: int = 20) -> str:
+    """The /account feed: what changed on tracked projects in the last 30 days."""
+    if not items:
+        return ('<p class="auth-note">No changes in the last 30 days. Grade flips, trust moves of '
+                "3+ points, lost provenance and supply-chain warnings show up here and in the "
+                "bell at the top of every page.</p>")
+    rows = []
+    for it in items[:limit]:
+        slug = escape(it["slug"])
+        rows.append(
+            f'<li class="wl-row{" is-unread" if it["unread"] else ""}">'
+            f'<div class="wl-main"><a class="wl-name" href="/agents/{slug}/">{escape(it["name"])}</a>'
+            f'<span class="wl-sub">{escape(it.get("detail") or it.get("label") or "")}</span></div>'
+            f'<div class="wl-rank">{escape(it["date"])}</div></li>')
+    return '<ul class="account-list wl-list wl-changes">' + "".join(rows) + "</ul>"
+
+
 @router.get("/account", response_class=HTMLResponse)
 @router.get("/account/", response_class=HTMLResponse, include_in_schema=False)
-def account_page(request: Request):
+def account_page(request: Request, tracked: str = ""):
     from app import _marketing_page
     user = current_user(request)
     if not user:
@@ -563,6 +605,14 @@ def account_page(request: Request):
     watch = db.list_watch(user["id"])
     watch_html = watchlist_html(watch, index)
     summary_html = watchlist_summary_html(watch, index)
+    # Opening the account page counts as reading the feed, like opening the bell.
+    changes, _ = notification_items(watch, index, db.get_last_read(user["id"]))
+    db.set_last_read(user["id"])
+    flash = ""
+    if tracked in watch:
+        name = escape((index.get(tracked) or {}).get("name") or tracked)
+        flash = (f'<p class="auth-note account-flash">Now tracking <strong>{name}</strong>. '
+                 "Its trust changes will show up below and in the bell at the top of every page.</p>")
 
     avatar = f'<img class="account-avatar" src="{escape(user.get("avatar_url") or "")}" alt="">' if user.get("avatar_url") else ""
     ident = escape(user.get("name") or user.get("login") or "Account")
@@ -578,14 +628,21 @@ def account_page(request: Request):
         '<form method="post" action="/auth/logout" class="account-signout">'
         '<input type="hidden" name="next" value="/"><button class="auth-btn auth-btn--ghost" type="submit">Sign out</button></form>'
         "</div>"
+        f'{flash}'
         f'<h3 id="watchlist">Tracked projects <span class="account-count">{len(watch)}</span></h3>'
         f'{summary_html}{watch_html}'
+        '<p class="auth-note">Track your whole stack at once: paste a requirements.txt, '
+        'package.json or MCP config into <a href="/scan/">Scan your stack</a> and choose '
+        '<em>Watch all</em>.</p>'
+        '<h3 id="changes">Recent changes</h3>'
+        f'{recent_changes_html(changes)}'
         "</div>"
     )
     return HTMLResponse(_marketing_page(
         "Your account — HVTracker", "Account", "Your account", body,
         description="Your HVTracker account: tracked projects and settings.",
-        path="/account/"))
+        path="/account/",
+        lede="The projects you track, and what changed on them."))
 
 
 # ------------------------------------------------------------------- api ---
@@ -641,23 +698,7 @@ def api_notifications(request: Request):
     if not user:
         return JSONResponse({"error": "auth_required"}, status_code=401)
     slugs = set(db.list_watch(user["id"]))
-    index = _agents_index()
-    last_read = db.get_last_read(user["id"]) or "0000-00-00"
-    items, unread = [], 0
-    for slug in slugs:
-        row = index.get(slug)
-        if not row:
-            continue
-        for ev in (row.get("recent_events") or []):
-            date = ev.get("date") or ""
-            is_unread = date > last_read[:10]
-            unread += 1 if is_unread else 0
-            items.append({
-                "slug": slug, "name": row.get("name", slug), "date": date,
-                "label": ev.get("label"), "detail": ev.get("detail"),
-                "tone": ev.get("tone", "neutral"), "unread": is_unread,
-            })
-    items.sort(key=lambda x: x["date"], reverse=True)
+    items, unread = notification_items(slugs, _agents_index(), db.get_last_read(user["id"]))
     return JSONResponse({"unread": unread, "items": items[:50],
                          "watching": len(slugs)})
 
