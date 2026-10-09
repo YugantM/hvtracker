@@ -233,6 +233,443 @@ REVIEWED_REJECTED = {
         "2026-10-01 owner: rejected — an office suite whose agent, skill and MCP "
         "server are features of the app (jub0t/concat)"
     ),
+    # 2026-10-09 batch 3 decisions (docs/research/new-listing-candidates-2026-10-08.md):
+    # the owner approved section A and rejected section C.
+    "orchestratorinc/agent-orchestrator": (
+        "2026-10-09 owner: rejected — Already rejected 2026-07-07 as "
+        "agentwrapper/agent-orchestrator; this is the same repo renamed"
+    ),
+    "feder-cr/invisible_dots": (
+        "2026-10-09 owner: rejected — adoption not earned: a new project moved "
+        "into feder-cr/Auto_Jobs_Applier_AIHawk's repo (2024 job bot) and "
+        "inherits its stars"
+    ),
+    "feder-cr/dots": (
+        "2026-10-09 owner: rejected — adoption not earned: a new project moved "
+        "into feder-cr/Auto_Jobs_Applier_AIHawk's repo (2024 job bot) and "
+        "inherits its stars"
+    ),
+    "cinderline/northcinder": (
+        "2026-10-09 owner: rejected — inorganic stars: forks under 2% of stars, "
+        "2-3 contributors, a few dozen commits (sv-number/mcp-server precedent)"
+    ),
+    "filtalgo/filtmall-shopping-skill": (
+        "2026-10-09 owner: rejected — inorganic stars: forks under 2% of stars, "
+        "2-3 contributors, a few dozen commits (sv-number/mcp-server precedent)"
+    ),
+    "twigpine/openclaude": (
+        "2026-10-09 owner: rejected — licence: LICENSE says it 'contains code "
+        "derived from Anthropic's Claude Code CLI… proprietary'"
+    ),
+    "ekkolearnai/ekko-studio": (
+        "2026-10-09 owner: rejected — licence: Business Source License 1.1, not "
+        "open source"
+    ),
+    "sugarforever/chat-ollama": (
+        "2026-10-09 owner: rejected — licence: Apache-2.0 modified to restrict "
+        "commercial use"
+    ),
+    "alishahryar1/free-claude-code": (
+        "2026-10-09 owner: rejected — provider proxy for free model access, "
+        "licence NOASSERTION"
+    ),
+    "21st-dev/magic-mcp": (
+        "2026-10-09 owner: rejected — deprecated: README says Magic MCP is now "
+        "the 21st MCP and this package is a thin compatibility proxy"
+    ),
+    "loopx-project/loopx": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "zeronsh/zeron": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "harnessmd/munder-difflin": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "mvschwarz/openrig": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "spacering-net/codeg": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "happier-dev/happier": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "bytepioneer-ai/codex-host": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "hardbeat920/monocode": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "codeaholicguy/ai-devkit": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "gaurav-gosain/tuios": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "gentleman-programming/gentle-ai": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "iamcorey/wake": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "altans/collie": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "lodyai/lody": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "louis-cfm/coucou": (
+        "2026-10-09 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "vastsa/pi-desktop": (
+        "2026-10-09 owner: rejected — wrapper around an already-listed agent "
+        "runtime (pi, Hermes Agent)"
+    ),
+    "abundantbeing/hermes-browser-extension": (
+        "2026-10-09 owner: rejected — wrapper around an already-listed agent "
+        "runtime (pi, Hermes Agent)"
+    ),
+    "ebony-vinyl/dsh-our-free-model": (
+        "2026-10-09 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "yujunzhixue/dsh-purge": (
+        "2026-10-09 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "small-tailqwq/dsh-deep-whale": (
+        "2026-10-09 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "bowenliang123/dsh-context": (
+        "2026-10-09 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "dsh-eac/eac-desktop": (
+        "2026-10-09 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "xmanrui/dsh-im": (
+        "2026-10-09 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "shaobeichen/dsh-pocket": (
+        "2026-10-09 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "adamplatin123/dsh-plugin-radar": (
+        "2026-10-09 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "clearailhc/clearai-dsh": (
+        "2026-10-09 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "devin-axis/deepseek-design": (
+        "2026-10-09 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "minglink/dsh-infinite-gen-4": (
+        "2026-10-09 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "yetone/magpie": (
+        "2026-10-09 owner: rejected — provider proxy or free-model access "
+        "layer: thin-wrapper boundary"
+    ),
+    "omnirush-ai/omnirush-gui": (
+        "2026-10-09 owner: rejected — provider proxy or free-model access "
+        "layer: thin-wrapper boundary"
+    ),
+    "rebel0789/codexpro": (
+        "2026-10-09 owner: rejected — provider proxy or free-model access "
+        "layer: thin-wrapper boundary"
+    ),
+    "sums001/windows-copilot-api": (
+        "2026-10-09 owner: rejected — provider proxy or free-model access "
+        "layer: thin-wrapper boundary"
+    ),
+    "harnessrouter/harnessrouter": (
+        "2026-10-09 owner: rejected — provider proxy or free-model access "
+        "layer: thin-wrapper boundary"
+    ),
+    "monid-ai/monid": (
+        "2026-10-09 owner: rejected — provider proxy or free-model access "
+        "layer: thin-wrapper boundary"
+    ),
+    "onlook-dev/onlook": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "duartesantos8/opengym": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "kkkkhazix/aihot": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "kuddev/pebrel": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "shader-effects-inc/shaders": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "dream-num/univer": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "dream-num/univer-workspace": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "tianma-if/edgeever": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "px0-ai/px0": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "feigecode/navop": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "augani/dory": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "incoai/splash": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "unstablebuild/rune": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "drawdb-io/drawdb": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "docmost/docmost": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "molunerfinn/picgo": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "asciimoo/hister": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "devlikeapro/waha": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "xpf0000/flyenv": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "bostrot/wslmanager": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "crosspaste/crosspaste-desktop": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "voidenhq/voiden": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "zhouxiaoka/autoclip": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "hbai-ltd/toonflow-app": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "ethanyoq/ai-novel-writer": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "every-app/open-seo": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "javis603/token-monitor": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "freestylefly/wechatbridge": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "fancydirty/mediary-scout": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "observal/observal": (
+        "2026-10-09 owner: rejected — not an agent: an app or tool whose AI "
+        "features are incidental"
+    ),
+    "wasmerio/wasmer": (
+        "2026-10-09 owner: rejected — infrastructure where agents are one use "
+        "among many, or agent support predates or is incidental to the product"
+    ),
+    "tyktechnologies/tyk": (
+        "2026-10-09 owner: rejected — infrastructure where agents are one use "
+        "among many, or agent support predates or is incidental to the product"
+    ),
+    "budtmo/docker-android": (
+        "2026-10-09 owner: rejected — infrastructure where agents are one use "
+        "among many, or agent support predates or is incidental to the product"
+    ),
+    "infobyte/faraday": (
+        "2026-10-09 owner: rejected — infrastructure where agents are one use "
+        "among many, or agent support predates or is incidental to the product"
+    ),
+    "cortex-docs/cortex": (
+        "2026-10-09 owner: rejected — infrastructure where agents are one use "
+        "among many, or agent support predates or is incidental to the product"
+    ),
+    "sopaco/deepwiki-rs": (
+        "2026-10-09 owner: rejected — infrastructure where agents are one use "
+        "among many, or agent support predates or is incidental to the product"
+    ),
+    "raullenchai/rapid-mlx": (
+        "2026-10-09 owner: rejected — infrastructure where agents are one use "
+        "among many, or agent support predates or is incidental to the product"
+    ),
+    "semianalysisai/inferencex": (
+        "2026-10-09 owner: rejected — infrastructure where agents are one use "
+        "among many, or agent support predates or is incidental to the product"
+    ),
+    "chrisryugj/kordoc": (
+        "2026-10-09 owner: rejected — infrastructure where agents are one use "
+        "among many, or agent support predates or is incidental to the product"
+    ),
+    "evil0ctal/douyin_tiktok_download_api": (
+        "2026-10-09 owner: rejected — infrastructure where agents are one use "
+        "among many, or agent support predates or is incidental to the product"
+    ),
+    "eatmoreduck/boss-zhipin-scraper": (
+        "2026-10-09 owner: rejected — scraper or account tool, not an agent"
+    ),
+    "mahanaicoach/google-maps-scraper-kit": (
+        "2026-10-09 owner: rejected — scraper or account tool, not an agent"
+    ),
+    "yacuo/check-cc": (
+        "2026-10-09 owner: rejected — scraper or account tool, not an agent"
+    ),
+    "jundizhou/easy-stock": (
+        "2026-10-09 owner: rejected — licence NOASSERTION with no standard "
+        "licence found; reconsider if one appears"
+    ),
+    "aoci-spec/aoci-code": (
+        "2026-10-09 owner: rejected — licence NOASSERTION with no standard "
+        "licence found; reconsider if one appears"
+    ),
+    "pgrundev/pgbot": (
+        "2026-10-09 owner: rejected — licence NOASSERTION with no standard "
+        "licence found; reconsider if one appears"
+    ),
+    "brayonpi/hexstellar": (
+        "2026-10-09 owner: rejected — licence NOASSERTION with no standard "
+        "licence found; reconsider if one appears"
+    ),
+    "fy-agent/fyagent": (
+        "2026-10-09 owner: rejected — licence NOASSERTION with no standard "
+        "licence found; reconsider if one appears"
+    ),
+    "lemomo-ai/lemo-opuscar": (
+        "2026-10-09 owner: rejected — licence NOASSERTION with no standard "
+        "licence found; reconsider if one appears"
+    ),
+    "vincentwei1021/video-talkcraft": (
+        "2026-10-09 owner: rejected — licence NOASSERTION with no standard "
+        "licence found; reconsider if one appears"
+    ),
+    "vincentwei1021/anything2explainer": (
+        "2026-10-09 owner: rejected — licence NOASSERTION with no standard "
+        "licence found; reconsider if one appears"
+    ),
+    "thedaviddias/front-end-checklist": (
+        "2026-10-09 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "harvard-edge/cs249r_book": (
+        "2026-10-09 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "dipakkr/awesome-ai-engineering": (
+        "2026-10-09 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "liyupi/ai-guide": (
+        "2026-10-09 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "tradecatlabs/vibe-coding-cn": (
+        "2026-10-09 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "walkinglabs/learn-harness-engineering": (
+        "2026-10-09 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "lopopolo/harness-engineering": (
+        "2026-10-09 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "aliyun/ai-agent-handbook": (
+        "2026-10-09 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "anative-lab/awesome-self-evolving-agents": (
+        "2026-10-09 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "andyrewlee/awesome-agent-orchestrators": (
+        "2026-10-09 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "flypythoncom/python": (
+        "2026-10-09 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "chenliu-1996/figures4papers": (
+        "2026-10-09 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "ciembor/agent-rules-books": (
+        "2026-10-09 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "crafter-station/petdex": (
+        "2026-10-09 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
 }
 
 # Topics to query (one request each)
