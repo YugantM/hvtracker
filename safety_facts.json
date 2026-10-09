@@ -102,6 +102,136 @@
         {"topic": "security", "class": "declared", "text": "SOC 2 documentation is available in its trust center, trust.kilo.ai. The page doesn't say which report type.", "source": "https://kilo.ai/security-and-compliance"},
         {"topic": "security", "class": "observed", "text": "kilo.ai publishes a security.txt (security@kilo.ai), and the repository has a SECURITY.md.", "source": "https://kilo.ai/.well-known/security.txt"}
       ]
+    },
+    "ollama": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "access", "class": "declared", "text": "Its API binds 127.0.0.1:11434 by default. The FAQ explains how to expose it on your network by changing the bind address with OLLAMA_HOST.", "source": "https://github.com/ollama/ollama/blob/main/docs/faq.mdx"},
+        {"topic": "access", "class": "source", "text": "Its official Docker image sets OLLAMA_HOST=0.0.0.0:11434, so the server listens on every interface, not just localhost.", "source": "https://github.com/ollama/ollama/blob/v0.40.2/Dockerfile#L339"},
+        {"topic": "data", "class": "declared", "text": "Local models run on your machine and Ollama doesn't see the prompts. With cloud-hosted models it processes prompts and responses, and says it doesn't store or log that content or train on it. Cloud features can be switched off for local-only use.", "source": "https://github.com/ollama/ollama/blob/main/docs/faq.mdx"},
+        {"topic": "security", "class": "observed", "text": "OSV lists 16 advisories for the github.com/ollama/ollama Go module (1 critical, 11 high, 3 medium, 1 low), 3 of them in the last 12 months. Ollama publishes no GitHub security advisories of its own; reports go through its SECURITY.md and GitHub private vulnerability reporting.", "source": "https://osv.dev/list?ecosystem=Go&q=github.com%2Follama%2Follama"}
+      ]
+    },
+    "anythingllm": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "operator", "class": "declared", "text": "Made by Mintplex Labs Inc.", "source": "https://github.com/Mintplex-Labs/anything-llm#telemetry--privacy"},
+        {"topic": "data", "class": "declared", "text": "Sends anonymous usage telemetry unless you turn it off, in the sidebar under Privacy or with DISABLE_TELEMETRY=true. With telemetry off it still contacts its CDN to download models.", "source": "https://github.com/Mintplex-Labs/anything-llm#telemetry--privacy"},
+        {"topic": "security", "class": "observed", "text": "Its maintainers have published 25 security advisories (1 critical, 7 high, 11 medium, 6 low), 23 of them in the last 12 months. The repository has a SECURITY.md and GitHub private vulnerability reporting is enabled.", "source": "https://github.com/Mintplex-Labs/anything-llm/security/advisories"}
+      ]
+    },
+    "opencode": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "access", "class": "source", "text": "Every tool, including file edits and shell commands, runs without asking by default. The exceptions: it asks before touching paths outside the project and before reading .env files.", "source": "https://github.com/anomalyco/opencode/blob/v1.18.35/packages/opencode/src/agent/agent.ts#L119-L136"},
+        {"topic": "access", "class": "declared", "text": "Rules in opencode.json can make any tool, such as bash or edit, ask first or refuse to run.", "source": "https://opencode.ai/docs/permissions/"},
+        {"topic": "security", "class": "observed", "text": "Its maintainers have published 3 security advisories (1 critical, 2 high), all in the last 12 months. The repository has a SECURITY.md and GitHub private vulnerability reporting is enabled.", "source": "https://github.com/anomalyco/opencode/security/advisories"}
+      ]
+    },
+    "desktop-commander-mcp": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "access", "class": "declared", "text": "It lets the AI client you connect read and write files and run any terminal command on your machine; the project calls it a privileged local automation tool.", "source": "https://github.com/wonderwhy-er/DesktopCommanderMCP/blob/main/SECURITY.md"},
+        {"topic": "access", "class": "declared", "text": "Its allowed-directories setting and command blocklist are guardrails against accidents, not a security boundary: terminal commands can still reach files outside the allowed directories. For real isolation the project recommends Docker or a virtual machine.", "source": "https://github.com/wonderwhy-er/DesktopCommanderMCP/blob/main/SECURITY.md"},
+        {"topic": "access", "class": "declared", "text": "It doesn't try to tell a genuine request from prompt injection; it assumes the connected AI client is trusted.", "source": "https://github.com/wonderwhy-er/DesktopCommanderMCP/blob/main/SECURITY.md"},
+        {"topic": "data", "class": "declared", "text": "Telemetry is on by default and can be turned off. It records base command names without their arguments, and no names, email addresses or file paths.", "source": "https://github.com/wonderwhy-er/DesktopCommanderMCP/blob/main/PRIVACY.md"},
+        {"topic": "data", "class": "declared", "text": "Every tool call is logged with its arguments, unredacted, in a file on the machine running it; that file isn't uploaded. If you use Remote Desktop Commander, its service holds tool arguments and results only briefly, to route each call.", "source": "https://github.com/wonderwhy-er/DesktopCommanderMCP#readme"},
+        {"topic": "security", "class": "observed", "text": "OSV lists 2 advisories (both low) for its npm package, @wonderwhy-er/desktop-commander, published in June 2026. The repository has a SECURITY.md; GitHub private vulnerability reporting is off.", "source": "https://osv.dev/list?ecosystem=npm&q=%40wonderwhy-er%2Fdesktop-commander"}
+      ]
+    },
+    "open-webui": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "access", "class": "declared", "text": "Tools, Functions, Pipes and Filters run arbitrary Python code on the server. Its docs say only trusted administrators should be able to install them, and that a listing on the community site isn't a security review.", "source": "https://docs.openwebui.com/features/extensibility/plugin/"},
+        {"topic": "access", "class": "declared", "text": "Its Open Terminal add-on gives agents a terminal and a filesystem.", "source": "https://github.com/open-webui/open-webui#readme"},
+        {"topic": "security", "class": "declared", "text": "Vulnerability reports are accepted only through GitHub's private reporting.", "source": "https://github.com/open-webui/open-webui#security-%EF%B8%8F"},
+        {"topic": "security", "class": "observed", "text": "Its maintainers have published 165 security advisories (1 critical, 71 high, 86 medium, 7 low), 162 of them in the last 12 months. openwebui.com publishes a security.txt.", "source": "https://github.com/open-webui/open-webui/security/advisories"}
+      ]
+    },
+    "cherry-studio": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "data", "class": "declared", "text": "Chat history, settings and API keys are stored on your device, with no cloud sync. Prompts go straight to a model provider you configure yourself; with its built-in model service they pass through Cherry Studio's relay, which it says discards them after each request.", "source": "https://docs.cherryai.com.cn/docs/en-us/about/privacypolicy"},
+        {"topic": "data", "class": "declared", "text": "It collects aggregated feature usage and anonymised crash logs, which you can switch off under Settings > Data Settings > Privacy Settings. It says it never collects API keys or conversations.", "source": "https://docs.cherryai.com.cn/docs/en-us/about/privacypolicy"},
+        {"topic": "security", "class": "observed", "text": "Its maintainers have published 4 security advisories, all rated critical, 1 of them in the last 12 months. The repository has a SECURITY.md and GitHub private vulnerability reporting is enabled.", "source": "https://github.com/CherryHQ/cherry-studio/security/advisories"}
+      ]
+    },
+    "blender-mcp": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "access", "class": "declared", "text": "By default the AI can run any Python code in Blender through its execute_blender_code tool; BLENDER_MCP_SAFE_MODE=1 checks each script first and blocks risky code. The README says to always save your work before using it.", "source": "https://github.com/ahujasid/mcp-for-blender#limitations--security-considerations"},
+        {"topic": "access", "class": "declared", "text": "The Blender add-on runs a socket server that listens on localhost by default. It has no authentication or encryption, so anyone who can reach its port can run Python inside Blender.", "source": "https://github.com/ahujasid/mcp-for-blender#readme"},
+        {"topic": "data", "class": "declared", "text": "Sends a minimal anonymous usage record by default (tool name, success, timing, versions, operating system). Prompts, generated code and screenshots are collected only if you opt in, and DISABLE_TELEMETRY=true turns telemetry off entirely. It says telemetry data may be used for research and to train AI models.", "source": "https://github.com/ahujasid/mcp-for-blender#telemetry-control"},
+        {"topic": "security", "class": "observed", "text": "OSV lists 1 advisory (medium), published in July 2026, for its PyPI package under its earlier name, blender-mcp. The repository has no SECURITY.md, and GitHub private vulnerability reporting is off.", "source": "https://osv.dev/list?ecosystem=PyPI&q=blender-mcp"}
+      ]
+    },
+    "headroom": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "access", "class": "declared", "text": "Runs locally as a proxy between your agent and the model provider, so prompts, tool outputs, logs and files pass through it.", "source": "https://github.com/headroomlabs-ai/headroom#readme"},
+        {"topic": "data", "class": "declared", "text": "An anonymous telemetry beacon is on by default. It reports compression ratios, counters, provider and model IDs, operating system and architecture, and never prompts, completions, code or file paths. HEADROOM_BEACON=off, DO_NOT_TRACK=1 or HEADROOM_OFFLINE=1 turns it off.", "source": "https://github.com/headroomlabs-ai/headroom#telemetry"},
+        {"topic": "security", "class": "observed", "text": "Its maintainers have published 1 security advisory (high), in the last 12 months. The repository has a SECURITY.md and GitHub private vulnerability reporting is enabled.", "source": "https://github.com/headroomlabs-ai/headroom/security/advisories"}
+      ]
+    },
+    "agent-reach": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "access", "class": "declared", "text": "Its README, which is in Chinese, says it works by having your agent run shell commands, such as pip install, mcporter and twitter.", "source": "https://github.com/Panniantong/Agent-Reach#readme"},
+        {"topic": "data", "class": "declared", "text": "Cookies and tokens for logged-in platforms stay on your machine, in ~/.agent-reach/config.yaml with owner-only (600) permissions, and aren't uploaded.", "source": "https://github.com/Panniantong/Agent-Reach#readme"},
+        {"topic": "access", "class": "declared", "text": "The README warns that scripting platforms such as Twitter or Xiaohongshu with your cookies risks an account ban, and recommends a dedicated secondary account.", "source": "https://github.com/Panniantong/Agent-Reach#readme"},
+        {"topic": "security", "class": "observed", "text": "The repository has a SECURITY.md; GitHub private vulnerability reporting is off.", "source": "https://github.com/Panniantong/Agent-Reach/security"}
+      ]
+    },
+    "openshell": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "operator", "class": "observed", "text": "Made by NVIDIA; open source under Apache-2.0.", "source": "https://github.com/NVIDIA/OpenShell"},
+        {"topic": "access", "class": "declared", "text": "Each agent runs in an isolated sandbox: kernel controls confine which files and system calls it can use, and every network connection passes through a policy.", "source": "https://github.com/NVIDIA/OpenShell#readme"},
+        {"topic": "data", "class": "declared", "text": "Sends anonymous telemetry limited to operational categories and counts, not sandbox names, hostnames, file paths, prompts, credentials or user content. OPENSHELL_TELEMETRY_ENABLED=false turns it off.", "source": "https://github.com/NVIDIA/OpenShell#telemetry"},
+        {"topic": "security", "class": "observed", "text": "The repository has a SECURITY.md and GitHub private vulnerability reporting is enabled.", "source": "https://github.com/NVIDIA/OpenShell/security"}
+      ]
+    },
+    "ckan-mcp-server": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "access", "class": "declared", "text": "Gives an assistant access to public CKAN open-data portals: search datasets, explore organisations, query tabular data and read metadata.", "source": "https://github.com/ondata/ckan-mcp-server#readme"},
+        {"topic": "data", "class": "declared", "text": "You can run it on your own machine or use the project's hosted endpoint, which has a shared request quota.", "source": "https://github.com/ondata/ckan-mcp-server#readme"},
+        {"topic": "security", "class": "observed", "text": "Its maintainers have published 15 security advisories (1 critical, 2 high, 10 medium, 2 low), all in the last 12 months. The repository has a SECURITY.md and GitHub private vulnerability reporting is enabled.", "source": "https://github.com/ondata/ckan-mcp-server/security/advisories"}
+      ]
+    },
+    "qwen-code": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "access", "class": "declared", "text": "Starts in Auto mode by default: a classifier model approves safe file edits and shell commands and blocks risky ones. Ask Permissions mode asks before every edit and command; YOLO approves everything.", "source": "https://github.com/QwenLM/qwen-code/blob/main/docs/users/features/approval-mode.md"},
+        {"topic": "access", "class": "declared", "text": "Its Chrome extension acts inside your Chrome profile, including signed-in pages, and browser results may be sent to the configured AI provider.", "source": "https://github.com/QwenLM/qwen-code/blob/main/docs/users/support/tos-privacy.md"},
+        {"topic": "data", "class": "declared", "text": "Which provider's terms and privacy policy apply depends on how you sign in: Qwen OAuth, Alibaba Cloud Coding Plan, Vertex AI (Google Cloud), or your own API key's provider.", "source": "https://github.com/QwenLM/qwen-code/blob/main/docs/users/support/tos-privacy.md"},
+        {"topic": "data", "class": "source", "text": "Sends usage statistics by default: the privacy.usageStatisticsEnabled setting defaults to true. Its privacy notice describes them as anonymous and optional.", "source": "https://github.com/QwenLM/qwen-code/blob/v0.25.0/packages/core/src/config/config.ts#L3430"},
+        {"topic": "security", "class": "observed", "text": "The repository has a SECURITY.md; GitHub private vulnerability reporting is off.", "source": "https://github.com/QwenLM/qwen-code/security"}
+      ]
+    },
+    "odysseus": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "access", "class": "declared", "text": "A self-hosted workspace whose agents can use local or API models, tools, MCP, files and a shell.", "source": "https://github.com/odysseus-dev/odysseus#readme"},
+        {"topic": "security", "class": "declared", "text": "Its README advises keeping authentication on, setting LOCALHOST_BYPASS=false outside local development, and not exposing raw model or service ports publicly.", "source": "https://github.com/odysseus-dev/odysseus#readme"},
+        {"topic": "security", "class": "observed", "text": "The repository has a SECURITY.md and GitHub private vulnerability reporting is enabled.", "source": "https://github.com/odysseus-dev/odysseus/security"}
+      ]
+    },
+    "ongrid": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "access", "class": "declared", "text": "An ops agent for your infrastructure. Its features include remote execution and a reverse-tunnel browser SSH shell into any host, alongside read-only inspection tools in a bash sandbox; it says every call is audited.", "source": "https://github.com/ongridio/ongrid#readme"},
+        {"topic": "security", "class": "observed", "text": "The repository has a SECURITY.md and GitHub private vulnerability reporting is enabled.", "source": "https://github.com/ongridio/ongrid/security"}
+      ]
+    },
+    "aider": {
+      "checked": "2026-10-09",
+      "facts": [
+        {"topic": "access", "class": "declared", "text": "Commits each edit it makes to git with a descriptive message, so /undo can discard the last change. --no-auto-commits turns that off. By default those commits skip your pre-commit hooks; --git-commit-verify runs them.", "source": "https://aider.chat/docs/git.html"},
+        {"topic": "data", "class": "declared", "text": "Connects to almost any LLM, including local models.", "source": "https://github.com/Aider-AI/aider#readme"},
+        {"topic": "data", "class": "declared", "text": "Analytics are collected only if you opt in, and never include your code, chat messages or keys.", "source": "https://aider.chat/docs/more/analytics.html"},
+        {"topic": "security", "class": "observed", "text": "OSV lists 2 advisories (both low) for its PyPI package, aider-chat, published in May 2026. The repository has no SECURITY.md, and GitHub private vulnerability reporting is off.", "source": "https://osv.dev/list?ecosystem=PyPI&q=aider-chat"}
+      ]
     }
   }
 }
