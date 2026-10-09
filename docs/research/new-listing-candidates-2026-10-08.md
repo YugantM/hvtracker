@@ -146,3 +146,24 @@ The last five rows are thin (one or two contributors, few commits). Batch 1 held
 1. **Rejections don't follow renames.** `REVIEWED_REJECTED` and the roster check match `owner/name` as typed, so a renamed reject comes back (agent-orchestrator). Discovery should resolve GitHub's redirect before matching, or the rejection list should store the new name too. Phase 8 noted the same gap for duplicates.
 2. **Star inheritance isn't caught.** The inorganic test looks at forks and velocity. A new project moved into an old popular repo passes both. A cheap flag: `created_at` far older than the first commit on the current default branch, or a recent repository rename.
 3. **The weekly report hides never-reviewed older repos.** It assumes anything older than 120 days "had its chance". 178 older candidates (77 with 2,000+ stars) were never surfaced in any screening. The report could add a short "older, never surfaced" section.
+
+## Outcome (owner, 9 Oct)
+
+Owner: "except for the rejected and closer look ones, list them and make it live". So: approve section A, reject section C, leave B open. That also lifts the #316 pause for this batch, before its criterion was met.
+
+**Added (37):** section A minus three held back by the README read that precedes adding (the batch 1 rule):
+- `ZJU-REAL/Easel` (A10): the README describes a workbench that "connects OpenClaw Agent, account profiles, content skills and media tools". OpenClaw does the agent work, which is the wrapper class.
+- `iflytek/skillhub` (A32): a registry for skill packages, not a skill. Listing it would contradict rejecting `Observal/Observal`, a registry for agent extensions, in C.
+- `amElnagdy/delegate-skills` (A35): "One orchestrator… discover the implementer CLIs". The same delegate-to-external-CLIs question as `jordan-gibbs/hyperresearch` in B.
+
+Category changes from the table: `google/mantis` goes to Security & Guardrails (its README: "Portable Toolkit for Building Secure Software"), and `milind-soni/OpenMausBot` to Multi-Agent Systems ("your own team of AI bots"). `virgiliojr94/book-to-skill` is named "Virgiliojr94 Book-to-Skill": the plain slug belongs to the delisted `Leutenegger/book-to-skill`, which answers 410.
+
+**Packages:** `scripts/verify_package_identifiers.py` verified 9 against their repos (npm: feynman, webcmd, openmausbot, latitude telemetry; PyPI: bub, nooa, aisoc-sandbox, mcp-memory-service, godot-ai). PyPI `evoagentx` was added by hand: its project URLs name `EvoAgentX/EvoAgentX`, which GitHub redirects to `ANative-Lab/EvoAgentX`, and the README installs it. The other 27 carry no identifier rather than a guess.
+
+**Rejected (109)** into `REVIEWED_REJECTED`, grouped by precedent, including the renamed `orchestratorinc/agent-orchestrator` and both names of `feder-cr/dots`/`invisible_dots`.
+
+**Rank-churn gate:** the 37 rows were scored in a local `--pending-only` run against the live 9 Oct board, inserted into it, and re-ranked. The comparator reproduces live ranks exactly (0 of 1,705 mismatches).
+- **Skills:** no top-100 row moves; the 12 skills enter at #353–#370, all grade D.
+- **Agents:** `beenuar/AiSOC` enters at **#94, 84.7 (A)**. That's earned: PyPI provenance attestations, Scorecard 5.6, 57% signed commits, very active. Rows #94–#100 each drop one place. Five more land mid-board: OpenMausBot #188 (78.0), Latitude #204 (77.1), Godot AI #205 (77.1), Feynman #283 (72.9), Webcmd #406 (67.9). The other 19 enter at grade D with 0.5–0.67 confidence (young repos, mostly without packages). Mean movement for existing agents: 5.5 places; maximum 25, at the bottom of the board.
+- The new rows raise no eligibility warnings, and board invariants are clean.
+- Scorecard scans were not pre-seeded (the CLI isn't installed locally), so the new rows pick up OSSF data from the hourly rotation within 24 hours of the deploy. Expect some scores to move then.

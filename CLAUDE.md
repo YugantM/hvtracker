@@ -93,14 +93,14 @@ Milestone history lives in `docs/changelog.md` — record new milestones there.
   the gates before calling anything done.
 
 ## Now / next
-- **Listing batches PAUSED (2026-10-02, owner).** Google recrawls only ~27
-  sitemap URLs/day. A URL Inspection sweep on 2026-10-01 found 143 of 1,893
-  sitemap URLs never crawled ("URL is unknown" / "Discovered – currently not
-  indexed"), 22 of them from listing batches 1–2 (#296, #310); new rows only
-  lengthen that queue. Resume when the batch 1–2 agent pages show as indexed
-  in GSC URL Inspection and under ~2% of sitemap URLs are uncrawled (sweep:
-  ~/hv_marketing/data/indexing-2026-10-01/inspect_bulk.py). Roster removals
-  and fixes are not paused.
+- **Listing batches: the owner lifted the 2026-10-02 pause for batch 3 on
+  2026-10-09** (37 rows, docs/research/new-listing-candidates-2026-10-08.md),
+  before its criterion was met (4 Oct sweep: 0 of 23 batch 1–2 profiles
+  indexed, 7.3% of sitemap URLs never crawled). Google recrawls only ~27
+  sitemap URLs/day, so new rows lengthen that queue. The criterion still
+  guides later batches: batch 1–3 pages indexed in GSC URL Inspection and
+  under ~2% of sitemap URLs uncrawled (weekly sweep: ~/hv_marketing/
+  indexing_check.py). Roster removals and fixes were never paused.
 - Active: Q4 2026 plan (approved 2026-10-06, runs to 31 Dec)
   https://claude.ai/artifact/89TFKpJfa8ce92uKowefQk. Positioning: HVTracker is
   the independent reputation record bound to identities others issue (signed
