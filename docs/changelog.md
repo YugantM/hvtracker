@@ -1081,6 +1081,21 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   (no email mention), /track and /account go to /login, bad verify/unsub tokens return
   400, a stale waitlist POST returns 303. Email digests stay dark (`ALERTS_ENABLED`
   unset). The 7 Oct deploy before this one (5e0dad2d: #352, #343) is recorded in #353.
+- **Listing batch 3 DEPLOYED 2026-10-09 08:14 UTC** (df8d75b9 @ 70ff7566, #360;
+  owner: "except for the rejected and closer look ones, list them and make it
+  live", which lifted the #316 pause for this batch). Pre-screen #359
+  (docs/research/new-listing-candidates-2026-10-08.md). 37 added (25 agents,
+  frameworks and MCP servers, 12 skills); 3 section-A repos held back by the
+  README read (Easel wraps OpenClaw; iflytek/skillhub is a registry, matching
+  the Observal rejection; delegate-skills delegates to external CLIs); 109
+  rejections recorded, including the renamed orchestratorinc/agent-orchestrator.
+  predeploy_check OK (roster 1,771 ≥ live 1,734). The boot ran repair-commits
+  (new rows weren't in data.json yet); board 1,742 with all 37 provisional;
+  invariants []; new profiles 200; the delisted book-to-skill slug still 410s
+  (the new row is virgiliojr94-book-to-skill). The new rows get scored by the
+  12:00 UTC batch (extra_agents), and Scorecard by the hourly rotation within
+  24 h (not pre-seeded). Gate expectation once scored: AiSOC ~#94 (84.7, A),
+  rows #94–#100 one place down, five more mid-board, 31 at D.
 
 ## Entries recorded only in the old AGENTS.md
 
