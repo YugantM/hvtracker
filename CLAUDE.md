@@ -110,7 +110,8 @@ Milestone history lives in `docs/changelog.md` — record new milestones there.
   docs/research/is-x-safe-question-audit-2026-10-06.md), an A2A Agent Card
   study run as a GitHub Action, never in the web service (F), identity-bound
   credentials (G; the `agent_records` usage channel counts credential
-  fetches), allowlist files only if the registry gate fails (H). Hosted-service
+  fetches; v0.3 design approved 2026-10-12, nothing built:
+  docs/research/trust-credential-v0.3-design-2026-10-06.md), allowlist files only if the registry gate fails (H). Hosted-service
   facts never change scores without a separate evidence gate.
 - Active: Phase 10 "turn impressions into clicks" (approved 2026-10-04, runs to
   15 Nov) https://claude.ai/artifact/CoU1ktL5ejKEffo9wv5snh: logged title

@@ -1108,6 +1108,18 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   optional. IN CODE facts are pinned to a release tag and line. Score-neutral.
   predeploy_check OK (roster 1,771 = live); boot render 1,742 profiles, 0
   failed; invariants []; all 15 profiles show the box with the reviewed text.
+- **Trust credential v0.3 design APPROVED 2026-10-12** (#349, owner: "approve
+  all four, apply the five changes"; docs/research/
+  trust-credential-v0.3-design-2026-10-06.md). VC 2.0 JWT from
+  did:web:hvtracker.net with a new ES256 key; v0.2 issued alongside until
+  2027-03-31; homepage domains in the credential (repo-declared) but not in
+  the lookup index; both profiles as Draft. Review changes: no Agent Card
+  identifier (32+ of the 51 cards on listing homepages are docs-site
+  assistants, none signed), no status list (records are fetched by URL and a
+  delisted one 404s), a published context file for our terms, the index maps
+  identifiers to lists, and the A2A profile accepts an HTTPS-fetched card.
+  Nothing built. Build order: G2a identifier index, G3 JWTs (needs the owner's
+  ES256 key as a Railway secret), then the Draft profiles.
 
 ## Entries recorded only in the old AGENTS.md
 
