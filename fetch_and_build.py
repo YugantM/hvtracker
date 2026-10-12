@@ -26,6 +26,7 @@ from jinja2 import Environment, FileSystemLoader
 
 import cache
 import db
+import mcp_trust
 import signing
 import storage
 
@@ -5987,6 +5988,57 @@ def build_registry_feed(base_dir: str, script_dir: str, rows: list[dict]) -> int
     return len(entries)
 
 
+IDENTIFIER_EVIDENCE = {
+    "purl": "The package's own registry metadata links to the listing's repository, or it is "
+            "the listing's only package and is named like the repository.",
+    "mcp-registry": "The registry entry's publisher is tied to the listing's repository: its "
+                    "io.github namespace is the repository owner, or its DNS namespace is the "
+                    "domain of the repository's or its owner's website.",
+}
+
+
+def build_identifier_index(script_dir: str, rows: list[dict]) -> dict:
+    """Write data/identifiers.json: the package and MCP registry names our
+    evidence ties to a listing, each mapped to a list of listing slugs, so a
+    client holding only one of those can find the record (trust credential
+    v0.3 design, section 4). A package counts once the advisory check has tied
+    it to the repo (package_is_the_listing); a registry name counts when
+    registry_publisher_check passes. Domains are left out on purpose: a
+    homepage is a claim any repo can make."""
+    purls: dict[str, set[str]] = {}
+    for r in rows:
+        for pkg in (r.get("advisories") or {}).get("checked") or []:
+            ptype = mcp_trust.PURL_TYPES.get(pkg.get("ecosystem"))
+            if ptype and pkg.get("name"):
+                purls.setdefault(mcp_trust.package_purl(ptype, pkg["name"]), set()).add(r["slug"])
+    try:
+        with open(os.path.join(script_dir, "data", "registry.json"), encoding="utf-8") as f:
+            entries = json.load(f).get("entries") or []
+    except (OSError, ValueError):
+        entries = []
+    slug_by_repo = {r["repo"].lower(): r["slug"] for r in rows}
+    names: dict[str, set[str]] = {}
+    for e in entries:
+        trust = ((e["entry"]["server"].get("_meta") or {}).get(REGISTRY_META_KEY)) or {}
+        slug = slug_by_repo.get((trust.get("scored_repo") or "").lower())
+        if slug and trust.get("publisher_verified"):
+            names.setdefault(e["name"], set()).add(slug)
+    doc = {
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "about": "Identifiers that HVTracker's evidence ties to a listing. Each maps to a list of "
+                 "listing slugs; the record is https://hvtracker.net/data/agents/<slug>.json. "
+                 "An identifier that is absent means no evidenced tie, not a bad project.",
+        "evidence": IDENTIFIER_EVIDENCE,
+        "counts": {"purl": len(purls), "mcp-registry": len(names)},
+        "identifiers": {"purl": {k: sorted(v) for k, v in sorted(purls.items())},
+                        "mcp-registry": {k: sorted(v) for k, v in sorted(names.items())}},
+    }
+    with open(os.path.join(script_dir, "data", "identifiers.json"), "w", encoding="utf-8") as f:
+        json.dump(doc, f, ensure_ascii=False, separators=(",", ":"))
+    print(f"Wrote identifier index: {doc['counts']}")
+    return doc
+
+
 def build_org_pages(rows: list[dict]) -> list[dict]:
     """Build org pages for GitHub owners with >=2 tracked projects."""
     owner_map: dict[str, list[dict]] = {}
@@ -8357,6 +8409,7 @@ def main() -> None:
     # Quarterly public dataset export (master plan 1.6) — rows are final here.
     write_dataset_export(script_dir, rows)
     build_registry_feed(base_dir, script_dir, rows)
+    build_identifier_index(script_dir, rows)
 
     # Board-integrity invariants (master plan 0.3): catch v4.2-class defects
     # (inflation, out-of-range scores, silent mass churn) at render time.
@@ -9450,6 +9503,7 @@ HVTrust = gate( confidence x [ Safety(25) + Identity(18) + Transparency(17) + Ma
 ## Machine-readable data (open, CC BY 4.0)
 - [Full registry JSON](https://hvtracker.net/data/latest.json): all {len(rows)} agents with trust scores, grades, and signals
 - [Per-agent record](https://hvtracker.net/data/agents/): /data/agents/{{slug}}.json — includes a signed-ready trust_credential block
+- [Identifier index](https://hvtracker.net/data/identifiers.json): package URLs (purl) and MCP registry names tied to a listing by evidence, each mapped to listing slugs
 - [Authority descriptor](https://hvtracker.net/.well-known/hvtracker.json)
 - [Trust Credential spec](https://hvtracker.net/spec/trust-credential/v0.1)
 - [Capability matrix](https://hvtracker.net/capabilities/): per-agent runtime surface — MCP support, external providers, tool/plugin surface, provenance drift

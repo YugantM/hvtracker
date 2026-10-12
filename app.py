@@ -28,6 +28,7 @@ from fastapi.staticfiles import StaticFiles
 import alerts
 import db
 import mcp_server
+import mcp_trust
 import usage
 import verify_log
 
@@ -653,8 +654,8 @@ def _normalize_github_repo(value: str | None) -> str | None:
     if not value:
         return None
     text = value.strip()
-    if not text:
-        return None
+    if not text or text.lower().startswith("pkg:"):
+        return None  # a package URL is never a repo ("pkg:npm/x" has two parts)
     text = text.replace("git@github.com:", "https://github.com/")
     text = text.replace("ssh://git@github.com/", "https://github.com/")
     text = text.replace("git+https://github.com/", "https://github.com/")
@@ -813,14 +814,41 @@ def find_agent_by_slug(slug: str) -> dict | None:
     return None
 
 
+_identifiers_cache: dict = {"mtime": None, "purl": {}, "registry": {}}
+
+
+def _identifier_slugs(identifier: str) -> list[str]:
+    """Listing slugs that data/identifiers.json (written each render) ties to a
+    package URL (pkg:npm/..., pkg:pypi/..., pkg:cargo/...) or an MCP registry
+    name. Registry names match case-insensitively."""
+    path = os.path.join(OUTPUT_DIR, "data", "identifiers.json")
+    try:
+        mtime = os.path.getmtime(path)
+        if _identifiers_cache["mtime"] != mtime:
+            with open(path, encoding="utf-8") as f:
+                ids = json.load(f).get("identifiers") or {}
+            _identifiers_cache.update(
+                mtime=mtime, purl=ids.get("purl") or {},
+                registry={k.lower(): v for k, v in (ids.get("mcp-registry") or {}).items()})
+    except (OSError, ValueError):
+        return []
+    purl = mcp_trust.parse_purl(identifier)
+    if purl:
+        return _identifiers_cache["purl"].get(purl, [])
+    return _identifiers_cache["registry"].get(identifier.lower(), [])
+
+
 def find_agent_by_key(key: str) -> dict | None:
-    """A tracked agent by exact slug, then exact display name, then npm/PyPI
-    package id. Slugs and names are unique; package ids are not across
+    """A tracked agent by exact slug, then exact display name, then a package
+    URL or MCP registry name from the identifier index, then npm/PyPI package
+    id. Slugs and names are unique; package ids are not across
     ecosystems (npm `fastmcp` is punkpeye/fastmcp, PyPI `fastmcp` is
     PrefectHQ/fastmcp, slug `fastmcp`). A single first-match pass in board
     order returned whichever ranked higher, so "fastmcp" resolved to the
-    TypeScript port."""
-    key = (key or "").strip().lower()
+    TypeScript port. An indexed identifier resolves only when it names one
+    listing; with several there is nothing to choose by."""
+    raw = (key or "").strip()
+    key = raw.lower()
     if not key:
         return None
     agents = load_data().get("agents", [])
@@ -828,6 +856,11 @@ def find_agent_by_key(key: str) -> dict | None:
         for a in agents:
             if (a.get(field) or "").strip().lower() == key:
                 return a
+    slugs = _identifier_slugs(raw)
+    if len(slugs) == 1:
+        indexed = find_agent_by_slug(slugs[0])
+        if indexed is not None:
+            return indexed
     for a in agents:
         if key in ((a.get("npm_package") or "").lower(), (a.get("pypi_package") or "").lower()):
             return a
@@ -2261,8 +2294,8 @@ def data_api_page():
   -d '{"input": "langchain\ncrewai\nautogen"}' | python -m json.tool</code></pre>
       </div>
       <div class='card' style='margin-top:12px'>
-        <h2 style='font-family:var(--font-mono);font-size:13px'><code>GET /api/v1/mcp/verify?server=&lt;repo|url|npm|pypi&gt;</code></h2>
-        <p>Pre-connect trust verdict for an MCP server — a signed attestation when the server is tracked, an explicit "not tracked, unverified" verdict when it isn't. Spec: <a href='/spec/mcp-server-trust/v0.1'>MCP Server Trust v0.1</a>.</p>
+        <h2 style='font-family:var(--font-mono);font-size:13px'><code>GET /api/v1/mcp/verify?server=&lt;repo|url|npm|pypi|purl|registry-name&gt;</code></h2>
+        <p>Pre-connect trust verdict for an MCP server — a signed attestation when the server is tracked, an explicit "not tracked, unverified" verdict when it isn't. A package URL (<code>pkg:npm/…</code>, <code>pkg:pypi/…</code>, <code>pkg:cargo/…</code>) or an MCP registry name resolves through the <a href='/data/identifiers.json'>identifier index</a>, which lists only identifiers our evidence ties to a listing. Spec: <a href='/spec/mcp-server-trust/v0.1'>MCP Server Trust v0.1</a>.</p>
         <pre style='background:var(--paper);border:1px solid var(--line);padding:12px;overflow-x:auto;font:13px var(--font-mono);border-radius:6px;margin-top:8px'><code>curl -s 'https://hvtracker.net/api/v1/mcp/verify?server=deepset-ai/haystack' | python -m json.tool</code></pre>
       </div>
       <div class='card' style='margin-top:12px'>

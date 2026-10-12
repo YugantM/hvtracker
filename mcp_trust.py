@@ -9,6 +9,7 @@ Reputation only — this rides on whatever identity the MCP transport provides
 verdict and this format stay OPEN; only operations/scale are monetized.
 """
 from datetime import datetime, timedelta, timezone
+from urllib.parse import quote, unquote
 
 import signing
 
@@ -17,6 +18,38 @@ TRUSTED_GRADES = {"A", "B", "C"}
 BLOCKED_STATUS = {"delisted", "warning", "legacy"}
 MCP_SUPPORT_STATUS = {"declared", "implemented", "verified", "supported"}
 MIN_SCORE = 40.0
+
+# Identifier index (trust credential v0.3 design, section 4): package URLs are
+# the keys of data/identifiers.json, so the generator and the resolver must
+# spell them the same way. OSV ecosystem name -> purl type.
+PURL_TYPES = {"npm": "npm", "PyPI": "pypi", "crates.io": "cargo"}
+
+
+def package_purl(ptype: str, name: str) -> str:
+    """Canonical package URL without a version, per the purl spec: npm and PyPI
+    names are lowercased, PyPI turns `_` into `-`, and an npm scope is
+    percent-encoded (pkg:npm/%40scope/name)."""
+    ptype = ptype.lower()
+    if ptype in ("npm", "pypi"):
+        name = name.lower()
+    if ptype == "pypi":
+        name = name.replace("_", "-")
+    return f"pkg:{ptype}/{quote(name, safe='/')}"
+
+
+def parse_purl(text: str) -> str | None:
+    """The canonical form of a package URL someone passed in, or None when the
+    text isn't one. Version, qualifiers and subpath are dropped, and an
+    unencoded npm scope (pkg:npm/@scope/name) is accepted."""
+    if not text.lower().startswith("pkg:"):
+        return None
+    rest = text[4:].split("#", 1)[0].split("?", 1)[0].strip("/")
+    ptype, _, path = rest.partition("/")
+    head, _, tail = unquote(path).rpartition("/")
+    tail = tail.split("@", 1)[0]
+    if not ptype or not tail:
+        return None
+    return package_purl(ptype, f"{head}/{tail}" if head else tail)
 
 
 def advisory_summary(agent: dict) -> dict | None:
