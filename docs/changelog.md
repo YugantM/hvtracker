@@ -1096,6 +1096,18 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   12:00 UTC batch (extra_agents), and Scorecard by the hourly rotation within
   24 h (not pre-seeded). Gate expectation once scored: AiSOC ~#94 (84.7, A),
   rows #94–#100 one place down, five more mid-board, 31 at D.
+- **E3 safety facts DEPLOYED 2026-10-09 14:00 UTC** (2da20893 @ ab6528be, #348;
+  owner line review: "apply all as proposed, include #49"). 55 sourced facts on
+  15 local-tool profiles (Ollama, AnythingLLM, OpenCode, Desktop Commander, Open
+  WebUI, Cherry Studio, Blender MCP, Headroom, Agent Reach, OpenShell, CKAN MCP,
+  Qwen Code, Odysseus, OnGrid, Aider), all re-checked 9 Oct. Review findings:
+  OpenCode's docs say .env reads are denied but v1.18.35 asks (now an IN CODE
+  fact); OSV's 31 Ollama entries are 16 advisories once GHSA/GO aliases are
+  merged; OSV added advisories for Aider (2) and Blender MCP (1, old PyPI name);
+  Qwen Code sends usage statistics by default in code though its notice says
+  optional. IN CODE facts are pinned to a release tag and line. Score-neutral.
+  predeploy_check OK (roster 1,771 = live); boot render 1,742 profiles, 0
+  failed; invariants []; all 15 profiles show the box with the reviewed text.
 
 ## Entries recorded only in the old AGENTS.md
 
