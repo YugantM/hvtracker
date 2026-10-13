@@ -1120,6 +1120,18 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   identifiers to lists, and the A2A profile accepts an HTTPS-fetched card.
   Nothing built. Build order: G2a identifier index, G3 JWTs (needs the owner's
   ES256 key as a Railway secret), then the Draft profiles.
+- **G2a identifier index DEPLOYED 2026-10-13 11:39 UTC** (2e1dc686 @ 7fa32e3f,
+  #363; owner: "merge it when CI passes and deploy"). Each render writes
+  `/data/identifiers.json`: package URLs (purl) the advisory check tied to the
+  repo and MCP registry names that pass the publisher check, each mapped to a
+  list of listing slugs; no domains. The shared resolver (verify API,
+  check_agent_trust, verify_mcp_server, scan) resolves them, and a package URL
+  is no longer read as a GitHub repo. Live: 851 package URLs, 919 registry
+  names, 0 naming more than one listing, 91 KB; `pkg:pypi/crewai@0.80` and
+  `ai.exa/exa` resolve, untied `pkg:pypi/open-webui` does not; invariants [].
+  predeploy_check OK (roster 1,771 = live). Not built yet: G3 (JWTs, needs the
+  owner's ES256 key) and the Draft profiles. Index fetches count under
+  `data_json`.
 
 ## Entries recorded only in the old AGENTS.md
 
