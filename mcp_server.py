@@ -473,7 +473,8 @@ def server_card() -> dict:
                     "properties": {
                         "server": {
                             "type": "string",
-                            "description": "MCP server URL, package name, or GitHub owner/repo.",
+                            "description": ("MCP server URL, package name or package URL (pkg:npm/...), "
+                                            "MCP registry name, or GitHub owner/repo."),
                         },
                     },
                     "required": ["server"],
@@ -490,8 +491,8 @@ def server_card() -> dict:
                         "name_or_repo": {
                             "type": "string",
                             "description": (
-                                "Agent name, slug, GitHub repo/URL, npm package, "
-                                "or PyPI package."
+                                "Agent name, slug, GitHub repo/URL, npm or PyPI package, "
+                                "package URL (pkg:npm/...), or MCP registry name."
                             ),
                         },
                     },
@@ -606,8 +607,8 @@ def server_card() -> dict:
                         "name_or_repo": {
                             "type": "string",
                             "description": (
-                                "Agent name, slug, GitHub repo/URL, npm package, "
-                                "or PyPI package."
+                                "Agent name, slug, GitHub repo/URL, npm or PyPI package, "
+                                "package URL (pkg:npm/...), or MCP registry name."
                             ),
                         },
                     },
@@ -722,7 +723,8 @@ def _profile(a: dict) -> AgentProfile:
 def check_agent_trust(name_or_repo: str) -> CheckAgentTrustResult:
     """Get the HVTracker supply-chain trust profile for a tracked AI agent or
     framework. Accepts a display name ("LangGraph"), slug, GitHub owner/repo or
-    URL, or an npm/PyPI package name. Returns the trust score (0-100), evidence
+    URL, an npm/PyPI package name, a package URL (pkg:npm/..., pkg:pypi/...,
+    pkg:cargo/...) or an MCP registry name. Returns the trust score (0-100), evidence
     grade (A-F), rank, provenance and OpenSSF Scorecard signals, and the profile
     URL. Returns tracked=false when the project is not in the registry."""
     usage.record_tool_call("check_agent_trust")
@@ -755,7 +757,8 @@ def _check_agent_trust(name_or_repo: str) -> CheckAgentTrustResult:
 def verify_mcp_server(server: str) -> VerifyMcpServerResult:
     """Pre-connect trust verdict for an MCP server — "Safe Browsing for MCP".
     Call this BEFORE connecting an agent to an untrusted MCP server. Pass the
-    server's URL, npm/PyPI package, or GitHub owner/repo. Returns whether it
+    server's URL, npm/PyPI package, package URL (pkg:npm/...), MCP registry
+    name, or GitHub owner/repo. Returns whether it
     resolves to a tracked, trusted project, with grade, score, and reasons. An
     unknown server returns trusted=false (no evidence) — not a guarantee of harm."""
     usage.record_tool_call("verify_mcp_server")

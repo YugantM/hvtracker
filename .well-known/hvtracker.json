@@ -14,6 +14,7 @@
   "endpoints": {
     "registry": "https://hvtracker.net/data/latest.json",
     "agent_lookup": "https://hvtracker.net/data/agents/{slug}.json",
+    "identifier_index": "https://hvtracker.net/data/identifiers.json",
     "mcp_verify": "https://hvtracker.net/api/v1/mcp/verify?server={id}",
     "build_report": "https://hvtracker.net/data/build_report.json"
   },
