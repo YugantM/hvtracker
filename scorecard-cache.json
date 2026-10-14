@@ -1,5 +1,5 @@
 {
-  "scanned_at": "2026-10-14T16:50:36Z",
+  "scanned_at": "2026-10-14T20:46:24Z",
   "agents": {
     "anthropics/claude-code": {
       "score": 6.0,
@@ -940,7 +940,7 @@
       "scanned_at": "2026-10-07T17:14:07Z"
     },
     "BerriAI/litellm": {
-      "score": 6.1,
+      "score": 6.0,
       "checks": {
         "Binary-Artifacts": 0,
         "Branch-Protection": 4,
@@ -953,15 +953,15 @@
         "Fuzzing": 0,
         "License": 9,
         "Maintained": 10,
-        "Packaging": 10,
+        "Packaging": -1,
         "Pinned-Dependencies": 6,
-        "SAST": 8,
+        "SAST": 10,
         "Security-Policy": 10,
         "Signed-Releases": -1,
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-08T02:39:33Z"
+      "scanned_at": "2026-10-14T20:34:24Z"
     },
     "langgenius/dify": {
       "score": 6.2,
@@ -1345,7 +1345,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-13T20:03:58Z"
+      "scanned_at": "2026-10-14T20:44:20Z"
     },
     "agentscope-ai/agentscope": {
       "score": 4.6,
@@ -2861,14 +2861,14 @@
       "scanned_at": "2026-10-10T23:15:31Z"
     },
     "neuml/txtai": {
-      "score": 5.2,
+      "score": 5.6,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 0,
-        "CI-Tests": 9,
+        "CI-Tests": 10,
         "CII-Best-Practices": 0,
-        "Code-Review": 6,
-        "Contributors": 6,
+        "Code-Review": 9,
+        "Contributors": 10,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 0,
         "Fuzzing": 0,
@@ -2882,7 +2882,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-10-06T22:37:00Z"
+      "scanned_at": "2026-10-14T20:32:49Z"
     },
     "vespa-engine/vespa": {
       "score": 6.1,
@@ -4323,7 +4323,7 @@
         "Token-Permissions": 9,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-09T10:00:53Z"
+      "scanned_at": "2026-10-14T20:36:33Z"
     },
     "Portkey-AI/gateway": {
       "score": 4.8,
@@ -4520,13 +4520,13 @@
       "scanned_at": "2026-10-13T13:43:27Z"
     },
     "Hmbown/CodeWhale": {
-      "score": 6.1,
+      "score": 6.4,
       "checks": {
         "Binary-Artifacts": 9,
         "Branch-Protection": 3,
         "CI-Tests": 10,
         "CII-Best-Practices": 0,
-        "Code-Review": 1,
+        "Code-Review": 10,
         "Contributors": 10,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 10,
@@ -4539,9 +4539,9 @@
         "Security-Policy": 10,
         "Signed-Releases": 0,
         "Token-Permissions": 0,
-        "Vulnerabilities": 8
+        "Vulnerabilities": 4
       },
-      "scanned_at": "2026-10-13T13:39:47Z"
+      "scanned_at": "2026-10-14T20:43:44Z"
     },
     "rohitg00/agentmemory": {
       "score": 6.5,
@@ -6058,7 +6058,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-06T04:41:55Z"
+      "scanned_at": "2026-10-14T20:32:11Z"
     },
     "mark3labs/mcp-go": {
       "score": 5.2,
@@ -6394,7 +6394,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-11T03:51:56Z"
+      "scanned_at": "2026-10-14T20:39:41Z"
     },
     "AI4Finance-Foundation/FinRobot": {
       "score": 3.9,
@@ -7284,7 +7284,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-10T23:09:28Z"
+      "scanned_at": "2026-10-14T20:39:15Z"
     },
     "Alibaba-NLP/DeepResearch": {
       "score": 1.5,
@@ -7961,7 +7961,7 @@
       "scanned_at": "2026-10-12T00:13:12Z"
     },
     "strands-agents/harness-sdk": {
-      "score": 5.4,
+      "score": 5.5,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 5,
@@ -7976,13 +7976,13 @@
         "Maintained": 10,
         "Packaging": 10,
         "Pinned-Dependencies": 2,
-        "SAST": 1,
+        "SAST": 3,
         "Security-Policy": 10,
         "Signed-Releases": -1,
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-03T17:16:19Z"
+      "scanned_at": "2026-10-14T20:27:15Z"
     },
     "can1357/oh-my-pi": {
       "score": 4.9,
@@ -8127,7 +8127,7 @@
       "scan_failed_at": "2026-10-14T06:00:41Z"
     },
     "lastmile-ai/mcp-agent": {
-      "scan_failed_at": "2026-10-05T08:15:01Z"
+      "scan_failed_at": "2026-10-14T20:30:55Z"
     },
     "continuedev/continue": {
       "scan_failed_at": "2026-09-30T06:35:06Z"
@@ -8320,7 +8320,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-08T17:19:23Z"
+      "scanned_at": "2026-10-14T20:35:40Z"
     },
     "stripe/ai": {
       "score": 6.1,
@@ -8923,13 +8923,13 @@
       "scanned_at": "2026-10-14T11:28:49Z"
     },
     "agent0ai/agent-zero": {
-      "score": 4.3,
+      "score": 4.4,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 0,
         "CI-Tests": 0,
         "CII-Best-Practices": 0,
-        "Code-Review": 0,
+        "Code-Review": 1,
         "Contributors": 10,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 0,
@@ -8944,7 +8944,7 @@
         "Token-Permissions": 10,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-09-28T18:43:36Z"
+      "scanned_at": "2026-10-14T20:25:13Z"
     },
     "anthropics/claude-agent-sdk-python": {
       "score": 5.0,
@@ -9281,7 +9281,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-10T14:59:34Z"
+      "scanned_at": "2026-10-14T20:38:42Z"
     },
     "volcengine/OpenViking": {
       "score": 6.4,
@@ -10296,7 +10296,7 @@
         "Vulnerabilities": 0
       },
       "scanned_at": "2026-09-29T04:09:37Z",
-      "scan_failed_at": "2026-10-13T13:26:01Z"
+      "scan_failed_at": "2026-10-14T20:42:51Z"
     },
     "FlagOpen/RoboOS": {
       "score": 1.8,
@@ -10320,7 +10320,7 @@
         "Token-Permissions": -1,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-09T10:13:18Z"
+      "scanned_at": "2026-10-14T20:36:45Z"
     },
     "skalesapp/skales": {
       "score": 4.1,
@@ -10765,11 +10765,11 @@
       "scanned_at": "2026-10-12T06:55:05Z"
     },
     "browseros-ai/BrowserOS": {
-      "score": 4.9,
+      "score": 4.6,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 3,
-        "CI-Tests": 6,
+        "CI-Tests": 4,
         "CII-Best-Practices": 0,
         "Code-Review": 0,
         "Contributors": 10,
@@ -10778,7 +10778,7 @@
         "Fuzzing": 0,
         "License": 10,
         "Maintained": 10,
-        "Packaging": 10,
+        "Packaging": -1,
         "Pinned-Dependencies": 0,
         "SAST": 0,
         "Security-Policy": 10,
@@ -10786,7 +10786,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-09-24T19:48:21Z"
+      "scanned_at": "2026-10-14T20:24:10Z"
     },
     "NevaMind-AI/memU": {
       "score": 5.0,
@@ -12874,7 +12874,7 @@
         "Token-Permissions": 9,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-12T16:40:47Z"
+      "scanned_at": "2026-10-14T20:41:56Z"
     },
     "ntegrals/10x": {
       "score": 1.8,
@@ -13162,7 +13162,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-04T15:42:59Z"
+      "scanned_at": "2026-10-14T20:27:22Z"
     },
     "TonyWang-hub/mcp-cn-commerce": {
       "score": 5.2,
@@ -13546,7 +13546,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-10-08T02:33:33Z"
+      "scanned_at": "2026-10-14T20:33:47Z"
     },
     "hex/claude-council": {
       "score": 6.4,
@@ -13666,7 +13666,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-10-09T03:01:13Z"
+      "scanned_at": "2026-10-14T20:35:45Z"
     },
     "JimLiu/baoyu-skills": {
       "score": 2.9,
@@ -15398,7 +15398,7 @@
         "Token-Permissions": -1,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-04T19:05:18Z"
+      "scanned_at": "2026-10-14T20:27:54Z"
     },
     "hyhmrright/brooks-lint": {
       "score": 6.1,
@@ -15854,7 +15854,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-13T05:11:58Z"
+      "scanned_at": "2026-10-14T20:42:30Z"
     },
     "kujenga/zotero-mcp": {
       "score": 4.0,
@@ -18279,7 +18279,7 @@
         "Token-Permissions": -1,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-14T11:14:04Z"
+      "scanned_at": "2026-10-14T20:45:05Z"
     },
     "wuji-labs/nopua": {
       "score": 3.4,
@@ -18543,7 +18543,7 @@
         "Token-Permissions": 9,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-13T13:32:38Z"
+      "scanned_at": "2026-10-14T20:43:10Z"
     },
     "JhostinAleck/brightspace-mcp": {
       "score": 4.6,
@@ -18688,7 +18688,7 @@
         "Vulnerabilities": 10
       },
       "scanned_at": "2026-10-03T20:35:07Z",
-      "scan_failed_at": "2026-10-10T23:11:38Z"
+      "scan_failed_at": "2026-10-14T20:39:16Z"
     },
     "epiral/bb-browser": {
       "score": 2.6,
@@ -19339,7 +19339,7 @@
       "scanned_at": "2026-10-06T11:44:14Z"
     },
     "kenryu42/cc-safety-net": {
-      "score": 6.0,
+      "score": 5.9,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 3,
@@ -19353,14 +19353,14 @@
         "License": 10,
         "Maintained": 10,
         "Packaging": 10,
-        "Pinned-Dependencies": 7,
+        "Pinned-Dependencies": 6,
         "SAST": 0,
         "Security-Policy": 10,
         "Signed-Releases": 0,
         "Token-Permissions": 10,
-        "Vulnerabilities": 10
+        "Vulnerabilities": 9
       },
-      "scanned_at": "2026-10-02T13:41:43Z"
+      "scanned_at": "2026-10-14T20:25:51Z"
     },
     "SamMorrowDrums/remarkable-mcp": {
       "score": 6.9,
@@ -19704,10 +19704,10 @@
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 6,
-        "CI-Tests": 6,
+        "CI-Tests": 8,
         "CII-Best-Practices": 0,
-        "Code-Review": 4,
-        "Contributors": 3,
+        "Code-Review": 1,
+        "Contributors": 6,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 0,
         "Fuzzing": 0,
@@ -19715,13 +19715,13 @@
         "Maintained": 10,
         "Packaging": 10,
         "Pinned-Dependencies": 4,
-        "SAST": 5,
+        "SAST": 8,
         "Security-Policy": 0,
         "Signed-Releases": 0,
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-02T22:58:44Z"
+      "scanned_at": "2026-10-14T20:26:47Z"
     },
     "MrGeDiao/shuorenhua": {
       "score": 3.6,
@@ -19985,7 +19985,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-12T00:20:39Z"
+      "scanned_at": "2026-10-14T20:40:51Z"
     },
     "moltlaunch/cashclaw": {
       "score": 1.5,
@@ -20177,7 +20177,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-10T08:22:41Z"
+      "scanned_at": "2026-10-14T20:38:18Z"
     },
     "MP-Tool/komodo-mcp-server": {
       "score": 6.4,
@@ -20963,13 +20963,13 @@
         "Maintained": 10,
         "Packaging": 10,
         "Pinned-Dependencies": 7,
-        "SAST": 10,
+        "SAST": 9,
         "Security-Policy": 10,
         "Signed-Releases": 4,
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-10T01:36:31Z"
+      "scanned_at": "2026-10-14T20:37:59Z"
     },
     "sjkim1127/Reversecore_MCP": {
       "score": 8.0,
@@ -21956,13 +21956,13 @@
       "scanned_at": "2026-10-04T04:15:22Z"
     },
     "nextlevelbuilder/ui-ux-pro-max-skill": {
-      "score": 5.2,
+      "score": 5.1,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 3,
-        "CI-Tests": 4,
+        "CI-Tests": 3,
         "CII-Best-Practices": 0,
-        "Code-Review": 8,
+        "Code-Review": 7,
         "Contributors": 10,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 0,
@@ -21977,7 +21977,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-05T17:56:02Z"
+      "scanned_at": "2026-10-14T20:31:43Z"
     },
     "xuzhougeng/wisp-science": {
       "score": 3.8,
@@ -22385,7 +22385,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-10-14T11:17:59Z"
+      "scanned_at": "2026-10-14T20:45:19Z"
     },
     "workopia/workopia-mcp": {
       "score": 1.6,
@@ -22505,7 +22505,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-13T13:43:36Z"
+      "scanned_at": "2026-10-14T20:43:53Z"
     },
     "Qiskit/mcp-servers": {
       "score": 4.4,
@@ -22649,7 +22649,7 @@
         "Token-Permissions": 9,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-13T20:09:24Z"
+      "scanned_at": "2026-10-14T20:44:37Z"
     },
     "stackql/stackql": {
       "score": 6.0,
@@ -23852,7 +23852,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-14T16:43:06Z"
+      "scanned_at": "2026-10-14T20:46:13Z"
     },
     "AvdLee/Core-Data-Agent-Skill": {
       "score": 3.1,
@@ -24332,7 +24332,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-12T00:15:36Z"
+      "scanned_at": "2026-10-14T20:40:41Z"
     },
     "samanhappy/mcphub": {
       "score": 5.3,
@@ -25508,7 +25508,7 @@
         "Token-Permissions": -1,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-10T08:21:50Z"
+      "scanned_at": "2026-10-14T20:38:12Z"
     },
     "RapierCraft/Perplexity-Comet-MCP": {
       "score": 2.9,
@@ -25583,7 +25583,7 @@
       "scanned_at": "2026-10-14T06:05:37Z"
     },
     "0xNyk/xint": {
-      "score": 5.0,
+      "score": 4.9,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 3,
@@ -25595,7 +25595,7 @@
         "Dependency-Update-Tool": 10,
         "Fuzzing": 0,
         "License": 10,
-        "Maintained": 10,
+        "Maintained": 9,
         "Packaging": -1,
         "Pinned-Dependencies": 8,
         "SAST": 0,
@@ -25604,7 +25604,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-11T10:41:34Z"
+      "scanned_at": "2026-10-14T20:39:55Z"
     },
     "ravitemer/mcp-hub": {
       "score": 2.8,
@@ -26060,7 +26060,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-10-14T16:40:56Z"
+      "scanned_at": "2026-10-14T20:45:57Z"
     },
     "ihor-sokoliuk/mcp-searxng": {
       "score": 8.9,
@@ -26591,13 +26591,13 @@
       "scanned_at": "2026-10-08T17:25:03Z"
     },
     "dsh-market/dsh-market": {
-      "score": 3.7,
+      "score": 4.3,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 0,
-        "CI-Tests": 8,
+        "CI-Tests": 10,
         "CII-Best-Practices": 0,
-        "Code-Review": 4,
+        "Code-Review": 2,
         "Contributors": 6,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 0,
@@ -26605,14 +26605,14 @@
         "License": 10,
         "Maintained": 0,
         "Packaging": 10,
-        "Pinned-Dependencies": 0,
+        "Pinned-Dependencies": 2,
         "SAST": 0,
         "Security-Policy": 10,
         "Signed-Releases": -1,
         "Token-Permissions": 0,
-        "Vulnerabilities": 0
+        "Vulnerabilities": 7
       },
-      "scanned_at": "2026-10-05T08:28:00Z"
+      "scanned_at": "2026-10-14T20:31:20Z"
     },
     "surendranb/google-analytics-mcp": {
       "score": 5.8,
@@ -26948,7 +26948,7 @@
         "Token-Permissions": -1,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-10-12T06:58:04Z"
+      "scanned_at": "2026-10-14T20:41:26Z"
     },
     "iseppo/e-arveldaja-mcp": {
       "score": 4.4,
@@ -28391,7 +28391,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-10T15:09:22Z"
+      "scanned_at": "2026-10-14T20:38:55Z"
     },
     "tenequm/pond": {
       "score": 5.0,
@@ -28823,7 +28823,7 @@
         "Token-Permissions": -1,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-09T10:15:34Z"
+      "scanned_at": "2026-10-14T20:36:50Z"
     },
     "Antonytm/mcp-sitecore-server": {
       "score": 4.0,
@@ -29040,7 +29040,7 @@
         "Vulnerabilities": 10
       },
       "scanned_at": "2026-10-04T22:29:51Z",
-      "scan_failed_at": "2026-10-14T16:28:06Z"
+      "scan_failed_at": "2026-10-14T20:45:47Z"
     },
     "Untrivial-ai/agent-orchestrator": {
       "score": 4.5,
@@ -30727,7 +30727,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-11T10:42:40Z"
+      "scanned_at": "2026-10-14T20:40:11Z"
     },
     "domdomegg/airtable-mcp-server": {
       "score": 4.7,
@@ -30967,7 +30967,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-07T22:45:57Z"
+      "scanned_at": "2026-10-14T20:33:01Z"
     },
     "usewhale/Whale": {
       "score": 4.3,
@@ -31231,7 +31231,7 @@
         "Token-Permissions": 10,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-08T09:51:59Z"
+      "scanned_at": "2026-10-14T20:35:02Z"
     },
     "saaslabsco/justcall-mcp-server": {
       "score": 4.0,
@@ -31351,7 +31351,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 4
       },
-      "scanned_at": "2026-10-12T00:27:47Z"
+      "scanned_at": "2026-10-14T20:41:16Z"
     },
     "maziyarpanahi/openmed": {
       "score": 6.2,
@@ -31591,7 +31591,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-10-09T03:06:13Z"
+      "scanned_at": "2026-10-14T20:35:54Z"
     },
     "Mertcikla/tld": {
       "score": 5.4,
@@ -31858,14 +31858,14 @@
       "scanned_at": "2026-10-14T16:48:09Z"
     },
     "jgraph/drawio-mcp": {
-      "score": 4.3,
+      "score": 4.6,
       "checks": {
         "Binary-Artifacts": 9,
         "Branch-Protection": 0,
-        "CI-Tests": -1,
+        "CI-Tests": 10,
         "CII-Best-Practices": 0,
         "Code-Review": 0,
-        "Contributors": 6,
+        "Contributors": 10,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 0,
         "Fuzzing": 0,
@@ -31879,7 +31879,7 @@
         "Token-Permissions": 9,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-10T01:33:37Z"
+      "scanned_at": "2026-10-14T20:37:30Z"
     },
     "Vladimir-Human/ru-marketplace-mcp": {
       "score": 3.9,
@@ -33226,7 +33226,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-12T23:41:14Z"
+      "scanned_at": "2026-10-14T20:42:13Z"
     },
     "oxylabs/oxylabs-mcp": {
       "score": 3.1,
@@ -33754,7 +33754,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-06T22:17:17Z"
+      "scanned_at": "2026-10-14T20:32:23Z"
     },
     "GoneTone/mcp-server-taiwan-weather": {
       "score": 3.2,
@@ -34189,7 +34189,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-09-30T22:58:12Z"
+      "scanned_at": "2026-10-14T20:25:35Z"
     },
     "docling-project/docling-mcp": {
       "score": 5.1,
@@ -34333,7 +34333,7 @@
         "Token-Permissions": 8,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-14T11:27:50Z"
+      "scanned_at": "2026-10-14T20:45:46Z"
     },
     "giuseppe-trisciuoglio/developer-kit": {
       "score": 5.0,
@@ -34501,7 +34501,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-10-14T00:13:39Z"
+      "scanned_at": "2026-10-14T20:45:00Z"
     },
     "abhishekbhakat/airflow-mcp-server": {
       "score": 3.0,
@@ -35390,7 +35390,7 @@
         "Token-Permissions": 10,
         "Vulnerabilities": 9
       },
-      "scanned_at": "2026-10-14T11:18:19Z"
+      "scanned_at": "2026-10-14T20:45:36Z"
     },
     "blwfish/freecad-mcp": {
       "score": 4.9,
@@ -35849,7 +35849,7 @@
         "Token-Permissions": 10,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-13T05:20:36Z"
+      "scanned_at": "2026-10-14T20:42:36Z"
     },
     "software-mansion/argent": {
       "score": 5.1,
@@ -36020,9 +36020,9 @@
       "scanned_at": "2026-10-01T08:33:45Z"
     },
     "delimit-ai/delimit-mcp-server": {
-      "score": 5.3,
+      "score": 5.0,
       "checks": {
-        "Binary-Artifacts": 10,
+        "Binary-Artifacts": 7,
         "Branch-Protection": 5,
         "CI-Tests": 10,
         "CII-Best-Practices": 0,
@@ -36039,9 +36039,9 @@
         "Security-Policy": 10,
         "Signed-Releases": -1,
         "Token-Permissions": 0,
-        "Vulnerabilities": 10
+        "Vulnerabilities": 9
       },
-      "scanned_at": "2026-09-24T23:00:11Z"
+      "scanned_at": "2026-10-14T20:24:27Z"
     },
     "webdriverio/mcp": {
       "score": 6.0,
@@ -36305,7 +36305,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-12T07:00:53Z"
+      "scanned_at": "2026-10-14T20:41:37Z"
     },
     "codelipenghui/mcp-mat": {
       "score": 1.9,
@@ -37052,11 +37052,11 @@
       "scanned_at": "2026-10-13T13:31:49Z"
     },
     "serejaris/personal-corp-os": {
-      "score": 6.1,
+      "score": 6.2,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 0,
-        "CI-Tests": -1,
+        "CI-Tests": 10,
         "CII-Best-Practices": 0,
         "Code-Review": 0,
         "Contributors": 0,
@@ -37073,7 +37073,7 @@
         "Token-Permissions": 10,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-09-29T17:03:18Z"
+      "scanned_at": "2026-10-14T20:25:22Z"
     },
     "ThinkInAIXYZ/deepchat": {
       "score": 4.7,
@@ -37217,7 +37217,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-04T15:50:42Z"
+      "scanned_at": "2026-10-14T20:27:49Z"
     },
     "simonlin1212/TradingAgents-astock": {
       "score": 3.6,
@@ -37556,13 +37556,13 @@
       "scanned_at": "2026-10-01T16:05:41Z"
     },
     "vuejs-ai/skills": {
-      "score": 4.3,
+      "score": 4.2,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 6,
         "CI-Tests": 0,
         "CII-Best-Practices": 0,
-        "Code-Review": 7,
+        "Code-Review": 6,
         "Contributors": 10,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 0,
@@ -37577,7 +37577,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-10-07T22:46:20Z"
+      "scanned_at": "2026-10-14T20:33:16Z"
     },
     "jschuller/mcp-server-servicenow": {
       "score": 4.8,
@@ -37676,7 +37676,7 @@
       "scanned_at": "2026-10-09T02:46:14Z"
     },
     "neverinfamous/postgres-mcp": {
-      "score": 6.6,
+      "score": 6.4,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 3,
@@ -37688,7 +37688,7 @@
         "Dependency-Update-Tool": 10,
         "Fuzzing": 0,
         "License": 10,
-        "Maintained": 10,
+        "Maintained": 8,
         "Packaging": 10,
         "Pinned-Dependencies": 8,
         "SAST": 10,
@@ -37697,7 +37697,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-09-27T20:46:17Z"
+      "scanned_at": "2026-10-14T20:24:41Z"
     },
     "OleksandrKucherenko/mcp-obsidian-via-rest": {
       "score": 1.9,
@@ -38228,13 +38228,13 @@
       "scanned_at": "2026-10-06T18:03:50Z"
     },
     "wise-vision/ros2_mcp": {
-      "score": 3.9,
+      "score": 4.4,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 0,
-        "CI-Tests": 9,
+        "CI-Tests": 10,
         "CII-Best-Practices": 0,
-        "Code-Review": 4,
+        "Code-Review": 0,
         "Contributors": 3,
         "Dangerous-Workflow": 10,
         "Dependency-Update-Tool": 0,
@@ -38247,9 +38247,9 @@
         "Security-Policy": 0,
         "Signed-Releases": -1,
         "Token-Permissions": 0,
-        "Vulnerabilities": 0
+        "Vulnerabilities": 9
       },
-      "scanned_at": "2026-10-08T02:49:19Z"
+      "scanned_at": "2026-10-14T20:34:44Z"
     },
     "ibelick/ui-skills": {
       "score": 3.5,
@@ -39866,10 +39866,10 @@
       "scanned_at": "2026-10-13T05:20:59Z"
     },
     "mtbun/storeshots-mcp": {
-      "score": 2.6,
+      "score": 2.8,
       "checks": {
         "Binary-Artifacts": 10,
-        "Branch-Protection": 0,
+        "Branch-Protection": 3,
         "CI-Tests": 10,
         "CII-Best-Practices": 0,
         "Code-Review": 0,
@@ -39887,7 +39887,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-10T19:22:01Z"
+      "scanned_at": "2026-10-14T20:39:01Z"
     },
     "zenstory-ai/drama-skills": {
       "score": 5.0,
@@ -40826,7 +40826,7 @@
       "scanned_at": "2026-10-03T13:22:09Z"
     },
     "larashero3-dotcom/lieflat-charts": {
-      "score": 2.5,
+      "score": 3.5,
       "checks": {
         "Binary-Artifacts": 10,
         "Branch-Protection": 0,
@@ -40838,7 +40838,7 @@
         "Dependency-Update-Tool": 0,
         "Fuzzing": 0,
         "License": 9,
-        "Maintained": 0,
+        "Maintained": 10,
         "Packaging": -1,
         "Pinned-Dependencies": -1,
         "SAST": 0,
@@ -40847,7 +40847,7 @@
         "Token-Permissions": -1,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-10-08T02:32:12Z"
+      "scanned_at": "2026-10-14T20:33:29Z"
     },
     "cacheplane/b4run": {
       "score": 7.2,
@@ -40874,13 +40874,13 @@
       "scanned_at": "2026-10-08T10:05:11Z"
     },
     "getsentry/toolkit": {
-      "score": 4.9,
+      "score": 5.1,
       "checks": {
         "Binary-Artifacts": 8,
         "Branch-Protection": 3,
         "CI-Tests": 10,
         "CII-Best-Practices": 0,
-        "Code-Review": 1,
+        "Code-Review": 3,
         "Contributors": 10,
         "Dangerous-Workflow": 0,
         "Dependency-Update-Tool": 10,
@@ -40888,14 +40888,14 @@
         "License": 9,
         "Maintained": 10,
         "Packaging": -1,
-        "Pinned-Dependencies": 6,
-        "SAST": 9,
+        "Pinned-Dependencies": 7,
+        "SAST": 10,
         "Security-Policy": 10,
         "Signed-Releases": 0,
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-02T22:48:05Z"
+      "scanned_at": "2026-10-14T20:26:20Z"
     },
     "reactive-resume/reactive-resume": {
       "score": 6.3,
@@ -41279,7 +41279,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 10
       },
-      "scanned_at": "2026-10-11T16:35:33Z"
+      "scanned_at": "2026-10-14T20:40:27Z"
     },
     "Dryxio/reagent": {
       "score": 4.0,
@@ -41807,7 +41807,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 9
       },
-      "scanned_at": "2026-10-08T17:09:07Z"
+      "scanned_at": "2026-10-14T20:35:17Z"
     },
     "SylphxAI/anymd": {
       "score": 5.3,
@@ -41999,7 +41999,7 @@
         "Token-Permissions": 8,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-09T16:48:53Z"
+      "scanned_at": "2026-10-14T20:37:19Z"
     },
     "NVIDIA-NeMo/labs-OO-Agents": {
       "scan_failed_at": "2026-10-09T21:28:39Z"
@@ -42290,7 +42290,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 1
       },
-      "scanned_at": "2026-10-13T05:24:04Z"
+      "scanned_at": "2026-10-14T20:42:49Z"
     },
     "redhat-et/ripwire": {
       "score": 4.0,
@@ -42458,7 +42458,7 @@
         "Token-Permissions": 0,
         "Vulnerabilities": 0
       },
-      "scanned_at": "2026-10-12T00:26:24Z"
+      "scanned_at": "2026-10-14T20:41:01Z"
     },
     "DIDA-AI/Dida-Hotel-MCP-Global": {
       "score": 3.8,
