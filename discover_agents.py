@@ -670,6 +670,97 @@ REVIEWED_REJECTED = {
         "2026-10-09 owner: rejected — list, course, guide or collection; ships "
         "no agent"
     ),
+    # 2026-10-15 batch 4 decisions (docs/research/new-listing-candidates-2026-10-13.md,
+    # weekly report #364): the owner rejected these 22.
+    "ebony-vinyl/eac-desktop": (
+        "2026-10-15 owner: rejected — Already rejected 2026-10-09 as "
+        "dsh-eac/eac-desktop (DeepSeek Harness add-on); this is the same repo "
+        "under a new owner"
+    ),
+    "zju-real/easel": (
+        "2026-10-15 owner: rejected — wrapper around an already-listed agent "
+        "runtime (OpenClaw does the agent work); held from batch 3"
+    ),
+    "amelnagdy/delegate-skills": (
+        "2026-10-15 owner: rejected — supervisory harness (#180) as skills: "
+        "delegates the work to external implementer CLIs; held from batch 3"
+    ),
+    "agentconnect-md/agentconnect": (
+        "2026-10-15 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "amplifthq/opentag": (
+        "2026-10-15 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "egoist/waku": (
+        "2026-10-15 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "eneskirca/nodeterm": (
+        "2026-10-15 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work; also Business Source License 1.1"
+    ),
+    "amap-ml/longhorizon-harness": (
+        "2026-10-15 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "fei2411/deepseek-bot": (
+        "2026-10-15 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "pc2005-cloud/dsh-pet": (
+        "2026-10-15 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "feitangyuan/onetake": (
+        "2026-10-15 owner: rejected — licence is not open source (PolyForm "
+        "Noncommercial 1.0.0)"
+    ),
+    "pluviobyte/rnskill": (
+        "2026-10-15 owner: rejected — licence is not open source (CC BY-NC 4.0)"
+    ),
+    "hahhforest/pi-textbook": (
+        "2026-10-15 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "saladday/pi-from-scratch": (
+        "2026-10-15 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "tokenrhythm/neohorse": (
+        "2026-10-15 owner: rejected — not an agent, or agent support is "
+        "incidental (open-weight model family)"
+    ),
+    "hanyuanwang/livestream-agent-studio": (
+        "2026-10-15 owner: rejected — not an agent, or agent support is "
+        "incidental (livestream-commerce Windows app; 2 contributors, 12 "
+        "commits)"
+    ),
+    "adtexterry-lgtm/unigit-ecosystem": (
+        "2026-10-15 owner: rejected — not an agent, or agent support is "
+        "incidental (a brand and ecosystem page; 3 commits)"
+    ),
+    "diudiu-tech/delivery-harness": (
+        "2026-10-15 owner: rejected — not an agent, or agent support is "
+        "incidental (its README calls it an educational MVP with mock tools)"
+    ),
+    "icebird1998/drawio-scientific-illustrator": (
+        "2026-10-15 owner: rejected — superseded: its README says development "
+        "moved to icebird1998/scientific-illustrator, which is listed"
+    ),
+    "jiwoochris/artex-ko": (
+        "2026-10-15 owner: rejected — a translated copy of another project "
+        "(Autumn-27/ARTEX), not original work; forks exceed stars"
+    ),
+    "appllama/appllama-skills": (
+        "2026-10-15 owner: rejected — adoption not earned: stars without "
+        "matching activity (one contributor, a handful of commits)"
+    ),
+    "ray-r-ren/agent-apprenticeship": (
+        "2026-10-15 owner: rejected — adoption not earned: stars without "
+        "matching activity (one contributor, a handful of commits)"
+    ),
 }
 
 # Topics to query (one request each)
