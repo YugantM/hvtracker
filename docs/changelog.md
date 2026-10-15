@@ -1132,6 +1132,18 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   predeploy_check OK (roster 1,771 = live). Not built yet: G3 (JWTs, needs the
   owner's ES256 key) and the Draft profiles. Index fetches count under
   `data_json`.
+- **Listing batch 4 DEPLOYED 2026-10-15 09:11 UTC** (9851907b @ 928f99d0, #367;
+  owner: "add the 21, reject the 22, hold the seven", which lifted the #316
+  pause for this batch). Review of weekly report #364:
+  docs/research/new-listing-candidates-2026-10-13.md. 21 added (7 agents and
+  tools, 14 skills; 5 verified package ids), 22 rejected (including
+  Ebony-Vinyl/EAC-Desktop, the rejected DSH-EAC repo under a new owner), 7
+  held. predeploy_check OK (roster 1,792 ≥ live 1,771). The startup render
+  finished 09:15 UTC: board 1,763 with the 21 rows provisional, all 21
+  profiles 200, invariants []. The five new package rows show in
+  `package_failures` until they are scored. They get scored by the 12:00 UTC
+  batch. Gate expectation: no top-100 agent moves; PenguinHarness ~#224
+  (76.5 B), Jevgrep ~#334 (71.1 B); Human Review ~#92 on the skill board.
 
 ## Entries recorded only in the old AGENTS.md
 
