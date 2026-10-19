@@ -2139,29 +2139,37 @@ def alerts_post():
     return RedirectResponse("/alerts/", status_code=303)
 
 
-@app.get("/track/{slug}", include_in_schema=False)
-@app.get("/track/{slug}/", include_in_schema=False)
-def track_agent(request: Request, slug: str):
-    """Track a project from a link (the profile's "Get email alerts for X").
-
-    Signed in: add it to the account's tracked projects and land on /account.
-    Signed out: sign in, then come back here. robots.txt disallows /track/.
-    """
+def _track(request: Request, slug: str, status_code: int):
+    """Signed in: add the project to the account's tracked projects and land on
+    /account. Signed out: sign in, then come back to GET /track/<slug>/."""
     agent = find_agent_by_slug(slug)
     if not agent:
         return HTMLResponse("<p>Agent not found.</p>", status_code=404)
     user = _auth.current_user(request)
     if not user:
-        return RedirectResponse(f"/login?next=/track/{agent['slug']}/", status_code=302)
+        return RedirectResponse(f"/login?next=/track/{agent['slug']}/", status_code=status_code)
     db.add_watch(user["id"], agent["slug"])
-    return RedirectResponse(f"/account/?tracked={agent['slug']}", status_code=302)
+    return RedirectResponse(f"/account/?tracked={agent['slug']}", status_code=status_code)
+
+
+@app.get("/track/{slug}", include_in_schema=False)
+@app.get("/track/{slug}/", include_in_schema=False)
+def track_agent(request: Request, slug: str):
+    """Where sign-in returns to (next=/track/<slug>/), plus old links and caches.
+
+    Profiles no longer link here: a crawler that ignores robots.txt walked every
+    profile's <a href="/track/<slug>/"> into /login (~2,500 GA4 /login views on
+    17-18 Oct 2026), so "Get email alerts for X" POSTs instead.
+    """
+    return _track(request, slug, 302)
 
 
 @app.post("/track/{slug}", include_in_schema=False)
 @app.post("/track/{slug}/", include_in_schema=False)
-def track_agent_post(slug: str):
-    # The old waitlist form, from a page still in someone's cache.
-    return RedirectResponse(f"/track/{slug}/", status_code=303)
+def track_agent_post(request: Request, slug: str):
+    # The profile's "Get email alerts for X" button (and the old waitlist form,
+    # from a page still in someone's cache).
+    return _track(request, slug, 303)
 
 
 @app.get("/sponsor", response_class=HTMLResponse)

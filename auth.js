@@ -225,7 +225,7 @@
       var p = document.createElement("p");
       p.id = "hvtTrackNudge";
       p.className = "hvt-track-nudge";
-      p.innerHTML = "Saved in this browser. <a href=\"/login?next=" + encodeURIComponent("/track/" + slug + "/") +
+      p.innerHTML = "Saved in this browser. <a rel=\"nofollow\" href=\"/login?next=" + encodeURIComponent("/track/" + slug + "/") +
         "\">Sign in</a> to be notified when " + esc(btn.getAttribute("data-watch-name") || "it") +
         "&rsquo;s trust changes, on any device.";
       var row = btn.closest(".hero-actions") || btn;
