@@ -1132,6 +1132,32 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   predeploy_check OK (roster 1,771 = live). Not built yet: G3 (JWTs, needs the
   owner's ES256 key) and the Draft profiles. Index fetches count under
   `data_json`.
+- **Listing batch 4 DEPLOYED 2026-10-15 09:11 UTC** (9851907b @ 928f99d0, #367;
+  owner: "add the 21, reject the 22, hold the seven", which lifted the #316
+  pause for this batch). Review of weekly report #364:
+  docs/research/new-listing-candidates-2026-10-13.md. 21 added (7 agents and
+  tools, 14 skills; 5 verified package ids), 22 rejected (including
+  Ebony-Vinyl/EAC-Desktop, the rejected DSH-EAC repo under a new owner), 7
+  held. predeploy_check OK (roster 1,792 ≥ live 1,771). The startup render
+  finished 09:15 UTC: board 1,763 with the 21 rows provisional, all 21
+  profiles 200, invariants []. The five new package rows show in
+  `package_failures` until they are scored. They get scored by the 12:00 UTC
+  batch. Gate expectation: no top-100 agent moves; PenguinHarness ~#224
+  (76.5 B), Jevgrep ~#334 (71.1 B); Human Review ~#92 on the skill board.
+- **Correction, batch 4 after Scorecard (recorded 2026-10-19).** The 12:00 UTC
+  batch on 15 Oct scored the rows as gated (PenguinHarness #225, Jevgrep #334,
+  Human Review skill #93). Scorecard data then arrived for 15 of the 21 rows
+  from the hourly scan rotation, and the 19 Oct 08:09 UTC board differs from
+  the gate. "No top-100 agent moves" was wrong: **PenguinHarness is #81 (85.8
+  A, Scorecard 4.4)**, so #81-#100 each moved down one place. It looks earned,
+  the same profile as AiSOC in batch 3: maintenance 20/20, npm provenance,
+  adoption 11.9. Also up: Personal Model #759 (57.3 C), Open Science Desktop
+  #944 (52.2 C), Dormice #945 (52.1 C), VoiceMem #1160 (43.2 D); Human Review is
+  skill #48 (66.6 B), and seven more skills reached C or upper D. Jevgrep,
+  mindwalk and four skills still have no Scorecard. Lesson: a gate run without
+  Scorecard under-states packaged, well-maintained rows by up to ~30 points.
+  Pre-seed Scorecard before the gate (needs the CLI locally) or re-check ranks
+  a day after the deploy.
 
 ## Entries recorded only in the old AGENTS.md
 
