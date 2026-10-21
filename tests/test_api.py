@@ -144,6 +144,29 @@ def test_track_link_tracks_for_a_signed_in_user(client, monkeypatch):
     assert added == [(9, "codex")]
 
 
+def test_track_button_sends_signed_out_visitors_to_sign_in(client):
+    # The profile's "Get email alerts for X" is a POST form; sign-in returns to
+    # the GET route above, which then tracks it.
+    r = client.post("/track/codex/", follow_redirects=False, headers=_CANONICAL_HEADERS)
+    assert r.status_code == 303
+    assert r.headers["location"] == "/login?next=/track/codex/"
+
+
+def test_track_button_tracks_for_a_signed_in_user(client, monkeypatch):
+    import app as _app
+    added = []
+    monkeypatch.setattr(_app._auth, "current_user", lambda request: {"id": 9})
+    monkeypatch.setattr(_app.db, "add_watch", lambda uid, slug: added.append((uid, slug)))
+    r = client.post("/track/codex/", follow_redirects=False, headers=_CANONICAL_HEADERS)
+    assert r.status_code == 303 and r.headers["location"] == "/account/?tracked=codex"
+    assert added == [(9, "codex")]
+
+
+def test_track_button_unknown_agent_is_404(client):
+    r = client.post("/track/not-a-real-agent/", follow_redirects=False, headers=_CANONICAL_HEADERS)
+    assert r.status_code == 404
+
+
 def test_sponsor_page_does_not_sell_comparisons(client):
     # Scores aren't for sale (independence statement, #322), so sponsors can't
     # buy a compare page; the offer was dropped on 4 Oct 2026.
@@ -746,12 +769,15 @@ def test_compare_fallback_is_noindex_but_static_pairs_index(client):
     assert r.headers.get("x-robots-tag") == "noindex"
 
 
-def test_agent_page_track_link_has_trailing_slash(client):
+def test_agent_page_alerts_action_is_a_post_form_not_a_link(client):
+    # A crawler that ignores robots.txt followed every profile's /track/ link
+    # into /login (~2,500 GA4 /login views on 17-18 Oct 2026). Crawlers don't
+    # submit forms, so no profile may carry a crawlable /track/ href.
     slug = client.get("/api/agents", params={"limit": 1}).json()["agents"][0]["slug"]
     r = client.get(f"/agents/{slug}/")
     assert r.status_code == 200
-    assert f'href="/track/{slug}/"' in r.text
-    assert f'href="/track/{slug}"/' not in r.text
+    assert f'<form method="post" action="/track/{slug}/">' in r.text
+    assert 'href="/track/' not in r.text
 
 
 def test_blog_urls_carry_trailing_slash(client):

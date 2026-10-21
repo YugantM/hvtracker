@@ -2640,9 +2640,10 @@ def select_indexed_skills(prior, rows: list[dict], size: int = SKILL_INDEX_COHOR
 # lastmod:skip; 5: the rank sparkline, which gains a point every day; 6: the
 # compare "Where they differ" rows; 7: the ?v=<hash> on auth.js and site.css,
 # whose hex letters survive number masking, so editing either file re-dated
-# every page), so stored hashes are re-keyed without re-stamping every URL
+# every page; 8: the profile's "Get email alerts" link became a POST form
+# button, #370), so stored hashes are re-keyed without re-stamping every URL
 # (see lastmod_entry).
-LASTMOD_FP_VERSION = 7
+LASTMOD_FP_VERSION = 8
 LASTMOD_SKIP_RE = re.compile(rb"<!--lastmod:skip-->.*?<!--/lastmod:skip-->", re.S)
 _LASTMOD_NUMBER_RE = re.compile(rb"\d+(?:[.,]\d+)*")
 _LASTMOD_ASSET_VER_RE = re.compile(rb"(\.(?:js|css))\?v=[0-9a-f]+")

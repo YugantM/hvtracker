@@ -407,6 +407,11 @@
     .review-value { font-size:15px; line-height:1.45; }
     .review-metric { font-family:var(--font-mono); font-size:18px; font-weight:700; color:var(--accent-warm); margin-top:3px; }
     .review-actions { margin-top:12px; display:flex; flex-wrap:wrap; gap:8px; }
+    /* The alerts action is a POST form, not a link, so crawlers that ignore
+       robots.txt can't walk it into /login?next=/track/<slug>/. display:contents
+       keeps the button a direct flex item, sized like its sibling links. */
+    .review-actions form { display:contents; }
+    .review-actions button.secondary-link { line-height:inherit; }
     .remediation-panel { margin-top:12px; border:1px solid var(--border); padding:10px; }
     .remediation-list { display:grid; gap:8px; }
     .remediation-item { display:grid; gap:2px; }
@@ -1084,7 +1089,7 @@
 {% else %}
         <a class="compare-link" href="/compare/?a={{ row.slug }}">Compare with another agent</a>
 {% endif %}
-        <a class="secondary-link" href="/track/{{ row.slug }}/">Get email alerts for {{ row.name }}</a>
+        <form method="post" action="/track/{{ row.slug }}/"><button class="secondary-link" type="submit">Get email alerts for {{ row.name }}</button></form>
         {% if row.category %}<a class="secondary-link" href="/categories/{{ row.category_slug }}/">View {{ row.category }}</a>{% endif %}
         <a class="secondary-link" href="{{ row.correction_url }}" target="_blank" rel="noopener noreferrer">Report missing data</a>
       </div>
