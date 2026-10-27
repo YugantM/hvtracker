@@ -3702,8 +3702,9 @@
     "name": "LycheeMemory",
     "category": "Memory & Knowledge",
     "pypi_package": "lycheemem",
-    "listing_status": "listed",
-    "tracking_mode": "direct"
+    "listing_status": "legacy",
+    "tracking_mode": "direct",
+    "status": "legacy"
   },
   {
     "repo": "zjunlp/LightMem",
@@ -6072,7 +6073,10 @@
     "docker_image": "docker.io/n24q02m/better-notion-mcp:latest"
   },
   {
-    "repo": "sandeepbazar/ocm-mcp-server",
+    "repo": "ocm-mcp-server/ocm-mcp-server",
+    "previous_repos": [
+      "sandeepbazar/ocm-mcp-server"
+    ],
     "name": "Ocm MCP Server",
     "category": "MCP Servers",
     "listing_status": "listed",
@@ -9848,7 +9852,10 @@
     "npm_package": "@steipete/peekaboo"
   },
   {
-    "repo": "crabtalk/crabtalk",
+    "repo": "crabtalk/crabtalk-20261010",
+    "previous_repos": [
+      "crabtalk/crabtalk"
+    ],
     "name": "Crabtalk",
     "category": "Agent Frameworks",
     "listing_status": "listed",
@@ -13217,11 +13224,12 @@
     "repo": "Scottcjn/beacon-skill",
     "name": "Beacon Skill",
     "category": "Agent Skills",
-    "listing_status": "listed",
+    "listing_status": "legacy",
     "tracking_mode": "direct",
     "npm_package": "beacon-skill",
     "pypi_package": "beacon-skill",
-    "class": "skill"
+    "class": "skill",
+    "status": "legacy"
   },
   {
     "repo": "serejaris/personal-corp-os",
