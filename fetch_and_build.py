@@ -3903,6 +3903,21 @@ def _write_series_cache(cache_path: str, raw: str) -> None:
         print(f"WARNING: history series cache not written ({cache_path}): {e}")
 
 
+def archive_history_snapshot(date: str, path: str) -> str:
+    """Copy today's snapshot to the bucket; return "ok", "disabled" or
+    "failed: <error>" for build_report.json. A bucket error must not end the
+    render: from 22 Oct 2026 every refresh died here after data.json, so no
+    page, sitemap or build report was rewritten for days (#380)."""
+    try:
+        if not storage.put_file(f"history/{date}.json", path, "application/json"):
+            return "disabled"
+    except Exception as e:
+        print(f"WARNING: could not archive history/{date}.json to the bucket: {type(e).__name__}: {e}")
+        return f"failed: {type(e).__name__}: {e}"[:300]
+    print(f"Archived history snapshot to bucket: history/{date}.json")
+    return "ok"
+
+
 def record_history_series_day(days: list[dict], date: str, snap: dict, path: str,
                               cache_dir: str) -> None:
     """After today's snapshot is written, cache it from the in-memory copy
@@ -8336,8 +8351,7 @@ def main() -> None:
     with open(history_path, "w", encoding="utf-8") as f:
         json.dump(snapshot_output, f, indent=2, ensure_ascii=False)
     print(f"Wrote history snapshot {history_path}.")
-    if storage.put_file(f"history/{today_utc}.json", history_path, "application/json"):
-        print(f"Archived history snapshot to bucket: history/{today_utc}.json")
+    history_archive = archive_history_snapshot(today_utc, history_path)
     record_history_series_day(history_all, today_utc, snapshot_output, history_path,
                               os.path.join(script_dir, ".cache", "history-series"))
     try:
@@ -8456,6 +8470,7 @@ def main() -> None:
         "board_invariant_violations": invariant_violations,
         "board_invariant_violation_count": len(invariant_violations),
         "fetch_rotation": summarize_fetch_rotation(rows),
+        "history_archive": history_archive,
     }
     report_path = os.path.join(script_dir, "data", "build_report.json")
     os.makedirs(os.path.dirname(report_path), exist_ok=True)
