@@ -7979,6 +7979,9 @@ def main() -> None:
     _source_note_map = {a["repo"].lower(): a.get("source_note", "") for a in all_agents if a.get("source_note")}
     # Official product site set by hand (a correction, e.g. #216); overrides the declared one.
     _homepage_map = {a["repo"].lower(): a.get("homepage", "") for a in all_agents if a.get("homepage")}
+    # NuGet package named on the profile only (a correction, #372). No downloads
+    # or source link are read from NuGet, so it never counts toward confidence.
+    _nuget_map = {a["repo"].lower(): a.get("nuget_package", "") for a in all_agents if a.get("nuget_package")}
     apply_listing_classes(rows, all_agents)
 
     # Re-apply the latest OSSF scan to every carried-forward agent (cache-only,
@@ -8012,6 +8015,7 @@ def main() -> None:
         if source_note_override:
             row["source_note"] = source_note_override
         apply_homepage(row, _homepage_map.get(repo_key, ""))
+        row["nuget_package"] = _nuget_map.get(repo_key, "")
         row["license_type"] = normalize_license_type(row, offline=render_only)
         # Always recompute freshness from the absolute last_push date so the
         # color coding (and the maintenance dimension) stay correct even when
