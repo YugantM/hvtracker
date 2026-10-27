@@ -873,9 +873,9 @@
         <li class="cstep">
           <span class="vdot {{ st }}" aria-hidden="true"></span>
           <div class="cstep-body">
-            <h3>Published packages <span class="ctag is-{{ st }}">{% if not pkgs %}None{% elif bad %}Source mismatch{% elif st == "ok" %}Linked and attested{% elif attested %}Partly attested{% elif linked %}Linked, not attested{% else %}Not linked{% endif %}</span></h3>
+            <h3>Published packages <span class="ctag is-{{ st }}">{% if not pkgs %}{% if row.nuget_package %}Not checked{% else %}None{% endif %}{% elif bad %}Source mismatch{% elif st == "ok" %}Linked and attested{% elif attested %}Partly attested{% elif linked %}Linked, not attested{% else %}Not linked{% endif %}</span></h3>
             {% if not pkgs %}
-            <p>{% if row.docker_image %}Distributed as the container image {{ row.docker_image }}; HVTracker doesn't check that registry's source link yet.{% elif row.vscode_extension %}Distributed as the VS Code extension {{ row.vscode_extension }}; HVTracker doesn't check marketplace source links yet.{% else %}No registry package. {{ row.name }} is used from its repository, so what you run is whatever you check out: pin a release tag or commit.{% endif %}</p>
+            <p>{% if row.docker_image %}Distributed as the container image {{ row.docker_image }}; HVTracker doesn't check that registry's source link yet.{% elif row.vscode_extension %}Distributed as the VS Code extension {{ row.vscode_extension }}; HVTracker doesn't check marketplace source links yet.{% elif row.nuget_package %}Distributed as the NuGet package <a href="https://www.nuget.org/packages/{{ row.nuget_package }}" rel="noopener">{{ row.nuget_package }}</a>; HVTracker doesn't track NuGet downloads or check its source link yet.{% else %}No registry package. {{ row.name }} is used from its repository, so what you run is whatever you check out: pin a release tag or commit.{% endif %}</p>
             {% else %}
             <ul class="cpkgs">
               {% for p in pkgs %}

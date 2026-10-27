@@ -112,6 +112,22 @@ def test_no_package_project_says_so():
     assert "pin a release tag or commit" in html
 
 
+def test_nuget_package_is_named_not_called_missing():
+    html = _custody(_render(npm_package="", pypi_package="", crate_package="",
+                            docker_image="", vscode_extension="", nuget_package="WpfVisualTreeMcp"))
+    assert "No registry package." not in html
+    assert '<a href="https://www.nuget.org/packages/WpfVisualTreeMcp" rel="noopener">WpfVisualTreeMcp</a>' in html
+    assert "doesn't track NuGet downloads" in html
+    assert ">Not checked</span>" in html
+
+
+def test_nuget_package_leaves_the_score_alone():
+    with open(os.path.join(ROOT, "data", "render_state.json"), encoding="utf-8") as f:
+        row = json.load(f)["rows"][0]
+    row.update(npm_package="", pypi_package="", crate_package="", docker_image="", vscode_extension="")
+    assert fab.compute_trust_score({**row, "nuget_package": "WpfVisualTreeMcp"}) == fab.compute_trust_score(row)
+
+
 def test_custody_changes_and_empty_state():
     ev = [{"date": "2026-09-01", "type": "provenance_added", "detail": "Package provenance attestation detected"},
           {"date": "2026-09-02", "type": "rank_changed", "detail": "Rank moved"}]
