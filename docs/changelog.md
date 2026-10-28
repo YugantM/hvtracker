@@ -1190,6 +1190,15 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   DIDA-AI/Dida-Hotel-MCP-Global, Connectry-io/connectrylab-architect-cert-mcp),
   not yet handled. Lesson: the freshness monitor should also check
   build_report `generated_at`, so that a frozen site can't read as fresh.
+- **Freshness monitor checks the render (2026-10-28, workflow only, no
+  deploy).** From 22 to 28 Oct every refresh crashed after writing data.json
+  (#380, fixed by #385), so /healthz said `data_fresh: true` while the pages
+  stayed at 21 Oct 20:07 UTC. scripts/check_freshness.py now also alerts on
+  the `stale-data` issue when `/data/build_report.json` `generated_at` or
+  sitemap.xml's Last-Modified is older than 9 h (two refresh slots plus an
+  hour; the sitemap is the render's last write, build_report comes before the
+  pages), and when `history_archive` starts with "failed". The backup alert
+  fires until the owner replaces the S3 keys on `web`.
 
 ## Entries recorded only in the old AGENTS.md
 
