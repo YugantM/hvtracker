@@ -1199,6 +1199,17 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   hour; the sitemap is the render's last write, build_report comes before the
   pages), and when `history_archive` starts with "failed". The backup alert
   fires until the owner replaces the S3 keys on `web`.
+- **Three more dead repos retired, DEPLOYED 2026-10-28 12:43 UTC** (434b76d7
+  @ b0d6debd, #388; owner: "deploy main"). Vorim-AI-Labs/vorim-mcp-server,
+  DIDA-AI/Dida-Hotel-MCP-Global and Connectry-io/connectrylab-architect-cert-mcp
+  returned 404 (their owners still exist), and no rename or move was found,
+  so they were retired as legacy, as #383 did. Their profiles now return
+  410. The only runtime change since ff2d03c7 is #388; #386 and #387 are docs
+  and workflow changes. predeploy_check OK (roster 1,792 = live). The boot
+  `repair-commits` render ran 12:44–12:47 UTC and succeeded: board 1,758 rows
+  (34 legacy), invariants []. `history_archive` still reads
+  `failed: ... SignatureDoesNotMatch`, so the owner actions from the
+  previous deploy entry are still open.
 
 ## Entries recorded only in the old AGENTS.md
 
