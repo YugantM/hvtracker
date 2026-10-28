@@ -1158,6 +1158,38 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   Scorecard under-states packaged, well-maintained rows by up to ~30 points.
   Pre-seed Scorecard before the gate (needs the CLI locally) or re-check ranks
   a day after the deploy.
+- **Frozen-site fix DEPLOYED 2026-10-28 12:10 UTC** (ff2d03c7 @ 60468319;
+  owner: "merge 385 and deploy after the refresh finishes"). From the 22 Oct
+  00:00 UTC refresh, every run died one second after writing data.json and
+  graph.json. The cause was the bucket upload of the daily snapshot:
+  `put_object` raised `ClientError (SignatureDoesNotMatch)`, and
+  `storage.put_bytes` doesn't catch errors. So no page, sitemap or
+  build_report was rewritten, and the site stayed frozen at the 21 Oct 20:07
+  UTC render for six and a half days. /healthz still called the data fresh,
+  because the freshness monitor reads data.json's age, and #380 said only
+  "last refresh failed". The likely trigger is Railway's 21 Oct security
+  reset (see the 22 Oct note in the railway-deploy memory), which also
+  invalidated the bill monitor's RAILWAY_TOKEN (#375). The volume snapshots
+  for 22–28 Oct are intact (7.4 MB each), but none reached the bucket. #385
+  moved the upload into `archive_history_snapshot()`: an error is now
+  recorded in build_report `history_archive` and the render goes on. Also
+  shipped: #383 (beacon-skill and lycheememory retired, 410; ocm-mcp-server
+  → ocm-mcp-server/ocm-mcp-server and crabtalk → crabtalk/crabtalk-20261010
+  via `previous_repos`), #384 (`nuget_package`, display-only; correction #372
+  closed), #370, and deps #354 and #355. predeploy_check OK (roster 1,792 =
+  live). The boot `repair-commits` render ran 12:13–12:16 UTC and succeeded:
+  pages, sitemap and build_report are dated 28 Oct, the board has 1,761 rows
+  (31 legacy), and invariants are []. `history_archive` still reads
+  `failed: ClientError ... SignatureDoesNotMatch`: the redeploy did not
+  refresh the bucket keys. **Owner actions:** set S3_ACCESS_KEY and
+  S3_SECRET_KEY on `web` (and in hvtracker-history-backup) from the bucket's
+  Credentials page; issue a new RAILWAY_TOKEN for bill-monitor; check the
+  other Railway-held secrets against Railway's rotation advice. Then
+  re-upload the 22–28 Oct snapshots to the bucket. The 28 Oct 08:00 log also
+  showed three more roster repos returning 404 (Vorim-AI-Labs/vorim-mcp-server,
+  DIDA-AI/Dida-Hotel-MCP-Global, Connectry-io/connectrylab-architect-cert-mcp),
+  not yet handled. Lesson: the freshness monitor should also check
+  build_report `generated_at`, so that a frozen site can't read as fresh.
 
 ## Entries recorded only in the old AGENTS.md
 
