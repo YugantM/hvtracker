@@ -5378,8 +5378,9 @@
     ],
     "name": "Dida RollingGo Hotel MCP Global",
     "category": "MCP Servers",
-    "listing_status": "listed",
-    "tracking_mode": "direct"
+    "listing_status": "legacy",
+    "tracking_mode": "direct",
+    "status": "legacy"
   },
   {
     "repo": "VictoriaMetrics/mcp-victoriametrics",
@@ -8152,9 +8153,10 @@
     "repo": "Vorim-AI-Labs/vorim-mcp-server",
     "name": "Vorim MCP Server",
     "category": "MCP Servers",
-    "listing_status": "listed",
+    "listing_status": "legacy",
     "tracking_mode": "direct",
-    "npm_package": "@vorim/mcp-server"
+    "npm_package": "@vorim/mcp-server",
+    "status": "legacy"
   },
   {
     "repo": "wellknownmcp/cortex-gateway",
@@ -9341,9 +9343,10 @@
     "repo": "Connectry-io/connectrylab-architect-cert-mcp",
     "name": "Connectrylab Architect Cert MCP",
     "category": "MCP Servers",
-    "listing_status": "listed",
+    "listing_status": "legacy",
     "tracking_mode": "direct",
-    "npm_package": "connectry-architect-mcp"
+    "npm_package": "connectry-architect-mcp",
+    "status": "legacy"
   },
   {
     "repo": "pranciskus/newsmcp",
