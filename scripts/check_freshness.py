@@ -9,9 +9,11 @@ data.json, so /healthz kept reporting fresh data while every page stayed at
 21 Oct (#380). So this also checks the render itself: build_report.json and
 sitemap.xml, the render's last write. Run this from CI every few hours; the
 workflow opens (or updates) a `stale-data` issue on alert and closes it once
-healthy again.
+healthy again. A failing history backup goes to its own `backup-failing`
+issue: the pages are fine then, and "data is stale" would mislead.
 
-Exit 0 = healthy, 2 = alert, 1 = /healthz could not be read (also an alert).
+Exit 0 = healthy, 2 = alert, 3 = only the history backup is failing,
+1 = /healthz could not be read (also an alert).
 """
 import json
 import os
@@ -71,12 +73,17 @@ def evaluate_report(report: dict, now: datetime,
     elif age > max_age_hours:
         problems.append(f"site render is {age:.1f} h old "
                         f"(build_report generated_at {generated}, limit {max_age_hours:g} h)")
+    return problems
+
+
+def evaluate_backup(report: dict) -> list[str]:
+    """The offsite copy of the daily snapshot, from build_report.json."""
     # Missing key (renders before #385) is not an alarm; "disabled" means no
     # bucket is configured.
     archive = report.get("history_archive")
     if isinstance(archive, str) and archive.startswith("failed"):
-        problems.append(f"offsite history backup is failing (build_report history_archive: {archive})")
-    return problems
+        return [f"offsite history backup is failing (build_report history_archive: {archive})"]
+    return []
 
 
 def evaluate_sitemap(last_modified: str | None, now: datetime,
@@ -114,6 +121,7 @@ def main() -> int:
     for job, nxt in sorted((h.get("scheduled_jobs") or {}).items()):
         print(f"  next {job}: {nxt}")
     problems = evaluate(h)
+    backup: list[str] = []
     now = datetime.now(timezone.utc)
     try:
         with _fetch(f"{SITE}/data/build_report.json") as resp:
@@ -124,6 +132,7 @@ def main() -> int:
         print(f"build_report generated_at: {report.get('generated_at')}  "
               f"history_archive: {report.get('history_archive')}")
         problems += evaluate_report(report, now)
+        backup = evaluate_backup(report)
     try:
         with _fetch(f"{SITE}/sitemap.xml", method="HEAD") as resp:
             last_modified = resp.headers.get("Last-Modified")
@@ -132,11 +141,16 @@ def main() -> int:
     else:
         print(f"sitemap.xml Last-Modified: {last_modified}")
         problems += evaluate_sitemap(last_modified, now)
+    # The workflow greps for these markers at the start of a line.
+    for marker, items in (("::ALERT::", problems), ("::BACKUP::", backup)):
+        if items:
+            print(marker)
+            for p in items:
+                print(f"  - {p}")
     if problems:
-        print("::ALERT::")
-        for p in problems:
-            print(f"  - {p}")
         return 2
+    if backup:
+        return 3
     print("healthy")
     return 0
 
