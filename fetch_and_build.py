@@ -3903,19 +3903,35 @@ def _write_series_cache(cache_path: str, raw: str) -> None:
         print(f"WARNING: history series cache not written ({cache_path}): {e}")
 
 
+HISTORY_BACKFILL_MAX = 20  # uploads per render; an empty bucket fills over a few renders
+_SNAPSHOT_NAME = re.compile(r"^\d{4}-\d{2}-\d{2}\.json$")
+
+
 def archive_history_snapshot(date: str, path: str) -> str:
-    """Copy today's snapshot to the bucket; return "ok", "disabled" or
-    "failed: <error>" for build_report.json. A bucket error must not end the
-    render: from 22 Oct 2026 every refresh died here after data.json, so no
-    page, sitemap or build report was rewritten for days (#380)."""
+    """Copy today's snapshot to the bucket, then up to HISTORY_BACKFILL_MAX
+    earlier snapshots the bucket is missing, newest first. Return "ok",
+    "ok, backfilled N", "disabled" or "failed: <error>" for build_report.json.
+    A bucket error must not end the render: from 22 Oct 2026 every refresh
+    died here after data.json, so no page, sitemap or build report was
+    rewritten for days (#380). The bucket then rejected uploads until its key
+    was replaced, and the backfill restores the days it missed."""
     try:
         if not storage.put_file(f"history/{date}.json", path, "application/json"):
             return "disabled"
+        history_dir = os.path.dirname(path)
+        stored = storage.list_keys("history/") or set()
+        missing = sorted((name for name in os.listdir(history_dir)
+                          if _SNAPSHOT_NAME.match(name) and name != f"{date}.json"
+                          and f"history/{name}" not in stored), reverse=True)
+        for name in missing[:HISTORY_BACKFILL_MAX]:
+            storage.put_file(f"history/{name}", os.path.join(history_dir, name), "application/json")
+            print(f"Backfilled history snapshot to bucket: history/{name}")
     except Exception as e:
-        print(f"WARNING: could not archive history/{date}.json to the bucket: {type(e).__name__}: {e}")
+        print(f"WARNING: could not archive history snapshots to the bucket: {type(e).__name__}: {e}")
         return f"failed: {type(e).__name__}: {e}"[:300]
     print(f"Archived history snapshot to bucket: history/{date}.json")
-    return "ok"
+    n = min(len(missing), HISTORY_BACKFILL_MAX)
+    return f"ok, backfilled {n}" if n else "ok"
 
 
 def record_history_series_day(days: list[dict], date: str, snap: dict, path: str,
