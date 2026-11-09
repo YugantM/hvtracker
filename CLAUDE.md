@@ -104,7 +104,18 @@ Milestone history lives in `docs/changelog.md` — record new milestones there.
   guides later batches: batch 1–4 pages indexed in GSC URL Inspection and
   under ~2% of sitemap URLs uncrawled (weekly sweep: ~/hv_marketing/
   indexing_check.py). Roster removals and fixes were never paused.
-- Active: Q4 2026 plan (approved 2026-10-06, runs to 31 Dec)
+- Active: Phase 11 "expand where the demand already is" (approved
+  2026-11-09, runs 16 Nov – 31 Mar 2027, closes the Q4 plan on 31 Dec)
+  https://claude.ai/artifact/WrzUitorEkPUr6L6tfZdnJ. Positioning: "the signed
+  public record of agent software". Don't use "credit bureau for agents"
+  (Experian and Socure sell agent trust scores under that framing). Workstreams:
+  K "is X safe?" facts where Search Console shows demand (OmniRoute first,
+  same rules as E2); L the A2A census as a monthly dated series with a DOI;
+  M credential v0.3, AI Catalog trust manifests and an Agent Card checker;
+  N outside-observed facts for registry hosts through the API, no new pages.
+  The ES256 key for v0.3 is `HVT_ES256_KEY` on `web`: base64 of a P-256
+  PKCS#8 PEM.
+- Q4 2026 plan (approved 2026-10-06, runs to 31 Dec, now inside Phase 11)
   https://claude.ai/artifact/89TFKpJfa8ce92uKowefQk. Positioning: HVTracker is
   the independent reputation record bound to identities others issue (signed
   A2A cards, domains, package registries); it does not authenticate agents.
@@ -116,7 +127,8 @@ Milestone history lives in `docs/changelog.md` — record new milestones there.
   fetches; v0.3 design approved 2026-10-12,
   docs/research/trust-credential-v0.3-design-2026-10-06.md: its identifier
   index `/data/identifiers.json` is live since 2026-10-13, the JWT records
-  wait for the owner's ES256 key), allowlist files only if the registry gate fails (H). Hosted-service
+  wait for the owner's ES256 key). H (allowlist files) was dropped on
+  2026-11-09. Hosted-service
   facts never change scores without a separate evidence gate.
 - Active: Phase 10 "turn impressions into clicks" (approved 2026-10-04, runs to
   15 Nov) https://claude.ai/artifact/CoU1ktL5ejKEffo9wv5snh: logged title
@@ -124,8 +136,9 @@ Milestone history lives in `docs/changelog.md` — record new milestones there.
   monthly provenance post, and indexing hygiene against the #316 pause.
 - Phase 9 MCP registry feed DEPLOYED 2026-10-02 (#312): /registry/<policy>
   v0.1 subregistry, publisher-tie rule for graded allowlists, daily
-  registry-snapshot.yml → `data` branch. Watch the "registry" channel on
-  /live/ for demand. Phase 8 "Citable provenance" (provenance study,
+  registry-snapshot.yml → `data` branch. FROZEN 2026-11-09: it failed the
+  31 Oct gate (24 outside requests in 5 weeks), so it stays up and gets no
+  further work. Phase 8 "Citable provenance" (provenance study,
   chain-of-custody profiles, incident watch) DEPLOYED 2026-10-01. Earlier plans: Phase 7 https://claude.ai/artifact/92fZ6PMrVQUbPbrxQp7B8a,
   Phase 6 https://claude.ai/artifact/DVwRksqt544SfWmEKoLpVu. Open owner items
   and check dates: docs/changelog.md and docs/ctr-tests.md.
