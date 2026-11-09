@@ -1210,6 +1210,26 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   (34 legacy), invariants []. `history_archive` still reads
   `failed: ... SignatureDoesNotMatch`, so the owner actions from the
   previous deploy entry are still open.
+- **Bucket key fixed, missed snapshots restored, DEPLOYED 2026-11-09 10:38
+  UTC** (2162a1c9 @ 79e88dd2, #392; owner: "Yes, set references"). Cause of
+  #380's `SignatureDoesNotMatch` since 22 Oct: Railway re-issued the
+  `hvtracker-archive` credentials at 23:10 UTC on 21 Oct, keeping the access
+  key ID and changing the secret, while `web` held a hand-copied secret. Its
+  `S3_ACCESS_KEY` and `S3_SECRET_KEY` are now references,
+  `${{hvtracker-archive.ACCESS_KEY_ID}}` and
+  `${{hvtracker-archive.SECRET_ACCESS_KEY}}`, so a future reset carries over
+  on a redeploy. They were set with skipDeploys and checked by hash against
+  the bucket's current keys before the deploy. #392 makes each render upload
+  up to 20 snapshots missing from the bucket, newest first. The only runtime
+  change since 434b76d7 is #392; predeploy_check OK (roster 1,792 = live).
+  The boot `repair-commits` render ran 10:38–10:40 UTC: `history_archive`
+  reads `ok, backfilled 20` (22 Oct to 8 Nov, plus 28 and 29 May, which were
+  missing too), invariants []. The bucket now holds 166 snapshots, 28 May to
+  9 Nov, with no gaps; later renders upload the older days still missing.
+  **Owner actions still open:** the `S3_SECRET_KEY` secret in
+  hvtracker-history-backup (its daily job has failed since 22 Oct), and a
+  new `RAILWAY_TOKEN` for bill-monitor (#375 is the dead token, not spend:
+  $1.44 of the $15 cap by 4 Nov).
 
 ## Entries recorded only in the old AGENTS.md
 
