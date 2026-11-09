@@ -92,17 +92,19 @@ def test_one_missed_refresh_stays_quiet_two_alert():
         "site render is 11.3 h old (build_report generated_at 2026-10-28T16:05:00Z, limit 9 h)"]
 
 
-def test_failing_history_backup_alerts():
-    # Production today: the bucket keys are stale, the render itself is fine.
-    problems = cf.evaluate_report({**REPORT, "history_archive": SIGNATURE_ERROR}, NOW, max_age_hours=9)
-    assert problems == [
+def test_failing_history_backup_is_its_own_alert():
+    # Production 28 Oct to 4 Nov: the bucket key is stale, the render itself is
+    # fine, so the backup must not read as stale data (#380).
+    report = {**REPORT, "history_archive": SIGNATURE_ERROR}
+    assert cf.evaluate_report(report, NOW, max_age_hours=9) == []
+    assert cf.evaluate_backup(report) == [
         f"offsite history backup is failing (build_report history_archive: {SIGNATURE_ERROR})"]
 
 
 def test_ok_disabled_or_missing_history_archive_does_not_alert():
-    for value in ("ok", "disabled", None):
-        assert cf.evaluate_report({**REPORT, "history_archive": value}, NOW, max_age_hours=9) == []
-    assert cf.evaluate_report({"generated_at": REPORT["generated_at"]}, NOW, max_age_hours=9) == []
+    for value in ("ok", "ok, backfilled 14", "disabled", None):
+        assert cf.evaluate_backup({**REPORT, "history_archive": value}) == []
+    assert cf.evaluate_backup({"generated_at": REPORT["generated_at"]}) == []
 
 
 def test_unknown_render_age_alerts():
@@ -112,3 +114,39 @@ def test_unknown_render_age_alerts():
     for value in (None, "not a date"):
         assert cf.evaluate_sitemap(value, NOW, max_age_hours=9) == [
             f"sitemap.xml age is unknown (Last-Modified: {value})"]
+
+
+class _Resp:
+    def __init__(self, body=None, headers=None):
+        self._body, self.headers = cf.json.dumps(body or {}).encode(), headers or {}
+
+    def read(self, *_a):
+        return self._body
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_a):
+        return False
+
+
+def _run_main(monkeypatch, capsys, archive):
+    now = cf.datetime.now(cf.timezone.utc)
+    report = {"generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "history_archive": archive}
+    sitemap = {"Last-Modified": now.strftime("%a, %d %b %Y %H:%M:%S GMT")}
+    monkeypatch.setattr(cf, "_fetch", lambda url, method="GET": (
+        _Resp(HEALTHY) if url == cf.URL else
+        _Resp(report) if url.endswith("build_report.json") else _Resp(headers=sitemap)))
+    return cf.main(), capsys.readouterr().out
+
+
+def test_main_exits_3_with_a_backup_marker_when_only_the_backup_fails(monkeypatch, capsys):
+    code, out = _run_main(monkeypatch, capsys, SIGNATURE_ERROR)
+    assert code == 3
+    assert "\n::BACKUP::\n" in out and "::ALERT::" not in out
+
+
+def test_main_is_healthy_once_the_backup_works(monkeypatch, capsys):
+    code, out = _run_main(monkeypatch, capsys, "ok, backfilled 14")
+    assert code == 0
+    assert "::BACKUP::" not in out and out.rstrip().endswith("healthy")

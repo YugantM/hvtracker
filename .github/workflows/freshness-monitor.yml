@@ -7,7 +7,8 @@ name: Data freshness monitor
 # it closes the issue again once the site is healthy. From 22 to 28 Oct every
 # render crashed after writing data.json, so /healthz looked fresh while the
 # pages were days old (#380): it also alerts when build_report.json or
-# sitemap.xml is older than 9 h, or the offsite history backup fails.
+# sitemap.xml is older than 9 h. A failing offsite history backup gets its own
+# `backup-failing` issue, because the site itself is fine then.
 
 on:
   schedule:
@@ -38,9 +39,14 @@ jobs:
             echo "$out"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
+          # 3 = only the backup fails, so the site itself is healthy.
           if [ $code -eq 2 ]; then echo "state=alert" >> "$GITHUB_OUTPUT";
-          elif [ $code -eq 0 ]; then echo "state=ok" >> "$GITHUB_OUTPUT";
+          elif [ $code -eq 0 ] || [ $code -eq 3 ]; then echo "state=ok" >> "$GITHUB_OUTPUT";
           else echo "state=error" >> "$GITHUB_OUTPUT"; fi
+          # Unknown when build_report.json could not be read: leave that issue alone.
+          if grep -q '^::BACKUP::' <<<"$out"; then echo "backup=failing" >> "$GITHUB_OUTPUT";
+          elif grep -q '^build_report generated_at:' <<<"$out"; then echo "backup=ok" >> "$GITHUB_OUTPUT";
+          else echo "backup=unknown" >> "$GITHUB_OUTPUT"; fi
 
       - name: Open or update stale-data issue
         if: steps.check.outputs.state == 'alert' || steps.check.outputs.state == 'error'
@@ -50,7 +56,7 @@ jobs:
           REPORT: ${{ steps.check.outputs.report }}
         run: |
           run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-          body=$(printf 'hvtracker.net is serving stale data or pages, its refresh scheduler is down, or its history backup is failing.\n\n```\n%s\n```\n\nRun: %s\n' "$REPORT" "$run_url")
+          body=$(printf 'hvtracker.net is serving stale data or pages, or its refresh scheduler is down.\n\n```\n%s\n```\n\nRun: %s\n' "$REPORT" "$run_url")
           gh label create stale-data --repo "$GITHUB_REPOSITORY" --color D93F0B --description "Site data not refreshing" 2>/dev/null || true
           existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label stale-data --json number --jq '.[0].number')
           if [ -n "$existing" ]; then
@@ -66,5 +72,31 @@ jobs:
         run: |
           existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label stale-data --json number --jq '.[0].number')
           if [ -n "$existing" ]; then
-            gh issue close "$existing" --repo "$GITHUB_REPOSITORY" --comment "Recovered: fresh data and pages, a running scheduler, and no failing history backup."
+            gh issue close "$existing" --repo "$GITHUB_REPOSITORY" --comment "Recovered: fresh data and pages, and a running scheduler."
+          fi
+
+      - name: Open or update backup-failing issue
+        if: steps.check.outputs.backup == 'failing'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPORT: ${{ steps.check.outputs.report }}
+        run: |
+          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          body=$(printf 'The daily history snapshot is not reaching the offsite bucket. The volume still has it, and the site may be fine: see the report.\n\n```\n%s\n```\n\nRun: %s\n' "$REPORT" "$run_url")
+          gh label create backup-failing --repo "$GITHUB_REPOSITORY" --color FBCA04 --description "History snapshots not reaching the bucket" 2>/dev/null || true
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label backup-failing --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "hvtracker.net history backup is failing" --label backup-failing --body "$body"
+          fi
+
+      - name: Close backup-failing issue when the backup works
+        if: steps.check.outputs.backup == 'ok'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label backup-failing --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue close "$existing" --repo "$GITHUB_REPOSITORY" --comment "Recovered: the daily history snapshot reaches the bucket again."
           fi
