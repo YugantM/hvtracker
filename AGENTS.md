@@ -103,6 +103,11 @@ Milestone history lives in `docs/changelog.md` — record new milestones there.
   guides later batches: batch 1–4 pages indexed in GSC URL Inspection and
   under ~2% of sitemap URLs uncrawled (weekly sweep: ~/hv_marketing/
   indexing_check.py). Roster removals and fixes were never paused.
+- Active: Phase 11 "expand where the demand already is" (approved
+  2026-11-09, runs 16 Nov – 31 Mar 2027)
+  https://claude.ai/artifact/WrzUitorEkPUr6L6tfZdnJ. Positioning: "the signed
+  public record of agent software"; don't use "credit bureau for agents". The
+  registry feed is frozen (up, no further work). Details: CLAUDE.md.
 - Active: Phase 10 "turn impressions into clicks" (approved 2026-10-04, runs to
   15 Nov) https://claude.ai/artifact/CoU1ktL5ejKEffo9wv5snh: logged title
   tests on profiles and categories (CTR_TEST_AGENT / CTR_TEST_CATEGORY), a

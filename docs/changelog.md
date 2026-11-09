@@ -1230,6 +1230,25 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   hvtracker-history-backup (its daily job has failed since 22 Oct), and a
   new `RAILWAY_TOKEN` for bill-monitor (#375 is the dead token, not spend:
   $1.44 of the $15 cap by 4 Nov).
+- **Phase 11 plan approved 2026-11-09** (owner: "Approve it"):
+  https://claude.ai/artifact/WrzUitorEkPUr6L6tfZdnJ. Runs 16 Nov – 31 Mar 2027
+  and closes the Q4 plan on 31 Dec. Evidence on 9 Nov (28 days to 7 Nov):
+  485 Search Console clicks (+31%, Phase 10's 450 met), CTR 1.43% (1.8%
+  missed), trust-question clicks 70 (+59%), branded search 0, MCP tool calls
+  ~60 a day. Positioning is now "the signed public record of agent
+  software". "Credit bureau for agents" is retired, since Experian Agent
+  Trust and Socure Agent Intelligence sell agent trust scores under that
+  framing. The site never used the phrase, so no page changed. Workstreams:
+  J clear blockers, K "is X safe?" facts by search demand (OmniRoute first),
+  L the A2A census as a monthly series with a DOI, M credential v0.3 + AI
+  Catalog trust manifests + an Agent Card checker, N outside-observed facts
+  for registry hosts through the API. Decided the same day: the Phase 9
+  registry feed is FROZEN (24 outside requests in 5 weeks against the 31 Oct
+  gate of 10 a week); it stays up and gets no more work, and the Q4 plan's H
+  (allowlist files) is dropped. The v0.3 ES256 key will be `HVT_ES256_KEY` on
+  `web`, base64 of a P-256 PKCS#8 PEM. Still with the owner: that key, the
+  bill-monitor `RAILWAY_TOKEN`, the backup repo's `S3_SECRET_KEY`, batch 5
+  (#374) deploy or close, and the Ahrefs referring-domain baseline.
 
 ## Entries recorded only in the old AGENTS.md
 
