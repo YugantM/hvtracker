@@ -49,3 +49,14 @@ def put_bytes(key: str, data: bytes, content_type: str = "application/octet-stre
 def put_file(key: str, path: str, content_type: str = "application/octet-stream") -> bool:
     with open(path, "rb") as f:
         return put_bytes(key, f.read(), content_type)
+
+
+def list_keys(prefix: str) -> set[str] | None:
+    """Every key under `prefix`, or None if storage is disabled."""
+    c = _s3()
+    if c is None:
+        return None
+    keys: set[str] = set()
+    for page in c.get_paginator("list_objects_v2").paginate(Bucket=S3_BUCKET, Prefix=prefix):
+        keys.update(o["Key"] for o in page.get("Contents", []))
+    return keys
