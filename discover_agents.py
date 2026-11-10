@@ -761,6 +761,72 @@ REVIEWED_REJECTED = {
         "2026-10-15 owner: rejected — adoption not earned: stars without "
         "matching activity (one contributor, a handful of commits)"
     ),
+    # 2026-11-10 batch 6 decisions (docs/research/new-listing-candidates-2026-11-10.md,
+    # weekly report #398): owner asked for the new entries to be added; these failed.
+    "deepseek-ai/dsh-superagent-prototype": (
+        "2026-11-10 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings); "
+        "a bundle for DSH, published as one commit and labelled a research "
+        "prototype, not a DeepSeek product"
+    ),
+    "ccch1mneyyy/dsh-go": (
+        "2026-11-10 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings); "
+        "a third-party Android client for DSH"
+    ),
+    "fei2411/ds-bot": (
+        "2026-11-10 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings); "
+        "bot personas and messaging for DSH"
+    ),
+    "kingcharleslzy-ai/dsh-purge": (
+        "2026-11-10 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings); "
+        "a community copy of yujunzhixue/dsh-purge, rejected 2026-10-09"
+    ),
+    "mmparko/dsh-purge": (
+        "2026-11-10 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings); "
+        "a mirror of yujunzhixue/dsh-purge, rejected 2026-10-09"
+    ),
+    "liguobao/ds-harness-remote": (
+        "2026-11-10 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings); "
+        "a remote-access plugin for DSH"
+    ),
+    "nightly-labs/openbot": (
+        "2026-11-10 owner: rejected — supervisory harness (#180): Codex, Claude "
+        "Code and other external CLIs do the agent work"
+    ),
+    "kkkkhazix/agent-autoloop": (
+        "2026-11-10 owner: rejected — supervisory harness (#180): it schedules "
+        "external CLI agents (Claude Code, Codex) that do the agent work"
+    ),
+    "sandbox-quantum/switch": (
+        "2026-11-10 owner: rejected — licence: Apache-2.0 limited by the Commons "
+        "Clause, not open source (sugarforever/chat-ollama precedent)"
+    ),
+    "kuafuai/andee": (
+        "2026-11-10 owner: rejected — licence: Apache-2.0 modified with added "
+        "conditions (no multi-tenant hosting, no white-labelling), not open "
+        "source (sugarforever/chat-ollama precedent)"
+    ),
+    "horizon-rust/horizon": (
+        "2026-11-10 owner: rejected — not an agent: a Minecraft: Java Edition "
+        "rewrite in Rust"
+    ),
+    "rddmwmddr/android-ad-cleaner": (
+        "2026-11-10 owner: rejected — not an agent: Android ad and debloat "
+        "scripts (gathin23/cleanyourtv precedent)"
+    ),
+    "simbasjungles/free-my-tv": (
+        "2026-11-10 owner: rejected — not an agent: a TV home-screen app "
+        "(gathin23/cleanyourtv precedent)"
+    ),
+    "shaongitbd/doory": (
+        "2026-11-10 owner: rejected — not an agent: a design app (a Canva "
+        "alternative)"
+    ),
 }
 
 # Topics to query (one request each)
