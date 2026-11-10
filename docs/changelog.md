@@ -1249,6 +1249,23 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   `web`, base64 of a P-256 PKCS#8 PEM. Still with the owner: that key, the
   bill-monitor `RAILWAY_TOKEN`, the backup repo's `S3_SECRET_KEY`, batch 5
   (#374) deploy or close, and the Ahrefs referring-domain baseline.
+- **Listing batches 5 and 6, DEPLOYED 2026-11-10 14:53 UTC** (a3da165d @
+  122a8029, #399 + #400; owner: "add new entries to the leaderboard", "Merge
+  both", "make it live"). Batch 5 (the #371 review, approved 21 Oct) had sat
+  unmerged as #374, so #399 rebased it onto main and re-checked it: Konnect
+  was archived on 2 Nov and dropped, leaving 15 rows. Batch 6 reviews weekly
+  report #398: 10 added, 14 rejected, 5 held
+  (docs/research/new-listing-candidates-2026-11-10.md). Together: 25 rows
+  (13 agents, 12 skills) and 40 `REVIEWED_REJECTED` entries. predeploy_check
+  OK (roster 1,817, live 1,792). The boot `repair-commits` render finished
+  14:57 UTC with the 25 rows provisional (score 0); the 16:00 UTC scheduled
+  batch scored all of them (render 16:13 UTC): board 1,783 rows (34 legacy),
+  no pending rows, every live score within 0.1 of the pre-merge gate
+  (agents: deja-vu #217, 78.3 B; Hex-Rays IDA MCP #414, 68.6 B; skills:
+  OpenFilm #26, ffmpeg-skill #27, Scenario Skills #41, Huashu Motion #49, all
+  B), invariants [], package failures only `AynOps/AynOps`. Our Scorecard
+  scan reaches the remaining rows within a day. #374 is still open for the
+  owner to close.
 
 ## Entries recorded only in the old AGENTS.md
 
