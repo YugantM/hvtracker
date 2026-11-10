@@ -761,6 +761,119 @@ REVIEWED_REJECTED = {
         "2026-10-15 owner: rejected — adoption not earned: stars without "
         "matching activity (one contributor, a handful of commits)"
     ),
+    # 2026-10-21 batch 5 decisions (docs/research/new-listing-candidates-2026-10-20.md,
+    # weekly report #371): the owner had the eligible ones added and these rejected.
+    "jiwoochris/artex-global": (
+        "2026-10-21 owner: rejected — Already rejected 2026-10-15 as "
+        "jiwoochris/artex-ko (a translated copy of ARTEX); this is the same "
+        "repo renamed"
+    ),
+    "trhhubsd/artex": (
+        "2026-10-21 owner: rejected — a re-upload of ARTEX by an unrelated "
+        "account; the original Autumn-27/ARTEX is gone (404), so authorship "
+        "can't be established"
+    ),
+    "t-auto/dsh-ops": (
+        "2026-10-21 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "dsh-app/dsha": (
+        "2026-10-21 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings); "
+        "an Android launcher for DSH"
+    ),
+    "elysia395/dsh-wallpaper-engine": (
+        "2026-10-21 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings)"
+    ),
+    "corrinehu/dsh-workbuddy-connect": (
+        "2026-10-21 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings); "
+        "also discontinued, its README says the repo goes offline on 2026-10-22"
+    ),
+    "derpyu520/qq-bridge": (
+        "2026-10-21 owner: rejected — DeepSeek Harness add-on (plugin, skin, "
+        "preset, wrapper or jailbreak), not an agent (2026-09-29 DSH rulings); "
+        "a QQ chat bridge"
+    ),
+    "ardeyouxipianyi/workbuddy2api-hub": (
+        "2026-10-21 owner: rejected — provider proxy or relay (thin-wrapper "
+        "boundary); a multi-account reverse-proxy gateway to Tencent WorkBuddy"
+    ),
+    "folkbench/folkbench": (
+        "2026-10-21 owner: rejected — provider proxy or relay (thin-wrapper "
+        "boundary); a relay benchmark and switcher with sponsored relays"
+    ),
+    "amontlabs/lcu": (
+        "2026-10-21 owner: rejected — provider proxy or relay (thin-wrapper "
+        "boundary); exposes the Codex app's computer-use runtime to other "
+        "harnesses without Codex authentication"
+    ),
+    "autonomous-ai/openharness": (
+        "2026-10-21 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work"
+    ),
+    "amplifthq/openmeld": (
+        "2026-10-21 owner: rejected — supervisory harness (#180): external "
+        "coding-agent CLIs do the agent work (same org as the rejected "
+        "amplifthq/opentag)"
+    ),
+    "penso/herdr-gpui": (
+        "2026-10-21 owner: rejected — wrapper around an already-listed agent "
+        "runtime (a third-party client for herdrdev/herdr)"
+    ),
+    "devswha/herdr-web-ui": (
+        "2026-10-21 owner: rejected — wrapper around an already-listed agent "
+        "runtime (a third-party client for herdrdev/herdr)"
+    ),
+    "ahmadhassan-bted/autoswarm-shadow-adapter": (
+        "2026-10-21 owner: rejected — add-on for another agent platform "
+        "(AutoSwarm); one contributor, forks 0.1%"
+    ),
+    "ahmadhassan-bted/openopc-shadow-adapter": (
+        "2026-10-21 owner: rejected — add-on for another agent platform "
+        "(AutoSwarm); the old name of ahmadhassan-bted/autoswarm-shadow-adapter"
+    ),
+    "gathin23/cleanyourtv": (
+        "2026-10-21 owner: rejected — not an agent, or agent support is "
+        "incidental (Android TV debloat guide and scripts)"
+    ),
+    "deeplethe/solid-glass": (
+        "2026-10-21 owner: rejected — not an agent, or agent support is "
+        "incidental (a UI design system)"
+    ),
+    "krishhgg/insomnia": (
+        "2026-10-21 owner: rejected — not an agent, or agent support is "
+        "incidental (a macOS keep-awake menu bar app)"
+    ),
+    "croffasia/itsaplan": (
+        "2026-10-21 owner: rejected — not an agent, or agent support is "
+        "incidental (an issue tracker with agent access)"
+    ),
+    "marclou/mailcheap": (
+        "2026-10-21 owner: rejected — not an agent, or agent support is "
+        "incidental (a newsletter app with an MCP server)"
+    ),
+    "l0ng-ai/tty7": (
+        "2026-10-21 owner: rejected — not an agent, or agent support is "
+        "incidental (a terminal emulator)"
+    ),
+    "youngyangyang04/llm-master": (
+        "2026-10-21 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "soumatheusgomes/vibe-coding-toolkit": (
+        "2026-10-21 owner: rejected — list, course, guide or collection; ships "
+        "no agent"
+    ),
+    "feder-cr/git-ai": (
+        "2026-10-21 owner: rejected — adoption not earned: stars without "
+        "matching activity: 2,404 stars in the 19 Oct report, 909 on 21 Oct"
+    ),
+    "maxrave-dev/kotlin-footguns": (
+        "2026-10-21 owner: rejected — adoption not earned: stars without "
+        "matching activity: one contributor, 11 commits, forks 0.4%"
+    ),
 }
 
 # Topics to query (one request each)

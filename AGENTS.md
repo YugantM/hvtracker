@@ -95,14 +95,17 @@ Milestone history lives in `docs/changelog.md` — record new milestones there.
 - **Listing batches: the owner lifted the 2026-10-02 pause for batch 3 on
   2026-10-09** (37 rows, docs/research/new-listing-candidates-2026-10-08.md)
   **and for batch 4 on 2026-10-15** (21 rows from weekly report #364,
-  docs/research/new-listing-candidates-2026-10-13.md), both before the
-  criterion was met (last full sweep 4 Oct: 0 of 23 batch 1–2 profiles
-  indexed, 7.3% of sitemap URLs never crawled). Google recrawls only ~27
-  sitemap URLs/day, so new agent rows lengthen that queue; skill pages are
-  noindex and outside the sitemap, so skills don't. The criterion still
-  guides later batches: batch 1–4 pages indexed in GSC URL Inspection and
-  under ~2% of sitemap URLs uncrawled (weekly sweep: ~/hv_marketing/
-  indexing_check.py). Roster removals and fixes were never paused.
+  docs/research/new-listing-candidates-2026-10-13.md) **and batch 5 on
+  2026-10-21** (15 rows from #371, docs/research/new-listing-candidates-
+  2026-10-20.md), all before the criterion was met (19 Oct sweep: 0 of 23
+  batch 1–2 profiles indexed, 8.7% of sitemap URLs never crawled). Google
+  recrawls only ~27 sitemap URLs/day, so new agent rows lengthen that queue;
+  skill pages are noindex and outside the sitemap, so skills don't. Manual
+  GSC "Request indexing" gets a page indexed within a day; batch 1–2 pages
+  are being requested ~10/day since 19 Oct. The criterion still guides later
+  batches: batch 1–5 pages indexed in GSC URL Inspection and under ~2% of
+  sitemap URLs uncrawled (weekly sweep: ~/hv_marketing/indexing_check.py).
+  Roster removals and fixes were never paused.
 - Active: Phase 11 "expand where the demand already is" (approved
   2026-11-09, runs 16 Nov – 31 Mar 2027)
   https://claude.ai/artifact/WrzUitorEkPUr6L6tfZdnJ. Positioning: "the signed
