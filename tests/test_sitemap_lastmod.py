@@ -50,6 +50,20 @@ def test_asset_cache_busters_keep_fingerprint():
     assert fp("3fa9c2be", "ab12cd34") != fp("3fa9c2be", "ab12cd34", n="Cline")
 
 
+def test_ga_guard_edits_keep_fingerprint():
+    """Every page carries the inline GA guard, so editing it re-dated every URL.
+    Other scripts, including one just before the guard, still count."""
+    page = ('<script>{other}</script><script>(function(){{if({cond}){{window["ga-disable-G-TZ8921LR0K"]=true}}}})();'
+            '</script><script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script><p>{n}</p>')
+
+    def fp(cond="navigator.webdriver", other="setTheme()", n="Aider"):
+        return fab.lastmod_fingerprint(page.format(cond=cond, other=other, n=n).encode("utf-8"), NOW)
+
+    assert fp() == fp(cond="navigator.webdriver||screen.width===innerWidth&&a<b")
+    assert fp() != fp(other="setTheme('dark')")
+    assert fp() != fp(n="Cline")
+
+
 def test_real_content_changes_move_fingerprint():
     base = _fp()
     assert _fp(grade="A") != base

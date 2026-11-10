@@ -4,12 +4,28 @@
 "Chrome" in Singapore with zero engagement: automation with a spoofed user
 agent, about a tenth of all GA sessions. Automation sets navigator.webdriver
 even when it spoofs the UA, so every page that loads GA disables it for
-webdriver, known bot UAs, local hosts and the hvt_notrack opt-out."""
+webdriver, known bot UAs, local hosts and the hvt_notrack opt-out.
+
+By November 2026, 82% of GA sessions came from headless browsers that hide
+webdriver and send a plain Chrome UA (GA screen 1280x720 from Tencent Cloud,
+1280x1200 from a residential proxy pool). A browser run with an emulated
+viewport (Playwright, Puppeteer) reports a screen exactly the size of its
+viewport; a real desktop window is shorter than its screen by the toolbar.
+The second check disables GA on that, limited to what it can't misread:
+no touch (phones), a Chrome UA (Firefox's resistFingerprinting and Tor
+report screen = window), not Brave (farbles screen from the window size)
+and not browser fullscreen (F11, which matches display-mode: fullscreen)."""
 import os
 import subprocess
 
+import app
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GA = "googletagmanager.com/gtag/js?id=G-TZ8921LR0K"
+VIEWPORT_CHECK = (
+    'if(screen.width===innerWidth&&screen.height===innerHeight&&navigator.maxTouchPoints===0'
+    '&&/Chrome\\//.test(ua)&&!navigator.brave&&!matchMedia("(display-mode: fullscreen)").matches)'
+    '{window["ga-disable-G-TZ8921LR0K"]=true}')
 
 
 def _tracked_sources():
@@ -29,7 +45,14 @@ def test_every_page_that_loads_ga_guards_it_first():
         head = text[:text.index(GA)]
         for check in ("navigator.webdriver", "HeadlessChrome", "hvt_notrack"):
             assert check in head, f"{rel}: guard lacks {check}"
+        if rel != "app.py":  # an f-string there; its rendered output is checked below
+            assert VIEWPORT_CHECK in head, f"{rel}: guard lacks the emulated-viewport check"
     assert len(pages) >= 30
+
+
+def test_app_pages_render_the_same_viewport_check():
+    html = app._marketing_page("Title", "Eyebrow", "Heading", "<p>Body</p>")
+    assert VIEWPORT_CHECK in html[:html.index(GA)]
 
 
 def test_custom_events_skip_webdriver_too():

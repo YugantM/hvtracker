@@ -1266,6 +1266,19 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   B), invariants [], package failures only `AynOps/AynOps`. Our Scorecard
   scan reaches the remaining rows within a day. #374 is still open for the
   owner to close.
+- **GA guard: emulated-viewport check, PR open 2026-11-10 (not merged, not
+  deployed).** 82% of GA4 sessions in the 28 days to 7 Nov were headless
+  browsers hiding webdriver behind a plain Chrome UA (screen 1280x720 from
+  Tencent Cloud, 1280x1200 from a residential proxy pool). Every copy of the
+  `ga-disable` guard now also disables GA when screen equals viewport on a
+  non-touch, non-Brave, non-fullscreen Chrome UA (Playwright and Puppeteer
+  emulation report exactly that; a real window is shorter by its toolbar).
+  Verified locally with Playwright 1.62 at 1280x720 and 1280x1200 (disabled,
+  no GA requests) and headed Google Chrome normal, maximized and fullscreen
+  (counted). `hvtTrack` only calls `gtag`, so it obeys the flag. The
+  fingerprint behind sitemap `<lastmod>` now drops the guard script
+  (`LASTMOD_FP_VERSION` 9): 0 of 3,347 pages re-dated. Production check after
+  deploy: GA4 sessions at 1280x720 and 1280x1200 near zero within two days.
 
 ## Entries recorded only in the old AGENTS.md
 

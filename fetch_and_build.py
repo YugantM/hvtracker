@@ -2641,10 +2641,12 @@ def select_indexed_skills(prior, rows: list[dict], size: int = SKILL_INDEX_COHOR
 # compare "Where they differ" rows; 7: the ?v=<hash> on auth.js and site.css,
 # whose hex letters survive number masking, so editing either file re-dated
 # every page; 8: the profile's "Get email alerts" link became a POST form
-# button, #370), so stored hashes are re-keyed without re-stamping every URL
-# (see lastmod_entry).
-LASTMOD_FP_VERSION = 8
+# button, #370; 9: the inline GA guard script is dropped, so editing the guard
+# never re-dates every page), so stored hashes are re-keyed without
+# re-stamping every URL (see lastmod_entry).
+LASTMOD_FP_VERSION = 9
 LASTMOD_SKIP_RE = re.compile(rb"<!--lastmod:skip-->.*?<!--/lastmod:skip-->", re.S)
+_LASTMOD_GA_GUARD_RE = re.compile(rb"<script>(?:(?!</script>).)*?ga-disable-G-TZ8921LR0K.*?</script>", re.S)
 _LASTMOD_NUMBER_RE = re.compile(rb"\d+(?:[.,]\d+)*")
 _LASTMOD_ASSET_VER_RE = re.compile(rb"(\.(?:js|css))\?v=[0-9a-f]+")
 
@@ -2661,6 +2663,7 @@ def lastmod_fingerprint(content: bytes, now_str: str) -> str:
     """
     content = content.replace(now_str.encode("utf-8"), b"")
     content = LASTMOD_SKIP_RE.sub(b"", content)
+    content = _LASTMOD_GA_GUARD_RE.sub(b"", content)
     content = _LASTMOD_ASSET_VER_RE.sub(rb"\1", content)
     content = _LASTMOD_NUMBER_RE.sub(b"#", content)
     return hashlib.sha256(content).hexdigest()
