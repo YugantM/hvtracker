@@ -1266,8 +1266,15 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   B), invariants [], package failures only `AynOps/AynOps`. Our Scorecard
   scan reaches the remaining rows within a day. #374 is still open for the
   owner to close.
-- **GA guard: emulated-viewport check, PR open 2026-11-10 (not merged, not
-  deployed).** 82% of GA4 sessions in the 28 days to 7 Nov were headless
+- **GA guard: emulated-viewport check, DEPLOYED 2026-11-10 21:07 UTC**
+  (a12c3311 @ ac5d8e79, #402; owner: "make it live in the site").
+  predeploy_check OK (roster 1,817, live 1,817). The boot `repair-commits`
+  render finished 21:09 UTC: the new line is live on the homepage, profiles,
+  categories, compare, blog posts, methodology and the app.py pages
+  (/submit/); 0 of 2,196 sitemap dates moved; invariants [], package failures
+  only `AynOps/AynOps`. Against production, headless Playwright at 1280x720
+  and 1280x1200 ended with GA disabled and sent no hits, and headed Chrome
+  was still counted. 82% of GA4 sessions in the 28 days to 7 Nov were headless
   browsers hiding webdriver behind a plain Chrome UA (screen 1280x720 from
   Tencent Cloud, 1280x1200 from a residential proxy pool). Every copy of the
   `ga-disable` guard now also disables GA when screen equals viewport on a
@@ -1277,8 +1284,9 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   no GA requests) and headed Google Chrome normal, maximized and fullscreen
   (counted). `hvtTrack` only calls `gtag`, so it obeys the flag. The
   fingerprint behind sitemap `<lastmod>` now drops the guard script
-  (`LASTMOD_FP_VERSION` 9): 0 of 3,347 pages re-dated. Production check after
-  deploy: GA4 sessions at 1280x720 and 1280x1200 near zero within two days.
+  (`LASTMOD_FP_VERSION` 9): 0 of 3,347 pages re-dated. Check on 12 Nov: GA4
+  sessions at 1280x720 and 1280x1200 should be near zero. If 1280x1200 stays,
+  that pool is a headful browser and needs a different signal.
 
 ## Entries recorded only in the old AGENTS.md
 
