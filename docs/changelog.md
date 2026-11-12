@@ -1293,9 +1293,31 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   (`LASTMOD_FP_VERSION` 9): 0 of 3,347 pages re-dated. Check on 12 Nov: GA4
   sessions at 1280x720 and 1280x1200 should be near zero. If 1280x1200 stays,
   that pool is a headful browser and needs a different signal.
-- **GA guard: 1280x720 screen check, PR open 2026-11-12 (not merged, not
-  deployed; owner approved opening it, "Yes, open it").** The 12 Nov check
-  found #402 PARTIAL: 1280x1200 went from 32–64 a day to 0, but 1280x720
+- **GA guard: 1280x720 screen check, DEPLOYED 2026-11-12 20:38 UTC**
+  (9a245792 @ e5064b12, #406; owner, in the hv_marketing session: "Yes,
+  deploy it"; run from that session at 20:37:29 UTC). predeploy_check OK
+  (roster 1,817, live 1,817), no refresh running. The boot `repair-commits`
+  render finished by 20:40 UTC: build_report invariants [], package failures
+  only `AynOps/AynOps`, scheduler running with its jobs. The new line was live
+  at the origin on /, a profile, a category, /compare/, /changelog/, a blog
+  post, /methodology/ and /submit/ (the edge served the old / and /compare/
+  for up to 15 minutes). Against production (Playwright, GA hosts blocked), a
+  1280x720 screen ended with GA disabled and no GA requests for a 1280x577
+  viewport, a UA without `Chrome/` and a 150%-scaled laptop. 1366x768,
+  1920x1080 and a headed Chrome window were still counted, and the #402
+  1280x1200 case stayed disabled. Board against the 20:09 UTC pre-deploy
+  snapshot: 1,783 rows, 1,817 roster and 34 legacy as before; top 100 in the
+  same order; no `score` changed. The boot repair rechecked the rows with
+  suspect commit counts (all still 0, now confirmed): 36 lost
+  `commits_low_confidence`, 24 went from `warning` to `listed`, and
+  downloads were re-read for 15 of them. That moved 5 trust scores
+  (opendocswork-mcp 49.8 to 50.0, grade D to C; replicant-mcp, vibe-check-mcp-
+  server and mcp-console-automation by 0.1; zscaler-zero-trust-exchange 46.3
+  to 45.1 because its Docker pulls dropped out, 21,633 to 2,874 weekly
+  downloads, `docker+pypi` to `pypi`) and 37 ranks. 44 profile dates moved
+  to 12 Nov, each with a status, grade or low-confidence note change on its
+  own page; none came from the guard. Originally opened after the 12 Nov
+  check, which found #402 PARTIAL: 1280x1200 went from 32–64 a day to 0, but 1280x720
   stayed at 889 on 11 Nov (mean 1,071 on 3–9 Nov). GA shows that crawler's
   browser as "(not set)", so it likely fails #402's Chrome-UA condition. Every
   guard copy now also disables GA when `screen.width===1280&&screen.height===720`,
