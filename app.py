@@ -1782,7 +1782,8 @@ def _marketing_page(
   <script>
     (function(){{try{{if(localStorage.getItem("hvt_notrack")==="1"){{window["ga-disable-G-TZ8921LR0K"]=true;return}}}}catch(_){{}}
     var ua=navigator.userAgent||"";if(navigator.webdriver||/HeadlessChrome|Puppeteer|Playwright|Claude\\/[\\d.]+.*Electron\\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){{window["ga-disable-G-TZ8921LR0K"]=true}}
-    if(screen.width===innerWidth&&screen.height===innerHeight&&navigator.maxTouchPoints===0&&/Chrome\\//.test(ua)&&!navigator.brave&&!matchMedia("(display-mode: fullscreen)").matches){{window["ga-disable-G-TZ8921LR0K"]=true}}}})();
+    if(screen.width===innerWidth&&screen.height===innerHeight&&navigator.maxTouchPoints===0&&/Chrome\\//.test(ua)&&!navigator.brave&&!matchMedia("(display-mode: fullscreen)").matches){{window["ga-disable-G-TZ8921LR0K"]=true}}
+    if(screen.width===1280&&screen.height===720){{window["ga-disable-G-TZ8921LR0K"]=true}}}})();
   </script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
   <script>

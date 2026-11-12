@@ -14,7 +14,14 @@ viewport; a real desktop window is shorter than its screen by the toolbar.
 The second check disables GA on that, limited to what it can't misread:
 no touch (phones), a Chrome UA (Firefox's resistFingerprinting and Tor
 report screen = window), not Brave (farbles screen from the window size)
-and not browser fullscreen (F11, which matches display-mode: fullscreen)."""
+and not browser fullscreen (F11, which matches display-mode: fullscreen).
+
+That caught 1280x1200 but not 1280x720: GA reports that crawler's browser
+as "(not set)", so it likely fails the Chrome-UA condition. The third check
+disables GA for a 1280x720 screen on its own, since screen size is the only
+thing GA proves it reports. The owner accepted the cost: a 1920x1080 laptop
+at 150% scaling also reports 1280x720 (31 named-browser sessions in 28 days,
+against 10,234 from the crawler)."""
 import os
 import subprocess
 
@@ -26,6 +33,7 @@ VIEWPORT_CHECK = (
     'if(screen.width===innerWidth&&screen.height===innerHeight&&navigator.maxTouchPoints===0'
     '&&/Chrome\\//.test(ua)&&!navigator.brave&&!matchMedia("(display-mode: fullscreen)").matches)'
     '{window["ga-disable-G-TZ8921LR0K"]=true}')
+SCREEN_CHECK = 'if(screen.width===1280&&screen.height===720){window["ga-disable-G-TZ8921LR0K"]=true}'
 
 
 def _tracked_sources():
@@ -47,12 +55,15 @@ def test_every_page_that_loads_ga_guards_it_first():
             assert check in head, f"{rel}: guard lacks {check}"
         if rel != "app.py":  # an f-string there; its rendered output is checked below
             assert VIEWPORT_CHECK in head, f"{rel}: guard lacks the emulated-viewport check"
+            assert SCREEN_CHECK in head, f"{rel}: guard lacks the 1280x720 screen check"
     assert len(pages) >= 30
 
 
-def test_app_pages_render_the_same_viewport_check():
+def test_app_pages_render_the_same_checks():
     html = app._marketing_page("Title", "Eyebrow", "Heading", "<p>Body</p>")
-    assert VIEWPORT_CHECK in html[:html.index(GA)]
+    head = html[:html.index(GA)]
+    assert VIEWPORT_CHECK in head
+    assert SCREEN_CHECK in head
 
 
 def test_custom_events_skip_webdriver_too():
