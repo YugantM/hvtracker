@@ -1293,6 +1293,18 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   (`LASTMOD_FP_VERSION` 9): 0 of 3,347 pages re-dated. Check on 12 Nov: GA4
   sessions at 1280x720 and 1280x1200 should be near zero. If 1280x1200 stays,
   that pool is a headful browser and needs a different signal.
+- **GA guard: 1280x720 screen check, PR open 2026-11-12 (not merged, not
+  deployed; owner approved opening it, "Yes, open it").** The 12 Nov check
+  found #402 PARTIAL: 1280x1200 went from 32–64 a day to 0, but 1280x720
+  stayed at 889 on 11 Nov (mean 1,071 on 3–9 Nov). GA shows that crawler's
+  browser as "(not set)", so it likely fails #402's Chrome-UA condition. Every
+  guard copy now also disables GA when `screen.width===1280&&screen.height===720`,
+  with no other condition, since screen size is the only thing GA proves the
+  crawler reports. The #402 check stays. Known cost, accepted by the owner: a
+  1920x1080 laptop at 150% scaling also reports 1280x720 and stops being
+  counted (31 named-browser sessions at 1280x720 in the 28 days to 11 Nov,
+  against 10,234 from the crawler). `LASTMOD_FP_VERSION` stays 9, since the
+  fingerprint already drops the guard script.
 
 ## Entries recorded only in the old AGENTS.md
 
