@@ -2,7 +2,7 @@
 # Deps install into a venv that is copied wholesale into the runtime stage;
 # curl lives only here (python:slim has none — the old single-stage fetch
 # silently fell back to the seed on every build).
-FROM python:3.12-slim AS builder
+FROM python:3.15-slim AS builder
 
 WORKDIR /build
 
@@ -26,7 +26,7 @@ RUN curl -sfL https://raw.githubusercontent.com/YugantM/hvtracker/data/mcp-regis
     || echo '{"servers":[]}' > mcp-registry-snapshot.json
 
 # ---- runtime ----------------------------------------------------------------
-FROM python:3.12-slim
+FROM python:3.15-slim
 
 WORKDIR /app
 ENV PATH="/opt/venv/bin:$PATH"
