@@ -5667,6 +5667,20 @@ CTR_TEST_COMPARE = {
                         "{a_score}/100 (Grade {a_grade}), {b} {b_score}/100 (Grade {b_grade}): see "
                         "which leads on supply-chain integrity, maintenance and adoption."),
     },
+    # Batch 2 (docs/ctr-tests.md): pages seen at positions 2-8 that earn no clicks.
+    ("cline", "qwen-code"): {
+        "title": "Cline vs Qwen Code: IDE Coding Agent vs Terminal Agent | HVTracker",
+        "description": ("Cline is an autonomous coding agent for your IDE, CLI or SDK; Qwen Code is the "
+                        "Qwen team's open-source coding agent for the terminal. Trust: {a} "
+                        "{a_score}/100 (Grade {a_grade}), {b} {b_score}/100 (Grade {b_grade})."),
+    },
+    ("langfuse", "mlflow"): {
+        "title": "Langfuse vs MLflow: LLM Observability vs the Full ML Platform | HVTracker",
+        "description": ("Langfuse is an open-source LLM and agent observability platform (tracing, evals, "
+                        "prompt management) built on OpenTelemetry; MLflow spans the whole ML lifecycle "
+                        "and adds GenAI tracing. Trust: {a} {a_score}/100 (Grade {a_grade}), {b} "
+                        "{b_score}/100 (Grade {b_grade})."),
+    },
 }
 
 
