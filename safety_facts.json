@@ -232,6 +232,35 @@
         {"topic": "data", "class": "declared", "text": "Analytics are collected only if you opt in, and never include your code, chat messages or keys.", "source": "https://aider.chat/docs/more/analytics.html"},
         {"topic": "security", "class": "observed", "text": "OSV lists 2 advisories (both low) for its PyPI package, aider-chat, published in May 2026. The repository has no SECURITY.md, and GitHub private vulnerability reporting is off.", "source": "https://osv.dev/list?ecosystem=PyPI&q=aider-chat"}
       ]
+    },
+    "omniroute": {
+      "checked": "2026-11-17",
+      "facts": [
+        {"topic": "operator", "class": "observed", "text": "The repository now belongs to the GitHub organisation Cheaper Inference (cheaperinference.com, created August 2026), a paid gateway that resells frontier models. It started as diegosouzapw/OmniRoute, and its README lists Cheaper Inference as a sponsor and a built-in provider.", "source": "https://github.com/cheaper-inference/OmniRoute"},
+        {"topic": "access", "class": "declared", "text": "Runs on your machine as a gateway (port 20128 by default) between your AI tools and the providers you connect with your own API keys or subscription logins, so every prompt and response passes through it.", "source": "https://github.com/cheaper-inference/OmniRoute#readme"},
+        {"topic": "access", "class": "declared", "text": "The README marks some providers as a terms-of-service risk (\"tos: avoid\", such as Kiro) and leaves them out of automatic routing by default; each provider's own terms still apply to the accounts you connect.", "source": "https://github.com/cheaper-inference/OmniRoute#readme"},
+        {"topic": "access", "class": "declared", "text": "An opt-in, Linux-only TPROXY mode, off by default and needing root, decrypts local outbound HTTPS traffic with a certificate authority that can sign any host.", "source": "https://github.com/cheaper-inference/OmniRoute/blob/main/docs/security/MITM-TPROXY-DECRYPT.md"},
+        {"topic": "data", "class": "declared", "text": "Adds no hosted hop: prompts go from your machine to the provider chosen for each request. Stored provider credentials are encrypted at rest (AES-256-GCM), and telemetry is off by default.", "source": "https://github.com/cheaper-inference/OmniRoute#-private--local-first"},
+        {"topic": "security", "class": "observed", "text": "Its maintainers have published 1 security advisory (critical, CVE-2026-88062, September 2026): with the dashboard login turned off (requireLogin=false), one anonymous HTTP request could run commands on the server. Fixed in 3.8.49. The repository has a SECURITY.md and GitHub private vulnerability reporting is enabled.", "source": "https://github.com/cheaper-inference/OmniRoute/security/advisories/GHSA-hf57-cqmx-p4gr"}
+      ]
+    },
+    "rea": {
+      "checked": "2026-11-17",
+      "facts": [
+        {"topic": "access", "class": "declared", "text": "Runs locally as a CLI and MCP server with your account's permissions, and its security policy says it is not a sandbox. Runtime, debugger, browser and desktop workflows can deliberately run the target, attach to processes, make network requests and write files; static inspection does not run the target.", "source": "https://github.com/morluto/rea/blob/main/SECURITY.md"},
+        {"topic": "access", "class": "declared", "text": "The opt-in HTTP MCP transport uses plain HTTP with no TLS or client authentication, and the policy says to keep it inside a trusted local or isolated environment. The default setup uses a local stdio process instead.", "source": "https://github.com/morluto/rea/blob/main/SECURITY.md"},
+        {"topic": "data", "class": "declared", "text": "Targets are analysed locally and not uploaded by REA. Results go to your agent, whose model provider has its own data policy.", "source": "https://github.com/morluto/rea#readme"},
+        {"topic": "security", "class": "observed", "text": "No published security advisories. The repository has a SECURITY.md, and GitHub private vulnerability reporting is enabled.", "source": "https://github.com/morluto/rea/security"}
+      ]
+    },
+    "openbot": {
+      "checked": "2026-11-17",
+      "facts": [
+        {"topic": "operator", "class": "declared", "text": "Published by CopilotKit. The OpenBot template is MIT-licensed, but it runs on CopilotKit Intelligence, which is licensed separately: free for personal use on a laptop, a trial licence for evaluation, and a paid licence for production.", "source": "https://github.com/CopilotKit/OpenBot#open-source-local-operation-and-licensing"},
+        {"topic": "access", "class": "declared", "text": "The quick-start configuration is single-user: anyone who can reach it is an administrator. The README says to configure sign-in before giving anyone else access.", "source": "https://github.com/CopilotKit/OpenBot#readme"},
+        {"topic": "data", "class": "declared", "text": "It can run fully locally with a local model. A cloud model or a connected online app still receives your requests, and initial downloads, account sign-in and licence renewal need internet access.", "source": "https://github.com/CopilotKit/OpenBot#open-source-local-operation-and-licensing"},
+        {"topic": "security", "class": "observed", "text": "No published security advisories. The repository has no SECURITY.md; GitHub private vulnerability reporting is enabled.", "source": "https://github.com/CopilotKit/OpenBot/security"}
+      ]
     }
   }
 }
