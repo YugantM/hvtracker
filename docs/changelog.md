@@ -1327,6 +1327,23 @@ bottom of the main section. Record new milestones here, not in `CLAUDE.md`.
   counted (31 named-browser sessions at 1280x720 in the 28 days to 11 Nov,
   against 10,234 from the crawler). `LASTMOD_FP_VERSION` stays 9, since the
   fingerprint already drops the guard script.
+- **Phase 11 batch #409–#412, DEPLOYED 2026-11-18 11:38 UTC** (2fe7fd60 @
+  3918e042; owner, in the hv_marketing session: "merge all and deploy").
+  Squash-merged in order #409 safety facts (OmniRoute, REA, OpenBot; K1),
+  #410 CTR batch 2 (langfuse-vs-mlflow, cline-vs-qwen-code), #411 A2A census
+  edition 1 (`/blog/state-of-public-a2a-agents-2026-11/` with metrics.json and
+  hosts.csv; L1) and #412 compare allowlist (360 → 652 pairs). `gates.sh`
+  passed on the merged main; predeploy_check OK (roster 1,817, live 1,817); no
+  refresh running. Boot: `[startup]` lines present, agents.json unchanged (DB
+  sync skipped), targeted `repair-commits` refresh finished 11:42 UTC;
+  build_report 11:41 UTC invariants [], package failures only
+  `AynOps/AynOps`; scheduler running with refresh, usage-flush and
+  verify-feed-refresh. Live (with a `?fresh=` query): post, metrics.json and
+  hosts.csv 200; post on /blog/, in feed.json and in the sitemap; sitemap 2,432
+  URLs, 665 /compare/; OmniRoute shows the Cheaper Inference and
+  CVE-2026-88062 facts; REA and OpenBot facts render; both batch 2 titles
+  served. Still open with the owner: Zenodo DOI for the census
+  (docs/zenodo-dataset.md) and one newsletter note for the edition.
 
 ## Entries recorded only in the old AGENTS.md
 
