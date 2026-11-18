@@ -9435,6 +9435,7 @@ def main() -> None:
     sitemap_urls.append(("https://hvtracker.net/blog/calibration-fix-and-coverage-grade/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/haystack-trust-case-study/", "0.9", "weekly"))
     sitemap_urls.append(("https://hvtracker.net/blog/who-ships-your-mcp-servers/", "0.9", "weekly"))
+    sitemap_urls.append(("https://hvtracker.net/blog/state-of-public-a2a-agents-2026-11/", "0.9", "weekly"))
     for _p in snapshot_posts:
         sitemap_urls.append((f"https://hvtracker.net/blog/{_p['slug']}/", "0.7", "monthly"))
     for _p in quarterly_reports:
@@ -9605,6 +9606,14 @@ Connect any MCP client to https://hvtracker.net/mcp (Model Context Protocol, Str
         }
         for _p in quarterly_reports
     ] + [
+        {
+            "id": "https://hvtracker.net/blog/state-of-public-a2a-agents-2026-11",
+            "url": "https://hvtracker.net/blog/state-of-public-a2a-agents-2026-11/",
+            "title": "State of Public A2A Agents, November 2026: 2,686 Agent Cards, 65 Verifiable Signatures",
+            "content_text": "We fetched the A2A discovery documents of 27,559 public hosts. 2,686 serve an Agent Card; 37% are valid A2A 1.0, 75% declare no authentication scheme, and 6% are signed, but more than half of those signatures name no key anyone could check them against. AI Catalogs doubled in a month. Edition 1 of a monthly census, with data.",
+            "date_modified": "2026-11-17T00:00:00Z",
+            "tags": ["A2A", "Agent Cards", "Research"],
+        },
         {
             "id": "https://hvtracker.net/blog/who-ships-your-mcp-servers",
             "url": "https://hvtracker.net/blog/who-ships-your-mcp-servers/",

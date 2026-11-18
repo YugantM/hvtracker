@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <title>State of Public A2A Agents, November 2026: 2,686 Agent Cards, 65 Verifiable Signatures | HVTracker</title>
+  <meta name="description" content="We fetched the A2A discovery documents of 27,559 public hosts. 2,686 serve an Agent Card, a third of them valid A2A 1.0, three in four declare no authentication, and 65 carry a signature anyone can verify. Data and method inside.">
+  <link rel="canonical" href="https://hvtracker.net/blog/state-of-public-a2a-agents-2026-11/">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="State of Public A2A Agents, November 2026: 2,686 Agent Cards, 65 Verifiable Signatures">
+  <meta property="og:description" content="A monthly census of public Agent Cards, AI Catalogs and MCP server cards. 6% of Agent Cards are signed, and half of those signatures name no key anyone could check them against.">
+  <meta property="og:url" content="https://hvtracker.net/blog/state-of-public-a2a-agents-2026-11/">
+  <meta property="og:image" content="https://hvtracker.net/og-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="State of Public A2A Agents, November 2026">
+  <meta name="twitter:description" content="2,686 public Agent Cards: a third valid A2A 1.0, 75% declare no auth, 65 verifiable signatures. The monthly census, with data.">
+  <meta name="twitter:image" content="https://hvtracker.net/og-v2.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "State of Public A2A Agents, November 2026: 2,686 Agent Cards, 65 Verifiable Signatures",
+    "description": "A monthly census of public A2A Agent Cards, AI Catalogs and MCP server cards: validity against A2A 1.0, declared authentication, card signatures and whether they verify, and trust manifests.",
+    "author": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "publisher": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "datePublished": "2026-11-17",
+    "dateModified": "2026-11-17",
+    "mainEntityOfPage": "https://hvtracker.net/blog/state-of-public-a2a-agents-2026-11/"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "name": "State of public A2A agents: Agent Card, AI Catalog and MCP server card census (2026-11-01)",
+    "description": "Every host among 27,559 public hosts (official MCP registry remote URLs, HVTracker's listed projects and an A2A Registry sample) that serves an A2A Agent Card, an AI Catalog or an MCP server card, with A2A 1.0 validity, declared authentication, signature and verification results, and AI Catalog trust manifests.",
+    "url": "https://hvtracker.net/blog/state-of-public-a2a-agents-2026-11/",
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "creator": { "@type": "Organization", "name": "HVTracker", "url": "https://hvtracker.net" },
+    "temporalCoverage": "2026-11-01",
+    "distribution": [
+      { "@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "https://hvtracker.net/blog/state-of-public-a2a-agents-2026-11/hosts.csv" },
+      { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://hvtracker.net/blog/state-of-public-a2a-agents-2026-11/metrics.json" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "HVTracker", "item": "https://hvtracker.net/" },
+      { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://hvtracker.net/blog/" },
+      { "@type": "ListItem", "position": 3, "name": "State of public A2A agents, November 2026" }
+    ]
+  }
+  </script>
+  <link rel="stylesheet" href="/static/site.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#f4f1eb; --surface:#eae6de; --border:#d4cfc5; --text:#1a1a1a; --muted:#6b6560;
+      --accent:#26405e; --accent-lt:rgba(38,64,94,0.08); --green:#2f6846; --red:#9b3c3c; --amber:#8b6914;
+      --font-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+      --font-sans:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-sans); font-size:16px; line-height:1.7; min-height:100vh; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .page { max-width:760px; margin:0 auto; padding:0 20px; background:var(--bg); min-height:100vh; }
+    article { padding:36px 0 48px; }
+    h1 { font-size:34px; font-weight:700; line-height:1.15; margin-bottom:12px; }
+    .meta { font-size:13px; color:var(--muted); margin-bottom:32px; font-family:var(--font-mono); }
+    h2 { font-size:22px; font-weight:700; margin-top:36px; margin-bottom:12px; }
+    p { margin-bottom:16px; }
+    ul.list { margin:0 0 16px 22px; }
+    ul.list li { margin-bottom:6px; }
+    code { font-family:var(--font-mono); font-size:14px; background:var(--surface); padding:2px 6px; border-radius:3px; }
+    .callout { background:var(--accent-lt); border-left:3px solid var(--accent); padding:16px 20px; margin:24px 0; border-radius:0 6px 6px 0; font-size:14px; }
+    .callout strong { color:var(--accent); }
+    .stat-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:12px; margin:24px 0; }
+    .stat { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; text-align:center; }
+    .stat .n { font-family:var(--font-mono); font-size:28px; font-weight:700; color:var(--accent); line-height:1; }
+    .stat .l { font-size:12px; color:var(--muted); margin-top:8px; line-height:1.45; }
+    table { width:100%; border-collapse:collapse; margin:20px 0 24px; font-size:14px; }
+    th, td { text-align:left; padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:top; }
+    th { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
+    td.n { font-family:var(--font-mono); white-space:nowrap; text-align:right; }
+    .note { font-size:13px; color:var(--muted); }
+    .cta-box { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:24px; margin:36px 0; text-align:center; }
+    .cta-box h3 { margin-bottom:8px; font-size:18px; }
+    .cta-box p { font-size:14px; color:var(--muted); margin-bottom:16px; }
+    .cta-btn { display:inline-block; background:var(--accent); color:var(--on-accent,#fff); padding:10px 24px; border-radius:5px; font-weight:600; font-size:14px; text-decoration:none; }
+    .cta-btn:hover { opacity:0.9; text-decoration:none; }
+    footer { padding:28px 0; border-top:1px solid var(--border); font-size:11px; color:var(--muted); text-align:center; }
+    footer a { color:var(--accent); }
+    @media (max-width:600px) { h1 { font-size:26px; } table { font-size:12.5px; } th,td { padding:8px 6px; } }
+    /* Dark mode: follows the system, matching static/site.css (this page
+       carries its own palette instead of linking it). */
+    @media (prefers-color-scheme: dark) {
+      html:root {
+        color-scheme: dark;
+        --bg:#15171b; --surface:#1e2126; --surface-2:#262a31; --border:#33373f;
+        --text:#e7e4de; --muted:#aaa49b; --accent:#8fb3dc; --accent-dim:#6f93bd;
+        --accent-lt:rgba(143,179,220,.12); --accent-warm:#e0977f; --on-accent:#0f1216;
+        --green:#74c08f; --red:#e3897f; --amber:#d9b75e; --fresh:#74c08f; --stale:#8e887f;
+        --mocha:#d9b75e; --mocha-lt:rgba(217,183,94,.14);
+      }
+    }
+  </style>
+  <script>
+    (function(){var host=window.location.hostname||"";if(/^(localhost|127(?:\.\d{1,3}){3}|0(?:\.\d{1,3}){3}|::1)$/i.test(host)){window["ga-disable-G-TZ8921LR0K"]=true;return}try{if(localStorage.getItem("hvt_notrack")==="1"){window["ga-disable-G-TZ8921LR0K"]=true;return}}catch(_){}
+    var ua=navigator.userAgent||"";if(navigator.webdriver||/HeadlessChrome|Puppeteer|Playwright|Claude\/[\d.]+.*Electron\/|bot|crawl|spider|curl|wget|python-requests/i.test(ua)){window["ga-disable-G-TZ8921LR0K"]=true}
+    if(screen.width===innerWidth&&screen.height===innerHeight&&navigator.maxTouchPoints===0&&/Chrome\//.test(ua)&&!navigator.brave&&!matchMedia("(display-mode: fullscreen)").matches){window["ga-disable-G-TZ8921LR0K"]=true}
+    if(screen.width===1280&&screen.height===720){window["ga-disable-G-TZ8921LR0K"]=true}})();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ8921LR0K"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-TZ8921LR0K');</script>
+  <script defer src="/analytics.js"></script>
+</head>
+<body data-page-type="blog_article">
+  <!--#site-header-->
+  <div class="page">
+    <article>
+      <h1>State of Public A2A Agents, November 2026: 2,686 Agent Cards, 65 Verifiable Signatures</h1>
+      <div class="meta">November 17, 2026 &middot; 7 min read &middot; HVTracker Research &middot; Edition 1 of a monthly series</div>
+
+      <p>An <a href="https://a2a-protocol.org/latest/specification/">A2A Agent Card</a> is the document an agent publishes at <code>/.well-known/agent-card.json</code> to say who it is, what it can do, where to reach it and how to authenticate. Other agents read it before they connect. If the card is wrong, unsigned or silent about authentication, the agent reading it has nothing else to go on.</p>
+
+      <p>On 1 November 2026 we fetched the public discovery documents of 27,559 hosts: every host behind a remote URL in the official MCP registry, the homepage of every project HVTracker lists, and a sample from the A2A Registry. We read only what any client reads, honoured robots.txt, and never called an agent's API. This is the first monthly edition; the next run is on 1 December.</p>
+
+      <div class="stat-row">
+        <div class="stat"><div class="n">2,686</div><div class="l">hosts serve an Agent Card (10.1% of reachable hosts)</div></div>
+        <div class="stat"><div class="n">37%</div><div class="l">of those cards are valid against A2A 1.0's required fields</div></div>
+        <div class="stat"><div class="n">75%</div><div class="l">declare no authentication scheme at all</div></div>
+        <div class="stat"><div class="n">65</div><div class="l">carry a signature we could verify (2.4% of cards)</div></div>
+      </div>
+
+      <div class="callout"><strong>What this measures.</strong> What public agents say about themselves, and whether that statement can be checked. It does not test whether an agent works, is safe, or enforces the authentication it declares. Most hosts in the frame come from the MCP registry, so this is a census of the public agent web that grew up around MCP, not of every A2A agent: agents behind a login or on private networks aren't visible. Method, limits and data are at the end.</div>
+
+      <h2>Agent Cards are spreading, mostly in the old shape</h2>
+      <p><strong>2,686 hosts serve an Agent Card</strong>, 2,408 at the current path and 278 only at the pre-0.3 path <code>/.well-known/agent.json</code>. They are not one vendor's fleet: the cards sit on about 1,750 distinct domains, and 370 (13.8%) are on platform subdomains such as <code>workers.dev</code>, <code>onrender.com</code> and <code>vercel.app</code>.</p>
+      <p><strong>Only 984 (36.6%) are valid against the required fields of A2A 1.0.</strong> The most common gap, on 1,515 cards, is a missing <code>supportedInterfaces</code> list: those cards still use the 0.3 layout, with a single <code>url</code> and a <code>protocolVersion</code>. The protocol versions cards declare tell the same story:</p>
+      <table>
+        <thead><tr><th>Declared protocol version</th><th style="text-align:right">Cards</th></tr></thead>
+        <tbody>
+          <tr><td>0.3.0 or 0.3</td><td class="n">839</td></tr>
+          <tr><td>None declared</td><td class="n">661</td></tr>
+          <tr><td>1.0</td><td class="n">632</td></tr>
+          <tr><td>Both 0.3 and 1.0</td><td class="n">199</td></tr>
+          <tr><td>1.x without a specific version</td><td class="n">128</td></tr>
+          <tr><td>Something else (1.0.x variants, MCP protocol dates, 0.2.x, custom strings)</td><td class="n">227</td></tr>
+        </tbody>
+      </table>
+      <p>Other gaps are smaller but basic: 427 cards omit the default input and output modes, 259 omit capabilities, and 271 list no skills at all, which leaves a reader nothing to decide with.</p>
+
+      <h2>Three in four declare no authentication</h2>
+      <p><strong>2,015 cards (75.0%) declare no security scheme.</strong> 429 (16.0%) mark authentication as required; the rest declare a scheme without requiring it. Among declared schemes, HTTP auth (436) and API keys (260) lead, then OAuth 2 (141) and mutual TLS (59). Six cards declare x402 payments.</p>
+      <p>A card that declares nothing isn't proof the endpoint is open: some agents enforce authentication they never mention. But the card is how a client learns what to send. A card that is silent leaves every caller to guess, and leaves no record of what the operator meant to require.</p>
+      <p>The endpoints themselves look tidier: 95.4% of cards point only at HTTPS interfaces, and 91.5% point at the same site that serves the card.</p>
+
+      <h2>Signing is rare, and half of it can't be checked</h2>
+      <p>A2A lets a publisher sign its card, so a reader can tell the card wasn't altered and was issued by whoever holds the key. <strong>162 cards (6.0%) carry a signature.</strong> Most use EdDSA (107) or ES256 (56).</p>
+      <table>
+        <thead><tr><th>What happened to the 162 signatures</th><th style="text-align:right">Cards</th></tr></thead>
+        <tbody>
+          <tr><td>Verified against a key we could fetch (a same-site <code>jku</code> or an embedded key)</td><td class="n">65</td></tr>
+          <tr><td>Name a key ID but no place to get the key</td><td class="n">85</td></tr>
+          <tr><td>Didn't verify against any canonical form we tried, or the key was missing or malformed</td><td class="n">12</td></tr>
+        </tbody>
+      </table>
+      <p><strong>More than half of all signed cards (85) can't be verified by anyone outside the publisher</strong>, because they give a key ID with no key set to look it up in. A signature nobody can check offers no more assurance than no signature. The 12 that failed aren't evidence of tampering: A2A 1.0 signs a canonical form of the card that is hard to reproduce exactly, and we report a failure as exactly that, never as forgery.</p>
+
+      <h2>AI Catalogs doubled; trust manifests are the slot to watch</h2>
+      <p>An <code>ai-catalog.json</code> lists everything a host offers across protocols: its A2A cards, MCP servers and more. <strong>1,485 hosts publish one</strong>, 350 of them listing an A2A card. <strong>206 catalogs carry trust manifests</strong> (1,168 in total), the place where a host or an independent party can attach claims about an agent. Only 47 hosts have a signed manifest.</p>
+      <p>We also looked for MCP server cards (SEP-2127) at up to 20 remote URLs per host: <strong>1,303 of 28,167 URLs checked (4.6%)</strong> serve one.</p>
+
+      <h2>Open-source agent projects barely take part</h2>
+      <p>HVTracker lists open-source agent software. Of the 752 project homepages we could reach, <strong>51 (6.8%) serve an Agent Card, 16 are valid A2A 1.0, and none is signed.</strong> The projects people install are the ones least likely to say, in a machine-readable and checkable way, what they are. The 44 hosts sampled from the A2A Registry are the opposite: 40 serve a card, 29 are valid 1.0, and 3 are signed.</p>
+
+      <h2>What changed since October</h2>
+      <p>A pilot run on 7 October used the same method on a smaller frame (the MCP registry has grown since), so read the counts as growth of the public agent web, and the shares as the like-for-like comparison:</p>
+      <table>
+        <thead><tr><th></th><th style="text-align:right">7 Oct</th><th style="text-align:right">1 Nov</th><th style="text-align:right">Change</th></tr></thead>
+        <tbody>
+          <tr><td>Hosts checked</td><td class="n">18,155</td><td class="n">27,559</td><td class="n">+52%</td></tr>
+          <tr><td>Agent Cards</td><td class="n">1,850</td><td class="n">2,686</td><td class="n">+45%</td></tr>
+          <tr><td>Share of reachable hosts with a card</td><td class="n">10.7%</td><td class="n">10.1%</td><td class="n">flat</td></tr>
+          <tr><td>Valid A2A 1.0 cards</td><td class="n">605</td><td class="n">984</td><td class="n">+63%</td></tr>
+          <tr><td>Signed cards</td><td class="n">75</td><td class="n">162</td><td class="n">2.2&times;</td></tr>
+          <tr><td>Verified signatures</td><td class="n">48</td><td class="n">65</td><td class="n">+35%</td></tr>
+          <tr><td>AI Catalogs</td><td class="n">696</td><td class="n">1,485</td><td class="n">2.1&times;</td></tr>
+          <tr><td>Catalogs with trust manifests</td><td class="n">122</td><td class="n">206</td><td class="n">+69%</td></tr>
+          <tr><td>MCP server cards</td><td class="n">465</td><td class="n">1,303</td><td class="n">2.8&times;</td></tr>
+        </tbody>
+      </table>
+      <p>Publishing a card grew only as fast as the frame. Doing it properly grew faster: valid 1.0 cards, signatures, catalogs and server cards all outpaced it. Verification did not: signed cards more than doubled, verifiable ones rose by a third.</p>
+
+      <h2>What to do with this</h2>
+      <p><strong>If you publish an agent:</strong></p>
+      <ul class="list">
+        <li>Move the card to the 1.0 shape: a <code>supportedInterfaces</code> list with a URL, binding and protocol version for each interface.</li>
+        <li>Declare your security schemes, and mark them required if they are. A client can only send what the card asks for.</li>
+        <li>If you sign the card, publish the key: a <code>jku</code> on your own site that serves the key set. A key ID with nowhere to fetch it can't be checked.</li>
+        <li>Publish an <code>ai-catalog.json</code> so one fetch tells a client everything you offer.</li>
+      </ul>
+      <p><strong>If your agents connect to other agents:</strong> treat an unsigned or unverifiable card as an unverified claim, prefer agents whose card verifies against a key on their own domain, and check the declared authentication against what the endpoint actually requires.</p>
+      <p>HVTracker keeps a signed public record of agent software; the per-host results behind this post are in the data below, and every listed project's provenance is on its <a href="/">profile page</a>.</p>
+
+      <h2>Method and limits</h2>
+      <ul class="list">
+        <li><strong>Frame:</strong> 27,559 hosts from three public sources, recorded per host: the host of every remote URL in the official MCP registry at its latest versions (26,800 hosts, from 36,458 URLs across 54,149 servers), the homepage host of every project listed on HVTracker (758), and Agent Card hosts from the A2A Registry's public sitemap (44; its full listing needs an account). Shared platforms such as github.com are excluded, because a well-known path there belongs to the platform. 26,484 hosts were reachable.</li>
+        <li><strong>Fetches:</strong> <code>/.well-known/agent-card.json</code>, <code>/.well-known/agent.json</code> and <code>/.well-known/ai-catalog.json</code> per host, and <code>&lt;url&gt;/server-card</code> for up to 20 MCP remote URLs per host. robots.txt was honoured (2,427 hosts block part of it); requests carried an identifying User-Agent, one worker per host with a pause between requests, a 10-second timeout and a 512 KB cap. No credentials, no API calls.</li>
+        <li><strong>Validity</strong> checks the fields A2A 1.0 marks as required (<code>specification/a2a.proto</code>), including each interface's URL, binding and protocol version. It doesn't validate types or values beyond that.</li>
+        <li><strong>Signatures</strong> are checked best-effort. A2A 1.0 signs the card after removing default-valued fields per its protobuf schema; without that schema we try the card as served and two approximations of the stripped form, fetch the key from the <code>jku</code> it names or use an embedded key, and count a card as verified only when one form checks out.</li>
+        <li><strong>Limits:</strong> cards are self-declared, so a declared scheme isn't proof of enforcement and a missing one isn't proof of an open endpoint. The frame leans on MCP hosts, and the A2A Registry part is a sample. These are point-in-time figures from one run.</li>
+      </ul>
+      <p><strong>Data:</strong> <a href="hosts.csv">hosts.csv</a> (one row per host that serves an Agent Card, an AI Catalog or an MCP server card: 3,978 hosts) and <a href="metrics.json">metrics.json</a> (every figure above, per source, with the October comparison), under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. The study runs monthly as a GitHub Action with <a href="https://github.com/YugantM/hvtracker/blob/main/scripts/a2a_card_study.py">a2a_card_study.py</a>; <a href="https://github.com/YugantM/hvtracker/blob/main/scripts/a2a_census_publish.py">a2a_census_publish.py</a> turns a run into these files. If your host is in the data and you think a result is wrong, <a href="https://github.com/YugantM/hvtracker/issues/new">open an issue</a>.</p>
+
+      <div class="cta-box">
+        <h3>Check what you're about to connect</h3>
+        <p>Paste a repository, package or MCP server and get its provenance, evidence coverage and a signed verdict.</p>
+        <a class="cta-btn" href="/verify/">Verify an agent or MCP server</a>
+      </div>
+    </article>
+    <footer>
+      <a href="/">Registry</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/methodology/">Methodology</a> &middot; <a href="/verify/">Verify</a>
+    </footer>
+  </div>
+</body>
+</html>
