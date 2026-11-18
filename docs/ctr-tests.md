@@ -72,7 +72,7 @@ is a clear win and held it (4.83% on 2026-10-19 → 11-15). litellm-vs-vllm
 still trails the control (0.77% in that later window): the next candidate for
 a second wording if it stays there.
 
-## Batch 2 — compare pages seen high but not clicked (opened 2026-11-17; deploy pending)
+## Batch 2 — compare pages seen high but not clicked (deployed 2026-11-18 11:38 UTC, deployment 2fe7fd60; check 2026-12-02, then 2026-12-16)
 
 Baseline window: 2026-10-19 → 2026-11-15 (28 days). Control: all other
 `/compare/` pages, 455 pages, 6,005 impr., 156 clicks, 2.60%.
